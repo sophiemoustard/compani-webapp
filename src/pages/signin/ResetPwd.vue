@@ -133,8 +133,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables'
-
   .margin-input
     margin-bottom: 10px
 </style>

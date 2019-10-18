@@ -51,11 +51,13 @@ module.exports = function (ctx) {
     ],
     framework: {
       all: false,
+      lang: 'fr',
       components: [
         'QBtn',
         'QDrawer',
         'QHeader',
         'QIcon',
+        'QInput',
         'QItem',
         'QItemLabel',
         'QItemSection',
