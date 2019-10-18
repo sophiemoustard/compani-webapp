@@ -1,1 +1,69 @@
-// app global css in Stylus form
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro')
+@import './input'
+@import './drawer'
+@import './btn'
+@import './table'
+@import './modal'
+@import './header'
+@import './icon'
+@import './card'
+@import './planning'
+@import './chip'
+
+body
+  color: $black
+  font-family: 'Source Sans Pro', 'Roboto', 'Helvetica', 'Arial'
+  font-size: 16px
+
+  @media (max-width: 767px)
+    font-size: 14px
+
+h1, h2, h3, h4, h5, h6
+  margin-top: 0
+
+  @media (max-width: 767px)
+    margin-bottom: 20px !important
+
+div h4:only-child
+  margin-bottom: 0
+
+.neutral-background
+  background: $grey-3
+
+.gutter-profile
+  margin-top: -24px
+  margin-left: -24px
+
+  & > div
+    padding-top: 24px
+    padding-left: 24px
+
+  &-x
+    margin-top: -24px
+
+    & > div
+      padding-top: 24px
+
+.overflow-hidden-nowrap
+  overflow: hidden
+  white-space: nowrap
+
+.full-height
+  height: 100% !important
+
+.layout-padding
+  @media (min-width: 1025px)
+    padding: 2rem 3rem 3rem
+
+  @media (max-width: 767px)
+    padding: 3rem .5rem
+
+.title-padding
+  @media (min-width: 1025px)
+    padding: 2rem 3rem 1rem
+  @media (max-width: 767px)
+    padding: 1rem
+
+// Used in q-dialog
+.modal-message
+  max-width: 500px

@@ -8,26 +8,16 @@
             <span><q-icon name="lock" size="2rem" /></span>
           </div>
           <div class="col-10 signup-bloctext-padding">
-            <p class="no-margin" style="font-size: 0.8rem">Les services d’Alenvi sont maintenant disponibles via le site Compani.<br> Pour vous connecter à votre compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span class="text-weight-bold">mot de passe</span></p>
+            <p class="no-margin" style="font-size: 0.8rem">
+              Les services d’Alenvi sont maintenant disponibles via le site Compani. <br> Pour vous connecter à votre compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span class="text-weight-bold">mot de passe</span>
+            </p>
           </div>
         </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Email</p>
-            </div>
-            <q-input @keyup.enter="submit" v-model.trim="credentials.email" color="white" inverted-light lower-case/>
-          </div>
-        </div>
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption">Mot de passe</p>
-            </div>
-            <q-input @keyup.enter="submit" v-model="credentials.password" type="password" color="white" inverted-light/>
-          </div>
-        </div>
-        <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }"><small>Mot de passe oublié ?</small></router-link>
+        <ni-input v-model="credentials.email" caption="Email" @keyup.enter="submit" />
+        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup.enter="submit" />
+        <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }">
+          <small>Mot de passe oublié ?</small>
+        </router-link>
         <div class="row justify-center">
           <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary" @click="submit()" />
         </div>
@@ -38,6 +28,7 @@
 
 <script>
 import CompaniHeader from '../../components/CompaniHeader';
+import Input from '../../components/form/Input';
 import { NotifyNegative } from '../../components/popup/notify';
 import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../../data/constants.js';
 
@@ -50,7 +41,8 @@ export default {
   },
   name: 'Authentication',
   components: {
-    CompaniHeader,
+    'compani-header': CompaniHeader,
+    'ni-input': Input,
   },
   data () {
     return {
