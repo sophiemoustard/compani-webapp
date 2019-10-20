@@ -1,4 +1,9 @@
 export const sideMenuMixin = {
+  data () {
+    return {
+      companiLogo: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png',
+    }
+  },
   computed: {
     userFirstnameUpper () {
       return this.user.identity.firstname.toUpperCase();

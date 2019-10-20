@@ -1,20 +1,20 @@
 <template>
   <q-list class="no-border sidemenu-alenvi sidemenu-flex">
-    <q-list-header>
-     <q-item class="justify-center">
-        <img src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png" alt="Compani logo">
-      </q-item>
-    </q-list-header>
-    <q-item-separator />
-    <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date range" label="Planning" />
-    <q-item-separator />
+    <div class="sidemenu-header">
+      <q-item-label header class="justify-center">
+        <img :src="companiLogo" alt="Compani logo">
+      </q-item-label>
+    </div>
+    <q-separator />
+    <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date_range" label="Planning" />
+    <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
-    <q-item-separator />
+    <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
-    <q-item-separator />
+    <q-separator />
     <template v-if="hasContracts">
       <ni-menu-item class="customer-menu-size" name="customer contracts" icon="description" label="Contrats" />
-      <q-item-separator />
+      <q-separator />
     </template>
     <ni-side-menu-footer :label="user.identity.lastname" :userId="user._id" />
   </q-list>
@@ -64,15 +64,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  @import '~variables'
-
-  .q-layout-drawer .q-list .router-link-active
-    color: $primary !important
-
-  /deep/ .customer-menu-size > .q-item-side > .q-item-icon
+.q-item
+  & .q-item__label
     font-size: 1rem
-
-  /deep/ .customer-menu-size .q-item-main > .q-item-label
-    font-size: 1rem
-
 </style>
