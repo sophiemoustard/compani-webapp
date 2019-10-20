@@ -1,23 +1,4 @@
 
-// const routes = [
-//   {
-//     path: '/',
-//     component: () => import('layouts/MyLayout.vue'),
-//     children: [
-//       { path: '', component: () => import('pages/Index.vue') },
-//     ],
-//   },
-// ];
-
-// // Always leave this as last one
-// if (process.env.MODE !== 'ssr') {
-//   routes.push({
-//     path: '*',
-//     component: () => import('pages/404.vue'),
-//   });
-// }
-
-// export default routes;
 import { Cookies } from 'quasar';
 
 import store from '../store/index';
@@ -30,24 +11,28 @@ const routes = [
     components: { default: () => import('layouts/Layout') },
     beforeEnter: async (to, from, next) => {
       try {
+        console.log('to', to)
         if (to.path !== '/') return next();
         if (await alenvi.refreshAlenviCookies()) {
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === HELPER) {
-          return next({name: 'customer agenda'});
+          // return next({name: 'customer agenda'});
+          return next({ name: 'account info', params: { id: store.getters['main/user']._id } }); // TODO : a changer
         } else if (
           store.getters['main/user'] &&
           (store.getters['main/user'].role.name === AUXILIARY ||
             store.getters['main/user'].role.name === PLANNING_REFERENT)
         ) {
-          return next({name: 'auxiliary agenda'});
+          // return next({name: 'auxiliary agenda'});
+          return next({ name: 'account info', params: { id: store.getters['main/user']._id } }); // TODO : a changer
         } else if (
           store.getters['main/user'] &&
           store.getters['main/user'].role.name !== AUXILIARY &&
           store.getters['main/user'].role.name !== HELPER
         ) {
-          return next({ name: 'tags config' }); // TODO : a changer
+          // return next({ name: 'administrative directory' });
+          return next({ name: 'account info', params: { id: store.getters['main/user']._id } }); // TODO : a changer
         } else {
           next({ path: '/login' });
         }

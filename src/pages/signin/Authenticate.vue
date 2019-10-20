@@ -67,7 +67,6 @@ export default {
           email: this.credentials.email.toLowerCase(),
           password: this.credentials.password,
         });
-        console.log(user);
         const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1 ? parseInt(user.data.data.expiresIn / 3600 / 24, 10) : 1;
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
@@ -85,11 +84,14 @@ export default {
         if (this.getUser.role.name === HELPER) {
           const customer = await this.$customers.getById(this.getUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
-          this.$router.replace({ name: 'customer agenda' });
+          // this.$router.replace({ name: 'customer agenda' });
+          this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
         } else if (this.isAuxiliary) {
-          this.$router.replace({ name: 'auxiliary agenda' });
+          // this.$router.replace({ name: 'auxiliary agenda' });
+          this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
         } else {
-          this.$router.replace({ name: 'administrative directory' });
+          // this.$router.replace({ name: 'administrative directory' });
+          this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
         }
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');
