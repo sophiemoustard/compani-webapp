@@ -11,7 +11,7 @@
           <q-icon size="xs" class="messenger" name="mdi-facebook-messenger" @click.native="clickHandler" />
         </q-item-section>
         <q-item-section>
-          <q-icon size="xs" class="person" name="person" :to="{ name: 'account info', params: { id: userId } }" exact />
+          <q-icon size="xs" class="person" name="person" @click.native="goToProfile" />
         </q-item-section>
       </div>
     </q-item>
@@ -41,6 +41,9 @@ export default {
     },
     openExtenalUrl (url) {
       window.open(url, '_blank');
+    },
+    goToProfile () {
+      return this.$router.push({ name: 'account info', params: { id: this.userId } });
     },
   },
 }
