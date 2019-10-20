@@ -44,7 +44,8 @@
     </q-expansion-item>
     <template v-if="isAdmin">
       <q-separator />
-      <q-expansion-item ref="configuration" v-model="activeRoutes.configuration.open" label="Configuration">
+      <q-expansion-item ref="configuration" v-model="activeRoutes.configuration.open" label="Configuration"
+        :header-class="{ 'text-weight-bold': activeRoutes.configuration.highlight }">
         <ni-menu-item name="rh config" icon="settings" label="Configuration RH" />
         <ni-menu-item name="customers config" icon="settings" label="Configuration bénéficiaires" />
         <ni-menu-item name="tags config" icon="list_alt" label="Tags" />
@@ -106,7 +107,7 @@ export default {
     };
   },
   mounted () {
-    this.CollapsibleOpening();
+    this.collapsibleOpening();
   },
   computed: {
     isAdmin () {

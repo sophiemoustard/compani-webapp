@@ -24,7 +24,8 @@
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup.enter')" :error-message="errorLabel"
         :readOnly="readOnly">
         <template v-if="isPassword" v-slot:append>
-          <q-icon :name="isPassword && showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" @click="showPassword = !showPassword" />
+          <q-icon :name="isPassword && showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" size="xs"
+            @click.native="showPassword = !showPassword" />
         </template>
       </q-input>
     </template>
