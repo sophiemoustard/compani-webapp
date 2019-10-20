@@ -7,7 +7,7 @@
       >
     </p>
     <p class="text-faded">Interdiction d'entrer ici !<strong> (401)</strong></p>
-    <q-btn color="primary" style="width:200px;" @click="$router.replace('/')">Accueil</q-btn>
+    <q-btn color="primary" @click="$router.replace('/')">Accueil</q-btn>
   </div>
 </template>
 
@@ -25,3 +25,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.q-btn
+  margin: 5px
+  width:200px
+</style>
