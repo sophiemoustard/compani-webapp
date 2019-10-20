@@ -5,24 +5,14 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <template v-if="type === 'file'">
-      <div class="row input-file-container" :class="{'borders': borders || inModal}">
-        <div class="col full-width">
-          <span class="input-file-empty" v-if="!value">Pas de document</span>
-          <template v-else>{{ (value && value.name) ? value.name : value }}</template>
-        </div>
-        <i aria-hidden="true" class="q-icon on-right material-icons self-center material-icons relative-position">
-          add
-          <input ref="inputFile" type="file" @input="updateInputFile" class="input-file absolute-full cursor-pointer"
-            @blur="onBlur" >
-        </i>
-      </div>
-    </template>
-    <template v-else>
+    <template>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup.enter')" :error-message="errorLabel"
-        :readOnly="readOnly">
+        :readOnly="readOnly" :debounce="debounce" :placeholder="placeholder">
+        <template v-if="icon" v-slot:prepend>
+          <q-icon size="xs" :name="icon" ></q-icon>
+        </template>
         <template v-if="isPassword" v-slot:append>
           <q-icon :name="isPassword && showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" size="xs"
             @click.native="showPassword = !showPassword" />
@@ -56,6 +46,9 @@ export default {
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     autofocus: { type: Boolean, default: false },
+    debounce: { type: Number, default: undefined },
+    placeholder: { type: String, default: '' },
+    icon: { type: String, default: '' },
   },
   data () {
     return {

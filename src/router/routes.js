@@ -253,16 +253,16 @@ const routes = [
       //     permissions: 'events:read',
       //   },
       // },
-      // {
-      //   path: 'auxiliaries/team',
-      //   name: 'team directory',
-      //   component: () => import('pages/auxiliaries/team/TeamDirectory'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:list',
-      //     parent: 'team',
-      //   },
-      // },
+      {
+        path: 'auxiliaries/team',
+        name: 'team directory',
+        component: () => import('pages/auxiliaries/team/TeamDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:list',
+          parent: 'team',
+        },
+      },
       // {
       //   path: 'auxiliaries/customers',
       //   name: 'profile customers',
