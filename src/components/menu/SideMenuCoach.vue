@@ -2,7 +2,7 @@
   <q-list class="no-border sidemenu-alenvi sidemenu-flex">
     <div class="sidemenu-header">
       <q-item-label header class="justify-center">
-        <img src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png" alt="Compani logo">
+        <img :src="companiLogo" alt="Compani logo">
       </q-item-label>
     </div>
     <q-separator />
