@@ -11,8 +11,8 @@
     <q-drawer :mini="enableMini" :mini-width="30" :width="250" side="left" v-model="toggleDrawer">
       <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !enableMini"
         :user="user" />
-      <!-- <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !enableMini" :user="user" />
-      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !enableMini" :user="user" /> -->
+      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !enableMini" :user="user" />
+      <!-- <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !enableMini" :user="user" /> -->
     </q-drawer>
     <q-page-container>
       <router-view :key="$route.fullPath"/>
@@ -24,14 +24,14 @@
 import { mapGetters } from 'vuex'
 
 import SideMenuCoach from '../components/menu/SideMenuCoach'
-// import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
+import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
 // import SideMenuCustomer from '../components/menu/SideMenuCustomer'
 import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../data/constants.js';
 
 export default {
   components: {
-    SideMenuCoach,
-    // SideMenuAuxiliary,
+    'side-menu-coach': SideMenuCoach,
+    'side-menu-auxiliary': SideMenuAuxiliary,
     // SideMenuCustomer,
   },
   data () {
