@@ -56,6 +56,7 @@ module.exports = function (ctx) {
       lang: 'fr',
       components: [
         'QBtn',
+        'QDate',
         'QDrawer',
         'QExpansionItem',
         'QHeader',
@@ -66,6 +67,7 @@ module.exports = function (ctx) {
         'QItemSection',
         'QLayout',
         'QList',
+        'QMenu',
         'QPage',
         'QPageSticky',
         'QPageContainer',
