@@ -1,3 +1,19 @@
+.q-table tbody td
+  padding: 4px
+  font-size: 13px
+  white-space: normal
+  @media (max-width: 767px)
+    font-size: 12px
+    padding: 4px 2px
+
+.q-table th
+  white-space: normal;
+  vertical-align: middle;
+  padding: 3px
+  @media (max-width: 767px)
+    font-size: 13px
+    padding: 4px 2px
+
 .table-grid
   table
     border: 0
@@ -24,7 +40,7 @@
       display: block
       text-align: right
       white-space: initial
-      height: auto
+      height: 48px !important
       padding: 8px 8px
       min-height: 32px
 
@@ -43,31 +59,17 @@
         .q-btn
           margin: 0 5px
 
-.q-table-container
-    box-shadow: none
-
-.q-table tbody td
-  white-space: normal
-  @media (max-width: 767px)
-    font-size: 12px
-    padding: 4px 2px;
-
-.q-table th
-  @media (max-width: 767px)
-    font-size: 13px
-    padding: 4px 2px;
-
 .table-responsive
   table
     table-layout: fixed
 
     th
-      white-space: normal;
-      padding: 10px 20px;
-      vertical-align: middle;
+      white-space: normal
+      padding: 10px 20px
+      vertical-align: middle
 
     td
-      padding: 4px 20px;
+      padding: 4px 20px
 
       .datetime
         margin: 0
@@ -205,19 +207,13 @@
       border-width: 1px 0 0 0
     &-no-border td
       border-width: 0 !important
-  &-inner-input.q-input.q-if-inverted
-    padding: 3px 5px
-    border: 1px solid $light-grey
-    & .q-input-target
-      font-size: 13px
-    & span.q-if-addon
-      font-size: 13px
 
-.large-table
-  table
-    th
-      white-space: normal;
-      vertical-align: middle;
-      padding: 6px
-    td
-      padding: 6px
+  &-inner-input.q-input
+    padding: 3px 5px
+    /deep/ .q-field__control
+      width: 45px
+      height: 30px
+      font-size: 13px
+      .q-field__native
+        padding: 6px
+

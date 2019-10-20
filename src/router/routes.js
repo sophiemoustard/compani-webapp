@@ -111,16 +111,16 @@ const routes = [
       //     parent: 'billing',
       //   },
       // },
-      // {
-      //   path: 'ni/pay/to-pay',
-      //   name: 'to pay',
-      //   component: () => import('pages/ni/pay/ToPay'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'pay:edit',
-      //     parent: 'pay',
-      //   },
-      // },
+      {
+        path: 'ni/pay/to-pay',
+        name: 'to pay',
+        component: () => import('pages/ni/pay/ToPay'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'pay:edit',
+          parent: 'pay',
+        },
+      },
       // {
       //   path: 'ni/pay/contract-ends',
       //   name: 'contract ends',
