@@ -1,0 +1,58 @@
+.q-drawer
+  min-width: 30px
+  box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
+  & .q-list
+    padding: 8px 0
+    &.sidemenu-alenvi.sidemenu-flex
+      display: flex
+      flex-direction: column
+      min-height: 100%
+      & .sidemenu-header
+        padding: 15px 16px
+        & .q-item__label--header
+          padding: 12px 16px
+          display: flex
+          img
+            width: 200px
+      & .q-item__label
+        font-size: 1.125rem
+      & .q-expansion-item__content
+        padding: 8px 16px
+        & .q-item
+          min-height: 20px
+          padding: 8px 16px 8px 0px
+          & .q-item__section--main
+            line-height: 20px
+          & .q-item__section--side
+            padding: 0
+            color: #737373
+          & .q-item__section--avatar
+            min-width: 24px
+          & .q-item__label
+            font-size: 1rem
+      & .q-separator
+        flex: 0
+
+      & .sidemenu-footer
+        flex-grow: 1
+        display: flex
+        align-items: flex-end
+        & .q-item
+          min-height: 40px
+          border-top: 1px solid #e0e0e0
+          padding: 6px 2px 0px 16px
+        & .sidemenu-footer-user
+          font-size: 11px
+          font-weight: bold
+          color: #A3A3A3
+        & .sidemenu-footer-icons
+          display: flex
+          & .q-item__section
+            min-width: 34px
+            cursor: pointer
+            .messenger
+              color: $messenger-blue
+            .feedback
+              color: $secondary
+            .person
+              color: #737373

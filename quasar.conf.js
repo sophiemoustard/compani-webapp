@@ -1,4 +1,6 @@
 /* eslint-disable func-names */
+require('dotenv').config();
+
 module.exports = function (ctx) {
   console.log(ctx)
   return {
@@ -55,6 +57,7 @@ module.exports = function (ctx) {
       components: [
         'QBtn',
         'QDrawer',
+        'QExpansionItem',
         'QHeader',
         'QIcon',
         'QInput',
@@ -66,6 +69,7 @@ module.exports = function (ctx) {
         'QPage',
         'QPageSticky',
         'QPageContainer',
+        'QSeparator',
         'QToolbar',
         'QToolbarTitle',
       ],

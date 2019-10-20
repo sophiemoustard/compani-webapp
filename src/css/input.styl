@@ -1,0 +1,51 @@
+.q-input-target
+  line-height: 20px
+  &:before
+    line-height: 20px
+
+.input-caption
+  font-size: 12px
+  margin: 0 0 4px 0
+
+.margin-input
+  margin-bottom: 6px
+  &.last
+    margin-bottom: 24px
+
+.q-field
+  & .q-field-bottom
+    padding-top: 2px
+  &-with-error
+    & .q-field-bottom
+      color: $secondary
+  &-no-input
+    & .q-field-bottom
+      border-top: none
+      margin: 0
+
+.q-uploader .q-input-target
+  visibility: hidden
+  position: relative
+  &:after
+    visibility: visible
+    position: absolute
+    top: 0
+    left: 0
+    content: 'Pas de document'
+    font-size: 12px
+
+.input-search
+  font-size: 14px
+  & /deep/ .q-if-control.q-icon
+    margin-right: 8px
+
+.required::after
+  content: ' *'
+
+.select-icon
+  display: flex !important;
+  margin: 0 0 0 10px;
+
+.pink-icon
+  color: $primary !important;
+  font-size: 22px;

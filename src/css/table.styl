@@ -1,0 +1,223 @@
+.table-grid
+  table
+    border: 0
+
+    thead
+      border: none
+      clip: rect(0 0 0 0)
+      height: 1px
+      margin: -1px
+      overflow: hidden
+      padding: 0
+      position: absolute
+      width: 1px
+
+    tr
+      border: 1px solid #ddd
+      padding: .35em
+      border-bottom: 2px solid #ddd
+      display: block
+      margin-bottom: .625em
+
+    td
+      border-bottom: 1px solid #ddd
+      display: block
+      text-align: right
+      white-space: initial
+      height: auto
+      padding: 8px 8px
+      min-height: 32px
+
+      &::before
+        content: attr(data-label)
+        float: left
+
+      &:first-child
+        width: 100%
+
+      &:last-child
+        border-bottom: 0
+
+      .table-actions
+        display: inline-table
+        .q-btn
+          margin: 0 5px
+
+.q-table-container
+    box-shadow: none
+
+.q-table tbody td
+  white-space: normal
+  @media (max-width: 767px)
+    font-size: 12px
+    padding: 4px 2px;
+
+.q-table th
+  @media (max-width: 767px)
+    font-size: 13px
+    padding: 4px 2px;
+
+.table-responsive
+  table
+    table-layout: fixed
+
+    th
+      white-space: normal;
+      padding: 10px 20px;
+      vertical-align: middle;
+
+    td
+      padding: 4px 20px;
+
+      .datetime
+        margin: 0
+        .q-field-bottom
+          display: none
+        .q-field-content
+          @media screen and (max-width: 767px)
+            padding-left: 10px
+
+      .q-uploader .q-if-inner
+        display: none
+
+      .q-uploader input
+        cursor: pointer !important
+
+      .q-uploader-pick-button
+        color: $primary
+        font-size: 1.5rem
+        cursor: pointer !important
+
+    .thirdPartyPayer
+    .email
+      word-break: break-all
+
+    .table-actions
+      min-width: 20px;
+      justify-content: center;
+
+  @media screen and (min-width: 768px)
+    .q-table-middle
+      margin: 10px;
+
+  @media screen and (max-width: 767px)
+    table
+      border: 0
+
+      thead
+        border: none
+        clip: rect(0 0 0 0)
+        height: 1px
+        margin: -1px
+        overflow: hidden
+        padding: 0
+        position: absolute
+        width: 1px
+
+      tr
+        border: 1px solid #ddd
+        padding: .35em
+        border-bottom: 2px solid #ddd
+        display: block
+        margin: .625em
+
+      td
+        border-bottom: 1px solid #ddd
+        display: block
+        text-align: right
+        white-space: initial
+        height: auto
+        padding: 8px 8px
+        min-height: 32px
+
+        &::before
+          content: attr(data-label)
+          float: left
+
+        &:first-child
+          width: 100%
+
+        &:last-child
+          border-bottom: 0
+
+        .table-actions
+          display: inline-table
+          .q-btn
+            margin: 0 5px
+
+.people-list
+  .q-table
+    border-spacing: 0 12px
+    border-collapse: separate
+    &-horizontal-separator tbody td
+      border: none
+    & thead
+      border: none
+      & tr
+        height: 48px
+    & th
+      padding: 0px 12px
+      &.sortable:hover .q-icon, &.sorted .q-icon
+        color: $primary
+    & td
+      padding: 8px 12px
+      & .q-item
+        min-height: 30px
+        padding: 0
+        &-main
+          flex: 0 1 auto
+        & .q-item-side
+          min-width: 30px
+          max-height: 30px
+          & .q-item-avatar
+            width: 29px
+            height: 29px
+            border: 1px solid #979797
+        & .q-item-section + .q-item-section
+          margin-left: 20px
+    &-container
+      & .q-table-nodata > i
+        display: none
+  .q-table-bottom
+    @media (max-width: 767px)
+      padding-left: 4px;
+      padding-right: 4px;
+
+.datatable
+  &-row
+    cursor: pointer
+    background: $white
+    &:hover
+      background: $white !important
+      box-shadow: 0px 0px 3px 0px rgba(0, 0, 0, 0.2)
+      & td
+        border-top: 1px solid $light-grey
+        border-bottom: 1px solid $light-grey
+        &:first-child
+          border-left: 1px solid $light-grey
+        &:last-child
+          border-right: 1px solid $light-grey
+    &-inactive
+      background: rgba(255, 255, 255, 0.5)
+      &:hover
+        background: rgba(255, 255, 255, 0.5)
+    &-border-top td
+      border-width: 1px 0 0 0
+    &-no-border td
+      border-width: 0 !important
+  &-inner-input.q-input.q-if-inverted
+    padding: 3px 5px
+    border: 1px solid $light-grey
+    & .q-input-target
+      font-size: 13px
+    & span.q-if-addon
+      font-size: 13px
+
+.large-table
+  table
+    th
+      white-space: normal;
+      vertical-align: middle;
+      padding: 6px
+    td
+      padding: 6px
