@@ -1,25 +1,17 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
-
-// import example from './module-example'
+import main from './main';
+import rh from './rh';
+import planning from './planning';
 
 Vue.use(Vuex);
 
-/*
- * If not building with SSR mode, you can
- * directly export the Store instantiation
- */
+const store = new Vuex.Store({
+  modules: {
+    main,
+    rh,
+    planning,
+  },
+});
 
-export default function (/* { ssrContext } */) {
-  const Store = new Vuex.Store({
-    modules: {
-      // example
-    },
-
-    // enable strict mode (adds overhead!)
-    // for dev mode only
-    strict: process.env.DEV,
-  });
-
-  return Store;
-}
+export default store;

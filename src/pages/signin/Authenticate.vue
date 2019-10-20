@@ -67,6 +67,7 @@ export default {
           email: this.credentials.email.toLowerCase(),
           password: this.credentials.password,
         });
+        console.log(user);
         const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1 ? parseInt(user.data.data.expiresIn / 3600 / 24, 10) : 1;
         this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
