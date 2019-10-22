@@ -1,9 +1,9 @@
+debug.log
 .quasar
 .DS_Store
 .thumbs.db
 node_modules
 /dist
-/src-cordova/node_modules
 /src-cordova/platforms
 /src-cordova/plugins
 /src-cordova/www
@@ -18,3 +18,6 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+
+# Our hidden files
+.env
