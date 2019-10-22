@@ -1,16 +1,16 @@
 <template>
-  <div class="row justify-between full-width">
+  <div class="row justify-between full-width custom-bottom">
     <div class="row items-center">
       <q-btn-toggle class="on-left no-shadow" v-model="pagination.rowsPerPage" :options="rowsPerPageOptions"
-        toggle-text-color="primary" toggle-color="white" no-caps dense size="md" />
+        toggle-text-color="primary" toggle-color="white" no-caps dense size="12px" />
       <div>Eléments par page</div>
     </div>
     <div class="row items-center">
       <div class="on-left">{{ paginationLabel }}</div>
       <div>
-        <q-btn icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage" size="md"
+        <q-btn icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage" size="12px"
           dense />
-        <q-btn icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage" size="md"
+        <q-btn icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage" size="12px"
           dense />
       </div>
     </div>
@@ -61,6 +61,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .custom-bottom
+    color: rgba(0, 0, 0, 0.54)
+
   /deep/ .q-btn-group
     & button .q-btn-inner
       font-size: 12px
