@@ -56,6 +56,9 @@ module.exports = function (ctx) {
       components: [
         'QBtn',
         'QBtnToggle',
+        'QCard',
+        'QCardActions',
+        'QCardSection',
         'QCheckbox',
         'QDate',
         'QDialog',
@@ -80,6 +83,7 @@ module.exports = function (ctx) {
         'QTd',
         'QTh',
         'QTr',
+        'QTime',
         'QToggle',
         'QToolbar',
         'QToolbarTitle',
@@ -87,6 +91,7 @@ module.exports = function (ctx) {
       ],
       directives: [
         'Ripple',
+        'ClosePopup',
       ],
       plugins: [
         'Notify',
@@ -175,7 +180,7 @@ module.exports = function (ctx) {
     },
     cordova: {},
     electron: {
-      extendWebpack(cfg) {},
+      extendWebpack (cfg) {},
       packager: {},
       builder: {},
     },

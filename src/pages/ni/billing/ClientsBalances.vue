@@ -40,9 +40,9 @@
     </q-table>
 
     <!-- Payment creation modal -->
-    <!-- <ni-payment-creation-modal :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
-      @createPayment="createPayment" :creationModal="paymentCreationModal" :selectedCustomer="selectedCustomer"
-      :loading="creationLoading" @resetForm="resetPaymentCreationModal"  /> -->
+    <ni-payment-creation-modal v-model="paymentCreationModal" :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
+      @createPayment="createPayment" :selectedCustomer="selectedCustomer"
+      :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
       :disable="selected.length === 0" @click="createPayments" />
@@ -52,7 +52,7 @@
 <script>
 import BillingPagination from '../../../components/table/BillingPagination';
 import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
-// import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
+import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
@@ -65,7 +65,7 @@ export default {
   components: {
     'ni-billing-pagination': BillingPagination,
     'ni-prefixed-cell-content': PrefixedCellContent,
-    // 'ni-payment-creation-modal': PaymentCreationModal,
+    'ni-payment-creation-modal': PaymentCreationModal,
   },
   mixins: [paymentMixin],
   data () {
