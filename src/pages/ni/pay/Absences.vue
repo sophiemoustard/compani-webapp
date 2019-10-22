@@ -33,10 +33,10 @@
     </q-table>
 
     <!-- Absence edition modal -->
-    <!-- <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :personKey="personKey" :activeAuxiliaries="activeAuxiliaries"
       @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" /> -->
+      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent" />
   </q-page>
 </template>
 
@@ -45,7 +45,7 @@ import DateRange from '../../../components/form/DateRange';
 import TitleHeader from '../../../components/TitleHeader';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '../../../data/constants';
 import BillingPagination from '../../../components/table/BillingPagination';
-// import EventEditionModal from '../../../components/planning/EventEditionModal';
+import EventEditionModal from '../../../components/planning/EventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { formatIdentity, formatHours } from '../../../helpers/utils';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -56,7 +56,7 @@ export default {
   components: {
     'ni-date-range': DateRange,
     'ni-billing-pagination': BillingPagination,
-    // 'ni-event-edition-modal': EventEditionModal,
+    'ni-event-edition-modal': EventEditionModal,
     'ni-title-header': TitleHeader,
   },
   mixins: [planningActionMixin],
