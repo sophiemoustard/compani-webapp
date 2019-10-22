@@ -51,5 +51,8 @@ export default {
       margin: 0;
   .date-item
     max-width: 150px
-
+    /deep/ .q-field--with-bottom
+      padding-bottom: 0px
+    /deep/ .q-field__bottom
+      display: none
 </style>
