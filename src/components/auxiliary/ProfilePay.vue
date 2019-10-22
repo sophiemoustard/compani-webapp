@@ -26,7 +26,7 @@
         label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
 
       <!-- Document upload modal -->
-      <ni-modal v-model="documentUpload" @hide="$refs.documentUploadForm.reset()">
+      <!-- <ni-modal v-model="documentUpload" @hide="$refs.documentUploadForm.reset()">
         <template slot="title">
           Ajouter un <span class="text-weight-bold">document</span>
         </template>
@@ -37,7 +37,7 @@
           <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add"
             color="primary" :loading="loading" @click="createDocument" />
         </template>
-      </ni-modal>
+      </ni-modal> -->
     </div>
   </div>
 </template>
@@ -49,16 +49,16 @@ import snakeCase from 'lodash/snakeCase';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
-import Modal from '../../components/Modal';
-import DocumentUpload from '../../components/documents/DocumentUpload';
+// import Modal from '../../components/Modal';
+// import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocuments from '../../api/PayDocuments';
 import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfilePay',
   components: {
-    'ni-document-upload': DocumentUpload,
-    'ni-modal': Modal,
+    // 'ni-document-upload': DocumentUpload,
+    // 'ni-modal': Modal,
   },
   data () {
     return {
