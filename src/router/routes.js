@@ -140,16 +140,16 @@ const routes = [
       //     parent: 'pay',
       //   },
       // },
-      // {
-      //   path: 'ni/pay/absences',
-      //   name: 'absences',
-      //   component: () => import('pages/ni/pay/Absences'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'pay:edit',
-      //     parent: 'pay',
-      //   },
-      // },
+      {
+        path: 'ni/pay/absences',
+        name: 'absences',
+        component: () => import('pages/ni/pay/Absences'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'pay:edit',
+          parent: 'pay',
+        },
+      },
       // {
       //   path: 'ni/exports/data',
       //   name: 'data',
