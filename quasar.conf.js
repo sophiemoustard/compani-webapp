@@ -2,7 +2,6 @@
 require('dotenv').config();
 
 module.exports = function (ctx) {
-  console.log(ctx)
   return {
     boot: [
       // 'i18n',

@@ -11,7 +11,6 @@ const routes = [
     components: { default: () => import('layouts/Layout') },
     beforeEnter: async (to, from, next) => {
       try {
-        console.log('to', to)
         if (to.path !== '/') return next();
         if (await alenvi.refreshAlenviCookies()) {
           await store.dispatch('main/getUser', Cookies.get('user_id'));
@@ -322,14 +321,14 @@ const routes = [
       //   },
       // },
       // // Customers view routes
-      // {
-      //   path: 'customers/agenda',
-      //   name: 'customer agenda',
-      //   component: () => import('pages/customers/CustomerAgenda'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //   },
-      // },
+      {
+        path: 'customers/agenda',
+        name: 'customer agenda',
+        component: () => import('pages/customers/CustomerAgenda'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
+      },
       {
         path: 'customers/documents',
         name: 'customer documents',
