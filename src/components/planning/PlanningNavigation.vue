@@ -1,12 +1,13 @@
 <template>
   <div class="items-center row justify-around">
-    <div class="planning-month col-7" @click="datimeModal = !datimeModal">
-      <span class="capitalize">{{ timelineTitle }}</span>
-      <q-icon name="arrow_drop_down" />
-      <!-- <q-popover v-model="datimeModal" self="top middle" anchor="bottom middle">
-        <q-datetime-picker minimal @input="goToWeek" :value="targetDate" />
-      </q-popover> -->
-      <ni-date-input :value="targetDate" @input="goToWeek" />
+    <div class="planning-month col-7">
+      <div class="cursor-pointer" @click.native="datimeModal = !datimeModal">
+        <span class="text-capitalize">{{ timelineTitle }}</span>
+        <q-icon name="arrow_drop_down" />
+        <q-menu v-model="datimeModal" self="top middle" anchor="bottom middle">
+          <q-date minimal @input="goToWeek" :value="date" />
+        </q-menu>
+      </div>
     </div>
     <div class="planning-actions col-5">
       <q-btn icon="chevron_left" flat round @click="goToPreviousWeek()"></q-btn>
@@ -22,7 +23,6 @@
 
 <script>
 import { AGENDA, PLANNING, THREE_DAYS_VIEW, WEEK_VIEW } from '../../data/constants';
-import DateInput from '../form/DateInput';
 
 export default {
   name: 'PlanningNavigation',
@@ -31,9 +31,6 @@ export default {
     targetDate: { type: String },
     viewMode: { type: String, default: 'week' },
     type: { type: String, default: PLANNING },
-  },
-  components: {
-    'ni-date-input': DateInput,
   },
   data () {
     return {
@@ -49,6 +46,9 @@ export default {
     isThreeDaysView () {
       return this.viewMode === THREE_DAYS_VIEW;
     },
+    date () {
+      return this.$moment(this.targetDate).format('YYYY/MM/DD');
+    },
   },
   methods: {
     goToNextWeek (value) {
@@ -58,7 +58,9 @@ export default {
       this.$emit('goToPreviousWeek', value)
     },
     goToWeek (value) {
-      this.$emit('goToWeek', value)
+      const momentValue = this.$moment(value, 'YYYY/MM/DD', true)
+      if (!momentValue.isValid()) return;
+      this.$emit('goToWeek', momentValue.toISOString())
     },
     goToToday (value) {
       this.$emit('goToToday', value)
@@ -74,9 +76,4 @@ export default {
   .planning-history-button
     display: flex;
     align-items: center;
-
-  .q-select
-    margin-left: 1px
-  /deep/ .q-if-control
-    color: $black !important;
 </style>
