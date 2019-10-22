@@ -29,9 +29,17 @@ export default {
     title: { type: String, default: '' },
   },
   methods: {
-    close () {
-      this.$emit('input', false);
+    close (event) {
+      this.$emit('input', event);
     },
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .modal-title
+    margin-bottom: 10px
+
+  .q-card__section
+    padding: 0
+</style>
