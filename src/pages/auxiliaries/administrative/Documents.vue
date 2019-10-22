@@ -2,7 +2,7 @@
   <q-page padding class="neutral-background">
     <h4>Documents</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
-    <q-table :data="documents" :columns="columns" row-key="name" hide-bottom>
+    <q-table :data="documents" :columns="columns" row-key="name" hide-bottom class="neutral-background" flat>
         <q-td slot="body-cell-title" slot-scope="props" :props="props">
           {{ props.value }}
         </q-td>
