@@ -205,12 +205,13 @@ export const planningModalMixin = {
     // Event creation
     customerSubscriptionsOptions () {
       if (!this.selectedCustomer || !this.selectedCustomer.subscriptions ||
-        this.selectedCustomer.subscriptions.length === 0 || !this.selectedAuxiliary._id) return [];
+        this.selectedCustomer.subscriptions.length === 0) return [];
 
       let subscriptions = this.selectedCustomer.subscriptions;
-      if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
-      if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
-
+      if (this.selectedAuxiliary._id) {
+        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+      }
       return subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
     },
     additionalValue () {
@@ -222,6 +223,9 @@ export const planningModalMixin = {
     },
   },
   methods: {
+    deleteClassFocus () {
+      this.$refs['addressSelect'].$el.className = this.$refs['addressSelect'].$el.className.replace('q-if-focused ', '');
+    },
     hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
       if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
@@ -260,14 +264,19 @@ export const planningModalMixin = {
       }
 
       const secondaryAddress = this.$_.get(this.selectedCustomer, 'contact.secondaryAddress', null);
+      const isCustomerSecondaryAddressDefined = secondaryAddress && secondaryAddress.fullAddress;
       if (event.address.fullAddress && secondaryAddress && secondaryAddress.fullAddress === event.address.fullAddress) {
         addresses.push(this.formatAddressOptions(event.address));
-      } else if (secondaryAddress && secondaryAddress.fullAddress !== '') {
+      } else if (isCustomerSecondaryAddressDefined) {
         addresses.push(this.formatAddressOptions(secondaryAddress));
       }
 
-      if (event.address.fullAddress && primaryAddress && primaryAddress.fullAddress !== event.address.fullAddress &&
-      secondaryAddress && secondaryAddress.fullAddress !== event.address.fullAddress) {
+      const eventAddressIsNotCustomerPrimaryAddress = event.address.fullAddress && primaryAddress &&
+        primaryAddress.fullAddress !== event.address.fullAddress;
+      const eventAddressIsNotCustomerSecondaryAddress = isCustomerSecondaryAddressDefined &&
+        secondaryAddress.fullAddress !== event.address.fullAddress;
+      if (eventAddressIsNotCustomerPrimaryAddress &&
+        (eventAddressIsNotCustomerSecondaryAddress || !isCustomerSecondaryAddressDefined)) {
         addresses.push(this.formatAddressOptions(event.address));
       }
 

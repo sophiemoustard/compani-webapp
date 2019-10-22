@@ -30,7 +30,7 @@ export default {
   methods: {
     dateOptions (date) {
       if (this.min) return date >= this.$moment(this.min).format('YYYY/MM/DD');
-      else return [];
+      else return true;
     },
     select (value) {
       const momentValue = this.$moment(value, 'YYYY/MM/DD', true)
