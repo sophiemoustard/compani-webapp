@@ -2,17 +2,17 @@
   <q-page padding class="neutral-background">
     <h4>Documents</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
-    <q-table :data="documents" :columns="columns" row-key="name" hide-bottom class="neutral-background" flat>
-        <q-td slot="body-cell-title" slot-scope="props" :props="props">
-          {{ props.value }}
-        </q-td>
-        <q-td slot="body-cell-link" slot-scope="props" :props="props">
-          <q-btn flat round small color="primary">
-            <a :href="props.value">
-              <q-icon name="file_download" />
-            </a>
-          </q-btn>
-        </q-td>
+    <q-table binary-state-sort :data="documents" :columns="columns" row-key="name" hide-bottom card-class="neutral-background people-list" flat>
+      <q-td slot="body-cell-title" slot-scope="props" :props="props">
+        {{ props.value }}
+      </q-td>
+      <q-td slot="body-cell-link" slot-scope="props" :props="props">
+        <q-btn flat round small color="primary">
+          <a :href="props.value">
+            <q-icon name="file_download" />
+          </a>
+        </q-btn>
+      </q-td>
     </q-table>
   </q-page>
 </template>
@@ -65,31 +65,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-
-/deep/ .q-table
-  border-spacing: 0 12px
-  border-collapse: separate
-  &-horizontal-separator tbody td
-    border: none
-  & thead
-    border: none
-    & tr
-      height: 48px
-  & th
-    padding: 0px 12px
-    &.sortable:hover .q-icon, &.sorted .q-icon
-      color: $primary
-  & tbody tr
-    background: $white
-  & td
-    padding: 8px 12px
-    font-size: 16px
-  &-container
-    & .q-table-bottom
-      padding-left: 12px
-    & .q-table-nodata > i
-      display: none
-
-</style>
