@@ -321,14 +321,14 @@ const routes = [
       //   },
       // },
       // // Customers view routes
-      // {
-      //   path: 'customers/agenda',
-      //   name: 'customer agenda',
-      //   component: () => import('pages/customers/CustomerAgenda'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //   },
-      // },
+      {
+        path: 'customers/agenda',
+        name: 'customer agenda',
+        component: () => import('pages/customers/CustomerAgenda'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
+      },
       {
         path: 'customers/documents',
         name: 'customer documents',
