@@ -106,6 +106,12 @@ export default {
       padding-left: 14px
       padding-right: 14px
       border-radius: 3px
+    /deep/ .q-field__append
+      .text-negative
+        display: none
+    /deep/ .q-field__bottom
+      color: $secondary
+      padding-top: 3px;
 
   .borders
     border: 1px solid $light-grey !important
