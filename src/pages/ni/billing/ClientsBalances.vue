@@ -30,8 +30,8 @@
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
-        <q-td v-if="props.row.toPay > 0" auto-width>
-          <q-checkbox v-model="props.selected" size="12px" dense />
+        <q-td v-if="props.row.toPay > 0" align="right" auto-width>
+          <q-checkbox v-model="props.selected" dense />
         </q-td>
         <q-td v-else />
       </q-tr>
@@ -171,29 +171,29 @@ export default {
     },
     async createPayments () {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
           cancel: 'Non',
+        }).onOk(async () => {
+          const payload = this.selected.map((row) => {
+            return {
+              nature: this.PAYMENT,
+              customer: row._id.customer,
+              customerInfo: row.customer,
+              netInclTaxes: row.toPay,
+              type: this.PAYMENT_OPTIONS[0].value,
+              date: this.$moment().toDate(),
+              rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
+            }
+          });
+          await this.$payments.createList(payload);
+          NotifyPositive('Règlement(s) créé(s)');
+          await this.getBalances();
         });
-        const payload = this.selected.map((row) => {
-          return {
-            nature: this.PAYMENT,
-            customer: row._id.customer,
-            customerInfo: row.customer,
-            netInclTaxes: row.toPay,
-            type: this.PAYMENT_OPTIONS[0].value,
-            date: this.$moment().toDate(),
-            rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
-          }
-        });
-        await this.$payments.createList(payload);
-        NotifyPositive('Règlement(s) créé(s)');
-        await this.getBalances();
       } catch (e) {
         console.error(e);
-        if (e.message === '') return;
         NotifyNegative('Erreur lors de la création du(des) règlement(s)');
       } finally {
         this.selected = [];
