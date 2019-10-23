@@ -282,16 +282,16 @@ const routes = [
       //     permissions: 'users:list',
       //   },
       // },
-      // {
-      //   path: 'auxiliaries/pay',
-      //   name: 'profile salaries',
-      //   component: () => import('pages/auxiliaries/administrative/Salaries'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'pay:read',
-      //     parent: 'administrative',
-      //   },
-      // },
+      {
+        path: 'auxiliaries/pay',
+        name: 'profile salaries',
+        component: () => import('pages/auxiliaries/administrative/Salaries'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'pay:read',
+          parent: 'administrative',
+        },
+      },
       // {
       //   path: 'auxiliaries/docs',
       //   name: 'profile docs',
