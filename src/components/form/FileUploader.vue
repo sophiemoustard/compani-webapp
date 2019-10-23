@@ -15,9 +15,9 @@
     </div>
     <q-field borderless v-if="(!document || !document.driveId) && displayUpload" :error="error"
       :error-message="errorLabel">
-      <q-uploader flat :bordered="false" color="white" label="Pas de document" :url="url" :headers="headers"
+      <q-uploader flat :bordered="false" color="white" :label="label" :url="url" :headers="headers"
         text-color="black" class="full-width" @failed="failMsg" :form-fields="additionalFields"
-        @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" />
+        @uploaded="documentUploaded" auto-upload :accept="extensions" :field-name="name" :multiple="multiple"/>
     </q-field>
   </div>
 </template>
@@ -37,7 +37,7 @@ export default {
     error: { type: Boolean, default: false },
     path: String,
     alt: String,
-    name: String,
+    name: { type: String, default: 'file' },
     additionalValue: String,
     entity: Object,
     url: { type: String, default: '' },
@@ -48,6 +48,8 @@ export default {
     withBorders: { type: Boolean, default: false },
     extensions: { type: String, default: '' },
     requiredField: { type: Boolean, default: false },
+    multiple: { type: Boolean, default: false },
+    label: { type: String, default: 'Pas de document' },
   },
   data () {
     return {
@@ -60,16 +62,6 @@ export default {
     },
     documentUploaded ({ file, xhr }) {
       this.$emit('uploaded', { file, xhr });
-    },
-    uploadDocument (files) {
-      if (files[0].size > 5000000) {
-        this.$refs[this.name].reset();
-        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-        return '';
-      } else {
-        this.headers.push({ name: 'Content-Type', value: files[0].type })
-        this.$refs[this.name].upload();
-      }
     },
     goToUrl (url) {
       url = `${url}?usp=sharing`

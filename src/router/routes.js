@@ -337,14 +337,14 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
         },
       },
-      // {
-      //   path: 'customers/subscriptions',
-      //   name: 'customer subscription',
-      //   component: () => import('pages/customers/Subscriptions'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //   },
-      // },
+      {
+        path: 'customers/subscriptions',
+        name: 'customer subscription',
+        component: () => import('pages/customers/Subscriptions'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
+      },
       // {
       //   path: 'customers/contracts',
       //   name: 'customer contracts',
