@@ -30,8 +30,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .modal-title
-    margin-bottom: 10px
-</style>
