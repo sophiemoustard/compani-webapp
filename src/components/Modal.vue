@@ -15,8 +15,8 @@
         </div>
         <slot />
       </div>
+      <slot name="footer" />
     </div>
-    <slot name="footer" />
   </q-dialog>
 </template>
 
