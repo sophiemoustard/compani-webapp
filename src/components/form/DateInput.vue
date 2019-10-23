@@ -1,23 +1,35 @@
 <template>
-  <q-input borderless dense :value="inputDate" bg-color="white" @input="input" placeholder="jj/mm/yyyy"
-    :disable="disable">
-    <template v-slot:append>
-      <q-icon name="event" class="cursor-pointer">
-        <q-menu ref="qDateMenu">
-          <q-date minimal :value="date" @input="select" :options="dateOptions"/>
-        </q-menu>
-      </q-icon>
-    </template>
-  </q-input>
+  <div>
+    <div v-if="caption" class="row justify-between">
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <q-icon v-if="error" name="error_outline" color="secondary" />
+    </div>
+    <q-input borderless dense :value="inputDate" bg-color="white" @input="input" placeholder="jj/mm/yyyy" :error="error"
+      :disable="disable" :class="{ 'borders': inModal }" :error-message="errorLabel">
+      <template v-slot:append>
+        <q-icon name="event" class="cursor-pointer">
+          <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
+            <q-date minimal :value="date" @input="select" :options="dateOptions"/>
+          </q-menu>
+        </q-icon>
+      </template>
+    </q-input>
+  </div>
 </template>
 
 <script>
+import { REQUIRED_LABEL } from '../../data/constants';
 export default {
   name: 'NiDateInput',
   props: {
+    caption: { type: String, default: '' },
+    error: Boolean,
+    errorLabel: { type: String, default: REQUIRED_LABEL },
     value: String,
     min: { type: String, default: '' },
     disable: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
+    requiredField: { type: Boolean, default: false },
   },
   computed: {
     date () {
@@ -51,8 +63,13 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .borders
+    /deep/ .q-field__control
+      border: 1px solid $light-grey
+
   .q-input
     /deep/ .q-field__control
+      font-size: 16px
       padding-left: 14px
       padding-right: 14px
       border-radius: 3px

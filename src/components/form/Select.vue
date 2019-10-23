@@ -6,7 +6,8 @@
     </div>
     <q-select dense borderless :value="model" bg-color="white" inverted-light :options="options" :multiple="multiple"
       :display-value="displayedValue" :filter-placeholder="filterPlaceholder" :clearable="clearable" :disable="disable"
-      @focus="onFocus" @blur="onBlur" @input="update" />
+      @focus="onFocus" @blur="onBlur" @input="update" :class="{ 'borders': inModal }" :error="error"
+      :error-message="errorLabel"/>
   </div>
 </template>
 
@@ -60,9 +61,22 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .q-select
+  .borders
     /deep/ .q-field__control
+      border: 1px solid $light-grey
+      border-radius: 3px
+
+  /deep/ .q-select
+    .q-field__inner
+      height: 40px
+    .q-field__control
+      font-size: 16px
       padding-left: 14px
       padding-right: 14px
-      border-radius: 3px
+    .q-field__append
+      .text-negative
+        display: none
+    .q-field__bottom
+      color: $secondary
+      padding-top: 3px;
 </style>

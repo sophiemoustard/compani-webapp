@@ -169,16 +169,17 @@ export const helperMixin = {
     },
     async removeHelper (helperId) {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
           ok: true,
           cancel: 'Annuler',
-        });
-        await this.$users.deleteById(helperId);
-        NotifyPositive('Aidant supprimé');
+        }).onOk(async () => {
+          await this.$users.deleteById(helperId);
+          NotifyPositive('Aidant supprimé');
 
-        await this.getUserHelpers();
+          await this.getUserHelpers();
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
       }
