@@ -292,15 +292,15 @@ const routes = [
           parent: 'administrative',
         },
       },
-      // {
-      //   path: 'auxiliaries/docs',
-      //   name: 'profile docs',
-      //   component: () => import('pages/auxiliaries/administrative/Documents'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     parent: 'administrative',
-      //   },
-      // },
+      {
+        path: 'auxiliaries/docs',
+        name: 'profile docs',
+        component: () => import('pages/auxiliaries/administrative/Documents'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'administrative',
+        },
+      },
       // {
       //   path: 'auxiliaries/contracts',
       //   name: 'profile contracts',
