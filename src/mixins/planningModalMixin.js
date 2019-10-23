@@ -1,5 +1,5 @@
 import SelectSector from '../components/form/SelectSector';
-import DatetimePicker from '../components/form/DatetimePicker.vue';
+import DateInput from '../components/form/DateInput.vue';
 import DatetimeRange from '../components/form/DatetimeRange.vue';
 import NiSelect from '../components/form/Select';
 import NiInput from '../components/form/Input';
@@ -40,7 +40,7 @@ import {
 export const planningModalMixin = {
   components: {
     'ni-select-sector': SelectSector,
-    'ni-datetime-picker': DatetimePicker,
+    'ni-date-input': DateInput,
     'ni-search-address': SearchAddress,
     'ni-select': NiSelect,
     'ni-input': NiInput,

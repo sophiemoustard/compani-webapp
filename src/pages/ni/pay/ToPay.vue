@@ -221,21 +221,21 @@ export default {
     // Creation
     async createList () {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
           cancel: 'Non',
-        });
+        }).onOk(async () => {
+          if (!this.hasSelectedRows) return;
 
-        if (!this.hasSelectedRows) return;
+          const pay = this.selected.map(row => this.formatPayload(row));
+          await this.$pay.createList(pay);
 
-        const pay = this.selected.map(row => this.formatPayload(row));
-        await this.$pay.createList(pay);
-
-        NotifyPositive('Fiches de paie crées');
-        await this.refreshDraftPay();
-        this.selected = [];
+          NotifyPositive('Fiches de paie crées');
+          await this.refreshDraftPay();
+          this.selected = [];
+        }).onCancel(() => NotifyPositive('Création annulée'));
       } catch (e) {
         if (e.message === '') return;
         console.error(e);

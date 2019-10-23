@@ -9,7 +9,7 @@
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup.enter')" :error-message="errorLabel"
-        :readOnly="readOnly" :debounce="debounce" :placeholder="placeholder">
+        :readOnly="readOnly" :debounce="debounce" :placeholder="placeholder" :class="{ 'borders': inModal }">
         <template v-if="icon" v-slot:prepend>
           <q-icon size="xs" :name="icon" ></q-icon>
         </template>
@@ -101,8 +101,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .borders
+    /deep/ .q-field__control
+      border: 1px solid $light-grey
+      border-radius: 3px
+
   .input
     /deep/ .q-field__control
+      font-size: 16px
       padding-left: 14px
       padding-right: 14px
       border-radius: 3px
@@ -112,10 +118,6 @@ export default {
     /deep/ .q-field__bottom
       color: $secondary
       padding-top: 3px;
-
-  .borders
-    border: 1px solid $light-grey !important
-    border-radius: 3px
 
   .input-file-container
     padding: 9px 14px 11px

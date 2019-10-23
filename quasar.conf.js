@@ -67,6 +67,7 @@ module.exports = function (ctx) {
         'QItem',
         'QItemLabel',
         'QItemSection',
+        'QField',
         'QLayout',
         'QList',
         'QMenu',
@@ -82,6 +83,7 @@ module.exports = function (ctx) {
         'QToggle',
         'QToolbar',
         'QToolbarTitle',
+        'QUploader',
       ],
       directives: [
         'Ripple',
