@@ -73,10 +73,12 @@
       </q-card-actions>
     </q-card>
 
-    <q-dialog v-model="esignModal" @hide="refreshWithTimeout" classes="e-sign-modal-container">
+    <q-dialog v-model="esignModal" @hide="refreshWithTimeout" content-class="e-sign-modal-container">
       <q-layout>
-        <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
-          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
+        <q-toolbar class="no-shadow row justify-end" style="justify-content:flex-end;" inverted color="black">
+          <q-btn flat round dense>
+            <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
+          </q-btn>
         </q-toolbar>
         <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
       </q-layout>
@@ -333,10 +335,6 @@ export default {
   .card-sub-title
     margin:  0 10px 10px
     font-size: 14px
-
-  /deep/ .e-sign-modal-container
-    min-width: 80vw
-    min-height: 90vh
 
   .toolbar-padding
     padding: 20px 58px
