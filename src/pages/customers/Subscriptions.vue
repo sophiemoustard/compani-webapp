@@ -78,9 +78,9 @@
     </template>
 
     <!-- Mandate signature modal -->
-    <q-dialog ref="modal" v-model="newESignModal" @hide="checkMandates" content-classes="e-sign-modal-container">
+    <q-dialog v-model="newESignModal" @hide="checkMandates" full-width>
       <q-layout>
-        <q-toolbar class="no-shadow row justify-end toolbar-padding" color="black" inverted slot="header">
+        <q-toolbar class="no-shadow row justify-end">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
         </q-toolbar>
         <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
@@ -91,7 +91,7 @@
     <q-dialog ref="modal" v-model="cgsModal">
       <q-layout class="modal-layout">
         <q-header>
-          <q-toolbar class="no-shadow row justify-between toolbar-padding toolbar-color" color="black" inverted>
+          <q-toolbar class="no-shadow row justify-between" color="black" inverted>
             <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
             <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
           </q-toolbar>
@@ -445,30 +445,13 @@ export default {
     width: 100%
     margin-bottom: 10px
 
-  .toolbar-padding
-    padding: 20px 58px
-
-  /deep/ .q-layout-header
-    box-shadow: none
-
   .iframe-normal
     position: absolute
     width: 100%
     height:100%
 
-  .q-card-container
-    padding: 0
-
-  /deep/ .e-sign-modal-container
-    min-width: 80vw
-    min-height: 90vh
-
   .modal-layout
     background-color: white
-    padding: 10px
-    min-width: 60vw
-    max-width: 60vw
-    min-height: 70vh
 
   .table-grid table tr
     margin-bottom: 0px !important
