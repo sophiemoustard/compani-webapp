@@ -138,3 +138,11 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  /deep/ .q-table
+    & thead th
+      padding: 3px
+    & tbody td
+      padding: 4px
+</style>
