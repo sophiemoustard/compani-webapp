@@ -13,10 +13,7 @@
         <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
       </div>
     </div>
-    <q-field v-if="(!document || !document.driveId) && displayUpload" :error="error" :error-label="errorLabel">
-      <!-- <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields"
-        @fail="failMsg" :disable="disable" :extensions="extensions" @add="uploadDocument" @uploaded="documentUploaded"
-        :class="{border: withBorders}" flat /> -->
+    <q-field v-if="(!document || !document.driveId) && displayUpload" :error="error" :error-message="errorLabel">
       <q-uploader flat :bordered="false" color="white" label="Pas de document" :url="url" :headers="headers"
         text-color="black" class="full-width" @failed="failMsg" :form-fields="additionalFields"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" />
@@ -103,13 +100,23 @@ export default {
   .doc-delete
     padding: 0px 14px 17px 0px
 
-  /deep/ .q-uploader__list
+  .q-field__control
+    height: 40px
+
+  /deep/ .q-field__append
     display: none
+  /deep/ .q-field__bottom
+      color: $secondary
+      padding-top: 3px;
 
   /deep/ .q-uploader
+    .q-uploader__list
+      display: none
     .q-uploader__header-content
       border: 1px solid $light-grey
       border-radius: 3px
+      height: 40px
+      margin: 0
     .q-btn
       margin: 0
       padding: 0

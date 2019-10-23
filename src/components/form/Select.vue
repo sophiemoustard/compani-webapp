@@ -66,14 +66,16 @@ export default {
       border: 1px solid $light-grey
       border-radius: 3px
 
-  .q-select
-    /deep/ .q-field__control
+  /deep/ .q-select
+    .q-field__inner
+      height: 40px
+    .q-field__control
       padding-left: 14px
       padding-right: 14px
-    /deep/ .q-field__append
+    .q-field__append
       .text-negative
         display: none
-    /deep/ .q-field__bottom
+    .q-field__bottom
       color: $secondary
       padding-top: 3px;
 </style>
