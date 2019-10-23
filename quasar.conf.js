@@ -56,9 +56,6 @@ module.exports = function (ctx) {
       components: [
         'QBtn',
         'QBtnToggle',
-        'QCard',
-        'QCardActions',
-        'QCardSection',
         'QCheckbox',
         'QDate',
         'QDialog',
@@ -83,7 +80,6 @@ module.exports = function (ctx) {
         'QTd',
         'QTh',
         'QTr',
-        'QTime',
         'QToggle',
         'QToolbar',
         'QToolbarTitle',
