@@ -325,7 +325,7 @@ export const planningActionMixin = {
           break;
         case INTERNAL_HOUR:
           const internalHour = event.internalHour._id;
-          this.editedEvent = { address: {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
+          this.editedEvent = { address: address || {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
           break;
         case ABSENCE:
           this.editedEvent = {
@@ -484,21 +484,20 @@ export const planningActionMixin = {
     // Event deletion
     async deleteEvent () {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
           ok: 'OK',
           cancel: 'Annuler',
-        });
-
-        this.loading = true
-        await this.$events.deleteById(this.editedEvent._id);
-        await this.refresh();
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement supprimé.');
+        }).onOk(async () => {
+          this.loading = true
+          await this.$events.deleteById(this.editedEvent._id);
+          await this.refresh();
+          this.editionModal = false;
+          this.resetEditionForm();
+          NotifyPositive('Évènement supprimé.');
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
         this.loading = false

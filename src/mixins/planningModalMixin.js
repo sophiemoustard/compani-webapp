@@ -248,11 +248,6 @@ export const planningModalMixin = {
           (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
       });
     },
-    iconSelect (event) {
-      if (this.customerAddressList(event).length === 1) return [];
-
-      return [{ icon: 'swap_vert', class: 'select-icon pink-icon', handler: () => { this.toggleAddressSelect() } }];
-    },
     customerAddressList (event) {
       const addresses = [];
 
@@ -297,7 +292,7 @@ export const planningModalMixin = {
       return { label: address.fullAddress, value: address };
     },
     toggleAddressSelect () {
-      return this.$refs['addressSelect'].show();
+      return this.$refs['addressSelect'].showPopup();
     },
   },
 };
