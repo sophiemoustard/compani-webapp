@@ -3,11 +3,9 @@
     <template slot="title">
       Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
     </template>
-    <template slot="subtitle">
-      <div class="modal-subtitle">
-        <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />
-      </div>
-    </template>
+    <div class="modal-subtitle">
+      <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />
+    </div>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
     <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number"
@@ -18,8 +16,8 @@
     <ni-date-input v-model="newPayment.date" :caption="`Date du ${creationModalNature}`"
       :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
     <template slot="footer">
-      <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary"
-        :loading="loading" @click="createPayment" :disable="validations.$error || disableCreationButton" />
+      <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary" :loading="loading"
+        @click="createPayment" :disable="validations.$error || disableCreationButton" />
     </template>
   </ni-modal>
 </template>
