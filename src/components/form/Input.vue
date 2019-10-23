@@ -108,6 +108,7 @@ export default {
 
   .input
     /deep/ .q-field__control
+      font-size: 16px
       padding-left: 14px
       padding-right: 14px
       border-radius: 3px
