@@ -2,7 +2,8 @@
   <q-page padding class="neutral-background">
     <h4>Documents</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
-    <q-table binary-state-sort :data="documents" :columns="columns" row-key="name" hide-bottom card-class="neutral-background people-list" flat>
+    <q-table binary-state-sort :data="documents" :columns="columns" row-key="name"
+      hide-bottom card-class="neutral-background people-list" flat>
       <q-td slot="body-cell-title" slot-scope="props" :props="props">
         {{ props.value }}
       </q-td>
@@ -65,3 +66,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+/deep/ .q-table
+  & td
+    font-size: 16px;
+</style>
