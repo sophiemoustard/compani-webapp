@@ -100,16 +100,16 @@ const routes = [
       //     parent: 'billing',
       //   },
       // },
-      // {
-      //   path: 'ni/billing/debits-archive',
-      //   name: 'debits archive',
-      //   component: () => import('pages/ni/billing/DebitsArchive'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'bills:edit',
-      //     parent: 'billing',
-      //   },
-      // },
+      {
+        path: 'ni/billing/debits-archive',
+        name: 'debits archive',
+        component: () => import('pages/ni/billing/DebitsArchive'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'bills:edit',
+          parent: 'billing',
+        },
+      },
       {
         path: 'ni/pay/to-pay',
         name: 'to pay',
