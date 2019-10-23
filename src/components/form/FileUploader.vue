@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="margin-input full-width">
     <div v-if="displayCaption && displayUpload" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -14,10 +14,12 @@
       </div>
     </div>
     <q-field v-if="(!document || !document.driveId) && displayUpload" :error="error" :error-label="errorLabel">
-      <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields" @fail="failMsg" :disable="disable"
-        hide-underline :extensions="extensions" color="white" inverted-light hide-upload-button @add="uploadDocument" @uploaded="documentUploaded"
-        :class="{border: withBorders}"
-      />
+      <!-- <q-uploader :ref="name" :name="name" :url="url" :headers="headers" :additional-fields="additionalFields"
+        @fail="failMsg" :disable="disable" :extensions="extensions" @add="uploadDocument" @uploaded="documentUploaded"
+        :class="{border: withBorders}" flat /> -->
+      <q-uploader flat :bordered="false" color="white" label="Pas de document" :url="url" :headers="headers"
+        text-color="black" class="full-width" @failed="failMsg" :form-fields="additionalFields"
+        @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" />
     </q-field>
   </div>
 </template>
@@ -49,11 +51,16 @@ export default {
     extensions: { type: String, default: '' },
     requiredField: { type: Boolean, default: false },
   },
+  data () {
+    return {
+      headers: [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }],
+    }
+  },
   methods: {
     deleteDocument () {
       this.$emit('delete');
     },
-    documentUploaded (file, xhr) {
+    documentUploaded ({ file, xhr }) {
       this.$emit('uploaded', { file, xhr });
     },
     uploadDocument (files) {
@@ -62,6 +69,7 @@ export default {
         NotifyNegative('Fichier trop volumineux (> 5 Mo)');
         return '';
       } else {
+        this.headers.push({ name: 'Content-Type', value: files[0].type })
         this.$refs[this.name].upload();
       }
     },
@@ -70,13 +78,10 @@ export default {
       openURL(url);
     },
     failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
+      return NotifyNegative('Echec de l\'envoi du document');
     },
   },
   computed: {
-    headers () {
-      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
-    },
     additionalFields () {
       return [{ name: 'fileName', value: this.additionalValue }];
     },
@@ -97,4 +102,22 @@ export default {
 
   .doc-delete
     padding: 0px 14px 17px 0px
+
+  /deep/ .q-uploader__list
+    display: none
+
+  /deep/ .q-uploader
+    .q-uploader__header-content
+      border: 1px solid $light-grey
+      border-radius: 3px
+    .q-btn
+      margin: 0
+      padding: 0
+    .col
+      margin: 0
+    .q-uploader__title
+      font-weight: 400;
+    .q-uploader__subtitle
+      display: none
+      height: 0
 </style>
