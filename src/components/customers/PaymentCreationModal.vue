@@ -15,9 +15,8 @@
       @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
     <ni-select in-modal :caption="`Type du ${creationModalNature}`" v-model="newPayment.type" :options="paymentOptions"
       required-field @blur="validations.type.$touch" :error="validations.type.$error" />
-    <ni-date-input v-model="newPayment.date" />
-    <!-- <ni-datetime-picker :caption="`Date du ${creationModalNature}`" v-model="newPayment.date"
-      :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field /> -->
+    <ni-date-input v-model="newPayment.date" :caption="`Date du ${creationModalNature}`"
+      :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary"
         :loading="loading" @click="createPayment" :disable="validations.$error || disableCreationButton" />
