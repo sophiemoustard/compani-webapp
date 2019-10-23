@@ -70,6 +70,7 @@ export default {
     .q-field__inner
       height: 40px
     .q-field__control
+      font-size: 16px
       padding-left: 14px
       padding-right: 14px
     .q-field__append
