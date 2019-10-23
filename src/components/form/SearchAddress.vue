@@ -39,7 +39,6 @@ export default {
     async searchAddress (terms, done) {
       try {
         if (!terms) return;
-
         const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: terms } });
         this.options = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
           return {
