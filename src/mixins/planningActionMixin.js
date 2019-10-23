@@ -466,19 +466,19 @@ export const planningActionMixin = {
     },
     async deleteDocument (driveId) {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
           cancel: 'Annuler',
-        });
-        await this.$gdrive.removeFileById({ id: driveId });
-        if (this.creationModal) this.newEvent.attachment = {};
-        if (this.editionModal) this.editedEvent.attachment = {};
-        NotifyPositive('Document supprimé');
+        }).onOk(async () => {
+          await this.$gdrive.removeFileById({ id: driveId });
+          if (this.creationModal) this.newEvent.attachment = {};
+          if (this.editionModal) this.editedEvent.attachment = {};
+          NotifyPositive('Document supprimé');
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
-        NotifyNegative('Erreur lors de la suppression du document');
+        return NotifyPositive('Suppression annulée');
       }
     },
     // Event deletion
