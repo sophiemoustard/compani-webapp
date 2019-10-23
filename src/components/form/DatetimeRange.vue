@@ -4,13 +4,13 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="hasError" name="error_outline" color="secondary" />
     </div>
-    <q-field :error="hasError" :error-label="errorMessage">
+    <q-field :error="hasError" :error-label="errorMessage" borderless>
       <div class="datetime-container">
         <div class="datetime-item">
           <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
             @blur="blurHandler" :disable="disable" @error="childErrors.startDate = $event" />
           <ni-select :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
-            @blur="blurHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour" hide-underline
+            @blur="blurHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour"
             name="start-hour" :disable="disable" align="center" />
         </div>
         <p class="delimiter">-</p>
@@ -120,16 +120,13 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  /deep/ .q-field-content
-    padding: 0;
-
   /deep/ .datetime-container
+    height: 40px
     border: 1px solid $light-grey;
     border-radius: 3px;
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
-    background-color: $white;
     @media screen and (min-width: 768px)
       & .delimiter
         padding: 10px 14px;
@@ -140,25 +137,38 @@ export default {
       & .delimiter
         display: none;
 
-  .time-item
-    /deep/ .q-input.q-if-inverted
-      padding: 10px;
-      max-width: 100px
-      /deep/ .q-if-inner
-        div
-          width: 100%
+  /deep/ .q-field__control
+    min-height: 40px
 
   .date-item
-    /deep/ .q-input.q-if-inverted
-      padding: 10px;
-      max-width: 120px
-      /deep/ .q-if-inner
-        div
-          width: 100%
-    /deep/ .q-field-content
-      padding-top: 0px;
+    /deep/ .q-field--with-bottom
+      padding: 0
+    /deep/ .q-field__native
+      min-height: 40px
+    /deep/ .q-field__inner
+      .q-field__bottom
+        display: none
+    /deep/ .q-field__control
+      min-height: 35px
+      height: 35px
+
+  .time-item
+    /deep/ .q-field__inner
+      display: flex;
+      flex-direction: row;
+    /deep/ .q-field--with-bottom
+      padding: 0
+    /deep/ .q-field__native
+      min-height: 40px
+    /deep/ .q-field__inner
+      .q-field__bottom
+        display: none
+    /deep/ .q-field__control
+      min-height: 35px
+      height: 35px
 
   .datetime-item
+    height: 40px
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -166,8 +176,9 @@ export default {
       @media screen and (max-width: 767px)
         border-top: 1px solid $light-grey;
         flex-direction: row-reverse;
-
-  /deep/ .q-if-inverted.q-if-focused
-    box-shadow: none;
+    /deep/ .q-field
+      .q-field__inner
+        input
+          height: 40px
 
 </style>
