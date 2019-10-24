@@ -85,7 +85,7 @@ export default {
 <style lang="stylus" scoped>
   .border
     border: 1px solid $light-grey;
-    border-radius: 3px;
+    border-radius: 3px
 
   .doc-thumbnail
     padding: 13px 0px 40px 12px
@@ -101,7 +101,7 @@ export default {
     display: none
   /deep/ .q-field__bottom
       color: $secondary
-      padding-top: 3px;
+      padding-top: 3px
 
   /deep/ .q-uploader
     .q-uploader__list
@@ -117,7 +117,8 @@ export default {
     .col
       margin: 0
     .q-uploader__title
-      font-weight: 400;
+      font-weight: 400
+      overflow: initial
     .q-uploader__subtitle
       display: none
       height: 0

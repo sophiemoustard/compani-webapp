@@ -455,6 +455,8 @@ export default {
 
   .modal-max-size
     max-width: 860px !important
+    max-height: 90%
+    min-height: -webkit-fill-available !important
 
   .table-grid table tr
     margin-bottom: 0px !important
