@@ -12,7 +12,7 @@
       </p>
       <p v-if="contract.status === COMPANY_CONTRACT" class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
       <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination"
-        hide-bottom :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive">
+        hide-bottom :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive q-pa-sm">
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <!-- <template v-if="col.name === 'contractEmpty'">
@@ -354,5 +354,10 @@ export default {
   .modal-max-size
     max-width: 860px !important
     background-color: white;
+
+  .modal-max-size
+    max-width: 860px !important
+    max-height: 90%
+    min-height: -webkit-fill-available !important
 
 </style>
