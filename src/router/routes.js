@@ -169,16 +169,16 @@ const routes = [
           parent: 'exports',
         },
       },
-      // {
-      //   path: 'ni/auxiliaries',
-      //   name: 'administrative directory',
-      //   component: () => import('pages/ni/auxiliaries/Directory'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:edit',
-      //     parent: 'administrative',
-      //   },
-      // },
+      {
+        path: 'ni/auxiliaries',
+        name: 'administrative directory',
+        component: () => import('pages/ni/auxiliaries/Directory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:edit',
+          parent: 'administrative',
+        },
+      },
       {
         path: 'ni/auxiliaries/staff-register',
         name: 'staff register',

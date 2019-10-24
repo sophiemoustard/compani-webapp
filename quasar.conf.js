@@ -54,6 +54,7 @@ module.exports = function (ctx) {
       all: false,
       lang: 'fr',
       components: [
+        'QAvatar',
         'QBtn',
         'QBtnToggle',
         'QCard',
