@@ -40,16 +40,16 @@ const routes = [
       }
     },
     children: [
-      // {
-      //   path: 'ni/config/rh',
-      //   name: 'rh config',
-      //   component: () => import('pages/ni/config/RhConfig'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'config:edit',
-      //     parent: 'configuration',
-      //   },
-      // },
+      {
+        path: 'ni/config/rh',
+        name: 'rh config',
+        component: () => import('pages/ni/config/RhConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'config:edit',
+          parent: 'configuration',
+        },
+      },
       // {
       //   path: 'ni/config/customers',
       //   name: 'customers config',
