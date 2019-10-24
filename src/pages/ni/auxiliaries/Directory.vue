@@ -10,7 +10,7 @@
           <q-item v-if="col.name === 'name'">
             <q-item-section avatar>
               <q-avatar size="30px">
-                <img :src="getAvatar(col.value.picture)">
+                <img class="border-for-avatar" :src="getAvatar(col.value.picture)">
               </q-avatar>
             </q-item-section>
             <q-item-section> {{col.value.name}} </q-item-section>
@@ -414,3 +414,8 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .border-for-avatar
+    border: solid 1px #979797;
+</style>
