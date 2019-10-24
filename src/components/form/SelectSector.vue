@@ -1,10 +1,12 @@
 <template>
-  <ni-select :value="value" ref="selectSector" @input="updateSector" :options="sectors" @blur="blurHandler"
-    @focus="focusHandler" filter-placeholder="Rechercher" :class="{border: inModal}" />
+  <ni-select :in-modal="inModal" :value="value" ref="selectSector" @input="updateSector" :options="sectors" @blur="blurHandler"
+    @focus="focusHandler" filter-placeholder="Rechercher" :error="error"
+    :error-label="error-label"/>
 </template>
 
 <script>
 import Select from './Select';
+import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
   name: 'SelectSector',
@@ -14,6 +16,8 @@ export default {
     inModal: { type: Boolean, default: false },
     companyId: String,
     allowNullOption: { type: Boolean, default: false },
+    error: Boolean,
+    errorLabel: { type: String, default: REQUIRED_LABEL },
   },
   components: {
     'ni-select': Select,
