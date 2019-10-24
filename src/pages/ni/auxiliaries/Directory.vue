@@ -148,7 +148,7 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'min-width: 150px',
+          style: 'min-width: 150px; width: 30%',
         },
         {
           name: 'profileErrors',
@@ -156,7 +156,7 @@ export default {
           field: 'profileErrors',
           align: 'left',
           sortable: true,
-          style: 'min-width: 75px',
+          style: 'min-width: 75px; width: 10%',
         },
         {
           name: 'tasksErrors',
@@ -164,7 +164,7 @@ export default {
           field: 'tasksErrors',
           align: 'left',
           sortable: true,
-          style: 'min-width: 82px',
+          style: 'min-width: 82px; width: 10%',
         },
         {
           name: 'startDate',
@@ -174,7 +174,7 @@ export default {
           sortable: true,
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'min-width: 110px',
+          style: 'min-width: 110px; width: 15%',
         },
         {
           name: 'hiringDate',
@@ -184,7 +184,7 @@ export default {
           sortable: true,
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : null,
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'min-width: 110px',
+          style: 'min-width: 110px; width: 15%',
         },
         {
           name: 'team',
@@ -192,7 +192,7 @@ export default {
           field: 'sector',
           align: 'left',
           sortable: true,
-          style: 'min-width: 100px',
+          style: 'min-width: 100px; width: 15%',
         },
         {
           name: 'active',
@@ -200,7 +200,7 @@ export default {
           field: 'isActive',
           align: 'right',
           sortable: false,
-          style: 'min-width: 30px',
+          style: 'min-width: 30px; width: 5%',
         },
       ],
       REQUIRED_LABEL,
