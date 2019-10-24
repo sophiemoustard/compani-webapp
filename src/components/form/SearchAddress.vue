@@ -6,7 +6,7 @@
     </div>
     <q-select dense borderless :value="value.fullAddress" @input="update" :error="error" :error-message="errorLabel"
       use-input @filter="searchAddress" fill-input hide-selected input-debounce="0" :options="options"
-      :class="{ 'borders': inModal }" @blur="blurEvent" @focus="focusEvent" />
+      :class="{ 'borders': inModal }" @blur="blurEvent" @focus="focusEvent" clearable :disable="disable" />
   </div>
 </template>
 
@@ -27,18 +27,13 @@ export default {
   data () {
     return {
       options: [],
-      addressObj: {
-        street: '',
-        zipCode: '',
-        city: '',
-        location: {},
-      },
     };
   },
   methods: {
     async searchAddress (terms, done) {
       try {
-        if (!terms) return;
+        if (!terms) return this.update();
+
         const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: terms } });
         this.options = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
           return {
@@ -64,8 +59,17 @@ export default {
       this.$emit('focus');
     },
     update (value) {
-      this.$emit('input', this.$_.pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
+      if (!value) this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' })
+      else this.$emit('input', this.$_.pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
     },
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  /deep/ .q-field__append
+    .q-select__dropdown-icon
+      display: none
+    .q-spinner
+      display: none
+</style>
