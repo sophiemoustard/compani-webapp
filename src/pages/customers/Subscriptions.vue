@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
-    <template v-if="customer !== {}">
+    <template v-if="Object.keys(customer).length > 0">
       <div class="q-mb-lg">
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
@@ -26,7 +26,7 @@
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
-              :disable="customer.subscriptionsAccepted" />
+              :disable="customer.subscriptionsAccepted" dense/>
             <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que
               les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
                 Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
@@ -88,7 +88,7 @@
     </q-dialog>
 
     <!-- CSG modal -->
-    <q-dialog ref="modal" v-model="cgsModal">
+    <q-dialog ref="modal" v-model="cgsModal" full-width>
       <q-layout class="modal-layout">
         <q-header>
           <q-toolbar class="no-shadow row justify-between" color="black" inverted>
@@ -106,7 +106,7 @@
         Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
           selectedSubscription.service.name}}</span>
       </template>
-      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions"
+      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" flat
         :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -119,7 +119,7 @@
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
       <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
-        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns">
+        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns" flat>
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template>{{ col.value }}</template>

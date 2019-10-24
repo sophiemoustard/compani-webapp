@@ -23,7 +23,7 @@
       </div>
     </div>
     <div v-if="documents && documents.length > 0" class="row">
-      <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :collapseIcon="collapsibleIcon"
+      <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
         class="col-xs-12 col-md-6">
         <ni-file-uploader path="financialCertificates" alt="justificatif financement" class="uploader-size"
           @uploaded="documentUploaded" name="financialCertificates" :user-profile="userProfile" :url="url"
@@ -100,25 +100,9 @@ export default {
       @media screen and (max-width: 767px)
         margin: 0px 5px
 
-  /deep/ .q-collapsible-inner
-    & .q-item
-      font-size: 12px
-      padding-left: 0
-      padding: 8px 0px
-      &-side
-        color: $primary
-        & > .q-icon
-          font-size: 16px
-
-  /deep/ .q-collapsible-sub-item
-    padding-left: 0
-    padding: 8px 0px
-
-  .uploader-background
-    background-color: white
-
-  /deep/.q-uploader__header::before
-    background: white
+  /deep/ .q-uploader
+    .q-uploader__header-content
+      border: none !important
 
   .uploader-size
     width: 50% !important
