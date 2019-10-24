@@ -1,18 +1,20 @@
-.q-table tbody td
-  padding: 4px
-  font-size: 13px
-  white-space: normal
-  @media (max-width: 767px)
-    font-size: 12px
-    padding: 4px 2px
-
-.q-table th
-  white-space: normal;
-  vertical-align: middle;
-  padding: 3px
-  @media (max-width: 767px)
+.q-table
+  & tbody td
     font-size: 13px
-    padding: 4px 2px
+    white-space: normal
+    padding: 4px
+    @media (max-width: 767px)
+      font-size: 12px
+      padding: 4px 2px
+  & th
+    white-space: normal;
+    vertical-align: middle;
+    padding: 4px
+    @media (max-width: 767px)
+      font-size: 13px
+      padding: 4px 2px
+  &__bottom
+    padding: 4px
 
 .table-grid
   table

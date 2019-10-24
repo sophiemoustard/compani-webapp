@@ -87,6 +87,7 @@ module.exports = function (ctx) {
       ],
       directives: [
         'Ripple',
+        'ClosePopup',
       ],
       plugins: [
         'Notify',
@@ -175,7 +176,7 @@ module.exports = function (ctx) {
     },
     cordova: {},
     electron: {
-      extendWebpack(cfg) {},
+      extendWebpack (cfg) {},
       packager: {},
       builder: {},
     },
