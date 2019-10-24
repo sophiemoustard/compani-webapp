@@ -38,7 +38,8 @@ export default {
   methods: {
     async searchAddress (terms, done) {
       try {
-        if (!terms) return;
+        if (!terms) return this.update();
+
         const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: terms } });
         this.options = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
           return {
@@ -64,7 +65,8 @@ export default {
       this.$emit('focus');
     },
     update (value) {
-      this.$emit('input', this.$_.pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
+      if (!value) this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' })
+      else this.$emit('input', this.$_.pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
     },
     resetValue () {
       this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' });
@@ -82,11 +84,4 @@ export default {
       display: none
     .q-spinner
       display: none
-
-  /deep/ .q-field__append
-    .text-negative
-      display: none
-  /deep/ .q-field__bottom
-    color: $secondary
-    padding-top: 3px;
 </style>
