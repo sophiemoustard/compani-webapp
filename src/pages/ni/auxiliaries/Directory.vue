@@ -12,8 +12,8 @@
               <q-avatar size="30px">
                 <img :src="getAvatar(col.value.picture)">
               </q-avatar>
-              <q-item-label :caption="col.value.name" />
             </q-item-section>
+            <q-item-section> {{col.value.name}} </q-item-section>
           </q-item>
           <template v-else-if="col.name === 'profileErrors'">
             <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error"
@@ -49,19 +49,17 @@
         caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
       <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
         @blur="$v.newUser.local.email.$touch" :error-label="emailError" required-field />
-      <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
+      <!-- <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
         @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
-        :error="$v.newUser.contact.address.$error" in-modal />
+        :error="$v.newUser.contact.address.$error" in-modal /> -->
       <div class="row margin-input">
         <div class="col-12">
           <div class="row justify-between">
             <p class="input-caption required">Équipe</p>
             <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL">
-            <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
-              :company-id="company._id" />
-          </q-field>
+          <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch"
+            :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
         </div>
       </div>
       <div class="row margin-input last">
@@ -86,7 +84,7 @@ import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
-import SearchAddress from '../../../components/form/SearchAddress';
+// import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
 import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
@@ -99,7 +97,7 @@ export default {
     'ni-select-sector': SelectSector,
     'ni-input': Input,
     'ni-select': Select,
-    'ni-search-address': SearchAddress,
+    // 'ni-search-address': SearchAddress,
     'ni-directory-header': DirectoryHeader,
     'ni-modal': Modal,
   },
@@ -150,7 +148,7 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'width: 450px',
+          style: 'min-width: 150px',
         },
         {
           name: 'profileErrors',
@@ -158,6 +156,7 @@ export default {
           field: 'profileErrors',
           align: 'left',
           sortable: true,
+          style: 'min-width: 75px',
         },
         {
           name: 'tasksErrors',
@@ -165,6 +164,7 @@ export default {
           field: 'tasksErrors',
           align: 'left',
           sortable: true,
+          style: 'min-width: 82px',
         },
         {
           name: 'startDate',
@@ -174,7 +174,7 @@ export default {
           sortable: true,
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px',
+          style: 'min-width: 110px',
         },
         {
           name: 'hiringDate',
@@ -184,7 +184,7 @@ export default {
           sortable: true,
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : null,
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
-          style: 'width: 170px',
+          style: 'min-width: 110px',
         },
         {
           name: 'team',
@@ -192,7 +192,7 @@ export default {
           field: 'sector',
           align: 'left',
           sortable: true,
-          style: 'width: 170px',
+          style: 'min-width: 100px',
         },
         {
           name: 'active',
@@ -200,7 +200,7 @@ export default {
           field: 'isActive',
           align: 'right',
           sortable: false,
-          style: 'width: 30px',
+          style: 'min-width: 30px',
         },
       ],
       REQUIRED_LABEL,
