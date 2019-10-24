@@ -119,8 +119,8 @@
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
       <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
-        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns" flat dense>
-        <q-tr slot="body" slot-scope="props" :props="props" dense>
+        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns" flat>
+        <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template>{{ col.value }}</template>
           </q-td>
