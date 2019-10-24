@@ -79,7 +79,7 @@
 
     <!-- Mandate signature modal -->
     <q-dialog v-model="newESignModal" @hide="checkMandates" full-width>
-      <q-layout>
+      <q-layout class="modal-max-size">
         <q-toolbar class="no-shadow row justify-end">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
         </q-toolbar>
@@ -89,7 +89,7 @@
 
     <!-- CSG modal -->
     <q-dialog ref="modal" v-model="cgsModal" full-width>
-      <q-layout class="modal-layout">
+      <q-layout class="modal-layout modal-max-size">
         <q-header>
           <q-toolbar class="no-shadow row justify-between" color="black" inverted>
             <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
@@ -106,7 +106,7 @@
         Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
           selectedSubscription.service.name}}</span>
       </template>
-      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" flat
+      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" flat dense
         :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -119,8 +119,8 @@
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
       <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
-        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns" flat>
-        <q-tr slot="body" slot-scope="props" :props="props">
+        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns" flat dense>
+        <q-tr slot="body" slot-scope="props" :props="props" dense>
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template>{{ col.value }}</template>
           </q-td>
@@ -452,6 +452,9 @@ export default {
 
   .modal-layout
     background-color: white
+
+  .modal-max-size
+    max-width: 860px !important
 
   .table-grid table tr
     margin-bottom: 0px !important
