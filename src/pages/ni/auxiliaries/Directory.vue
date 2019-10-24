@@ -58,7 +58,7 @@
             <p class="input-caption required">Équipe</p>
             <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
           </div>
-          <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch"
+          <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
             :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
         </div>
       </div>

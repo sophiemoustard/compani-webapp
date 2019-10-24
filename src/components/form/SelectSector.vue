@@ -1,7 +1,7 @@
 <template>
-  <ni-select :in-modal="inModal" :value="value" ref="selectSector" @input="updateSector" :options="sectors" @blur="blurHandler"
+  <ni-select :class="{'borders': inModal}" :value="value" ref="selectSector" @input="updateSector" :options="sectors" @blur="blurHandler"
     @focus="focusHandler" filter-placeholder="Rechercher" :error="error"
-    :error-label="error-label"/>
+    :error-label="errorLabel"/>
 </template>
 
 <script>
