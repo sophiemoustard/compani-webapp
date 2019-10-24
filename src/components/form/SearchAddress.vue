@@ -4,9 +4,11 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-select dense borderless :value="value.fullAddress" @input="update" :error="error" :error-message="errorLabel"
-      use-input @filter="searchAddress" fill-input hide-selected input-debounce="0" :options="options"
-      :class="{ 'borders': inModal }" @blur="blurEvent" @focus="focusEvent" clearable :disable="disable" />
+    <q-field dense :error="error" :error-message="errorLabel" borderless>
+      <q-select dense borderless :value="value.fullAddress" @input="update"
+        use-input @filter="searchAddress" fill-input hide-selected input-debounce="0" :options="options"
+        :class="{ 'borders': inModal }" @blur="blurEvent" @focus="focusEvent" :disable="disable" />
+    </q-field>
   </div>
 </template>
 
@@ -67,9 +69,19 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  /deep/ .q-select
+    width: 100%
+
   /deep/ .q-field__append
     .q-select__dropdown-icon
       display: none
     .q-spinner
       display: none
+
+  /deep/ .q-field__append
+    .text-negative
+      display: none
+  /deep/ .q-field__bottom
+    color: $secondary
+    padding-top: 3px;
 </style>
