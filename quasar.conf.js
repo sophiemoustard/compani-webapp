@@ -175,7 +175,7 @@ module.exports = function (ctx) {
     },
     cordova: {},
     electron: {
-      extendWebpack(cfg) {},
+      extendWebpack (cfg) {},
       packager: {},
       builder: {},
     },
