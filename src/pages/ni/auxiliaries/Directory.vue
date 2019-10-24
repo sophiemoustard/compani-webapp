@@ -49,9 +49,9 @@
         caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
       <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
         @blur="$v.newUser.local.email.$touch" :error-label="emailError" required-field />
-      <!-- <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
+      <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
         @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
-        :error="$v.newUser.contact.address.$error" in-modal /> -->
+        :error="$v.newUser.contact.address.$error" in-modal />
       <div class="row margin-input">
         <div class="col-12">
           <div class="row justify-between">
@@ -84,7 +84,7 @@ import { taskValidation } from '../../../helpers/taskValidation';
 import SelectSector from '../../../components/form/SelectSector';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
-// import SearchAddress from '../../../components/form/SearchAddress';
+import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
 import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
@@ -97,7 +97,7 @@ export default {
     'ni-select-sector': SelectSector,
     'ni-input': Input,
     'ni-select': Select,
-    // 'ni-search-address': SearchAddress,
+    'ni-search-address': SearchAddress,
     'ni-directory-header': DirectoryHeader,
     'ni-modal': Modal,
   },
