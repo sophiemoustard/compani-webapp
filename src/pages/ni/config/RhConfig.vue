@@ -70,10 +70,9 @@
         <div class="row gutter-profile">
           <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
             <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
-              type="number" v-model="company.rhConfig.transportSubs[index].price"
+              type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
               @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
-              @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })"
-              :key="index" />
+              @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })" />
           </template>
         </div>
       </div>
@@ -82,33 +81,29 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contractWithCompany"
-              :entity="company" alt="template contrat prestataire" name="contractWithCompany"
+              :entity="company" alt="template contrat prestataire" name="contractWithCompany" :url="docsUploadUrl"
               @delete="deleteDocument(company.rhConfig.templates.contractWithCompany.driveId, 'contractWithCompany', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`"
-              :url="docsUploadUrl" />
+              @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat prestataire"
               path="rhConfig.templates.contractWithCompanyVersion" :entity="company" alt="template avenant prestataire"
-              name="contractWithCompanyVersion"
+              name="contractWithCompanyVersion" :url="docsUploadUrl"
               @delete="deleteDocument(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`"
-              :url="docsUploadUrl" />
+              @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat mandataire" path="rhConfig.templates.contractWithCustomer"
-              :entity="company" alt="template contrat mandataire" name="contractWithCustomer"
+              :entity="company" alt="template contrat mandataire" name="contractWithCustomer" :url="docsUploadUrl"
               @delete="deleteDocument(company.rhConfig.templates.contractWithCustomer.driveId, 'contractWithCustomer', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_contrat_mandataire_${company.name}`"
-              :url="docsUploadUrl" />
+              @uploaded="documentUploaded" :additional-value="`modele_contrat_mandataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat mandataire"
               path="rhConfig.templates.contractWithCustomerVersion" :entity="company" alt="template avenant mandataire"
-              name="contractWithCustomerVersion"
+              name="contractWithCustomerVersion" :url="docsUploadUrl"
               @delete="deleteDocument(company.rhConfig.templates.contractWithCustomerVersion.driveId, 'contractWithCustomerVersion', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`"
-              :url="docsUploadUrl" />
+              @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`" />
           </div>
         </div>
       </div>
@@ -180,7 +175,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import { required, maxValue } from 'vuelidate/lib/validators';
 
 import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
@@ -263,11 +257,6 @@ export default {
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
-    },
-    headers () {
-      return {
-        'x-access-token': Cookies.get('alenvi_token') || '',
-      }
     },
     isSameThanEditedSector () {
       return this.tmpInput === this.editedSector.name;
