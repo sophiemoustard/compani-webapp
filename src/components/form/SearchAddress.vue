@@ -84,4 +84,11 @@ export default {
       display: none
     .q-spinner
       display: none
+
+  /deep/ .q-field__append
+    .text-negative
+      display: none
+  /deep/ .q-field__bottom
+    color: $secondary
+    padding-top: 3px;
 </style>
