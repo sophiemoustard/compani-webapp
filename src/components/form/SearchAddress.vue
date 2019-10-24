@@ -5,9 +5,13 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field dense :error="error" :error-message="errorLabel" borderless>
-      <q-select dense borderless :value="value.fullAddress" @input="update"
-        use-input @filter="searchAddress" fill-input hide-selected input-debounce="0" :options="options"
-        :class="{ 'borders': inModal }" @blur="blurEvent" @focus="focusEvent" :disable="disable" />
+      <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
+        input-debounce="0" :options="options" :class="{ 'borders': inModal }" :disable="disable" @filter="searchAddress"
+        @blur="blurEvent" @focus="focusEvent">
+        <template v-if="value.fullAddress" v-slot:append>
+          <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
+        </template>
+      </q-select>
     </q-field>
   </div>
 </template>
@@ -34,7 +38,7 @@ export default {
   methods: {
     async searchAddress (terms, done) {
       try {
-        if (!terms) return this.update();
+        if (!terms) return;
 
         const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: terms } });
         this.options = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
@@ -61,8 +65,10 @@ export default {
       this.$emit('focus');
     },
     update (value) {
-      if (!value) this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' })
-      else this.$emit('input', this.$_.pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
+      this.$emit('input', this.$_.pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
+    },
+    resetValue () {
+      this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' });
     },
   },
 }
