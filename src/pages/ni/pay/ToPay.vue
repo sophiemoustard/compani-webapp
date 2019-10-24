@@ -27,9 +27,9 @@
       :visible-columns="visibleColumns" card-class="neutral-background" flat>
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
-        <q-th auto-width>
+        <th>
           <q-checkbox v-model="props.selected" indeterminate-value="some" />
-        </q-th>
+        </th>
       </q-tr>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -70,7 +70,7 @@
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
-        <q-td auto-width style="width: 50px">
+        <q-td>
           <q-checkbox v-model="props.selected" />
         </q-td>
       </q-tr>
@@ -237,7 +237,6 @@ export default {
           this.selected = [];
         }).onCancel(() => NotifyPositive('Création annulée'));
       } catch (e) {
-        if (e.message === '') return;
         console.error(e);
         NotifyNegative('Erreur lors de la création des fiches de paie');
       }
