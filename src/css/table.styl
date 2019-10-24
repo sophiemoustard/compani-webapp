@@ -40,7 +40,8 @@
       display: block
       text-align: right
       white-space: initial
-      height: 30px
+      height: auto
+      min-height 32px
       padding: 8px 8px
 
       &::before
@@ -66,6 +67,10 @@
       white-space: normal
       padding: 10px 20px
       vertical-align: middle
+
+    tr
+      @media screen and (max-width: 767px)
+        height: auto !important
 
     td
       padding: 4px 20px

@@ -104,7 +104,8 @@ export default {
     .q-uploader__header-content
       border: none !important
 
-  .uploader-size
-    width: 50% !important
+  @media screen and (min-width: 1025px)
+    .uploader-size
+      width: 50% !important
 
 </style>
