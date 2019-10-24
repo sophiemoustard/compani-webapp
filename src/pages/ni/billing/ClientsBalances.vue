@@ -208,6 +208,4 @@ export default {
   /deep/ .q-table
     & tbody tr.selected
       background: $white
-    &-bottom > .q-icon
-      display: none
 </style>
