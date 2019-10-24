@@ -18,7 +18,7 @@ export const paymentMixin = {
         client: null,
         netInclTaxes: 0,
         type: '',
-        date: new Date(),
+        date: this.$moment().toISOString(),
       },
       newPayment: null,
     }

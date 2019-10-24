@@ -90,16 +90,16 @@ const routes = [
       //     parent: 'billing',
       //   },
       // },
-      // {
-      //   path: 'ni/billing/clients-balances',
-      //   name: 'clients balances',
-      //   component: () => import('pages/ni/billing/ClientsBalances'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'bills:edit',
-      //     parent: 'billing',
-      //   },
-      // },
+      {
+        path: 'ni/billing/clients-balances',
+        name: 'clients balances',
+        component: () => import('pages/ni/billing/ClientsBalances'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'bills:edit',
+          parent: 'billing',
+        },
+      },
       {
         path: 'ni/billing/debits-archive',
         name: 'debits archive',
