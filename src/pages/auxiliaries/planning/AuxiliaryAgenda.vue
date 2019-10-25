@@ -2,7 +2,7 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
-        <div class="col-xs-12 col-md-5 person-name" v-if="Object.keys(selectedAuxiliary).length > 0">
+        <div class="col-xs-12 col-sm-5 person-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
           <q-select borderless dense emit-value :value="selectedAuxiliary._id" :options="auxiliariesOptions"
             @input="updateAuxiliary" ref="personSelect" :display-value="placeholder" behavior="menu">
@@ -11,7 +11,7 @@
             </template>
           </q-select>
         </div>
-        <div class="col-xs-12 col-md-7">
+        <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :viewMode="viewMode"
             :type="AGENDA" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
             @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
