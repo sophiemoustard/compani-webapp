@@ -4,7 +4,7 @@
       <p class="input-caption">{{ caption }}</p>
     </div>
     <div v-if="documents.length === 0" class="row uploader-size">
-        <ni-file-uploader :path="path" alt="justificatif financement" class="uploader-size"
+        <ni-file-uploader :path="path" alt="justificatif financement"
           @uploaded="documentUploaded" :name="name" :user-profile="userProfile" :url="url"
           @delete="deleteDocument($event)" :additional-value="additionalFieldsName" :multiple="true"
           label="Choisir un document"/>

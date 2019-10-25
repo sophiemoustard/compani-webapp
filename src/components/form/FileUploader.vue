@@ -1,5 +1,5 @@
 <template>
-  <div class="margin-input full-width">
+  <div class="margin-input">
     <div v-if="displayCaption && displayUpload" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -16,7 +16,7 @@
     <q-field borderless v-if="(!document || !document.driveId) && displayUpload" :error="error"
       :error-message="errorLabel">
       <q-uploader flat :bordered="false" color="white" :label="label" :url="url" :headers="headers"
-        text-color="black" class="full-width" @failed="failMsg" :form-fields="additionalFields"
+        text-color="black" @failed="failMsg" :form-fields="additionalFields"
         @uploaded="documentUploaded" auto-upload :accept="extensions" :field-name="name" :multiple="multiple"/>
     </q-field>
   </div>
