@@ -4,10 +4,9 @@
       <p class="input-caption">{{ caption }}</p>
     </div>
     <div v-if="documents.length === 0" class="row uploader-size">
-        <ni-file-uploader :path="path" alt="justificatif financement"
-          @uploaded="documentUploaded" :name="name" :user-profile="userProfile" :url="url"
-          @delete="deleteDocument($event)" :additional-value="additionalFieldsName" :multiple="true"
-          label="Choisir un document"/>
+        <ni-file-uploader :path="path" alt="caption" @uploaded="documentUploaded" :name="name"
+          :user-profile="userProfile" :url="url" @delete="deleteDocument($event)"
+          :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
     </div>
     <div class="row gutter-profile" v-if="documents && documents.length > 0">
       <div class="col-xs-12 col-md-6" v-for="(certificate, index) in documents" :key="index">
@@ -26,10 +25,9 @@
     <div v-if="documents && documents.length > 0" class="row">
       <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
         class="col-xs-12 col-md-6">
-        <ni-file-uploader :path="path" alt="justificatif financement" class="uploader-size"
-          @uploaded="documentUploaded" :name="name" :user-profile="userProfile" :url="url"
-          @delete="deleteDocument($event)" :additional-value="additionalFieldsName" :multiple="true"
-          label="Choisir un document"/>
+        <ni-file-uploader :path="path" alt="caption" class="uploader-size" @uploaded="documentUploaded" :name="name"
+          :user-profile="userProfile" :url="url" @delete="deleteDocument($event)"
+          :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
       </q-expansion-item>
     </div>
   </div>
