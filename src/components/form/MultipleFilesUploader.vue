@@ -4,9 +4,9 @@
       <p class="input-caption">{{ caption }}</p>
     </div>
     <div v-if="documents.length === 0" class="row uploader-size">
-        <ni-file-uploader path="financialCertificates" alt="justificatif financement" class="uploader-size"
-          @uploaded="documentUploaded" name="financialCertificates" :user-profile="userProfile" :url="url"
-          @delete="deleteDocument($event)" additional-value="financialCertificates" :multiple="true"
+        <ni-file-uploader :path="path" alt="justificatif financement" class="uploader-size"
+          @uploaded="documentUploaded" :name="name" :user-profile="userProfile" :url="url"
+          @delete="deleteDocument($event)" :additional-value="additionalFieldsName" :multiple="true"
           label="Choisir un document"/>
     </div>
     <div class="row gutter-profile" v-if="documents && documents.length > 0">
@@ -26,9 +26,9 @@
     <div v-if="documents && documents.length > 0" class="row">
       <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
         class="col-xs-12 col-md-6">
-        <ni-file-uploader path="financialCertificates" alt="justificatif financement" class="uploader-size"
-          @uploaded="documentUploaded" name="financialCertificates" :user-profile="userProfile" :url="url"
-          @delete="deleteDocument($event)" additional-value="financialCertificates" :multiple="true"
+        <ni-file-uploader :path="path" alt="justificatif financement" class="uploader-size"
+          @uploaded="documentUploaded" :name="name" :user-profile="userProfile" :url="url"
+          @delete="deleteDocument($event)" :additional-value="additionalFieldsName" :multiple="true"
           label="Choisir un document"/>
       </q-expansion-item>
     </div>
@@ -49,15 +49,15 @@ export default {
     'ni-file-uploader': FileUploader,
   },
   props: {
-    caption: String,
+    caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
-    path: String,
-    alt: String,
-    name: String,
-    url: String,
-    additionalFieldsName: String,
-    userProfile: Object,
-    collapsibleLabel: String,
+    path: { type: String, default: '' },
+    alt: { type: String, default: '' },
+    name: { type: String, default: '' },
+    url: { type: String, default: '' },
+    additionalFieldsName: { type: String, default: '' },
+    userProfile: { type: Object, default: () => {} },
+    collapsibleLabel: { type: String, default: '' },
   },
   data () {
     return {

@@ -63,9 +63,9 @@
         <ni-select caption="Nationalité" :error="$v.user.identity.nationality.$error" :options="nationalitiesOptions"
           v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')"
           @blur="updateUser('identity.nationality')" />
-        <ni-datetime-picker caption="Date de naissance" :error="$v.user.identity.birthDate.$error"
-          v-model="user.identity.birthDate" @focus="saveTmp('identity.birthDate')"
-          @blur="updateUser('identity.birthDate')" />
+        <ni-date-input caption="Date de naissance" :error="$v.user.identity.birthDate.$error"
+          v-model="user.identity.birthDate" @focus="saveTmp('identity.birthDate')" content-class="col-xs-12 col-md-6"
+          @input="updateUser('identity.birthDate')" />
         <ni-select caption="Pays de naissance" :error="$v.user.identity.birthCountry.$error" :options="countriesOptions"
           v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
           @blur="updateUser('identity.birthCountry')" />
@@ -304,7 +304,7 @@ import Select from '../form/Select';
 import OptionGroup from '../form/OptionGroup';
 import FileUploader from '../form/FileUploader.vue';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
-import DatetimePicker from '../form/DatetimePicker.vue';
+import DateInput from '../form/DateInput.vue';
 import SearchAddress from '../form/SearchAddress';
 import { frPhoneNumber, iban, frAddress, bic } from '../../helpers/vuelidateCustomVal';
 import { extend } from '../../helpers/utils.js';
@@ -320,7 +320,7 @@ export default {
     'ni-select': Select,
     'ni-file-uploader': FileUploader,
     'ni-multiple-files-uploader': MultipleFilesUploader,
-    'ni-datetime-picker': DatetimePicker,
+    'ni-date-input': DateInput,
     'ni-search-address': SearchAddress,
     'ni-option-group': OptionGroup,
   },
@@ -730,23 +730,24 @@ export default {
     },
     async deleteDocument (driveId, path) {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
           cancel: 'Annuler',
+        }).onOk(async () => {
+          await gdrive.removeFileById({ id: driveId });
+          let payload = { _id: this.currentUser._id };
+          if (path === 'certificates') {
+            payload = Object.assign(payload, { [`administrative.${path}`]: { driveId } });
+            await this.$users.updateCertificates(payload);
+          } else {
+            payload = this.$_.set(payload, path, { driveId: null, link: null });
+            await this.$users.updateById(payload);
+          }
+          await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+          NotifyPositive('Document supprimé');
         });
-        await gdrive.removeFileById({ id: driveId });
-        let payload = { _id: this.currentUser._id };
-        if (path === 'certificates') {
-          payload = Object.assign(payload, { [`administrative.${path}`]: { driveId } });
-          await this.$users.updateCertificates(payload);
-        } else {
-          payload = this.$_.set(payload, path, { driveId: null, link: null });
-          await this.$users.updateById(payload);
-        }
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
-        NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
         if (e.message === '') return NotifyPositive('Suppression annulée');
@@ -755,22 +756,23 @@ export default {
     },
     async deleteImage (params) {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
           ok: true,
           cancel: 'Annuler',
+        }).onOk(async () => {
+          if (this.currentUser.picture && this.currentUser.picture.publicId) {
+            await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
+            this.croppa.remove();
+          }
+          await this.$users.updateById({
+            _id: this.currentUser._id,
+            picture: { link: null, publicId: null },
+          });
+          await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+          NotifyPositive('Photo supprimée');
         });
-        if (this.currentUser.picture && this.currentUser.picture.publicId) {
-          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
-          this.croppa.remove();
-        }
-        await this.$users.updateById({
-          _id: this.currentUser._id,
-          picture: { link: null, publicId: null },
-        });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
-        NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
         if (e.message === '') return NotifyPositive('Suppression annulée');
@@ -844,4 +846,8 @@ export default {
      width: 200px
      height: 200px
      background: $neutral
+  /deep/.q-field--standard .q-field__control::before
+    border-bottom: none !important
+  /deep/.q-field--standard .q-field__control::after
+    background: none !important
 </style>
