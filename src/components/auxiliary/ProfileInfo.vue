@@ -87,8 +87,9 @@
           {{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.user.contact.phone.$error" :error-label="phoneNbrError" type="tel"
-          v-model.trim="user.contact.phone" @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
+        <ni-input caption="Numéro de téléphone" :error="$v.user.contact.phone.$error" :error-label="phoneNbrError"
+          type="tel" v-model.trim="user.contact.phone" @blur="updateUser('contact.phone')"
+          @focus="saveTmp('contact.phone')" />
         <div v-if="!isAuxiliary" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
@@ -99,7 +100,7 @@
             <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock" />
           </div>
         </div>
-        <ni-search-address v-model="user.contact.address" color="white" inverted-light @focus="saveTmp('contact.address.fullAddress')"
+        <ni-search-address v-model="user.contact.address" color="white" @focus="saveTmp('contact.address.fullAddress')"
           @blur="updateUser('contact.address')" :error-label="addressError" :error="$v.user.contact.address.$error" />
       </div>
     </div>
@@ -144,25 +145,22 @@
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.identityDocs" type="radio"
             :options="identityDocsOptions" :error="$v.user.administrative.identityDocs.$error"
-            caption="Merci de nous indiquer le type de document d'identité que tu possèdes."  required-field
+            caption="Merci de nous indiquer le type de document d'identité que tu possèdes." required-field
             :error-label="requiredLabel" @input="updateUser('administrative.identityDocs')" />
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
-            :entity="currentUser"
+            :entity="currentUser" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
             @delete="deleteDocument(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
-            name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
-            :error="$v.user.administrative.idCardRecto.driveId.$error"
-            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :extensions="extensions" />
+            :error="$v.user.administrative.idCardRecto.driveId.$error" :extensions="extensions"
+            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
-            :entity="currentUser" :url="docsUploadUrl"
+            :entity="currentUser" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
             @delete="deleteDocument(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
-            name="idCardVerso" @uploaded="refreshUser"
-            :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :extensions="extensions" />
+             :extensions="extensions"
+            :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
         <div v-if="user.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
@@ -173,9 +171,8 @@
         </div>
         <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
-            alt="titre de séjour (recto)" :entity="currentUser"
+            alt="titre de séjour (recto)" :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl"
             @delete="deleteDocument(user.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
-            @uploaded="refreshUser" :url="docsUploadUrl"
             :error="$v.user.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
             :additional-value="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions" />
@@ -189,19 +186,17 @@
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
-            alt="attestation secu" :entity="currentUser"
+            alt="attestation secu" :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
             @delete="deleteDocument(user.administrative.healthAttest.driveId, 'administrative.healthAttest')"
             name="healthAttest" @uploaded="refreshUser" :error="$v.user.administrative.healthAttest.driveId.$error"
-            :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :url="docsUploadUrl" :extensions="extensions" />
+            :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
-            :entity="currentUser"
+            :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
             @delete="deleteDocument(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
             name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
-            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :url="docsUploadUrl" :extensions="extensions" />
+            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
       </div>
       <div class="q-mt-lg">
@@ -223,7 +218,7 @@
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
             <q-icon v-if="$v.user.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field :error="$v.user.administrative.mutualFund.has.$error" :error-label="requiredLabel">
+          <q-field dense :error="$v.user.administrative.mutualFund.has.$error" :error-label="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary"
               v-model="user.administrative.mutualFund.has" @input="updateUser('administrative.mutualFund.has')"
               :options="[
@@ -237,12 +232,10 @@
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
             @delete="deleteDocument(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
-            name="mutualFund" @uploaded="refreshUser"
+            name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
             :display-upload="user.administrative.mutualFund.has && !user.administrative.mutualFund.driveId"
             entity-url="users" :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
-            :url="docsUploadUrl"
-            :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :extensions="extensions" />
+            :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
       </div>
     </div>
@@ -263,11 +256,9 @@
           <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement"
             path="administrative.transportInvoice" alt="justif transport" :entity="currentUser" name="transportInvoice"
             @uploaded="refreshUser" :error="$v.user.administrative.transportInvoice.driveId.$error"
-            :display-caption="isAuxiliary"
+            :display-caption="isAuxiliary" :url="docsUploadUrl" :extensions="extensions"
             @delete="deleteDocument(user.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :url="docsUploadUrl"
-            :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
-            :extensions="extensions" />
+            :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
       </div>
     </div>
@@ -276,9 +267,8 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate"
-            alt="certificat médical" :entity="user"
+            alt="certificat médical" :entity="user" name="medicalCertificate" @uploaded="refreshUser"
             @delete="deleteDocument(user.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
-            name="medicalCertificate" @uploaded="refreshUser"
             :additional-value="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :url="docsUploadUrl" :extensions="extensions" />
         </div>
@@ -747,10 +737,11 @@ export default {
           }
           await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
           NotifyPositive('Document supprimé');
+        }).onCancel(() => {
+          return NotifyPositive('Suppression annulée');
         });
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
@@ -772,10 +763,11 @@ export default {
           });
           await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
           NotifyPositive('Photo supprimée');
+        }).onCancel(() => {
+          return NotifyPositive('Suppression annulée');
         });
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression de la photo');
       }
     },

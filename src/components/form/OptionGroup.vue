@@ -17,17 +17,17 @@
 import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
-  name: 'NiOptionGroup',
+  name: 'OptionGroup',
   props: {
-    caption: String,
-    error: Boolean,
+    caption: { type: String, default: '' },
+    error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
     value: [String, Array],
-    last: Boolean,
+    last: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
-    options: Array,
-    type: String,
+    options: { type: Array, default: () => [] },
+    type: { type: String, default: '' },
     inline: { type: Boolean, default: false },
     displayCaption: { type: Boolean, default: true },
   },

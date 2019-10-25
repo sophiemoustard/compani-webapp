@@ -23,9 +23,9 @@ export default {
   name: 'NiDateInput',
   props: {
     caption: { type: String, default: '' },
-    error: Boolean,
+    error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
-    value: String,
+    value: { type: String, default: '' },
     min: { type: String, default: '' },
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
@@ -34,9 +34,11 @@ export default {
   },
   computed: {
     date () {
+      if (this.value === '') return '';
       return this.$moment(this.value).format('YYYY/MM/DD');
     },
     inputDate () {
+      if (this.value === '') return '';
       return this.$moment(this.value).format('DD/MM/YYYY');
     },
   },

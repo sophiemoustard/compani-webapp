@@ -62,7 +62,6 @@ module.exports = function (ctx) {
         'QCheckbox',
         'QCard',
         'QDate',
-        'QDate',
         'QDialog',
         'QDrawer',
         'QExpansionItem',

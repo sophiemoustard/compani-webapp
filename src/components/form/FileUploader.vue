@@ -33,13 +33,13 @@ export default {
     'ni-custom-img': CustomImg,
   },
   props: {
-    caption: String,
+    caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
-    path: String,
-    alt: String,
+    path: { type: String, default: '' },
+    alt: { type: String, default: '' },
     name: { type: String, default: 'file' },
-    additionalValue: String,
-    entity: Object,
+    additionalValue: { type: String, default: '' },
+    entity: { type: Object, default: () => {} },
     url: { type: String, default: '' },
     errorLabel: { type: String, default: 'Document requis' },
     displayUpload: { type: Boolean, default: true },
@@ -107,7 +107,6 @@ export default {
     .q-uploader__list
       display: none
     .q-uploader__header-content
-      border: 1px solid $light-grey
       border-radius: 3px
       height: 40px
       margin: 0
