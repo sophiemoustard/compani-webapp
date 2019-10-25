@@ -101,23 +101,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .borders
-    /deep/ .q-field__control
-      border: 1px solid $light-grey
-      border-radius: 3px
-
-  .input
+  .q-input
     /deep/ .q-field__control
       font-size: 16px
-      padding-left: 14px
-      padding-right: 14px
-      border-radius: 3px
-    /deep/ .q-field__append
-      .text-negative
-        display: none
-    /deep/ .q-field__bottom
-      color: $secondary
-      padding-top: 3px;
 
   .input-file-container
     padding: 9px 14px 11px

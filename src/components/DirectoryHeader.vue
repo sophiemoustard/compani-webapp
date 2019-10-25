@@ -4,18 +4,20 @@
       <h4 class="no-margin">{{ title }}</h4>
     </div>
     <div :class="['col-xs-12', { 'col-md-5': displayToggle }, { 'col-md-6': !displayToggle }]">
-      <ni-input class="no-border" :value="search" :placeholder="searchPlaceholder"
-        @input="input" :debounce="0" icon="search" type="search" />
+      <q-input class="no-border" :value="search" :placeholder="searchPlaceholder" dense borderless
+        @input="input" debounce="0" type="search" bg-color="white">
+        <template v-slot:prepend>
+          <q-icon size="xs" name="search"></q-icon>
+        </template>
+      </q-input>
     </div>
     <div v-if="displayToggle" class="col-xs-12 col-md-2 row justify-end">
-      <q-toggle :value="toggleValue" color="primary" :label="toggleLabel" @input="toggle" />
+      <q-toggle dense :value="toggleValue" color="primary" :label="toggleLabel" @input="toggle" />
     </div>
   </div>
 </template>
 
 <script>
-import Input from './form/Input';
-
 export default {
   name: 'DirectoryHeader',
   props: {
@@ -25,9 +27,6 @@ export default {
     toggleValue: { type: Boolean, default: false },
     displayToggle: { type: Boolean, default: false },
     search: { type: String, default: '' },
-  },
-  components: {
-    'ni-input': Input,
   },
   methods: {
     input (value) {
@@ -42,5 +41,8 @@ export default {
 
 <style lang="stylus" scoped>
   .q-option
-    font-size: 14px
+    font-size: 14px;
+  .q-input
+    /deep/ .q-field__control
+      font-size: 14px
 </style>
