@@ -1,15 +1,15 @@
 <template>
   <div>
-    <div class="row" v-if="caption">
-      <p class="input-caption">{{ caption }}</p>
-    </div>
-    <div v-if="documents.length === 0" class="row uploader-size">
-        <ni-file-uploader :path="path" alt="caption" @uploaded="documentUploaded" :name="name"
-          :user-profile="userProfile" :url="url" @delete="deleteDocument($event)"
-          :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
-    </div>
-    <div class="row gutter-profile" v-if="documents && documents.length > 0">
-      <div class="col-xs-12 col-md-6" v-for="(certificate, index) in documents" :key="index">
+    <template v-if="documents.length === 0">
+      <ni-file-uploader :path="path" alt="caption" @uploaded="documentUploaded" :name="name"
+        :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
+        :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
+    </template>
+    <template v-if="documents && documents.length > 0">
+      <div class="row" v-if="caption">
+        <p class="input-caption">{{ caption }}</p>
+      </div>
+      <div v-for="(certificate, index) in documents" :key="index">
         <div v-if="certificate.driveId" class="justify-between row" style="background: white">
           <div class="doc-thumbnail">
             <ni-custom-img :driveId="certificate.driveId" :alt="alt" :key="certificate.driveId" />
@@ -21,15 +21,14 @@
           </div>
         </div>
       </div>
-    </div>
-    <div v-if="documents && documents.length > 0" class="row">
-      <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
-        class="col-xs-12 col-md-6">
-        <ni-file-uploader :path="path" alt="caption" class="uploader-size" @uploaded="documentUploaded" :name="name"
-          :user-profile="userProfile" :url="url" @delete="deleteDocument($event)"
+    </template>
+    <template v-if="documents && documents.length > 0">
+      <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon">
+        <ni-file-uploader :path="path" alt="caption" @uploaded="documentUploaded" :name="name"
+          :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
           :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
       </q-expansion-item>
-    </div>
+    </template>
   </div>
 </template>
 
@@ -98,12 +97,4 @@ export default {
     .q-btn
       @media screen and (max-width: 767px)
         margin: 0px 5px
-
-  @media screen and (min-width: 1025px)
-    .uploader-size
-      width: 50% !important
-
-  /deep/ .q-expansion-item__toggle-icon
-    color: $primary
-
 </style>

@@ -141,7 +141,7 @@
         <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">
           {{groupErrors('documents').msg }}</p>
       </div>
-      <div class="row gutter-profile items-stretch">
+      <div class="row gutter-profile">
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.identityDocs" type="radio"
             :options="identityDocsOptions" :error="$v.user.administrative.identityDocs.$error"
@@ -198,12 +198,12 @@
             name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
             :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
-      </div>
-      <div class="q-mt-lg">
-        <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
-          alt="facture téléphone" @delete="deleteDocument($event, 'certificates')" name="certificates"
-          collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
-          additional-fields-name="diplomes" @uploaded="refreshUser" />
+        <div class="col-xs-12 col-md-6">
+          <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
+            alt="facture téléphone" @delete="deleteDocument($event, 'certificates')" name="certificates"
+            collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
+            additional-fields-name="diplomes" @uploaded="refreshUser" />
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -212,7 +212,7 @@
         <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">
           {{ groupErrors('mutualFund').msg }}</p>
       </div>
-      <div class="row gutter-profile-x">
+      <div class="row gutter-profile">
         <div class="col-xs-12">
           <div v-if="isAuxiliary" class="row justify-between">
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
@@ -227,7 +227,7 @@
                 ]" />
           </q-field>
         </div>
-        <div class="col-xs-12">
+        <div class="col-xs-12 col-md-6">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
@@ -245,7 +245,7 @@
         <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">
           {{ groupErrors('transportInvoice').msg }}</p>
       </div>
-      <div class="row gutter-profile-x">
+      <div class="row gutter-profile">
         <div class="col-xs-12">
           <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.transportInvoice.transportType"
             :options="transportOptions" caption="Par quel moyen comptes-tu te rendre au travail ?" type="radio"

@@ -1,5 +1,5 @@
 <template>
-  <div class="margin-input">
+  <div class="margin-input col-xs-12 col-md-6">
     <div v-if="displayCaption && displayUpload" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -104,6 +104,7 @@ export default {
       padding-top: 3px
 
   /deep/ .q-uploader
+    width: 100%
     .q-uploader__list
       display: none
     .q-uploader__header-content
