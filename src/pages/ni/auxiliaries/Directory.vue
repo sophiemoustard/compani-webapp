@@ -2,16 +2,15 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire auxiliaires" toggleLabel="Actifs" :toggleValue="activeUsers" display-toggle
       @updateSearch="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
-    <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list q-pa-sm neutral-background" flat>
-      <q-tr slot="body" slot-scope="props" :props="props" :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]"
-        @click.native="goToUserProfile(props.row.auxiliary._id)">
+    <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort flat :loading="tableLoading"
+      :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination"
+      class="people-list neutral-background">
+      <q-tr slot="body" slot-scope="props" :props="props" @click.native="goToUserProfile(props.row.auxiliary._id)"
+      :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]" >
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <q-item v-if="col.name === 'name'">
             <q-item-section avatar>
-              <q-avatar size="30px">
-                <img class="border-for-avatar" :src="getAvatar(col.value.picture)">
-              </q-avatar>
+              <img class="avatar" :src="getAvatar(col.value.picture)">
             </q-item-section>
             <q-item-section> {{col.value.name}} </q-item-section>
           </q-item>
@@ -34,15 +33,15 @@
       @click="auxiliaryCreationModal = true" />
 
     <!-- User creation modal -->
-    <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm">
+    <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm" content-class="modal-container-md">
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
 
       <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
         required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
-      <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-        @blur="$v.newUser.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
+        @blur="$v.newUser.identity.lastname.$touch" required-field caption="Nom" />
       <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
         caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
       <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
@@ -63,9 +62,7 @@
         </div>
       </div>
       <div class="row margin-input last">
-        <div class="col-12">
-          <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" />
-        </div>
+        <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense />
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
@@ -416,6 +413,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .border-for-avatar
-    border: solid 1px #979797;
+  /deep/.q-field--with-bottom
+    padding-bottom: 12px !important
 </style>
