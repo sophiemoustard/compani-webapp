@@ -43,7 +43,9 @@ export default {
       window.open(url, '_blank');
     },
     goToProfile () {
-      return this.$router.push({ name: 'account info', params: { id: this.userId } });
+      if (this.$router.currentRoute.name !== 'account info') {
+        return this.$router.push({ name: 'account info', params: { id: this.userId } });
+      }
     },
   },
 }

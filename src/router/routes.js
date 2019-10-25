@@ -120,16 +120,16 @@ const routes = [
           parent: 'pay',
         },
       },
-      // {
-      //   path: 'ni/pay/contract-ends',
-      //   name: 'contract ends',
-      //   component: () => import('pages/ni/pay/ContractEnds'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'pay:edit',
-      //     parent: 'pay',
-      //   },
-      // },
+      {
+        path: 'ni/pay/contract-ends',
+        name: 'contract ends',
+        component: () => import('pages/ni/pay/ContractEnds'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'pay:edit',
+          parent: 'pay',
+        },
+      },
       // {
       //   path: 'ni/pay/contract-monitoring',
       //   name: 'contract monitoring',
