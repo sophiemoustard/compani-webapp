@@ -840,8 +840,6 @@ export default {
     &-ok
       font-size: 12px
       color: $tertiary
-  .croppa-container
-    background-color: white
   .picture-container
      width: 200px
      height: 200px
