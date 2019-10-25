@@ -505,7 +505,7 @@ export const planningActionMixin = {
     },
     async deleteEventRepetition () {
       try {
-        const shouldDeleteRepetition = await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Supprimer l\'événement périodique',
           ok: 'OK',
@@ -518,22 +518,21 @@ export const planningActionMixin = {
               { label: 'Supprimer cet évenement et tous les suivants', value: true },
             ],
           },
-        });
+        }).onOk(async (shouldDeleteRepetition) => {
+          this.loading = true
+          if (shouldDeleteRepetition) {
+            await this.$events.deleteRepetition(this.editedEvent._id);
+            await this.refresh();
+          } else {
+            await this.$events.deleteById(this.editedEvent._id);
+            await this.refresh();
+          }
 
-        this.loading = true
-        if (shouldDeleteRepetition) {
-          await this.$events.deleteRepetition(this.editedEvent._id);
-          await this.refresh();
-        } else {
-          await this.$events.deleteById(this.editedEvent._id);
-          await this.refresh();
-        }
-
-        this.editionModal = false;
-        this.resetEditionForm();
-        NotifyPositive('Évènement supprimé.');
+          this.editionModal = false;
+          this.resetEditionForm();
+          NotifyPositive('Évènement supprimé.');
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
         this.loading = false
