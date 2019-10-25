@@ -301,15 +301,16 @@ const routes = [
           parent: 'administrative',
         },
       },
-      // {
-      //   path: 'auxiliaries/contracts',
-      //   name: 'profile contracts',
-      //   component: () => import('pages/auxiliaries/administrative/Contracts'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     parent: 'administrative',
-      //   },
-      // },
+
+      {
+        path: 'auxiliaries/contracts',
+        name: 'profile contracts',
+        component: () => import('pages/auxiliaries/administrative/Contracts'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'administrative',
+        },
+      },
       // {
       //   path: 'auxiliaries/info',
       //   name: 'auxiliary personal info',
