@@ -1,14 +1,19 @@
 .modal
-  &-container
-    min-width: 30vw;
+  &-container-md
     background-color: $white
-    .modal-padding
-      padding: 24px 25px 0px 25px
-      & .q-btn-toggle
-        width: 100%
-        margin-bottom: 20px
-        & .q-btn-item
-          width: 100%
+    min-width: 45vw;
+    @media screen and (min-width: 768px)
+      max-width: 65vw
+  &-container-sm
+    background-color: $white
+    min-width: 30vw
+    @media screen and (min-width: 768px)
+      max-width: 50vw
+  &-padding
+    padding: 24px 25px 0px 25px
+    & .q-btn-toggle
+      margin-bottom: 20px
+
   &-btn
     border-radius: 0
     height: 45px
@@ -28,21 +33,6 @@
     align-items: center
     & .q-icon
       font-size: 1.5em
-
-  &-content
-    max-height: -webkit-fill-available;
-    @media screen and (max-width: 767px)
-      height: auto !important;
-
-  &-container-sm
-    min-width: 30vw
-    @media screen and (min-width: 768px)
-      max-width: 50vw
-
-  &-container-md
-    min-width: 45vw
-    @media screen and (min-width: 768px)
-      max-width: 65vw
 
 .q-toolbar
   padding: 20px 58px

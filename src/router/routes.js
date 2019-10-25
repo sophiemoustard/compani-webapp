@@ -23,8 +23,7 @@ const routes = [
           (store.getters['main/user'].role.name === AUXILIARY ||
             store.getters['main/user'].role.name === PLANNING_REFERENT)
         ) {
-          // return next({name: 'auxiliary agenda'});
-          return next({ name: 'account info', params: { id: store.getters['main/user']._id } }); // TODO : a changer
+          return next({name: 'auxiliary agenda'});
         } else if (
           store.getters['main/user'] &&
           store.getters['main/user'].role.name !== AUXILIARY &&
@@ -243,15 +242,15 @@ const routes = [
       //   },
       // },
       // // Auxiliary view routes
-      // {
-      //   path: 'auxiliaries/agenda',
-      //   name: 'auxiliary agenda',
-      //   component: () => import('pages/auxiliaries/planning/AuxiliaryAgenda'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'events:read',
-      //   },
-      // },
+      {
+        path: 'auxiliaries/agenda',
+        name: 'auxiliary agenda',
+        component: () => import('pages/auxiliaries/planning/AuxiliaryAgenda'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'events:read',
+        },
+      },
       {
         path: 'auxiliaries/team',
         name: 'team directory',

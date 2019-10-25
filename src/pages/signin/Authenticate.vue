@@ -87,8 +87,7 @@ export default {
           // this.$router.replace({ name: 'customer agenda' });
           this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
         } else if (this.isAuxiliary) {
-          // this.$router.replace({ name: 'auxiliary agenda' });
-          this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
+          this.$router.replace({ name: 'auxiliary agenda' });
         } else {
           // this.$router.replace({ name: 'administrative directory' });
           this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });

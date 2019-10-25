@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" @hide="resetForm()">
-    <div class="modal-container">
+    <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer" :selectedPerson="selectedCustomer"
           @close="close" />
@@ -9,7 +9,8 @@
         <ni-planning-modal-header v-else v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
           :selectedPerson="selectedAuxiliary" @close="close" />
         <div class="modal-subtitle">
-          <q-btn-toggle no-wrap v-model="editedEvent.type" :options="eventType" toggle-color="primary" />
+          <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" rounded unelevated
+            :options="eventType" />
           <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
             color="grey" v-if="!isDisabled" />
         </div>
@@ -18,7 +19,10 @@
             :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
-          <ni-select in-modal caption="Bénéficiaire" v-model="editedEvent.customer" :options="customersOptions"
+          <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" v-model="editedEvent.auxiliary"
+            :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
+            @blur="validations.auxiliary.$touch" />
+          <ni-select v-else in-modal caption="Bénéficiaire" v-model="editedEvent.customer" :options="customersOptions"
             :error="validations.customer.$error" required-field disable />
           <ni-select in-modal caption="Service" :options="customerSubscriptionsOptions"
             v-model="editedEvent.subscription" :error="validations.subscription.$error"
@@ -34,7 +38,7 @@
         <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
-              @input="toggleRepetition" />
+              @input="toggleRepetition" size="12px" dense />
           </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
@@ -65,23 +69,29 @@
           :required-field="isMiscRequired" />
         <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm" />
+            <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm"
+              size="12px" dense />
           </div>
           <div class="row justify-between">
             <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
               :options="cancellationConditions" required-field @blur="validations.cancel.condition.$touch"
-              class="col-6 cancel" :error="validations.cancel.condition.$error" />
+              :error="validations.cancel.condition.$error" />
             <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
               :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
-              class="col-6 cancel" :error="validations.cancel.reason.$error" />
+              :error="validations.cancel.reason.$error" />
           </div>
         </template>
       </div>
       <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select v-model="editedEvent.address" color="white" inverted-light @input="deleteClassFocus"
+          <q-select borderless dense v-model="editedEvent.address" @input="deleteClassFocus" emit-value behavior="menu"
             :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
-            :after="iconSelect(editedEvent)" :filter-placeholder="editedEvent.address.fullAddress" ref="addressSelect" filter />
+            :display-value="editedEvent.address.fullAddress" ref="addressSelect">
+            <template v-slot:append v-if="customerAddressList(editedEvent).length > 1">
+              <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer"
+                @click.stop="toggleAddressSelect" />
+            </template>
+          </q-select>
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
         </div>
       </div>
@@ -138,9 +148,6 @@ export default {
     },
   },
   methods: {
-    toggleAuxiliarySelect () {
-      return this.$refs['auxiliarySelect'].show();
-    },
     toggleCancellationForm (value) {
       if (!value) this.editedEvent.cancel = {};
       else {
@@ -181,40 +188,18 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  /deep/ .q-btn-toggle
-    border: none;
-    box-shadow: none;
-    @media screen and (max-width: 767px)
-      display: inline-flex;
-      flex-wrap: wrap;
-    & .q-btn-item
-      width: 45%;
-      border-radius: 20px;
-      margin: 5px;
-      background-color: $light-grey;
-
   .modal-subtitle
     display: flex;
     justify-content: space-between;
     margin-bottom: 16px;
-    .q-btn-toggle
+    /deep/ .q-btn-toggle
       margin-bottom: 0;
-      cursor: default;
-      width: 50%;
+      width: 33%;
       @media screen and (max-width: 767px)
         width: 100%
-      & .q-btn-item
-          width: 100%
-    .delete-action
-      display: flex;
-      flex-direction: row;
-      align-items: center;
 
   .light-checkbox
     color: $grey
     font-size: 14px
-
-  .cancel
-    padding-right: 3px;
 
 </style>

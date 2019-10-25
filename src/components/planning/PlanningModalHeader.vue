@@ -1,11 +1,15 @@
 <template>
   <div class="row q-mb-md">
-    <div class="col-11 row person-name">
+    <div class="col-11 person-name">
       <img :src="avatar" class="avatar">
       <div class="person-name-text" v-if="options.length === 0">{{ formattedIdentity }}</div>
-      <q-select v-else filter :value="value" color="white" inverted-light :options="options"
-        :after="[{ icon: 'swap_vert', class: 'select-icon pink-icon', handler () { $refs['personSelect'].show() } }]"
-        :filter-placeholder="placeholder" ref="personSelect" @input="$emit('input', $event)" />
+      <q-select v-else borderless dense emit-value :value="value" :options="options" @input="$emit('input', $event)"
+        ref="personSelect" :display-value="placeholder" behavior="menu">
+        <template v-slot:append>
+          <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer"
+            @click.stop="$refs['personSelect'].showPopup()" />
+        </template>
+      </q-select>
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
       <span><q-icon name="clear" @click.native="$emit('close')" /></span>
