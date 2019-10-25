@@ -42,9 +42,9 @@
       display: block
       text-align: right
       white-space: initial
-      height: 48px !important
+      height: auto
+      min-height 32px
       padding: 8px 8px
-      min-height: 32px
 
       &::before
         content: attr(data-label)
@@ -69,6 +69,10 @@
       white-space: normal
       padding: 10px 20px
       vertical-align: middle
+
+    tr
+      @media screen and (max-width: 767px)
+        height: auto !important
 
     td
       padding: 4px 20px

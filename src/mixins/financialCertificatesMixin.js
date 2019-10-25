@@ -11,7 +11,7 @@ export const financialCertificatesMixin = {
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
           cancel: 'Annuler',
-        }).onOK(async () => {
+        }).onOk(async () => {
           await gdrive.removeFileById({ id: driveId });
 
           const payload = { 'financialCertificates': { driveId } };
