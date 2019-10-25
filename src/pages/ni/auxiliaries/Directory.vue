@@ -33,7 +33,7 @@
       @click="auxiliaryCreationModal = true" />
 
     <!-- User creation modal -->
-    <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm" content-class="modal-container-md">
+    <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm">
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
@@ -145,7 +145,7 @@ export default {
             const bArr = b.name.split(' ');
             return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
           },
-          style: 'min-width: 150px; width: 30%',
+          style: 'min-width: 200px; width: 35%',
         },
         {
           name: 'profileErrors',
@@ -153,7 +153,7 @@ export default {
           field: 'profileErrors',
           align: 'left',
           sortable: true,
-          style: 'min-width: 75px; width: 10%',
+          style: 'min-width: 75px; width: 8%',
         },
         {
           name: 'tasksErrors',
@@ -161,7 +161,7 @@ export default {
           field: 'tasksErrors',
           align: 'left',
           sortable: true,
-          style: 'min-width: 82px; width: 10%',
+          style: 'min-width: 82px; width: 8%',
         },
         {
           name: 'startDate',
@@ -197,7 +197,7 @@ export default {
           field: 'isActive',
           align: 'right',
           sortable: false,
-          style: 'min-width: 30px; width: 5%',
+          style: 'min-width: 30px; width: 4%',
         },
       ],
       REQUIRED_LABEL,
@@ -411,8 +411,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  /deep/.q-field--with-bottom
-    padding-bottom: 12px !important
-</style>
