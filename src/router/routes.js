@@ -300,7 +300,6 @@ const routes = [
           parent: 'administrative',
         },
       },
-
       {
         path: 'auxiliaries/contracts',
         name: 'profile contracts',
@@ -310,16 +309,16 @@ const routes = [
           parent: 'administrative',
         },
       },
-      // {
-      //   path: 'auxiliaries/info',
-      //   name: 'auxiliary personal info',
-      //   component: () => import('pages/auxiliaries/administrative/Info'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:list',
-      //     parent: 'administrative',
-      //   },
-      // },
+      {
+        path: 'auxiliaries/info',
+        name: 'auxiliary personal info',
+        component: () => import('pages/auxiliaries/administrative/Info'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:list',
+          parent: 'administrative',
+        },
+      },
       // // Customers view routes
       {
         path: 'customers/agenda',
