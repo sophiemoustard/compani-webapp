@@ -4,7 +4,7 @@
       {{ value }}
     </div>
     <q-input v-show="props[editionBooleanName]" class="datatable-inner-input" :ref="refName" :value="props[editedField]"
-      @change="setEdition($event)" type="number" @blur="disableEdition" bg-color="white" dense
+      @input="setEdition" type="number" @blur="disableEdition" bg-color="white" dense
       @keyup.esc="disableEdition" no-parent-field @keyup.enter="disableEdition" borderless />
   </div>
 </template>
