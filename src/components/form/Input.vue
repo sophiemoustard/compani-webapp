@@ -102,10 +102,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .q-input
-    /deep/ .q-field__control
-      font-size: 16px
-
   .input-file-container
     padding: 9px 14px 11px
     .input-file-empty

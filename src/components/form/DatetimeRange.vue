@@ -11,11 +11,11 @@
             @blur="blurHandler" :disable="disable" @error="childErrors.startDate = $event" />
           <ni-select :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
             @blur="blurHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour"
-            name="start-hour" :disable="disable" align="center" />
+            name="start-hour" :disable="disable" />
         </div>
         <p class="delimiter">-</p>
         <div class="datetime-item end">
-          <ni-select :value="value.endHour" @input="update($event, 'endHour')" class="time-item" align="center"
+          <ni-select :value="value.endHour" @input="update($event, 'endHour')" class="time-item"
             @blur="blurHandler" :options="endHourOptions" :disable="disable" @error="childErrors.endDate = $event" />
           <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
             @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
@@ -121,7 +121,7 @@ export default {
 
 <style lang="stylus" scoped>
   /deep/ .datetime-container
-    height: 40px
+    height: 100%
     border: 1px solid $light-grey;
     border-radius: 3px;
     display: flex;

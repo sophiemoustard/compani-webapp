@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-select dense borderless :value="model" bg-color="white" inverted-light :options="options" :multiple="multiple"
+    <q-select dense borderless :value="model" bg-color="white" :options="options" :multiple="multiple" behavior="menu"
       :display-value="displayedValue" :filter-placeholder="filterPlaceholder" :clearable="clearable" :disable="disable"
       @focus="onFocus" @blur="onBlur" @input="update" :class="{ 'borders': inModal }" :error="error"
       :error-message="errorLabel"/>

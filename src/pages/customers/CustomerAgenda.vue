@@ -2,11 +2,11 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
-        <div class="col-xs-12 col-md-5 person-name" v-if="customer && customer.identity">
+        <div class="col-xs-12 col-sm-5 person-name" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
           <div>{{ customer.identity | formatIdentity('FL') }}</div>
         </div>
-        <div class="col-xs-12 col-md-7">
+        <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
             @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
             :type="AGENDA" />
