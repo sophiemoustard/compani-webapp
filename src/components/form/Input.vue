@@ -9,7 +9,8 @@
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup.enter')" :error-message="errorLabel"
-        :readOnly="readOnly" :debounce="debounce" :placeholder="placeholder" :class="{ 'borders': inModal }">
+        :autogrow="this.type === 'textarea'" :readOnly="readOnly" :debounce="debounce" :placeholder="placeholder"
+        :class="{ 'borders': inModal }">
         <template v-if="icon" v-slot:prepend>
           <q-icon size="xs" :name="icon" ></q-icon>
         </template>
@@ -28,8 +29,8 @@ import { REQUIRED_LABEL } from '../../data/constants';
 export default {
   name: 'NiInput',
   props: {
-    caption: String,
-    error: Boolean,
+    caption: { type: String, default: '' },
+    error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
     value: [String, Number, File],
     upperCase: { type: Boolean, default: false },
@@ -42,7 +43,7 @@ export default {
     suffix: { type: String, default: '' },
     borders: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
-    name: String,
+    name: { type: String, default: '' },
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     autofocus: { type: Boolean, default: false },
@@ -101,23 +102,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .borders
-    /deep/ .q-field__control
-      border: 1px solid $light-grey
-      border-radius: 3px
-
-  .input
+  .q-input
     /deep/ .q-field__control
       font-size: 16px
-      padding-left: 14px
-      padding-right: 14px
-      border-radius: 3px
-    /deep/ .q-field__append
-      .text-negative
-        display: none
-    /deep/ .q-field__bottom
-      color: $secondary
-      padding-top: 3px;
 
   .input-file-container
     padding: 9px 14px 11px
