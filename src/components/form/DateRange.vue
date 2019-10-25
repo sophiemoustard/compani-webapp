@@ -6,10 +6,14 @@
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
       <div :class="{ 'borders': !borderless }" class="date-container row justify-center items-center">
-        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
+        <div class="date-item">
+          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
+        </div>
         <p class="delimiter">-</p>
-        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          :min="value.startDate" />
+        <div class="date-item">
+          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+            :min="value.startDate" />
+        </div>
       </div>
     </q-field>
   </div>
@@ -61,15 +65,12 @@ export default {
     width: 100%
     border-radius: 3px
     background-color: $white
-    border: 1px solid $light-grey;
     & .delimiter
       margin: 0
+      color: rgba(0, 0, 0, 0.87)
   .date-item
-    width: 50%
-    display: flex
-    justify-content: center
+    max-width: 150px
     /deep/ .q-field--with-bottom
-      max-width: 150px
       padding-bottom: 0px
     /deep/ .q-field__bottom
       display: none
