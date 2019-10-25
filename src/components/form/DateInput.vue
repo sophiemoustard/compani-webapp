@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="contentClass">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -23,19 +23,22 @@ export default {
   name: 'NiDateInput',
   props: {
     caption: { type: String, default: '' },
-    error: Boolean,
+    error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
-    value: String,
+    value: { type: String, default: '' },
     min: { type: String, default: '' },
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
+    contentClass: { type: String, default: '' },
   },
   computed: {
     date () {
+      if (this.value === '') return '';
       return this.$moment(this.value).format('YYYY/MM/DD');
     },
     inputDate () {
+      if (this.value === '') return '';
       return this.$moment(this.value).format('DD/MM/YYYY');
     },
   },

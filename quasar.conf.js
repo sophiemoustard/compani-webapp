@@ -75,6 +75,7 @@ module.exports = function (ctx) {
         'QLayout',
         'QList',
         'QMenu',
+        'QOptionGroup',
         'QPage',
         'QPageSticky',
         'QPageContainer',
