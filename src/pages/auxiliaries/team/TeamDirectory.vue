@@ -2,7 +2,7 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire" @updateSearch="updateSearch" :search="searchStr" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[15, 25, 35]"
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list" card-class="neutral-background" flat
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list neutral-background" flat
       binary-state-sort>
       <q-tr slot="body" slot-scope="props" :props="props">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
