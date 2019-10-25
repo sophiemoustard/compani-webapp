@@ -6,7 +6,7 @@
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
           <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" hide-bottom binary-state-sort
-            class="table-responsive">
+            class="table-responsive q-pa-sm">
             <q-tr slot="body" slot-scope="props" :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
                 <template v-if="col.name === 'actions'">
@@ -35,10 +35,14 @@
       </div>
       <div class="q-mb-lg">
         <p class="title">Justificatifs APA ou autres financements</p>
-        <ni-multiple-files-uploader ref="" path="financialCertificates" alt="justificatif financement"
-          @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates"
-          collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
-          @delete="deleteDocument($event)" additional-value="financialCertificates" :multiple="true"/>
+        <div class="row gutter-profile">
+          <div class="col-xs-12 col-md-6">
+            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
+              @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates"
+              collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
+              @delete="deleteDocument($event)" additional-value="financialCertificates" multiple/>
+          </div>
+        </div>
       </div>
       <div class="q-mb-lg">
         <p class="title">Paiement</p>
@@ -58,7 +62,7 @@
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
           <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom
             :pagination.sync="pagination" :visible-columns="visibleColumnsMandates" binary-state-sort
-            class="table-responsive">
+            class="table-responsive q-pa-sm">
             <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}
             </q-td>
             <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
@@ -91,7 +95,7 @@
     <q-dialog ref="modal" v-model="cgsModal" full-width>
       <q-layout class="modal-layout modal-max-size">
         <q-header>
-          <q-toolbar class="no-shadow row justify-between" color="black" inverted>
+          <q-toolbar class="no-shadow row justify-between">
             <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
             <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
           </q-toolbar>
@@ -444,21 +448,14 @@ export default {
     background: white
     width: 100%
     margin-bottom: 10px
-
+  .q-header
+    position: sticky
   .iframe-normal
     position: absolute
     width: 100%
     height:100%
-
   .modal-layout
     background-color: white
-
-  .modal-max-size
-    max-width: 860px !important
-    max-height: 90%
-    min-height: -webkit-fill-available !important
-
   .table-grid table tr
     margin-bottom: 0px !important
-
 </style>

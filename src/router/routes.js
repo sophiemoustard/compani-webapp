@@ -344,14 +344,14 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
         },
       },
-      // {
-      //   path: 'customers/contracts',
-      //   name: 'customer contracts',
-      //   component: () => import('pages/customers/Contracts'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //   },
-      // },
+      {
+        path: 'customers/contracts',
+        name: 'customer contracts',
+        component: () => import('pages/customers/Contracts'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
+      },
       // All profiles
       {
         path: ':id/account',

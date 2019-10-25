@@ -1,7 +1,7 @@
 <template>
   <div>
     <q-card v-for="(contract, index) in sortedContracts" :key="index" class="contract-card">
-      <q-card-section :style="{ color: cardTitle(contract.endDate).color }">
+      <q-card-section class="card-title" :style="{ color: cardTitle(contract.endDate).color }">
         {{ cardTitle(contract.endDate).msg }}
       </q-card-section>
       <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="card-sub-title">
@@ -10,7 +10,9 @@
       <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="card-sub-title">
         Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity | formatIdentity('FL') }}
       </p>
-      <p v-if="contract.status === COMPANY_CONTRACT" class="card-sub-title">Statut : {{ getContractStatus(contract) }}</p>
+      <p v-if="contract.status === COMPANY_CONTRACT" class="card-sub-title">
+        Statut : {{ getContractStatus(contract) }}
+      </p>
       <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination"
         hide-bottom :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive q-pa-sm">
         <q-tr slot="body" slot-scope="props" :props="props">
@@ -23,13 +25,16 @@
             </template> -->
             <template v-if="col.name === 'contractSigned'">
               <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
-                <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer" @click="openSignatureModal(props.row.signature.eversignId)" />
+                <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer"
+                @click="openSignatureModal(props.row.signature.eversignId)" />
               </div>
-              <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
-                <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers" :url="docsUploadUrl(contract._id)"
+              <!-- <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
+                class="row justify-center table-actions">
+                <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers"
+                  :url="docsUploadUrl(contract._id)" :extensions="extensions" hide-upload-button
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
-                  @uploaded="refresh" :extensions="extensions" hide-upload-button @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
-              </div>
+                  @uploaded="refresh" @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
+              </div> -->
               <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
                   <a :href="getContractLink(props.row)" target="_blank">
@@ -330,6 +335,10 @@ export default {
     width: 100%
     margin-bottom: 20px
 
+  .card-title
+    font-size: 18px
+    padding: 16px 10px
+
   .card-sub-title
     margin:  0 10px 10px
     font-size: 14px
@@ -350,14 +359,5 @@ export default {
 
   .contract-actions
     justify-content: normal !important
-
-  .modal-max-size
-    max-width: 860px !important
-    background-color: white;
-
-  .modal-max-size
-    max-width: 860px !important
-    max-height: 90%
-    min-height: -webkit-fill-available !important
 
 </style>

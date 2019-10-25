@@ -3,8 +3,7 @@
     <h4>Historique</h4>
     <div class="row q-col-gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" />
-      <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" borderless
-        :error.sync="dateRangeHasError" />
+      <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :error.sync="dateRangeHasError" />
     </div>
     <q-btn label="Exporter" no-caps unelevated text-color="white" color="primary" icon="import_export"
       @click="exportCsv" :disable="dateRangeHasError" />
