@@ -207,7 +207,7 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Mutuelle</p>
         <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">
           {{ groupErrors('mutualFund').msg }}</p>
@@ -240,7 +240,7 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <div class="row justify-between">
+      <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Transports</p>
         <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">
           {{ groupErrors('transportInvoice').msg }}</p>
@@ -737,9 +737,7 @@ export default {
           }
           await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
           NotifyPositive('Document supprimé');
-        }).onCancel(() => {
-          return NotifyPositive('Suppression annulée');
-        });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');
@@ -763,9 +761,7 @@ export default {
           });
           await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
           NotifyPositive('Photo supprimée');
-        }).onCancel(() => {
-          return NotifyPositive('Suppression annulée');
-        });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la photo');

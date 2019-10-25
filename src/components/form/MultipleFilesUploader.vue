@@ -1,7 +1,7 @@
 <template>
   <div>
     <template v-if="documents.length === 0">
-      <ni-file-uploader :path="path" alt="caption" @uploaded="documentUploaded" :name="name"
+      <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
         :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
         :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
     </template>
@@ -24,7 +24,7 @@
     </template>
     <template v-if="documents && documents.length > 0">
       <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon">
-        <ni-file-uploader :path="path" alt="caption" @uploaded="documentUploaded" :name="name"
+        <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
           :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
           :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
       </q-expansion-item>

@@ -17,7 +17,7 @@
 import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
-  name: 'OptionGroup',
+  name: 'NiOptionGroup',
   props: {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },

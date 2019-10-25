@@ -122,4 +122,7 @@ export default {
     .q-uploader__subtitle
       display: none
       height: 0
+    .q-uploader__header:before
+      opacity:0
+
 </style>
