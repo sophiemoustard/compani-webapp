@@ -262,26 +262,26 @@ const routes = [
           parent: 'team',
         },
       },
-      // {
-      //   path: 'auxiliaries/customers',
-      //   name: 'profile customers',
-      //   component: () => import('pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:list',
-      //     parent: 'benef',
-      //   },
-      // },
-      // {
-      //   path: 'auxiliaries/customers/:customerId',
-      //   name: 'profile customers info',
-      //   props: true,
-      //   component: () => import('pages/auxiliaries/customers/CustomerInfo'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:list',
-      //   },
-      // },
+      {
+        path: 'auxiliaries/customers',
+        name: 'profile customers',
+        component: () => import('pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:list',
+          parent: 'benef',
+        },
+      },
+      {
+        path: 'auxiliaries/customers/:customerId',
+        name: 'profile customers info',
+        props: true,
+        component: () => import('pages/auxiliaries/customers/CustomerInfo'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:list',
+        },
+      },
       {
         path: 'auxiliaries/pay',
         name: 'profile salaries',
