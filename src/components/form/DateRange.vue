@@ -5,7 +5,7 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
-      <div :class="{ 'borders': !borderless }" class="date-container">
+      <div :class="{ 'borders': !borderless }" class="date-container row justify-center items-center">
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
         <p class="delimiter">-</p>
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
@@ -34,6 +34,12 @@ export default {
   methods: {
     update (value, key) {
       const dates = { ...this.value, [key]: value }
+      if (this.$moment(dates.startDate).isAfter(this.$moment(dates.endDate))) {
+        return this.$emit('input', {
+          startDate: dates.startDate,
+          endDate: this.$moment(dates.startDate).endOf('d').toISOString(),
+        });
+      }
       this.$emit('input', dates);
     },
   },
@@ -54,10 +60,8 @@ export default {
   .date-container
     width: 100%
     border-radius: 3px
-    display: flex
-    flex-direction: row
     background-color: $white
-    align-items: center
+    border: 1px solid $light-grey;
     & .delimiter
       margin: 0
   .date-item
