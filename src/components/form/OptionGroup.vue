@@ -7,7 +7,7 @@
       </div>
       <q-field :error="error" :error-label="errorLabel" class="col-12">
         <q-option-group :value="value" @input="inputHandler" @blur="blurHandler" :options="options" :readonly="readOnly"
-          :type="type" :inline="inline" />
+          :type="type" :inline="inline"  dense />
       </q-field>
     </div>
   </div>
@@ -45,4 +45,10 @@ export default {
 <style lang="stylus" scoped>
   .required::after
     content: ' *'
+  /deep/.q-option-group
+    color: black !important
+    .q-radio
+      padding-bottom: 10px !important
+      .q-radio__label
+        font-size: 15px
 </style>
