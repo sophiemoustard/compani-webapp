@@ -106,7 +106,7 @@
         Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
           selectedSubscription.service.name}}</span>
       </template>
-      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" flat dense
+      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" flat
         :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">

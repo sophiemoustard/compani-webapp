@@ -3,7 +3,7 @@
     <div class="col-11 person-name">
       <img :src="avatar" class="avatar">
       <div class="person-name-text" v-if="options.length === 0">{{ formattedIdentity }}</div>
-      <q-select borderless dense emit-value :value="value" :options="options" @input="$emit('input', $event)"
+      <q-select v-else borderless dense emit-value :value="value" :options="options" @input="$emit('input', $event)"
         ref="personSelect" :display-value="placeholder" behavior="menu">
         <template v-slot:append>
           <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer"

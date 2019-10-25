@@ -16,7 +16,8 @@
             <ni-custom-img :driveId="certificate.driveId" :alt="alt" :key="certificate.driveId" />
           </div>
           <div class="self-end doc-delete">
-            <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument(certificate.driveId)" />
+            <q-btn color="primary" round flat icon="delete" size="1rem"
+              @click.native="deleteDocument(certificate.driveId)" />
             <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
           </div>
         </div>
@@ -107,5 +108,8 @@ export default {
   @media screen and (min-width: 1025px)
     .uploader-size
       width: 50% !important
+
+  /deep/ .q-expansion-item__toggle-icon
+    color: $primary
 
 </style>

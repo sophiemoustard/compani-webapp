@@ -1,6 +1,6 @@
 <template>
   <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="resetForm(false)">
-    <div class="modal-container">
+    <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" v-model="newEvent.customer" :selectedPerson="selectedCustomer"
           @close="close" />
