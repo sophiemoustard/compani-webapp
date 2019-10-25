@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="contentClass">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -30,6 +30,7 @@ export default {
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
+    contentClass: { type: String, default: '' },
   },
   computed: {
     date () {
