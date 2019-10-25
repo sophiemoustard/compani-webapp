@@ -29,8 +29,8 @@ import { REQUIRED_LABEL } from '../../data/constants';
 export default {
   name: 'NiInput',
   props: {
-    caption: String,
-    error: Boolean,
+    caption: { type: String, default: '' },
+    error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
     value: [String, Number, File],
     upperCase: { type: Boolean, default: false },
@@ -43,7 +43,7 @@ export default {
     suffix: { type: String, default: '' },
     borders: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
-    name: String,
+    name: { type: String, default: '' },
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     autofocus: { type: Boolean, default: false },
