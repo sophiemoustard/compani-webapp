@@ -272,16 +272,16 @@ const routes = [
           parent: 'benef',
         },
       },
-      // {
-      //   path: 'auxiliaries/customers/:customerId',
-      //   name: 'profile customers info',
-      //   props: true,
-      //   component: () => import('pages/auxiliaries/customers/CustomerInfo'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:list',
-      //   },
-      // },
+      {
+        path: 'auxiliaries/customers/:customerId',
+        name: 'profile customers info',
+        props: true,
+        component: () => import('pages/auxiliaries/customers/CustomerInfo'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:list',
+        },
+      },
       {
         path: 'auxiliaries/pay',
         name: 'profile salaries',
