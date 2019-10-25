@@ -242,7 +242,7 @@ export default {
     },
     async createBills () {
       try {
-        const shouldBeSent = await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Cette opération est définitive. Confirmez-vous ?',
           ok: 'Oui',
@@ -252,22 +252,21 @@ export default {
             model: [true],
             items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
           },
+        }).onOk(async (shouldBeSent) => {
+          if (!this.hasSelectedRows) return;
+          const bills = this.selected.map(row => ({
+            ...this.$_.omit(row, ['__index']),
+            customerBills: {
+              ...row.customerBills,
+              shouldBeSent: !!shouldBeSent[0],
+            },
+          }));
+          await this.$bills.create({ bills });
+          NotifyPositive('Clients facturés');
+          await this.getDraftBills();
+          this.selected = [];
         });
-
-        if (!this.hasSelectedRows) return;
-        const bills = this.selected.map(row => ({
-          ...this.$_.omit(row, ['__index']),
-          customerBills: {
-            ...row.customerBills,
-            shouldBeSent: !!shouldBeSent,
-          },
-        }));
-        await this.$bills.create({ bills });
-        NotifyPositive('Clients facturés');
-        await this.getDraftBills();
-        this.selected = [];
       } catch (e) {
-        if (e.message === '') return;
         console.error(e);
         NotifyNegative('Erreur lors de la facturation des clients');
       }
