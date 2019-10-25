@@ -1,7 +1,6 @@
 <template>
-  <q-dialog :value="value" @input="$emit('input', $event)" @hide="$emit('hide', $event)"
-    :content-classes="contentClasses">
-    <div :class="containerClass">
+  <q-dialog :value="value" @input="$emit('input', $event)" @hide="$emit('hide', $event)">
+    <div class="modal-container" :class="containerClass">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
@@ -25,9 +24,8 @@ export default {
   name: 'Modal',
   props: {
     value: { type: Boolean, default: false },
-    contentClasses: { type: String, default: () => 'modal-container-sm' },
+    containerClass: { type: String, default: () => 'modal-container-sm' },
     title: { type: String, default: '' },
-    containerClass: { type: String, default: 'modal-container-sm' },
   },
 }
 </script>
