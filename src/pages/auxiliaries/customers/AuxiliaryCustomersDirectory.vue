@@ -2,7 +2,7 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Bénéficiaires" @updateSearch="updateSearch" :search="searchStr" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]" binary-state-sort
-      :pagination="pagination" :loading="tableLoading" class="people-list neutral-background" flat>
+      :pagination.sync="pagination" :loading="tableLoading" class="people-list neutral-background" flat>
       <q-tr slot="body" slot-scope="props" :props="props" @click.native="goToCustomerProfile(props.row.customerId)">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template>{{ col.value }}</template>
