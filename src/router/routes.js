@@ -16,8 +16,7 @@ const routes = [
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === HELPER) {
-          // return next({name: 'customer agenda'});
-          return next({ name: 'account info', params: { id: store.getters['main/user']._id } }); // TODO : a changer
+          return next({name: 'customer agenda'});
         } else if (
           store.getters['main/user'] &&
           (store.getters['main/user'].role.name === AUXILIARY ||
@@ -29,8 +28,7 @@ const routes = [
           store.getters['main/user'].role.name !== AUXILIARY &&
           store.getters['main/user'].role.name !== HELPER
         ) {
-          // return next({ name: 'administrative directory' });
-          return next({ name: 'account info', params: { id: store.getters['main/user']._id } }); // TODO : a changer
+          return next({ name: 'administrative directory' });
         } else {
           next({ path: '/login' });
         }
