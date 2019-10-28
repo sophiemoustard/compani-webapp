@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import Agenda from '../../../components/Agenda';
+import Agenda from '../../../components/planning/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
 import EventEditionModal from '../../../components/planning/EventEditionModal';

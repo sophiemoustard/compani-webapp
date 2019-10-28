@@ -20,7 +20,7 @@
 <script>
 import { DEFAULT_AVATAR, WEEK_VIEW, AGENDA, CUSTOMER } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
-import Agenda from '../../components/Agenda';
+import Agenda from '../../components/planning/Agenda';
 import PlanningNavigation from '../../components/planning/PlanningNavigation';
 import { formatIdentity } from '../../helpers/utils';
 

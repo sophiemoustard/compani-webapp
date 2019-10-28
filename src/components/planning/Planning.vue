@@ -114,7 +114,7 @@ import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
 import NiEventHistoryFeed from './EventHistoryFeed';
-import ChipsAutocomplete from '../ChipsAutocomplete';
+import ChipsAutocomplete from './ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';

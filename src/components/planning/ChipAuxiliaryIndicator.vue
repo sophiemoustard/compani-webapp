@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import AuxiliaryIndicators from '../AuxiliaryIndicators';
+import AuxiliaryIndicators from './AuxiliaryIndicators';
 import {
   DEFAULT_AVATAR,
   ABSENCE,

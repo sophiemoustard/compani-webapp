@@ -40,8 +40,8 @@
 </template>
 
 <script>
-import { WEEK_STATS, MONTH_STATS } from '../data/constants';
-import { formatHours } from '../helpers/utils';
+import { WEEK_STATS, MONTH_STATS } from '../../data/constants';
+import { formatHours } from '../../helpers/utils';
 
 export default {
   name: 'AuxiliaryIndicators',
