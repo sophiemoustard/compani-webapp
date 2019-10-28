@@ -97,4 +97,9 @@ export default {
     .q-btn
       @media screen and (max-width: 767px)
         margin: 0px 5px
+
+  /deep/ .q-item__section--side
+    .q-icon
+      size: 1em
+      color: $primary
 </style>
