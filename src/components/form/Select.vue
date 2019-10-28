@@ -7,7 +7,7 @@
     <q-select dense borderless :value="model" bg-color="white" :options="options" :multiple="multiple" behavior="menu"
       :display-value="displayedValue" :filter-placeholder="filterPlaceholder" :clearable="clearable" :disable="disable"
       @focus="onFocus" @blur="onBlur" @input="update" :class="{ 'borders': inModal }" :error="error"
-      :error-message="errorLabel"/>
+      :error-message="errorLabel" />
   </div>
 </template>
 

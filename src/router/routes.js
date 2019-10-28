@@ -222,25 +222,25 @@ const routes = [
       //     parent: 'benef',
       //   },
       // },
-      // {
-      //   path: 'ni/planning/auxiliaries',
-      //   name: 'auxiliaries planning',
-      //   component: () => import('pages/ni/planning/AuxiliaryPlanning'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'events:read',
-      //   },
-      // },
-      // {
-      //   path: 'ni/planning/customers',
-      //   name: 'customers planning',
-      //   component: () => import('pages/ni/planning/CustomerPlanning'),
-      //   props: true,
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'events:read',
-      //   },
-      // },
+      {
+        path: 'ni/planning/auxiliaries',
+        name: 'auxiliaries planning',
+        component: () => import('pages/ni/planning/AuxiliaryPlanning'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'events:read',
+        },
+      },
+      {
+        path: 'ni/planning/customers',
+        name: 'customers planning',
+        component: () => import('pages/ni/planning/CustomerPlanning'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'events:read',
+        },
+      },
       // // Auxiliary view routes
       {
         path: 'auxiliaries/agenda',

@@ -1,35 +1,37 @@
-.chip-indicator
-  white-space: nowrap;
-  padding-left: 2px;
-
 .chip-container
+  display: flex
+  position: relative
   .q-chip
-    width: 100%;
-    background: $dark-grey;
-    padding: 0 10px;
-    @media (max-width: 1024px)
-      font-size: 12px;
-    @media (max-width: 767px)
-      display: none;
-    &-main
-      justify-content: flex-end;
-      padding-left: 1.8rem;
-      overflow: visible;
-      display: flex;
-      align-items: center;
-
+    cursor: pointer
+    width: 100%
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
+    padding: 0 10px
+    justify-content: flex-end
+  @media (max-width: 767px)
+    .q-chip
+      font-size: 10px
+      padding: 0 2px
+  @media (max-width: 549px)
+    .q-chip
+      display: none
+  .q-chip
+    background: $dark-grey
+    margin: 0
     &.high-occupation
-      background: $secondary !important;
+      background: $secondary !important
     &.extreme-occupation
-      background: $red !important;
+      background: $red !important
 
   .avatar
-    z-index: 2;
-    box-shadow: none;
-    border: 1px solid #979797;
+    z-index: 2
+    box-shadow: none
+    border: 1px solid #979797
     @media (min-width: 1025px)
-      width: 2.5rem;
-      height: 2.5rem;
+      width: 2.5rem
+      height: 2.5rem
     @media (max-width: 1024px)
-      width: 1.5rem;
-      height: 1.5rem;
+      width: 1.5rem
+      height: 1.5rem
