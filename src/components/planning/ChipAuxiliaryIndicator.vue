@@ -13,7 +13,7 @@
           <div class="row justify-between items-center q-pa-lg">
             <div class="col-11 row person-name">
               <img :src="getAvatar(person.picture)" class="avatar">
-              <div>{{ person.identity.firstname }} {{ person.identity.lastname.toUpperCase() }}</div>
+              <div class="q-pl-md">{{ person.identity.firstname }} {{ person.identity.lastname.toUpperCase() }}</div>
             </div>
             <div class="col-1 cursor-pointer modal-btn-close">
               <span>
