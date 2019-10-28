@@ -1,5 +1,5 @@
 <template>
-  <div class="row">
+  <div class="row q-mb-md">
     <div :class="['col-xs-12', { 'col-md-5': displayToggle }, { 'col-md-6': !displayToggle }]">
       <h4 class="no-margin">{{ title }}</h4>
     </div>

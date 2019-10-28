@@ -1,19 +1,22 @@
 <template>
-  <ni-select :value="value" ref="selectSector" @input="updateSector" :options="sectors" @blur="blurHandler"
-    @focus="focusHandler" filter-placeholder="Rechercher" :class="{border: inModal}" />
+  <ni-select :class="{'borders': inModal}" :value="value" ref="selectSector" @input="updateSector" :options="sectors"
+    @blur="blurHandler" @focus="focusHandler" filter-placeholder="Rechercher" :error="error" :error-label="errorLabel"/>
 </template>
 
 <script>
 import Select from './Select';
+import { REQUIRED_LABEL } from '../../data/constants';
 
 export default {
   name: 'SelectSector',
   props: {
-    value: String,
+    value: { type: String, default: '' },
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
-    companyId: String,
+    companyId: { type: String, default: '' },
     allowNullOption: { type: Boolean, default: false },
+    error: { type: Boolean, default: false },
+    errorLabel: { type: String, default: REQUIRED_LABEL },
   },
   components: {
     'ni-select': Select,
@@ -53,8 +56,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  .border
-    border: 1px solid $light-grey
-</style>
