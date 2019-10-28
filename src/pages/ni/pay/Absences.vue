@@ -207,8 +207,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-.absence-header
-  display: flex
-</style>
