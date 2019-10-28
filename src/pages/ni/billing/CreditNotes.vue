@@ -28,7 +28,7 @@
       </template>
       <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
         required-field @input="getEvents" @blur="$v.newCreditNote.customer.$touch"
-        :error="$v.newCreditNote.customer.$error" />
+        :error="$v.newCreditNote.customer.$error" use-input clearable />
       <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer"
         :options="thirdPartyPayerOptions" required-field @input="getEvents"
         :disable="thirdPartyPayerOptions.length === 0" clearable />
@@ -193,6 +193,8 @@ export default {
         endDate: '',
         exclTaxesCustomer: 0,
         inclTaxesCustomer: 0,
+        exclTaxesTpp: 0,
+        inclTaxesTpp: 0,
         subscription: null,
       },
       editedCreditNote: {},
@@ -520,7 +522,10 @@ export default {
         endDate: '',
         exclTaxesCustomer: 0,
         inclTaxesCustomer: 0,
+        exclTaxesTpp: 0,
+        inclTaxesTpp: 0,
         subscription: null,
+        thirdPartyPayer: null,
       };
       this.creditNoteEvents = [];
       this.hasLinkedEvents = false;
