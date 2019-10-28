@@ -143,20 +143,20 @@
         :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
         :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
-      <ni-date-input caption="Début soirée" v-model="newSurcharge.eveningStartTime"
-        :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch" in-modal
-        type="time" :disable="!newSurcharge.evening" clearable />
-      <ni-date-input caption="Fin soirée" v-model="newSurcharge.eveningEndTime"
-        :error="$v.newSurcharge.eveningEndTime.$error" @blur="$v.newSurcharge.eveningEndTime.$touch" in-modal
-        type="time" :disable="!newSurcharge.evening" clearable />
+      <ni-time-input in-modal v-model="newSurcharge.eveningStartTime" caption="Début soirée"
+        :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch"
+        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening"/>
+      <ni-time-input in-modal v-model="newSurcharge.eveningEndTime" caption="Fin soirée"
+        :error="$v.newSurcharge.eveningEndTime.$error" @blur="$v.newSurcharge.eveningEndTime.$touch"
+        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening"/>
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
         :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
-      <ni-date-input caption="Début personnalisé" v-model="newSurcharge.customStartTime"
-        :error="$v.newSurcharge.customStartTime.$error" @blur="$v.newSurcharge.customStartTime.$touch" in-modal
-        type="time" :disable="!newSurcharge.custom" clearable />
-      <ni-date-input caption="Fin personnalisée" v-model="newSurcharge.customEndTime"
-        :error="$v.newSurcharge.customEndTime.$error" @blur="$v.newSurcharge.customEndTime.$touch" in-modal type="time"
-        :disable="!newSurcharge.custom" clearable />
+      <ni-time-input in-modal v-model="newSurcharge.customStartTime" caption="Début personnalisé"
+        :error="$v.newSurcharge.customStartTime.$error" @blur="$v.newSurcharge.customStartTime.$touch"
+        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom"/>
+      <ni-time-input in-modal v-model="newSurcharge.customEndTime" caption="Fin personnalisée"
+        :error="$v.newSurcharge.customEndTime.$error" @blur="$v.newSurcharge.customEndTime.$touch"
+        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom"/>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
           :loading="loading" @click="createNewSurcharge" :disable="$v.newSurcharge.$error || !newSurcharge.name" />
@@ -184,20 +184,20 @@
         :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
         :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch" />
-      <ni-date-input caption="Début soirée" v-model="editedSurcharge.eveningStartTime"
-        :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch" in-modal
-        type="time" :disable="!editedSurcharge.evening" clearable />
-      <ni-date-input caption="Fin soirée" v-model="editedSurcharge.eveningEndTime"
-        :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch" in-modal
-        type="time" :disable="!editedSurcharge.evening" clearable />
+      <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
+        :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
+        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening"/>
+      <ni-time-input in-modal v-model="editedSurcharge.eveningEndTime" caption="Fin soirée"
+        :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch"
+        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening"/>
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
         :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
-      <ni-date-input caption="Début personnalisé" v-model="editedSurcharge.customStartTime"
-        :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch" in-modal
-        type="time" :disable="!editedSurcharge.custom" clearable />
-      <ni-date-input caption="Fin personnalisée" v-model="editedSurcharge.customEndTime"
-        :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch" in-modal
-        type="time" :disable="!editedSurcharge.custom" clearable />
+      <ni-time-input in-modal v-model="editedSurcharge.customStartTime" caption="Début personnalisé"
+        :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch"
+        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom"/>
+      <ni-time-input in-modal v-model="editedSurcharge.customEndTime" caption="Fin personnalisée"
+        :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch"
+        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom"/>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
           color="primary" :loading="loading" @click="updateSurcharge" :disable="$v.editedSurcharge.$error" />
@@ -320,6 +320,7 @@
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import DateInput from '../../../components/form/DateInput.vue';
+import TimeInput from '../../../components/form/TimeInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
@@ -339,6 +340,7 @@ export default {
     'ni-select': Select,
     'ni-search-address': SearchAddress,
     'ni-date-input': DateInput,
+    'ni-time-input': TimeInput,
     'ni-modal': Modal,
   },
   mixins: [configMixin, validationMixin],
@@ -370,6 +372,7 @@ export default {
   },
   data () {
     return {
+      selectEveningStartTime: false,
       loading: false,
       company: null,
       documents: null,
@@ -861,10 +864,10 @@ export default {
     },
     getSurchargePayload (surchargeType) {
       const payload = surchargeType;
-      if (surchargeType.eveningStartTime) payload.eveningStartTime = this.$moment(surchargeType.eveningStartTime).format('HH:mm');
-      if (surchargeType.eveningEndTime) payload.eveningEndTime = this.$moment(surchargeType.eveningEndTime).format('HH:mm');
-      if (surchargeType.customStartTime) payload.customStartTime = this.$moment(surchargeType.customStartTime).format('HH:mm');
-      if (surchargeType.customEndTime) payload.customEndTime = this.$moment(surchargeType.customEndTime).format('HH:mm');
+      if (surchargeType.eveningStartTime) payload.eveningStartTime = this.$moment(surchargeType.eveningStartTime, 'HH:mm').format('HH:mm');
+      if (surchargeType.eveningEndTime) payload.eveningEndTime = this.$moment(surchargeType.eveningEndTime, 'HH:mm').format('HH:mm');
+      if (surchargeType.customStartTime) payload.customStartTime = this.$moment(surchargeType.customStartTime, 'HH:mm').format('HH:mm');
+      if (surchargeType.customEndTime) payload.customEndTime = this.$moment(surchargeType.customEndTime, 'HH:mm').format('HH:mm');
       return payload;
     },
     async createNewSurcharge () {
@@ -872,6 +875,7 @@ export default {
         this.$v.newSurcharge.$touch();
         if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
+
         const payload = this.getSurchargePayload(this.newSurcharge);
         payload.company = this.user.company._id;
         await this.$surcharges.create(payload);
@@ -899,11 +903,11 @@ export default {
         twentyFifthOfDecember,
         firstOfMay,
         evening,
-        eveningStartTime: eveningStartTime ? eveningStartTime.toISOString() : '',
-        eveningEndTime: eveningEndTime ? eveningEndTime.toISOString() : '',
+        eveningStartTime: eveningStartTime ? this.$moment(eveningStartTime).format('HH:mm') : '',
+        eveningEndTime: eveningEndTime ? this.$moment(eveningEndTime).format('HH:mm') : '',
         custom,
-        customStartTime: customStartTime ? customStartTime.toISOString() : '',
-        customEndTime: customEndTime ? customEndTime.toISOString() : '',
+        customStartTime: customStartTime ? this.$moment(customStartTime).format('HH:mm') : '',
+        customEndTime: customEndTime ? this.$moment(customEndTime).format('HH:mm') : '',
       };
       this.surchargeEditionModal = true;
     },
@@ -947,18 +951,20 @@ export default {
     },
     async deleteSurcharge (surchargeId, cell) {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
           ok: 'OK',
           cancel: 'Annuler',
+        }).onOk(async () => {
+          await this.$surcharges.remove(surchargeId);
+          this.surcharges.splice(cell, 1);
+          NotifyPositive('Plan de majoration supprimé.');
+        }).onCancel(() => {
+          return NotifyPositive('Suppression annulée');
         });
-        await this.$surcharges.remove(surchargeId);
-        this.surcharges.splice(cell, 1);
-        NotifyPositive('Plan de majoration supprimé.');
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du plan de majoration.');
       }
     },
@@ -1054,19 +1060,20 @@ export default {
     },
     async deleteService (serviceId, cell) {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer ce service ?',
           ok: 'OK',
           cancel: 'Annuler',
+        }).onOk(async () => {
+          await this.$services.remove(serviceId);
+          this.services.splice(cell, 1);
+          NotifyPositive('Service supprimé.');
+        }).onCancel(() => {
+          return NotifyPositive('Suppression annulée');
         });
-
-        await this.$services.remove(serviceId);
-        this.services.splice(cell, 1);
-        NotifyPositive('Service supprimé.');
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée');
         NotifyNegative('Erreur lors de la suppression du service.');
       }
     },
@@ -1153,19 +1160,20 @@ export default {
     },
     async deleteThirdPartyPayer (thirdPartyPayerId, cell) {
       try {
-        await this.$q.dialog({
+        this.$q.dialog({
           title: 'Confirmation',
           message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
           ok: 'OK',
           cancel: 'Annuler',
+        }).onOk(async () => {
+          await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
+          this.thirdPartyPayers.splice(cell, 1);
+          NotifyPositive('Tiers payeur supprimé.');
+        }).onCancel(() => {
+          return NotifyPositive('Suppression annulée')
         });
-
-        await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
-        this.thirdPartyPayers.splice(cell, 1);
-        NotifyPositive('Tiers payeur supprimé.');
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée')
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
