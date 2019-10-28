@@ -90,9 +90,9 @@
         </tbody>
       </table>
     </div>
-    <!-- <q-page-sticky expand position="right">
+    <q-page-sticky expand position="right">
       <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory" @updateFeeds="$emit('updateFeeds', $event)" />
-    </q-page-sticky> -->
+    </q-page-sticky>
   </div>
 </template>
 
@@ -113,7 +113,7 @@ import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
 import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
-// import NiEventHistoryFeed from './EventHistoryFeed';
+import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from '../ChipsAutocomplete';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
@@ -131,7 +131,7 @@ export default {
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
-    // 'ni-event-history-feed': NiEventHistoryFeed,
+    'ni-event-history-feed': NiEventHistoryFeed,
   },
   props: {
     events: { type: Array, default: () => [] },
