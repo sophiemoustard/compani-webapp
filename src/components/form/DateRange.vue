@@ -6,14 +6,10 @@
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
       <div :class="{ 'borders': !borderless }" class="date-container row justify-center items-center">
-        <div class="date-item">
-          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
-        </div>
+        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
         <p class="delimiter">-</p>
-        <div class="date-item">
-          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-            :min="value.startDate" />
-        </div>
+        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+          :min="value.startDate" />
       </div>
     </q-field>
   </div>
@@ -37,12 +33,12 @@ export default {
   },
   methods: {
     update (value, key) {
-      const dates = { ...this.value, [key]: value }
+      let dates = { ...this.value, [key]: value }
       if (this.$moment(dates.startDate).isAfter(this.$moment(dates.endDate))) {
-        return this.$emit('input', {
+        dates = {
           startDate: dates.startDate,
           endDate: this.$moment(dates.startDate).endOf('d').toISOString(),
-        });
+        };
       }
       this.$emit('input', dates);
     },
@@ -67,7 +63,7 @@ export default {
     background-color: $white
     & .delimiter
       margin: 0
-      color: rgba(0, 0, 0, 0.87)
+      color: $black
   .date-item
     max-width: 150px
     /deep/ .q-field--with-bottom
