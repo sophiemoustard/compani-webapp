@@ -66,10 +66,9 @@
               <td valign="top">
                 <div class="person-inner-cell">
                   <div :class="[!staffingView && 'q-mb-md']">
-                    <!-- <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
+                    <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
-                    <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)" -->
-                    <ni-chip-auxiliary-indicator :person="person" :events="getPersonEvents(person)"
+                    <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
                       :startOfWeek="startOfWeek" :dm="distanceMatrix" />
                   </div>
                   <div class="person-name overflow-hidden-nowrap">
@@ -112,7 +111,7 @@ import {
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
-// import NiChipCustomerIndicator from './ChipCustomerIndicator';
+import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
 // import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from '../ChipsAutocomplete';
@@ -127,7 +126,7 @@ export default {
   name: 'PlanningManager',
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
-    // 'ni-chip-customer-indicator': NiChipCustomerIndicator,
+    'ni-chip-customer-indicator': NiChipCustomerIndicator,
     'ni-chip-auxiliary-indicator': ChipAuxiliaryIndicator,
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
