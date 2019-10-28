@@ -827,7 +827,7 @@ export default {
     color: $secondary
     &-ok
       font-size: 12px
-      color: $tertiary
+      color: $accent
   .picture-container
      width: 200px
      height: 200px
