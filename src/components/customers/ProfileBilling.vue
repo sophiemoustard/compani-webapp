@@ -307,7 +307,8 @@ export default {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    align-items: flex-end;
+    align-items: center;
+    flex-wrap: wrap;
 
   .message
     font-style: italic;

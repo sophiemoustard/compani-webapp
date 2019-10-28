@@ -5,7 +5,7 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
-      <div :class="{ 'borders': !borderless }" class="date-container row justify-center items-center">
+      <div class="date-container justify-center items-center row">
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
         <p class="delimiter">-</p>
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
@@ -27,7 +27,6 @@ export default {
     caption: { type: String, default: '' },
     value: { type: Object, default: function () { return { startDate: this.$moment().startOf('d').toISOString(), endDate: this.$moment().endOf('d').toISOString() } } },
     requiredField: { type: Boolean, default: false },
-    borderless: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
   },
