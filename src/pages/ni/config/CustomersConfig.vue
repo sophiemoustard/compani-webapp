@@ -145,18 +145,18 @@
         :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
       <ni-time-input in-modal v-model="newSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch"
-        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-label="Heure invalide"/>
+        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-label="Heure invalide" />
       <ni-time-input in-modal v-model="newSurcharge.eveningEndTime" caption="Fin soirée"
         :error="$v.newSurcharge.eveningEndTime.$error" @blur="$v.newSurcharge.eveningEndTime.$touch"
-        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-label="Heure invalide"/>
+        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-label="Heure invalide" />
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
         :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
       <ni-time-input in-modal v-model="newSurcharge.customStartTime" caption="Début personnalisé"
         :error="$v.newSurcharge.customStartTime.$error" @blur="$v.newSurcharge.customStartTime.$touch"
-        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide"/>
+        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
       <ni-time-input in-modal v-model="newSurcharge.customEndTime" caption="Fin personnalisée"
         :error="$v.newSurcharge.customEndTime.$error" @blur="$v.newSurcharge.customEndTime.$touch"
-        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide"/>
+        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
           :loading="loading" @click="createNewSurcharge" :disable="$v.newSurcharge.$error || !newSurcharge.name" />
@@ -186,18 +186,18 @@
         :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch" />
       <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
-        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-label="Heure invalide"/>
+        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-label="Heure invalide" />
       <ni-time-input in-modal v-model="editedSurcharge.eveningEndTime" caption="Fin soirée"
         :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch"
-        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-label="Heure invalide"/>
+        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-label="Heure invalide" />
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
         :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
       <ni-time-input in-modal v-model="editedSurcharge.customStartTime" caption="Début personnalisé"
         :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch"
-        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide"/>
+        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide" />
       <ni-time-input in-modal v-model="editedSurcharge.customEndTime" caption="Fin personnalisée"
         :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch"
-        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide"/>
+        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
           color="primary" :loading="loading" @click="updateSurcharge" :disable="$v.editedSurcharge.$error" />
@@ -262,7 +262,7 @@
     <!-- Service history modal -->
     <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData">
       <template slot="title">
-        Historique du service <span class="text-weight-bold">{{selectedService.name}}</span>
+        Historique du service <span class="text-weight-bold">{{ selectedService.name }}</span>
       </template>
       <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom
         binary-state-sort :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns">
