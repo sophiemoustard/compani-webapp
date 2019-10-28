@@ -41,7 +41,7 @@ export default {
 
 <style lang="stylus" scoped>
   .q-option
-    font-size: 12px;
+    font-size: 14px;
   .q-input
     /deep/ .q-field__control
       font-size: 14px

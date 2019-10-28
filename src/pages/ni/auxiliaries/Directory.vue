@@ -414,5 +414,5 @@ export default {
 
 <style lang='stylus' scoped>
   /deep/.q-select .q-field__control
-    font-size: 14px !important
+    font-size: 12px !important
 </style>
