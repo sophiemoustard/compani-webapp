@@ -69,16 +69,16 @@ const routes = [
           parent: 'configuration',
         },
       },
-      // {
-      //   path: 'ni/billing/to-bill',
-      //   name: 'to bill',
-      //   component: () => import('pages/ni/billing/ToBill'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'bills:edit',
-      //     parent: 'billing',
-      //   },
-      // },
+      {
+        path: 'ni/billing/to-bill',
+        name: 'to bill',
+        component: () => import('pages/ni/billing/ToBill'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'bills:edit',
+          parent: 'billing',
+        },
+      },
       // {
       //   path: 'ni/billing/credit-notes',
       //   name: 'credit note',

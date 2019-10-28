@@ -2,7 +2,7 @@
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="Absences">
       <template slot="content">
-        <div class="absence-header col-xs-12 col-md-5 justify-end">
+        <div class="col-xs-12 col-md-5">
           <ni-date-range v-model="dates" @input="refresh" borderless :error.sync="datesHasError" />
         </div>
       </template>
@@ -207,8 +207,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-.absence-header
-  display: flex
-</style>
