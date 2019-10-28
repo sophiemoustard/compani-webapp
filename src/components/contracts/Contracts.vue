@@ -4,13 +4,13 @@
       <q-card-section class="card-title" :style="{ color: cardTitle(contract.endDate).color }">
         {{ cardTitle(contract.endDate).msg }}
       </q-card-section>
-      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="card-sub-title">
+      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="card-subtitle">
         Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity | formatIdentity('FL') }}
       </p>
-      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="card-sub-title">
+      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="card-subtitle">
         Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity | formatIdentity('FL') }}
       </p>
-      <p v-if="contract.status === COMPANY_CONTRACT" class="card-sub-title">
+      <p v-if="contract.status === COMPANY_CONTRACT" class="card-subtitle">
         Statut : {{ getContractStatus(contract) }}
       </p>
       <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination"
@@ -339,7 +339,7 @@ export default {
     font-size: 18px
     padding: 16px 10px
 
-  .card-sub-title
+  .card-subtitle
     margin:  0 10px 10px
     font-size: 14px
 
