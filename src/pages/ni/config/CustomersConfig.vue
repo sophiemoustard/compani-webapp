@@ -37,7 +37,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn flat round small dense color="grey" icon="edit" @click="openServiceEditionModal(col.value)" />
+                    <q-btn flat round small dense color="grey" icon="edit" @click="openServiceEditionModal(col.value)"/>
                     <q-btn flat round small dense color="grey" icon="delete" :disable="props.row.subscriptionCount > 0"
                       @click="deleteService(col.value, props.row.__index)" />
                   </div>
@@ -97,8 +97,8 @@
                 </template>
                 <template v-else-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small dense color="grey" icon="delete"
-                      @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
+                    <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small dense color="grey"
+                      icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
                     <q-btn flat round small dense color="grey" icon="edit"
                       @click="openThirdPartyPayerEditionModal(col.value)" />
                   </div>

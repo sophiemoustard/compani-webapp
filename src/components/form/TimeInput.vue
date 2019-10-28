@@ -51,8 +51,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-.time-item
-  background-color: white !important
-</style>

@@ -152,6 +152,21 @@ export default {
       min-height: 35px
       height: 35px
 
+  .time-item
+    /deep/ .q-field__inner
+      display: flex;
+      flex-direction: row;
+    /deep/ .q-field--with-bottom
+      padding: 0
+    /deep/ .q-field__native
+      min-height: 40px
+    /deep/ .q-field__inner
+      .q-field__bottom
+        display: none
+    /deep/ .q-field__control
+      min-height: 35px
+      height: 35px
+
   .datetime-item
     height: 40px
     display: flex;
