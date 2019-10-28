@@ -1,8 +1,9 @@
 <template>
   <q-tr :props="props" :class="{'datatable-row-border-top': index === 0 }">
-    <q-td v-for="col in props.cols" :key="col.name" :props="props" :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
+    <q-td v-for="col in props.cols" :key="col.name" :props="props"
+      :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
       <template v-if="index === 0 && col.name === 'externalBilling' && bill.thirdPartyPayer">
-        <q-checkbox v-model="bill.externalBilling" color="grey"/>
+        <q-checkbox v-model="bill.externalBilling" color="grey" />
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">
@@ -18,8 +19,9 @@
         <div class="cursor-pointer text-primary">
           {{ formatDate(bill.startDate) }}
           <q-popup-proxy>
-            <div class="div">
-              <q-date v-model="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal @input="$emit('datetime:input')" />
+            <div>
+              <q-date v-model="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal
+                @input="$emit('datetime:input')" />
             </div>
           </q-popup-proxy>
         </div>
@@ -31,15 +33,15 @@
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
-        <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
-          :refName="bill._id" :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)"
+        <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition" :refName="bill._id"
+          :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)"
           @click="$emit('discount:click', $event)" @change="setDiscount" suffix="€" />
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
-    <q-td auto-width>
+    <q-td>
       <q-checkbox v-if="index === 0 && displayCheckbox" v-model="props.selected" dense />
     </q-td>
   </q-tr>
