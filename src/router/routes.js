@@ -77,16 +77,16 @@ const routes = [
           parent: 'billing',
         },
       },
-      // {
-      //   path: 'ni/billing/credit-notes',
-      //   name: 'credit note',
-      //   component: () => import('pages/ni/billing/CreditNotes'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'bills:edit',
-      //     parent: 'billing',
-      //   },
-      // },
+      {
+        path: 'ni/billing/credit-notes',
+        name: 'credit note',
+        component: () => import('pages/ni/billing/CreditNotes'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'bills:edit',
+          parent: 'billing',
+        },
+      },
       {
         path: 'ni/billing/clients-balances',
         name: 'clients balances',
