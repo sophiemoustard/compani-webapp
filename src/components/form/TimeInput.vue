@@ -6,11 +6,11 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }" clearable
-     :error-message="errorLabel" :error="error" :disable="disable">
+     :error-message="errorLabel" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time">
       <template v-slot:append>
         <q-icon name="access_time" class="cursor-pointer" @click.native="{selectTime = !selectTime}">
           <q-popup-proxy transition-show="scale" transition-hide="scale" ref="qTimePopup">
-            <q-time :value="value" format24 @input="select"></q-time>
+            <q-time :value="value" format24h @input="select"></q-time>
           </q-popup-proxy>
         </q-icon>
       </template>
@@ -44,6 +44,9 @@ export default {
     },
     update (value) {
       this.$emit('input', value);
+    },
+    onBlur () {
+      this.$emit('blur');
     },
   },
 }
