@@ -8,10 +8,10 @@
     <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }" clearable
      :error-message="errorLabel" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time">
       <template v-slot:append>
-        <q-icon name="access_time" class="cursor-pointer" @click.native="selectTime = !selectTime">
-          <q-popup-proxy transition-show="scale" transition-hide="scale" ref="qTimePopup">
+        <q-icon name="far fa-clock" class="cursor-pointer icon-clock" @click.native="selectTime = !selectTime">
+          <q-menu ref="qTimeMenu">
             <q-time :value="value" format24h @input="select" />
-          </q-popup-proxy>
+          </q-menu>
         </q-icon>
       </template>
     </q-input>
@@ -38,9 +38,8 @@ export default {
   },
   methods: {
     select (value) {
-      const momentValue = this.$moment(value, 'HH:mm');
-      this.update(momentValue.format('HH:mm'));
-      this.$refs.qTimePopup.hide();
+      this.update(value);
+      this.$refs.qTimeMenu.hide();
     },
     update (value) {
       this.$emit('input', value);
@@ -51,3 +50,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .icon-clock
+    font-size: 16px
+    color: rgba(0,0,0,0.87)
+</style>

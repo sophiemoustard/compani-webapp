@@ -4,7 +4,7 @@
       <h4>Configuration Bénéficiaires</h4>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
-        <q-card style="background: white">
+        <q-card>
           <q-table :data="surcharges" :columns="surchargeColumns" hide-bottom binary-state-sort
             :pagination.sync="pagination" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
@@ -29,7 +29,7 @@
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
-        <q-card style="background: white">
+        <q-card>
           <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort
             :pagination.sync="pagination" :visible-columns="visibleColumnsServices" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
@@ -37,7 +37,8 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn flat round small dense color="grey" icon="edit" @click="openServiceEditionModal(col.value)"/>
+                    <q-btn flat round small dense color="grey" icon="edit"
+                      @click="openServiceEditionModal(col.value)" />
                     <q-btn flat round small dense color="grey" icon="delete" :disable="props.row.subscriptionCount > 0"
                       @click="deleteService(col.value, props.row.__index)" />
                   </div>
@@ -87,7 +88,7 @@
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
-        <q-card style="background: white">
+        <q-card>
           <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort
             :pagination.sync="pagination" class="table-responsive">
             <q-tr slot="body" slot-scope="props" :props="props">
@@ -960,9 +961,7 @@ export default {
           await this.$surcharges.remove(surchargeId);
           this.surcharges.splice(cell, 1);
           NotifyPositive('Plan de majoration supprimé.');
-        }).onCancel(() => {
-          return NotifyPositive('Suppression annulée');
-        });
+        }).onCancel(() => { return NotifyPositive('Suppression annulée'); });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du plan de majoration.');
@@ -1069,9 +1068,7 @@ export default {
           await this.$services.remove(serviceId);
           this.services.splice(cell, 1);
           NotifyPositive('Service supprimé.');
-        }).onCancel(() => {
-          return NotifyPositive('Suppression annulée');
-        });
+        }).onCancel(() => { return NotifyPositive('Suppression annulée'); });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
@@ -1169,9 +1166,7 @@ export default {
           await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
           this.thirdPartyPayers.splice(cell, 1);
           NotifyPositive('Tiers payeur supprimé.');
-        }).onCancel(() => {
-          return NotifyPositive('Suppression annulée')
-        });
+        }).onCancel(() => { return NotifyPositive('Suppression annulée') });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
