@@ -35,7 +35,6 @@ export default {
   data () {
     return {
       innerOptions: [],
-      filterValue: '',
     };
   },
   computed: {
@@ -61,7 +60,6 @@ export default {
       this.$emit('input', val);
     },
     onFilter (val, update) {
-      this.filterValue = val;
       update(() => {
         if (val) {
           const value = val.toLowerCase();
