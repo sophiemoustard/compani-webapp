@@ -18,12 +18,10 @@
       <template v-else-if="index === 0 && col.name === 'startDate'">
         <div class="cursor-pointer text-primary">
           {{ formatDate(bill.startDate) }}
-          <q-popup-proxy>
-            <div>
-              <q-date v-model="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal
-                @input="$emit('datetime:input')" />
-            </div>
-          </q-popup-proxy>
+          <q-menu>
+            <q-date v-model="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal
+              @input="$emit('datetime:input')" />
+          </q-menu>
         </div>
       </template>
       <template v-else-if="col.name === 'endDate'">{{ formatDate(bill.endDate) }}</template>

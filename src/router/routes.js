@@ -47,16 +47,16 @@ const routes = [
           parent: 'configuration',
         },
       },
-      // {
-      //   path: 'ni/config/customers',
-      //   name: 'customers config',
-      //   component: () => import('pages/ni/config/CustomersConfig'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'config:edit',
-      //     parent: 'configuration',
-      //   },
-      // },
+      {
+        path: 'ni/config/customers',
+        name: 'customers config',
+        component: () => import('pages/ni/config/CustomersConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'config:edit',
+          parent: 'configuration',
+        },
+      },
       {
         path: 'ni/config/tags',
         name: 'tags config',

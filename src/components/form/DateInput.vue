@@ -34,11 +34,11 @@ export default {
   },
   computed: {
     date () {
-      if (this.value === '') return '';
+      if (!this.value) return '';
       return this.$moment(this.value).format('YYYY/MM/DD');
     },
     inputDate () {
-      if (this.value === '') return '';
+      if (!this.value) return '';
       return this.$moment(this.value).format('DD/MM/YYYY');
     },
   },
