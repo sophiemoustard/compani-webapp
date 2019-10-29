@@ -5,9 +5,13 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-select dense borderless :value="model" bg-color="white" :options="innerOptions" :multiple="multiple"
-      behavior="menu" use-input :input-debounce="0" hide-selected fill-input emit-value :error="error"
-      :disable="disable" @focus="onFocus" @blur="onBlur" @input="update" :class="{ 'borders': inModal }"
-      :error-message="errorLabel" @filter="filter" />
+      :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput"
+      :class="{ 'borders': inModal }" :error="error" :error-message="errorLabel" @filter="onFilter" use-input
+      :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value>
+        <template v-if="value && !disable" v-slot:append>
+          <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
+        </template>
+    </q-select>
   </div>
 </template>
 
@@ -17,21 +21,19 @@ import { REQUIRED_LABEL } from '../../data/constants';
 export default {
   name: 'NiSelect',
   props: {
-    caption: String,
-    error: Boolean,
+    caption: { type: String, default: '' },
+    error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
-    options: Array,
+    options: { type: Array, default: () => [] },
     value: [String, Number, Object],
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
-    filterPlaceholder: { type: String, default: 'Rechercher' },
     disable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
   },
   data () {
     return {
-      model: null,
       innerOptions: [],
     };
   },
@@ -40,14 +42,9 @@ export default {
       const option = this.options.find(opt => opt.value === this.value);
       return option ? option.label : '';
     },
-  },
-  watch: {
-    value (value) {
-      this.model = this.options.find(opt => opt.value === value);
+    model () {
+      return this.options.find(opt => opt.value === this.value) || null;
     },
-  },
-  mounted () {
-    this.model = this.options.find(opt => opt.value === this.value);
   },
   methods: {
     onFocus () {
@@ -56,15 +53,21 @@ export default {
     onBlur () {
       this.$emit('blur');
     },
-    update (opt) {
-      this.$emit('input', opt);
+    onInput (val) {
+      this.$emit('input', val);
     },
-    filter (term, done) {
-      if (term) {
-        const value = term.toLowerCase();
-        this.innerOptions = this.options.filter(opt => opt.label.toLowerCase().includes(value));
-      } else this.innerOptions = this.options
-      done(this.innerOptions);
+    onFilter (val, update) {
+      update(() => {
+        if (val) {
+          const value = val.toLowerCase();
+          this.innerOptions = this.options.filter(opt => opt.label.toLowerCase().includes(value));
+        } else {
+          this.innerOptions = this.options;
+        }
+      });
+    },
+    resetValue () {
+      this.onInput(null);
     },
   },
 }
