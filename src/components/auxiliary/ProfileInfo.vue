@@ -253,10 +253,10 @@
             required-field @input="updateUser('administrative.transportInvoice.transportType')" />
         </div>
         <div v-if="user.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Merci de nous transmettre ton justificatif d'abonnement"
-            path="administrative.transportInvoice" alt="justif transport" :entity="currentUser" name="transportInvoice"
-            @uploaded="refreshUser" :error="$v.user.administrative.transportInvoice.driveId.$error"
-            :display-caption="isAuxiliary" :url="docsUploadUrl" :extensions="extensions"
+          <ni-file-uploader :caption="captionTransportUploader" path="administrative.transportInvoice"
+            alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
+            :error="$v.user.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
+            :extensions="extensions"
             @delete="deleteDocument(user.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
             :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
@@ -508,6 +508,11 @@ export default {
     }
   },
   computed: {
+    captionTransportUploader () {
+      const coachText = 'Justificatif d\'abonnement';
+      const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'
+      return this.isAuxiliary ? auxiliaryText : coachText;
+    },
     ...mapGetters({
       userProfile: 'rh/getUserProfile',
       mainUser: 'main/user',
