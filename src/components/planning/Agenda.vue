@@ -51,8 +51,16 @@
 </template>
 
 <script>
-import { planningEventMixin } from '../mixins/planningEventMixin';
-import { ABSENCE, INTERVENTION, INTERNAL_HOUR, UNAVAILABILITY, PLANNING_PERCENTAGE_BY_MINUTES, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '../data/constants';
+import { planningEventMixin } from '../../mixins/planningEventMixin';
+import {
+  ABSENCE,
+  INTERVENTION,
+  INTERNAL_HOUR,
+  UNAVAILABILITY,
+  PLANNING_PERCENTAGE_BY_MINUTES,
+  PLANNING_VIEW_START_HOUR,
+  PLANNING_VIEW_END_HOUR,
+} from '../../data/constants';
 
 export default {
   name: 'Agenda',

@@ -90,8 +90,8 @@ export const planningActionMixin = {
   },
   methods: {
     addSavedTerms (endPath) {
-      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.get.item(`lastSearch${endPath}`).length > 0) {
-        const lastSearch = JSON.parse(this.$q.localStorage.get.item(`lastSearch${endPath}`));
+      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.getItem(`lastSearch${endPath}`).length > 0) {
+        const lastSearch = JSON.parse(this.$q.localStorage.getItem(`lastSearch${endPath}`));
         if (this.$refs.planningManager) this.$refs.planningManager.restoreFilter(lastSearch);
       }
     },
