@@ -201,16 +201,16 @@ const routes = [
       //     parent: 'administrative',
       //   },
       // },
-      // {
-      //   path: 'ni/customers',
-      //   name: 'customers directory',
-      //   component: () => import('pages/ni/customers/CustomersDirectory'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:edit',
-      //     parent: 'benef',
-      //   },
-      // },
+      {
+        path: 'ni/customers',
+        name: 'customers directory',
+        component: () => import('pages/ni/customers/CustomersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:edit',
+          parent: 'benef',
+        },
+      },
       // {
       //   path: 'ni/customers/:id',
       //   name: 'customers profile',
