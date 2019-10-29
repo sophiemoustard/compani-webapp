@@ -386,7 +386,7 @@ const routes = [
   //     }
   //   },
   // },
-  // { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
+  { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   // { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   // { path: '/error403Pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },

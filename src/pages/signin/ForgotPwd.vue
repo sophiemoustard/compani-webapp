@@ -1,20 +1,18 @@
 <template>
   <div>
     <compani-header />
-    <div class="neutral-background" style="min-height: 100vh">
-      <q-card flat style="width: 500px; max-width: 90vw; margin: auto">
-        <q-card-main>
-          <p class="q-mb-lg">Nous allons vous envoyer un email pour réinitialiser votre mot de passe. Veuillez renseigner votre adresse
-          email :</p>
-          <p class="input-caption">Email</p>
-          <q-field :error="$v.email.$error" error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)">
-            <q-input v-model.trim="email" @blur="$v.email.$touch" inverted-light color="white" />
-          </q-field>
-        </q-card-main>
-        <q-card-actions class="row justify-center">
-          <q-btn @click="submit" color="primary" :disable="$v.email.$invalid">Envoyer</q-btn>
-        </q-card-actions>
-      </q-card>
+    <div class="row justify-center layout-padding neutral-background" style="min-height: 100vh">
+      <div class="col-md-6 col-xs-12">
+        <div class="margin-input">
+          <div class="q-mb-lg message">Nous allons vous envoyer un email pour réinitialiser votre mot de passe.
+            Veuillez renseigner votre adresse email.</div>
+          <ni-input caption="Email" :error="$v.email.$error" v-model.trim="email" @blur="$v.email.$touch"
+            error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)" required-field />
+        </div>
+        <div class="row justify-center">
+          <q-btn class="btn-submit" @click="submit" color="primary" :disable="$v.email.$invalid" big>Envoyer</q-btn>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -23,11 +21,13 @@
 import { email, required } from 'vuelidate/lib/validators'
 
 import CompaniHeader from '../../components/CompaniHeader';
+import Input from '../../components/form/Input';
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
-    CompaniHeader,
+    'compani-header': CompaniHeader,
+    'ni-input': Input,
   },
   data () {
     return {
@@ -66,4 +66,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.message
+  font-size: 14px
 </style>
