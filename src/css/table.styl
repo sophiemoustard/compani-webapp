@@ -6,6 +6,11 @@
     @media (max-width: 767px)
       font-size: 12px
       padding: 4px 2px
+    .q-icon
+      margin: 0 5px
+      cursor: pointer
+      font-size: 1.5em
+
   & th
     white-space: normal;
     vertical-align: middle;
@@ -25,6 +30,32 @@
   .q-item
     padding: 2px
     min-height: auto
+  .q-uploader
+    width: auto
+    .q-uploader__list
+      display: none
+    .q-uploader__header
+      background-color: transparent
+    .q-uploader__header:before
+      opacity: 0
+    .q-uploader__header-content
+      margin: 0
+      padding: 0
+      .col
+        margin: 0
+      .q-btn
+        margin: 0
+        padding: 0
+      .q-uploader__subtitle
+        display: none
+      .q-icon
+        margin: 0
+        color: $primary
+      .q-spinner
+        color: $primary
+  tr:hover
+    .q-uploader__header
+      background: rgba(0,0,0,0.07)
 
 .table-grid
   table
@@ -69,10 +100,6 @@
 .table-actions
   display: inline-table
   min-width: 20px;
-  .q-icon
-    margin: 0 5px
-    cursor: pointer
-    font-size: 1.5em
 
 .table-responsive
   table
@@ -115,7 +142,7 @@
 
   @media screen and (min-width: 768px)
     .q-table__middle
-      margin: 10px;
+      margin: 0 10px;
 
   @media screen and (max-width: 767px)
     table
@@ -161,9 +188,6 @@
   .q-table
     border-spacing: 0 12px
     border-collapse: separate
-    th.sorted
-      .q-icon
-        color: $primary
   th
     padding: 0px 12px
   tbody

@@ -10,7 +10,7 @@
       <q-td slot="body-cell-link" slot-scope="props" :props="props">
         <q-btn flat round small color="primary">
           <a :href="props.value">
-            <q-icon name="file_download" />
+            <q-icon name="file_download" color="primary" />
           </a>
         </q-btn>
       </q-td>

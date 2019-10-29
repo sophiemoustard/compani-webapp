@@ -115,29 +115,27 @@
               <template v-if="col.name === 'emptyMandate'">
                 <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary"
                   @click="downloadMandate(props.row)">
-                  <q-icon name="file download" />
+                  <q-icon name="file_download" />
                 </q-btn>
-              </template>
-              <template v-else-if="col.name === 'signed'">
-                <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
               </template>
               <template v-else-if="col.name === 'signedMandate'">
                 <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
-                  <q-uploader :ref="`signedMandate_${props.row._id}`" name="signedMandate" :url="docsUploadUrl"
-                    extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf"
-                    hide-underline hide-upload-button @add="uploadDocument($event, `signedMandate_${props.row._id}`)"
-                    @uploaded="refreshMandates" @fail="failMsg"
-                    :additional-fields="formatAdditionalFields(props.row)" />
+                  <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
+                    field-name="signedMandate" auto-upload :accept="extensions" @uploaded="refreshMandates"
+                    @failed="failMsg" />
                 </div>
                 <q-btn v-else flat round small color="primary">
                   <a :href="props.row.drive.link" download target="_blank">
-                    <q-icon name="file download" />
+                    <q-icon name="file_download" />
                   </a>
                 </q-btn>
               </template>
               <template v-else-if="col.name === 'signedAt'">
                 <ni-date-input v-model="customer.payment.mandates[props.row.__index].signedAt"
                   @blur="updateSignedAt(props.row)" @focus="saveTmpSignedAt(props.row.__index)" in-modal />
+              </template>
+              <template v-else-if="col.name === 'signed'">
+                <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
               </template>
               <template v-else>{{ col.value}}</template>
             </q-td>
@@ -196,22 +194,17 @@
           <q-tr slot="body" slot-scope="props" :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'emptyQuote'">
-                <q-icon name="file download" color="primary" @click="downloadQuote(props.row)" />
+                <q-icon name="file_download" color="primary" @click="downloadQuote(props.row)" />
               </template>
               <template v-else-if="col.name === 'signedQuote'">
                 <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
-                  <q-uploader :ref="`signedQuote_${props.row._id}`" name="signedQuote" hide-underline
-                    :url="docsUploadUrl" :headers="headers"
-                    extensions="image/jpg, image/jpeg, image/gif, image/png, application/pdf" hide-upload-button
-                    @add="uploadDocument($event, `signedQuote_${props.row._id}`)" @uploaded="refreshQuotes"
-                    @fail="failMsg" :additional-fields="[
-                      { name: 'quoteId', value: props.row._id },
-                      { name: 'fileName', value: `devis_signe_${customer.identity.firstname}_${customer.identity.lastname}` }
-                    ]" />
+                  <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
+                    field-name="signedQuote" :accept="extensions" auto-upload @uploaded="refreshQuotes"
+                    @failed="failMsg" />
                 </div>
                 <q-btn v-else flat round small color="primary">
                   <a :href="props.row.drive.link" download target="_blank">
-                    <q-icon name="file download" />
+                    <q-icon name="file_download" />
                   </a>
                 </q-btn>
               </template>
@@ -606,6 +599,7 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
+      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
     }
   },
   computed: {
@@ -615,7 +609,7 @@ export default {
       return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`;
     },
     headers () {
-      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
+      return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
     },
     company () {
       return this.$store.getters['main/company'];
@@ -808,13 +802,19 @@ export default {
     this.isLoaded = true;
   },
   methods: {
-    formatAdditionalFields (row) {
+    mandateFormFields (row) {
       return [
         { name: 'mandateId', value: row._id },
         {
           name: 'fileName',
           value: `mandat_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}`,
         },
+      ]
+    },
+    quoteFormFields (quote) {
+      return [
+        { name: 'quoteId', value: quote._id },
+        { name: 'fileName', value: `devis_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}` },
       ]
     },
     getServiceLastVersion (service) {
@@ -1322,4 +1322,9 @@ export default {
 
   .inactiveDot
     background: $secondary
+  .signedAt
+    /deep/ .q-field--with-bottom
+      padding: 0
+    /deep/ .q-field__bottom
+      display: none
 </style>
