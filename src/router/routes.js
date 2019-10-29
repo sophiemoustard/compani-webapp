@@ -209,17 +209,17 @@ const routes = [
           parent: 'administrative',
         },
       },
-      // {
-      //   path: 'ni/customers/:id',
-      //   name: 'customers profile',
-      //   props: true,
-      //   component: () => import('pages/ni/customers/Profile'),
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:edit',
-      //     parent: 'benef',
-      //   },
-      // },
+      {
+        path: 'ni/customers/:id',
+        name: 'customers profile',
+        props: true,
+        component: () => import('pages/ni/customers/CustomerProfile'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:edit',
+          parent: 'benef',
+        },
+      },
       {
         path: 'ni/planning/auxiliaries',
         name: 'auxiliaries planning',
@@ -239,7 +239,7 @@ const routes = [
           permissions: 'events:read',
         },
       },
-      // // Auxiliary view routes
+      // Auxiliary view routes
       {
         path: 'auxiliaries/agenda',
         name: 'auxiliary agenda',
@@ -317,7 +317,7 @@ const routes = [
           parent: 'administrative',
         },
       },
-      // // Customers view routes
+      // Customers view routes
       {
         path: 'customers/agenda',
         name: 'customer agenda',

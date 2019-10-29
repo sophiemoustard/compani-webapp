@@ -15,11 +15,18 @@
 <script>
 export default {
   name: 'ProfileTabs',
-  props: ['tabsContent', 'profileId'],
+  props: {
+    tabsContent: { type: Array, default: () => [] },
+    profileId: { type: String, default: '' },
+  },
   data () {
     return {
-      selectedTab: 'info',
+      selectedTab: null,
     }
+  },
+  mounted () {
+    const selectedTab = this.tabsContent.find(tab => tab.default);
+    this.selectedTab = selectedTab.name;
   },
   computed: {
     notifications () {
