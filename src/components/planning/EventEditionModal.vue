@@ -2,8 +2,8 @@
   <q-dialog v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" @hide="resetForm()">
     <div class="modal-container-md">
       <div class="modal-padding">
-        <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer" :selectedPerson="selectedCustomer"
-          @close="close" />
+        <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer"
+          :selectedPerson="selectedCustomer" @close="close" />
         <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" :options="[]"
           v-model="editedEvent.auxiliary" :selectedPerson="selectedAuxiliary" @close="close" />
         <ni-planning-modal-header v-else v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
@@ -53,13 +53,15 @@
             <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
               :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
             <ni-file-uploader v-if="editedEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(editedEvent.absence)"
-              caption="Justificatif d'absence" :disable="!selectedAuxiliary._id" :entity="editedEvent" name="file" required-field
-               path="attachment" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
-              in-modal @delete="deleteDocument(editedEvent.attachment.driveId)" alt="justificatif absence" />
+              caption="Justificatif d'absence" :disable="!selectedAuxiliary._id" :entity="editedEvent" name="file"
+              required-field path="attachment" :url="docsUploadUrl" @uploaded="documentUploaded"
+              :additionalValue="additionalValue" in-modal @delete="deleteDocument(editedEvent.attachment.driveId)"
+              alt="justificatif absence" />
           </template>
           <template v-if="editedEvent.absenceNature === HOURLY">
             <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
-              :disable="isDisabled" disable-end-date :error="validations.dates.$error" @blur="validations.dates.$touch" />
+              :disable="isDisabled" disable-end-date :error="validations.dates.$error"
+              @blur="validations.dates.$touch" />
             <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
               :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
           </template>
@@ -73,8 +75,8 @@
               size="12px" dense />
           </div>
           <div class="row justify-between">
-            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" caption="Conditions"
-              :options="cancellationConditions" required-field @blur="validations.cancel.condition.$touch"
+            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" required-field
+              caption="Conditions" :options="cancellationConditions" @blur="validations.cancel.condition.$touch"
               :error="validations.cancel.condition.$error" />
             <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
               :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
