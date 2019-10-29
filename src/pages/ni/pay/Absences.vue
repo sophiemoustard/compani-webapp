@@ -2,7 +2,7 @@
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="Absences">
       <template slot="content">
-        <div class="col-xs-12 col-md-5">
+        <div class="col-xs-12 col-md-6">
           <ni-date-range v-model="dates" @input="refresh" :error.sync="datesHasError" />
         </div>
       </template>
