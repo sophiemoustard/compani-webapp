@@ -112,7 +112,7 @@
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline />
         </template>
-        <div v-if="!editedCreditNoteHasNoEvents" class="light warning">
+        <div v-if="editedCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
         </div>
         <div class="row justify-between items-baseline">
@@ -659,7 +659,7 @@ export default {
         if (this.$v.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer_id };
+        const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer._id };
         if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
         await this.$creditNotes.updateById(this.editedCreditNote._id, payload);
 
