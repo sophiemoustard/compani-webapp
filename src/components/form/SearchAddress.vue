@@ -6,8 +6,8 @@
     </div>
     <q-field dense :error="error" :error-message="errorLabel" borderless>
       <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
-        input-debounce="0" :options="options" :class="{ 'borders': inModal }" :disable="disable" @filter="searchAddress"
-        @blur="blurEvent" @focus="focusEvent" :bg-color="color">
+        input-debounce="500" :options="options" :class="{ 'borders': inModal }" :disable="disable"
+        @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color">
         <template v-if="value.fullAddress && !disable" v-slot:append>
           <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
         </template>
