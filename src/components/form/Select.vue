@@ -46,9 +46,6 @@ export default {
       return this.options.find(opt => opt.value === this.value) || null;
     },
   },
-  mounted () {
-    this.model = this.options.find(opt => opt.value === this.value);
-  },
   methods: {
     onFocus () {
       this.$emit('focus');
