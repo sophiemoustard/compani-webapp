@@ -961,7 +961,7 @@ export default {
           await this.$surcharges.remove(surchargeId);
           this.surcharges.splice(cell, 1);
           NotifyPositive('Plan de majoration supprimé.');
-        }).onCancel(() => { return NotifyPositive('Suppression annulée'); });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du plan de majoration.');
@@ -1068,7 +1068,7 @@ export default {
           await this.$services.remove(serviceId);
           this.services.splice(cell, 1);
           NotifyPositive('Service supprimé.');
-        }).onCancel(() => { return NotifyPositive('Suppression annulée'); });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
@@ -1166,7 +1166,7 @@ export default {
           await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
           this.thirdPartyPayers.splice(cell, 1);
           NotifyPositive('Tiers payeur supprimé.');
-        }).onCancel(() => { return NotifyPositive('Suppression annulée') });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');

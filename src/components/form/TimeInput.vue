@@ -5,11 +5,11 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }" clearable
-     :error-message="errorLabel" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time">
+    <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
+     :error-message="showErrorLabel" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time">
       <template v-slot:append>
         <q-icon name="far fa-clock" class="cursor-pointer icon-clock" @click.native="selectTime = !selectTime">
-          <q-menu ref="qTimeMenu">
+          <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-time :value="value" format24h @input="select" />
           </q-menu>
         </q-icon>
@@ -35,6 +35,12 @@ export default {
     errorLabel: { type: String, default: '' },
     disable: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
+  },
+  computed: {
+    showErrorLabel () {
+      if (this.error) return this.errorLabel;
+      return '';
+    },
   },
   methods: {
     select (value) {
