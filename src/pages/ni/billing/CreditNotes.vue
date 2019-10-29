@@ -24,7 +24,8 @@
       @click="creditNoteCreationModal = true" />
 
     <!-- Credit note creation modal -->
-    <ni-modal v-model="creditNoteCreationModal" @hide="resetCreationCreditNoteData">
+    <ni-modal v-model="creditNoteCreationModal" @hide="resetCreationCreditNoteData"
+      container-class="modal-container-md">
       <template slot="title">
         Créer un <span class="text-weight-bold">avoir</span>
       </template>
@@ -51,9 +52,7 @@
           <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline />
         </template>
-        <div
-          v-if="newCreditNote.customer && newCreditNote.startDate && newCreditNote.endDate && creditNoteEvents.length === 0"
-          class="light warning">
+        <div v-if="newCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
         </div>
         <div class="row justify-between items-baseline">
@@ -91,7 +90,7 @@
 
     <!-- Credit note edition modal -->
     <ni-modal v-if="Object.keys(editedCreditNote).length > 0" v-model="creditNoteEditionModal"
-      @hide="resetEditionCreditNoteData">
+      @hide="resetEditionCreditNoteData" container-class="modal-container-md">
       <template slot="title">
         Editer un <span class="text-weight-bold">avoir</span>
       </template>
@@ -113,9 +112,7 @@
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline />
         </template>
-        <div
-          v-if="editedCreditNote.customer && editedCreditNote.startDate && editedCreditNote.endDate && creditNoteEvents.length === 0"
-          class="light warning">
+        <div v-if="!editedCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
         </div>
         <div class="row justify-between items-baseline">
@@ -416,6 +413,12 @@ export default {
     },
     inclTaxesError () {
       return 'Montant TTC non valide';
+    },
+    newCreditNoteHasNoEvents () {
+      return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate && !this.creditNoteEvents.length;
+    },
+    editedCreditNoteHasNoEvents () {
+      return this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate && !this.creditNoteEvents.length;
     },
   },
   methods: {
