@@ -5,21 +5,16 @@
       <q-icon v-if="hasError" name="error_outline" color="secondary" />
     </div>
     <q-field :error="hasError" :error-label="errorMessage" borderless>
-      <div class="datetime-container">
-        <div class="datetime-item">
-          <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
-            @blur="blurHandler" :disable="disable" @error="childErrors.startDate = $event" />
-          <ni-select :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
-            @blur="blurHandler" :options="hoursOptions" filter :filter-placeholder="value.startHour"
-            name="start-hour" :disable="disable" />
-        </div>
+      <div class="datetime-container row justify-evenly items-center">
+        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
+          @blur="blurHandler" :disable="disable" @error="childErrors.startDate = $event" />
+        <ni-select :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
+          @blur="blurHandler" :options="hoursOptions" :disable="disable" />
         <p class="delimiter">-</p>
-        <div class="datetime-item end">
-          <ni-select :value="value.endHour" @input="update($event, 'endHour')" class="time-item"
-            @blur="blurHandler" :options="endHourOptions" :disable="disable" @error="childErrors.endDate = $event" />
-          <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-            @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
-        </div>
+        <ni-select :value="value.endHour" @input="update($event, 'endHour')" class="time-item"
+          @blur="blurHandler" :options="endHourOptions" :disable="disable" />
+        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+          @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
       </div>
     </q-field>
   </div>
@@ -67,12 +62,17 @@ export default {
   },
   computed: {
     hoursOptions () {
-      const range = this.$moment.range(this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0), this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0));
+      const range = this.$moment.range(
+        this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
+        this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
+      );
       const hours = Array.from(range.by('hours'));
       const selectOptions = [];
       hours.map((hour) => {
         selectOptions.push({ label: hour.format('HH:mm'), value: hour.format('HH:mm') });
-        if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
+        if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
+          selectOptions.push({ label: hour.minutes(30).format('HH:mm'), value: hour.minutes(30).format('HH:mm') });
+        }
       });
       return selectOptions;
     },
@@ -120,65 +120,50 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  /deep/ .datetime-container
-    height: 100%
+  .datetime-container
+    width: 100%
     border: 1px solid $light-grey;
     border-radius: 3px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
     @media screen and (min-width: 768px)
-      & .delimiter
-        padding: 10px 14px;
-        margin: 0;
-        width: 4%;
-    @media screen and (max-width: 767px)
-      flex-direction: column;
-      & .delimiter
-        display: none;
+      flex-wrap: nowrap;
 
   /deep/ .q-field__control
     min-height: 40px
 
   .date-item
+    @media screen and (min-width: 768px)
+      width: 22%
+    @media screen and (max-width: 767px)
+      width: 50%
     /deep/ .q-field--with-bottom
       padding: 0
+    /deep/ .q-field__control
+      min-height: 35px
     /deep/ .q-field__native
-      min-height: 40px
+      min-height: auto
     /deep/ .q-field__inner
       .q-field__bottom
         display: none
-    /deep/ .q-field__control
-      min-height: 35px
-      height: 35px
 
   .time-item
-    /deep/ .q-field__inner
-      display: flex;
-      flex-direction: row;
+    @media screen and (min-width: 768px)
+      width: 22%
+    @media screen and (max-width: 767px)
+      width: 50%
     /deep/ .q-field--with-bottom
       padding: 0
-    /deep/ .q-field__native
-      min-height: 40px
     /deep/ .q-field__inner
       .q-field__bottom
         display: none
     /deep/ .q-field__control
       min-height: 35px
-      height: 35px
+    /deep/ .q-field__native
+      min-height: auto
 
-  .datetime-item
-    height: 40px
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    &.end
-      @media screen and (max-width: 767px)
-        border-top: 1px solid $light-grey;
-        flex-direction: row-reverse;
-    /deep/ .q-field
-      .q-field__inner
-        input
-          height: 40px
+  .delimiter
+    margin: 0
+    color: $black
+    @media screen and (max-width: 767px)
+      display: none
 
 </style>

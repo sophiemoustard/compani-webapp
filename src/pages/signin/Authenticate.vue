@@ -84,13 +84,11 @@ export default {
         if (this.getUser.role.name === HELPER) {
           const customer = await this.$customers.getById(this.getUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
-          // this.$router.replace({ name: 'customer agenda' });
-          this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
+          this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliary) {
           this.$router.replace({ name: 'auxiliary agenda' });
         } else {
-          // this.$router.replace({ name: 'administrative directory' });
-          this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
+          this.$router.replace({ name: 'administrative directory' });
         }
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');
