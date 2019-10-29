@@ -431,14 +431,12 @@ export default {
           message: 'Etes-vous sûr de vouloir supprimer cet avenant ?',
           ok: 'OK',
           cancel: 'Annuler',
-        });
-
-        await this.$contracts.deleteVersion(contractId, versionId);
-
-        await this.refreshContracts();
-        NotifyPositive('Version supprimée');
+        }).onOk(async () => {
+          await this.$contracts.deleteVersion(contractId, versionId);
+          await this.refreshContracts();
+          NotifyPositive('Version supprimée');
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
-        if (e.message === '') return NotifyPositive('Suppression annulée');
         console.error(e);
         if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant');
         NotifyNegative('Erreur lors de la suppression de l\'avenant');

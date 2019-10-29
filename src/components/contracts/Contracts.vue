@@ -362,6 +362,7 @@ export default {
     justify-content: normal !important
 
   /deep/ .q-uploader
+    width: 0px
     .q-uploader__list
       display: none
     .q-uploader__header-content
