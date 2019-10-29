@@ -2,7 +2,6 @@
   display: flex
   position: relative
   .q-chip
-    cursor: pointer
     width: 100%
     position: absolute
     top: 50%
@@ -10,16 +9,13 @@
     transform: translate(-50%, -50%)
     padding: 0 10px
     justify-content: flex-end
-  @media (max-width: 767px)
-    .q-chip
-      font-size: 10px
-      padding: 0 2px
-  @media (max-width: 549px)
-    .q-chip
-      display: none
-  .q-chip
     background: $dark-grey
     margin: 0
+    @media (max-width: 767px)
+      font-size: 10px
+      padding: 0 2px
+    @media (max-width: 549px)
+      display: none
     &.high-occupation
       background: $secondary !important
     &.extreme-occupation

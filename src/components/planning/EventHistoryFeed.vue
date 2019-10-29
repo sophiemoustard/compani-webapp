@@ -6,12 +6,14 @@
         <q-icon name="clear" size="16px" @click.native="close" />
       </div>
     </div>
-    <q-infinite-scroll inline @load="load" class="scroll-container">
-      <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
-      <div slot="loading" class="loading">
-        <q-spinner />
-      </div>
-    </q-infinite-scroll>
+    <div class="scroll-container" ref="scrollTargetRef">
+      <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTargetRef">
+        <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
+        <div slot="loading" class="loading">
+          <q-spinner />
+        </div>
+      </q-infinite-scroll>
+    </div>
   </div>
 </template>
 

@@ -341,23 +341,19 @@ export default {
     .avatar
     .q-chip
       box-shadow: 0 0 1px 1px $primary-dark
-
+  .q-chip
+    cursor: pointer
   .q-tab-panel
     padding: 0;
-
   .q-tabs
     margin: 0px 24px;
-
   .q-tab
     text-transform: none
     padding: 3px 0
     display: flex
     justify-content: flex-start
-
   /deep/ .q-hoverable:hover > .q-focus-helper
     background: none !important
-
   /deep/ .q-ripple
     display: none
-
 </style>
