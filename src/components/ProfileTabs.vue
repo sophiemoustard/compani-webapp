@@ -1,13 +1,13 @@
 <template>
   <div class="profile-tabs">
-    <q-tabs align="justify" color="transparent" text-color="primary">
+    <q-tabs align="justify" color="transparent" text-color="primary" v-model="selectedTab">
       <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label"
         :name="tab.name" :alert="alert(tab)"/>
     </q-tabs>
     <q-tab-panels v-model="selectedTab" class="no-border neutral-background" flat>
       <!-- Dynamic component loading  -->
       <q-tab-panel v-for="(tab, index) in tabsContent" :name="tab.name"  :key="index">
-        <component v-if="tab.name === 'info'" :is="tab.component" />
+        <component :is="tab.component" />
       </q-tab-panel>
     </q-tab-panels>
   </div>
@@ -39,41 +39,37 @@ export default {
 
 <style lang="stylus" scoped>
   .profile-tabs
+    /deep/ .q-tab--active
+      & > .q-tab__indicator
+        color: $primary
+    /deep/.q-tab__indicator
+      color: $light-grey
+      opacity: 1
     & /deep/ .q-tabs
-      &-scroller
-        & div:nth-last-child(2)
-          margin-right: 0 !important
-        & .q-tab
-          flex: 1 1 0
-          margin-right: 24px
-      &-normal
-        & .q-tab-label
-          color: $dark-grey
-          opacity: 1
-      & .q-tabs-panes .q-tab-pane
+      & div:nth-last-child(1)
+        margin-right: 0 !important
+      & .q-tab-panels .q-tab-panel
         padding: 0
         padding-top: 24px
-      & > .q-tabs-head
-        font-size: 24px
+      & .q-tabs__content
         &:not(.scrollable)
           @media (min-width: 992px)
             padding: 0
         & .q-tab
+          flex: 1 1 0
+          padding-left: 0px
+          justify-content: start
+          margin-right: 24px
           text-transform: none
-          align-items: start
+          & .q-tab__content
+            & .q-tab__label
+              color: $dark-grey
+              font-size: 24px
           &:before
             background: none
-          &.active
-            & .q-tab-label
+        & .q-tab--active
+          & .q-tab__content
+            & .q-tab__label
               color: $primary
               font-weight: 700
-            & .q-tabs-bar
-              color: inherit
-          @media (min-width: 992px)
-            padding-left: 0
-          & .q-tabs-bar
-            display: block !important
-            color: $light-grey
-          & .q-dot
-            background: $secondary
 </style>
