@@ -188,17 +188,6 @@ const routes = [
           parent: 'administrative',
         },
       },
-      // {
-      //   path: 'ni/auxiliaries/:id',
-      //   name: 'personal info',
-      //   component: () => import('pages/ni/auxiliaries/PersonalInfo'),
-      //   props: true,
-      //   meta: {
-      //     cookies: ['alenvi_token', 'refresh_token'],
-      //     permissions: 'users:edit',
-      //     parent: 'administrative',
-      //   },
-      // },
       {
         path: 'ni/customers',
         name: 'customers directory',
@@ -207,6 +196,17 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'users:edit',
           parent: 'benef',
+        },
+      },
+      {
+        path: 'ni/auxiliaries/:id',
+        name: 'personal info',
+        component: () => import('pages/ni/auxiliaries/PersonalInfo'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:edit',
+          parent: 'administrative',
         },
       },
       // {
