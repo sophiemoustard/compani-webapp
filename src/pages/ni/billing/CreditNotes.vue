@@ -17,6 +17,8 @@
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
+      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
+        :data="creditNotes" />
     </q-table>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
       @click="creditNoteCreationModal = true" />
@@ -152,6 +154,7 @@
 </template>
 
 <script>
+import BillingPagination from '../../../components/table/BillingPagination';
 import DateInput from '../../../components/form/DateInput';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
@@ -174,6 +177,7 @@ export default {
     'ni-select': Select,
     'ni-option-group': OptionGroup,
     'ni-modal': Modal,
+    'ni-billing-pagination': BillingPagination,
   },
   data () {
     return {
