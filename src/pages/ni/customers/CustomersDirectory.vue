@@ -186,24 +186,6 @@ export default {
     filteredCustomers () {
       return this.clientsCustomerList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
     },
-    zipCodeError () {
-      if (!this.$v.newCustomer.contact.primaryAddress.zipCode.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newCustomer.contact.primaryAddress.zipCode.frZipCode || !this.$v.newCustomer.contact.primaryAddress.zipCode.maxLength) {
-        return 'Code postal non valide';
-      }
-
-      return '';
-    },
-    emailError () {
-      if (!this.$v.newCustomer.email.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newCustomer.email.email) {
-        return 'Email non valide';
-      }
-
-      return '';
-    },
     primaryAddressError () {
       return !this.$v.newCustomer.contact.primaryAddress.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
