@@ -5,7 +5,6 @@
         :name="tab.name" :alert="alert(tab)"/>
     </q-tabs>
     <q-tab-panels v-model="selectedTab" class="no-border neutral-background" flat>
-      <!-- Dynamic component loading  -->
       <q-tab-panel v-for="(tab, index) in tabsContent" :name="tab.name"  :key="index">
         <component :is="tab.component" />
       </q-tab-panel>
@@ -65,6 +64,8 @@ export default {
             & .q-tab__label
               color: $dark-grey
               font-size: 24px
+            & .q-tab__alert
+              background: $secondary
           &:before
             background: none
         & .q-tab--active

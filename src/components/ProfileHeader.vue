@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="row col-xs-12 profile-info">
-      <div :class="[customer ? 'col-xs-12': 'col-xs-6', 'pl-lg', 'col-md-6', 'profile-info-item']">
+      <div :class="[customer ? 'col-xs-12': 'col-xs-6', 'q-pl-lg', 'col-md-6', 'profile-info-item']">
         <div class="row items-center">
           <div class="row items-center justify-center on-left" style="width: 17px; height: 17px">
             <div :class="[{ activeDot: userActivity.active, inactiveDot: !userActivity.active }]" />
@@ -30,7 +30,7 @@
             @click=deleteCustomer />
         </div>
       </div>
-      <div v-if="!customer" class="pl-lg col-xs-6 col-md-6 row profile-info-item">
+      <div v-if="!customer" class="q-pl-lg col-xs-6 col-md-6 row profile-info-item">
         <div class="relative-position" style="width: 37px;">
           <q-icon size="36px" name="phone_iphone" color="grey-2" />
           <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
@@ -120,8 +120,7 @@ export default {
       return '';
     },
     isExternalUser () {
-      if (this.user._id !== this.currentUser._id) return true;
-      return false;
+      return this.user._id !== this.currentUser._id;
     },
     isAccountConfirmed () {
       if (this.user.isConfirmed) {
@@ -130,25 +129,14 @@ export default {
       return 'Accès WebApp non activé'
     },
     msgSupportOptions () {
-      const options = [
-        {
-          label: 'SMS',
-          value: 'sms',
-        },
-      ];
+      const options = [{ label: 'SMS', value: 'sms' }];
       if (this.user.facebook && this.user.facebook.address) {
-        options.push({
-          label: 'Pigi',
-          value: 'pigi',
-        });
+        options.push({ label: 'Pigi', value: 'pigi' });
       }
       return options
     },
     activationCode () {
-      if (this.typeMessage === 'CA') {
-        return randomize('0000');
-      }
-      return '';
+      return this.typeMessage === 'CA' ? randomize('0000') : '';
     },
     messageComp: {
       get () {
@@ -203,10 +191,11 @@ export default {
           message: 'Confirmez-vous la suppression ?',
           ok: 'OK',
           cancel: 'Annuler',
-        });
-        await this.$customers.remove(this.user._id);
-        NotifyPositive('Bénéficiaire supprimé.');
-        this.$router.push({ name: 'customers directory' });
+        }).onOk(async () => {
+          await this.$customers.remove(this.user._id);
+          NotifyPositive('Bénéficiaire supprimé.');
+          this.$router.push({ name: 'customers directory' });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
@@ -224,9 +213,6 @@ export default {
     width: 59px
     height: 59px
     border: 1px solid #979797
-
-  .pl-lg
-    padding-left: 28px
 
   .profile-info
     font-size: 14px
@@ -251,9 +237,4 @@ export default {
       justify-content: flex-end
       @media (max-width: 767px)
         justify-content: center
-    &-center
-      justify-content: flex-start
-      @media (max-width: 767px)
-        justify-content: center
-
 </style>

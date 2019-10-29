@@ -1,10 +1,8 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header v-if="!isAuxiliary" :profileId="id" class="header" />
-      <profile-tabs v-if="!isAuxiliary" :profileId="id" :tabsContent="tabsContent" />
-      <h4 v-if="isAuxiliary">Informations personnelles</h4>
-      <profile-info v-if="isAuxiliary" />
+      <profile-header :profileId="id" class="header" />
+      <profile-tabs :profileId="id" :tabsContent="tabsContent" />
     </div>
   </q-page>
 </template>
@@ -17,7 +15,6 @@ import ProfileInfo from '../../../components/auxiliary/ProfileInfo';
 // import ProfileTasks from '../../../components/auxiliary/ProfileTasks';
 // import ProfileContracts from '../../../components/auxiliary/ProfileContracts';
 // import ProfilePay from '../../../components/auxiliary/ProfilePay';
-import { AUXILIARY, PLANNING_REFERENT } from '../../../data/constants.js';
 
 export default {
   props: {
@@ -27,7 +24,6 @@ export default {
   components: {
     ProfileHeader,
     ProfileTabs,
-    ProfileInfo,
   },
   name: 'PersonalInfo',
   metaInfo: {
@@ -39,9 +35,6 @@ export default {
     },
     currentUser () {
       return this.$store.getters['main/user'];
-    },
-    isAuxiliary () {
-      return this.currentUser.role.name === AUXILIARY || this.currentUser.role.name === PLANNING_REFERENT;
     },
   },
   data () {
