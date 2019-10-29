@@ -16,7 +16,7 @@
     <q-field borderless v-if="(!document || !document.driveId) && displayUpload" :error="error"
       :error-message="errorLabel">
       <q-uploader flat :bordered="false" color="white" :label="label" :url="url" :headers="headers"
-        text-color="black" @failed="failMsg" :form-fields="additionalFields" :class="{ borders: inModal }"
+        text-color="black" @failed="failMsg" :form-fields="additionalFields" :class="{ border: inModal }"
         @uploaded="documentUploaded" auto-upload :accept="extensions" :field-name="name" :multiple="multiple"/>
     </q-field>
   </div>

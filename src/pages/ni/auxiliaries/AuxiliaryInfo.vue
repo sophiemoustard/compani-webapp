@@ -12,9 +12,9 @@
 import ProfileHeader from '../../../components/ProfileHeader';
 import ProfileTabs from '../../../components/ProfileTabs';
 import ProfileInfo from '../../../components/auxiliary/ProfileInfo';
-// import ProfileTasks from '../../../components/auxiliary/ProfileTasks';
-// import ProfileContracts from '../../../components/auxiliary/ProfileContracts';
-// import ProfilePay from '../../../components/auxiliary/ProfilePay';
+import ProfileTasks from '../../../components/auxiliary/ProfileTasks';
+import ProfileContracts from '../../../components/auxiliary/ProfileContracts';
+import ProfilePay from '../../../components/auxiliary/ProfilePay';
 
 export default {
   props: {
@@ -25,7 +25,7 @@ export default {
     ProfileHeader,
     ProfileTabs,
   },
-  name: 'PersonalInfo',
+  name: 'AuxiliaryInfo',
   metaInfo: {
     title: 'Infos personnelles',
   },
@@ -51,20 +51,20 @@ export default {
           label: 'Tâches',
           name: 'tasks',
           default: this.defaultTab === 'tasks',
-          // component: ProfileTasks,
+          component: ProfileTasks,
           notification: 'tasks',
         },
         {
           label: 'Contrats',
           name: 'contracts',
           default: this.defaultTab === 'contracts',
-          // component: ProfileContracts,
+          component: ProfileContracts,
         },
         {
           label: 'Paie',
           name: 'pays',
           default: this.defaultTab === 'pays',
-          // component: ProfilePay,
+          component: ProfilePay,
         },
       ],
     }

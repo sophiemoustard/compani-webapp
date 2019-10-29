@@ -17,24 +17,25 @@
         hide-bottom :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive q-pa-sm">
         <q-tr slot="body" slot-scope="props" :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <!-- <template v-if="col.name === 'contractEmpty'">
+            <template v-if="col.name === 'contractEmpty'">
               <div class="row justify-center table-actions">
                 <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract)" icon="file_download"
                   :disable="!canDownload(props.row, contract.status)" />
               </div>
-            </template> -->
+            </template>
             <template v-if="col.name === 'contractSigned'">
               <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
                 <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer"
                 @click="openSignatureModal(props.row.signature.eversignId)" />
               </div>
-              <!-- <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
+              <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
                 class="row justify-center table-actions">
                 <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers"
-                  :url="docsUploadUrl(contract._id)" :extensions="extensions" hide-upload-button
+                  :url="docsUploadUrl(contract._id)" :extensions="extensions" hide-upload-btn flat
+                  :bordered="false" color="white" auto-upload icon="add_box"
                   @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
                   @uploaded="refresh" @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
-              </div> -->
+              </div>
               <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
                   <a :href="getContractLink(props.row)" target="_blank">
@@ -46,8 +47,8 @@
                 <p class="no-margin">En attente de signature</p>
               </div>
             </template>
-            <!-- <template v-else-if="col.name === 'archives'"> -->
-              <!-- <div class="row archives justify-center">
+            <template v-else-if="col.name === 'archives'">
+              <div class="row archives justify-center">
                 <div v-for="archive in col.value" :key="archive._id">
                   <q-btn flat round small color="primary">
                     <a :href="archive.link" target="_blank">
@@ -63,12 +64,12 @@
                 <q-btn v-if="!props.row.endDate" flat round small color="grey" icon="delete"
                   :disable="!props.row.canBeDeleted" @click="deleteVersion(contract._id, props.row._id)" />
               </div>
-            </template> -->
+            </template>
             <template v-else>{{ col.value }}</template>
           </q-td>
         </q-tr>
       </q-table>
-      <q-card-actions align="left">
+      <q-card-actions align="right">
         <template v-if="displayActions && !contract.endDate">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" />
@@ -179,7 +180,7 @@ export default {
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
     headers () {
-      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
+      return [{ 'x-access-token': Cookies.get('alenvi_token') || '' }];
     },
   },
   methods: {
@@ -359,5 +360,28 @@ export default {
 
   .contract-actions
     justify-content: normal !important
+
+  /deep/ .q-uploader
+    .q-uploader__list
+      display: none
+    .q-uploader__header-content
+      border-radius: 3px
+      height: 40px
+      margin: 0
+    .q-btn
+      margin: 0
+      padding: 0
+    .col
+      margin: 0
+    .q-uploader__title
+      font-weight: 400
+      overflow: initial
+    .q-uploader__subtitle
+      display: none
+      height: 0
+    .q-uploader__header:before
+      opacity:0
+    .q-icon
+      color: $primary
 
 </style>

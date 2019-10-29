@@ -26,7 +26,7 @@
         label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
 
       <!-- Document upload modal -->
-      <!-- <ni-modal v-model="documentUpload" @hide="$refs.documentUploadForm.reset()">
+      <ni-modal v-model="documentUpload" @hide="hideDocumentUploadModal">
         <template slot="title">
           Ajouter un <span class="text-weight-bold">document</span>
         </template>
@@ -37,7 +37,7 @@
           <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add"
             color="primary" :loading="loading" @click="createDocument" />
         </template>
-      </ni-modal> -->
+      </ni-modal>
     </div>
   </div>
 </template>
@@ -49,16 +49,16 @@ import snakeCase from 'lodash/snakeCase';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
-// import Modal from '../../components/Modal';
-// import DocumentUpload from '../../components/documents/DocumentUpload';
+import Modal from '../../components/Modal';
+import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocuments from '../../api/PayDocuments';
 import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfilePay',
   components: {
-    // 'ni-document-upload': DocumentUpload,
-    // 'ni-modal': Modal,
+    'ni-document-upload': DocumentUpload,
+    'ni-modal': Modal,
   },
   data () {
     return {
@@ -122,6 +122,9 @@ export default {
     await this.getDocuments();
   },
   methods: {
+    hideDocumentUploadModal () {
+      this.$refs.documentUploadForm.reset();
+    },
     formatDocumentPayload () {
       const { file, nature, date } = this.newDocument;
       const form = new FormData();
@@ -132,7 +135,7 @@ export default {
         : snakeCase(`document_paie_${formattedDate}`);
 
       form.append('nature', nature);
-      form.append('date', date.toISOString());
+      form.append('date', date);
       form.append('payDoc', file);
       form.append('mimeType', file.type || 'application/octet-stream');
       form.append('fileName', fileName);
@@ -180,11 +183,11 @@ export default {
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
           cancel: 'Annuler',
-        });
-
-        await PayDocuments.remove(payDocument._id);
-        NotifyPositive('Document supprimé');
-        await this.getDocuments();
+        }).onOk(async () => {
+          await PayDocuments.remove(payDocument._id);
+          NotifyPositive('Document supprimé');
+          await this.getDocuments();
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');

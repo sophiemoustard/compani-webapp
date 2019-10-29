@@ -201,7 +201,7 @@ const routes = [
       {
         path: 'ni/auxiliaries/:id',
         name: 'personal info',
-        component: () => import('pages/ni/auxiliaries/PersonalInfo'),
+        component: () => import('pages/ni/auxiliaries/AuxiliaryInfo'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
