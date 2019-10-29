@@ -7,7 +7,8 @@
           <template v-if="!isAuxiliaryUpdate"> de <span class="auxiliary">{{ auxiliaryName }}</span></template>
           {{ historyInfo.title.post }}
         </div>
-        <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye" @click="toggleDetails" />
+        <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye"
+          @click="toggleDetails" />
       </div>
       <div v-if="displayDetails" class="history-details">
         <div>{{ historyInfo.details }}</div>

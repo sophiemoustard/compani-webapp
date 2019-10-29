@@ -26,9 +26,9 @@
           </q-tabs>
           <q-tab-panels v-model="tab" animated>
             <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
-              <ni-auxiliary-indicators :total-working-hours="totalWorkingHours" :weekly-interventions="weeklyInterventions"
-                :weekly-internal-hours="weeklyInternalHours" :weekly-paid-transports="weeklyPaidTransports"
-                :customers-count="customersCount" :average-time-by-customer="averageTimeByCustomer"
+              <ni-auxiliary-indicators :total-working-hours="totalWorkingHours" :customers-count="customersCount"
+                :weekly-interventions="weeklyInterventions" :weekly-internal-hours="weeklyInternalHours"
+                :weekly-paid-transports="weeklyPaidTransports" :average-time-by-customer="averageTimeByCustomer"
                 :weekly-break="weeklyBreak" :time-unit="tab.name" />
             </q-tab-panel>
           </q-tab-panels>
