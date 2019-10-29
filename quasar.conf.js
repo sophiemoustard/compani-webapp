@@ -93,6 +93,7 @@ module.exports = function (ctx) {
         'QTable',
         'QTd',
         'QTh',
+        'QTime',
         'QTr',
         'QToggle',
         'QToolbar',
