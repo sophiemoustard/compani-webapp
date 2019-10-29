@@ -1,10 +1,9 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire auxiliaires" toggleLabel="Actifs" :toggleValue="activeUsers" display-toggle
+    <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @updateSearch="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <q-table :data="filteredUsers" :columns="columns" row-key="name" binary-state-sort flat :loading="tableLoading"
-      :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination"
-      class="people-list neutral-background">
+      :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" class="people-list neutral-background">
       <q-tr slot="body" slot-scope="props" :props="props" @click.native="goToUserProfile(props.row.auxiliary._id)"
       :class="['datatable-row', { 'datatable-row-inactive': !props.row.isActive }]" >
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
@@ -37,7 +36,6 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
-
       <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
         required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
       <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
