@@ -6,18 +6,16 @@
           :disable="displayedDraftPay.length === 0" />
       </template>
       <template slot="content">
-        <div class="col-xs-12">
-          <div class="row items-baseline justify-end">
-            <div class="on-left responsive-sort responsive-margin-bottom">Trier par</div>
-            <div class="col-xs-12 col-md-3 responsive-margin-bottom">
-              <ni-select class="on-left" :options="sortOptions" v-model="sortOption" separator />
-            </div>
-            <div class="col-xs-12 col-md-3 responsive-margin-bottom">
-              <ni-select-sector class="on-left" v-model="selectedSector" allow-null-option />
-            </div>
-            <div class="col-xs-12 col-md-3 responsive-margin-bottom">
-              <ni-select class="on-left" :options="periodOptions" v-model="period" separator />
-            </div>
+        <div class=" col-xs-12 row items-baseline justify-end fill-width">
+          <div>Trier par</div>
+          <div class="col-xs-12 col-sm-6 col-md-3">
+            <ni-select class="q-pl-sm" :options="sortOptions" v-model="sortOption" separator />
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <ni-select-sector class="q-pl-sm" v-model="selectedSector" allow-null-option />
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-3">
+            <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator />
           </div>
         </div>
       </template>
