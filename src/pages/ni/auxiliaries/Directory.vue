@@ -393,11 +393,8 @@ export default {
         NotifyPositive('Fiche auxiliaire créée');
         this.auxiliaryCreationModal = false;
       } catch (e) {
-        if (e && e.response) {
-          console.error(e.response);
-          if (e.response.status === 409) return NotifyNegative('Email déjà existant');
-        }
         console.error(e);
+        if (e.data.status === 409) return NotifyNegative('Email déjà existant');
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire');
       } finally {
         this.loading = false;
