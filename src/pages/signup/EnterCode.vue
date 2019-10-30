@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="row justify-center layout-padding neutral-background" style="min-height: 100vh">
+    <div class="row justify-center layout-padding neutral-background page-container">
       <div>
         <ni-input v-model="code" type="tel" autofocus caption="Entre le code à 4 chiffres que tu as reçu par SMS" />
         <div class="row justify-center">

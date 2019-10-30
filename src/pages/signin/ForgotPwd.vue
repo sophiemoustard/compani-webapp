@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="row justify-center layout-padding neutral-background forgotpwd-container">
+    <div class="row justify-center layout-padding neutral-background page-container">
       <div class="col-md-6 col-xs-12">
         <div class="q-mb-lg message">Nous allons vous envoyer un email pour réinitialiser votre mot de passe.
           Veuillez renseigner votre adresse email.</div>
@@ -66,7 +66,4 @@ export default {
 <style lang="stylus" scoped>
 .message
   font-size: 14px
-
-.forgotpwd-container
-  min-height: 100vh
 </style>
