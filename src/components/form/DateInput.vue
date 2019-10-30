@@ -5,9 +5,10 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input borderless dense :value="inputDate" bg-color="white" @input="input" placeholder="jj/mm/yyyy" :error="error"
-      :disable="disable" :class="{ 'borders': inModal }" :error-message="errorLabel">
+      :disable="disable" :class="{ 'borders': inModal }" :error-message="errorLabel" @blur="blur" ref="dateInput"
+      @focus="focus">
       <template v-slot:append>
-        <q-icon name="event" class="cursor-pointer">
+        <q-icon name="event" class="cursor-pointer" @click="focus">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
             <q-date minimal :value="date" @input="select" :options="dateOptions"/>
           </q-menu>
@@ -52,14 +53,22 @@ export default {
       if (!momentValue.isValid()) return;
       this.update(momentValue.toISOString());
       this.$refs.qDateMenu.hide();
+      this.$refs.dateInput.blur();
     },
     input (value) {
       const momentValue = this.$moment(value, 'DD/MM/YYYY', true)
       if (!momentValue.isValid()) return;
       this.update(momentValue.toISOString());
+      this.$refs.dateInput.blur();
     },
     update (value) {
       this.$emit('input', value);
+    },
+    blur () {
+      this.$emit('blur');
+    },
+    focus () {
+      this.$emit('focus');
     },
   },
 }

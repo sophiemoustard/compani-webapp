@@ -66,28 +66,14 @@ export default {
   },
   methods: {
     onBlur (event) {
-      if (this.type === 'number') {
-        this.$nextTick(() => {
-          this.$emit('blur');
-        });
-      } else {
-        this.$emit('blur');
-      }
+      if (this.type === 'number') this.$nextTick(() => this.$emit('blur'));
+      else this.$emit('blur');
     },
     onFocus (event) {
       this.$emit('focus');
     },
     update (value) {
       this.$emit('input', value);
-    },
-    updateInputFile () {
-      this.$emit('input', this.$refs.inputFile.files[0]);
-    },
-    focus () {
-      return this.$refs[this.name].focus();
-    },
-    select () {
-      return this.$refs[this.name].select();
     },
   },
   watch: {

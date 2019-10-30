@@ -1,33 +1,44 @@
 <template>
   <div>
     <template v-if="documents.length === 0">
-      <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
-        :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-        :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
+      <div class="row gutter-profile">
+        <div class="col-xs-12 col-md-6">
+          <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
+            :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
+            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
+        </div>
+      </div>
     </template>
     <template v-if="documents && documents.length > 0">
       <div class="row" v-if="caption">
         <p class="input-caption">{{ caption }}</p>
       </div>
-      <div v-for="(certificate, index) in documents" :key="index">
-        <div v-if="certificate.driveId" class="justify-between row" style="background: white">
-          <div class="doc-thumbnail">
-            <ni-custom-img :driveId="certificate.driveId" :alt="alt" :key="certificate.driveId" />
+      <div class="row gutter-profile">
+        <template v-for="(certificate, index) in documents">
+          <div class="col-md-6 col-xs-12" :key="index">
+            <div v-if="certificate.driveId" class="justify-between row" style="background: white">
+              <div class="doc-thumbnail">
+                <ni-custom-img :driveId="certificate.driveId" :alt="alt" :key="certificate.driveId" />
+              </div>
+              <div class="self-end doc-delete">
+                <q-btn color="primary" round flat icon="delete" size="1rem"
+                  @click.native="deleteDocument(certificate.driveId)" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
+              </div>
+            </div>
           </div>
-          <div class="self-end doc-delete">
-            <q-btn color="primary" round flat icon="delete" size="1rem"
-              @click.native="deleteDocument(certificate.driveId)" />
-            <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
-          </div>
-        </div>
+        </template>
       </div>
     </template>
     <template v-if="documents && documents.length > 0">
-      <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon">
-        <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
-          :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-          :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
-      </q-expansion-item>
+      <div class="row gutter-profile">
+        <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
+          class="col-md-6 col-xs-12">
+          <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
+            :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
+            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
+        </q-expansion-item>
+      </div>
     </template>
   </div>
 </template>
