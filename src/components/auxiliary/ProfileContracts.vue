@@ -31,14 +31,14 @@
         @blur="$v.newContract.customer.$touch" separator required-field />
       <ni-input in-modal v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
         :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
-        @blur="$v.newContract.weeklyHours.$touch" suffix="hr" required-field />
+        @blur="$v.newContract.weeklyHours.$touch" suffix="h" required-field />
       <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number"
         v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
       <ni-date-input caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="companyContractMinStartDate"
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
-          <q-checkbox v-model="newContract.shouldBeSigned" label="Signature en ligne" />
+          <q-checkbox dense v-model="newContract.shouldBeSigned" label="Signature en ligne" />
         </div>
       </div>
       <template slot="footer">
@@ -62,7 +62,7 @@
         :min="newVersionMinStartDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
-          <q-checkbox v-model="newVersion.shouldBeSigned" label="Signature en ligne" />
+          <q-checkbox dense v-model="newVersion.shouldBeSigned" label="Signature en ligne" />
         </div>
       </div>
       <template slot="footer">
@@ -72,7 +72,7 @@
     </ni-modal>
 
     <!-- Edition modal -->
-    <version-edition-modal :isOpened="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
+    <version-edition-modal v-model="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated"
       @hide="resetVersionEditionModal" @editVersion="editVersion"/>
 

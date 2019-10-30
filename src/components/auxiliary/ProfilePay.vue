@@ -10,7 +10,7 @@
           <div class="row justify-center table-actions">
             <q-btn flat round small color="primary" :disabled="!$_.get(props, 'row.file.link', null)" class="q-mx-sm"
               :disable="loading">
-              <a :href="$_.get(props, 'row.file.link', false)" target="_blank">
+              <a :href="$_.get(props, 'row.file.link', '')" target="_blank">
                 <q-icon name="file_download" color="primary"/>
               </a>
             </q-btn>
