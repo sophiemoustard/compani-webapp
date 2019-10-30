@@ -47,7 +47,7 @@ export default {
         const checkToken = await users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
-        next({ path: '/error403Pwd' });
+        next({ path: '/403-pwd' });
       }
     } catch (e) {
       if (e.response) {

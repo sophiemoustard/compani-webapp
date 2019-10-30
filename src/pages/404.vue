@@ -3,7 +3,7 @@
     <p>
       <img
         src="~assets/sad.svg"
-        style="width:30vw;max-width:150px;"
+        class="error-image"
       >
     </p>
     <p class="text-faded">Désolé, il n'y a rien ici...<strong> (404)</strong></p>

@@ -387,7 +387,7 @@ const routes = [
       }
     },
   },
-  { path: '/error403Pwd', component: () => import('pages/signin/403') },
+  { path: '/403-pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },
   { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: route => ({ signed: route.query.signed }) },
   // {
