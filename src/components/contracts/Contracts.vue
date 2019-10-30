@@ -30,11 +30,9 @@
               </div>
               <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
                 class="row justify-center table-actions">
-                <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers"
-                  :url="docsUploadUrl(contract._id)" :extensions="extensions" hide-upload-btn flat
-                  :bordered="false" color="white" auto-upload icon="add_box"
-                  @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
-                  @uploaded="refresh" @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
+                <q-uploader flat :url="docsUploadUrl(contract._id)" :headers="headers"
+                  :form-fields="getFormFields(contract, props.row)" field-name="signedContract" :accept="extensions"
+                  auto-upload @uploaded="refresh" @fail="failMsg" />
               </div>
               <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
@@ -180,7 +178,7 @@ export default {
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
     headers () {
-      return [{ 'x-access-token': Cookies.get('alenvi_token') || '' }];
+      return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
     },
   },
   methods: {
@@ -202,17 +200,17 @@ export default {
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
-    getAdditionalFields (contract, version) {
-      const additionalFields = [
+    getFormFields (contract, version) {
+      const formFields = [
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id },
         { name: 'status', value: contract.status },
       ];
 
-      if (contract.status === CUSTOMER_CONTRACT) additionalFields.push({ name: 'customer', value: contract.customer._id });
+      if (contract.status === CUSTOMER_CONTRACT) formFields.push({ name: 'customer', value: contract.customer._id });
 
-      return additionalFields;
+      return formFields;
     },
     getLastVersion (contract) {
       return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
@@ -260,15 +258,6 @@ export default {
       if (!driveId) return '';
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;
-    },
-    uploadDocument (files, refName) {
-      if (files[0].size > 5000000) {
-        this.$refs[refName][0].reset();
-        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-        return '';
-      } else {
-        this.$refs[refName][0].upload();
-      }
     },
     async dlTemplate (contractVersion, parentContract) {
       try {
@@ -360,30 +349,5 @@ export default {
 
   .contract-actions
     justify-content: normal !important
-
-  /deep/ .q-uploader
-    width: 0px
-    .q-uploader__list
-      display: none
-    .q-uploader__header-content
-      border-radius: 3px
-      height: 40px
-      margin: 0
-    .q-btn
-      margin: 0
-      padding: 0
-    .col
-      margin: 0
-    .q-uploader__title
-      font-weight: 400
-      overflow: initial
-    .q-uploader__subtitle
-      display: none
-      height: 0
-    .q-uploader__header:before
-      opacity:0
-    .q-icon
-      color: $primary
-      padding-right: 16px
 
 </style>
