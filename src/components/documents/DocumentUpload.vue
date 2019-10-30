@@ -7,7 +7,7 @@
       @input="update('date', $event)" />
     <ni-input :inModal="inModal" caption="Document" required-field type="file" :value="formValue.file"
       @input="onBlur('file'); update('file', $event)" :error="$v.formValue.file.$error"
-      :errorLabel="getErrorLabel('file')" />
+      :errorLabel="getErrorLabel('file')" last />
   </div>
 </template>
 
@@ -60,7 +60,8 @@ export default {
       this.$emit('blur');
     },
     async update (field, value) {
-      this.formValue[field] = field === 'file' ? value[0] : value;
+      debugger
+      this.formValue[field] = value;
       this.$emit('input', this.formValue);
       if (this.$v.formValue[field]) {
         await this.waitForFormValidation(this.$v.formValue[field]);
@@ -68,6 +69,7 @@ export default {
       }
     },
     getErrorLabel (field) {
+      debugger
       const validation = this.$v.formValue[field];
       const validatorKeys = Object.keys(validation.$params);
       const validatorKey = find(validatorKeys, key => !validation[key]);

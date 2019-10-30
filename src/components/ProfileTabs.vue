@@ -51,12 +51,14 @@ export default {
     /deep/.q-tab__indicator
       color: $light-grey
       opacity: 1
+    & /deep/.q-tab-panels
+        .q-panel
+          .q-tab-panel
+            padding: 0
+            padding-top: 24px
     & /deep/ .q-tabs
       & div:nth-last-child(1)
         margin-right: 0 !important
-      & .q-tab-panels .q-tab-panel
-        padding: 0
-        padding-top: 24px
       & .q-tabs__content
         &:not(.scrollable)
           @media (min-width: 992px)

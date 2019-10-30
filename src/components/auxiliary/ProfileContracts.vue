@@ -54,7 +54,7 @@
       </template>
       <ni-input in-modal v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
         :error="$v.newVersion.weeklyHours.$error" v-model="newVersion.weeklyHours" type="number"
-        @blur="$v.newVersion.weeklyHours.$touch" suffix="hr" required-field />
+        @blur="$v.newVersion.weeklyHours.$touch" suffix="h" required-field />
       <ni-input in-modal caption="Taux horaire" :error="$v.newVersion.grossHourlyRate.$error"
         v-model="newVersion.grossHourlyRate" type="number" suffix="€" required-field
         @blur="$v.newVersion.grossHourlyRate.$touch" />
@@ -243,10 +243,6 @@ export default {
     newVersionMinStartDate () {
       const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
       return lastVersion ? this.$moment(lastVersion.startDate).toISOString() : '';
-    },
-    isPreviousPayImpacted () {
-      const startOfMonth = this.$moment().startOf('M');
-      return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)
     },
   },
   async mounted () {

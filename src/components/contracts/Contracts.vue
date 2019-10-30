@@ -77,13 +77,15 @@
       </q-card-actions>
     </q-card>
 
-    <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-width>
-      <q-layout class="modal-max-size">
-        <q-toolbar class="no-shadow row justify-end">
+    <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-height full-width>
+      <q-card class="full-height" style="width: 80vw">
+        <q-card-section class="row justify-end">
             <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
-        </q-toolbar>
-        <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
-      </q-layout>
+        </q-card-section>
+        <q-card-section class="full-height">
+          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+        </q-card-section>
+      </q-card>
     </q-dialog>
   </div>
 </template>
@@ -349,5 +351,9 @@ export default {
 
   .contract-actions
     justify-content: normal !important
+
+  .full-height
+    /deep/.q-card__section
+      padding-left: 0px !important
 
 </style>

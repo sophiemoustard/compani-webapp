@@ -32,6 +32,10 @@ export const contractMixin = {
     }
   },
   computed: {
+    isPreviousPayImpacted () {
+      const startOfMonth = this.$moment().startOf('M');
+      return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)
+    },
     editedVersionMinStartDate () {
       if (!this.editedVersion.versionId) return '';
 
@@ -113,32 +117,38 @@ export const contractMixin = {
 
       return this.$_.pickBy(payload);
     },
+    async saveVersion () {
+      this.$v.editedVersion.$touch();
+      if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      this.loading = true;
+      const payload = await this.getVersionEditionPayload();
+      const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
+      await this.$contracts.updateVersion(params, payload);
+      await this.refreshContracts();
+
+      this.resetVersionEditionModal();
+      NotifyPositive('Contrat modifié');
+    },
     async editVersion () {
       try {
         if (!this.isVersionUpdated) return this.resetVersionEditionModal();
         if (this.isPreviousPayImpacted) {
-          await this.$q.dialog({
+          this.$q.dialog({
             title: 'Confirmation',
             message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant prenant effet ce mois-ci. Confirmez-vous ce changement ?',
             ok: true,
             cancel: 'Annuler',
+          }).onOk(async () => {
+            await this.saveVersion();
+          }).onCancel(() => {
+            return NotifyPositive('Edition annulée');
           });
+        } else {
+          await this.saveVersion();
         }
-
-        this.$v.editedVersion.$touch();
-        if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        const payload = await this.getVersionEditionPayload();
-        const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
-        await this.$contracts.updateVersion(params, payload);
-        await this.refreshContracts();
-
-        this.resetVersionEditionModal();
-        NotifyPositive('Contrat modifié');
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Edition annulée');
         if (e.data && e.data.statusCode === 422) {
           this.$v.editedVersion.$reset();
           return NotifyNegative('La date de début du contrat doit etre antérieure aux évènements de l\'auxiliaire.');
