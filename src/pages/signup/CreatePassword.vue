@@ -6,7 +6,7 @@
         <div class="row items-center">
           <div class="col-2" style="text-align: left">
             <span>
-              <q-icon name="thumb up" size="2rem" /></span>
+              <q-icon name="thumb_up" size="2rem" /></span>
           </div>
           <div class="col-10 signup-bloctext-padding">
             <p class="no-margin" style="font-size: 0.8rem;">Afin de confirmer la création de votre compte, merci de
