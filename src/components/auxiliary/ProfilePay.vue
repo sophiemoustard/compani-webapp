@@ -8,7 +8,8 @@
         class="q-pa-sm large-table neutral-background" flat>
         <q-td slot="body-cell-actions" slot-scope="props" :props="props">
           <div class="row justify-center table-actions">
-            <q-btn flat round small color="primary" :disabled="!$_.get(props, 'row.file.link', null)" class="q-mx-sm" :disable="loading">
+            <q-btn flat round small color="primary" :disabled="!$_.get(props, 'row.file.link', null)" class="q-mx-sm"
+              :disable="loading">
               <a :href="$_.get(props, 'row.file.link', false)" target="_blank">
                 <q-icon name="file_download" color="primary"/>
               </a>
