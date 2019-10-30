@@ -1,19 +1,15 @@
 <template>
   <div>
     <compani-header />
-    <div class="row justify-center layout-padding neutral-background" style="min-height: 100vh">
+    <div class="row justify-center layout-padding neutral-background resetpwd-container">
       <div class="col-md-6 col-xs-12">
         <p class="q-mb-lg message">Veuillez renseigner un nouveau mot de passe.</p>
-        <div class="margin-input">
-          <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
-            v-model.trim="password" @blur="$v.password.$touch" type="password"
-            error-label="Le mot de passe doit contenir entre 6 et 20 caractères." required-field />
-        </div>
-        <div class="margin-input">
-          <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
-            v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
-            error-label="Le mot de passe entré et la confirmation sont différents." />
-        </div>
+        <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
+          v-model.trim="password" @blur="$v.password.$touch" type="password"
+          error-label="Le mot de passe doit contenir entre 6 et 20 caractères." required-field />
+        <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
+          v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
+          error-label="Le mot de passe entré et la confirmation sont différents." />
         <div class="row justify-center">
           <q-btn @click="submit" color="primary" :disable="$v.$invalid">Envoyer</q-btn>
         </div>
@@ -122,9 +118,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .margin-input
-    margin-bottom: 10px
-
   .message
     font-size: 14px
+
+  .resetpwd-container
+    min-height: 100vh
 </style>
