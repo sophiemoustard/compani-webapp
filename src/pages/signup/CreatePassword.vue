@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="col-12 row justify-center neutral-background createpwd-container">
+    <div class="col-12 row justify-center neutral-background page-container">
       <div class="signup-body-padding">
         <div class="row items-center">
           <div class="col-2" style="text-align: left">
@@ -133,6 +133,4 @@ export default {
       font-size: 16px
       margin-top: 20px
       margin-bottom: 24px
-  .createpwd-container
-    height: 100vh
 </style>
