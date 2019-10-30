@@ -20,9 +20,9 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error" :error-label="phoneError"
-          v-model.trim="customer.contact.phone" @focus="saveTmp('contact.phone')"
-          @blur="updateCustomer('contact.phone')" />
+        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
+          :error-label="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
+          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-model="customer.contact.primaryAddress" :error-label="primaryAddressError"
           :error="$v.customer.contact.primaryAddress.$error" caption="Adresse principale"
           @focus="saveTmp('contact.primaryAddress.fullAddress')" @blur="updateCustomer('contact.primaryAddress')" />
@@ -647,14 +647,6 @@ export default {
         return REQUIRED_LABEL;
       } else if (!this.$v.customer.payment.bic.bic) {
         return 'BIC non valide';
-      }
-      return '';
-    },
-    phoneError () {
-      if (!this.$v.customer.contact.phone.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.customer.contact.phone.frPhoneNumber || !this.$v.customer.contact.phone.maxLength) {
-        return 'Numéro de téléphone non valide';
       }
       return '';
     },
