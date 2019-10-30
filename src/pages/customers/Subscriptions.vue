@@ -82,7 +82,7 @@
     </template>
 
     <!-- Mandate signature modal -->
-    <q-dialog v-model="newESignModal" @hide="checkMandates" full-height>
+    <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width>
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
@@ -463,4 +463,8 @@ export default {
   .q-dialog__inner
     &--minimized > div
       max-width: none
+
+  .full-height
+    /deep/.q-card__section
+      padding-left: 0px !important
 </style>
