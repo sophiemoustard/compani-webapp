@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)">
     <template slot="title">
-      Ajouter une <span class="text-weight-bold">personne</span>
+      Ajouter un <span class="text-weight-bold">aidant</span>
     </template>
     <ni-input in-modal v-model="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
       caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
