@@ -1,29 +1,19 @@
 <template>
   <div>
     <compani-header />
-    <div class="neutral-background" style="min-height: 100vh">
-      <q-card flat style="width: 500px; max-width: 90vw; margin: auto">
-        <q-card-main>
-          <p class="q-mb-lg">Veuillez renseigner un nouveau mot de passe:</p>
-          <div class="margin-input">
-            <p class="input-caption">Nouveau mot de passe (6 caractères minimum)</p>
-            <q-field :error="$v.passwords.password.$error" error-label="Le mot de passe doit contenir entre 6 et 20 caractères.">
-              <q-input icon="vpn key" type="password" v-model.trim="passwords.password" @blur="$v.passwords.password.$touch"
-                inverted-light color="white" />
-            </q-field>
-          </div>
-          <div class="margin-input">
-            <p class="input-caption">Confirmation nouveau mot de passe</p>
-            <q-field :error="$v.passwords.passwordConfirm.$error" error-label="Le mot de passe entré et la confirmation sont différents.">
-              <q-input type="password" v-model.trim="passwords.passwordConfirm" @blur="$v.passwords.passwordConfirm.$touch"
-                inverted-light color="white" />
-            </q-field>
-          </div>
-        </q-card-main>
-        <q-card-actions class="row justify-center">
-          <q-btn @click="submit" color="primary" :disable="$v.passwords.$invalid">Envoyer</q-btn>
-        </q-card-actions>
-      </q-card>
+    <div class="row justify-center layout-padding neutral-background resetpwd-container">
+      <div class="col-md-6 col-xs-12">
+        <p class="q-mb-lg message">Veuillez renseigner un nouveau mot de passe.</p>
+        <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
+          v-model.trim="password" @blur="$v.password.$touch" type="password"
+          error-label="Le mot de passe doit contenir entre 6 et 20 caractères." required-field />
+        <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
+          v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
+          error-label="Le mot de passe entré et la confirmation sont différents." />
+        <div class="row justify-center">
+          <q-btn @click="submit" color="primary" :disable="$v.$invalid">Envoyer</q-btn>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -32,19 +22,19 @@
 import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
 
 import CompaniHeader from '../../components/CompaniHeader';
+import Input from '../../components/form/Input';
 import users from '../../api/Users'
 import { NotifyPositive, NotifyNegative } from '../../components/popup/notify';
 
 export default {
   components: {
-    CompaniHeader,
+    'compani-header': CompaniHeader,
+    'ni-input': Input,
   },
   data () {
     return {
-      passwords: {
-        password: '',
-        passwordConfirm: '',
-      },
+      password: '',
+      passwordConfirm: '',
       token: null,
       userId: null,
       userEmail: '',
@@ -69,18 +59,15 @@ export default {
     }
   },
   validations: {
-    passwords: {
-      password: {
-        required,
-        minLength: minLength(6),
-        maxLength: maxLength(20),
-      },
-      passwordConfirm: {
-        required,
-        sameAsPassword: sameAs('password'),
-      },
+    password: {
+      required,
+      minLength: minLength(6),
+      maxLength: maxLength(20),
     },
-
+    passwordConfirm: {
+      required,
+      sameAsPassword: sameAs('password'),
+    },
   },
   methods: {
     setData (checkToken) {
@@ -93,9 +80,7 @@ export default {
       try {
         const userPayload = {
           _id: this.userId,
-          local: {
-            password: this.passwords.password,
-          },
+          local: { password: this.password },
           resetPassword: {
             token: null,
             expiresIn: null,
@@ -133,6 +118,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .margin-input
-    margin-bottom: 10px
+  .message
+    font-size: 14px
+
+  .resetpwd-container
+    min-height: 100vh
 </style>
