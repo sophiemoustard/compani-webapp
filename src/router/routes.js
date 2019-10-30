@@ -373,24 +373,23 @@ const routes = [
       return next();
     },
   },
-  // { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
-  // { path: '/messenger', component: () => import('pages/signup/ChooseMessengerPlatform') },
-  // {
-  //   path: '/createPassword',
-  //   component: () => import('pages/signup/CreatePassword'),
-  //   beforeEnter: (to, from, next) => {
-  //     if (Cookies.get('signup_token') && Cookies.get('signup_userId') && Cookies.get('signup_userEmail')) {
-  //       next();
-  //     } else {
-  //       next({ path: '/enterCode' });
-  //     }
-  //   },
-  // },
+  { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
-  // { path: '/error403Pwd', component: () => import('pages/signin/403') },
+  {
+    path: '/createPassword',
+    component: () => import('pages/signup/CreatePassword'),
+    beforeEnter: (to, from, next) => {
+      if (Cookies.get('signup_token') && Cookies.get('signup_userId') && Cookies.get('signup_userEmail')) {
+        next();
+      } else {
+        next({ path: '/enterCode' });
+      }
+    },
+  },
+  { path: '/403-pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },
-  // { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: route => ({signed: route.query.signed}) },
+  { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: route => ({ signed: route.query.signed }) },
   // {
   //   path: '/display/:fileName',
   //   name: 'display file',

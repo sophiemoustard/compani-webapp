@@ -1,14 +1,11 @@
 <template>
   <div class="fixed-center text-center">
     <p>
-      <img
-        src="~assets/sad.svg"
-        style="width:30vw;max-width:150px;"
-      >
+      <img src="~assets/sad.svg" class="error-image">
     </p>
-    <p class="text-faded">Le lien de réinitialisation du mot de passe a expiré.<strong>(403)</strong></p>
-    <q-btn v-if="canGoBack" color="primary" style="width:200px;" @click="goBack">Retour</q-btn>
-    <q-btn color="primary" style="width:200px;" @click="goToForgot">Recevoir un nouveau lien</q-btn>
+    <p class="text-faded">Le lien de réinitialisation du mot de passe a expiré.</p>
+    <q-btn v-if="canGoBack" class="q-mr-sm" color="primary" @click="goBack">Retour</q-btn>
+    <q-btn color="primary" @click="goToForgot">Recevoir un nouveau lien</q-btn>
   </div>
 </template>
 
