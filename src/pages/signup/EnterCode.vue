@@ -25,10 +25,6 @@ export default {
   data () {
     return {
       code: '',
-      boxesStyle: {
-        style: 'color: #E2007A; height: 40px',
-        autocorrect: 'off',
-      },
     }
   },
   methods: {
