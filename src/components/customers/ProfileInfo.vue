@@ -223,12 +223,12 @@
     </div>
 
     <!-- Add helper modal -->
-    <!-- <add-helper-modal :openNewHelperModal="openNewHelperModal" :company="company" :loading="loading"
-      :validations="$v.newHelper" :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/> -->
+    <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading"
+      :validations="$v.newHelper" :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/>
 
     <!-- Edit helper modal -->
-    <!-- <edit-helper-modal :editedHelper="editedHelper" :openEditedHelperModal="openEditedHelperModal" :loading="loading"
-      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/> -->
+    <edit-helper-modal :editedHelper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
+      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/>
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -407,8 +407,8 @@ import { clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
-// import AddHelperModal from '../form/AddHelperModal.vue';
-// import EditHelperModal from '../form/EditHelperModal.vue';
+import AddHelperModal from './AddHelperModal.vue';
+import EditHelperModal from './EditHelperModal.vue';
 import Select from '../form/Select';
 import OptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
@@ -444,8 +444,8 @@ export default {
     'ni-option-group': OptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
-    // 'add-helper-modal': AddHelperModal,
-    // 'edit-helper-modal': EditHelperModal,
+    'add-helper-modal': AddHelperModal,
+    'edit-helper-modal': EditHelperModal,
   },
   mixins: [
     customerMixin,
