@@ -198,7 +198,7 @@
             name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
             :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
-        <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
             alt="facture téléphone" @delete="deleteDocument($event, 'certificates')" name="certificates"
             collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
