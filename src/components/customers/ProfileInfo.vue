@@ -1089,14 +1089,6 @@ export default {
       }
     },
     // Documents
-    async uploadDocument (files, refName) {
-      if (files[0].size > 5000000) {
-        this.$refs[refName][0].reset();
-        return NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-      } else {
-        this.$refs[refName][0].upload();
-      }
-    },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },

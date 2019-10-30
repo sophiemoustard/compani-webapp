@@ -73,7 +73,6 @@ export default {
       this.$emit('focus');
     },
     update (value) {
-      console.log(value);
       this.$emit('input', value);
     },
   },
