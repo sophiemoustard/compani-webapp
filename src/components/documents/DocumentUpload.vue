@@ -5,7 +5,7 @@
       :errorLabel="getErrorLabel('nature')" />
     <ni-date-input :inModal="inModal" caption="Date" required-field :value="formValue.date"
       @input="update('date', $event)" />
-    <ni-file-uploader :inModal="inModal" caption="Document" required-field type="file" :value="fileName"
+    <ni-input :inModal="inModal" caption="Document" required-field type="file" :value="formValue.file"
       @input="onBlur('file'); update('file', $event)" :error="$v.formValue.file.$error"
       :errorLabel="getErrorLabel('file')" />
   </div>
@@ -18,7 +18,7 @@ import find from 'lodash/find';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import Select from '../form/Select';
 import DateInput from '../form/DateInput';
-import FileUploader from '../form/FileUploader.vue';
+import Input from '../form/Input';
 
 export default {
   name: 'DocumentUpload',
@@ -26,7 +26,7 @@ export default {
   components: {
     'ni-select': Select,
     'ni-date-input': DateInput,
-    'ni-file-uploader': FileUploader,
+    'ni-input': Input,
   },
   props: {
     natureOptions: { type: Array, default: () => [] },
@@ -49,11 +49,6 @@ export default {
   created () {
     this.reset();
   },
-  computed: {
-    fileName () {
-      return this.$_.get(this.formValue, 'file.name', '');
-    },
-  },
   methods: {
     reset () {
       this.formValue = { ...this.defaultValue };
@@ -65,8 +60,7 @@ export default {
       this.$emit('blur');
     },
     async update (field, value) {
-      debugger
-      this.formValue[field] = value;
+      this.formValue[field] = field === 'file' ? value[0] : value;
       this.$emit('input', this.formValue);
       if (this.$v.formValue[field]) {
         await this.waitForFormValidation(this.$v.formValue[field]);
@@ -100,11 +94,7 @@ export default {
     return {
       formValue: {
         nature: { required },
-        file: { required,
-          maxSize: file => {
-            return !!file && file.size < 5000000
-          },
-        },
+        file: { required, maxSize: file => !!file && file.size < 5000000 },
       },
     };
   },

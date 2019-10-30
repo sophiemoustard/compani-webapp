@@ -384,5 +384,6 @@ export default {
       opacity:0
     .q-icon
       color: $primary
+      padding-right: 16px
 
 </style>

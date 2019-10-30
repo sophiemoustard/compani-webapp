@@ -26,7 +26,7 @@
         label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
 
       <!-- Document upload modal -->
-      <ni-modal v-model="documentUpload" @hide="hideDocumentUploadModal">
+      <ni-modal v-model="documentUpload">
         <template slot="title">
           Ajouter un <span class="text-weight-bold">document</span>
         </template>
@@ -122,9 +122,6 @@ export default {
     await this.getDocuments();
   },
   methods: {
-    hideDocumentUploadModal () {
-      this.$refs.documentUploadForm.reset();
-    },
     formatDocumentPayload () {
       const { file, nature, date } = this.newDocument;
       const form = new FormData();
@@ -155,7 +152,6 @@ export default {
         await PayDocuments.create(this.formatDocumentPayload());
 
         this.documentUpload = false;
-        this.$refs.documentUploadForm.reset();
         NotifyPositive('Document sauvegardé');
 
         await this.getDocuments();
