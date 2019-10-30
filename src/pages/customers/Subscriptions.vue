@@ -37,11 +37,10 @@
         <p class="title">Justificatifs APA ou autres financements</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
+            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement"
               @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates"
               collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
-              @delete="deleteDocument($event)" additional-value="financialCertificates" multiple
-              additional-fields-name="financialCertificate" />
+              @delete="deleteDocument($event)" multiple additional-fields-name="justificatif_financement" />
           </div>
         </div>
       </div>
