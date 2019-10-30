@@ -37,11 +37,10 @@
         <p class="title">Justificatifs APA ou autres financements</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
+            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement"
               @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates"
               collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
-              @delete="deleteDocument($event)" additional-value="financialCertificates" multiple
-              additional-fields-name="financialCertificate" />
+              @delete="deleteDocument($event)" multiple additional-fields-name="justificatif_financement" />
           </div>
         </div>
       </div>
@@ -83,26 +82,28 @@
     </template>
 
     <!-- Mandate signature modal -->
-    <q-dialog v-model="newESignModal" @hide="checkMandates" full-width>
-      <q-layout class="modal-max-size">
-        <q-toolbar class="no-shadow row justify-end">
+    <q-dialog v-model="newESignModal" @hide="checkMandates" full-height>
+      <q-card class="full-height" style="width: 80vw">
+        <q-card-section class="row justify-end">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
-        </q-toolbar>
-        <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
-      </q-layout>
+        </q-card-section>
+        <q-card-section class="full-height">
+          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+        </q-card-section>
+      </q-card>
     </q-dialog>
 
     <!-- CSG modal -->
-    <q-dialog ref="modal" v-model="cgsModal" full-width>
-      <q-layout class="modal-layout modal-max-size">
-        <q-header>
-          <q-toolbar class="no-shadow row justify-between">
-            <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
-            <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
-          </q-toolbar>
-        </q-header>
-        <div v-html="cgs" class="modal-padding"></div>
-      </q-layout>
+    <q-dialog ref="modal" v-model="cgsModal" full-height>
+      <q-card class="full-height" style="width: 80vw">
+        <q-card-section class="row justify-between">
+          <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
+        </q-card-section>
+        <q-card-section>
+          <div v-html="cgs" class="modal-padding"></div>
+        </q-card-section>
+      </q-card>
     </q-dialog>
 
     <!-- Subscription history modal -->
@@ -459,4 +460,7 @@ export default {
     background-color: white
   .table-grid table tr
     margin-bottom: 0px !important
+  .q-dialog__inner
+    &--minimized > div
+      max-width: none
 </style>
