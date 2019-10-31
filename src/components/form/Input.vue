@@ -6,12 +6,12 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <template v-if="type === 'file'">
-      <div class="row input-file-container" :class="{'borders': borders || inModal}">
+      <div class="row input-file-container" :class="{'borders': inModal}">
         <div class="col full-width">
           <span class="input-file-empty" v-if="!value">Pas de document</span>
-          <template v-else>{{ (value && value.name) ? value.name : value }}</template>
+          <template v-else>{{ value.name }}</template>
         </div>
-        <i aria-hidden="true" class="q-icon on-right material-icons self-center material-icons relative-position">
+        <i aria-hidden="true" class="q-icon on-right material-icons self-center relative-position">
           add
           <input ref="inputFile" type="file" @input="updateInputFile" class="input-file absolute-full cursor-pointer"
             @blur="onBlur" >
@@ -54,7 +54,6 @@ export default {
     rows: { type: Number, default: 1 },
     hidden: { type: Boolean, default: false },
     suffix: { type: String, default: '' },
-    borders: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
     name: { type: String, default: '' },
     inModal: { type: Boolean, default: false },
