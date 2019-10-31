@@ -93,13 +93,15 @@ export const helperMixin = {
       }
     },
     // Creation
-    resetHelperForm () {
+    resetAddHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
+      this.openNewHelperModal = false;
     },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
       this.editedHelper = Object.assign({}, clear(this.editedHelper));
+      this.openEditedHelperModal = false;
     },
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
@@ -135,8 +137,8 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.addHelper = false
       } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
-        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
+        console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
         NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
@@ -156,7 +158,6 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.openEditedHelperModal = false
       } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'aidant');
       } finally {
         this.loading = false;
@@ -165,6 +166,7 @@ export const helperMixin = {
     openEditionModalHelper (helperId) {
       const helper = this.helpers.find(helper => helper._id === helperId);
       this.editedHelper = this.$_.pick(helper, ['_id', 'contact.phone', 'local.email', 'identity.firstname', 'identity.lastname']);
+      this.editedHelper.contact = { phone: helper.contact.phone || '' };
       this.openEditedHelperModal = true;
     },
     async removeHelper (helperId) {
