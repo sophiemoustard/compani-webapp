@@ -12,7 +12,7 @@
           </q-select>
         </div>
         <div class="col-xs-12 col-sm-7">
-          <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :viewMode="viewMode"
+          <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :view-mode="viewMode"
             :type="AGENDA" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
             @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
         </div>
@@ -41,7 +41,7 @@ import Agenda from '../../../components/planning/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
 import EventEditionModal from '../../../components/planning/EventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, WEEK_VIEW, THREE_DAYS_VIEW, ABSENCE, AUXILIARY, UNKNOWN_AVATAR } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, THREE_DAYS_VIEW, ABSENCE, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '../../../data/constants';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';

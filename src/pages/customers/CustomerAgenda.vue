@@ -8,7 +8,7 @@
         </div>
         <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-            @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
+            @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :view-mode="viewMode" @updateViewMode="updateViewMode"
             :type="AGENDA" />
         </div>
       </div>
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR, WEEK_VIEW, AGENDA, CUSTOMER } from '../../data/constants';
+import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import Agenda from '../../components/planning/Agenda';
 import PlanningNavigation from '../../components/planning/PlanningNavigation';
@@ -49,6 +49,7 @@ export default {
     },
   },
   async mounted () {
+    this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
     this.height = window.innerHeight;
     this.startOfWeek = this.$moment().startOf('week').toISOString();
     this.getTimelineDays();
