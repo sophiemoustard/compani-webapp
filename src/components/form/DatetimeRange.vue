@@ -12,7 +12,7 @@
           @blur="blurHandler" :disable="disable" />
         <p class="delimiter">-</p>
         <ni-time-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item"
-          @blur="blurHandler" :disable="disable" />
+          @blur="blurHandler" :disable="disable" :min="value.startHour" />
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
       </div>
