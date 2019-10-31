@@ -5,21 +5,25 @@
       <div class="signup-body-padding">
         <div class="row items-center">
           <div class="col-2" style="text-align: left">
-            <span><q-icon name="lock" size="2rem" /></span>
+            <span>
+              <q-icon name="lock" size="2rem" /></span>
           </div>
           <div class="col-10 signup-bloctext-padding">
             <p class="no-margin" style="font-size: 0.8rem">
-              Les services d’Alenvi sont maintenant disponibles via le site Compani. <br> Pour vous connecter à votre compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span class="text-weight-bold">mot de passe</span>
+              Les services d’Alenvi sont maintenant disponibles via le site Compani. <br> Pour vous connecter à votre
+              compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span
+                class="text-weight-bold">mot de passe</span>
             </p>
           </div>
         </div>
-        <ni-input v-model.trim="credentials.email" caption="Email" @keyup.enter="submit" />
-        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup.enter="submit" />
+        <ni-input v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
+        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
         <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }">
           <small>Mot de passe oublié ?</small>
         </router-link>
         <div class="row justify-center">
-          <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary" @click="submit()" />
+          <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
+            @click="submit()" />
         </div>
       </div>
     </div>
