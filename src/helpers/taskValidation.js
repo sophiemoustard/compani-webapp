@@ -8,18 +8,17 @@ export const taskValidation = (user = null) => {
   if (!user) throw new Error('No user.');
   const tasks = user.procedure;
   if (!Array.isArray(tasks)) throw new Error('Tasks must be an array.');
-
   for (let i = 0, l = tasks.length; i < l; i++) {
     if (!tasks[i].check.isDone && displayTask(tasks[i], user)) {
-      if (tasks[i].task.name.match(/inscription (mutuelle|médecine)/i)) {
+      if (tasks[i].task.name === 'Validation titre de séjour') {
+        return true;
+      } else if (tasks[i].task.name.match(/inscription (mutuelle|médecine)/i)) {
         const contract = user.contracts.find(contract => contract.status === COMPANY_CONTRACT && !contract.endDate);
         if (contract) {
           const contractPlusSixWeeks = moment(contract.startDate).add(6, 'w');
           return moment().isAfter(moment(contractPlusSixWeeks));
         }
-        return false;
       }
-      return true;
     }
   }
   return false;

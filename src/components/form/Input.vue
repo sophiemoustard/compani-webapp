@@ -5,7 +5,20 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <template>
+    <template v-if="type === 'file'">
+      <div class="row input-file-container" :class="{'borders': inModal}">
+        <div class="col full-width">
+          <span class="input-file-empty" v-if="!value">Pas de document</span>
+          <template v-else>{{ value.name }}</template>
+        </div>
+        <i aria-hidden="true" class="q-icon on-right material-icons self-center relative-position">
+          add
+          <input ref="inputFile" type="file" @input="updateInputFile" class="input-file absolute-full cursor-pointer"
+            @blur="onBlur" >
+        </i>
+      </div>
+    </template>
+    <template v-else>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup.enter')" :error-message="errorLabel"
@@ -41,7 +54,6 @@ export default {
     rows: { type: Number, default: 1 },
     hidden: { type: Boolean, default: false },
     suffix: { type: String, default: '' },
-    borders: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
     name: { type: String, default: '' },
     inModal: { type: Boolean, default: false },
@@ -65,6 +77,9 @@ export default {
     },
   },
   methods: {
+    updateInputFile () {
+      this.$emit('input', this.$refs.inputFile.files[0]);
+    },
     onBlur (event) {
       if (this.type === 'number') this.$nextTick(() => this.$emit('blur'));
       else this.$emit('blur');
@@ -89,7 +104,7 @@ export default {
 
 <style lang="stylus" scoped>
   .input-file-container
-    padding: 9px 14px 11px
+    padding: 6px 10px
     .input-file-empty
       font-size: 12px
     .input-file
@@ -98,4 +113,6 @@ export default {
       height: 100%
       width: 100%
       font-size: 0
+    &.borders
+      border: 1px solid $light-grey
 </style>

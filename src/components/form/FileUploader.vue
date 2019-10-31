@@ -83,10 +83,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .border
-    border: 1px solid $light-grey;
-    border-radius: 3px
-
   .doc-thumbnail
     padding: 13px 0px 40px 12px
 

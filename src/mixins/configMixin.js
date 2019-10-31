@@ -19,12 +19,10 @@ export const configMixin = {
           await this.$companies.updateById(this.company._id, payload);
           this.refreshCompany();
           NotifyPositive('Document supprimé');
-        }).onCancel(() => {
-          NotifyNegative('Erreur lors de la suppression du document');
-        });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée');
+        NotifyNegative('Erreur lors de la suppression du document');
       }
     },
     documentUploaded () {

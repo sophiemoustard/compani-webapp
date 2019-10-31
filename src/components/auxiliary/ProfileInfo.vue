@@ -227,13 +227,12 @@
                 ]" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12 col-md-6" v-if="displayMutualUploader">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
             @delete="deleteDocument(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
             name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :display-upload="user.administrative.mutualFund.has && !user.administrative.mutualFund.driveId"
             entity-url="users" :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
             :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
@@ -508,6 +507,9 @@ export default {
     }
   },
   computed: {
+    displayMutualUploader () {
+      return this.user.administrative.mutualFund.has && !this.user.administrative.mutualFund.driveId;
+    },
     captionTransportUploader () {
       const coachText = 'Justificatif d\'abonnement';
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'

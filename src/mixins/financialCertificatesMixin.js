@@ -18,12 +18,10 @@ export const financialCertificatesMixin = {
           await this.$customers.updateCertificates(this.customer._id, payload);
           this.refreshCustomer();
           NotifyPositive('Document supprimé');
-        }).onCancel(() => {
-          NotifyNegative('Erreur lors de la suppression du document');
-        });
+        }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
-        if (e.message === '') return NotifyPositive('Suppression annulée');
+        NotifyNegative('Erreur lors de la suppression du document')
       }
     },
     async documentUploaded () {
