@@ -137,6 +137,7 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.addHelper = false
       } catch (e) {
+        console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
         NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
