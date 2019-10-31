@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="row justify-center layout-padding neutral-background page-container">
+    <div class="row justify-center q-layout-padding neutral-background page-container">
       <div class="col-md-6 col-xs-12">
         <p class="q-mb-lg message">Veuillez renseigner un nouveau mot de passe.</p>
         <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
