@@ -24,6 +24,6 @@ export default {
 
 <style lang="stylus" scoped>
   .balance-icon
-    cursor: initial !important
+    cursor: default !important
     margin-right: 4px
 </style>
