@@ -464,7 +464,4 @@ export default {
     &--minimized > div
       max-width: none
 
-  .full-height
-    /deep/.q-card__section
-      padding-left: 0px !important
 </style>

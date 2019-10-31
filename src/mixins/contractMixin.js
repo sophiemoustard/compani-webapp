@@ -141,9 +141,7 @@ export const contractMixin = {
             cancel: 'Annuler',
           }).onOk(async () => {
             await this.saveVersion();
-          }).onCancel(() => {
-            return NotifyPositive('Edition annulée');
-          });
+          }).onCancel(() => NotifyPositive('Edition annulée'));
         } else {
           await this.saveVersion();
         }

@@ -352,8 +352,4 @@ export default {
   .contract-actions
     justify-content: normal !important
 
-  .full-height
-    /deep/.q-card__section
-      padding-left: 0px !important
-
 </style>

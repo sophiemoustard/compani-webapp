@@ -52,6 +52,8 @@ export default {
       color: $light-grey
       opacity: 1
     & /deep/.q-tab-panels
+        .scroll
+          overflow: initial
         .q-panel
           .q-tab-panel
             padding: 0
