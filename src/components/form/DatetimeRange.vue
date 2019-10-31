@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="hasError" name="error_outline" color="secondary" />
     </div>
-    <q-field :error="hasError" :error-label="errorMessage" borderless>
+    <q-field :error="hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
       <div class="datetime-container row justify-evenly items-center">
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
           @blur="blurHandler" :disable="disable" @error="childErrors.startDate = $event" />
@@ -39,16 +39,6 @@ export default {
     disable: { type: Boolean, default: false },
     disableEndDate: { type: Boolean, default: false },
   },
-  data () {
-    return {
-      errorMessage: 'Date(s) et heure(s) invalide(s)',
-      childErrors: {
-        startDate: false,
-        endDate: false,
-      },
-      blur: false,
-    };
-  },
   validations () {
     return {
       value: {
@@ -61,12 +51,7 @@ export default {
   },
   computed: {
     hasError () {
-      if (!this.blur) return false;
-
-      if (this.error || Object.values(this.childErrors).indexOf(true) !== -1 ||
-        this.$v.value.startDate.$error || this.$v.value.startHour.$error || this.$v.value.endDate.$error || this.$v.value.endHour.$error) {
-        return true;
-      }
+      if (this.error || this.$v.value.$error) return true;
 
       const startTime = this.value.startHour.split(':')
       const startDatetime = this.$moment(this.value.startDate).hours(startTime[0]).minutes(startTime[1]);
@@ -80,10 +65,8 @@ export default {
     blurHandler () {
       this.$v.value.$touch();
       this.$emit('blur');
-      this.blur = true;
     },
     update (value, key) {
-      this.blur = false;
       const dates = { ...this.value, [key]: value }
       if (key === 'startDate') dates.endDate = value;
       if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {
