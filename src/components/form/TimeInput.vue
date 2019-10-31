@@ -59,13 +59,13 @@ export default {
         selectOptions.push({
           label: hour.format('HH:mm'),
           value: hour.format('HH:mm'),
-          disable: this.min && hour.isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+          disable: this.min !== '' && hour.isSameOrBefore(this.$moment(this.min, 'HH:mm')),
         });
         if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
           selectOptions.push({
             label: hour.minutes(30).format('HH:mm'),
             value: hour.minutes(30).format('HH:mm'),
-            disable: this.min && hour.minutes(30).isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+            disable: this.min !== '' && hour.minutes(30).isSameOrBefore(this.$moment(this.min, 'HH:mm')),
           });
         }
       });
