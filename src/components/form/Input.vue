@@ -79,7 +79,6 @@ export default {
   },
   methods: {
     updateInputFile () {
-      debugger
       this.$emit('input', this.$refs.inputFile.files[0]);
     },
     onBlur (event) {

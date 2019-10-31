@@ -60,7 +60,6 @@ export default {
       this.$emit('blur');
     },
     async update (field, value) {
-      debugger
       this.formValue[field] = value;
       this.$emit('input', this.formValue);
       if (this.$v.formValue[field]) {
@@ -69,7 +68,6 @@ export default {
       }
     },
     getErrorLabel (field) {
-      debugger
       const validation = this.$v.formValue[field];
       const validatorKeys = Object.keys(validation.$params);
       const validatorKey = find(validatorKeys, key => !validation[key]);
