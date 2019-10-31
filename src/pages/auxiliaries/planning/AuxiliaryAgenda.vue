@@ -4,12 +4,8 @@
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-sm-5 person-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-          <q-select borderless dense emit-value :value="selectedAuxiliary._id" :options="auxiliariesOptions"
-            @input="updateAuxiliary" ref="personSelect" :display-value="placeholder" behavior="menu">
-            <template v-slot:append>
-              <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer" @click.stop="toggleAuxiliarySelect" />
-            </template>
-          </q-select>
+          <ni-select :value="selectedAuxiliary._id" :options="auxiliariesOptions" @input="updateAuxiliary"
+            ref="personSelect" behavior="menu" icon="swap_vert" no-error />
         </div>
         <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :view-mode="viewMode"
@@ -42,6 +38,7 @@ import PlanningNavigation from '../../../components/planning/PlanningNavigation'
 import EventCreationModal from '../../../components/planning/EventCreationModal';
 import EventEditionModal from '../../../components/planning/EventEditionModal';
 import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, THREE_DAYS_VIEW, ABSENCE, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '../../../data/constants';
+import Select from '../../../components/form/Select';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
@@ -55,6 +52,7 @@ export default {
     'planning-navigation': PlanningNavigation,
     'ni-event-creation-modal': EventCreationModal,
     'ni-event-edition-modal': EventEditionModal,
+    'ni-select': Select,
   },
   mixins: [planningTimelineMixin, planningActionMixin],
   data () {
@@ -114,9 +112,6 @@ export default {
       if (!aux || !aux._id) return UNKNOWN_AVATAR;
 
       return aux.picture && aux.picture.link ? aux.picture.link : DEFAULT_AVATAR;
-    },
-    toggleAuxiliarySelect () {
-      return this.$refs['personSelect'].showPopup();
     },
     async updateAuxiliary (auxiliaryId) {
       this.selectedAuxiliary = this.auxiliaries.find(aux => aux._id === auxiliaryId);
@@ -208,3 +203,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.planning-header
+  /deep/ .q-field__control
+    background-color: $grey-3 !important
+</style>
