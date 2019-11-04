@@ -2,14 +2,14 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
-        <div class="col-xs-12 col-sm-5 person-name" v-if="customer && customer.identity">
+        <div class="col-xs-12 col-sm-5 person-name row" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
-          <div class="q-pl-md">{{ customer.identity | formatIdentity('FL') }}</div>
+          <input class="q-pl-sm neutral-background identity" :value="formatIdentity(customer.identity, 'FL')" readonly />
         </div>
         <div class="col-xs-12 col-sm-7">
-          <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-            @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :view-mode="viewMode" @updateViewMode="updateViewMode"
-            :type="AGENDA" />
+          <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" :targetDate="targetDate"
+            :view-mode="viewMode" :type="AGENDA" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+            @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
         </div>
       </div>
       <agenda :events="events" :days="days" :personKey="personKey" />
@@ -85,9 +85,15 @@ export default {
         this.events = [];
       }
     },
-  },
-  filters: {
     formatIdentity,
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .identity
+    border: none
+    flex-grow: 1
+  input:focus
+    outline: none
+</style>

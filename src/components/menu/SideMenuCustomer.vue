@@ -54,7 +54,8 @@ export default {
   },
   computed: {
     hasContracts () {
-      return this.user && this.user.customers && this.user.customers.length > 0 && this.user.customers[0].contracts && this.user.customers[0].contracts.length > 0;
+      return this.user && this.user.customers && this.user.customers.length > 0 && this.user.customers[0].contracts &&
+        this.user.customers[0].contracts.length > 0;
     },
   },
   mounted () {

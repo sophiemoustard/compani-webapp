@@ -82,6 +82,6 @@ export default {
 <style lang="stylus" scoped>
   .no-bottom
     padding-bottom: 0
-    .q-field__bottom
+    /deep/ .q-field__bottom
       display: none
 </style>

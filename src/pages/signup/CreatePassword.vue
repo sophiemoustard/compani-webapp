@@ -107,8 +107,6 @@ export default {
         this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: this.secure });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
 
-        if (this.$q.platform.is.desktop) this.$store.commit('main/setToggleDrawer', true);
-
         if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
         this.$router.replace({ name: 'auxiliary personal info', params: { id: this.$q.cookies.get('user_id') } });
       } catch (e) {

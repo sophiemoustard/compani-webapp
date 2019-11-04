@@ -76,9 +76,6 @@ export default {
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
-        if (this.$q.platform.is.desktop) {
-          this.$store.commit('main/setToggleDrawer', true);
-        }
 
         if (this.$route.query.from) {
           return this.$router.replace({ path: this.$route.query.from });
