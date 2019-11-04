@@ -5,7 +5,7 @@ export default {
     const sectors = await alenviAxios.post(`${process.env.API_HOSTNAME}/sectors`, payload);
     return sectors.data.data.sector;
   },
-  async showAll (params) {
+  async list (params) {
     const sectors = await alenviAxios.get(`${process.env.API_HOSTNAME}/sectors`, { params });
     return sectors.data.data.sectors;
   },
