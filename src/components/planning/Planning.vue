@@ -236,23 +236,15 @@ export default {
     },
     getEventWithStyleInfo (event, day) {
       let dayEvent = { ...event };
-
       const displayedStartHour = Math.max((this.$moment(event.startDate).hours()), STAFFING_VIEW_START_HOUR);
       const displayedEndHour = Math.min(this.$moment(event.endDate).hours(), STAFFING_VIEW_END_HOUR);
       let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
       let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
-      if (!this.$moment(day).isSame(event.startDate, 'day')) {
-        dayEvent.startDate = this.$moment(day).hour(STAFFING_VIEW_START_HOUR).toISOString();
-        staffingLeft = 0;
-      }
-      if (!this.$moment(day).isSame(event.endDate, 'day')) {
-        dayEvent.endDate = this.$moment(day).hour(STAFFING_VIEW_END_HOUR).toISOString();
-        staffingRight = (STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60;
-      }
 
+      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).toISOString();
+      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).toISOString();
       dayEvent.staffingLeft = staffingLeft;
       dayEvent.staffingWidth = staffingRight - staffingLeft;
-
       return dayEvent;
     },
     getPersonEvents (person) {
