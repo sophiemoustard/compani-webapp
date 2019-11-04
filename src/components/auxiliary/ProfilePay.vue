@@ -4,22 +4,31 @@
       <div v-if="!isAuxiliary" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <q-table :data="payDocuments" :columns="columns" hide-bottom :pagination="pagination"
-        class="q-pa-sm large-table neutral-background" flat>
-        <q-td slot="body-cell-actions" slot-scope="props" :props="props">
-          <div class="row justify-center table-actions">
-            <q-btn flat round small color="primary" :disabled="!$_.get(props, 'row.file.link', null)" class="q-mx-sm"
-              :disable="loading">
-              <a :href="$_.get(props, 'row.file.link', '')" target="_blank">
-                <q-icon name="file_download" color="primary"/>
-              </a>
-            </q-btn>
-            <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm" :disable="loading"
-              @click="deletePayDocument(payDocuments[props.row.__index])">
-            </q-btn>
-          </div>
-        </q-td>
-      </q-table>
+      <ni-large-table :data="payDocuments" :columns="columns" :pagination.sync="pagination" row-key="name">
+        <template v-slot:body="{ props }" >
+          <q-tr :props="props">
+            <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+              :style="col.style">
+              <template v-if="col.name === 'actions'">
+                <div class="row justify-center table-actions">
+                  <q-btn flat round small color="primary" :disabled="!$_.get(props, 'row.file.link', null)"
+                    class="q-mx-sm" :disable="loading">
+                    <a :href="$_.get(props, 'row.file.link', '')" target="_blank">
+                      <q-icon name="file_download" color="primary"/>
+                    </a>
+                  </q-btn>
+                  <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm"
+                    :disable="loading" @click="deletePayDocument(payDocuments[props.row.__index])">
+                  </q-btn>
+                </div>
+              </template>
+              <template v-else>
+                {{ col.value }}
+              </template>
+            </q-td>
+          </q-tr>
+        </template>
+      </ni-large-table>
       <div v-if="payDocuments.length === 0" class="q-px-md q-my-sm">
         <span class="no-document">Aucun document</span>
       </div>
@@ -51,6 +60,7 @@ import snakeCase from 'lodash/snakeCase';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
 import Modal from '../../components/Modal';
+import LargeTable from '../../components/table/LargeTable';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocuments from '../../api/PayDocuments';
 import { formatIdentity } from '../../helpers/utils';
@@ -60,6 +70,7 @@ export default {
   components: {
     'ni-document-upload': DocumentUpload,
     'ni-modal': Modal,
+    'ni-large-table': LargeTable,
   },
   data () {
     return {

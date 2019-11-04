@@ -10,16 +10,17 @@
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="filteredAndOrderedDraftBills" :columns="columns" row-key="customerId" binary-state-sort
-      :loading="tableLoading" :pagination.sync="pagination" separator="none" selection="multiple"
-      :selected.sync="selected" class="q-pa-sm large-table" card-class="neutral-background" flat>
-      <q-tr slot="header" slot-scope="props">
-        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
-        <th>
-          <q-checkbox v-model="props.selected" indeterminate-value="some" dense />
-        </th>
-      </q-tr>
-      <template slot="body" slot-scope="props">
+    <ni-large-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
+      row-key="customerId" :loading="tableLoading" selection="multiple" :selected.sync="selected" separator="none">
+      <template v-slot:header="{ props }" >
+        <q-tr :props="props">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
+          <th>
+            <q-checkbox v-model="props.selected" indeterminate-value="some" dense />
+          </th>
+        </q-tr>
+      </template>
+      <template v-slot:body="{ props }" >
         <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
           @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
           @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
@@ -39,9 +40,7 @@
           </template>
         </template>
       </template>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="filteredAndOrderedDraftBills" />
-    </q-table>
+    </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="createBills" />
   </q-page>
@@ -52,7 +51,7 @@ import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
-import BillingPagination from '../../../components/table/BillingPagination';
+import LargeTable from '../../../components/table/LargeTable';
 import Select from '../../../components/form/Select';
 import TitleHeader from '../../../components/TitleHeader';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
@@ -68,7 +67,7 @@ export default {
   components: {
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
-    'ni-billing-pagination': BillingPagination,
+    'ni-large-table': LargeTable,
     'ni-select': Select,
     'ni-title-header': TitleHeader,
   },

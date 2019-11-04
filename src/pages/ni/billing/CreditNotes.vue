@@ -3,23 +3,25 @@
     <div class="title-padding">
       <h4>Avoirs</h4>
     </div>
-    <q-table :data="creditNotes" :columns="creditNotesColumns" binary-state-sort :pagination.sync="pagination"
-      :loading="tableLoading" class="q-pa-sm" card-class="neutral-background" flat>
-      <q-tr slot="body" slot-scope="props" :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-          <template v-if="col.name === 'actions'">
-            <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
-              <q-btn flat round small color="grey" icon="edit" @click.native="openCreditNoteEditionModal(props.row)" />
-              <q-btn flat round small color="grey" icon="delete"
-                @click="deleteCreditNote(col.value, props.row.__index)" />
-            </div>
-          </template>
-          <template v-else>{{ col.value }}</template>
-        </q-td>
-      </q-tr>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="creditNotes" />
-    </q-table>
+    <ni-large-table :data="creditNotes" :columns="creditNotesColumns" :pagination.sync="pagination"
+      :loading="tableLoading">
+      <template v-slot:body="{ props }">
+        <q-tr :props="props">
+          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'actions'">
+              <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
+                <q-btn flat round small color="grey" icon="edit"
+                  @click.native="openCreditNoteEditionModal(props.row)" />
+                <q-btn flat round small color="grey" icon="delete"
+                  @click="deleteCreditNote(col.value, props.row.__index)" />
+              </div>
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-large-table>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
       @click="creditNoteCreationModal = true" />
 
@@ -151,7 +153,7 @@
 </template>
 
 <script>
-import BillingPagination from '../../../components/table/BillingPagination';
+import LargeTable from '../../../components/table/LargeTable';
 import DateInput from '../../../components/form/DateInput';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
@@ -174,7 +176,7 @@ export default {
     'ni-select': Select,
     'ni-option-group': OptionGroup,
     'ni-modal': Modal,
-    'ni-billing-pagination': BillingPagination,
+    'ni-large-table': LargeTable,
   },
   data () {
     return {
@@ -237,6 +239,7 @@ export default {
           label: 'Tiers payeur',
           align: 'left',
           field: row => row.thirdPartyPayer ? `${row.thirdPartyPayer.name}` : '',
+          style: 'max-width: 250px',
         },
         {
           name: 'exclTaxes',

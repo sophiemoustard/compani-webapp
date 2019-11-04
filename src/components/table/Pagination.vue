@@ -19,7 +19,7 @@
 
 <script>
 export default {
-  name: 'BillingPagination',
+  name: 'Pagination',
   props: {
     props: Object,
     data: Array,
