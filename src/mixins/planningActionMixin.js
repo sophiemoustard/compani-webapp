@@ -231,7 +231,7 @@ export const planningActionMixin = {
             (!type || type === event.type)
         });
     },
-    async onOkForCreateEvent () {
+    async onOkForEventCreation () {
       this.loading = true;
       const payload = this.getCreationPayload(this.newEvent);
       if (!this.isCreationAllowed(payload)) {
@@ -246,7 +246,7 @@ export const planningActionMixin = {
       NotifyPositive('Évènement créé');
       this.loading = false;
     },
-    onCancelForCreateEvent () {
+    onCancelForEventCreation () {
       return NotifyPositive('Création annulée');
     },
     async createEvent () {
@@ -262,8 +262,8 @@ export const planningActionMixin = {
             ok: 'OK',
             cancel: 'Annuler',
           })
-            .onOk(async () => this.onOkForCreateEvent())
-            .onCancel(() => this.onCancelForCreateEvent());
+            .onOk(() => this.onOkForEventCreation())
+            .onCancel(() => this.onCancelForEventCreation());
         }
 
         if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
@@ -273,8 +273,8 @@ export const planningActionMixin = {
             ok: 'OK',
             cancel: 'Annuler',
           })
-            .onOk(async () => this.onOkForCreateEvent())
-            .onCancel(() => this.onCancelForCreateEvent());
+            .onOk(() => this.onOkForEventCreation())
+            .onCancel(() => this.onCancelForEventCreation());
         }
       } catch (e) {
         console.error(e);
