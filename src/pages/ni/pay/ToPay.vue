@@ -20,9 +20,9 @@
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm large-table" selection="multiple"
-      row-key="auxiliaryId" :selected.sync="selected" :pagination.sync="sortedPagination" :loading="tableLoading"
-      :visible-columns="visibleColumns" card-class="neutral-background" flat>
+    <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
+      :selected.sync="selected" :pagination.sync="sortedPagination" :loading="tableLoading"
+      :visible-columns="visibleColumns">
       <q-tr slot="header" slot-scope="props">
         <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
         <th>
@@ -74,7 +74,7 @@
       </q-tr>
       <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="sortedPagination"
         :data="displayedDraftPay" />
-    </q-table>
+    </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="createList" />
 
@@ -94,6 +94,7 @@ import PaySurchargeDetailsModal from '../../../components/pay/PaySurchargeDetail
 import TitleHeader from '../../../components/TitleHeader';
 import { payMixin } from '../../../mixins/payMixin';
 import { editableTdMixin } from '../../../mixins/editableTdMixin';
+import LargeTable from '../../../components/table/LargeTable';
 
 export default {
   name: 'ToPay',
@@ -106,6 +107,7 @@ export default {
     'ni-billing-pagination': BillingPagination,
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
     'ni-title-header': TitleHeader,
+    'ni-large-table': LargeTable,
   },
   data () {
     return {
