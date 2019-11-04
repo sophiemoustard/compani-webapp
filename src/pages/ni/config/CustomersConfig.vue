@@ -62,7 +62,8 @@
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
-          <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+          <ni-input v-if="company.type === 'company'" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+          <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')" @blur="updateCompany('rna')" />
           <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
             @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
           <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
@@ -689,7 +690,8 @@ export default {
     company: {
       ics: { required },
       name: { required },
-      rcs: { required },
+      rcs: { required: requiredIf(item => !item.rna) },
+      rna: { required: requiredIf(item => !item.rcs) },
       iban: { required, iban },
       bic: { required, bic },
       address: {
