@@ -62,7 +62,6 @@ export default {
   },
   methods: {
     toggleMenu (value) {
-      console.error('je passe ici', value);
       this.$store.commit('main/setToggleDrawer', value);
     },
   },
