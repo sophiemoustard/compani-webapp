@@ -202,7 +202,7 @@
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
             alt="facture téléphone" @delete="deleteDocument($event, 'certificates')" name="certificates"
             collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
-            additional-fields-name="diplomes" @uploaded="refreshUser" />
+            additional-fields-name="diplomes" @uploaded="refreshUser" :extensions="extensions" />
         </div>
       </div>
     </div>

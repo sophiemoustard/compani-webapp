@@ -23,7 +23,7 @@
       <div class="row referent">
         <img :src="auxiliaryAvatar" class="avatar">
         <q-select :options="auxiliariesOptions" v-model="customer.referent._id" dense borderless emit-value
-          @input="updateCustomer('referent')" :display-value="auxiliaryPlaceholder" :disable="loading"
+          @input="updateCustomer('referent')" :display-value="auxiliaryPlaceholder" :disable="loading" behavior="menu"
           ref="auxiliarySelect" @focus="saveTmp('referent')">
           <template v-slot:append>
             <q-icon name="swap_vert" class="select-icon pink-icon" @click="toggleAuxiliarySelect" />

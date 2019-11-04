@@ -5,7 +5,8 @@
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
+            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"
+            :extensions="extensions" />
         </div>
       </div>
     </template>
@@ -36,7 +37,8 @@
           class="col-md-6 col-xs-12">
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"/>
+            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"
+            :extensions="extensions" />
         </q-expansion-item>
       </div>
     </template>
@@ -66,10 +68,10 @@ export default {
     additionalFieldsName: { type: String, default: '' },
     userProfile: { type: Object, default: () => {} },
     collapsibleLabel: { type: String, default: '' },
+    extensions: { type: String, default: '' },
   },
   data () {
     return {
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
       collapsibleOpened: false,
     };
   },

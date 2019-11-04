@@ -3,13 +3,7 @@
     <div class="col-11 person-name">
       <img :src="avatar" class="avatar">
       <div class="person-name-text" v-if="options.length === 0">{{ formattedIdentity }}</div>
-      <q-select v-else borderless dense emit-value :value="value" :options="options" @input="$emit('input', $event)"
-        ref="personSelect" :display-value="placeholder" behavior="menu">
-        <template v-slot:append>
-          <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer"
-            @click.stop="$refs['personSelect'].showPopup()" />
-        </template>
-      </q-select>
+      <ni-select v-else :value="value" :options="options" @input="$emit('input', $event)" no-error icon="swap_vert" />
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
       <span><q-icon name="clear" @click.native="$emit('close')" /></span>
@@ -20,6 +14,7 @@
 <script>
 import { UNKNOWN_AVATAR, DEFAULT_AVATAR } from '../../data/constants';
 import { formatIdentity } from '../../helpers/utils';
+import Select from '../form/Select';
 
 export default {
   name: 'PlanningModalHeader',
@@ -27,6 +22,9 @@ export default {
     value: { type: String },
     options: { type: Array, default: () => [] },
     selectedPerson: { type: Object, default: () => ({}) },
+  },
+  components: {
+    'ni-select': Select,
   },
   computed: {
     formattedIdentity () {

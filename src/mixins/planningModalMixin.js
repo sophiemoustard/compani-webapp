@@ -291,8 +291,5 @@ export const planningModalMixin = {
     formatAddressOptions (address) {
       return { label: address.fullAddress, value: address };
     },
-    toggleAddressSelect () {
-      return this.$refs['addressSelect'].showPopup();
-    },
   },
 };

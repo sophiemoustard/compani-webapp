@@ -40,7 +40,8 @@
             <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement"
               @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates"
               collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
-              @delete="deleteDocument($event)" multiple additional-fields-name="justificatif_financement" />
+              @delete="deleteDocument($event)" multiple additional-fields-name="justificatif_financement"
+              :extensions="extensions" />
           </div>
         </div>
       </div>
@@ -211,7 +212,8 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
-    }
+      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+    };
   },
   validations: {
     customer: {
