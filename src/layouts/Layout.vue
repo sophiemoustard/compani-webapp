@@ -1,8 +1,5 @@
 <template>
   <q-layout view="hhh Lpr lff">
-    <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
-      <q-btn class="menu-icon" color="primary" round dense @click="toggleLeft" icon="menu" />
-    </q-page-sticky>
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer"
       @click="toggleMenu">
       <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !isMini"
@@ -17,6 +14,9 @@
     <q-page-container>
       <router-view :key="$route.fullPath"/>
     </q-page-container>
+    <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
+      <q-btn class="menu-icon" color="primary" round dense @click="toggleMenu" icon="menu" />
+    </q-page-sticky>
   </q-layout>
 </template>
 
@@ -60,12 +60,12 @@ export default {
       return 'auxiliaryMenu';
     },
   },
+  mounted () {
+    this.$store.commit('main/setToggleDrawer', !this.toggleDrawer);
+  },
   methods: {
-    toggleLeft () {
-      this.$store.commit('main/setToggleDrawer', !this.toggleDrawer);
-    },
     toggleMenu () {
-      this.$store.commit('main/setToggleDrawer', !this.toggleDrawer)
+      this.$store.commit('main/setToggleDrawer', !this.toggleDrawer);
     },
   },
   beforeRouteUpdate (to, from, next) {
