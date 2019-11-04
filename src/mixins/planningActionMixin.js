@@ -12,8 +12,6 @@ import {
   CUSTOMER_CONTRACT,
   COMPANY_CONTRACT,
   DAILY,
-  PLANNING_VIEW_START_HOUR,
-  PLANNING_VIEW_END_HOUR,
   SECTOR,
   CUSTOMER,
   OTHER,
@@ -173,8 +171,8 @@ export const planningActionMixin = {
       }
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        payload.startDate = this.$moment(event.dates.startDate).hour(PLANNING_VIEW_START_HOUR).minute(0).toISOString();
-        payload.endDate = this.$moment(event.dates.endDate).hour(PLANNING_VIEW_END_HOUR).minute(0).toISOString();
+        payload.startDate = this.$moment(event.dates.startDate).startOf('d').toDate();
+        payload.endDate = this.$moment(event.dates.endDate).endOf('d').toDate();
       } else {
         payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
           .minutes(event.dates.startHour.split(':')[1]).toISOString();
@@ -233,24 +231,23 @@ export const planningActionMixin = {
             (!type || type === event.type)
         });
     },
-    async notifyCreation () {
-      if (this.newEvent.type === ABSENCE) {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        });
+    async onOkForCreateEvent () {
+      this.loading = true;
+      const payload = this.getCreationPayload(this.newEvent);
+      if (!this.isCreationAllowed(payload)) {
+        return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
       }
 
-      if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        });
-      }
+      await this.$events.create(payload);
+
+      await this.refresh();
+      this.creationModal = false;
+      this.resetCreationForm(false);
+      NotifyPositive('Évènement créé');
+      this.loading = false;
+    },
+    onCancelForCreateEvent () {
+      return NotifyPositive('Création annulée');
     },
     async createEvent () {
       try {
@@ -258,23 +255,28 @@ export const planningActionMixin = {
         const isValid = await this.waitForFormValidation(this.$v.newEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.notifyCreation();
-
-        this.loading = true;
-        const payload = this.getCreationPayload(this.newEvent);
-        if (!this.isCreationAllowed(payload)) {
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+        if (this.newEvent.type === ABSENCE) {
+          this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
+            ok: 'OK',
+            cancel: 'Annuler',
+          })
+            .onOk(async () => this.onOkForCreateEvent())
+            .onCancel(() => this.onCancelForCreateEvent());
         }
 
-        await this.$events.create(payload);
-
-        await this.refresh();
-        this.creationModal = false;
-        this.resetCreationForm(false);
-        NotifyPositive('Évènement créé');
-        this.loading = false;
+        if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
+          this.$q.dialog({
+            title: 'Confirmation',
+            message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
+            ok: 'OK',
+            cancel: 'Annuler',
+          })
+            .onOk(async () => this.onOkForCreateEvent())
+            .onCancel(() => this.onCancelForCreateEvent());
+        }
       } catch (e) {
-        if (e.message === '') return NotifyPositive('Création annulée');
         console.error(e);
         if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
@@ -496,6 +498,7 @@ export const planningActionMixin = {
           this.editionModal = false;
           this.resetEditionForm();
           NotifyPositive('Évènement supprimé.');
+          this.loading = false;
         }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
