@@ -5,7 +5,7 @@
     </div>
     <q-input v-show="props[editionBooleanName]" :ref="refName" :value="props[editedField]"
       @change.native="setEdition" type="number" @blur="disableEdition" bg-color="white" dense
-      @keyup.esc="disableEdition" no-parent-field @keyup.enter="disableEdition" borderless :suffix="suffix" />
+      @keyup.esc="disableEdition" no-parent-field @keyup:enter="disableEdition" borderless :suffix="suffix" />
   </div>
 </template>
 

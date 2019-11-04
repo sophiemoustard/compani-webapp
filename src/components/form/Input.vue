@@ -21,7 +21,7 @@
     <template v-else>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
-        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup.enter')" :error-message="errorLabel"
+        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup:enter')" :error-message="errorLabel"
         :autogrow="this.type === 'textarea'" :readOnly="readOnly" :debounce="debounce" :placeholder="placeholder"
         :class="{ 'borders': inModal }">
         <template v-if="icon" v-slot:prepend>
