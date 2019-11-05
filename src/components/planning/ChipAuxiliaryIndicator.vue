@@ -7,7 +7,7 @@
     </q-chip>
 
     <!-- Indicators modal -->
-    <q-dialog :value="indicatorsModal">
+    <q-dialog v-model="indicatorsModal">
       <div class="modal-container modal-container-md">
         <div class="q-mb-md">
           <div class="row justify-between items-center q-pa-lg">
