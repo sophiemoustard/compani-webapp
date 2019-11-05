@@ -46,7 +46,7 @@ export const frAddress = async (value) => {
 
 export const sector = async (value) => {
   if (!value) return true;
-  const res = await sectors.showAll({ name: value });
+  const res = await sectors.list({ name: value });
   return new Promise(resolve => {
     resolve(res.length === 0);
   });

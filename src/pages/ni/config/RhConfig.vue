@@ -416,7 +416,7 @@ export default {
     // Sectors
     async getSectors () {
       try {
-        this.sectors = await this.$sectors.showAll({ company: this.company._id });
+        this.sectors = await this.$sectors.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des équipes.')
@@ -428,7 +428,6 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        this.newSector.company = this.company._id;
         await this.$sectors.create(this.newSector);
         NotifyPositive('Équipe créée.');
         this.resetCreationSectorData();

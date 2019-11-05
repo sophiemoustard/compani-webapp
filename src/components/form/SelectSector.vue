@@ -37,7 +37,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        const sectors = await this.$sectors.showAll({ company: this.currentUser.company._id });
+        const sectors = await this.$sectors.list();
         if (this.allowNullOption) sectors.push({ name: 'Toutes les équipes', _id: '' });
         this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {
