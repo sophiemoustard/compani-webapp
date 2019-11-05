@@ -262,8 +262,8 @@ export const planningActionMixin = {
             ok: 'OK',
             cancel: 'Annuler',
           })
-            .onOk(() => this.onOkForEventCreation())
-            .onCancel(() => this.onCancelForEventCreation());
+            .onOk(this.onOkForEventCreation)
+            .onCancel(this.onCancelForEventCreation);
         }
 
         if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
@@ -273,8 +273,8 @@ export const planningActionMixin = {
             ok: 'OK',
             cancel: 'Annuler',
           })
-            .onOk(() => this.onOkForEventCreation())
-            .onCancel(() => this.onCancelForEventCreation());
+            .onOk(this.onOkForEventCreation)
+            .onCancel(this.onCancelForEventCreation);
         }
       } catch (e) {
         console.error(e);
