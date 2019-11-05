@@ -881,7 +881,6 @@ export default {
         this.loading = true;
 
         const payload = this.getSurchargePayload(this.newSurcharge);
-        payload.company = this.user.company._id;
         await this.$surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
         this.resetCreationSurchargeData();

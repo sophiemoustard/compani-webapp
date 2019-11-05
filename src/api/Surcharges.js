@@ -2,7 +2,7 @@ import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
   async showAll (params) {
-    const surcharges = await alenviAxios.get(`${process.env.API_HOSTNAME}/surcharges`, { params });
+    const surcharges = await alenviAxios.get(`${process.env.API_HOSTNAME}/surcharges`);
     return surcharges.data.data.surcharges;
   },
   async create (payload) {
