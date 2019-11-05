@@ -56,7 +56,8 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
-          <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
+          <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
+          <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')" @blur="updateCompany('tradeName')" />
           <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
