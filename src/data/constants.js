@@ -237,3 +237,7 @@ export const PAY_DOCUMENT_NATURES = [
   { label: 'Attestation', value: CERTIFICATE },
   { label: 'Autre', value: OTHER },
 ];
+
+// COMPANY
+export const TYPE_COMPANY = 'company';
+export const TYPE_ASSOCIATION = 'association';

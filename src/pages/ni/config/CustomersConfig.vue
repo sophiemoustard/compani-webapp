@@ -332,7 +332,18 @@ import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import Modal from '../../../components/Modal';
 import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS, FIXED } from '../../../data/constants.js';
+import {
+  BILLING_DIRECT,
+  BILLING_INDIRECT,
+  REQUIRED_LABEL,
+  CONTRACT_STATUS_OPTIONS,
+  TWO_WEEKS,
+  MONTH,
+  NATURE_OPTIONS,
+  FIXED,
+  TYPE_COMPANY,
+  TYPE_ASSOCIATION,
+} from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -690,8 +701,9 @@ export default {
     company: {
       ics: { required },
       name: { required },
-      rcs: { required: requiredIf(item => !item.rna) },
-      rna: { required: requiredIf(item => !item.rcs) },
+      type: { required },
+      rcs: { required: requiredIf(item => item.type === TYPE_COMPANY) },
+      rna: { required: requiredIf(item => item.type === TYPE_ASSOCIATION) },
       iban: { required, iban },
       bic: { required, bic },
       address: {
@@ -783,7 +795,7 @@ export default {
     async refreshSurcharges () {
       try {
         this.surchargesOptions = [];
-        this.surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
+        this.surcharges = await this.$surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
           if (this.surcharges[i].eveningStartTime) this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
           if (this.surcharges[i].eveningEndTime) this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
@@ -801,7 +813,7 @@ export default {
     },
     async refreshServices () {
       try {
-        const services = await this.$services.showAll();
+        const services = await this.$services.list();
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
           ...service,
