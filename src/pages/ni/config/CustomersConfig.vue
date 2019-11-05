@@ -801,7 +801,7 @@ export default {
     },
     async refreshServices () {
       try {
-        const services = await this.$services.showAll({ company: this.user.company._id });
+        const services = await this.$services.showAll();
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
           ...service,
@@ -977,7 +977,6 @@ export default {
         nature,
         versions: [{ name, defaultUnitAmount }],
         type,
-        company: this.user.company._id,
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') formattedService.versions[0].surcharge = this.newService.surcharge;
       if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;

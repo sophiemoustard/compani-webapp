@@ -2,7 +2,7 @@ import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
   async showAll (params) {
-    const services = await alenviAxios.get(`${process.env.API_HOSTNAME}/services`, { params });
+    const services = await alenviAxios.get(`${process.env.API_HOSTNAME}/services`);
     return services.data.data.services;
   },
   async create (payload) {
