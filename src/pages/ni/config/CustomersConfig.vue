@@ -62,7 +62,8 @@
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
-          <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+          <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+          <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')" @blur="updateCompany('rna')" />
           <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
             @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
           <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
@@ -331,7 +332,18 @@ import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import Modal from '../../../components/Modal';
 import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS, FIXED } from '../../../data/constants.js';
+import {
+  BILLING_DIRECT,
+  BILLING_INDIRECT,
+  REQUIRED_LABEL,
+  CONTRACT_STATUS_OPTIONS,
+  TWO_WEEKS,
+  MONTH,
+  NATURE_OPTIONS,
+  FIXED,
+  COMPANY,
+  ASSOCIATION,
+} from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -379,6 +391,7 @@ export default {
       company: null,
       documents: null,
       FIXED,
+      COMPANY,
       billingPeriodOptions: [
         { value: TWO_WEEKS, label: 'Quinzaine' },
         { value: MONTH, label: 'Mois' },
@@ -689,7 +702,9 @@ export default {
     company: {
       ics: { required },
       name: { required },
-      rcs: { required },
+      type: { required },
+      rcs: { required: requiredIf(item => item.type === COMPANY) },
+      rna: { required: requiredIf(item => item.type === ASSOCIATION) },
       iban: { required, iban },
       bic: { required, bic },
       address: {
@@ -781,7 +796,7 @@ export default {
     async refreshSurcharges () {
       try {
         this.surchargesOptions = [];
-        this.surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
+        this.surcharges = await this.$surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
           if (this.surcharges[i].eveningStartTime) this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
           if (this.surcharges[i].eveningEndTime) this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
@@ -799,7 +814,7 @@ export default {
     },
     async refreshServices () {
       try {
-        const services = await this.$services.showAll({ company: this.user.company._id });
+        const services = await this.$services.list();
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
           ...service,
@@ -879,7 +894,6 @@ export default {
         this.loading = true;
 
         const payload = this.getSurchargePayload(this.newSurcharge);
-        payload.company = this.user.company._id;
         await this.$surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
         this.resetCreationSurchargeData();
@@ -975,7 +989,6 @@ export default {
         nature,
         versions: [{ name, defaultUnitAmount }],
         type,
-        company: this.user.company._id,
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') formattedService.versions[0].surcharge = this.newService.surcharge;
       if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;

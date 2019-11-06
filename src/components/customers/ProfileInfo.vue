@@ -820,7 +820,7 @@ export default {
     // Refresh data
     async getServices () {
       try {
-        this.services = await this.$services.showAll({ company: this.company._id });
+        this.services = await this.$services.list();
       } catch (e) {
         console.error(e);
       }
