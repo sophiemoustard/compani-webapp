@@ -287,6 +287,7 @@ export default {
       } catch (e) {
         this.contracts = [];
         console.error(e);
+        NotifyNegative('Erreur lors de la récupération des contracts');
       }
     },
     // Contract creation
