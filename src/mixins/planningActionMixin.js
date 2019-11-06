@@ -275,6 +275,8 @@ export const planningActionMixin = {
           })
             .onOk(this.onOkForEventCreation)
             .onCancel(this.onCancelForEventCreation);
+        } else {
+          await this.onOkForEventCreation();
         }
       } catch (e) {
         console.error(e);
