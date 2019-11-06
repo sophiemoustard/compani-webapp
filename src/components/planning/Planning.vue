@@ -237,13 +237,15 @@ export default {
     getEventWithStyleInfo (event, day) {
       let dayEvent = { ...event };
 
-      const displayedStartHour = Math.max((this.$moment(event.startDate).hours()), STAFFING_VIEW_START_HOUR);
-      const displayedEndHour = Math.min(this.$moment(event.endDate).hours(), STAFFING_VIEW_END_HOUR);
-      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
+      const eventStartDate = this.$moment(event.startDate);
+      const eventEndDate = this.$moment(event.endDate);
+      const displayedStartHour = Math.max((eventStartDate.hours()), STAFFING_VIEW_START_HOUR);
+      const displayedEndHour = Math.min(eventEndDate.hours(), STAFFING_VIEW_END_HOUR);
+      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + eventStartDate.minutes();
+      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + eventEndDate.minutes();
 
-      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).toISOString();
-      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).toISOString();
+      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(eventStartDate.minutes()).toISOString();
+      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(eventEndDate.minutes()).toISOString();
       dayEvent.staffingLeft = staffingLeft;
       dayEvent.staffingWidth = staffingRight - staffingLeft;
 
