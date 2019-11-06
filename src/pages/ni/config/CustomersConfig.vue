@@ -341,8 +341,8 @@ import {
   MONTH,
   NATURE_OPTIONS,
   FIXED,
-  TYPE_COMPANY,
-  TYPE_ASSOCIATION,
+  COMPANY,
+  ASSOCIATION,
 } from '../../../data/constants.js';
 
 export default {
@@ -702,8 +702,8 @@ export default {
       ics: { required },
       name: { required },
       type: { required },
-      rcs: { required: requiredIf(item => item.type === TYPE_COMPANY) },
-      rna: { required: requiredIf(item => item.type === TYPE_ASSOCIATION) },
+      rcs: { required: requiredIf(item => item.type === COMPANY) },
+      rna: { required: requiredIf(item => item.type === ASSOCIATION) },
       iban: { required, iban },
       bic: { required, bic },
       address: {

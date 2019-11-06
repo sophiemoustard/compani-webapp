@@ -239,5 +239,5 @@ export const PAY_DOCUMENT_NATURES = [
 ];
 
 // COMPANY
-export const TYPE_COMPANY = 'company';
-export const TYPE_ASSOCIATION = 'association';
+export const COMPANY = 'company';
+export const ASSOCIATION = 'association';
