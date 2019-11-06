@@ -9,13 +9,13 @@
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div>Trier par</div>
           <div class="col-xs-12 col-sm-6 col-md-3">
-            <ni-select class="q-pl-sm" :options="sortOptions" v-model="sortOption" separator />
+            <ni-select class="q-pl-sm" :options="sortOptions" v-model="sortOption" separator in-form />
           </div>
           <div class="col-xs-12 col-sm-6 col-md-4">
             <ni-select-sector class="q-pl-sm" v-model="selectedSector" allow-null-option />
           </div>
           <div class="col-xs-12 col-sm-6 col-md-3">
-            <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator />
+            <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator in-form />
           </div>
         </div>
       </template>

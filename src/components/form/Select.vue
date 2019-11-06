@@ -1,10 +1,10 @@
 <template>
-  <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
+  <div :class="{ 'col-xs-12 col-md-6': inForm, 'margin-input full-width': inModal, last: last }">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-select dense borderless :value="model" bg-color="white" :options="innerOptions" :multiple="multiple"
+    <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
       :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorLabel" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput">
@@ -33,10 +33,12 @@ export default {
     value: [String, Number, Object],
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
+    inForm: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
     noError: { type: Boolean, default: false },
+    bgColor: { type: String, default: 'white' },
   },
   data () {
     return {
