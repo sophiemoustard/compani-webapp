@@ -458,7 +458,6 @@ export default {
       FIXED,
       days,
       loading: false,
-      openNewHelperModal: false,
       openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,

@@ -7,7 +7,7 @@ import { HELPER, REQUIRED_LABEL } from '../data/constants';
 export const helperMixin = {
   data () {
     return {
-      addHelper: false,
+      openNewHelperModal: false,
       openEditedHelperModal: false,
       newHelper: {
         identity: { lastname: '', firstname: '' },
@@ -135,7 +135,7 @@ export const helperMixin = {
         NotifyPositive('Email envoyé');
 
         await this.getUserHelpers();
-        this.addHelper = false
+        this.openNewHelperModal = false;
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
