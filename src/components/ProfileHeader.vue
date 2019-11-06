@@ -99,7 +99,7 @@ export default {
       currentUser: 'main/user',
       user: 'rh/getUserProfile',
     }),
-    currentUserCompanyName () {
+    companyName () {
       return this.currentUser.company.tradeName || this.currentUser.company.name;
     },
     userActivity () {
@@ -149,7 +149,7 @@ export default {
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.user._id}\nSi tu ` +
           'rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
         } else if (this.typeMessage === 'CA') {
-          return `${this.currentUserCompanyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
+          return `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration: ' +
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`;
         }
@@ -181,10 +181,10 @@ export default {
     },
     async sendSMS () {
       try {
-        if (!this.currentUserCompanyName) NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+        if (!this.companyName) NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
         await this.$twilio.sendSMS({
           to: `+33${this.user.contact.phone.substring(1)}`,
-          from: this.currentUserCompanyName,
+          from: this.companyName,
           body: this.messageComp,
         });
         NotifyPositive('SMS bien envoyé');
