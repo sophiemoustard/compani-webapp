@@ -29,14 +29,14 @@
     </div>
 
     <!-- Payment creation modal -->
-    <!-- <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
+    <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
       :selectedClientName="selectedClientName" :creationModal="paymentCreationModal" :validations="$v.newPayment"
-      @createPayment="createPayment" @resetForm="resetPaymentCreationModal" /> -->
+      @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
-    <!-- <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
+    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
       :editionModal="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
-      @updatePayment="updatePayment"  @resetForm="resetPaymentEditionModal" /> -->
+      @updatePayment="updatePayment"  @resetForm="resetPaymentEditionModal" />
   </div>
 </template>
 
@@ -44,8 +44,8 @@
 import { required } from 'vuelidate/lib/validators';
 import { CREDIT_NOTE, BILL, DIRECT_DEBIT, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH, CUSTOMER, THIRD_PARTY_PAYER, HELPER } from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
-// import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
-// import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
+import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
+import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
 import DateRange from '../../components/form/DateRange';
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
@@ -56,8 +56,8 @@ export default {
   components: {
     'ni-customer-billing-table': CustomerBillingTable,
     'ni-date-range': DateRange,
-    // 'ni-payment-creation-modal': PaymentCreationModal,
-    // 'ni-payment-edition-modal': PaymentEditionModal,
+    'ni-payment-creation-modal': PaymentCreationModal,
+    'ni-payment-edition-modal': PaymentEditionModal,
   },
   mixins: [paymentMixin],
   data () {
