@@ -30,12 +30,12 @@
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
-      :selectedClientName="selectedClientName" :creationModal="paymentCreationModal" :validations="$v.newPayment"
+      :selectedClientName="selectedClientName" v-model="paymentCreationModal" :validations="$v.newPayment"
       @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
-      :editionModal="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
+      v-model="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
       @updatePayment="updatePayment"  @resetForm="resetPaymentEditionModal" />
   </div>
 </template>

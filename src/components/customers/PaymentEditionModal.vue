@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="editionModal" @hide="resetForm">
+  <ni-modal :value="value" @input="$emit('input', $event)" @hide="resetForm">
     <template slot="title">
       Editer le <span class="text-weight-bold">{{ editionModalNature }}</span>
     </template>
@@ -37,7 +37,7 @@ export default {
   },
   props: {
     editedPayment: { type: Object, default: () => ({}) },
-    editionModal: { type: Boolean, default: false },
+    value: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     selectedCustomer: { type: Object, default: () => ({}) },
