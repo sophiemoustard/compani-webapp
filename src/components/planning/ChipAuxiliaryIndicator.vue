@@ -7,7 +7,7 @@
     </q-chip>
 
     <!-- Indicators modal -->
-    <q-dialog :value="indicatorsModal">
+    <q-dialog v-model="indicatorsModal">
       <div class="modal-container modal-container-md">
         <div class="q-mb-md">
           <div class="row justify-between items-center q-pa-lg">
@@ -57,6 +57,7 @@ import {
   EXTREME,
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
+  INVOICED_AND_PAID,
 } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
@@ -187,11 +188,12 @@ export default {
     async openIndicatorsModal () {
       if (!this.hasCompanyContractOnEvent) return;
       try {
-        this.monthEvents = await this.$events.list({
+        const monthEvents = await this.$events.list({
           startDate: this.$moment(this.startOfWeek).startOf('month').toDate(),
           endDate: this.$moment(this.startOfWeek).endOf('month').toDate(),
           auxiliary: this.person._id,
         });
+        this.monthEvents = monthEvents.filter(ev => !ev.isCancelled || ev.cancel.condition === INVOICED_AND_PAID);
       } catch (e) {
         this.monthEvents = [];
       } finally {
