@@ -227,7 +227,7 @@
                 ]" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6" v-if="displayMutualUploader">
+        <div class="col-xs-12 col-md-6" v-if="$_.get(user, 'administrative.mutualFund.has')">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
@@ -507,9 +507,6 @@ export default {
     }
   },
   computed: {
-    displayMutualUploader () {
-      return this.user.administrative.mutualFund.has && !this.user.administrative.mutualFund.driveId;
-    },
     captionTransportUploader () {
       const coachText = 'Justificatif d\'abonnement';
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'

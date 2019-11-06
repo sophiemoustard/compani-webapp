@@ -1,6 +1,6 @@
 <template>
   <div class="margin-input col-xs-12 col-md-6">
-    <div v-if="displayCaption && displayUpload" class="row justify-between">
+    <div v-if="displayCaption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
@@ -13,7 +13,7 @@
         <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
       </div>
     </div>
-    <q-field borderless v-if="(!document || !document.driveId) && displayUpload" :error="error"
+    <q-field borderless v-if="(!document || !document.driveId)" :error="error"
       :error-message="errorLabel">
       <q-uploader flat :bordered="false" color="white" :label="label" :url="url" :headers="headers"
         text-color="black" @failed="failMsg" :form-fields="additionalFields" :class="{ borders: inModal }"
@@ -42,7 +42,6 @@ export default {
     entity: { type: Object, default: () => {} },
     url: { type: String, default: '' },
     errorLabel: { type: String, default: 'Document requis' },
-    displayUpload: { type: Boolean, default: true },
     displayCaption: { type: Boolean, default: true },
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
