@@ -87,7 +87,7 @@ import Input from '../form/Input';
 import { NotifyNegative } from '../popup/notify.js';
 import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '../../data/constants';
 import SearchAddress from '../form/SearchAddress';
-import { extend, formatIdentity } from '../../helpers/utils.js';
+import { extend, formatIdentity, formatHours } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import { helperMixin } from '../../mixins/helperMixin.js';
@@ -119,7 +119,7 @@ export default {
           name: 'hours',
           align: 'center',
           label: 'Heures réalisées',
-          field: row => `${Math.trunc(row.totalHours)}h`,
+          field: row => formatHours(row.totalHours, 1),
         },
         {
           name: 'lastEvent',
