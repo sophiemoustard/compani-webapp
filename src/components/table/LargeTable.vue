@@ -3,9 +3,13 @@
     class="q-pa-sm large-table neutral-background" flat :rows-per-page-options="rowsPerPageOptions"
     :selection="selection" :selected="selected" :visible-columns="visibleColumns" :loading="loading"
     @update:pagination="$emit('update:pagination', $event)" @update:selected="$emit('update:selected', $event)">
-    <slot />
-    <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-      :data="data"/>
+    <template v-slot:body="props">
+      <slot name="body" :props="props" />
+    </template>
+    <template v-slot:bottom="props">
+      <ni-billing-pagination :props="props" :pagination.sync="pagination"
+        :data="data"/>
+    </template>
   </q-table>
 </template>
 
