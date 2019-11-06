@@ -62,7 +62,7 @@
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
-          <ni-input v-if="company.type === 'company'" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+          <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
           <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')" @blur="updateCompany('rna')" />
           <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
             @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
@@ -391,6 +391,7 @@ export default {
       company: null,
       documents: null,
       FIXED,
+      COMPANY,
       billingPeriodOptions: [
         { value: TWO_WEEKS, label: 'Quinzaine' },
         { value: MONTH, label: 'Mois' },
