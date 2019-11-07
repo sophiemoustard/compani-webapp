@@ -4,12 +4,12 @@
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
-          :company-id="mainUser.company._id" />
+          :company-id="mainUser.company._id" in-form />
       </div>
       <ni-input v-model="user.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
         @blur="updateUser('mentor')" />
       <ni-select v-model="user.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')"
-        @blur="updateUser('role._id')" />
+        @blur="updateUser('role._id')" in-form />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -61,13 +61,13 @@
         <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model.trim="user.identity.lastname"
           @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')" />
         <ni-select caption="Nationalité" :error="$v.user.identity.nationality.$error" :options="nationalitiesOptions"
-          v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')"
+          v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')" in-form
           @blur="updateUser('identity.nationality')" />
         <ni-date-input caption="Date de naissance" :error="$v.user.identity.birthDate.$error"
           v-model="user.identity.birthDate" @focus="saveTmp('identity.birthDate')" content-class="col-xs-12 col-md-6"
           @input="updateUser('identity.birthDate')" />
         <ni-select caption="Pays de naissance" :error="$v.user.identity.birthCountry.$error" :options="countriesOptions"
-          v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
+          v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')" in-form
           @blur="updateUser('identity.birthCountry')" />
         <ni-input caption="Département de naissance" :error="$v.user.identity.birthState.$error"
           :error-label="birthStateError" v-model="user.identity.birthState" @blur="updateUser('identity.birthState')"
@@ -227,7 +227,7 @@
                 ]" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6" v-if="displayMutualUploader">
+        <div class="col-xs-12 col-md-6" v-if="$_.get(user, 'administrative.mutualFund.has')">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
@@ -507,9 +507,6 @@ export default {
     }
   },
   computed: {
-    displayMutualUploader () {
-      return this.user.administrative.mutualFund.has && !this.user.administrative.mutualFund.driveId;
-    },
     captionTransportUploader () {
       const coachText = 'Justificatif d\'abonnement';
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'

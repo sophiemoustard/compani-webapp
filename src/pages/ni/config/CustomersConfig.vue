@@ -119,7 +119,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Facturation</p>
         <div class="row gutter-profile">
-          <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod"
+          <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod" in-form
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
             :options="billingPeriodOptions" />
         </div>

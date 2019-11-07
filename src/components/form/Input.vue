@@ -22,7 +22,7 @@
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup:enter')" :error-message="errorLabel"
-        :autogrow="this.type === 'textarea'" :readOnly="readOnly" :debounce="debounce" :placeholder="placeholder"
+        :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
         :class="{ 'borders': inModal }">
         <template v-if="icon" v-slot:prepend>
           <q-icon size="xs" :name="icon" ></q-icon>

@@ -2,7 +2,7 @@
   <q-page padding class="neutral-background q-pb-xl">
     <h4>Données</h4>
     <div class="row">
-      <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" />
+      <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />
     </div>
     <q-btn label="Exporter" no-caps unelevated text-color="white" color="primary" icon="import_export"
       @click="exportCsv" />

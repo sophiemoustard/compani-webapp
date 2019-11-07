@@ -7,8 +7,7 @@ export default {
     return creditNotes.data.data.creditNotes;
   },
   async create (payload) {
-    const creditNote = await alenviAxios.post(`${process.env.API_HOSTNAME}/creditNotes`, payload);
-    return creditNote.data.data.creditNote;
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/creditNotes`, payload);
   },
   async updateById (id, payload) {
     const creditNote = await alenviAxios.put(`${process.env.API_HOSTNAME}/creditNotes/${id}`, payload);

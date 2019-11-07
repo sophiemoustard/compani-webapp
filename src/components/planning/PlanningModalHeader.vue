@@ -4,8 +4,7 @@
       <img :src="avatar" class="avatar">
       <div class="person-name-text" v-if="options.length === 0">{{ formattedIdentity }}</div>
       <div v-else :class="{ 'col-md-6': $q.platform.is.desktop }" class="person-name-select">
-        <ni-select :value="value" :options="options" @input="$emit('input', $event)" no-error icon="swap_vert"
-          in-modal />
+        <ni-select :value="value" :options="options" @input="$emit('input', $event)" no-error icon="swap_vert" />
       </div>
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
@@ -51,11 +50,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .person-name
-    /deep/ .q-select
-      width: 80%
-      .q-field__control
-        border: none
-</style>
