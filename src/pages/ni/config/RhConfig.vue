@@ -5,22 +5,24 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Heures internes</p>
         <q-card>
-          <q-table :data="internalHours" :columns="internalHoursColumns" hide-bottom binary-state-sort
-            :pagination.sync="pagination" class="table-responsive q-pa-sm">
-            <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template v-if="col.name === 'default'">
-                  <q-checkbox :disable="col.value" :value="col.value"
-                    @input="updateDefaultInternalHour(props.row._id)" />
-                </template>
-                <template v-else-if="col.name === 'actions'">
-                  <q-btn :disable="props.row.default" flat round small color="grey" icon="delete"
-                    @click="deleteInternalHour(col.value, props.row.__index)" />
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </q-table>
+          <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" :pagination.sync="pagination">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'default'">
+                    <q-checkbox :disable="col.value" :value="col.value"
+                      @input="updateDefaultInternalHour(props.row._id)" />
+                  </template>
+                  <template v-else-if="col.name === 'actions'">
+                    <q-btn :disable="props.row.default" flat round small color="grey" icon="delete"
+                      @click="deleteInternalHour(col.value, props.row.__index)" />
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
               @click="newInternalHourModal = true" :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
@@ -110,21 +112,23 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Équipes</p>
         <q-card>
-          <q-table :data="sectors" :columns="sectorsColumns" hide-bottom binary-state-sort
-            :pagination.sync="sectorPagination" class="table-responsive q-pa-sm">
-            <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
-                    <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
-                      @click="deleteSector(col.value._id, props.row.__index)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </q-table>
+          <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorPagination">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'actions'">
+                    <div class="row no-wrap table-actions">
+                      <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
+                      <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
+                        @click="deleteSector(col.value._id, props.row.__index)" />
+                    </div>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une équipe"
               @click="sectorCreationModal = true" />
@@ -182,6 +186,7 @@ import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../componen
 import Input from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import Modal from '../../../components/Modal';
+import ResponsiveTable from '../../../components/table/ResponsiveTable';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin';
@@ -193,6 +198,7 @@ export default {
     'ni-input': Input,
     'ni-file-uploader': FileUploader,
     'ni-modal': Modal,
+    'ni-responsive-table': ResponsiveTable,
   },
   mixins: [configMixin, validationMixin],
   data () {

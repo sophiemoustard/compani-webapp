@@ -5,21 +5,23 @@
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
-          <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" hide-bottom binary-state-sort
-            class="table-responsive q-pa-sm">
-            <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn :disable="!getFunding(col.value)" flat round small color="grey" icon="mdi-calculator"
-                      @click="showFunding(col.value)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </q-table>
+          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'actions'">
+                    <div class="row no-wrap table-actions">
+                      <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
+                      <q-btn :disable="!getFunding(col.value)" flat round small color="grey" icon="mdi-calculator"
+                        @click="showFunding(col.value)" />
+                    </div>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
         </q-card>
         <p v-if="subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations
           soir / dimanche</p>
@@ -61,20 +63,25 @@
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
-          <q-table :data="customer.payment.mandates" :columns="columnsMandates" row-key="name" hide-bottom
-            :pagination.sync="pagination" :visible-columns="visibleColumnsMandates" binary-state-sort
-            class="table-responsive q-pa-sm">
-            <q-td slot="body-cell-rum" slot-scope="props" :props="props" :data-label="props.col.label">{{ props.value }}
-            </q-td>
-            <q-td slot="body-cell-sign" slot-scope="props" :props="props" :data-label="props.col.label">
-              <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
-                {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-              <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary"
-                @click="preOpenESignModal(props.row)">
-                Signer
-              </q-btn>
-            </q-td>
-          </q-table>
+          <ni-responsive-table :data="customer.payment.mandates" :columns="columnsMandates"
+            :pagination.sync="pagination" :visible-columns="visibleColumnsMandates">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'sign'">
+                    <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
+                      {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+                    <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary"
+                      @click="preOpenESignModal(props.row)">
+                      Signer
+                    </q-btn>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
         </q-card>
       </div>
     </template>
@@ -113,14 +120,8 @@
         Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
           selectedSubscription.service.name}}</span>
       </template>
-      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" flat
-        :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
+        :pagination.sync="paginationHistory" />
     </ni-modal>
 
     <!-- Funding modal -->
@@ -144,6 +145,7 @@ import esign from '../../api/Esign.js';
 import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import Modal from '../../components/Modal';
+import ResponsiveTable from '../../components/table/ResponsiveTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
@@ -161,6 +163,7 @@ export default {
     'ni-input': Input,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
+    'ni-responsive-table': ResponsiveTable,
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
   data () {
