@@ -246,13 +246,13 @@ export default {
       let displayedStartMinutes = eventStartDate.minutes();
       let displayedEndMinutes = eventEndDate.minutes();
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        displayedStartHour = Math.max((eventStartDate.hours()), STAFFING_VIEW_START_HOUR);
-        displayedEndHour = Math.min(eventEndDate.hours(), STAFFING_VIEW_END_HOUR);
+        displayedStartHour = STAFFING_VIEW_START_HOUR;
+        displayedEndHour = STAFFING_VIEW_END_HOUR;
         displayedStartMinutes = 0;
         displayedEndMinutes = 0;
       }
-      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + eventStartDate.minutes();
-      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + eventEndDate.minutes();
+      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + displayedStartMinutes;
+      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + displayedEndMinutes;
 
       dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
       dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
