@@ -203,9 +203,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  /deep/ .q-table
-    & tbody tr.selected
-      background: $white
-</style>
