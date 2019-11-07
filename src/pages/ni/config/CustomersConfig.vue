@@ -833,7 +833,7 @@ export default {
     },
     async refreshThirdPartyPayers () {
       try {
-        this.thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
+        this.thirdPartyPayers = await this.$thirdPartyPayers.list();
       } catch (e) {
         this.thirdPartyPayers = [];
         console.error(e);
@@ -1132,7 +1132,6 @@ export default {
         if (this.$v.newThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        this.newThirdPartyPayer.company = this.company._id;
         await this.$thirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur créé.');

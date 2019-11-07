@@ -5,7 +5,7 @@ export default {
     const newThirdPartyPayer = await alenviAxios.post(`${process.env.API_HOSTNAME}/thirdpartypayers`, data);
     return newThirdPartyPayer.data.data.thirdPartyPayer;
   },
-  async showAll (params) {
+  async list (params) {
     const thirdPartyPayers = await alenviAxios.get(`${process.env.API_HOSTNAME}/thirdpartypayers`, { params });
     return thirdPartyPayers.data.data.thirdPartyPayers;
   },
