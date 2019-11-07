@@ -109,6 +109,8 @@ import {
   COACH,
   ADMIN,
   NOT_INVOICED_AND_NOT_PAID,
+  ABSENCE,
+  DAILY,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -239,13 +241,21 @@ export default {
 
       const eventStartDate = this.$moment(event.startDate);
       const eventEndDate = this.$moment(event.endDate);
-      const displayedStartHour = Math.max((eventStartDate.hours()), STAFFING_VIEW_START_HOUR);
-      const displayedEndHour = Math.min(eventEndDate.hours(), STAFFING_VIEW_END_HOUR);
+      let displayedStartHour = eventStartDate.hours();
+      let displayedEndHour = eventEndDate.hours();
+      let displayedStartMinutes = eventStartDate.minutes();
+      let displayedEndMinutes = eventEndDate.minutes();
+      if (event.type === ABSENCE && event.absenceNature === DAILY) {
+        displayedStartHour = Math.max((eventStartDate.hours()), STAFFING_VIEW_START_HOUR);
+        displayedEndHour = Math.min(eventEndDate.hours(), STAFFING_VIEW_END_HOUR);
+        displayedStartMinutes = 0;
+        displayedEndMinutes = 0;
+      }
       let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + eventStartDate.minutes();
       let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + eventEndDate.minutes();
 
-      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(eventStartDate.minutes()).toISOString();
-      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(eventEndDate.minutes()).toISOString();
+      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
+      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
       dayEvent.staffingLeft = staffingLeft;
       dayEvent.staffingWidth = staffingRight - staffingLeft;
 
