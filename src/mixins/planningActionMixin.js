@@ -256,7 +256,7 @@ export const planningActionMixin = {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         if (this.newEvent.type === ABSENCE) {
-          this.$q.dialog({
+          return this.$q.dialog({
             title: 'Confirmation',
             message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
             ok: 'OK',
@@ -267,7 +267,7 @@ export const planningActionMixin = {
         }
 
         if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
-          this.$q.dialog({
+          return this.$q.dialog({
             title: 'Confirmation',
             message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
             ok: 'OK',
@@ -275,9 +275,8 @@ export const planningActionMixin = {
           })
             .onOk(this.onOkForEventCreation)
             .onCancel(this.onCancelForEventCreation);
-        } else {
-          await this.onOkForEventCreation();
         }
+        await this.onOkForEventCreation();
       } catch (e) {
         console.error(e);
         if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
