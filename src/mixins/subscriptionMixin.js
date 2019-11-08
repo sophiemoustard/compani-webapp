@@ -13,7 +13,7 @@ export const subscriptionMixin = {
           name: 'service',
           label: 'Service',
           align: 'left',
-          field: row => row.service.name,
+          field: row => this.$_.get(row, 'service.name'),
         },
         {
           name: 'nature',
@@ -23,7 +23,7 @@ export const subscriptionMixin = {
             const nature = NATURE_OPTIONS.find(option => option.value === value);
             return nature ? this.$_.capitalize(nature.label) : '';
           },
-          field: row => row.service.nature,
+          field: row => this.$_.get(row, 'service.nature'),
         },
         {
           name: 'unitTTCRate',
@@ -35,7 +35,7 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => row.service.nature === HOURLY ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+          field: row => this.$_.get(row, 'service.nature') === HOURLY ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
           name: 'weeklyRate',
@@ -68,7 +68,7 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => this.selectedSubscription.service && this.selectedSubscription.service.nature === HOURLY
+          field: row => this.$_.get(this.selectedSubscription, 'service.nature') === HOURLY
             ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
@@ -97,7 +97,7 @@ export const subscriptionMixin = {
     },
     computeWeeklyRate (subscription, funding) {
       let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (subscription.service.surcharge) {
+      if (this.$_.get(subscription, 'service.surcharge', null)) {
         if (subscription.sundays && subscription.service.surcharge.sunday) {
           weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
         }

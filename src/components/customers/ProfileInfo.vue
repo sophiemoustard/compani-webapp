@@ -628,7 +628,7 @@ export default {
     serviceOptions () {
       if (!this.services) return [];
 
-      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
+      const subscribedServices = this.subscriptions.map(subscription => this.$_.get(subscription, 'service._id'));
       const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
@@ -1081,7 +1081,9 @@ export default {
       }
     },
     fundingSubscriptionsOptions () {
-      return this.subscriptions.filter(sub => sub.service.nature !== FIXED).map(sub => ({ label: sub.service.name, value: sub._id }));
+      return this.subscriptions
+        .filter(sub => this.$_.get(sub, 'service.nature') !== FIXED)
+        .map(sub => ({ label: this.$_.get(sub, 'service.name'), value: sub._id }));
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
