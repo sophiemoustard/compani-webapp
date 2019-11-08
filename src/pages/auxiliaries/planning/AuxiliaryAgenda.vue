@@ -5,7 +5,7 @@
         <div class="col-xs-12 col-sm-5 person-name" v-if="Object.keys(selectedAuxiliary).length > 0">
           <img :src="getAvatar(selectedAuxiliary)" class="avatar">
           <ni-select :value="selectedAuxiliary._id" :options="auxiliariesOptions" @input="updateAuxiliary"
-            ref="personSelect" behavior="menu" icon="swap_vert" no-error />
+            ref="personSelect" behavior="menu" icon="swap_vert" no-error class="person-name-select" />
         </div>
         <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :view-mode="viewMode"

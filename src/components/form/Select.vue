@@ -86,4 +86,6 @@ export default {
     padding-bottom: 0
     /deep/ .q-field__bottom
       display: none
+  .select-icon
+    margin: 0
 </style>
