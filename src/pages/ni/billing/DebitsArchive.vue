@@ -4,19 +4,20 @@
       <h4>Archive Prélèvements</h4>
     </div>
     <div class="q-pa-sm">
-      <q-table :data="directDebits" :columns="columns" binary-state-sort :pagination.sync="pagination" hide-bottom
-        card-class="neutral-background" flat>
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template v-if="col.name === 'download'">
-              <div class="row no-wrap table-actions">
-                <q-btn flat round icon="file_download" color="primary" @click="goToUrl(col.value)" />
-              </div>
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-large-table :data="directDebits" :columns="columns" :pagination.sync="pagination">
+        <template v-slot:body="{ props }">
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template v-if="col.name === 'download'">
+                <div class="row no-wrap table-actions">
+                  <q-btn flat round icon="file_download" color="primary" @click="goToUrl(col.value)" />
+                </div>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </template>
+      </ni-large-table>
     </div>
   </q-page>
 </template>
@@ -24,10 +25,14 @@
 <script>
 import { openURL } from 'quasar';
 import { NotifyNegative } from '../../../components/popup/notify'
+import LargeTable from '../../../components/table/LargeTable';
 
 export default {
   name: 'DebitArchive',
   metaInfo: { title: 'Archive prélèvements' },
+  components: {
+    'ni-large-table': LargeTable,
+  },
   data () {
     return {
       directDebits: [],

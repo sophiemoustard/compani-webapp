@@ -3,34 +3,41 @@
     <div class="title-padding">
       <h4>Registre unique du personnel</h4>
     </div>
-    <q-table :data="staffRegister" :columns="columns" row-key="_id" binary-state-sort flat :loading="tableLoading"
-      :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" class="q-pa-sm large-table neutral-background">
-      <q-tr slot="body" slot-scope="props" :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
-              <div  class="row justify-center table-actions">
-                <q-btn flat round small color="primary">
-                  <a :href="col.value" target="_blank">
-                    <q-icon name="file_download" />
-                  </a>
-                </q-btn>
-              </div>
-          </template>
-          <template v-else>{{ col.value }}</template>
-        </q-td>
-      </q-tr>
-    </q-table>
+    <ni-large-table :data="staffRegister" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      row-key="_id">
+      <template v-slot:body="{ props }" >
+        <q-tr :props="props">
+          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
+                <div  class="row justify-center table-actions">
+                  <q-btn flat round small color="primary">
+                    <a :href="col.value" target="_blank">
+                      <q-icon name="file_download" />
+                    </a>
+                  </q-btn>
+                </div>
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-large-table>
   </q-page>
 </template>
 
 <script>
 import nationalities from '../../../data/nationalities.js';
 import { CIVILITY_OPTIONS } from '../../../data/constants';
+import LargeTable from '../../../components/table/LargeTable';
 
 export default {
   name: 'StaffRegister',
   metaInfo: {
     title: 'Registre unique du personnel',
+  },
+  components: {
+    'ni-large-table': LargeTable,
   },
   data () {
     return {

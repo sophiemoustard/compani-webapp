@@ -7,30 +7,30 @@
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="absences" :columns="columns" binary-state-sort :pagination.sync="pagination"
-      class="q-pa-sm large-table" card-class="neutral-background" flat>
-      <q-tr slot="body" slot-scope="props" :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
-          <template v-if="col.name === 'actions'">
-            <div class="row no-wrap table-actions">
-              <q-btn flat round small color="grey" icon="edit" @click="openEditionModal(props.row)" />
-            </div>
-          </template>
-          <template v-if="col.name === 'attachment'">
-            <div v-if="props.row.attachment && props.row.attachment.link" class="row no-wrap table-actions">
-              <q-btn flat round small color="primary">
-                <a :href="props.row.attachment.link" target="_blank">
-                  <q-icon name="file_download" />
-                </a>
-              </q-btn>
-            </div>
-          </template>
-          <template v-else>{{ col.value }}</template>
-        </q-td>
-      </q-tr>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="absences" />
-    </q-table>
+    <ni-large-table :data="absences" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+      <template v-slot:body="{ props }" >
+        <q-tr :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'actions'">
+              <div class="row no-wrap table-actions">
+                <q-btn flat round small color="grey" icon="edit" @click="openEditionModal(props.row)" />
+              </div>
+            </template>
+            <template v-if="col.name === 'attachment'">
+              <div v-if="props.row.attachment && props.row.attachment.link" class="row no-wrap table-actions">
+                <q-btn flat round small color="primary">
+                  <a :href="props.row.attachment.link" target="_blank">
+                    <q-icon name="file_download" />
+                  </a>
+                </q-btn>
+              </div>
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-large-table>
 
     <!-- Absence edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
@@ -44,7 +44,7 @@
 import DateRange from '../../../components/form/DateRange';
 import TitleHeader from '../../../components/TitleHeader';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '../../../data/constants';
-import BillingPagination from '../../../components/table/BillingPagination';
+import LargeTable from '../../../components/table/LargeTable';
 import EventEditionModal from '../../../components/planning/EventEditionModal';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { formatIdentity, formatHours } from '../../../helpers/utils';
@@ -55,7 +55,7 @@ export default {
   metaInfo: { title: 'Absences' },
   components: {
     'ni-date-range': DateRange,
-    'ni-billing-pagination': BillingPagination,
+    'ni-large-table': LargeTable,
     'ni-event-edition-modal': EventEditionModal,
     'ni-title-header': TitleHeader,
   },
@@ -65,6 +65,7 @@ export default {
       personKey: AUXILIARY,
       events: [],
       loading: false,
+      tableLoading: false,
       absences: [],
       auxiliaries: [],
       editedEvent: {},
@@ -186,6 +187,7 @@ export default {
     },
     async refresh () {
       try {
+        this.tableLoading = true;
         if (this.datesHasError) return;
         this.absences = await this.$events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
         this.auxiliaries = await this.$users.showAllActive();
@@ -193,6 +195,8 @@ export default {
         this.absences = [];
         this.auxiliaries = [];
         console.error(e);
+      } finally {
+        this.tableLoading = false;
       }
     },
     // Event edition
