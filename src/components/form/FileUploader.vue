@@ -106,6 +106,8 @@ export default {
       border-radius: 3px
       height: 40px
       margin: 0
+      .q-btn__content
+        color: $grey
     .q-btn
       margin: 0
       padding: 0
