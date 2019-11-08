@@ -138,7 +138,7 @@
     </div>
 
     <!-- Internal hour creation modal -->
-    <ni-modal v-model="newInternalHourModal">
+    <ni-modal v-model="newInternalHourModal" @hide="resetInternalHourCreationModal">
       <template slot="title">
         Créer une <span class="text-weight-bold">heure interne</span>
       </template>
@@ -361,6 +361,10 @@ export default {
       this.company = this.user.company;
     },
     // Internal hours
+    resetInternalHourCreationModal () {
+      this.newInternalHour = { name: '' };
+      this.$v.newInternalHour.$reset();
+    },
     async refreshInternalHours () {
       this.internalHours = await this.$companies.getInternalHours(this.company._id);
     },
@@ -374,12 +378,10 @@ export default {
         const payload = this.$_.pickBy(this.newInternalHour);
         await this.$companies.createInternalHour(this.company._id, payload);
         await this.$store.dispatch('main/getUser', this.user._id);
-        NotifyPositive('Heure interne créée');
 
+        NotifyPositive('Heure interne créée');
         this.newInternalHourModal = false;
-        this.newInternalHour = { name: '' };
         await this.refreshInternalHours();
-        this.$v.newInternalHour.$reset();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'heure interne');
