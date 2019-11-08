@@ -635,6 +635,10 @@ export default {
           label: 'Facturation',
           field: 'billingMode',
           align: 'left',
+          format: val => {
+            const mode = this.billingModeOptions.find(m => m.value === val);
+            return mode ? mode.label : '';
+          },
         },
         {
           name: 'actions',
