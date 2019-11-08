@@ -68,7 +68,6 @@ export default {
   beforeRouteUpdate (to, from, next) {
     if (this.toggleDrawer && !this.isMini) {
       this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
-      this.$refs[this.sidemenusRefs].collapsibleEntering(to);
     }
 
     next();
