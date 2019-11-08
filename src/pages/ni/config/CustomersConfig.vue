@@ -43,7 +43,8 @@
                       <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click="openServiceEditionModal(col.value)" />
-                      <q-btn flat round small dense color="grey" icon="delete" :disable="props.row.subscriptionCount > 0"
+                      <q-btn flat round small dense color="grey" icon="delete"
+                        :disable="props.row.subscriptionCount > 0"
                         @click="deleteService(col.value, props.row.__index)" />
                     </div>
                   </template>
@@ -64,7 +65,8 @@
           <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
             @blur="updateCompany('name')" />
           <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
-            @blur="updateCompany('tradeName')" />
+            @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
+            :error-label="tradeNameError" />
           <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
@@ -254,9 +256,8 @@
       </template>
       <ni-input in-modal caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error"
         @blur="$v.editedService.name.$touch" required-field />
-      <ni-date-input caption="Date d'effet" v-model="editedService.startDate"
-        :error="$v.editedService.startDate.$error" @blur="$v.editedService.startDate.$touch" :min="minStartDate"
-        in-modal required-field />
+      <ni-date-input caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
+        @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
       <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
         v-model="editedService.defaultUnitAmount" :error="$v.editedService.defaultUnitAmount.$error"
         @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
@@ -328,7 +329,7 @@
 </template>
 
 <script>
-import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
+import { required, numeric, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import DateInput from '../../../components/form/DateInput.vue';
 import TimeInput from '../../../components/form/TimeInput.vue';
@@ -716,6 +717,7 @@ export default {
     company: {
       ics: { required },
       name: { required },
+      tradeName: { required, maxLength: maxLength(11) },
       type: { required },
       rcs: { required: requiredIf(item => item.type === COMPANY) },
       rna: { required: requiredIf(item => item.type === ASSOCIATION) },
@@ -787,6 +789,14 @@ export default {
         return REQUIRED_LABEL;
       } else if (!this.$v.company.bic.bic) {
         return 'BIC non valide';
+      }
+      return '';
+    },
+    tradeNameError () {
+      if (!this.$v.company.tradeName.required) {
+        return REQUIRED_LABEL;
+      } else if (!this.$v.company.tradeName.maxLength) {
+        return 'Doit contenir 11 caractères max (espaces inclus).';
       }
       return '';
     },

@@ -126,8 +126,8 @@ export default {
 
         const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (selectedSubscription.service.type === COMPANY_CONTRACT) return this.isCompanyContractValidForRepetition;
-        if (selectedSubscription.service.type === CUSTOMER_CONTRACT) return this.isCustomerContractValidForRepetition;
+        if (this.$_.get(selectedSubscription, 'service.type') === COMPANY_CONTRACT) return this.isCompanyContractValidForRepetition;
+        if (this.$_.get(selectedSubscription, 'service.type') === CUSTOMER_CONTRACT) return this.isCustomerContractValidForRepetition;
       }
 
       return true;

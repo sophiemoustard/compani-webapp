@@ -100,7 +100,7 @@ export default {
       user: 'rh/getUserProfile',
     }),
     companyName () {
-      return this.currentUser.company.tradeName || this.currentUser.company.name;
+      return this.$_.get(this.currentUser, 'company.tradeName');
     },
     userActivity () {
       if (this.customer) {
