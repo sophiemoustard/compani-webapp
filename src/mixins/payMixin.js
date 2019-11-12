@@ -29,7 +29,7 @@ export const payMixin = {
           label: 'Début',
           align: 'left',
           field: 'startDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => value ? this.$moment(value).format('DD/MM') : '',
           sort: (a, b) => new Date(a) - new Date(b),
         },
         {
@@ -37,7 +37,7 @@ export const payMixin = {
           label: 'Date de notif',
           align: 'left',
           field: 'endNotificationDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => value ? this.$moment(value).format('DD/MM') : '',
         },
         {
           name: 'endReason',
@@ -54,7 +54,7 @@ export const payMixin = {
           label: 'Fin',
           align: 'left',
           field: 'endDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => value ? this.$moment(value).format('DD/MM') : '',
         },
         {
           name: 'contractHours',
@@ -135,14 +135,14 @@ export const payMixin = {
         },
         {
           name: 'overtimeHours',
-          label: 'Heures sup à payer',
+          label: 'Heures sup',
           align: 'center',
           field: 'overtimeHours',
           format: value => formatHours(value),
         },
         {
           name: 'additionalHours',
-          label: 'Heures comp à payer',
+          label: 'Heures comp',
           align: 'center',
           field: 'additionalHours',
           format: value => formatHours(value),

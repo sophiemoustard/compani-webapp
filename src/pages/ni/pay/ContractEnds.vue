@@ -4,7 +4,7 @@
       <h4>Fins de contrats</h4>
     </div>
     <ni-large-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      row-key="auxiliaryId" selection="multiple" :selected.sync="selected" :visible-columns="visibleColumns">
+      row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
       <template v-slot:header="{ props }" >
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :style="col.style" :key="col.name" :props="props">{{ col.label }}</q-th>
@@ -95,9 +95,6 @@ export default {
       selected: [],
       pagination: { rowsPerPage: 0 },
       tableLoading: false,
-      visibleColumns: ['auxiliary', 'sector', 'startDate', 'endNotificationDate', 'endReason', 'endDate', 'contractHours', 'workedHours',
-        'notSurchargedAndExempt', 'surchargedAndExempt', 'notSurchargedAndNotExempt', 'surchargedAndNotExempt', 'hoursBalance', 'hoursCounter',
-        'overtimeHours', 'additionalHours', 'mutual', 'transport', 'otherFees', 'bonus', 'compensation'],
       surchargeDetailModal: false,
       surchargeDetails: {},
     };
