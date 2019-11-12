@@ -377,7 +377,7 @@ export const planningActionMixin = {
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
       if (event.shouldUpdateRepetition) delete payload.misc;
 
-      return this.$_.omit(payload, ['customer', 'repetition', 'staffingLeft', 'staffingWidth', 'staffingTop', 'staffingHeight', 'type']);
+      return this.$_.omit(payload, ['customer', 'repetition', 'staffingBeginning', 'staffingDuration', 'type']);
     },
     async updateEvent () {
       try {
