@@ -371,7 +371,7 @@ export default {
       return newUser;
     },
     async sendSms (newUserId) {
-      if (!this.company.tradeName) NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+      if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
       const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
       const code = activationDataRaw.activationData.code;
       await this.$twilio.sendSMS({
