@@ -102,6 +102,11 @@ export const contractMixin = {
 
       return signature;
     },
+    getContractTemplate (contract) {
+      return contract.status === COMPANY_CONTRACT
+        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompany')
+        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
+    },
     getVersionTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
         ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
@@ -111,7 +116,8 @@ export const contractMixin = {
       const payload = this.$_.pick(this.editedVersion, ['startDate', 'grossHourlyRate']);
       if (this.editedVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.editedVersion };
-        const template = this.getVersionTemplate(versionMix);
+        const isContract = this.selectedContract.versions[0]._id === this.editedVersion.versionId;
+        const template = isContract ? this.getContractTemplate(versionMix) : this.getVersionTemplate(versionMix);
         payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 

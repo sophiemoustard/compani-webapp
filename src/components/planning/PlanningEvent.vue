@@ -63,8 +63,8 @@ export default {
   methods: {
     getEventStyleForStaffing (event) {
       return {
-        left: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingLeft}%`,
-        width: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingWidth}%`,
+        left: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingBeginning}%`,
+        width: `${STAFFING_PERCENTAGE_BY_MINUTES * event.staffingDuration}%`,
       };
     },
     drag (event, nativeEvent) {

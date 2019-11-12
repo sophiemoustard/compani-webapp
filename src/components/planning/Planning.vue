@@ -109,8 +109,6 @@ import {
   COACH,
   ADMIN,
   NOT_INVOICED_AND_NOT_PAID,
-  ABSENCE,
-  DAILY,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -233,33 +231,8 @@ export default {
           this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled)
         )
-        .map((event) => this.isCustomerPlanning ? event : this.getEventWithStyleInfo(event, day))
+        .map((event) => this.isCustomerPlanning ? event : this.getDisplayedEvent(event, day, STAFFING_VIEW_START_HOUR, STAFFING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-    },
-    getEventWithStyleInfo (event, day) {
-      let dayEvent = { ...event };
-
-      const eventStartDate = this.$moment(event.startDate);
-      const eventEndDate = this.$moment(event.endDate);
-      let displayedStartHour = eventStartDate.hours();
-      let displayedEndHour = eventEndDate.hours();
-      let displayedStartMinutes = eventStartDate.minutes();
-      let displayedEndMinutes = eventEndDate.minutes();
-      if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        displayedStartHour = STAFFING_VIEW_START_HOUR;
-        displayedEndHour = STAFFING_VIEW_END_HOUR;
-        displayedStartMinutes = 0;
-        displayedEndMinutes = 0;
-      }
-      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + displayedStartMinutes;
-      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + displayedEndMinutes;
-
-      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
-      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
-      dayEvent.staffingLeft = staffingLeft;
-      dayEvent.staffingWidth = staffingRight - staffingLeft;
-
-      return dayEvent;
     },
     getPersonEvents (person) {
       if (this.isCustomerPlanning) {

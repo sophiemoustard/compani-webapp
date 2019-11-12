@@ -22,7 +22,7 @@
               <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
                 <div :style="getEventStyle(event)" :key="eventId" @click.stop="editEvent(event)"
                 :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
-                  <div class="event-container" :style="{ top: event.staffingHeight < 90 ? '10%' : '6px' }">
+                  <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                     <div class="col-12 event-title">
                       <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
                         {{ eventTitle(event) }}
@@ -86,8 +86,8 @@ export default {
   methods: {
     getEventStyle (event) {
       return {
-        top: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingTop}%`,
-        height: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingHeight - 0.2}%`,
+        top: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingBeginning}%`,
+        height: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingDuration - 0.2}%`,
       };
     },
     getTimelineHours () {
@@ -102,25 +102,7 @@ export default {
         .filter(event =>
           this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day')
         )
-        .map((event) => {
-          let dayEvent = { ...event };
-
-          let staffingTop = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-          let staffingBottom = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
-          if (!this.$moment(day).isSame(event.startDate, 'day')) {
-            dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
-            staffingTop = 0;
-          }
-          if (!this.$moment(day).isSame(event.endDate, 'day')) {
-            dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
-            staffingBottom = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
-          }
-
-          dayEvent.staffingTop = staffingTop;
-          dayEvent.staffingHeight = staffingBottom - staffingTop;
-
-          return dayEvent;
-        })
+        .map((event) => this.getDisplayedEvent(event, day, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     createEvent (value) {
