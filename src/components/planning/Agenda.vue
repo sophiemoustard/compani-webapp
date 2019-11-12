@@ -60,6 +60,9 @@ import {
   PLANNING_PERCENTAGE_BY_MINUTES,
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
+  STAFFING_VIEW_START_HOUR,
+  STAFFING_VIEW_END_HOUR,
+  DAILY,
 } from '../../data/constants';
 
 export default {
@@ -105,16 +108,23 @@ export default {
         .map((event) => {
           let dayEvent = { ...event };
 
-          let staffingTop = (this.$moment(event.startDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-          let staffingBottom = (this.$moment(event.endDate).hours() - PLANNING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
-          if (!this.$moment(day).isSame(event.startDate, 'day')) {
-            dayEvent.startDate = this.$moment(day).hour(PLANNING_VIEW_START_HOUR).toISOString();
-            staffingTop = 0;
+          const eventStartDate = this.$moment(event.startDate);
+          const eventEndDate = this.$moment(event.endDate);
+          let displayedStartHour = eventStartDate.hours();
+          let displayedEndHour = eventEndDate.hours();
+          let displayedStartMinutes = eventStartDate.minutes();
+          let displayedEndMinutes = eventEndDate.minutes();
+
+          if (event.type === ABSENCE && event.absenceNature === DAILY) {
+            displayedStartHour = STAFFING_VIEW_START_HOUR;
+            displayedEndHour = STAFFING_VIEW_END_HOUR;
+            displayedStartMinutes = 0;
+            displayedEndMinutes = 0;
           }
-          if (!this.$moment(day).isSame(event.endDate, 'day')) {
-            dayEvent.endDate = this.$moment(day).hour(PLANNING_VIEW_END_HOUR).toISOString();
-            staffingBottom = (PLANNING_VIEW_END_HOUR - PLANNING_VIEW_START_HOUR) * 60;
-          }
+          let staffingTop = (displayedStartHour - PLANNING_VIEW_START_HOUR) * 60 + displayedStartMinutes;
+          let staffingBottom = (displayedEndHour - PLANNING_VIEW_START_HOUR) * 60 + displayedEndMinutes;
+          dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
+          dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
 
           dayEvent.staffingTop = staffingTop;
           dayEvent.staffingHeight = staffingBottom - staffingTop;
