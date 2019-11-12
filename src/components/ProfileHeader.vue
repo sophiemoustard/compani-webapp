@@ -99,6 +99,9 @@ export default {
       currentUser: 'main/user',
       user: 'rh/getUserProfile',
     }),
+    companyName () {
+      return this.$_.get(this.currentUser, 'company.tradeName');
+    },
     userActivity () {
       if (this.customer) {
         return {
@@ -141,9 +144,14 @@ export default {
     messageComp: {
       get () {
         if (this.typeMessage === 'PM') {
-          return `Bonjour ${this.user.identity.firstname},\nIl manque encore des informations et documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.user._id}\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.`;
+          return `Bonjour ${this.user.identity.firstname},\nIl manque encore des informations et documents importants pour ` +
+          'compléter ton dossier.\nClique ici pour compléter ton profil: ' +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.user._id}\nSi tu ` +
+          'rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
         } else if (this.typeMessage === 'CA') {
-          return `Bienvenue chez Alenvi ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir commencer ton enregistrement sur Compani avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`
+          return `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
+          'commencer ton enregistrement sur Compani avant ton intégration: ' +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`;
         }
         return this.message;
       },
@@ -173,8 +181,10 @@ export default {
     },
     async sendSMS () {
       try {
+        if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
         await this.$twilio.sendSMS({
           to: `+33${this.user.contact.phone.substring(1)}`,
+          from: this.companyName,
           body: this.messageComp,
         });
         NotifyPositive('SMS bien envoyé');

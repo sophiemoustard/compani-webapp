@@ -2,14 +2,14 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
-        <div class="col-xs-12 col-sm-5 person-name" v-if="customer && customer.identity">
+        <div class="col-xs-12 col-sm-5 person-name row" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
-          <div class="q-pl-md">{{ customer.identity | formatIdentity('FL') }}</div>
+          <input class="q-pl-sm neutral-background identity" :value="formatIdentity(customer.identity, 'FL')" readonly />
         </div>
         <div class="col-xs-12 col-sm-7">
-          <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek"
-            @goToToday="goToToday" @goToWeek="goToWeek" :targetDate="targetDate" :viewMode="viewMode" @updateViewMode="updateViewMode"
-            :type="AGENDA" />
+          <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" :targetDate="targetDate"
+            :view-mode="viewMode" :type="AGENDA" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+            @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
         </div>
       </div>
       <agenda :events="events" :days="days" :personKey="personKey" />
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { DEFAULT_AVATAR, WEEK_VIEW, AGENDA, CUSTOMER } from '../../data/constants';
+import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import Agenda from '../../components/planning/Agenda';
 import PlanningNavigation from '../../components/planning/PlanningNavigation';
@@ -49,6 +49,7 @@ export default {
     },
   },
   async mounted () {
+    this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
     this.height = window.innerHeight;
     this.startOfWeek = this.$moment().startOf('week').toISOString();
     this.getTimelineDays();
@@ -84,9 +85,15 @@ export default {
         this.events = [];
       }
     },
-  },
-  filters: {
     formatIdentity,
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .identity
+    border: none
+    flex-grow: 1
+  input:focus
+    outline: none
+</style>

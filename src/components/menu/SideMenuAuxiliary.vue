@@ -50,15 +50,12 @@ export default {
       activeRoutes: {
         planning: {
           open: false,
-          highlight: false,
         },
         benef: {
           open: false,
-          highlight: false,
         },
         administrative: {
           open: false,
-          highlight: false,
         },
         team: {
           open: false,

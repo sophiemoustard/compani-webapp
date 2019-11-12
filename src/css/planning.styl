@@ -96,7 +96,7 @@
       @media screen and (min-width: 768px)
         top: 90px;
       @media screen and (max-width: 767px)
-        top: 106px;
+        top: 110px;
       &:not(:first-child):before
         content: '';
         position: absolute;
@@ -126,7 +126,7 @@
     @media screen and (min-width: 768px)
       height: 90px;
     @media screen and (max-width: 767px)
-      height: 106px;
+      height: 110px;
   &-month
     display: flex;
     @media screen and (min-width: 768px)
@@ -161,14 +161,19 @@
   flex-direction: row
   align-items: center
   &-text
-    padding: 9px 14px 11px;
-    margin-left: 5px;
+    padding: 9px 14px 11px
+    margin-left: 5px
     font-size: 1.3em
+  &-select
+    @media screen and (max-width: 767px)
+      width: 80%
   .q-field__control
     font-size: 1.3rem
   .q-select
     border: none;
     margin-left: 5px;
+    .q-field__control
+      border: none
   .q-icon
     display: none;
   

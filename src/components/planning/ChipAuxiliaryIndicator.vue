@@ -7,7 +7,7 @@
     </q-chip>
 
     <!-- Indicators modal -->
-    <q-dialog :value="indicatorsModal">
+    <q-dialog v-model="indicatorsModal">
       <div class="modal-container modal-container-md">
         <div class="q-mb-md">
           <div class="row justify-between items-center q-pa-lg">
@@ -57,6 +57,7 @@ import {
   EXTREME,
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
+  INVOICED_AND_PAID,
 } from '../../data/constants.js';
 import googleMaps from '../../api/GoogleMaps';
 import { getPaidTransport } from '../../helpers/planning';
@@ -187,11 +188,12 @@ export default {
     async openIndicatorsModal () {
       if (!this.hasCompanyContractOnEvent) return;
       try {
-        this.monthEvents = await this.$events.list({
+        const monthEvents = await this.$events.list({
           startDate: this.$moment(this.startOfWeek).startOf('month').toDate(),
           endDate: this.$moment(this.startOfWeek).endOf('month').toDate(),
           auxiliary: this.person._id,
         });
+        this.monthEvents = monthEvents.filter(ev => !ev.isCancelled || ev.cancel.condition === INVOICED_AND_PAID);
       } catch (e) {
         this.monthEvents = [];
       } finally {
@@ -310,6 +312,8 @@ export default {
       let contractHours = 0;
       const contractDaysRange = Array.from(this.$moment.range(this.startOfWeek, this.$moment(this.endOfWeek).subtract(1, 'd')).by('days')) // from Monday to Saturday
       for (const day of contractDaysRange) {
+        if (!day.startOf('d').isBusinessDay()) continue;
+
         const absences = this.events.filter(event =>
           event.type === ABSENCE &&
           day.isSameOrAfter(event.startDate, 'd') && day.isSameOrBefore(event.endDate, 'd')
@@ -325,7 +329,7 @@ export default {
         const version = this.getContractVersionOnDay(day);
         if (!version) continue;
 
-        contractHours += version.weeklyHours / 6 || 0; // 6 : from Monday to Saturday, there are 6 half days
+        contractHours += version.weeklyHours / 6 || 0; // 6 : from Monday to Saturday, there are 6 days
         contractHours -= hourlyAbsence;
       };
       return Math.round(contractHours);

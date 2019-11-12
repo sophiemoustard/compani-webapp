@@ -3,46 +3,48 @@
     <div class="title-padding">
       <h4>Balances Clients</h4>
     </div>
-    <q-table :data="balances" :columns="columns" row-key="rowId" binary-state-sort :loading="tableLoading"
-      :pagination.sync="pagination" selection="multiple" :selected.sync="selected" class="q-pa-sm"
-      card-class="neutral-background" flat>
-      <q-tr slot="header" slot-scope="props">
-        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
-        <q-th auto-width>
-          <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" dense />
-        </q-th>
-      </q-tr>
-      <q-tr :props="props" slot="body" slot-scope="props">
-        <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template v-if="col.name === 'client' || col.name === 'customer'">
-            <span class="uppercase text-weight-bold">{{ col.value }}</span>
-          </template>
-          <template v-else-if="col.name === 'actions'">
-            <div class="row no-wrap table-actions">
-              <q-btn flat round color="grey" icon="remove_red_eye" size="12px"
-                @click="goToCustomerBillingPage(col.value)" />
-              <q-btn flat round color="grey" icon="add" size="12px"
-                @click="openPaymentCreationModal(props.row.customer, props.row.thirdPartyPayer)" />
-            </div>
-          </template>
-          <template v-else-if="col.name === 'balance'">
-            <ni-prefixed-cell-content :cell-value="col.value" />
-          </template>
-          <template v-else>{{ col.value }}</template>
-        </q-td>
-        <q-td v-if="props.row.toPay > 0" align="right" auto-width>
-          <q-checkbox v-model="props.selected" dense />
-        </q-td>
-        <q-td v-else />
-      </q-tr>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="balances" />
-    </q-table>
+    <ni-large-table :data="balances" :columns="columns" row-key="rowId" :loading="tableLoading" selection="multiple"
+      :pagination.sync="pagination" :selected.sync="selected">
+      <template v-slot:header="{ props }">
+        <q-tr :props="props">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
+          <q-th auto-width>
+            <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" dense />
+          </q-th>
+        </q-tr>
+      </template>
+      <template v-slot:body="{ props }">
+        <q-tr :props="props">
+          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'client' || col.name === 'customer'">
+              <span class="uppercase text-weight-bold">{{ col.value }}</span>
+            </template>
+            <template v-else-if="col.name === 'actions'">
+              <div class="row no-wrap table-actions">
+                <q-btn flat round color="grey" icon="remove_red_eye" size="12px"
+                  @click="goToCustomerBillingPage(col.value)" />
+                <q-btn flat round color="grey" icon="add" size="12px"
+                  @click="openPaymentCreationModal(props.row.customer, props.row.thirdPartyPayer)" />
+              </div>
+            </template>
+            <template v-else-if="col.name === 'balance'">
+              <ni-prefixed-cell-content :cell-value="col.value" />
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+          <q-td v-if="props.row.toPay > 0" align="right" auto-width>
+            <q-checkbox v-model="props.selected" dense />
+          </q-td>
+          <q-td v-else />
+        </q-tr>
+      </template>
+    </ni-large-table>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal v-model="paymentCreationModal" :newPayment="newPayment" :validations="$v.newPayment" :selectedClientName="selectedClientName"
-      @createPayment="createPayment" :selectedCustomer="selectedCustomer"
-      :loading="creationLoading" @resetForm="resetPaymentCreationModal"  />
+    <ni-payment-creation-modal v-model="paymentCreationModal" :newPayment="newPayment" :validations="$v.newPayment"
+      :selectedClientName="selectedClientName" :loading="creationLoading" @resetForm="resetPaymentCreationModal"
+      @createPayment="createPayment" :selectedCustomer="selectedCustomer" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
       :disable="selected.length === 0" @click="createPayments" />
@@ -50,7 +52,7 @@
 </template>
 
 <script>
-import BillingPagination from '../../../components/table/BillingPagination';
+import LargeTable from '../../../components/table/LargeTable';
 import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
@@ -63,7 +65,7 @@ export default {
     title: 'Balances clients',
   },
   components: {
-    'ni-billing-pagination': BillingPagination,
+    'ni-large-table': LargeTable,
     'ni-prefixed-cell-content': PrefixedCellContent,
     'ni-payment-creation-modal': PaymentCreationModal,
   },
@@ -203,9 +205,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  /deep/ .q-table
-    & tbody tr.selected
-      background: $white
-</style>

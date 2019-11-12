@@ -10,7 +10,8 @@
         <ni-input caption="Nom" :error="$v.customer.identity.lastname.$error" v-model.trim="customer.identity.lastname"
           @focus="saveTmp('identity.lastname')" @blur="updateCustomer('identity.lastname')" />
         <ni-select caption="Civilité" :error="$v.customer.identity.title.$error" v-model="customer.identity.title"
-          :options="civilityOptions" @focus="saveTmp('identity.title')" @blur="updateCustomer('identity.title')" />
+          :options="civilityOptions" @focus="saveTmp('identity.title')" @blur="updateCustomer('identity.title')"
+          in-form />
         <ni-date-input v-model="customer.identity.birthDate" @focus="saveTmp('identity.birthDate')"
           caption="Date de naissance" @blur="updateCustomer('identity.birthDate')" content-class="col-xs-12 col-md-6" />
       </div>
@@ -34,22 +35,24 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Souscriptions</p>
       <q-card>
-        <q-table :data="subscriptions" :columns="subscriptionsColumns" row-key="name" hide-bottom
-          class="table-responsive">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
-                  <q-icon color="grey" name="history" @click="showHistory(col.value)" />
-                  <q-icon color="grey" name="edit" @click="startSubscriptionEdition(col.value)" />
-                  <q-icon color="grey" name="delete" :disable="props.row.eventCount > 0"
-                    @click="removeSubscriptions(col.value)" />
-                </div>
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
+        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns">
+          <template v-slot:body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-icon color="grey" name="history" @click="showHistory(col.value)" />
+                    <q-icon color="grey" name="edit" @click="startSubscriptionEdition(col.value)" />
+                    <q-icon color="grey" name="delete" :disable="props.row.eventCount > 0"
+                      @click="removeSubscriptions(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
         <q-card-actions align="right">
           <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add"
             label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
@@ -70,20 +73,22 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
-        <q-table :data="sortedHelpers" :columns="helperColumns" row-key="name" hide-bottom
-          class="table-responsive" :pagination="helperPagination">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
-              <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
-                  <q-icon color="grey" name="edit" @click="openEditionModalHelper(col.value)" />
-                  <q-icon color="grey" name="delete" @click.native="removeHelper(col.value)" />
-                </div>
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
+        <ni-responsive-table :data="sortedHelpers" :columns="helperColumns" :pagination="helperPagination">
+          <template v-slot:body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-icon color="grey" name="edit" @click="openEditionModalHelper(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="removeHelper(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
         <q-card-actions align="right">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true" />
         </q-card-actions>
@@ -108,39 +113,42 @@
         <p class="text-weight-bold">Mandats de prélèvement</p>
       </div>
       <q-card>
-        <q-table :columns="mandateColumns" :data="customer.payment.mandates" hide-bottom :pagination.sync="pagination"
-          :visible-columns="visibleMandateColumns" binary-state-sort class="table-responsive mandate-table">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
-              <template v-if="col.name === 'emptyMandate'">
-                <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary"
-                  @click="downloadMandate(props.row)">
-                  <q-icon name="file_download" />
-                </q-btn>
-              </template>
-              <template v-else-if="col.name === 'signedMandate'">
-                <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
-                  <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
-                    field-name="signedMandate" auto-upload :accept="extensions" @uploaded="refreshMandates"
-                    @failed="failMsg" />
-                </div>
-                <q-btn v-else flat round small color="primary">
-                  <a :href="props.row.drive.link" download target="_blank">
+        <ni-responsive-table :columns="mandateColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
+          :visible-columns="visibleMandateColumns" class="mandate-table">
+          <template v-slot:body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'emptyMandate'">
+                  <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary"
+                    @click="downloadMandate(props.row)">
                     <q-icon name="file_download" />
-                  </a>
-                </q-btn>
-              </template>
-              <template v-else-if="col.name === 'signedAt'">
-                <ni-date-input v-model="customer.payment.mandates[props.row.__index].signedAt"
-                  @blur="updateSignedAt(props.row)" @focus="saveTmpSignedAt(props.row.__index)" in-modal />
-              </template>
-              <template v-else-if="col.name === 'signed'">
-                <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
-              </template>
-              <template v-else>{{ col.value}}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signedMandate'">
+                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
+                    <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
+                      field-name="signedMandate" auto-upload :accept="extensions" @uploaded="refreshMandates"
+                      @failed="failMsg" />
+                  </div>
+                  <q-btn v-else flat round small color="primary">
+                    <a :href="props.row.drive.link" download target="_blank">
+                      <q-icon name="file_download" />
+                    </a>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signedAt'">
+                  <ni-date-input v-model="customer.payment.mandates[props.row.__index].signedAt"
+                    @blur="updateSignedAt(props.row)" @focus="saveTmpSignedAt(props.row.__index)" in-modal />
+                </template>
+                <template v-else-if="col.name === 'signed'">
+                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                </template>
+                <template v-else>{{ col.value}}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
       </q-card>
     </div>
     <div class="q-mb-xl">
@@ -148,24 +156,25 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <q-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns"
-          :rows-per-page-options="[0]" row-key="name" table-style="font-size: 1rem" hide-bottom
-          class="table-responsive">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
-              <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
-                  <q-icon color="grey" name="remove_red_eye"
-                    @click.native="showFundingDetails(col.value)" />
-                  <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
-                  <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
-                  <q-icon color="grey" name="delete" @click.native="removeFunding(col.value)" />
-                </div>
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
+        <ni-responsive-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns">
+          <template v-slot:body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-icon color="grey" name="remove_red_eye"
+                      @click.native="showFundingDetails(col.value)" />
+                    <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
+                    <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="removeFunding(col.value)" />
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
         <q-card-actions align="right">
           <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add"
             label="Ajouter un financement" @click="openFundingCreationModal" />
@@ -179,7 +188,7 @@
           <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
             @uploaded="documentUploaded" name="financialCertificates" collapsibleLabel="Ajouter un justificatif"
             :user-profile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"
-            additional-fields-name="financialCertificate" />
+            additional-fields-name="financialCertificate" :extensions="extensions" />
           </div>
       </div>
     </div>
@@ -188,33 +197,35 @@
         <p class="text-weight-bold">Devis</p>
       </div>
       <q-card>
-        <q-table :data="customer.quotes" :columns="quoteColumns" row-key="name" table-style="font-size: 1rem"
-          hide-bottom :pagination.sync="pagination" :visible-columns="visibleQuoteColumns" binary-state-sort
-          class="table-responsive">
-          <q-tr slot="body" slot-scope="props" :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template v-if="col.name === 'emptyQuote'">
-                <q-icon name="file_download" color="primary" @click="downloadQuote(props.row)" />
-              </template>
-              <template v-else-if="col.name === 'signedQuote'">
-                <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
-                  <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
-                    field-name="signedQuote" :accept="extensions" auto-upload @uploaded="refreshQuotes"
-                    @failed="failMsg" />
-                </div>
-                <q-btn v-else flat round small color="primary">
-                  <a :href="props.row.drive.link" download target="_blank">
-                    <q-icon name="file_download" />
-                  </a>
-                </q-btn>
-              </template>
-              <template v-else-if="col.name === 'signed'">
-                <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </q-table>
+        <ni-responsive-table :data="customer.quotes" :columns="quoteColumns" :pagination.sync="pagination"
+          :visible-columns="visibleQuoteColumns">
+          <template v-slot:body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'emptyQuote'">
+                  <q-icon name="file_download" color="primary" @click="downloadQuote(props.row)" />
+                </template>
+                <template v-else-if="col.name === 'signedQuote'">
+                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
+                    <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
+                      field-name="signedQuote" :accept="extensions" auto-upload @uploaded="refreshQuotes"
+                      @failed="failMsg" />
+                  </div>
+                  <q-btn v-else flat round small color="primary">
+                    <a :href="props.row.drive.link" download target="_blank">
+                      <q-icon name="file_download" />
+                    </a>
+                  </q-btn>
+                </template>
+                <template v-else-if="col.name === 'signed'">
+                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
         <q-card-actions align="right">
           <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add"
             label="Générer un devis" @click="generateQuote" />
@@ -278,14 +289,16 @@
         Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
                 selectedSubscription.service.name}}</span>
       </template>
-      <q-table class="q-mb-xl table-responsive" :data="selectedSubscription.versions" flat
-        :columns="subscriptionHistoryColumns" hide-bottom binary-state-sort :pagination.sync="paginationHistory">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
+        :pagination.sync="paginationHistory">
+        <template v-slot:body="{ props }">
+            <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+              <template>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </template>
+      </ni-responsive-table>
     </ni-modal>
 
     <!-- Funding details modal -->
@@ -402,8 +415,6 @@
 <script>
 import { Cookies } from 'quasar';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
-import randomize from 'randomatic';
-import { clear } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
@@ -414,6 +425,7 @@ import OptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput';
 import Modal from '../Modal';
+import ReponsiveTable from '../table/ResponsiveTable';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
@@ -426,7 +438,6 @@ import {
   REQUIRED_LABEL,
   ONCE,
   CIVILITY_OPTIONS,
-  HELPER,
 } from '../../data/constants.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
@@ -446,6 +457,7 @@ export default {
     'ni-modal': Modal,
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
+    'ni-responsive-table': ReponsiveTable,
   },
   mixins: [
     customerMixin,
@@ -460,7 +472,6 @@ export default {
       FIXED,
       days,
       loading: false,
-      openNewHelperModal: false,
       openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
@@ -617,7 +628,7 @@ export default {
     serviceOptions () {
       if (!this.services) return [];
 
-      const subscribedServices = this.subscriptions.map(subscription => subscription.service._id);
+      const subscribedServices = this.subscriptions.map(subscription => this.$_.get(subscription, 'service._id'));
       const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
@@ -823,7 +834,7 @@ export default {
     // Refresh data
     async getServices () {
       try {
-        this.services = await this.$services.showAll({ company: this.company._id });
+        this.services = await this.$services.list();
       } catch (e) {
         console.error(e);
       }
@@ -949,99 +960,6 @@ export default {
         console.error(e);
       }
     },
-    // Helpers
-    resetAddHelperForm () {
-      this.$v.newHelper.$reset();
-      this.newHelper = Object.assign({}, clear(this.newHelper));
-      this.openNewHelperModal = false;
-    },
-    resetEditedHelperForm () {
-      this.$v.editedHelper.$reset();
-      this.editedHelper = Object.assign({}, clear(this.editedHelper));
-      this.openEditedHelperModal = false;
-    },
-    async createAlenviHelper () {
-      this.newHelper.local.password = randomize('0', 6);
-      this.newHelper.customers = [this.userProfile._id];
-      const roles = await this.$roles.showAll({ name: HELPER });
-      if (roles.length === 0) throw new Error('Role not found');
-      this.newHelper.role = roles[0]._id;
-      this.newHelper.company = this.company._id;
-      this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
-      const payload = this.$_.pickBy(this.newHelper);
-      await this.$users.create(payload);
-    },
-    async sendWelcomingEmail () {
-      await this.$email.sendWelcome({
-        receiver: {
-          email: this.newHelper.local.email,
-          password: this.newHelper.local.password,
-        },
-      });
-    },
-    async submitHelper () {
-      try {
-        this.loading = true;
-        this.$v.newHelper.$touch();
-        if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
-        this.$v.newHelper.$reset();
-
-        await this.createAlenviHelper();
-        NotifyPositive('Aidant créé');
-        await this.sendWelcomingEmail();
-        NotifyPositive('Email envoyé');
-
-        await this.getUserHelpers();
-        this.openNewHelperModal = false;
-      } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
-        if (e && e.response && e.response.status === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
-        NotifyNegative('Erreur lors de la création de l\'aidant');
-      } finally {
-        this.loading = false;
-      }
-    },
-    async editHelper () {
-      try {
-        this.loading = true;
-        this.$v.editedHelper.$touch();
-        if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = Object.assign({}, this.editedHelper);
-        delete payload.local;
-        await this.$users.updateById(payload);
-        NotifyPositive('Aidant modifié');
-        await this.getUserHelpers();
-        this.openEditedHelperModal = false;
-      } catch (e) {
-        e.response ? console.error(e.response) : console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'aidant');
-      } finally {
-        this.loading = false;
-      }
-    },
-    openEditionModalHelper (helperId) {
-      const helper = this.helpers.find(helper => helper._id === helperId);
-      this.editedHelper = this.$_.pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']);
-      this.editedHelper.contact = { phone: helper.contact.phone || '' };
-      this.openEditedHelperModal = true;
-    },
-    async removeHelper (helperId) {
-      try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$users.deleteById(helperId);
-          NotifyPositive('Aidant supprimé');
-          await this.getUserHelpers();
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
-      } catch (e) {
-        console.error(e);
-      }
-    },
     // Mandates
     async updateSignedAt (mandate) {
       try {
@@ -1146,7 +1064,7 @@ export default {
     // Fundings
     async getThirdPartyPayersOptions () {
       try {
-        const thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
+        const thirdPartyPayers = await this.$thirdPartyPayers.list();
         this.fundingTppOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
       } catch (e) {
         this.fundingTppOptions = [];
@@ -1163,7 +1081,9 @@ export default {
       }
     },
     fundingSubscriptionsOptions () {
-      return this.subscriptions.filter(sub => sub.service.nature !== FIXED).map(sub => ({ label: sub.service.name, value: sub._id }));
+      return this.subscriptions
+        .filter(sub => this.$_.get(sub, 'service.nature') !== FIXED)
+        .map(sub => ({ label: this.$_.get(sub, 'service.name'), value: sub._id }));
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
@@ -1299,8 +1219,6 @@ export default {
     text-decoration: none
 
   .mandate-table
-    /deep/ .q-table
-      margin: 10px 0px
     td
       word-break: break-all
 

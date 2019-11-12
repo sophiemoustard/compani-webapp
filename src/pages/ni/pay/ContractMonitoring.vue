@@ -7,24 +7,24 @@
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="versionsList" :columns="columns" binary-state-sort :pagination.sync="pagination" flat
-      class="q-pa-sm large-table neutral-background">
-      <q-tr slot="body" slot-scope="props" :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
-          <template v-if="col.name==='actions'">
-            <div class="row no-wrap table-actions contract-actions">
-              <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
-              <q-btn flat round small color="grey" icon="edit" @click="openVersionEditionModal(props.row)" />
-            </div>
-          </template>
-          <template v-else>
-            {{ col.value }}
-          </template>
-        </q-td>
-      </q-tr>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="pagination"
-        :data="versionsList"/>
-    </q-table>
+    <ni-large-table :data="versionsList" :columns="columns" :pagination.sync="pagination" row-key="name">
+      <template v-slot:body="{ props }">
+        <q-tr :props="props">
+          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'actions'">
+              <div class="row no-wrap table-actions contract-actions">
+                <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
+                <q-btn flat round small color="grey" icon="edit" @click="openVersionEditionModal(props.row)" />
+              </div>
+            </template>
+            <template v-else>
+              {{ col.value }}
+            </template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-large-table>
 
     <!-- Edition modal -->
     <version-edition-modal v-model="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
@@ -36,8 +36,8 @@
 
 <script>
 import DateRange from '../../../components/form/DateRange';
-import BillingPagination from '../../../components/table/BillingPagination';
 import TitleHeader from '../../../components/TitleHeader';
+import LargeTable from '../../../components/table/LargeTable';
 import { formatIdentity } from '../../../helpers/utils';
 import { contractMixin } from '../../../mixins/contractMixin.js';
 import VersionEditionModal from '../../../components/contracts/VersionEditionModal.vue';
@@ -50,9 +50,9 @@ export default {
   mixins: [contractMixin],
   components: {
     'ni-date-range': DateRange,
-    'ni-billing-pagination': BillingPagination,
     'ni-title-header': TitleHeader,
     'version-edition-modal': VersionEditionModal,
+    'ni-large-table': LargeTable,
   },
   data () {
     return {

@@ -209,10 +209,10 @@ export const planningModalMixin = {
 
       let subscriptions = this.selectedCustomer.subscriptions;
       if (this.selectedAuxiliary._id) {
-        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== CUSTOMER_CONTRACT);
-        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => sub.service.type !== COMPANY_CONTRACT);
+        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => this.$_.get(sub, 'service.type') !== CUSTOMER_CONTRACT);
+        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => this.$_.get(sub, 'service.type') !== COMPANY_CONTRACT);
       }
-      return subscriptions.map(sub => ({ label: sub.service.name, value: sub._id }));
+      return subscriptions.map(sub => ({ label: this.$_.get(sub, 'service.name'), value: sub._id }));
     },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
@@ -290,9 +290,6 @@ export const planningModalMixin = {
     },
     formatAddressOptions (address) {
       return { label: address.fullAddress, value: address };
-    },
-    toggleAddressSelect () {
-      return this.$refs['addressSelect'].showPopup();
     },
   },
 };

@@ -5,22 +5,24 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
-          <q-table :data="surcharges" :columns="surchargeColumns" hide-bottom binary-state-sort
-            :pagination.sync="pagination" class="table-responsive">
-            <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-btn flat round small dense color="grey" icon="edit"
-                      @click.native="openSurchargeEditionModal(col.value)" />
-                    <q-btn flat round small dense color="grey" icon="delete"
-                      @click="deleteSurcharge(col.value, props.row.__index)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </q-table>
+          <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'actions'">
+                    <div class="row no-wrap table-actions">
+                      <q-btn flat round small dense color="grey" icon="edit"
+                        @click.native="openSurchargeEditionModal(col.value)" />
+                      <q-btn flat round small dense color="grey" icon="delete"
+                        @click="deleteSurcharge(col.value, props.row.__index)" />
+                    </div>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration"
               @click="surchargeCreationModal = true" />
@@ -30,23 +32,27 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Services</p>
         <q-card>
-          <q-table :data="services" :columns="serviceColumns" hide-bottom binary-state-sort
-            :pagination.sync="pagination" :visible-columns="visibleColumnsServices" class="table-responsive">
-            <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-                <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn flat round small dense color="grey" icon="edit"
-                      @click="openServiceEditionModal(col.value)" />
-                    <q-btn flat round small dense color="grey" icon="delete" :disable="props.row.subscriptionCount > 0"
-                      @click="deleteService(col.value, props.row.__index)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </q-table>
+          <ni-responsive-table :data="services" :columns="serviceColumns" :pagination.sync="pagination"
+            :visible-columns="visibleColumnsServices">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'actions'">
+                    <div class="row no-wrap table-actions">
+                      <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
+                      <q-btn flat round small dense color="grey" icon="edit"
+                        @click="openServiceEditionModal(col.value)" />
+                      <q-btn flat round small dense color="grey" icon="delete"
+                        :disable="props.row.subscriptionCount > 0"
+                        @click="deleteService(col.value, props.row.__index)" />
+                    </div>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service"
               @click="serviceCreationModal = true" />
@@ -56,12 +62,19 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
-          <ni-input caption="Nom" v-model="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
+          <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
+            @blur="updateCompany('name')" />
+          <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
+            @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
+            :error-label="tradeNameError" />
           <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
-          <ni-input caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')" @blur="updateCompany('rcs')" />
+          <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
+            @blur="updateCompany('rcs')" />
+          <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
+            @blur="updateCompany('rna')" />
           <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
             @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
           <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
@@ -89,25 +102,28 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card>
-          <q-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" hide-bottom binary-state-sort
-            :pagination.sync="pagination" class="table-responsive">
-            <q-tr slot="body" slot-scope="props" :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name">
-                <template v-if="col.name === 'billingMode'">
-                  <div class="capitalize">{{ col.value }}</div>
-                </template>
-                <template v-else-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small dense color="grey"
-                      icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
-                    <q-btn flat round small dense color="grey" icon="edit"
-                      @click="openThirdPartyPayerEditionModal(col.value)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value}}</template>
-              </q-td>
-            </q-tr>
-          </q-table>
+          <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns"
+            :pagination.sync="pagination">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'billingMode'">
+                    <div class="capitalize">{{ col.value }}</div>
+                  </template>
+                  <template v-else-if="col.name === 'actions'">
+                    <div class="row no-wrap table-actions">
+                      <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small dense color="grey"
+                        icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
+                      <q-btn flat round small dense color="grey" icon="edit"
+                        @click="openThirdPartyPayerEditionModal(col.value)" />
+                    </div>
+                  </template>
+                  <template v-else>{{ col.value}}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur"
               @click="thirdPartyPayerCreationModal = true" />
@@ -117,7 +133,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Facturation</p>
         <div class="row gutter-profile">
-          <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod"
+          <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod" in-form
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
             :options="billingPeriodOptions" />
         </div>
@@ -240,9 +256,8 @@
       </template>
       <ni-input in-modal caption="Nom" v-model="editedService.name" :error="$v.editedService.name.$error"
         @blur="$v.editedService.name.$touch" required-field />
-      <ni-date-input caption="Date d'effet" v-model="editedService.startDate"
-        :error="$v.editedService.startDate.$error" @blur="$v.editedService.startDate.$touch" :min="minStartDate"
-        in-modal required-field />
+      <ni-date-input caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
+        @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
       <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
         v-model="editedService.defaultUnitAmount" :error="$v.editedService.defaultUnitAmount.$error"
         @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
@@ -261,16 +276,12 @@
     </ni-modal>
 
     <!-- Service history modal -->
-    <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData">
+    <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData" container-class="modal-container-md">
       <template slot="title">
         Historique du service <span class="text-weight-bold">{{ selectedService.name }}</span>
       </template>
-      <q-table class="q-mb-xl table-responsive" :data="selectedService.versions" :columns="serviceColumns" hide-bottom
-        binary-state-sort :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">{{ col.value }}</q-td>
-        </q-tr>
-      </q-table>
+      <ni-responsive-table class="q-mb-sm" :data="selectedService.versions" :columns="serviceColumns"
+        :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns" />
     </ni-modal>
 
     <!-- Third party payers creation modal -->
@@ -318,7 +329,7 @@
 </template>
 
 <script>
-import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
+import { required, numeric, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import DateInput from '../../../components/form/DateInput.vue';
 import TimeInput from '../../../components/form/TimeInput.vue';
@@ -329,8 +340,20 @@ import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import Modal from '../../../components/Modal';
+import ReponsiveTable from '../../../components/table/ResponsiveTable';
 import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
-import { BILLING_DIRECT, BILLING_INDIRECT, REQUIRED_LABEL, CONTRACT_STATUS_OPTIONS, TWO_WEEKS, MONTH, NATURE_OPTIONS, FIXED } from '../../../data/constants.js';
+import {
+  BILLING_DIRECT,
+  BILLING_INDIRECT,
+  REQUIRED_LABEL,
+  CONTRACT_STATUS_OPTIONS,
+  TWO_WEEKS,
+  MONTH,
+  NATURE_OPTIONS,
+  FIXED,
+  COMPANY,
+  ASSOCIATION,
+} from '../../../data/constants.js';
 
 export default {
   name: 'CustomersConfig',
@@ -343,6 +366,7 @@ export default {
     'ni-date-input': DateInput,
     'ni-time-input': TimeInput,
     'ni-modal': Modal,
+    'ni-responsive-table': ReponsiveTable,
   },
   mixins: [configMixin, validationMixin],
   watch: {
@@ -378,6 +402,7 @@ export default {
       company: null,
       documents: null,
       FIXED,
+      COMPANY,
       billingPeriodOptions: [
         { value: TWO_WEEKS, label: 'Quinzaine' },
         { value: MONTH, label: 'Mois' },
@@ -611,6 +636,10 @@ export default {
           label: 'Facturation',
           field: 'billingMode',
           align: 'left',
+          format: val => {
+            const mode = this.billingModeOptions.find(m => m.value === val);
+            return mode ? mode.label : '';
+          },
         },
         {
           name: 'actions',
@@ -688,7 +717,10 @@ export default {
     company: {
       ics: { required },
       name: { required },
-      rcs: { required },
+      tradeName: { required, maxLength: maxLength(11) },
+      type: { required },
+      rcs: { required: requiredIf(item => item.type === COMPANY) },
+      rna: { required: requiredIf(item => item.type === ASSOCIATION) },
       iban: { required, iban },
       bic: { required, bic },
       address: {
@@ -760,6 +792,14 @@ export default {
       }
       return '';
     },
+    tradeNameError () {
+      if (!this.$v.company.tradeName.required) {
+        return REQUIRED_LABEL;
+      } else if (!this.$v.company.tradeName.maxLength) {
+        return 'Doit contenir 11 caractères max (espaces inclus).';
+      }
+      return '';
+    },
   },
   async mounted () {
     await this.refreshCompany();
@@ -780,7 +820,7 @@ export default {
     async refreshSurcharges () {
       try {
         this.surchargesOptions = [];
-        this.surcharges = await this.$surcharges.showAll({ company: this.user.company._id });
+        this.surcharges = await this.$surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
           if (this.surcharges[i].eveningStartTime) this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
           if (this.surcharges[i].eveningEndTime) this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
@@ -798,7 +838,7 @@ export default {
     },
     async refreshServices () {
       try {
-        const services = await this.$services.showAll({ company: this.user.company._id });
+        const services = await this.$services.list();
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
           ...service,
@@ -817,7 +857,7 @@ export default {
     },
     async refreshThirdPartyPayers () {
       try {
-        this.thirdPartyPayers = await this.$thirdPartyPayers.showAll({ company: this.company._id });
+        this.thirdPartyPayers = await this.$thirdPartyPayers.list();
       } catch (e) {
         this.thirdPartyPayers = [];
         console.error(e);
@@ -878,7 +918,6 @@ export default {
         this.loading = true;
 
         const payload = this.getSurchargePayload(this.newSurcharge);
-        payload.company = this.user.company._id;
         await this.$surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
         this.resetCreationSurchargeData();
@@ -974,7 +1013,6 @@ export default {
         nature,
         versions: [{ name, defaultUnitAmount }],
         type,
-        company: this.user.company._id,
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') formattedService.versions[0].surcharge = this.newService.surcharge;
       if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;
@@ -1118,7 +1156,6 @@ export default {
         if (this.$v.newThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        this.newThirdPartyPayer.company = this.company._id;
         await this.$thirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur créé.');

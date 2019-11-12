@@ -1,22 +1,22 @@
 <template>
   <q-layout view="hhh Lpr lff">
-    <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
-      <q-btn class="menu-icon" color="primary" round dense @click="toggleLeft" icon="menu" />
-    </q-page-sticky>
-
-    <q-btn v-if="!enableMini" size="sm" flat round icon="chevron_left" @click="enableMini = !enableMini"
-      class="chevron chevron-left" />
-    <q-btn v-else flat round icon="view_headline" @click="enableMini = !enableMini" class="chevron chevron-right"
-      size="sm" />
-    <q-drawer :mini="enableMini" :mini-width="30" :width="250" side="left" v-model="toggleDrawer">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !enableMini"
+    <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer"
+      @input="toggleMenu">
+      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !isMini"
         :user="user" />
-      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !enableMini" :user="user" />
-      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !enableMini" :user="user" />
+      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !isMini" :user="user" />
+      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !isMini" :user="user" />
+      <div :class="[!isMini ? 'q-mini-drawer-hide' : 'q-mini-drawer-only']" class="absolute" >
+        <q-btn :class="[!isMini ? 'chevron-left' : 'chevron-right']" class="chevron" dense round unelevated
+          :icon="menuIcon" @click="isMini = !isMini" />
+      </div>
     </q-drawer>
     <q-page-container>
       <router-view :key="$route.fullPath"/>
     </q-page-container>
+    <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
+      <q-btn class="menu-icon" color="primary" round dense @click="toggleMenu(true)" icon="menu" />
+    </q-page-sticky>
   </q-layout>
 </template>
 
@@ -37,7 +37,7 @@ export default {
   data () {
     return {
       HELPER,
-      enableMini: false,
+      isMini: false,
     }
   },
   computed: {
@@ -47,13 +47,11 @@ export default {
     isAuxiliary () {
       return this.user.role.name === AUXILIARY || this.user.role.name === PLANNING_REFERENT;
     },
-    toggleDrawer: {
-      get () {
-        return this.$store.state.main.toggleDrawer;
-      },
-      set (val) {
-        this.$store.commit('main/setToggleDrawer', !this.toggleDrawer)
-      },
+    menuIcon () {
+      return this.isMini ? 'view_headline' : 'chevron_left';
+    },
+    toggleDrawer () {
+      return this.$store.state.main.toggleDrawer;
     },
     sidemenusRefs () {
       if (this.user && !this.isAuxiliary) {
@@ -63,14 +61,13 @@ export default {
     },
   },
   methods: {
-    toggleLeft () {
-      this.$store.commit('main/setToggleDrawer', !this.toggleDrawer);
+    toggleMenu (value) {
+      this.$store.commit('main/setToggleDrawer', value);
     },
   },
   beforeRouteUpdate (to, from, next) {
-    if (this.toggleDrawer && !this.enableMini) {
+    if (this.toggleDrawer && !this.isMini) {
       this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
-      this.$refs[this.sidemenusRefs].collapsibleEntering(to);
     }
 
     next();

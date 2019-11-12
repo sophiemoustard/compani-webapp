@@ -371,11 +371,15 @@ export default {
       return newUser;
     },
     async sendSms (newUserId) {
+      if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
       const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
       const code = activationDataRaw.activationData.code;
       await this.$twilio.sendSMS({
         to: `+33${this.newUser.contact.phone.substring(1)}`,
-        body: `Bienvenue chez Alenvi ! :) Utilise ce code: ${code} pour pouvoir commencer ton enregistrement sur Compani avant ton intégration: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
+        from: this.company.tradeName,
+        body: `${this.company.tradeName}. Bienvenue ! :)\nUtilise ce code: ${code} pour pouvoir ` +
+          'commencer ton enregistrement sur Compani avant ton intégration: ' +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
       });
     },
     async submit () {
@@ -393,11 +397,8 @@ export default {
         NotifyPositive('Fiche auxiliaire créée');
         this.auxiliaryCreationModal = false;
       } catch (e) {
-        if (e && e.response) {
-          console.error(e.response);
-          if (e.response.status === 409) return NotifyNegative('Email déjà existant');
-        }
         console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant');
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire');
       } finally {
         this.loading = false;

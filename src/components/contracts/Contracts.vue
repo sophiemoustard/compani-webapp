@@ -13,62 +13,64 @@
       <p v-if="contract.status === COMPANY_CONTRACT" class="card-subtitle">
         Statut : {{ getContractStatus(contract) }}
       </p>
-      <q-table :data="contract.versions" :columns="contractColumns" row-key="name" :pagination.sync="pagination"
-        hide-bottom :visible-columns="visibleColumns(contract)" binary-state-sort class="table-responsive q-pa-sm">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <!-- <template v-if="col.name === 'contractEmpty'">
-              <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract)" icon="file_download"
-                  :disable="!canDownload(props.row, contract.status)" />
-              </div>
-            </template> -->
-            <template v-if="col.name === 'contractSigned'">
-              <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
-                <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer"
-                @click="openSignatureModal(props.row.signature.eversignId)" />
-              </div>
-              <!-- <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
-                class="row justify-center table-actions">
-                <q-uploader :ref="`signedContract_${props.row._id}`" name="signedContract" :headers="headers"
-                  :url="docsUploadUrl(contract._id)" :extensions="extensions" hide-upload-button
-                  @fail="failMsg" :additional-fields="getAdditionalFields(contract, props.row)" hide-underline
-                  @uploaded="refresh" @add="uploadDocument($event, `signedContract_${props.row._id}`)"/>
-              </div> -->
-              <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
-                <q-btn flat round small color="primary">
-                  <a :href="getContractLink(props.row)" target="_blank">
-                    <q-icon name="file_download" />
-                  </a>
-                </q-btn>
-              </div>
-              <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
-                <p class="no-margin">En attente de signature</p>
-              </div>
-            </template>
-            <!-- <template v-else-if="col.name === 'archives'"> -->
-              <!-- <div class="row archives justify-center">
-                <div v-for="archive in col.value" :key="archive._id">
+      <ni-responsive-table :data="contract.versions" :columns="contractColumns" row-key="name"
+        :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
+        <template v-slot:body="{ props }" >
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+              :style="col.style">
+              <template v-if="col.name === 'contractEmpty'">
+                <div class="row justify-center table-actions">
+                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract)" icon="file_download"
+                    :disable="!canDownload(props.row, contract.status)" />
+                </div>
+              </template>
+              <template v-if="col.name === 'contractSigned'">
+                <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
+                  <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer"
+                  @click="openSignatureModal(props.row.signature.eversignId)" />
+                </div>
+                <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
+                  class="row justify-center table-actions">
+                  <q-uploader flat :url="docsUploadUrl(contract._id)" :headers="headers"
+                    :form-fields="getFormFields(contract, props.row)" field-name="signedContract" :accept="extensions"
+                    auto-upload @uploaded="refresh" @fail="failMsg" />
+                </div>
+                <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                   <q-btn flat round small color="primary">
-                    <a :href="archive.link" target="_blank">
+                    <a :href="getContractLink(props.row)" target="_blank">
                       <q-icon name="file_download" />
                     </a>
                   </q-btn>
                 </div>
-              </div>
-            </template>
-            <template v-else-if="col.name === 'actions'">
-              <div v-if="!contract.endDate" class="row no-wrap table-actions contract-actions">
-                <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
-                <q-btn v-if="!props.row.endDate" flat round small color="grey" icon="delete"
-                  :disable="!props.row.canBeDeleted" @click="deleteVersion(contract._id, props.row._id)" />
-              </div>
-            </template> -->
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
-      <q-card-actions align="left">
+                <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
+                  <p class="no-margin">En attente de signature</p>
+                </div>
+              </template>
+              <template v-else-if="col.name === 'archives'">
+                <div class="row archives justify-center">
+                  <div v-for="archive in col.value" :key="archive._id">
+                    <q-btn flat round small color="primary">
+                      <a :href="archive.link" target="_blank">
+                        <q-icon name="file_download" />
+                      </a>
+                    </q-btn>
+                  </div>
+                </div>
+              </template>
+              <template v-else-if="col.name === 'actions'">
+                <div v-if="!contract.endDate" class="row no-wrap table-actions contract-actions">
+                  <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
+                  <q-btn v-if="!props.row.endDate" flat round small color="grey" icon="delete"
+                    :disable="!props.row.canBeDeleted" @click="deleteVersion(contract._id, props.row._id)" />
+                </div>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </template>
+      </ni-responsive-table>
+      <q-card-actions align="right">
         <template v-if="displayActions && !contract.endDate">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" />
@@ -78,13 +80,15 @@
       </q-card-actions>
     </q-card>
 
-    <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-width>
-      <q-layout class="modal-max-size">
-        <q-toolbar class="no-shadow row justify-end">
+    <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-height full-width>
+      <q-card class="full-height" style="width: 80vw">
+        <q-card-section class="row justify-end">
             <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
-        </q-toolbar>
-        <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
-      </q-layout>
+        </q-card-section>
+        <q-card-section class="full-height">
+          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+        </q-card-section>
+      </q-card>
     </q-dialog>
   </div>
 </template>
@@ -98,10 +102,14 @@ import { downloadDocxFile } from '../../helpers/downloadFile';
 import { generateContractFields } from '../../helpers/generateContractFields';
 import { formatIdentity } from '../../helpers/utils';
 import esign from '../../api/Esign.js';
+import ResponsiveTable from '../table/ResponsiveTable';
 
 export default {
   name: 'Contracts',
   mixins: [contractMixin],
+  components: {
+    'ni-responsive-table': ResponsiveTable,
+  },
   props: {
     user: { type: Object, default: () => null },
     contracts: { type: Array, default: () => [] },
@@ -179,7 +187,7 @@ export default {
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
     headers () {
-      return { 'x-access-token': Cookies.get('alenvi_token') || '' };
+      return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
     },
   },
   methods: {
@@ -201,17 +209,17 @@ export default {
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document');
     },
-    getAdditionalFields (contract, version) {
-      const additionalFields = [
+    getFormFields (contract, version) {
+      const formFields = [
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id },
         { name: 'status', value: contract.status },
       ];
 
-      if (contract.status === CUSTOMER_CONTRACT) additionalFields.push({ name: 'customer', value: contract.customer._id });
+      if (contract.status === CUSTOMER_CONTRACT) formFields.push({ name: 'customer', value: contract.customer._id });
 
-      return additionalFields;
+      return formFields;
     },
     getLastVersion (contract) {
       return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
@@ -259,15 +267,6 @@ export default {
       if (!driveId) return '';
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;
-    },
-    uploadDocument (files, refName) {
-      if (files[0].size > 5000000) {
-        this.$refs[refName][0].reset();
-        NotifyNegative('Fichier trop volumineux (> 5 Mo)');
-        return '';
-      } else {
-        this.$refs[refName][0].upload();
-      }
     },
     async dlTemplate (contractVersion, parentContract) {
       try {
@@ -353,9 +352,6 @@ export default {
     position: absolute
     width: 100%
     height:100%
-
-  .archives
-    display: flex;
 
   .contract-actions
     justify-content: normal !important

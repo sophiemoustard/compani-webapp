@@ -4,12 +4,12 @@
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
-          :company-id="mainUser.company._id" />
+          :company-id="mainUser.company._id" in-form />
       </div>
       <ni-input v-model="user.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
         @blur="updateUser('mentor')" />
       <ni-select v-model="user.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')"
-        @blur="updateUser('role._id')" />
+        @blur="updateUser('role._id')" in-form />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -61,13 +61,13 @@
         <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model.trim="user.identity.lastname"
           @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')" />
         <ni-select caption="Nationalité" :error="$v.user.identity.nationality.$error" :options="nationalitiesOptions"
-          v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')"
+          v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')" in-form
           @blur="updateUser('identity.nationality')" />
         <ni-date-input caption="Date de naissance" :error="$v.user.identity.birthDate.$error"
           v-model="user.identity.birthDate" @focus="saveTmp('identity.birthDate')" content-class="col-xs-12 col-md-6"
           @input="updateUser('identity.birthDate')" />
         <ni-select caption="Pays de naissance" :error="$v.user.identity.birthCountry.$error" :options="countriesOptions"
-          v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')"
+          v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')" in-form
           @blur="updateUser('identity.birthCountry')" />
         <ni-input caption="Département de naissance" :error="$v.user.identity.birthState.$error"
           :error-label="birthStateError" v-model="user.identity.birthState" @blur="updateUser('identity.birthState')"
@@ -202,7 +202,7 @@
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
             alt="facture téléphone" @delete="deleteDocument($event, 'certificates')" name="certificates"
             collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
-            additional-fields-name="diplomes" @uploaded="refreshUser" />
+            additional-fields-name="diplomes" @uploaded="refreshUser" :extensions="extensions" />
         </div>
       </div>
     </div>
@@ -227,13 +227,12 @@
                 ]" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6">
+        <div class="col-xs-12 col-md-6" v-if="$_.get(user, 'administrative.mutualFund.has')">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
             @delete="deleteDocument(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
             name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :display-upload="user.administrative.mutualFund.has && !user.administrative.mutualFund.driveId"
             entity-url="users" :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
             :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
@@ -678,9 +677,7 @@ export default {
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
-        if (e.status === 409) {
-          return this.emailErrorHandler(path);
-        }
+        if (e.data.statusCode === 409) return this.emailErrorHandler(path);
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';

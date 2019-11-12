@@ -1,7 +1,7 @@
 import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
-  async showAll (params) {
+  async list (params) {
     const surcharges = await alenviAxios.get(`${process.env.API_HOSTNAME}/surcharges`, { params });
     return surcharges.data.data.surcharges;
   },

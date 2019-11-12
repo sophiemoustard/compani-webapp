@@ -9,17 +9,20 @@
           </div>
           <div class="col-10 signup-bloctext-padding">
             <p class="no-margin" style="font-size: 0.8rem">
-              Les services d’Alenvi sont maintenant disponibles via le site Compani. <br> Pour vous connecter à votre compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span class="text-weight-bold">mot de passe</span>
+              Les services d’Alenvi sont maintenant disponibles via le site Compani. <br> Pour vous connecter à votre
+              compte, merci de <span class="text-weight-bold">saisir votre identifiant</span> et votre <span
+                class="text-weight-bold">mot de passe</span>
             </p>
           </div>
         </div>
-        <ni-input v-model.trim="credentials.email" caption="Email" @keyup.enter="submit" />
-        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup.enter="submit" />
+        <ni-input v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
+        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
         <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }">
           <small>Mot de passe oublié ?</small>
         </router-link>
         <div class="row justify-center">
-          <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary" @click="submit()" />
+          <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
+            @click="submit()" />
         </div>
       </div>
     </div>
@@ -73,9 +76,6 @@ export default {
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
-        if (this.$q.platform.is.desktop) {
-          this.$store.commit('main/setToggleDrawer', true);
-        }
 
         if (this.$route.query.from) {
           return this.$router.replace({ path: this.$route.query.from });

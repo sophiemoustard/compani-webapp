@@ -9,72 +9,75 @@
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div>Trier par</div>
           <div class="col-xs-12 col-sm-6 col-md-3">
-            <ni-select class="q-pl-sm" :options="sortOptions" v-model="sortOption" separator />
+            <ni-select class="q-pl-sm" :options="sortOptions" v-model="sortOption" separator in-form />
           </div>
           <div class="col-xs-12 col-sm-6 col-md-4">
             <ni-select-sector class="q-pl-sm" v-model="selectedSector" allow-null-option />
           </div>
           <div class="col-xs-12 col-sm-6 col-md-3">
-            <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator />
+            <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator in-form />
           </div>
         </div>
       </template>
     </ni-title-header>
-    <q-table :data="displayedDraftPay" :columns="columns" class="q-pa-sm large-table" selection="multiple"
-      row-key="auxiliaryId" :selected.sync="selected" :pagination.sync="sortedPagination" :loading="tableLoading"
-      :visible-columns="visibleColumns" card-class="neutral-background" flat>
-      <q-tr slot="header" slot-scope="props">
-        <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
-        <th>
-          <q-checkbox v-model="props.selected" indeterminate-value="some" />
-        </th>
-      </q-tr>
-      <q-tr slot="body" slot-scope="props" :props="props">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-          <template v-if="col.name === 'surchargedAndExempt'">
-            <div v-if="props.row.surchargedAndExempt" class="cursor-pointer text-primary"
-              @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
-              {{ col.value }}
-            </div>
-            <div v-else>{{ col.value }}</div>
-          </template>
-          <template v-else-if="col.name === 'surchargedAndNotExempt'">
-            <div v-if="props.row.surchargedAndNotExempt" class="cursor-pointer text-primary"
-              @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
-              {{ col.value }}
-            </div>
-            <div v-else>{{ col.value }}</div>
-          </template>
-          <template v-else-if="col.name === 'hoursCounter'">
-            <ni-editable-td :props="props.row" edited-field="hoursCounter" edition-boolean-name="hoursCounterEdition"
-              :refName="`${props.row.auxiliaryId}Counter`" :value="col.value" @disable="disableEditionField($event)"
-              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
-          </template>
-          <template v-else-if="col.name === 'overtimeHours'">
-            <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean-name="overtimeHoursEdition"
-              :refName="`${props.row.auxiliaryId}Overtime`" :value="col.value" @disable="disableEditionField($event)"
-              @click="editField($event)" @change="setEditionField($event)" suffix="h" />
-          </template>
-          <template v-else-if="col.name === 'additionalHours'">
-            <ni-editable-td :props="props.row" edited-field="additionalHours"
-              edition-boolean-name="additionalHoursEdition" :refName="`${props.row.auxiliaryId}Additional`"
-              :value="col.value" @disable="disableEditionField($event)" @click="editField($event)"
-              @change="setEditionField($event)" suffix="h" />
-          </template>
-          <template v-else-if="col.name === 'bonus'">
-            <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean-name="bonusEdition"
-              :refName="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
-              @click="editField($event)" @change="setEditionField($event)" suffix="€" />
-          </template>
-          <template v-else>{{ col.value }}</template>
-        </q-td>
-        <q-td>
-          <q-checkbox v-model="props.selected" />
-        </q-td>
-      </q-tr>
-      <ni-billing-pagination slot="bottom" slot-scope="props" :props="props" :pagination.sync="sortedPagination"
-        :data="displayedDraftPay" />
-    </q-table>
+    <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
+      :selected.sync="selected" :pagination.sync="sortedPagination" :loading="tableLoading"
+      :visible-columns="visibleColumns">
+      <template v-slot:header="{ props }" >
+        <q-tr :props="props">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
+          <th>
+            <q-checkbox v-model="props.selected" indeterminate-value="some" />
+          </th>
+        </q-tr>
+      </template>
+      <template v-slot:body="{ props }" >
+        <q-tr :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+              :style="col.style">
+            <template v-if="col.name === 'surchargedAndExempt'">
+              <div v-if="props.row.surchargedAndExempt" class="cursor-pointer text-primary"
+                @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
+                {{ col.value }}
+              </div>
+              <div v-else>{{ col.value }}</div>
+            </template>
+            <template v-else-if="col.name === 'surchargedAndNotExempt'">
+              <div v-if="props.row.surchargedAndNotExempt" class="cursor-pointer text-primary"
+                @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
+                {{ col.value }}
+              </div>
+              <div v-else>{{ col.value }}</div>
+            </template>
+            <template v-else-if="col.name === 'hoursCounter'">
+              <ni-editable-td :props="props.row" edited-field="hoursCounter" edition-boolean-name="hoursCounterEdition"
+                :refName="`${props.row.auxiliaryId}Counter`" :value="col.value" @disable="disableEditionField($event)"
+                @click="editField($event)" @change="setEditionField($event)" suffix="h" />
+            </template>
+            <template v-else-if="col.name === 'overtimeHours'">
+              <ni-editable-td :props="props.row" edited-field="overtimeHours" edition-boolean-name="overtimeHoursEdition"
+                :refName="`${props.row.auxiliaryId}Overtime`" :value="col.value" @disable="disableEditionField($event)"
+                @click="editField($event)" @change="setEditionField($event)" suffix="h" />
+            </template>
+            <template v-else-if="col.name === 'additionalHours'">
+              <ni-editable-td :props="props.row" edited-field="additionalHours"
+                edition-boolean-name="additionalHoursEdition" :refName="`${props.row.auxiliaryId}Additional`"
+                :value="col.value" @disable="disableEditionField($event)" @click="editField($event)"
+                @change="setEditionField($event)" suffix="h" />
+            </template>
+            <template v-else-if="col.name === 'bonus'">
+              <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean-name="bonusEdition"
+                :refName="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
+                @click="editField($event)" @change="setEditionField($event)" suffix="€" />
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+          <q-td>
+            <q-checkbox v-model="props.selected" />
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="createList" />
 
@@ -89,11 +92,11 @@ import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify
 import Select from '../../../components/form/Select';
 import SelectSector from '../../../components/form/SelectSector';
 import EditableTd from '../../../components/table/EditableTd';
-import BillingPagination from '../../../components/table/BillingPagination';
 import PaySurchargeDetailsModal from '../../../components/pay/PaySurchargeDetailsModal';
 import TitleHeader from '../../../components/TitleHeader';
 import { payMixin } from '../../../mixins/payMixin';
 import { editableTdMixin } from '../../../mixins/editableTdMixin';
+import LargeTable from '../../../components/table/LargeTable';
 
 export default {
   name: 'ToPay',
@@ -103,9 +106,9 @@ export default {
     'ni-select': Select,
     'ni-select-sector': SelectSector,
     'ni-editable-td': EditableTd,
-    'ni-billing-pagination': BillingPagination,
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
     'ni-title-header': TitleHeader,
+    'ni-large-table': LargeTable,
   },
   data () {
     return {

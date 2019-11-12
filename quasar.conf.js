@@ -54,6 +54,7 @@ module.exports = function (ctx) {
       all: false,
       lang: 'fr',
       components: [
+        'QAjaxBar',
         'QBtn',
         'QBtnToggle',
         'QCard',
@@ -65,6 +66,7 @@ module.exports = function (ctx) {
         'QDialog',
         'QDrawer',
         'QExpansionItem',
+        'QField',
         'QHeader',
         'QIcon',
         'QInfiniteScroll',
@@ -72,7 +74,6 @@ module.exports = function (ctx) {
         'QItem',
         'QItemLabel',
         'QItemSection',
-        'QField',
         'QLayout',
         'QLinearProgress',
         'QList',

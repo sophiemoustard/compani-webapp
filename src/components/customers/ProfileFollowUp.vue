@@ -20,15 +20,12 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Référent</p>
       </div>
-      <div class="row referent">
-        <img :src="auxiliaryAvatar" class="avatar">
-        <q-select :options="auxiliariesOptions" v-model="customer.referent._id" dense borderless emit-value
-          @input="updateCustomer('referent')" :display-value="auxiliaryPlaceholder" :disable="loading"
-          ref="auxiliarySelect" @focus="saveTmp('referent')">
-          <template v-slot:append>
-            <q-icon name="swap_vert" class="select-icon pink-icon" @click="toggleAuxiliarySelect" />
-          </template>
-        </q-select>
+      <div class="row gutter-profile">
+        <div class="col-md-6 col-xs-12 referent items-center">
+          <img :src="auxiliaryAvatar" class="avatar q-mr-sm" />
+          <ni-select v-model="customer.referent._id" :options="auxiliariesOptions" no-error icon="swap_vert"
+            @input="updateCustomer('referent')" bg-color="grey-3" />
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -84,10 +81,11 @@
 
 <script>
 import Input from '../form/Input';
+import Select from '../form/Select';
 import { NotifyNegative } from '../popup/notify.js';
 import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '../../data/constants';
 import SearchAddress from '../form/SearchAddress';
-import { extend, formatIdentity } from '../../helpers/utils.js';
+import { extend, formatIdentity, formatHours } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
 import { helperMixin } from '../../mixins/helperMixin.js';
@@ -97,6 +95,7 @@ export default {
   name: 'ProfileFollowUp',
   components: {
     'ni-input': Input,
+    'ni-select': Select,
     'ni-search-address': SearchAddress,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
@@ -119,7 +118,7 @@ export default {
           name: 'hours',
           align: 'center',
           label: 'Heures réalisées',
-          field: row => `${Math.trunc(row.totalHours)}h`,
+          field: row => formatHours(row.totalHours, 1),
         },
         {
           name: 'lastEvent',
@@ -248,7 +247,7 @@ export default {
     display: inline-block;
     font-size: 12px;
   .referent
-    align-items: center
+    display: flex
   /deep/ .q-field__append
     .q-select__dropdown-icon
       display: none

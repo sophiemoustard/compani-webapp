@@ -20,10 +20,5 @@ export const sideMenuMixin = {
         this.activeRoutes[from.meta.parent].open = false;
       }
     },
-    collapsibleEntering (to) {
-      if (this.$refs[to.meta.parent]) {
-        this.activeRoutes[to.meta.parent].highlight = true;
-      }
-    },
   },
 };

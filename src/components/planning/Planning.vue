@@ -109,6 +109,8 @@ import {
   COACH,
   ADMIN,
   NOT_INVOICED_AND_NOT_PAID,
+  ABSENCE,
+  DAILY,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
 import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
@@ -237,19 +239,23 @@ export default {
     getEventWithStyleInfo (event, day) {
       let dayEvent = { ...event };
 
-      const displayedStartHour = Math.max((this.$moment(event.startDate).hours()), STAFFING_VIEW_START_HOUR);
-      const displayedEndHour = Math.min(this.$moment(event.endDate).hours(), STAFFING_VIEW_END_HOUR);
-      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.startDate).minutes();
-      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + this.$moment(event.endDate).minutes();
-      if (!this.$moment(day).isSame(event.startDate, 'day')) {
-        dayEvent.startDate = this.$moment(day).hour(STAFFING_VIEW_START_HOUR).toISOString();
-        staffingLeft = 0;
+      const eventStartDate = this.$moment(event.startDate);
+      const eventEndDate = this.$moment(event.endDate);
+      let displayedStartHour = eventStartDate.hours();
+      let displayedEndHour = eventEndDate.hours();
+      let displayedStartMinutes = eventStartDate.minutes();
+      let displayedEndMinutes = eventEndDate.minutes();
+      if (event.type === ABSENCE && event.absenceNature === DAILY) {
+        displayedStartHour = STAFFING_VIEW_START_HOUR;
+        displayedEndHour = STAFFING_VIEW_END_HOUR;
+        displayedStartMinutes = 0;
+        displayedEndMinutes = 0;
       }
-      if (!this.$moment(day).isSame(event.endDate, 'day')) {
-        dayEvent.endDate = this.$moment(day).hour(STAFFING_VIEW_END_HOUR).toISOString();
-        staffingRight = (STAFFING_VIEW_END_HOUR - STAFFING_VIEW_START_HOUR) * 60;
-      }
+      let staffingLeft = (displayedStartHour - STAFFING_VIEW_START_HOUR) * 60 + displayedStartMinutes;
+      let staffingRight = (displayedEndHour - STAFFING_VIEW_START_HOUR) * 60 + displayedEndMinutes;
 
+      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
+      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
       dayEvent.staffingLeft = staffingLeft;
       dayEvent.staffingWidth = staffingRight - staffingLeft;
 
