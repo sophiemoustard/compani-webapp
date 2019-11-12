@@ -1,4 +1,10 @@
-import { ABSENCE_TYPES } from '../data/constants';
+import {
+  ABSENCE_TYPES,
+  DAILY,
+  ABSENCE,
+  STAFFING_VIEW_START_HOUR,
+  STAFFING_VIEW_END_HOUR,
+} from '../data/constants';
 import { formatIdentity } from '../helpers/utils';
 
 export const planningEventMixin = {
@@ -37,6 +43,32 @@ export const planningEventMixin = {
       if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
       return this.isCustomerPlanning ? formatIdentity(event.auxiliary.identity, 'Fl') : formatIdentity(event.customer.identity, 'fL');
+    },
+    getDisplayedEvent (event, day, startDisplay) {
+      let dayEvent = { ...event };
+      const eventStartDate = this.$moment(event.startDate);
+      const eventEndDate = this.$moment(event.endDate);
+      let displayedStartHour = eventStartDate.hours();
+      let displayedEndHour = eventEndDate.hours();
+      let displayedStartMinutes = eventStartDate.minutes();
+      let displayedEndMinutes = eventEndDate.minutes();
+
+      if (event.type === ABSENCE && event.absenceNature === DAILY) {
+        displayedStartHour = STAFFING_VIEW_START_HOUR;
+        displayedEndHour = STAFFING_VIEW_END_HOUR;
+        displayedStartMinutes = 0;
+        displayedEndMinutes = 0;
+      }
+
+      let staffingBeginning = (displayedStartHour - startDisplay) * 60 + displayedStartMinutes;
+      let staffingEnd = (displayedEndHour - startDisplay) * 60 + displayedEndMinutes;
+
+      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
+      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
+      dayEvent.staffingBeginning = staffingBeginning;
+      dayEvent.staffingDuration = staffingEnd - staffingBeginning;
+
+      return dayEvent;
     },
   },
 };
