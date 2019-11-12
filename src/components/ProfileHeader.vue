@@ -181,7 +181,7 @@ export default {
     },
     async sendSMS () {
       try {
-        if (!this.companyName) NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+        if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
         await this.$twilio.sendSMS({
           to: `+33${this.user.contact.phone.substring(1)}`,
           from: this.companyName,
