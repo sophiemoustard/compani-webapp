@@ -102,7 +102,7 @@ export default {
         .filter(event =>
           this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day')
         )
-        .map((event) => this.getDisplayedEvent(event, day, PLANNING_VIEW_START_HOUR))
+        .map((event) => this.getDisplayedEvent(event, day, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     createEvent (value) {

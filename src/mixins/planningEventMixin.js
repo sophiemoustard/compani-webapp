@@ -44,7 +44,7 @@ export const planningEventMixin = {
 
       return this.isCustomerPlanning ? formatIdentity(event.auxiliary.identity, 'Fl') : formatIdentity(event.customer.identity, 'fL');
     },
-    getDisplayedEvent (event, day, startDisplay) {
+    getDisplayedEvent (event, day, startDisplay, endDisplay) {
       let dayEvent = { ...event };
       const eventStartDate = this.$moment(event.startDate);
       const eventEndDate = this.$moment(event.endDate);
@@ -60,8 +60,8 @@ export const planningEventMixin = {
         displayedEndMinutes = 0;
       }
 
-      let staffingBeginning = (displayedStartHour - startDisplay) * 60 + displayedStartMinutes;
-      let staffingEnd = (displayedEndHour - startDisplay) * 60 + displayedEndMinutes;
+      let staffingBeginning = Math.max((displayedStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
+      let staffingEnd = Math.min((displayedEndHour - startDisplay) * 60 + displayedEndMinutes, (endDisplay - startDisplay) * 60 + displayedEndMinutes);
 
       dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
       dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
