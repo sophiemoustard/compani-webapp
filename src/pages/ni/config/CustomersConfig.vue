@@ -298,10 +298,11 @@
         v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
         error-label="Le prix unitaire doit être positif" />
       <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
-        :filter="false" />
+        :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
-          :loading="loading" @click="createNewThirdPartyPayer" />
+          :loading="loading" @click="createNewThirdPartyPayer"
+          :disable="$v.newThirdPartyPayer.$error || !newThirdPartyPayer.name || !newThirdPartyPayer.billingMode" />
       </template>
     </ni-modal>
 
@@ -319,10 +320,11 @@
         v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
         error-label="Le prix unitaire doit être positif" />
       <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
-        caption="Facturation" :filter="false" />
+        caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
-          :loading="loading" @click="updateThirdPartyPayer" />
+          :loading="loading" @click="updateThirdPartyPayer"
+          :disable="$v.editedThirdPartyPayer.$error || !editedThirdPartyPayer.name || !editedThirdPartyPayer.billingMode" />
       </template>
     </ni-modal>
   </q-page>
@@ -741,6 +743,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      billingMode: { required },
       unitTTCRate: { posDecimals },
     },
     editedThirdPartyPayer: {
@@ -751,6 +754,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      billingMode: { required },
       unitTTCRate: { posDecimals },
     },
   },
