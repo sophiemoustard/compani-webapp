@@ -64,6 +64,13 @@ export const payMixin = {
           format: value => formatHours(value),
         },
         {
+          name: 'hoursToWork',
+          label: 'Heures à travailler',
+          align: 'center',
+          field: 'hoursToWork',
+          format: value => formatHours(value),
+        },
+        {
           name: 'workedHours',
           label: 'Heures travaillées',
           align: 'center',
@@ -99,10 +106,24 @@ export const payMixin = {
           format: value => formatHours(value),
         },
         {
+          name: 'diff',
+          label: 'Dont rattrapage',
+          align: 'center',
+          field: 'diff',
+          format: value => formatHours(value),
+        },
+        {
           name: 'hoursBalance',
           label: 'Solde heures',
           align: 'center',
           field: 'hoursBalance',
+          format: value => formatHours(value),
+        },
+        {
+          name: 'previousMonthHoursCounter',
+          label: 'Compteur M-1',
+          align: 'center',
+          field: row => row.previousMonthHoursCounter,
           format: value => formatHours(value),
         },
         {
