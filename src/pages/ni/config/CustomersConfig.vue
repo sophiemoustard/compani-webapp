@@ -176,7 +176,7 @@
         :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
-          :loading="loading" @click="createNewSurcharge" :disable="$v.newSurcharge.$error || !newSurcharge.name" />
+          :loading="loading" @click="createNewSurcharge" :disable="disableSurchargeCreationButton" />
       </template>
     </ni-modal>
 
@@ -302,7 +302,7 @@
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
           :loading="loading" @click="createNewThirdPartyPayer"
-          :disable="$v.newThirdPartyPayer.$error || !newThirdPartyPayer.name || !newThirdPartyPayer.billingMode" />
+          :disable="disableThirdPartyPayerCreationButton" />
       </template>
     </ni-modal>
 
@@ -324,7 +324,7 @@
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
           :loading="loading" @click="updateThirdPartyPayer"
-          :disable="$v.editedThirdPartyPayer.$error || !editedThirdPartyPayer.name || !editedThirdPartyPayer.billingMode" />
+          :disable="disableThirdPartyPayerEditionButton" />
       </template>
     </ni-modal>
   </q-page>
@@ -767,6 +767,15 @@ export default {
     },
     addressError () {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
+    },
+    disableThirdPartyPayerEditionButton () {
+      return this.$v.editedThirdPartyPayer.$error || !this.editedThirdPartyPayer.name || !this.editedThirdPartyPayer.billingMode;
+    },
+    disableThirdPartyPayerCreationButton () {
+      return this.$v.newThirdPartyPayer.$error || !this.newThirdPartyPayer.name || !this.newThirdPartyPayer.billingMode;
+    },
+    disableSurchargeCreationButton () {
+      return this.$v.newSurcharge.$error || !this.newSurcharge.name;
     },
     disableServiceEditionButton () {
       return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount ||
