@@ -366,7 +366,7 @@ export default {
       this.$v.newInternalHour.$reset();
     },
     async refreshInternalHours () {
-      this.internalHours = await this.$companies.getInternalHours(this.company._id);
+      this.internalHours = await this.$internalHours.list();
     },
     async createInternalHour () {
       try {
@@ -376,7 +376,7 @@ export default {
         this.loading = true;
         if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
         const payload = this.$_.pickBy(this.newInternalHour);
-        await this.$companies.createInternalHour(this.company._id, payload);
+        await this.$internalHours.create(payload);
         await this.$store.dispatch('main/getUser', this.user._id);
 
         NotifyPositive('Heure interne créée');
@@ -397,8 +397,7 @@ export default {
           ok: 'OK',
           cancel: 'Annuler',
         }).onOk(async () => {
-          const queries = { id: this.company._id, internalHourId };
-          await this.$companies.deleteInternalHour(queries);
+          await this.$internalHours.remove(internalHourId);
           await this.$store.dispatch('main/getUser', this.user._id);
           this.internalHours.splice(cell, 1);
           NotifyPositive('Heure interne supprimée.');
@@ -410,14 +409,11 @@ export default {
     },
     async updateDefaultInternalHour (internalHourId) {
       const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
-      const params = { id: this.company._id };
       if (defaultInternalHour) {
-        params.internalHourId = defaultInternalHour._id;
-        await this.$companies.updateInternalHour(params, { default: false });
+        await this.$internalHours.update(defaultInternalHour._id, { default: false });
       }
 
-      params.internalHourId = internalHourId;
-      await this.$companies.updateInternalHour(params, { default: true });
+      await this.$internalHours.update(internalHourId, { default: true });
       await this.refreshInternalHours();
       await this.$store.dispatch('main/getUser', this.user._id);
     },
