@@ -5,7 +5,7 @@
       <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
       <q-td class="bold">Début de période</q-td>
       <q-td />
-      <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
+      <td class="bold padding-to-align">{{ formatPrice(startBalance) }}</td>
       <q-td />
     </q-tr>
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
@@ -34,11 +34,11 @@
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
         </template>
         <template v-else-if="col.name === 'balance'">
-          <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
+          <div v-if="!isNegative(col.value)" class="row no-wrap items-center">
             <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
             <div>{{ col.value }}</div>
           </div>
-          <div v-else-if="isNegative(col.value)" class="row no-wrap items-center justify-center">
+          <div v-else-if="isNegative(col.value)" class="row no-wrap items-center">
             <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
             <div>{{ col.value.substring(1) }}</div>
           </div>
@@ -55,7 +55,7 @@
       <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
       <q-td class="bold">Fin de période</q-td>
       <q-td />
-      <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
+      <td class="bold padding-to-align">{{ formatPrice(endBalance) }}</td>
       <q-td />
     </q-tr>
   </q-table>
@@ -115,8 +115,9 @@ export default {
         {
           name: 'balance',
           label: 'Solde',
-          align: 'center',
+          align: 'left',
           field: 'balance',
+          style: 'padding-left: 30px',
           format: value => formatPrice(value),
         },
         {
@@ -186,5 +187,8 @@ export default {
     cursor: pointer;
     color: $primary;
     text-decoration underline;
+
+  .padding-to-align
+    padding-left: 30px;
 
 </style>
