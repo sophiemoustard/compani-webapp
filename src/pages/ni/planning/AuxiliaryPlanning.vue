@@ -70,7 +70,7 @@ export default {
     try {
       await Promise.all([this.fillFilter(AUXILIARY), this.getCustomers()]);
       this.initFilters();
-      this.setInternalHours();
+      await this.setInternalHours();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');

@@ -93,11 +93,8 @@ export const planningActionMixin = {
         if (this.$refs.planningManager) this.$refs.planningManager.restoreFilter(lastSearch);
       }
     },
-    setInternalHours () {
-      const user = this.$store.getters['main/user'];
-      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
-        this.internalHours = user.company.rhConfig.internalHours;
-      }
+    async setInternalHours () {
+      this.internalHours = await this.$internalHours.list();
     },
     hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
