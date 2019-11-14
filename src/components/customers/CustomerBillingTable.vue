@@ -34,15 +34,14 @@
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
         </template>
         <template v-else-if="col.name === 'balance'">
-          <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
-            <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
-            <div>{{ col.value }}</div>
-          </div>
-          <div v-else-if="isNegative(col.value)" class="row no-wrap items-center justify-center">
-            <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-            <div>{{ col.value.substring(1) }}</div>
-          </div>
-          <div v-else>{{ col.value }}</div>
+          <q-item class="row no-wrap items-center">
+            <q-item-section side>
+              <q-icon :name="balanceIcon(col.value)" :color="balanceIconColor(col.value)" class="balance-icon"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ formatBalance(col.value) }}</q-item-label>
+            </q-item-section>
+          </q-item>
         </template>
         <template v-else-if="col.name === 'actions'">
           <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
@@ -117,6 +116,7 @@ export default {
           label: 'Solde',
           align: 'center',
           field: 'balance',
+          style: 'width: 100px',
           format: value => formatPrice(value),
         },
         {
@@ -130,6 +130,16 @@ export default {
     }
   },
   methods: {
+    balanceIconColor (val) {
+      return this.isZero(val) || !this.isNegative(val) ? 'grey' : 'secondary'
+    },
+    balanceIcon (val) {
+      return this.isZero(val) || !this.isNegative(val) ? 'mdi-plus-circle-outline' : 'mdi-minus-circle-outline'
+    },
+    formatBalance (val) {
+      if (this.isNegative(val)) return val.substring(1);
+      else return val;
+    },
     getPaymentTitle (payment) {
       const titlePrefix = payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
       const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === payment.type);
@@ -141,6 +151,9 @@ export default {
     },
     formatPrice (value) {
       return formatPrice(value);
+    },
+    isZero (val) {
+      return Number.parseFloat(val) === 0;
     },
     isNegative (val) {
       return val[0] === '-';
@@ -186,5 +199,9 @@ export default {
     cursor: pointer;
     color: $primary;
     text-decoration underline;
+
+  /deep/ .q-item
+    .q-item__section
+      padding: 0px;
 
 </style>
