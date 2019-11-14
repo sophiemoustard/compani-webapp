@@ -68,7 +68,7 @@
       label="Payer" @click="createList" />
 
     <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
-      @update:surchargeDetailModal="resetSurchargeDetail" :surchargeDetails="surchargeDetails" />
+      @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surchargeDetailKey="surchargeDetailKey" />
   </q-page>
 </template>
 
@@ -97,6 +97,8 @@ export default {
       tableLoading: false,
       surchargeDetailModal: false,
       surchargeDetails: {},
+      pay: {},
+      surchargeDetailKey: '',
     };
   },
   computed: {
@@ -134,11 +136,13 @@ export default {
       const draft = this.draftFinalPay.find(ds => ds.auxiliary._id === id);
       if (!draft) return;
 
-      this.surchargeDetails = draft[details];
+      this.pay = draft;
+      this.surchargeDetailKey = details;
       this.surchargeDetailModal = true;
     },
     resetSurchargeDetail () {
-      this.surchargeDetails = {};
+      this.pay = {};
+      this.surchargeDetailKey = '';
     },
     // Creation
     async createList () {
