@@ -176,7 +176,7 @@
         :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
-          :loading="loading" @click="createNewSurcharge" :disable="$v.newSurcharge.$error || !newSurcharge.name" />
+          :loading="loading" @click="createNewSurcharge" :disable="isSurchargeCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -217,7 +217,7 @@
         :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
-          color="primary" :loading="loading" @click="updateSurcharge" :disable="$v.editedSurcharge.$error" />
+          color="primary" :loading="loading" @click="updateSurcharge" :disable="isSurchargeEditionDisabled" />
       </template>
     </ni-modal>
 
@@ -245,7 +245,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
-          :loading="loading" @click="createNewService" :disable="disableServiceCreationButton" />
+          :loading="loading" @click="createNewService" :disable="isServiceCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -271,7 +271,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
-          :loading="loading" @click="updateService" :disable="disableServiceEditionButton" />
+          :loading="loading" @click="updateService" :disable="isServiceEditionDisabled" />
       </template>
     </ni-modal>
 
@@ -298,10 +298,12 @@
         v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
         error-label="Le prix unitaire doit être positif" />
       <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
-        :filter="false" />
+        :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
+        @blur="$v.newThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
-          :loading="loading" @click="createNewThirdPartyPayer" />
+          :loading="loading" @click="createNewThirdPartyPayer"
+          :disable="isTppCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -319,10 +321,12 @@
         v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
         error-label="Le prix unitaire doit être positif" />
       <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
-        caption="Facturation" :filter="false" />
+        caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
+        @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
-          :loading="loading" @click="updateThirdPartyPayer" />
+          :loading="loading" @click="updateThirdPartyPayer"
+          :disable="isTppEditionDisabled" />
       </template>
     </ni-modal>
   </q-page>
@@ -741,6 +745,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      billingMode: { required },
       unitTTCRate: { posDecimals },
     },
     editedThirdPartyPayer: {
@@ -751,6 +756,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      billingMode: { required },
       unitTTCRate: { posDecimals },
     },
   },
@@ -764,11 +770,23 @@ export default {
     addressError () {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
-    disableServiceEditionButton () {
+    isTppEditionDisabled () {
+      return this.$v.editedThirdPartyPayer.$error || !this.editedThirdPartyPayer.name || !this.editedThirdPartyPayer.billingMode;
+    },
+    isTppCreationDisabled () {
+      return this.$v.newThirdPartyPayer.$error || !this.newThirdPartyPayer.name || !this.newThirdPartyPayer.billingMode;
+    },
+    isSurchargeEditionDisabled () {
+      return this.$v.editedSurcharge.$error || !this.editedSurcharge.name;
+    },
+    isSurchargeCreationDisabled () {
+      return this.$v.newSurcharge.$error || !this.newSurcharge.name;
+    },
+    isServiceEditionDisabled () {
       return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount ||
         !this.editedService.vat < 0;
     },
-    disableServiceCreationButton () {
+    isServiceCreationDisabled () {
       return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount ||
         !this.newService.vat < 0;
     },
