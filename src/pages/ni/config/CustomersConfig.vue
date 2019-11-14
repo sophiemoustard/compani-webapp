@@ -176,7 +176,7 @@
         :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
-          :loading="loading" @click="createNewSurcharge" :disable="canCreateSurcharge" />
+          :loading="loading" @click="createNewSurcharge" :disable="isSurchargeCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -217,7 +217,7 @@
         :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
-          color="primary" :loading="loading" @click="updateSurcharge" :disable="canEditSurcharge" />
+          color="primary" :loading="loading" @click="updateSurcharge" :disable="isSurchargeEditionDisabled" />
       </template>
     </ni-modal>
 
@@ -245,7 +245,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
-          :loading="loading" @click="createNewService" :disable="canCreateService" />
+          :loading="loading" @click="createNewService" :disable="isServiceCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -271,7 +271,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
-          :loading="loading" @click="updateService" :disable="canEditService" />
+          :loading="loading" @click="updateService" :disable="isServiceEditionDisabled" />
       </template>
     </ni-modal>
 
@@ -302,7 +302,7 @@
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
           :loading="loading" @click="createNewThirdPartyPayer"
-          :disable="canCreateTpp" />
+          :disable="isTppCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -324,7 +324,7 @@
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
           :loading="loading" @click="updateThirdPartyPayer"
-          :disable="canEditTpp" />
+          :disable="isTppEditionDisabled" />
       </template>
     </ni-modal>
   </q-page>
@@ -768,23 +768,23 @@ export default {
     addressError () {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
-    canEditTpp () {
+    isTppEditionDisabled () {
       return this.$v.editedThirdPartyPayer.$error || !this.editedThirdPartyPayer.name || !this.editedThirdPartyPayer.billingMode;
     },
-    canCreateTpp () {
+    isTppCreationDisabled () {
       return this.$v.newThirdPartyPayer.$error || !this.newThirdPartyPayer.name || !this.newThirdPartyPayer.billingMode;
     },
-    canEditSurcharge () {
+    isSurchargeEditionDisabled () {
       return this.$v.editedSurcharge.$error || !this.editedSurcharge.name;
     },
-    canCreateSurcharge () {
+    isSurchargeCreationDisabled () {
       return this.$v.newSurcharge.$error || !this.newSurcharge.name;
     },
-    canEditService () {
+    isServiceEditionDisabled () {
       return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount ||
         !this.editedService.vat < 0;
     },
-    canCreateService () {
+    isServiceCreationDisabled () {
       return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount ||
         !this.newService.vat < 0;
     },
