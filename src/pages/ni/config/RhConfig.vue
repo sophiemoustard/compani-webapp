@@ -371,6 +371,7 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des heures internes');
+        this.internalHours = [];
       }
     },
     async createInternalHour () {

@@ -94,7 +94,12 @@ export const planningActionMixin = {
       }
     },
     async setInternalHours () {
-      this.internalHours = await this.$internalHours.list();
+      try {
+        this.internalHours = await this.$internalHours.list();
+      } catch (e) {
+        console.error(e);
+        this.internalHours = [];
+      }
     },
     hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
