@@ -5,7 +5,7 @@
       <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
       <q-td class="bold">Début de période</q-td>
       <q-td />
-      <td class="bold padding-to-align">{{ formatPrice(startBalance) }}</td>
+      <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
       <q-td />
     </q-tr>
     <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
@@ -34,14 +34,30 @@
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
         </template>
         <template v-else-if="col.name === 'balance'">
-          <div v-if="!isNegative(col.value)" class="row no-wrap items-center">
-            <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
-            <div>{{ col.value }}</div>
-          </div>
-          <div v-else-if="isNegative(col.value)" class="row no-wrap items-center">
-            <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-            <div>{{ col.value.substring(1) }}</div>
-          </div>
+          <q-item v-if="isZero(col.value)" class="row no-wrap items-center">
+            <q-item-section side>
+              <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon"/>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ formatZero(col.value) }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item v-else-if="!isNegative(col.value)" class="row no-wrap items-center">
+            <q-item-section side>
+              <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ col.value }}</q-item-label>
+            </q-item-section>
+          </q-item>
+          <q-item v-else-if="isNegative(col.value)" class="row no-wrap items-center">
+            <q-item-section side>
+              <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ col.value.substring(1) }}</q-item-label>
+            </q-item-section>
+          </q-item>
           <div v-else>{{ col.value }}</div>
         </template>
         <template v-else-if="col.name === 'actions'">
@@ -55,7 +71,7 @@
       <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
       <q-td class="bold">Fin de période</q-td>
       <q-td />
-      <td class="bold padding-to-align">{{ formatPrice(endBalance) }}</td>
+      <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
       <q-td />
     </q-tr>
   </q-table>
@@ -115,9 +131,9 @@ export default {
         {
           name: 'balance',
           label: 'Solde',
-          align: 'left',
+          align: 'center',
           field: 'balance',
-          style: 'padding-left: 30px',
+          style: 'width: 100px',
           format: value => formatPrice(value),
         },
         {
@@ -131,6 +147,9 @@ export default {
     }
   },
   methods: {
+    formatZero (val) {
+      return val.substring(0, 1) === '-' ? val.substring(1) : val;
+    },
     getPaymentTitle (payment) {
       const titlePrefix = payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
       const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === payment.type);
@@ -142,6 +161,9 @@ export default {
     },
     formatPrice (value) {
       return formatPrice(value);
+    },
+    isZero (val) {
+      return Number.parseFloat(val) === 0;
     },
     isNegative (val) {
       return val[0] === '-';
@@ -188,7 +210,8 @@ export default {
     color: $primary;
     text-decoration underline;
 
-  .padding-to-align
-    padding-left: 30px;
+  /deep/ .q-item
+    .q-item__section
+      padding: 0px;
 
 </style>
