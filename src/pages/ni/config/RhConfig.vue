@@ -302,7 +302,7 @@ export default {
     this.company = this.$_.cloneDeep(this.user.company);
     if (!this.company.rhConfig.templates) this.company.rhConfig.templates = {};
 
-    this.internalHours = this.company.rhConfig && this.company.rhConfig.internalHours ? this.company.rhConfig.internalHours : [];
+    await this.refreshInternalHours();
     await this.getSectors();
   },
   methods: {
@@ -366,7 +366,12 @@ export default {
       this.$v.newInternalHour.$reset();
     },
     async refreshInternalHours () {
-      this.internalHours = await this.$internalHours.list();
+      try {
+        this.internalHours = await this.$internalHours.list();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des heures internes');
+      }
     },
     async createInternalHour () {
       try {
