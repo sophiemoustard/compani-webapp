@@ -34,31 +34,14 @@
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
         </template>
         <template v-else-if="col.name === 'balance'">
-          <q-item v-if="isZero(col.value)" class="row no-wrap items-center">
+          <q-item class="row no-wrap items-center">
             <q-item-section side>
-              <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon"/>
+              <q-icon :name="balanceIcon(col.value)" :color="balanceIconColor(col.value)" class="balance-icon"/>
             </q-item-section>
             <q-item-section>
-              <q-item-label>{{ formatZero(col.value) }}</q-item-label>
+              <q-item-label>{{ formatBalance(col.value) }}</q-item-label>
             </q-item-section>
           </q-item>
-          <q-item v-else-if="!isNegative(col.value)" class="row no-wrap items-center">
-            <q-item-section side>
-              <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ col.value }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <q-item v-else-if="isNegative(col.value)" class="row no-wrap items-center">
-            <q-item-section side>
-              <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ col.value.substring(1) }}</q-item-label>
-            </q-item-section>
-          </q-item>
-          <div v-else>{{ col.value }}</div>
         </template>
         <template v-else-if="col.name === 'actions'">
           <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
@@ -147,8 +130,15 @@ export default {
     }
   },
   methods: {
-    formatZero (val) {
-      return val.substring(0, 1) === '-' ? val.substring(1) : val;
+    balanceIconColor (val) {
+      return this.isZero(val) || !this.isNegative(val) ? 'grey' : 'secondary'
+    },
+    balanceIcon (val) {
+      return this.isZero(val) || !this.isNegative(val) ? 'mdi-plus-circle-outline' : 'mdi-minus-circle-outline'
+    },
+    formatBalance (val) {
+      if (this.isNegative(val)) return val.substring(1);
+      else return val;
     },
     getPaymentTitle (payment) {
       const titlePrefix = payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
