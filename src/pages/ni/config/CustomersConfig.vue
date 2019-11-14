@@ -298,7 +298,8 @@
         v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
         error-label="Le prix unitaire doit être positif" />
       <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
-        :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error" />
+        :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
+        @blur="$v.newThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
           :loading="loading" @click="createNewThirdPartyPayer"
@@ -320,7 +321,8 @@
         v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
         error-label="Le prix unitaire doit être positif" />
       <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
-        caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error" />
+        caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
+        @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
           :loading="loading" @click="updateThirdPartyPayer"
