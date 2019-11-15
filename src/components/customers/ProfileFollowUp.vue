@@ -65,21 +65,8 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" row-key="name" hide-bottom
-        :visible-columns="visibleColumns" class="neutral-background" flat>
-        <template v-slot:body="{ props }" >
-          <q-tr :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-              :style="col.style">
-              <template v-if="col.name === 'phone'">
-                <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
-                <div v-else>{{ col.value }}</div>
-              </template>
-             <template v-else>{{ col.value }}</template>
-           </q-td>
-          </q-tr>
-        </template>
-      </ni-simple-table>
+      <ni-simple-table :data="customerFundingsMonitoring" :columns="fundingsMonitoringColumns" row-key="name"
+        hide-bottom class="neutral-background" flat />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
@@ -93,7 +80,7 @@
               <template v-if="col.name === 'identity'">
                 <q-item>
                   <q-item-section avatar>
-                    <img :src="getAvatar(col.value.picture.link)" class="avatar" />
+                    <img :src="getAvatar(col.value)" class="avatar" />
                   </q-item-section>
                   <q-item-section>
                     <span class="identity-block q-mr-sm">{{ col.value.identity | formatIdentity('Fl') }} ({{ col.value.sector.name }})</span>
@@ -140,7 +127,6 @@ export default {
       loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
-      customerFundingsMonitoring: [],
       followUpColumns: [
         {
           name: 'identity',
@@ -158,6 +144,33 @@ export default {
           align: 'center',
           label: 'Dernière inter.',
           field: row => this.$moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
+        },
+      ],
+      customerFundingsMonitoring: [],
+      fundingsMonitoringColumns: [
+        {
+          name: 'funding',
+          align: 'center',
+          label: 'financeur',
+          field: row => row.funding,
+        },
+        {
+          name: 'possibleCareHours',
+          align: 'center',
+          label: 'Heures attribuées',
+          field: row => row.possibleCareHours,
+        },
+        {
+          name: 'prevMonth',
+          align: 'center',
+          label: 'Heures mois derniers',
+          field: row => row.prevMonth,
+        },
+        {
+          name: 'currentMonth',
+          align: 'center',
+          label: 'Heures mois en cours',
+          field: row => row.currentMonth,
         },
       ],
     };
@@ -274,7 +287,8 @@ export default {
     getPhoneLink (link) {
       return link ? `tel:+33${link.substring(1)}` : '-';
     },
-    getAvatar (link) {
+    getAvatar (value) {
+      const link = this.$_.get(value, 'picture.link', '');
       return link || DEFAULT_AVATAR;
     },
   },
