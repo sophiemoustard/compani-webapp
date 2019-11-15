@@ -12,24 +12,20 @@
       <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
         <template v-if="col.name === 'document'">
           <template v-if="props.row.type === BILL">
-            <div :class="{'download': canDownloadBill(props.row)}">
-              <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
-                Facture {{ props.row.number || 'tiers' }}
+            <template v-if="props.row.number">
+              <a v-if="canDownloadBill(props.row)" :href="billUrl(props.row)" target="_blank" class="download">
+                Facture {{ props.row.number }}
               </a>
-              <div v-else>
-                <a :href="$bills.getPDFUrl(props.row._id)" target="_blank">Facture {{ props.row.number || 'tiers' }}</a>
-              </div>
-            </div>
+              <div v-else>Facture {{ props.row.number }}</div>
+            </template>
+            <div v-else>Facture tiers</div>
           </template>
           <template  v-else-if="props.row.type === CREDIT_NOTE">
-            <div :class="{'download': canDownloadCreditNote(props.row)}">
-              <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
-                Avoir {{ props.row.number }}
-              </a>
-              <div v-else>
-                <a :href="$creditNotes.getPDFUrl(props.row._id)" target="_blank">Avoir {{ props.row.number }}</a>
-              </div>
-            </div>
+            <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
+              class="download">
+              Avoir {{ props.row.number }}
+            </a>
+            <div v-else>Avoir {{ props.row.number }}</div>
           </template>
           <div v-else>{{ getPaymentTitle(props.row) }}</div>
         </template>
@@ -180,6 +176,14 @@ export default {
     },
     canDownloadCreditNote (creditNote) {
       return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
+    },
+    billUrl (bill) {
+      return this.$_.get(bill, 'driveFile.link') ? bill.driveFile.link : this.$bills.getPDFUrl(bill._id);
+    },
+    creditNoteUrl (creditNote) {
+      return this.$_.get(creditNote, 'driveFile.link')
+        ? creditNote.driveFile.link
+        : this.$creditNotes.getPDFUrl(creditNote._id);
     },
   },
 }
