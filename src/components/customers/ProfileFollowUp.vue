@@ -45,36 +45,66 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
-      <q-table :data="sortedHelpers" :columns="helperColumns" row-key="name" :pagination="helperPagination"
-        hide-bottom :visible-columns="visibleColumns" class="neutral-background" flat>
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <template v-if="col.name === 'phone'">
-              <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
-              <div v-else>{{ col.value }}</div>
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" row-key="name" hide-bottom
+        :visible-columns="visibleColumns" class="neutral-background" flat>
+        <template v-slot:body="{ props }" >
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+              :style="col.style">
+              <template v-if="col.name === 'phone'">
+                <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
+                <div v-else>{{ col.value }}</div>
+              </template>
+             <template v-else>{{ col.value }}</template>
+           </q-td>
+          </q-tr>
+        </template>
+      </ni-simple-table>
+    </div>
+    <div v-if="customer.fundings.length" class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Financements</p>
+      </div>
+      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" row-key="name" hide-bottom
+        :visible-columns="visibleColumns" class="neutral-background" flat>
+        <template v-slot:body="{ props }" >
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+              :style="col.style">
+              <template v-if="col.name === 'phone'">
+                <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
+                <div v-else>{{ col.value }}</div>
+              </template>
+             <template v-else>{{ col.value }}</template>
+           </q-td>
+          </q-tr>
+        </template>
+      </ni-simple-table>
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <q-table :data="customerFollowUp" :columns="followUpColumns" row-key="name" :pagination.sync="followUpPagination"
-        :rows-per-page-options="[]" class="neutral-background" flat>
-        <q-td slot="body-cell-identity" slot-scope="props" :props="props">
-          <q-item>
-            <q-item-section avatar>
-              <img :src="getAvatar(props.value.picture.link)" class="avatar" />
-            </q-item-section>
-            <q-item-section>
-              <span class="identity-block q-mr-sm">{{ props.value.identity | formatIdentity('Fl') }} ({{ props.value.sector.name }})</span>
-            </q-item-section>
-          </q-item>
-        </q-td>
-      </q-table>
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :rows-per-page-options="[]">
+        <template v-slot:body="{ props }" >
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+              :style="col.style">
+              <template v-if="col.name === 'identity'">
+                <q-item>
+                  <q-item-section avatar>
+                    <img :src="getAvatar(col.value.picture.link)" class="avatar" />
+                  </q-item-section>
+                  <q-item-section>
+                    <span class="identity-block q-mr-sm">{{ col.value.identity | formatIdentity('Fl') }} ({{ col.value.sector.name }})</span>
+                  </q-item-section>
+                </q-item>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </template>
+      </ni-simple-table>
     </div>
   </div>
 </template>
@@ -85,6 +115,7 @@ import Select from '../form/Select';
 import { NotifyNegative } from '../popup/notify.js';
 import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '../../data/constants';
 import SearchAddress from '../form/SearchAddress';
+import SimpleTable from '../table/SimpleTable';
 import { extend, formatIdentity, formatHours } from '../../helpers/utils.js';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { validationMixin } from '../../mixins/validationMixin.js';
@@ -97,6 +128,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-search-address': SearchAddress,
+    'ni-simple-table': SimpleTable,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
@@ -108,6 +140,7 @@ export default {
       loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
+      customerFundingsMonitoring: [],
       followUpColumns: [
         {
           name: 'identity',
@@ -127,7 +160,6 @@ export default {
           field: row => this.$moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
         },
       ],
-      followUpPagination: { rowsPerPage: 5 },
     };
   },
   validations: {
@@ -182,6 +214,7 @@ export default {
   async mounted () {
     await Promise.all([this.refreshCustomer(), this.getUserHelpers(), this.getAuxiliaries()])
     if (this.customer.firstIntervention) await this.getCustomerFollowUp();
+    if (this.customer.fundings.length) await this.getCustomerFundingsMonitoring();
   },
   methods: {
     getAuxiliaryAvatar (picture) {
@@ -207,6 +240,15 @@ export default {
       } catch (e) {
         this.customerFollowUp = [];
         NotifyNegative('Erreur lors de la récupération des auxiliaires');
+      }
+    },
+    async getCustomerFundingsMonitoring () {
+      try {
+        this.customerFundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
+      } catch (e) {
+        console.error(e);
+        this.customerFundingsMonitoring = [];
+        NotifyNegative('Erreur lors de la récupération du suivi des financements');
       }
     },
     async refreshCustomer () {
