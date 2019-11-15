@@ -36,14 +36,16 @@
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
             <template v-if="col.name === 'surchargedAndExempt'">
-              <div v-if="props.row.surchargedAndExempt" class="cursor-pointer text-primary"
+              <div v-if="props.row.surchargedAndExempt || props.row.diff.surchargedAndExempt"
+                class="cursor-pointer text-primary"
                 @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
                 {{ col.value }}
               </div>
               <div v-else>{{ col.value }}</div>
             </template>
             <template v-else-if="col.name === 'surchargedAndNotExempt'">
-              <div v-if="props.row.surchargedAndNotExempt" class="cursor-pointer text-primary"
+              <div v-if="props.row.surchargedAndNotExempt || props.row.diff.surchargedAndNotExempt"
+                class="cursor-pointer text-primary"
                 @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
                 {{ col.value }}
               </div>

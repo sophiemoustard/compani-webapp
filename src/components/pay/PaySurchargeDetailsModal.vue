@@ -19,17 +19,19 @@
     <template v-if="pay.diff && pay.diff[surchargeDetailKey]">
       <div v-for="(surchargePlanDetails, surchargePlanId) in pay.diff[surchargeDetailKey]" class="q-mb-xl"
         :key="`diff${surchargePlanId}`">
-      <div class="text-primary capitalize text-weight-bold q-mb-md">
-        {{ surchargePlanDetails.planName }} (M-1)
+        <template v-if="displayDiff(surchargePlanDetails)">
+          <div class="text-primary capitalize text-weight-bold q-mb-md">
+            {{ surchargePlanDetails.planName }} (M-1)
+          </div>
+          <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
+            class="surcharge-line">
+            <div class="surcharge-type q-pa-sm">
+              {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
+            </div>
+            <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
+          </div>
+        </template>
       </div>
-      <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
-        class="surcharge-line">
-        <div class="surcharge-type q-pa-sm">
-          {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
-        </div>
-        <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
-      </div>
-    </div>
     </template>
   </ni-modal>
 </template>
@@ -57,6 +59,9 @@ export default {
   methods: {
     getSurcharges (surchargesPlanDetails) {
       return this.$_.pick(surchargesPlanDetails, Object.keys(SURCHARGES));
+    },
+    displayDiff (plan) {
+      return Object.values(plan).some(sur => sur.hours);
     },
     close () {
       this.$emit('update:paySurchargeDetailsModal', false);
