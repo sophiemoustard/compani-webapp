@@ -111,7 +111,8 @@ export default {
     activeFilters () {
       return this.filters
         .filter(f => f.type === SECTOR || this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
-          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek));
+          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          (this.initialAuxiliary && f._id === this.initialAuxiliary._id));
     },
   },
   methods: {
