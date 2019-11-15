@@ -31,6 +31,7 @@ import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
+import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -40,6 +41,9 @@ export default {
     'ni-planning-manager': Planning,
     'ni-event-creation-modal': EventCreationModal,
     'ni-event-edition-modal': EventEditionModal,
+  },
+  props: {
+    targetedAuxiliary: { type: Object, default: null },
   },
   data () {
     return {
@@ -107,7 +111,8 @@ export default {
     activeFilters () {
       return this.filters
         .filter(f => f.type === SECTOR || this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
-          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek));
+          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id)); // add targeted auxiliary even if not active on strat of week to display future events
     },
   },
   methods: {
@@ -125,7 +130,9 @@ export default {
     },
     // Filters
     initFilters () {
-      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+      if (this.targetedAuxiliary) {
+        this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
+      } else if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
