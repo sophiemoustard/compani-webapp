@@ -224,6 +224,7 @@ const routes = [
         path: 'ni/planning/auxiliaries',
         name: 'auxiliaries planning',
         component: () => import('pages/ni/planning/AuxiliaryPlanning'),
+        props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'events:read',

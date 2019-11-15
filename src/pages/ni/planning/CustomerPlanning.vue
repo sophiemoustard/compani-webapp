@@ -220,9 +220,6 @@ export default {
       }
     },
   },
-  filters: {
-    formatIdentity,
-  },
 }
 </script>
 
