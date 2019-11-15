@@ -167,7 +167,7 @@ export default {
         }
 
         this.events = await this.$events.list(params);
-        if (this.displayHistory) await this.updateEventHistories();
+        if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];

@@ -187,7 +187,7 @@ export default {
 
       const { address } = this.history.event;
 
-      return address && address ? `${details} ${address.fullAddress}.` : details;
+      return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
     },
     // Deletion
     getEventDeletionTitle () {
