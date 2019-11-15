@@ -43,7 +43,7 @@ export default {
     'ni-event-edition-modal': EventEditionModal,
   },
   props: {
-    initialAuxiliary: { type: Object, default: null },
+    targetedAuxiliary: { type: Object, default: null },
   },
   data () {
     return {
@@ -112,7 +112,7 @@ export default {
       return this.filters
         .filter(f => f.type === SECTOR || this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
           this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
-          (this.initialAuxiliary && f._id === this.initialAuxiliary._id));
+          (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id)); // add targeted auxiliary even if not active on strat of week to display future events
     },
   },
   methods: {
@@ -130,8 +130,8 @@ export default {
     },
     // Filters
     initFilters () {
-      if (this.initialAuxiliary) {
-        this.$refs.planningManager.restoreFilter([formatIdentity(this.initialAuxiliary.identity, 'FL')]);
+      if (this.targetedAuxiliary) {
+        this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
       } else if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Auxiliaries');
       } else {

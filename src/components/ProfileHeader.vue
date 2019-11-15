@@ -99,8 +99,7 @@ export default {
       user: 'rh/getUserProfile',
     }),
     isPlanningRouterDisable () {
-      if (this.customer) return !this.user.subscriptions || !this.user.subscriptions.length;
-      console.error(this.user.contracts);
+      if (this.customer) return !this.user.firstIntervention;
       return !this.user.contracts || !this.user.contracts.length;
     },
     companyName () {
@@ -169,8 +168,8 @@ export default {
   },
   methods: {
     goToPlanning () {
-      if (this.customer) this.$router.push({ name: 'customers planning', params: { initialCustomer: this.user } });
-      else this.$router.push({ name: 'auxiliaries planning', params: { initialAuxiliary: this.user } });
+      if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.user } });
+      else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.user } });
     },
     async sendMessage () {
       this.loading = true;
