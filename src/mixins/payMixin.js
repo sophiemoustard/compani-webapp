@@ -211,6 +211,12 @@ export const payMixin = {
 
       return formattedPlans.join('\r\n');
     },
+    formatHoursWithDiff (pay, key) {
+      let hours = pay[key];
+      if (pay.diff[key]) hours += pay.diff[key];
+
+      return parseFloat(hours).toFixed(2);
+    },
     async exportToCSV () {
       const csvData = [[
         'Auxiliaire',
@@ -218,6 +224,7 @@ export const payMixin = {
         'Début',
         'Fin',
         'Heures contrat',
+        'Heures à travailler',
         'Heures travaillées',
         'Dont exo non majo',
         'Dont exo et majo',
@@ -226,6 +233,7 @@ export const payMixin = {
         'Dont non exo et majo',
         'Details non exo et majo',
         'Solde heures',
+        'Dont rattrapage',
         'Compteur',
         'Heures sup à payer',
         'Heures comp à payer',
@@ -243,14 +251,16 @@ export const payMixin = {
           startDate ? this.$moment(startDate).format('DD/MM/YYYY') : '',
           endDate ? this.$moment(endDate).format('DD/MM/YYYY') : '',
           parseFloat(draftPay.contractHours).toFixed(2),
-          parseFloat(draftPay.workedHours).toFixed(2),
-          parseFloat(draftPay.notSurchargedAndExempt).toFixed(2),
-          parseFloat(draftPay.surchargedAndExempt).toFixed(2),
+          parseFloat(draftPay.hoursToWork).toFixed(2),
+          this.formatHoursWithDiff(draftPay, 'workedHours'),
+          this.formatHoursWithDiff(draftPay, 'notSurchargedAndExempt'),
+          this.formatHoursWithDiff(draftPay, 'surchargedAndExempt'),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndExemptDetails)}"` || '',
-          parseFloat(draftPay.notSurchargedAndNotExempt).toFixed(2),
-          parseFloat(draftPay.surchargedAndNotExempt).toFixed(2),
+          this.formatHoursWithDiff(draftPay, 'notSurchargedAndNotExempt'),
+          this.formatHoursWithDiff(draftPay, 'surchargedAndNotExempt'),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndNotExemptDetails)}"` || '',
-          parseFloat(draftPay.hoursBalance).toFixed(2),
+          this.formatHoursWithDiff(draftPay, 'hoursBalance'),
+          get(draftPay, 'diff.hoursBalance') ? parseFloat(draftPay.diff.hoursBalance).toFixed(2) : '0,00',
           parseFloat(draftPay.hoursCounter).toFixed(2),
           parseFloat(draftPay.overtimeHours).toFixed(2),
           parseFloat(draftPay.additionalHours).toFixed(2),
