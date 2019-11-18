@@ -61,7 +61,7 @@
         </template>
       </ni-simple-table>
     </div>
-    <div v-if="customer.fundings.length" class="q-mb-xl">
+    <div v-if="customerFundingsMonitoring.length" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
