@@ -153,6 +153,12 @@ export default {
           field: row => row.funding,
         },
         {
+          name: 'service',
+          align: 'center',
+          label: 'Service',
+          field: row => row.service,
+        },
+        {
           name: 'possibleCareHours',
           align: 'center',
           label: 'Heures attribuées',
@@ -162,13 +168,13 @@ export default {
           name: 'prevMonth',
           align: 'center',
           label: 'Heures mois derniers',
-          field: row => row.prevMonth,
+          field: row => row[this.$moment().subtract(1, 'month').format('YYYY-MM')],
         },
         {
           name: 'currentMonth',
           align: 'center',
           label: 'Heures mois en cours',
-          field: row => row.currentMonth,
+          field: row => row[this.$moment().format('YYYY-MM')],
         },
       ],
     };
