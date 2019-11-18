@@ -45,8 +45,7 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
-      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" row-key="name" hide-bottom
-        :visible-columns="visibleColumns" class="neutral-background" flat>
+      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" :visible-columns="visibleColumns">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -65,14 +64,13 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="customerFundingsMonitoring" :columns="fundingsMonitoringColumns" row-key="name"
-        hide-bottom class="neutral-background" flat />
+      <ni-simple-table :data="customerFundingsMonitoring" :columns="fundingsMonitoringColumns" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :rows-per-page-options="[]">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"

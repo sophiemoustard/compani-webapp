@@ -1,59 +1,60 @@
 <template>
-  <q-table :data="documents" :columns="columns" hide-bottom :pagination.sync="pagination"
-    class="q-mb-lg" row-key="_id" card-class="neutral-background" flat>
-    <q-tr slot="top-row">
-      <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
-      <q-td class="bold">Début de période</q-td>
-      <q-td />
-      <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
-      <q-td />
-    </q-tr>
-    <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
-      <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-        <template v-if="col.name === 'document'">
-          <template v-if="props.row.type === BILL">
-            <template v-if="props.row.number">
-              <a v-if="canDownloadBill(props.row)" :href="billUrl(props.row)" target="_blank" class="download">
-                Facture {{ props.row.number }}
-              </a>
-              <div v-else>Facture {{ props.row.number }}</div>
+  <ni-simple-table :data="documents" :columns="columns">
+    <template v-slot:body="{ props }" >
+      <q-tr :props="props">
+        <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
+        <q-td class="bold">Début de période</q-td>
+        <q-td />
+        <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
+        <q-td />
+      </q-tr>
+      <q-tr :props="props" v-if="Object.keys(documents).length > 0">
+        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+          <template v-if="col.name === 'document'">
+            <template v-if="props.row.type === BILL">
+              <template v-if="props.row.number">
+                <a v-if="canDownloadBill(props.row)" :href="billUrl(props.row)" target="_blank" class="download">
+                  Facture {{ props.row.number }}
+                </a>
+                <div v-else>Facture {{ props.row.number }}</div>
+              </template>
+              <div v-else>Facture tiers</div>
             </template>
-            <div v-else>Facture tiers</div>
+            <template  v-else-if="props.row.type === CREDIT_NOTE">
+              <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
+                class="download">
+                Avoir {{ props.row.number }}
+              </a>
+              <div v-else>Avoir {{ props.row.number }}</div>
+            </template>
+            <div v-else>{{ getPaymentTitle(props.row) }}</div>
           </template>
-          <template  v-else-if="props.row.type === CREDIT_NOTE">
-            <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
-              class="download">
-              Avoir {{ props.row.number }}
-            </a>
-            <div v-else>Avoir {{ props.row.number }}</div>
+          <template v-else-if="col.name === 'balance'">
+            <q-item class="row no-wrap items-center">
+              <q-item-section side>
+                <q-icon :name="balanceIcon(col.value)" :color="balanceIconColor(col.value)" class="balance-icon"/>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ formatBalance(col.value) }}</q-item-label>
+              </q-item-section>
+            </q-item>
           </template>
-          <div v-else>{{ getPaymentTitle(props.row) }}</div>
-        </template>
-        <template v-else-if="col.name === 'balance'">
-          <q-item class="row no-wrap items-center">
-            <q-item-section side>
-              <q-icon :name="balanceIcon(col.value)" :color="balanceIconColor(col.value)" class="balance-icon"/>
-            </q-item-section>
-            <q-item-section>
-              <q-item-label>{{ formatBalance(col.value) }}</q-item-label>
-            </q-item-section>
-          </q-item>
-        </template>
-        <template v-else-if="col.name === 'actions'">
-          <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
-            @click="openEditionModal(props.row)" />
-        </template>
-        <template v-else>{{ col.value }}</template>
-      </q-td>
-    </q-tr>
-    <q-tr slot="bottom-row">
-      <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
-      <q-td class="bold">Fin de période</q-td>
-      <q-td />
-      <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
-      <q-td />
-    </q-tr>
-  </q-table>
+          <template v-else-if="col.name === 'actions'">
+            <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
+              @click="openEditionModal(props.row)" />
+          </template>
+          <template v-else>{{ col.value }}</template>
+        </q-td>
+      </q-tr>
+      <q-tr :props="props">
+        <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
+        <q-td class="bold">Fin de période</q-td>
+        <q-td />
+        <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
+        <q-td />
+      </q-tr>
+    </template>
+  </ni-simple-table>
 </template>
 
 <script>
@@ -71,6 +72,7 @@ import {
   COMPANI,
 } from '../../data/constants';
 import { formatPrice } from '../../helpers/utils';
+import SimpleTable from '../table/SimpleTable';
 
 export default {
   name: 'CustomerBillingTable',
@@ -81,6 +83,9 @@ export default {
     type: { type: String, default: CUSTOMER },
     startBalance: { type: Number, default: 0 },
     endBalance: { type: Number, default: 0 },
+  },
+  components: {
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {
