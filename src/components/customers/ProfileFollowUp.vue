@@ -45,7 +45,7 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
-      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" :visible-columns="visibleColumns">
+      <ni-simple-table :data="sortedHelpers" :columns="helperColumns">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -60,17 +60,18 @@
         </template>
       </ni-simple-table>
     </div>
-    <div v-if="customerFundingsMonitoring.length" class="q-mb-xl">
+    <div v-if="fundingsMonitoring.length" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="customerFundingsMonitoring" :columns="fundingsMonitoringColumns" />
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
+        :hide-bottom="false" :rows-per-page-options="[]">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -144,25 +145,20 @@ export default {
           field: row => this.$moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
         },
       ],
-      customerFundingsMonitoring: [],
+      followUpPagination: { rowsPerPage: 5 },
+      fundingsMonitoring: [],
       fundingsMonitoringColumns: [
         {
-          name: 'funding',
-          align: 'center',
-          label: 'financeur',
-          field: row => row.funding,
+          name: 'thirdPartyPayer',
+          align: 'left',
+          label: 'Financeur',
+          field: row => row.thirdPartyPayer,
         },
         {
-          name: 'service',
-          align: 'center',
-          label: 'Service',
-          field: row => row.service,
-        },
-        {
-          name: 'possibleCareHours',
+          name: 'plannedCareHours',
           align: 'center',
           label: 'Heures attribuées',
-          field: row => row.possibleCareHours,
+          field: row => row.plannedCareHours,
         },
         {
           name: 'prevMonth',
@@ -261,10 +257,10 @@ export default {
     },
     async getCustomerFundingsMonitoring () {
       try {
-        this.customerFundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
+        this.fundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
-        this.customerFundingsMonitoring = [];
+        this.fundingsMonitoring = [];
         NotifyNegative('Erreur lors de la récupération du suivi des financements');
       }
     },

@@ -1,6 +1,6 @@
 <template>
-  <q-table :data="data" :columns="columns" row-key="name" hide-bottom flat
-  :visible-columns="visibleColumns" class="neutral-background">
+  <q-table :data="data" :columns="columns" :row-key="rowKey" flat :hide-bottom="hideBottom" :pagination="pagination"
+    :visible-columns="visibleColumns" class="neutral-background" :rows-per-page-options="rowsPerPageOptions">
     <template v-slot:body="props">
       <slot name="body" :props="props">
         <q-tr :props="props">
@@ -21,7 +21,10 @@ export default {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
     rowKey: { type: String, default: 'name' },
+    hideBottom: { type: Boolean, default: true },
     visibleColumns: Array,
+    pagination: { type: Object, default: () => ({}) },
+    rowsPerPageOptions: { type: Array, default: () => [] },
   },
 }
 </script>
