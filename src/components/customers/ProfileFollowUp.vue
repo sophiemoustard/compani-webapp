@@ -225,9 +225,11 @@ export default {
     },
   },
   async mounted () {
-    await Promise.all([this.refreshCustomer(), this.getUserHelpers(), this.getAuxiliaries()])
-    if (this.customer.firstIntervention) await this.getCustomerFollowUp();
-    if (this.customer.fundings.length) await this.getCustomerFundingsMonitoring();
+    await this.refreshCustomer();
+    const promises = [this.getUserHelpers(), this.getAuxiliaries()];
+    if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
+    if (this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
+    await Promise.all(promises);
   },
   methods: {
     getAuxiliaryAvatar (picture) {
