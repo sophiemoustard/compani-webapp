@@ -251,7 +251,7 @@ export const payMixin = {
           startDate ? this.$moment(startDate).format('DD/MM/YYYY') : '',
           endDate ? this.$moment(endDate).format('DD/MM/YYYY') : '',
           parseFloat(draftPay.contractHours).toFixed(2),
-          parseFloat(draftPay.hoursToWork).toFixed(2),
+          this.formatHoursWithDiff(draftPay, 'hoursToWork'),
           this.formatHoursWithDiff(draftPay, 'workedHours'),
           this.formatHoursWithDiff(draftPay, 'notSurchargedAndExempt'),
           this.formatHoursWithDiff(draftPay, 'surchargedAndExempt'),
