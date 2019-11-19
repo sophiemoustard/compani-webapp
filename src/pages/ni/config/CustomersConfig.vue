@@ -491,31 +491,31 @@ export default {
         {
           name: 'eveningStartTime',
           label: 'Début soirée',
-          align: 'left',
+          align: 'center',
           field: row => row.eveningStartTime ? this.$moment(row.eveningStartTime).format('HH:mm') : '',
         },
         {
           name: 'eveningEndTime',
           label: 'Fin soirée',
-          align: 'left',
+          align: 'center',
           field: row => row.eveningEndTime ? this.$moment(row.eveningEndTime).format('HH:mm') : '',
         },
         {
           name: 'custom',
-          label: 'Majoration perso',
+          label: 'Perso',
           align: 'center',
           field: row => row.custom && `${row.custom}%`,
         },
         {
           name: 'customStartTime',
           label: 'Début perso',
-          align: 'left',
+          align: 'center',
           field: row => row.customStartTime ? this.$moment(row.customStartTime).format('HH:mm') : '',
         },
         {
           name: 'customEndTime',
           label: 'Fin perso',
-          align: 'left',
+          align: 'center',
           field: row => row.customEndTime ? this.$moment(row.customEndTime).format('HH:mm') : '',
         },
         {
