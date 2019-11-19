@@ -29,7 +29,7 @@ export const payMixin = {
           label: 'Début',
           align: 'left',
           field: 'startDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => value ? this.$moment(value).format('DD/MM') : '',
           sort: (a, b) => new Date(a) - new Date(b),
         },
         {
@@ -37,7 +37,7 @@ export const payMixin = {
           label: 'Date de notif',
           align: 'left',
           field: 'endNotificationDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => value ? this.$moment(value).format('DD/MM') : '',
         },
         {
           name: 'endReason',
@@ -54,7 +54,7 @@ export const payMixin = {
           label: 'Fin',
           align: 'left',
           field: 'endDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => value ? this.$moment(value).format('DD/MM') : '',
         },
         {
           name: 'contractHours',
@@ -64,45 +64,66 @@ export const payMixin = {
           format: value => formatHours(value),
         },
         {
+          name: 'hoursToWork',
+          label: 'Heures à travailler',
+          align: 'center',
+          field: 'hoursToWork',
+          format: value => formatHours(value),
+        },
+        {
           name: 'workedHours',
           label: 'Heures travaillées',
           align: 'center',
-          field: 'workedHours',
+          field: row => row.workedHours + row.diff.workedHours,
           format: value => formatHours(value),
         },
         {
           name: 'notSurchargedAndExempt',
           label: 'Dont exo non majo',
           align: 'center',
-          field: 'notSurchargedAndExempt',
+          field: row => row.notSurchargedAndExempt + row.diff.notSurchargedAndExempt,
           format: value => formatHours(value),
         },
         {
           name: 'surchargedAndExempt',
           label: 'Dont exo et majo',
           align: 'center',
-          field: 'surchargedAndExempt',
+          field: row => row.surchargedAndExempt + row.diff.surchargedAndExempt,
           format: value => formatHours(value),
         },
         {
           name: 'notSurchargedAndNotExempt',
           label: 'Dont non exo et non majo ',
           align: 'center',
-          field: 'notSurchargedAndNotExempt',
+          field: row => row.notSurchargedAndNotExempt + row.diff.notSurchargedAndNotExempt,
           format: value => formatHours(value),
         },
         {
           name: 'surchargedAndNotExempt',
           label: 'Dont non exo et majo',
           align: 'center',
-          field: 'surchargedAndNotExempt',
+          field: row => row.surchargedAndNotExempt + row.diff.surchargedAndNotExempt,
           format: value => formatHours(value),
         },
         {
           name: 'hoursBalance',
           label: 'Solde heures',
           align: 'center',
-          field: 'hoursBalance',
+          field: row => row.hoursBalance + row.diff.hoursBalance,
+          format: value => formatHours(value),
+        },
+        {
+          name: 'diff',
+          label: 'Dont rattrapage',
+          align: 'center',
+          field: row => row.diff.hoursBalance,
+          format: value => formatHours(value),
+        },
+        {
+          name: 'previousMonthHoursCounter',
+          label: 'Compteur M-1',
+          align: 'center',
+          field: row => row.previousMonthHoursCounter,
           format: value => formatHours(value),
         },
         {
@@ -114,14 +135,14 @@ export const payMixin = {
         },
         {
           name: 'overtimeHours',
-          label: 'Heures sup à payer',
+          label: 'Heures sup',
           align: 'center',
           field: 'overtimeHours',
           format: value => formatHours(value),
         },
         {
           name: 'additionalHours',
-          label: 'Heures comp à payer',
+          label: 'Heures comp',
           align: 'center',
           field: 'additionalHours',
           format: value => formatHours(value),
@@ -190,6 +211,12 @@ export const payMixin = {
 
       return formattedPlans.join('\r\n');
     },
+    formatHoursWithDiff (pay, key) {
+      let hours = pay[key];
+      if (pay.diff[key]) hours += pay.diff[key];
+
+      return parseFloat(hours).toFixed(2);
+    },
     async exportToCSV () {
       const csvData = [[
         'Auxiliaire',
@@ -197,6 +224,7 @@ export const payMixin = {
         'Début',
         'Fin',
         'Heures contrat',
+        'Heures à travailler',
         'Heures travaillées',
         'Dont exo non majo',
         'Dont exo et majo',
@@ -205,6 +233,7 @@ export const payMixin = {
         'Dont non exo et majo',
         'Details non exo et majo',
         'Solde heures',
+        'Dont rattrapage',
         'Compteur',
         'Heures sup à payer',
         'Heures comp à payer',
@@ -222,14 +251,16 @@ export const payMixin = {
           startDate ? this.$moment(startDate).format('DD/MM/YYYY') : '',
           endDate ? this.$moment(endDate).format('DD/MM/YYYY') : '',
           parseFloat(draftPay.contractHours).toFixed(2),
-          parseFloat(draftPay.workedHours).toFixed(2),
-          parseFloat(draftPay.notSurchargedAndExempt).toFixed(2),
-          parseFloat(draftPay.surchargedAndExempt).toFixed(2),
+          parseFloat(draftPay.hoursToWork).toFixed(2),
+          this.formatHoursWithDiff(draftPay, 'workedHours'),
+          this.formatHoursWithDiff(draftPay, 'notSurchargedAndExempt'),
+          this.formatHoursWithDiff(draftPay, 'surchargedAndExempt'),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndExemptDetails)}"` || '',
-          parseFloat(draftPay.notSurchargedAndNotExempt).toFixed(2),
-          parseFloat(draftPay.surchargedAndNotExempt).toFixed(2),
+          this.formatHoursWithDiff(draftPay, 'notSurchargedAndNotExempt'),
+          this.formatHoursWithDiff(draftPay, 'surchargedAndNotExempt'),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndNotExemptDetails)}"` || '',
-          parseFloat(draftPay.hoursBalance).toFixed(2),
+          this.formatHoursWithDiff(draftPay, 'hoursBalance'),
+          get(draftPay, 'diff.hoursBalance') ? parseFloat(draftPay.diff.hoursBalance).toFixed(2) : '0,00',
           parseFloat(draftPay.hoursCounter).toFixed(2),
           parseFloat(draftPay.overtimeHours).toFixed(2),
           parseFloat(draftPay.additionalHours).toFixed(2),

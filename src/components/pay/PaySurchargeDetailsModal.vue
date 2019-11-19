@@ -3,7 +3,8 @@
     <template slot="title">
       Détails des <span class="text-weight-bold">majorations</span>
     </template>
-    <div v-for="(surchargePlanDetails, surchargePlanId) in surchargeDetails" :key="surchargePlanId" class="q-mb-xl">
+    <div v-for="(surchargePlanDetails, surchargePlanId) in pay[surchargeDetailKey]" :key="surchargePlanId"
+      class="q-mb-xl">
       <div class="text-primary capitalize text-weight-bold q-mb-md">
         {{ surchargePlanDetails.planName }}
       </div>
@@ -15,6 +16,23 @@
         <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
       </div>
     </div>
+    <template v-if="pay.diff && pay.diff[surchargeDetailKey]">
+      <div v-for="(surchargePlanDetails, surchargePlanId) in pay.diff[surchargeDetailKey]" class="q-mb-xl"
+        :key="`diff${surchargePlanId}`">
+        <template v-if="displayDiff(surchargePlanDetails)">
+          <div class="text-primary capitalize text-weight-bold q-mb-md">
+            {{ surchargePlanDetails.planName }} (M-1)
+          </div>
+          <div v-for="(surchage, surchargeName) in getSurcharges(surchargePlanDetails)" :key="surchargeName"
+            class="surcharge-line">
+            <div class="surcharge-type q-pa-sm">
+              {{ SURCHARGES[surchargeName] }} - {{ surchage.percentage }}%
+            </div>
+            <div class="q-pa-sm">{{ formatHours(surchage.hours) }}</div>
+          </div>
+        </template>
+      </div>
+    </template>
   </ni-modal>
 </template>
 
@@ -35,11 +53,15 @@ export default {
   },
   props: {
     paySurchargeDetailsModal: { type: Boolean, default: false },
-    surchargeDetails: { type: Object, default: () => {} },
+    pay: { type: Object, default: () => {} },
+    surchargeDetailKey: { type: String, default: '' },
   },
   methods: {
     getSurcharges (surchargesPlanDetails) {
       return this.$_.pick(surchargesPlanDetails, Object.keys(SURCHARGES));
+    },
+    displayDiff (plan) {
+      return Object.values(plan).some(sur => sur.hours);
     },
     close () {
       this.$emit('update:paySurchargeDetailsModal', false);
