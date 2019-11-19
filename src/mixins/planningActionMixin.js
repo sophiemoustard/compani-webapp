@@ -167,10 +167,6 @@ export const planningActionMixin = {
         payload.sector = auxiliary.sector._id;
       }
 
-      if (event.type === INTERNAL_HOUR) {
-        payload.internalHour = event.internalHour;
-      }
-
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
         payload.startDate = this.$moment(event.dates.startDate).startOf('d').toDate();
         payload.endDate = this.$moment(event.dates.endDate).endOf('d').toDate();
