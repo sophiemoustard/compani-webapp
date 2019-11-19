@@ -502,19 +502,19 @@ export default {
         },
         {
           name: 'custom',
-          label: 'Majoration personnalisée',
+          label: 'Majoration perso',
           align: 'center',
           field: row => row.custom && `${row.custom}%`,
         },
         {
           name: 'customStartTime',
-          label: 'Début personnalisé',
+          label: 'Début perso',
           align: 'left',
           field: row => row.customStartTime ? this.$moment(row.customStartTime).format('HH:mm') : '',
         },
         {
           name: 'customEndTime',
-          label: 'Fin personnalisée',
+          label: 'Fin perso',
           align: 'left',
           field: row => row.customEndTime ? this.$moment(row.customEndTime).format('HH:mm') : '',
         },
