@@ -152,13 +152,13 @@ export default {
           name: 'thirdPartyPayer',
           align: 'left',
           label: 'Financeur',
-          field: row => row.thirdPartyPayer,
+          field: 'thirdPartyPayer',
         },
         {
           name: 'plannedCareHours',
           align: 'center',
           label: 'Heures attribuées',
-          field: row => row.plannedCareHours,
+          field: 'plannedCareHours',
         },
         {
           name: 'prevMonth',
