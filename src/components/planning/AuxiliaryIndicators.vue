@@ -1,78 +1,37 @@
 <template>
   <div>
     <div class="economic-indicators">
-      <p style="font-weight:bold">
-        {{ totalWorkingHours | formatHours }} travaillées
-      </p>
       <div class="progress-indicator">
-        <q-linear-progress :value="Math.round(weeklyInterventionsPercentage) / 100" class="intervention" />
         <div class="progress-caption">
-          <div>Interventions</div>
-          <div>{{ weeklyInterventions | formatHours }}</div>
+          <div>Heures à travailler</div>
+          <div>{{ details.hoursToWork | formatHours }}</div>
         </div>
       </div>
       <div class="progress-indicator">
-        <q-linear-progress :value="Math.round(weeklyInternalHoursPercentage) / 100" class="internal-hours" />
         <div class="progress-caption">
-          <div>Heures internes</div>
-          <div>{{ weeklyInternalHours | formatHours }}</div>
+          <div>Heures travaillées</div>
+          <div>{{ details.workedHours | formatHours }}</div>
         </div>
       </div>
       <div class="progress-indicator">
-        <q-linear-progress :value="Math.round(weeklyPaidTransportsPercentage) / 100" class="transports" />
         <div class="progress-caption">
-          <div>Transports</div>
-          <div>{{ weeklyPaidTransports | formatHours }}</div>
+          <div>Soldes d'heures du mois</div>
+          <div>{{ details.hoursBalance | formatHours }}</div>
         </div>
       </div>
     </div>
     <div class="quality-indicators">
-      <div class="quality-indicators-item">
-        <span class="highlight">{{ customersCount }}</span> bénéficiaires accompagnés,
-        <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }}</span>
-        par {{ averageHoursLabels[timeUnit] }} en moyenne
-      </div>
-      <div class="quality-indicators-item">
-        <span class="highlight">{{ `${Math.round(weeklyBreak)}h` }}</span> de coupure, incluant transport
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { WEEK_STATS, MONTH_STATS } from '../../data/constants';
 import { formatHours } from '../../helpers/utils';
 
 export default {
   name: 'AuxiliaryIndicators',
-  data () {
-    return {
-      averageHoursLabels: { [WEEK_STATS]: 'semaine', [MONTH_STATS]: 'mois' },
-    };
-  },
   props: {
-    totalWorkingHours: { type: Number, default: 0 },
-    weeklyInterventions: { type: Number, default: 0 },
-    weeklyInternalHours: { type: Number, default: 0 },
-    weeklyPaidTransports: { type: Number, default: 0 },
-    customersCount: { type: Number, default: 0 },
-    averageTimeByCustomer: { type: Number, default: 0 },
-    weeklyBreak: { type: Number, default: 0 },
-    timeUnit: { type: String, default: WEEK_STATS },
-  },
-  computed: {
-    weeklyInternalHoursPercentage () {
-      if (this.totalWorkingHours === 0) return 0;
-      return this.weeklyInternalHours / this.totalWorkingHours * 100;
-    },
-    weeklyInterventionsPercentage () {
-      if (this.totalWorkingHours === 0) return 0;
-      return this.weeklyInterventions / this.totalWorkingHours * 100;
-    },
-    weeklyPaidTransportsPercentage () {
-      if (this.totalWorkingHours === 0) return 0;
-      return this.weeklyPaidTransports / this.totalWorkingHours * 100;
-    },
+    details: { type: Object, default: () => ({}) },
   },
   filters: {
     formatHours: hours => formatHours(hours, 1),
