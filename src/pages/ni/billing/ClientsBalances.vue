@@ -171,29 +171,22 @@ export default {
         this.creationLoading = false;
       }
     },
-    async createPayments () {
+    async createPaymentList () {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Cette opération est définitive. Confirmez-vous ?',
-          ok: 'Oui',
-          cancel: 'Non',
-        }).onOk(async () => {
-          const payload = this.selected.map((row) => {
-            return {
-              nature: this.PAYMENT,
-              customer: row._id.customer,
-              customerInfo: row.customer,
-              netInclTaxes: row.toPay,
-              type: this.PAYMENT_OPTIONS[0].value,
-              date: this.$moment().toDate(),
-              rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
-            }
-          });
-          await this.$payments.createList(payload);
-          NotifyPositive('Règlement(s) créé(s)');
-          await this.getBalances();
+        const payload = this.selected.map((row) => {
+          return {
+            nature: this.PAYMENT,
+            customer: row._id.customer,
+            customerInfo: row.customer,
+            netInclTaxes: row.toPay,
+            type: this.PAYMENT_OPTIONS[0].value,
+            date: this.$moment().toDate(),
+            rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
+          }
         });
+        await this.$payments.createList(payload);
+        NotifyPositive('Règlement(s) créé(s)');
+        await this.getBalances();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du(des) règlement(s)');
