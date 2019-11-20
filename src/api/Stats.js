@@ -9,10 +9,10 @@ export default {
       console.error(e.response);
     }
   },
-  async getCustomerFundingsMonitoring (params = null) {
+  async getCustomerFundingsMonitoring (customerId) {
     try {
-      const fundingsMonitoring = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-fundings-monitoring/${params.customer}`);
-      return fundingsMonitoring.data.data.stats;
+      const fundingsMonitoring = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-fundings-monitoring/${customerId}`);
+      return fundingsMonitoring.data.data;
     } catch (e) {
       console.error(e.response);
     }

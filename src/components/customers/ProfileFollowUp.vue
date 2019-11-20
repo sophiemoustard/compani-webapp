@@ -45,7 +45,7 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
-      <ni-simple-table :data="sortedHelpers" :columns="helperColumns">
+      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" :visible-columns="visibleColumns">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -70,8 +70,7 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
-        :hide-bottom="false" :rows-per-page-options="[]">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -164,13 +163,13 @@ export default {
           name: 'prevMonth',
           align: 'center',
           label: 'Heures mois derniers',
-          field: row => row[this.$moment().subtract(1, 'month').format('YYYY-MM')],
+          field: row => row[this.$moment().subtract(1, 'month').format('YYYY-MM')] || 'N/A',
         },
         {
           name: 'currentMonth',
           align: 'center',
           label: 'Heures mois en cours',
-          field: row => row[this.$moment().format('YYYY-MM')],
+          field: row => row[this.$moment().format('YYYY-MM')] || 0,
         },
       ],
     };
@@ -228,7 +227,7 @@ export default {
     await this.refreshCustomer();
     const promises = [this.getUserHelpers(), this.getAuxiliaries()];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
-    if (this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
+    if (this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring(this.customer._id));
     await Promise.all(promises);
   },
   methods: {
@@ -259,7 +258,7 @@ export default {
     },
     async getCustomerFundingsMonitoring () {
       try {
-        this.fundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
+        this.fundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring(this.customer._id);
       } catch (e) {
         console.error(e);
         this.fundingsMonitoring = [];
