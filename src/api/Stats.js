@@ -12,7 +12,7 @@ export default {
   async getCustomerFundingsMonitoring (customerId) {
     try {
       const fundingsMonitoring = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-fundings-monitoring/${customerId}`);
-      return fundingsMonitoring.data.data;
+      return fundingsMonitoring.data.data.customerFundingsMonitoring;
     } catch (e) {
       console.error(e.response);
     }
