@@ -202,6 +202,15 @@ export default {
         this.creationLoading = false;
       }
     },
+    async createPayments () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(this.createPaymentList)
+        .onCancel(() => NotifyPositive('Création des règlements annulée'));
+    },
   },
 }
 </script>
