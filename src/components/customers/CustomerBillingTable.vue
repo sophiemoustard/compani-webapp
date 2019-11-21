@@ -1,6 +1,6 @@
 <template>
   <ni-simple-table :data="documents" :columns="columns">
-    <template v-slot:body="{ props }" >
+    <template v-slot:top-row="{ props }" >
       <q-tr :props="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
         <q-td class="bold">Début de période</q-td>
@@ -8,6 +8,8 @@
         <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
         <q-td />
       </q-tr>
+    </template>
+    <template v-slot:body="{ props }">
       <q-tr :props="props" v-if="Object.keys(documents).length > 0">
         <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
@@ -46,6 +48,8 @@
           <template v-else>{{ col.value }}</template>
         </q-td>
       </q-tr>
+    </template>
+    <template v-slot:bottom-row="{ props }">
       <q-tr :props="props">
         <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
         <q-td class="bold">Fin de période</q-td>
