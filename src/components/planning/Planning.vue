@@ -135,7 +135,7 @@ export default {
     'ni-event-history-feed': NiEventHistoryFeed,
   },
   props: {
-    workingStats: { type: Array, default: () => [] },
+    workingStats: { type: Object, default: () => ({}) },
     events: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
     filteredSectors: { type: Array, default: () => [] },

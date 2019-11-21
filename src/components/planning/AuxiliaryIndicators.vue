@@ -1,23 +1,19 @@
 <template>
   <div>
     <div class="economic-indicators">
-      <div class="progress-indicator">
-        <div class="progress-caption">
-          <div>Heures à travailler</div>
-          <div>{{ details.hoursToWork | formatHours }}</div>
-        </div>
+      <div class="indicator row">
+        <div class="col-4">Heures à travailler</div>
+        <div class="col-2 indicator-hours">{{ hoursToWork | formatHours }}</div>
+        <div class="col-6">{{ details.contractHours | formatHours }} (contrat) - {{ absencesHours | formatHours }} (absence)</div>
       </div>
-      <div class="progress-indicator">
-        <div class="progress-caption">
-          <div>Heures travaillées</div>
-          <div>{{ details.workedHours | formatHours }}</div>
-        </div>
+      <div class="indicator row">
+        <div class="col-4">Heures travaillées</div>
+        <div class="col-2 indicator-hours">{{ workedHours | formatHours }}</div>
+        <div class="col-6">{{ workedHoursDetail }}</div>
       </div>
-      <div class="progress-indicator">
-        <div class="progress-caption">
-          <div>Soldes d'heures du mois</div>
-          <div>{{ details.hoursBalance | formatHours }}</div>
-        </div>
+      <div class="indicator row text-weight-bold">
+        <div class="col-4">Soldes d'heures du mois</div>
+        <div class="col-2 indicator-hours">{{ hoursBalance | formatHours }}</div>
       </div>
     </div>
     <div class="quality-indicators">
@@ -36,53 +32,70 @@ export default {
   filters: {
     formatHours: hours => formatHours(hours, 1),
   },
+  computed: {
+    hoursToWork () {
+      return this.getHoursWithDiff('hoursToWork');
+    },
+    absencesHours () {
+      return this.getHoursWithDiff('absencesHours');
+    },
+    hoursBalance () {
+      return this.getHoursWithDiff('hoursBalance');
+    },
+    workedHours () {
+      return this.getHoursWithDiff('workedHours');
+    },
+    workedHoursDetail () {
+      let detail = '';
+      if (this.details.internalHours) detail += ` ${formatHours(this.details.internalHours, 1)} internes`;
+      if (this.details.diff && this.details.diff.workedHours) {
+        if (detail !== '') detail += ' et'
+        detail += ` ${formatHours(this.details.diff.workedHours, 1)} de rattrapage`;
+      }
+
+      return detail;
+    },
+  },
+  methods: {
+    getHoursWithDiff (key) {
+      return this.details.diff && this.details.diff[key]
+        ? this.details.diff[key] + this.details[key]
+        : this.details[key];
+    },
+  },
 }
 </script>
 
 <style lang="stylus" scoped>
-  .progress-indicator
-    padding: 3px
-    border-top: 1px solid $light-grey;
-    border-left: 1px solid $light-grey;
-    border-right: 1px solid $light-grey;
-    &:last-child
-      border-bottom: 1px solid $light-grey;
-
-  .progress-caption
+  .indicator
     display: flex;
-    justify-content: space-between;
+    border-top: 1px solid $light-grey
+    border-left: 1px solid $light-grey
+    border-right: 1px solid $light-grey
+    div
+      padding: 3px 4px
+    &:last-child
+      border-bottom: 1px solid $light-grey
+
+  .indicator-hours
+    display: flex
+    border-left:  1px solid $light-grey
 
   .highlight
     color: $primary
     font-weight: bold
 
   .economic-indicators
-    padding: 0 24px;
-    margin: 24px 0;
-    border-left: 5px solid $primary-dark !important;
+    padding: 0 24px
+    margin: 24px 0
+    border-left: 5px solid $primary-dark !important
 
   .quality-indicators
-    padding: 0 24px;
-    margin-bottom: 24px;
-    border-left: 5px solid $primary !important;
+    padding: 0 24px
+    margin-bottom: 24px
+    border-left: 5px solid $primary !important
 
   .quality-indicators-item
-    border-top: 1px solid $light-grey;
-    padding: 10px 0;
-
-  .q-linear-progress
-    height: 10px !important;
-    /deep/ .q-linear-progress__track
-      background: repeating-linear-gradient(45deg, $grey-3, $grey-3 1px, $white 1px, $white 3px)
-      opacity: 0.8;
-    &.intervention
-      /deep/ .q-linear-progress__model
-        color: $light-pink;
-    &.internal-hours
-      /deep/ .q-linear-progress__model
-        color: $light-purple;
-    &.transports
-      /deep/ .q-linear-progress__model
-        color: $primary-dark;
-
+    border-top: 1px solid $light-grey
+    padding: 10px 0
 </style>

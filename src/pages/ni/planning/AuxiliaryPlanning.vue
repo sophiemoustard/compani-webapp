@@ -68,7 +68,7 @@ export default {
       displayAllSectors: false,
       eventHistories: [],
       displayHistory: false,
-      workingStats: [],
+      workingStats: {},
     };
   },
   async mounted () {
