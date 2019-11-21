@@ -94,10 +94,10 @@
           <div class="col-xs-11">
             <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
               :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="user.local.email"
-              @blur="updateUser('local.email')" @focus="saveTmp('local.email')" />
+              @focus="saveTmp('local.email')" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock" />
+            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
           </div>
         </div>
         <ni-search-address v-model="user.contact.address" color="white" @focus="saveTmp('contact.address.fullAddress')"
@@ -633,11 +633,13 @@ export default {
     },
   },
   methods: {
-    async toggleEmailLock (event) {
-      if (this.emailLock) {
+    async toggleEmailLock (toLock) {
+      if (!toLock) {
         this.emailLock = false;
         await this.$nextTick();
-        this.$refs.userEmail.focus();
+        this.$refs.userEmail.$refs.emailInput.focus();
+      } else {
+        await this.updateUser('local.email');
       }
     },
     mergeUser (value = null) {
@@ -645,7 +647,7 @@ export default {
       this.user = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.user, path);
+      if (this.tmpInput === '') this.tmpInput = this.$_.get(this.user, path);
     },
     async emailErrorHandler (path) {
       try {
@@ -660,15 +662,14 @@ export default {
     async updateUser (path) {
       try {
         if (this.tmpInput === this.$_.get(this.user, path)) {
-          if (path === 'local.email' && this.tmpInput !== '') this.emailLock = true;
+          this.emailLock = true;
           return;
         }
+
         if (this.$_.get(this.$v.user, path)) {
           this.$_.get(this.$v.user, path).$touch();
           const isValid = await this.waitForValidation(this.$v.user, path);
-          if (!isValid) {
-            return NotifyWarning('Champ(s) invalide(s)');
-          }
+          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         await this.updateAlenviUser(path);
 
