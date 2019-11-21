@@ -17,6 +17,13 @@
       </div>
     </div>
     <div class="quality-indicators">
+      <div class="quality-indicators-item">
+        <span class="highlight">{{ details.customersCount }}</span> bénéficiaires accompagnés,
+        <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }} en moyenne</span>
+      </div>
+      <div class="quality-indicators-item">
+        <span class="highlight">{{ details.paidTransportHours | formatHours }}</span> de transport rémunéré
+      </div>
     </div>
   </div>
 </template>
@@ -33,6 +40,10 @@ export default {
     formatHours: hours => formatHours(hours, 1),
   },
   computed: {
+    averageTimeByCustomer () {
+      if (!this.details.customersCount) return 0;
+      return this.workedHours / this.details.customersCount;
+    },
     hoursToWork () {
       return this.getHoursWithDiff('hoursToWork');
     },
