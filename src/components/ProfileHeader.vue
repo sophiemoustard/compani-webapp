@@ -174,7 +174,7 @@ export default {
     async sendMessage () {
       this.loading = true;
       if (this.typeMessage === 'CA') {
-        await this.$activationCode.create({ code: this.activationCode, newUserId: this.user._id, userEmail: this.user.local.email });
+        await this.$activationCode.create({ code: this.activationCode, user: this.user._id });
       }
       await this.sendSMS();
       this.loading = false;

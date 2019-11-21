@@ -370,14 +370,13 @@ export default {
       await this.$users.createDriveFolder({ _id: newUser._id });
       return newUser;
     },
-    async sendSms (newUserId) {
+    async sendSms (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
-      const activationDataRaw = await this.$activationCode.create({ newUserId, userEmail: this.newUser.local.email });
-      const code = activationDataRaw.activationData.code;
+      const activationCode = await this.$activationCode.create({ user });
       await this.$twilio.sendSMS({
         to: `+33${this.newUser.contact.phone.substring(1)}`,
         from: this.company.tradeName,
-        body: `${this.company.tradeName}. Bienvenue ! :)\nUtilise ce code: ${code} pour pouvoir ` +
+        body: `${this.company.tradeName}. Bienvenue ! :)\nUtilise ce code: ${activationCode.code} pour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration: ' +
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
       });
