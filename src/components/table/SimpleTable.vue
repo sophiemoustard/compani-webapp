@@ -2,6 +2,7 @@
   <q-table :data="data" :columns="columns" :row-key="rowKey" flat :hide-bottom="!Object.keys(pagination).length"
     :pagination="pagination" :visible-columns="visibleColumns" class="neutral-background"
     :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)">
+    <template v-slot:top-row="props"><slot name="top-row" :props="props" /></template>
     <template v-slot:body="props">
       <slot name="body" :props="props">
         <q-tr :props="props">
@@ -12,6 +13,7 @@
         </q-tr>
       </slot>
     </template>
+    <template v-slot:bottom-row="props"><slot name="bottom-row" :props="props" /></template>
   </q-table>
 </template>
 
