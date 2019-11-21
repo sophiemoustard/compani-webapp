@@ -3,7 +3,7 @@
     <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
       <q-spinner-dots v-if="loading" />
-      <span v-else class="chip-indicator">{{ weeklyHours }}h / {{ contractHours }}</span>
+      <span v-else class="chip-indicator">{{ Math.round(workingStats.workedHours) }}h / {{ workingStats.hoursToWork }}</span>
     </q-chip>
 
     <!-- Indicators modal -->
@@ -58,12 +58,11 @@ export default {
     events: { type: Array, default: () => [] },
     startOfWeek: { type: String, default: '' },
     dm: { type: Array, default: () => [] },
+    workingStats: { type: Object, default: () => ({ workedHours: 0, hoursToWork: 0 }) },
   },
   data () {
     return {
       loading: false,
-      weeklyHours: 0,
-      contractHours: 0,
       indicatorsModal: false,
       tabsContent: [
         { label: 'Stats du mois', default: true, name: MONTH_STATS },
@@ -77,9 +76,9 @@ export default {
   },
   computed: {
     occupationLevel () {
-      if (this.contractHours !== 0 && this.weeklyHours < this.contractHours) {
+      if (this.workingStats.hoursToWork !== 0 && this.workingStats.workedHours < this.workingStats.hoursToWork) {
         return LOW;
-      } else if (this.weeklyHours < MAX_WEEKLY_OCCUPATION_LEVEL) {
+      } else if (this.workingStats.workedHours < MAX_WEEKLY_OCCUPATION_LEVEL) {
         return HIGH;
       }
       return EXTREME;

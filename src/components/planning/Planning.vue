@@ -69,7 +69,7 @@
                     <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
                     <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                      :startOfWeek="startOfWeek" :dm="distanceMatrix" />
+                      :startOfWeek="startOfWeek" :dm="distanceMatrix" :working-stats="workingStats[person._id]" />
                   </div>
                   <div class="person-name overflow-hidden-nowrap">
                     <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
@@ -135,6 +135,7 @@ export default {
     'ni-event-history-feed': NiEventHistoryFeed,
   },
   props: {
+    workingStats: { type: Array, default: () => [] },
     events: { type: Array, default: () => [] },
     persons: { type: Array, default: () => [] },
     filteredSectors: { type: Array, default: () => [] },

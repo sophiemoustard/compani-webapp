@@ -5,7 +5,7 @@
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
       :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
-      @updateFeeds="updateEventHistories" />
+      @updateFeeds="updateEventHistories" :working-stats="workingStats" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -68,6 +68,7 @@ export default {
       displayAllSectors: false,
       eventHistories: [],
       displayHistory: false,
+      workingStats: [],
     };
   },
   async mounted () {
@@ -174,6 +175,8 @@ export default {
         }
 
         this.events = await this.$events.list(params);
+        this.workingStats = await this.$events.workingStats(this.$_.pick(params, ['startDate', 'endDate', 'auxiliary']));
+
         if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
         console.error(e);
