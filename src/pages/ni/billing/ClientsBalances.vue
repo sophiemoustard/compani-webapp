@@ -201,7 +201,8 @@ export default {
         message: 'Cette opération est définitive. Confirmez-vous ?',
         ok: 'Oui',
         cancel: 'Non',
-      }).onOk(this.createPaymentList);
+      }).onOk(this.createPaymentList)
+        .onCancel(() => NotifyPositive('Création des règlements annulée'));
     },
   },
 }
