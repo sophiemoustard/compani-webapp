@@ -163,13 +163,13 @@ export default {
           name: 'prevMonth',
           align: 'center',
           label: 'Heures mois derniers',
-          field: row => row[this.$moment().subtract(1, 'month').format('YYYY-MM')] || 'N/A',
+          field: row => row.prevMonth === -1 ? 'N/A' : row.prevMonth,
         },
         {
           name: 'currentMonth',
           align: 'center',
           label: 'Heures mois en cours',
-          field: row => row[this.$moment().format('YYYY-MM')] || 0,
+          field: 'currentMonth',
         },
       ],
     };
