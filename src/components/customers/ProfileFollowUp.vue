@@ -160,16 +160,16 @@ export default {
           field: 'plannedCareHours',
         },
         {
-          name: 'prevMonth',
+          name: 'prevMonthCareHours',
           align: 'center',
           label: 'Heures mois derniers',
-          field: row => row.prevMonth === -1 ? 'N/A' : row.prevMonth,
+          field: row => row.prevMonthCareHours === -1 ? 'N/A' : row.prevMonthCareHours,
         },
         {
-          name: 'currentMonth',
+          name: 'currentMonthCareHours',
           align: 'center',
           label: 'Heures mois en cours',
-          field: 'currentMonth',
+          field: 'currentMonthCareHours',
         },
       ],
     };
