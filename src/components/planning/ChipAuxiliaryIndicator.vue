@@ -3,7 +3,9 @@
     <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
       <q-spinner-dots v-if="loading" />
-      <span v-else class="chip-indicator">{{ Math.round(workingStats.workedHours) }}h / {{ workingStats.hoursToWork }}</span>
+      <span v-else class="chip-indicator">
+        {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
+      </span>
     </q-chip>
 
     <!-- Indicators modal -->

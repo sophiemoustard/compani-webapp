@@ -181,6 +181,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.events = [];
+        this.workingStats = [];
       }
     },
     async getCustomers () {
