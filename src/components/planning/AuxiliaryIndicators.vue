@@ -4,7 +4,7 @@
       <div class="indicator row">
         <div class="col-4">Heures à travailler</div>
         <div class="col-2 indicator-hours">{{ hoursToWork | formatHours }}</div>
-        <div class="col-6">{{ details.contractHours | formatHours }} (contrat) - {{ absencesHours | formatHours }} (absence)</div>
+        <div class="col-6">{{ details.contractHours | formatHours }} - {{ details.holidaysHours | formatHours }} (fériés)  - {{ absencesHours | formatHours }} (absences)</div>
       </div>
       <div class="indicator row">
         <div class="col-4">Heures travaillées</div>
@@ -46,7 +46,7 @@ export default {
     },
     hoursToWork () {
       return this.details.diff && this.details.diff.absencesHours
-        ? this.details.diff.absencesHours + this.details.hoursToWork
+        ? this.details.hoursToWork - this.details.diff.absencesHours
         : this.details.hoursToWork;
     },
     absencesHours () {
