@@ -34,9 +34,9 @@
                 @click="deleteImage" />
               <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
                 size="1rem" />
-              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate left" @click="croppa.rotate(-1)" round
+              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_left" @click="croppa.rotate(-1)" round
                 flat size="1rem" />
-              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate right" @click="croppa.rotate(1)" round
+              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_right" @click="croppa.rotate(1)" round
                 flat size="1rem" />
               <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
                 @click="uploadImage" round flat size="1rem" />
