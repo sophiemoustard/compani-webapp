@@ -4,7 +4,7 @@
       <div class="indicator row">
         <div class="col-4">Heures à travailler</div>
         <div class="col-2 indicator-hours">{{ hoursToWork | formatHours }}</div>
-        <div class="col-6">{{ details.contractHours | formatHours }} (contrat) - {{ absencesHours | formatHours }} (absence)</div>
+        <div class="col-6">{{ contractHoursDetail }}</div>
       </div>
       <div class="indicator row">
         <div class="col-4">Heures travaillées</div>
@@ -46,7 +46,7 @@ export default {
     },
     hoursToWork () {
       return this.details.diff && this.details.diff.absencesHours
-        ? this.details.diff.absencesHours + this.details.hoursToWork
+        ? this.details.hoursToWork - this.details.diff.absencesHours
         : this.details.hoursToWork;
     },
     absencesHours () {
@@ -65,6 +65,13 @@ export default {
         if (detail !== '') detail += ' et'
         detail += ` ${formatHours(this.details.diff.workedHours, 1)} de rattrapage`;
       }
+
+      return detail;
+    },
+    contractHoursDetail () {
+      let detail = formatHours(this.details.contractHours);
+      if (this.details.holidaysHours) detail += ` - ${formatHours(this.details.holidaysHours, 1)} (fériés)`;
+      if (this.absencesHours) detail += ` - ${formatHours(this.absencesHours, 1)} (absences)`;
 
       return detail;
     },
