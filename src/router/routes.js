@@ -374,7 +374,14 @@ const routes = [
       return next();
     },
   },
-  { path: '/enterCode', component: () => import('pages/signup/EnterCode') },
+  {
+    path: '/enterCode',
+    component: () => import('pages/signup/EnterCode'),
+    beforeEnter: (to, from, next) => {
+      if (Cookies.get('refresh_token')) return next({path: '/'});
+      return next();
+    },
+  },
   { path: '/forgotPassword', component: () => import('pages/signin/ForgotPwd') },
   { path: '/resetPassword/:token', component: () => import('pages/signin/ResetPwd') },
   {
@@ -391,12 +398,6 @@ const routes = [
   { path: '/403-pwd', component: () => import('pages/signin/403') },
   { path: '/401', component: () => import('pages/401') },
   { path: '/docsigned', component: () => import('pages/DocumentSigned'), props: route => ({ signed: route.query.signed }) },
-  // {
-  //   path: '/display/:fileName',
-  //   name: 'display file',
-  //   component: () => import('pages/DisplayPdf'),
-  //   props: (route) => ({ blobUrl: route.query.blobUrl, fileName: route.params.fileName }),
-  // },
   {
     // Always leave this as last one
     path: '*',
