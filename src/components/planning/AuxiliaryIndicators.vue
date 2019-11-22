@@ -45,7 +45,9 @@ export default {
       return this.workedHours / this.details.customersCount;
     },
     hoursToWork () {
-      return this.getHoursWithDiff('hoursToWork');
+      return this.details.diff && this.details.diff.absencesHours
+        ? this.details.diff.absencesHours + this.details.hoursToWork
+        : this.details.hoursToWork;
     },
     absencesHours () {
       return this.getHoursWithDiff('absencesHours');
