@@ -160,16 +160,16 @@ export default {
           field: 'plannedCareHours',
         },
         {
-          name: 'prevMonth',
+          name: 'prevMonthCareHours',
           align: 'center',
           label: 'Heures mois derniers',
-          field: row => row[this.$moment().subtract(1, 'month').format('YYYY-MM')] || 'N/A',
+          field: row => row.prevMonthCareHours === -1 ? 'N/A' : row.prevMonthCareHours,
         },
         {
-          name: 'currentMonth',
+          name: 'currentMonthCareHours',
           align: 'center',
           label: 'Heures mois en cours',
-          field: row => row[this.$moment().format('YYYY-MM')] || 0,
+          field: 'currentMonthCareHours',
         },
       ],
     };
