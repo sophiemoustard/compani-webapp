@@ -296,7 +296,7 @@ import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput.vue';
 import SearchAddress from '../form/SearchAddress';
 import { frPhoneNumber, iban, frAddress, bic } from '../../helpers/vuelidateCustomVal';
-import { extend } from '../../helpers/utils.js';
+import { extend, removeDiacritics } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { validationMixin } from '../../mixins/validationMixin.js';
 
@@ -803,7 +803,9 @@ export default {
       }
     },
     pictureDlLink (link) {
-      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`) : '';
+      return link ? link.replace(/(\/upload)/i,
+        `$1/fl_attachment:photo_${removeDiacritics(this.currentUser.identity.firstname)}_${removeDiacritics(this.currentUser.identity.lastname)}`)
+        : '';
     },
     async getAuxiliaryRoles () {
       try {
