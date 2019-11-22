@@ -1110,6 +1110,7 @@ export default {
     formatCreatedFunding () {
       const cleanPayload = this.$_.pickBy(this.newFunding);
       const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
+      if (version.endDate) version.endDate = this.$moment(version.endDate).endOf('d').toDate();
       return {
         nature,
         thirdPartyPayer,
@@ -1185,7 +1186,7 @@ export default {
           careDays,
           customerParticipationRate,
           startDate,
-          endDate,
+          endDate: endDate ? this.$moment(endDate).endOf('d') : '',
           subscription,
         };
         if (this.editedFunding.nature === FIXED) payload.amountTTC = amountTTC;
