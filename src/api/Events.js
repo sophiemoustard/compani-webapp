@@ -23,4 +23,8 @@ export default {
     const event = await alenviAxios.put(`${process.env.API_HOSTNAME}/events/${id}`, payload);
     return event.data.data.event;
   },
+  async workingStats (params = null) {
+    const workingStats = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/working-stats`, { params });
+    return workingStats.data.data.workingStats;
+  },
 };
