@@ -29,17 +29,17 @@ export default {
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${id}`);
   },
-  async updateById (data, token = null) {
+  async updateById (userId, data, token = null) {
     let updatedUser;
     if (token === null) {
-      updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data);
+      updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data);
     } else {
-      updatedUser = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } });
+      updatedUser = await axios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data, { headers: { 'x-access-token': token } });
     }
     return updatedUser;
   },
-  async updateCertificates (data) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}/certificates`, data);
+  async updateCertificates (userId, data) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/certificates`, data);
   },
   async getRoles () {
     const rolesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`);
@@ -58,8 +58,8 @@ export default {
     return driveFolder;
   },
   // Tasks
-  async updateTask (data) {
-    const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data.user_id}/tasks/${data.task_id}`, data)
+  async updateTask ({ userId, taskId }, data) {
+    const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/tasks/${taskId}`, data)
     return updatedTask;
   },
   async getTasks (userId) {

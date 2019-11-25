@@ -149,9 +149,9 @@ export const helperMixin = {
         this.$v.editedHelper.$touch();
         if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = Object.assign({}, this.editedHelper);
+        const payload = Object.assign({}, this.$_.omit(this.editedHelper, ['_id']));
         delete payload.local;
-        await this.$users.updateById(payload);
+        await this.$users.updateById(this.editedHelper._id, payload);
         NotifyPositive('Aidant modifié');
 
         await this.getUserHelpers();

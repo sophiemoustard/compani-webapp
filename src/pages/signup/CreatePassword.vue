@@ -46,8 +46,8 @@ export default {
     return {
       loading: false,
       alenviToken: '',
+      userId: '',
       user: {
-        _id: '',
         local: { email: '', password: '' },
         isConfirmed: '',
       },
@@ -66,8 +66,8 @@ export default {
     }
   },
   mounted () {
+    this.userId = this.$q.cookies.get('signup_userId');
     this.user.local.email = this.$q.cookies.get('signup_userEmail');
-    this.user._id = this.$q.cookies.get('signup_userId');
     this.alenviToken = this.$q.cookies.get('signup_token');
   },
   computed: {
@@ -89,7 +89,7 @@ export default {
     async submit () {
       try {
         this.user.isConfirmed = true;
-        await this.$users.updateById(this.user, this.alenviToken);
+        await this.$users.updateById(this.userId, this.user, this.alenviToken);
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });

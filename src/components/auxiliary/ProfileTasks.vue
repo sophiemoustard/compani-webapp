@@ -37,7 +37,7 @@ export default {
   methods: {
     async handleTask (task) {
       try {
-        await this.$users.updateTask({ user_id: this.getUser._id, task_id: task.task._id, isDone: task.check.isDone });
+        await this.$users.updateTask({ userId: this.getUser._id, taskId: task.task._id }, { isDone: task.check.isDone });
         this.$store.dispatch('rh/getUserProfile', { userId: this.getUser._id });
         NotifyPositive('Tâche mise à jour');
       } catch (e) {
