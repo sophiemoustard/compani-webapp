@@ -519,6 +519,12 @@ export default {
     currentUser () {
       return this.userProfile ? this.userProfile : this.mainUser;
     },
+    currentUserLastname () {
+      return this.$_.get(this.currentUser, 'identity.lastname');
+    },
+    currentUserFirstname () {
+      return this.$_.get(this.currentUser, 'identity.firstname');
+    },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },
@@ -804,7 +810,7 @@ export default {
     },
     pictureDlLink (link) {
       return link ? link.replace(/(\/upload)/i,
-        `$1/fl_attachment:photo_${removeDiacritics(this.currentUser.identity.firstname)}_${removeDiacritics(this.currentUser.identity.lastname)}`)
+        `$1/fl_attachment:photo_${removeDiacritics(this.currentUserFirstname)}_${removeDiacritics(this.currentUserLastname)}`)
         : '';
     },
     async getAuxiliaryRoles () {

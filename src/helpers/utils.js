@@ -1,5 +1,5 @@
 import moment from 'moment';
-import diacritics from '../data/diacritics';
+import diacriticsMap from '../data/diacritics';
 
 export const extend = (...sources) => {
   const extended = {};
@@ -97,14 +97,6 @@ export const formatPhone = phoneNumber => phoneNumber
   : '';
 
 export const removeDiacritics = (str) => {
-  const diacriticsMap = {};
-  const strClone = str;
-  for (let i = 0; i < diacritics.length; i++) {
-    let letters = diacritics[i].letters;
-    for (let j = 0; j < letters.length; j++) {
-      diacriticsMap[letters[j]] = diacritics[i].base;
-    }
-  }
   // eslint-disable-next-line no-control-regex
-  return strClone.replace(/[^\u0000-\u007E]/g, (a) => diacriticsMap[a] || a);
+  return str.replace(/[^\u0000-\u007E]/g, (a) => diacriticsMap[a] || a);
 }
