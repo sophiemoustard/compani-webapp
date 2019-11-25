@@ -34,9 +34,9 @@
                 @click="deleteImage" />
               <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
                 size="1rem" />
-              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate left" @click="croppa.rotate(-1)" round
+              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_left" @click="croppa.rotate(-1)" round
                 flat size="1rem" />
-              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate right" @click="croppa.rotate(1)" round
+              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_right" @click="croppa.rotate(1)" round
                 flat size="1rem" />
               <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
                 @click="uploadImage" round flat size="1rem" />
@@ -296,7 +296,7 @@ import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput.vue';
 import SearchAddress from '../form/SearchAddress';
 import { frPhoneNumber, iban, frAddress, bic } from '../../helpers/vuelidateCustomVal';
-import { extend } from '../../helpers/utils.js';
+import { extend, removeDiacritics } from '../../helpers/utils.js';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { validationMixin } from '../../mixins/validationMixin.js';
 
@@ -518,6 +518,12 @@ export default {
     }),
     currentUser () {
       return this.userProfile ? this.userProfile : this.mainUser;
+    },
+    currentUserLastname () {
+      return this.$_.get(this.currentUser, 'identity.lastname');
+    },
+    currentUserFirstname () {
+      return this.$_.get(this.currentUser, 'identity.firstname');
     },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
@@ -803,7 +809,9 @@ export default {
       }
     },
     pictureDlLink (link) {
-      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`) : '';
+      return link ? link.replace(/(\/upload)/i,
+        `$1/fl_attachment:photo_${removeDiacritics(this.currentUserFirstname)}_${removeDiacritics(this.currentUserLastname)}`)
+        : '';
     },
     async getAuxiliaryRoles () {
       try {

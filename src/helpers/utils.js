@@ -1,4 +1,5 @@
 import moment from 'moment';
+import diacriticsMap from '../data/diacritics';
 
 export const extend = (...sources) => {
   const extended = {};
@@ -94,3 +95,8 @@ export const formatHoursWithMinutes = (date) => {
 export const formatPhone = phoneNumber => phoneNumber
   ? phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5')
   : '';
+
+export const removeDiacritics = (str) => {
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/[^\u0000-\u007E]/g, (a) => diacriticsMap[a] || a);
+}
