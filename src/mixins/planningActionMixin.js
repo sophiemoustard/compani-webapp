@@ -1,6 +1,6 @@
 import { validationMixin } from './validationMixin'
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import { frAddress } from '../helpers/vuelidateCustomVal.js';
+import { frAddress, validHour } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -28,8 +28,14 @@ export const planningActionMixin = {
         dates: {
           startDate: { required },
           endDate: { required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === DAILY)) },
-          startHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
-          endHour: { required: requiredIf((item, parent) => parent && (parent.type === ABSENCE && parent.absenceNature === HOURLY)) },
+          startHour: {
+            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
+            validHour,
+          },
+          endHour: {
+            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
+            validHour,
+          },
         },
         auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
         customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
@@ -56,8 +62,14 @@ export const planningActionMixin = {
         dates: {
           startDate: { required },
           endDate: { required },
-          startHour: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && this.editedEvent.absenceNature === HOURLY) },
-          endHour: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && this.editedEvent.absenceNature === HOURLY) },
+          startHour: {
+            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
+            validHour,
+          },
+          endHour: {
+            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
+            validHour,
+          },
         },
         auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
         sector: { required },
@@ -239,7 +251,6 @@ export const planningActionMixin = {
 
       await this.refresh();
       this.creationModal = false;
-      this.resetCreationForm(false);
       NotifyPositive('Évènement créé');
       this.loading = false;
     },
@@ -412,7 +423,6 @@ export const planningActionMixin = {
 
         await this.refresh();
         this.editionModal = false;
-        this.resetEditionForm();
         NotifyPositive('Évènement modifié');
       } catch (e) {
         console.error(e)
@@ -512,7 +522,6 @@ export const planningActionMixin = {
           await this.$events.deleteById(this.editedEvent._id);
           await this.refresh();
           this.editionModal = false;
-          this.resetEditionForm();
           NotifyPositive('Évènement supprimé.');
           this.loading = false;
         }).onCancel(() => NotifyPositive('Suppression annulée'));
@@ -548,7 +557,6 @@ export const planningActionMixin = {
           }
 
           this.editionModal = false;
-          this.resetEditionForm();
           NotifyPositive('Évènement supprimé.');
         }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {

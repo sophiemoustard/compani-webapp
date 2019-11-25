@@ -7,7 +7,7 @@
     <q-field :error="hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
       <div class="datetime-container row justify-evenly items-center">
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
-          @blur="blurHandler" :disable="disable" @error="childErrors.startDate = $event" />
+          @blur="blurHandler" :disable="disable" />
         <ni-time-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
           @blur="blurHandler" :disable="disable" />
         <p class="delimiter">-</p>
