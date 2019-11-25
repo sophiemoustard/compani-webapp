@@ -30,13 +30,13 @@ export default {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${id}`);
   },
   async updateById (data, token = null) {
-    let userUpdated;
+    let updatedUser;
     if (token === null) {
-      userUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data);
+      updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data);
     } else {
-      userUpdated = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } });
+      updatedUser = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } });
     }
-    return userUpdated;
+    return updatedUser;
   },
   async updateCertificates (data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}/certificates`, data);
@@ -53,8 +53,8 @@ export default {
     const check = await axios.get(`${process.env.API_HOSTNAME}/users/checkResetPassword/${resetToken}`);
     return check.data.data;
   },
-  async createDriveFolder (data) {
-    const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${data._id}/drivefolder`, data);
+  async createDriveFolder (userId, data) {
+    const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`, data);
     return driveFolder;
   },
   // Tasks
