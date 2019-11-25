@@ -6,9 +6,8 @@
           <q-icon v-if="isExternalUser" class="on-left cursor-pointer" size="1rem" name="arrow_back" color="primary"
             @click.native="$router.go(-1)" />
           <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
-          <router-link :to="customerPlanningRouterLink" v-if="customer">
-            <q-icon class="on-right cursor-pointer" size="1.2rem" name="date range" />
-          </router-link>
+          <q-btn :disable="isPlanningRouterDisable" flat size="sm" color="primary" icon="date_range"
+            @click="goToPlanning" />
         </div>
       </div>
       <div v-if="!customer" class="row custom-justify-end col-xs-4 col-md-2">
@@ -99,6 +98,10 @@ export default {
       currentUser: 'main/user',
       user: 'rh/getUserProfile',
     }),
+    isPlanningRouterDisable () {
+      if (this.customer) return !this.user.firstIntervention;
+      return !this.user.contracts || !this.user.contracts.length;
+    },
     companyName () {
       return this.$_.get(this.currentUser, 'company.tradeName');
     },
@@ -162,18 +165,16 @@ export default {
     hasPicture () {
       return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
     },
-    customerPlanningRouterLink () {
-      return {
-        name: 'customers planning',
-        params: { initialCustomer: this.user },
-      };
-    },
   },
   methods: {
+    goToPlanning () {
+      if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.user } });
+      else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.user } });
+    },
     async sendMessage () {
       this.loading = true;
       if (this.typeMessage === 'CA') {
-        await this.$activationCode.create({ code: this.activationCode, newUserId: this.user._id, userEmail: this.user.local.email });
+        await this.$activationCode.create({ code: this.activationCode, user: this.user._id });
       }
       await this.sendSMS();
       this.loading = false;

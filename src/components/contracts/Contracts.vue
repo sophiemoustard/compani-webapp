@@ -83,7 +83,7 @@
     <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-height full-width>
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end">
-            <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
           <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>

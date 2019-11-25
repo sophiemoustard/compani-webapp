@@ -1,64 +1,64 @@
 <template>
-  <q-table :data="documents" :columns="columns" hide-bottom :pagination.sync="pagination"
-    class="q-mb-lg" row-key="_id" card-class="neutral-background" flat>
-    <q-tr slot="top-row">
-      <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
-      <q-td class="bold">Début de période</q-td>
-      <q-td />
-      <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
-      <q-td />
-    </q-tr>
-    <q-tr v-if="Object.keys(documents).length > 0" slot="body" slot-scope="props" :props="props">
-      <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-        <template v-if="col.name === 'document'">
-          <template v-if="props.row.type === BILL">
-            <div :class="{'download': canDownloadBill(props.row)}">
-              <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
-                Facture {{ props.row.number || 'tiers' }}
-              </a>
-              <div v-else>
-                <a :href="$bills.getPDFUrl(props.row._id)" target="_blank">Facture {{ props.row.number || 'tiers' }}</a>
-              </div>
-            </div>
-          </template>
-          <template  v-else-if="props.row.type === CREDIT_NOTE">
-            <div :class="{'download': canDownloadCreditNote(props.row)}">
-              <a v-if="props.row.driveFile && props.row.driveFile.link" :href="props.row.driveFile.link" target="_blank">
+  <ni-simple-table :data="documents" :columns="columns">
+    <template v-slot:top-row="{ props }" >
+      <q-tr :props="props">
+        <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
+        <q-td class="bold">Début de période</q-td>
+        <q-td />
+        <td class="bold" align="center">{{ formatPrice(startBalance) }}</td>
+        <q-td />
+      </q-tr>
+    </template>
+    <template v-slot:body="{ props }">
+      <q-tr :props="props" v-if="Object.keys(documents).length > 0">
+        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+          <template v-if="col.name === 'document'">
+            <template v-if="props.row.type === BILL">
+              <template v-if="props.row.number">
+                <a v-if="canDownloadBill(props.row)" :href="billUrl(props.row)" target="_blank" class="download">
+                  Facture {{ props.row.number }}
+                </a>
+                <div v-else>Facture {{ props.row.number }}</div>
+              </template>
+              <div v-else>Facture tiers</div>
+            </template>
+            <template  v-else-if="props.row.type === CREDIT_NOTE">
+              <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
+                class="download">
                 Avoir {{ props.row.number }}
               </a>
-              <div v-else>
-                <a :href="$creditNotes.getPDFUrl(props.row._id)" target="_blank">Avoir {{ props.row.number }}</a>
-              </div>
-            </div>
+              <div v-else>Avoir {{ props.row.number }}</div>
+            </template>
+            <div v-else>{{ getPaymentTitle(props.row) }}</div>
           </template>
-          <div v-else>{{ getPaymentTitle(props.row) }}</div>
-        </template>
-        <template v-else-if="col.name === 'balance'">
-          <div v-if="!isNegative(col.value)" class="row no-wrap items-center justify-center">
-            <q-icon name="mdi-plus-circle-outline" color="grey" class="balance-icon" />
-            <div>{{ col.value }}</div>
-          </div>
-          <div v-else-if="isNegative(col.value)" class="row no-wrap items-center justify-center">
-            <q-icon name="mdi-minus-circle-outline" color="secondary" class="balance-icon" />
-            <div>{{ col.value.substring(1) }}</div>
-          </div>
-          <div v-else>{{ col.value }}</div>
-        </template>
-        <template v-else-if="col.name === 'actions'">
-          <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
-            @click="openEditionModal(props.row)" />
-        </template>
-        <template v-else>{{ col.value }}</template>
-      </q-td>
-    </q-tr>
-    <q-tr slot="bottom-row">
-      <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
-      <q-td class="bold">Fin de période</q-td>
-      <q-td />
-      <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
-      <q-td />
-    </q-tr>
-  </q-table>
+          <template v-else-if="col.name === 'balance'">
+            <q-item class="row no-wrap items-center">
+              <q-item-section side>
+                <q-icon :name="balanceIcon(col.value)" :color="balanceIconColor(col.value)" class="balance-icon"/>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ formatBalance(col.value) }}</q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-else-if="col.name === 'actions'">
+            <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
+              @click="openEditionModal(props.row)" />
+          </template>
+          <template v-else>{{ col.value }}</template>
+        </q-td>
+      </q-tr>
+    </template>
+    <template v-slot:bottom-row="{ props }">
+      <q-tr :props="props">
+        <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
+        <q-td class="bold">Fin de période</q-td>
+        <q-td />
+        <td class="bold" align="center">{{ formatPrice(endBalance) }}</td>
+        <q-td />
+      </q-tr>
+    </template>
+  </ni-simple-table>
 </template>
 
 <script>
@@ -76,6 +76,7 @@ import {
   COMPANI,
 } from '../../data/constants';
 import { formatPrice } from '../../helpers/utils';
+import SimpleTable from '../table/SimpleTable';
 
 export default {
   name: 'CustomerBillingTable',
@@ -86,6 +87,9 @@ export default {
     type: { type: String, default: CUSTOMER },
     startBalance: { type: Number, default: 0 },
     endBalance: { type: Number, default: 0 },
+  },
+  components: {
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {
@@ -117,6 +121,7 @@ export default {
           label: 'Solde',
           align: 'center',
           field: 'balance',
+          style: 'width: 100px',
           format: value => formatPrice(value),
         },
         {
@@ -130,6 +135,16 @@ export default {
     }
   },
   methods: {
+    balanceIconColor (val) {
+      return this.isZero(val) || !this.isNegative(val) ? 'grey' : 'secondary'
+    },
+    balanceIcon (val) {
+      return this.isZero(val) || !this.isNegative(val) ? 'mdi-plus-circle-outline' : 'mdi-minus-circle-outline'
+    },
+    formatBalance (val) {
+      if (this.isNegative(val)) return val.substring(1);
+      else return val;
+    },
     getPaymentTitle (payment) {
       const titlePrefix = payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
       const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === payment.type);
@@ -141,6 +156,9 @@ export default {
     },
     formatPrice (value) {
       return formatPrice(value);
+    },
+    isZero (val) {
+      return Number.parseFloat(val) === 0;
     },
     isNegative (val) {
       return val[0] === '-';
@@ -168,6 +186,14 @@ export default {
     canDownloadCreditNote (creditNote) {
       return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
     },
+    billUrl (bill) {
+      return this.$_.get(bill, 'driveFile.link') ? bill.driveFile.link : this.$bills.getPDFUrl(bill._id);
+    },
+    creditNoteUrl (creditNote) {
+      return this.$_.get(creditNote, 'driveFile.link')
+        ? creditNote.driveFile.link
+        : this.$creditNotes.getPDFUrl(creditNote._id);
+    },
   },
 }
 </script>
@@ -186,5 +212,9 @@ export default {
     cursor: pointer;
     color: $primary;
     text-decoration underline;
+
+  /deep/ .q-item
+    .q-item__section
+      padding: 0px;
 
 </style>

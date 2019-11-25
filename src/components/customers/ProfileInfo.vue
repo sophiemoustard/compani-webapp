@@ -386,8 +386,6 @@
       <ni-date-input v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
         :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
       <ni-input in-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
-      <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" v-model="editedFunding.frequency"
-        @blur="$v.editedFunding.frequency.$touch" :error="$v.editedFunding.frequency.$error" required-field />
       <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate"
         caption="Prix unitaire TTC" type="number" @blur="$v.editedFunding.unitTTCRate.$touch"
         :error="$v.editedFunding.unitTTCRate.$error" required-field />
@@ -669,9 +667,9 @@ export default {
     },
     fundingHistoryVisibleColumns () {
       if (this.selectedFunding.nature === FIXED) {
-        return ['startDate', 'endDate', 'frequency', 'amountTTC', 'customerParticipationRate', 'careDays'];
+        return ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays'];
       }
-      return ['startDate', 'endDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
+      return ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     },
     fundingDetailsVisibleColumns () {
       if (this.selectedFunding.nature === FIXED) {
@@ -781,7 +779,6 @@ export default {
       }) },
     },
     editedFunding: {
-      frequency: { required },
       amountTTC: { required: requiredIf((item) => {
         return item.nature === FIXED;
       }) },
@@ -1112,11 +1109,13 @@ export default {
     },
     formatCreatedFunding () {
       const cleanPayload = this.$_.pickBy(this.newFunding);
-      const { nature, thirdPartyPayer, subscription, ...version } = cleanPayload;
+      const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
+      if (version.endDate) version.endDate = this.$moment(version.endDate).endOf('d').toDate();
       return {
         nature,
         thirdPartyPayer,
         subscription,
+        frequency,
         versions: [{...version}],
       };
     },
@@ -1181,14 +1180,13 @@ export default {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, frequency, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription } = this.editedFunding;
+        const { folderNumber, endDate, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription } = this.editedFunding;
         const payload = {
           folderNumber,
-          frequency,
           careDays,
           customerParticipationRate,
           startDate,
-          endDate,
+          endDate: endDate ? this.$moment(endDate).endOf('d') : '',
           subscription,
         };
         if (this.editedFunding.nature === FIXED) payload.amountTTC = amountTTC;

@@ -5,7 +5,7 @@
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
       :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
-      @updateFeeds="updateEventHistories" />
+      @updateFeeds="updateEventHistories" :working-stats="workingStats" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
@@ -31,6 +31,7 @@ import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
+import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'AuxiliaryPlanning',
@@ -40,6 +41,9 @@ export default {
     'ni-planning-manager': Planning,
     'ni-event-creation-modal': EventCreationModal,
     'ni-event-edition-modal': EventEditionModal,
+  },
+  props: {
+    targetedAuxiliary: { type: Object, default: null },
   },
   data () {
     return {
@@ -64,13 +68,14 @@ export default {
       displayAllSectors: false,
       eventHistories: [],
       displayHistory: false,
+      workingStats: {},
     };
   },
   async mounted () {
     try {
       await Promise.all([this.fillFilter(AUXILIARY), this.getCustomers()]);
       this.initFilters();
-      this.setInternalHours();
+      await this.setInternalHours();
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des personnes');
@@ -107,7 +112,8 @@ export default {
     activeFilters () {
       return this.filters
         .filter(f => f.type === SECTOR || this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
-          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek));
+          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id)); // add targeted auxiliary even if not active on strat of week to display future events
     },
   },
   methods: {
@@ -125,7 +131,9 @@ export default {
     },
     // Filters
     initFilters () {
-      if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+      if (this.targetedAuxiliary) {
+        this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
+      } else if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
@@ -167,10 +175,13 @@ export default {
         }
 
         this.events = await this.$events.list(params);
-        if (this.displayHistory) await this.updateEventHistories();
+        this.workingStats = await this.$events.workingStats(this.$_.pick(params, ['startDate', 'endDate', 'auxiliary']));
+
+        if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];
+        this.workingStats = [];
       }
     },
     async getCustomers () {

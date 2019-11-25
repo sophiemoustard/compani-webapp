@@ -4,7 +4,7 @@
       <h4>Fins de contrats</h4>
     </div>
     <ni-large-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      row-key="auxiliaryId" selection="multiple" :selected.sync="selected" :visible-columns="visibleColumns">
+      row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
       <template v-slot:header="{ props }" >
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :style="col.style" :key="col.name" :props="props">{{ col.label }}</q-th>
@@ -68,7 +68,7 @@
       label="Payer" @click="createList" />
 
     <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
-      @update:surchargeDetailModal="resetSurchargeDetail" :surchargeDetails="surchargeDetails" />
+      @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surchargeDetailKey="surchargeDetailKey" />
   </q-page>
 </template>
 
@@ -95,11 +95,10 @@ export default {
       selected: [],
       pagination: { rowsPerPage: 0 },
       tableLoading: false,
-      visibleColumns: ['auxiliary', 'sector', 'startDate', 'endNotificationDate', 'endReason', 'endDate', 'contractHours', 'workedHours',
-        'notSurchargedAndExempt', 'surchargedAndExempt', 'notSurchargedAndNotExempt', 'surchargedAndNotExempt', 'hoursBalance', 'hoursCounter',
-        'overtimeHours', 'additionalHours', 'mutual', 'transport', 'otherFees', 'bonus', 'compensation'],
       surchargeDetailModal: false,
       surchargeDetails: {},
+      pay: {},
+      surchargeDetailKey: '',
     };
   },
   computed: {
@@ -137,11 +136,13 @@ export default {
       const draft = this.draftFinalPay.find(ds => ds.auxiliary._id === id);
       if (!draft) return;
 
-      this.surchargeDetails = draft[details];
+      this.pay = draft;
+      this.surchargeDetailKey = details;
       this.surchargeDetailModal = true;
     },
     resetSurchargeDetail () {
-      this.surchargeDetails = {};
+      this.pay = {};
+      this.surchargeDetailKey = '';
     },
     // Creation
     async createList () {

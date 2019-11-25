@@ -58,7 +58,10 @@ export const getLastVersion = (versions, dateKey) => {
 export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' });
 
 export const formatPrice = (val) => {
-  return val ? roundFrenchNumber(val) : roundFrenchNumber(0);
+  if (!val) return roundFrenchNumber(0)
+  const result = roundFrenchNumber(val);
+  if (Number.parseFloat(result) === 0) return roundFrenchNumber(0);
+  return result;
 };
 
 export const formatIdentity = (identity, format) => {

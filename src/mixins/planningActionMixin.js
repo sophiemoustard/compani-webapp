@@ -93,10 +93,12 @@ export const planningActionMixin = {
         if (this.$refs.planningManager) this.$refs.planningManager.restoreFilter(lastSearch);
       }
     },
-    setInternalHours () {
-      const user = this.$store.getters['main/user'];
-      if (user && user.company && user.company.rhConfig && user.company.rhConfig.internalHours) {
-        this.internalHours = user.company.rhConfig.internalHours;
+    async setInternalHours () {
+      try {
+        this.internalHours = await this.$internalHours.list();
+      } catch (e) {
+        console.error(e);
+        this.internalHours = [];
       }
     },
     hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
@@ -163,11 +165,6 @@ export const planningActionMixin = {
       if (event.auxiliary) {
         const auxiliary = this.activeAuxiliaries.find(aux => aux._id === event.auxiliary);
         payload.sector = auxiliary.sector._id;
-      }
-
-      if (event.type === INTERNAL_HOUR) {
-        const internalHour = this.internalHours.find(hour => hour._id === event.internalHour);
-        payload.internalHour = internalHour;
       }
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
@@ -302,7 +299,19 @@ export const planningActionMixin = {
         : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
     },
     formatEditedEvent (event) {
-      const { createdAt, updatedAt, startDate, endDate, isBilled, auxiliary, subscription, address, customer, ...eventData } = this.$_.cloneDeep(event);
+      const {
+        createdAt,
+        updatedAt,
+        startDate,
+        endDate,
+        isBilled,
+        auxiliary,
+        subscription,
+        address,
+        customer,
+        internalHour,
+        ...eventData
+      } = this.$_.cloneDeep(event);
       const dates = {
         startDate,
         endDate,
@@ -327,8 +336,14 @@ export const planningActionMixin = {
           };
           break;
         case INTERNAL_HOUR:
-          const internalHour = event.internalHour._id;
-          this.editedEvent = { address: address || {}, shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, internalHour, dates };
+          this.editedEvent = {
+            address: address || {},
+            shouldUpdateRepetition: false,
+            ...eventData,
+            auxiliary: auxiliary._id,
+            internalHour: internalHour._id,
+            dates,
+          };
           break;
         case ABSENCE:
           this.editedEvent = {

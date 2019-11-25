@@ -147,7 +147,7 @@ export const EVENT_DELETION = 'event_deletion';
 export const EVENT_UPDATE = 'event_update';
 
 // INDICATORS
-export const WEEK_STATS = 'week_stats';
+export const PREV_MONTH_STATS = 'prev_month_stat';
 export const MONTH_STATS = 'month_stat';
 
 // TRANSORT

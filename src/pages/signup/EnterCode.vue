@@ -15,7 +15,7 @@
 <script>
 import CompaniHeader from '../../components/CompaniHeader';
 import Input from '../../components/form/Input';
-import { NotifyNegative } from '../../components/popup/notify';
+import { NotifyNegative, NotifyWarning } from '../../components/popup/notify';
 
 export default {
   components: {
@@ -30,14 +30,20 @@ export default {
   methods: {
     async submit () {
       try {
-        const activationDataRaw = await this.$activationCode.check(this.code);
-        this.$q.cookies.set('signup_token', activationDataRaw.token, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('signup_userEmail', activationDataRaw.activationData.userEmail, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('signup_userId', activationDataRaw.activationData.newUserId, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
+        const code = await this.$activationCode.check(this.code);
+
+        const userEmail = this.$_.get(code, 'user.local.email', '');
+        const userId = this.$_.get(code, 'user._id', '');
+        this.$q.cookies.set('signup_token', code.token, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_userEmail', userEmail, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
+        this.$q.cookies.set('signup_userId', userId, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
+
         this.$router.replace({ path: '/createPassword' });
       } catch (e) {
-        NotifyNegative('Code invalide');
-        console.error(e.response);
+        if (e.response.data && e.response.data.statusCode === 422) {
+          this.$router.replace({ path: '/' });
+          NotifyWarning('L\'utilisateur est deja actif.');
+        } else NotifyNegative('Code invalide.');
       }
     },
   },

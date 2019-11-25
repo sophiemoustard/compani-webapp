@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="À payer">
+    <ni-title-header title="Paie mensuelle">
       <template slot="title">
         <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
           :disable="displayedDraftPay.length === 0" />
@@ -36,14 +36,16 @@
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
             <template v-if="col.name === 'surchargedAndExempt'">
-              <div v-if="props.row.surchargedAndExempt" class="cursor-pointer text-primary"
+              <div v-if="props.row.surchargedAndExempt || props.row.diff.surchargedAndExempt"
+                class="cursor-pointer text-primary"
                 @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
                 {{ col.value }}
               </div>
               <div v-else>{{ col.value }}</div>
             </template>
             <template v-else-if="col.name === 'surchargedAndNotExempt'">
-              <div v-if="props.row.surchargedAndNotExempt" class="cursor-pointer text-primary"
+              <div v-if="props.row.surchargedAndNotExempt || props.row.diff.surchargedAndNotExempt"
+                class="cursor-pointer text-primary"
                 @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
                 {{ col.value }}
               </div>
@@ -82,8 +84,7 @@
       label="Payer" @click="createList" />
 
     <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
-      @update:surchargeDetailModal="resetSurchargeDetail" :surchargeDetails="surchargeDetails">
-    </ni-pay-surcharge-details-modal>
+      @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surchargeDetailKey="surchargeDetailKey" />
   </q-page>
 </template>
 
@@ -115,11 +116,32 @@ export default {
       draftPay: [],
       selected: [],
       pagination: { rowsPerPage: 0 },
-      visibleColumns: ['auxiliary', 'sector', 'startDate', 'endDate', 'contractHours', 'workedHours', 'notSurchargedAndExempt', 'surchargedAndExempt',
-        'notSurchargedAndNotExempt', 'surchargedAndNotExempt', 'hoursBalance', 'hoursCounter', 'overtimeHours', 'additionalHours', 'mutual', 'transport',
-        'otherFees', 'bonus'],
+      visibleColumns: [
+        'auxiliary',
+        'sector',
+        'startDate',
+        'endDate',
+        'contractHours',
+        'hoursToWork',
+        'workedHours',
+        'notSurchargedAndExempt',
+        'surchargedAndExempt',
+        'notSurchargedAndNotExempt',
+        'surchargedAndNotExempt',
+        'diff',
+        'hoursBalance',
+        'previousMonthHoursCounter',
+        'hoursCounter',
+        'overtimeHours',
+        'additionalHours',
+        'mutual',
+        'transport',
+        'otherFees',
+        'bonus',
+      ],
       surchargeDetailModal: false,
-      surchargeDetails: {},
+      pay: {},
+      surchargeDetailKey: '',
       selectedSector: '',
       tableLoading: false,
       sortOptions: [
@@ -213,11 +235,13 @@ export default {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
       if (!draft) return;
 
-      this.surchargeDetails = draft[details];
+      this.pay = draft;
+      this.surchargeDetailKey = details;
       this.surchargeDetailModal = true;
     },
     resetSurchargeDetail () {
-      this.surchargeDetails = {};
+      this.pay = {};
+      this.surchargeDetailKey = '';
     },
     // Creation
     async createList () {

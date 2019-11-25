@@ -105,7 +105,7 @@ export default {
     this.selectedAuxiliary = this.currentUser;
     this.getTimelineDays();
     await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh()]);
-    this.setInternalHours();
+    await this.setInternalHours();
   },
   methods: {
     getAvatar (aux) {
