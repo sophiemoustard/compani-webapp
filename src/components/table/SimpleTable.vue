@@ -1,5 +1,5 @@
 <template>
-  <q-table :data="data" :columns="columns" :row-key="rowKey" flat :hide-bottom="!Object.keys(pagination).length"
+  <q-table :data="data" :columns="columns" :row-key="rowKey" flat :hide-bottom="pagination.rowsPerPage === 0"
     :pagination="pagination" :visible-columns="visibleColumns" class="neutral-background"
     :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)">
     <template v-slot:top-row="props"><slot name="top-row" :props="props" /></template>
@@ -26,7 +26,7 @@ export default {
     rowKey: { type: String, default: 'name' },
     hideBottom: { type: Boolean, default: true },
     visibleColumns: Array,
-    pagination: { type: Object, default: () => ({}) },
+    pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
   },
 }
 </script>
