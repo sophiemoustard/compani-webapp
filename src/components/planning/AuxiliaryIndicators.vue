@@ -37,7 +37,7 @@ export default {
     details: { type: Object, default: () => ({}) },
   },
   filters: {
-    formatHours: hours => formatHours(hours, 1),
+    formatHours: hours => formatHours(hours),
   },
   computed: {
     averageTimeByCustomer () {
@@ -60,18 +60,18 @@ export default {
     },
     workedHoursDetail () {
       let detail = '';
-      if (this.details.internalHours) detail += ` ${formatHours(this.details.internalHours, 1)} internes`;
+      if (this.details.internalHours) detail += ` ${formatHours(this.details.internalHours)} internes`;
       if (this.details.diff && this.details.diff.workedHours) {
         if (detail !== '') detail += ' et'
-        detail += ` ${formatHours(this.details.diff.workedHours, 1)} de rattrapage`;
+        detail += ` ${formatHours(this.details.diff.workedHours)} de rattrapage`;
       }
 
       return detail;
     },
     contractHoursDetail () {
       let detail = formatHours(this.details.contractHours);
-      if (this.details.holidaysHours) detail += ` - ${formatHours(this.details.holidaysHours, 1)} (fériés)`;
-      if (this.absencesHours) detail += ` - ${formatHours(this.absencesHours, 1)} (absences)`;
+      if (this.details.holidaysHours) detail += ` - ${formatHours(this.details.holidaysHours)} (fériés)`;
+      if (this.absencesHours) detail += ` - ${formatHours(this.absencesHours)} (absences)`;
 
       return detail;
     },
