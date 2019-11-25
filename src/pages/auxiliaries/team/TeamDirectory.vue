@@ -82,7 +82,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const users = await this.$users.listActive({ role: [AUXILIARY, PLANNING_REFERENT] });
         this.userList = users.map(user => ({
           auxiliary: {
             name: formatIdentity(user.identity, 'FL'),

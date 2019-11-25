@@ -155,7 +155,7 @@ export default {
       }
     },
     async getAuxiliaries () {
-      this.auxiliaries = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
+      this.auxiliaries = await this.$users.list({ role: [AUXILIARY, PLANNING_REFERENT] });
     },
     // Event creation
     openCreationModal (vEvent) {

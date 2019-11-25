@@ -2,7 +2,7 @@ import { alenviAxios } from './ressources/alenviAxios'
 import axios from 'axios'
 
 export default {
-  async showAll (params = null) {
+  async list (params = null) {
     try {
       const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
       return usersRaw.data.data.users;
@@ -10,7 +10,7 @@ export default {
       console.error(e.response);
     }
   },
-  async showAllActive (params = null) {
+  async listActive (params = null) {
     try {
       const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
       return usersRaw.data.data.users;
