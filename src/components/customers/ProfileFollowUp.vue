@@ -227,7 +227,7 @@ export default {
     await this.refreshCustomer();
     const promises = [this.getUserHelpers(), this.getAuxiliaries()];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
-    if (this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring(this.customer._id));
+    if (this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
     await Promise.all(promises);
   },
   methods: {
@@ -258,7 +258,7 @@ export default {
     },
     async getCustomerFundingsMonitoring () {
       try {
-        this.fundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring(this.customer._id);
+        this.fundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.fundingsMonitoring = [];
