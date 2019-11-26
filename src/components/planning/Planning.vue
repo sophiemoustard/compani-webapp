@@ -292,8 +292,8 @@ export default {
 
       this.$emit('createEvent', eventInfo);
     },
-    editEvent (eventId) {
-      this.$emit('editEvent', eventId);
+    editEvent (event) {
+      this.$emit('editEvent', event);
     },
   },
   filters: {
