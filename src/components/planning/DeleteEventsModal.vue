@@ -27,6 +27,7 @@ import { planningModalMixin } from '../../mixins/planningModalMixin';
 import Modal from '../Modal';
 import Select from '../form/Select';
 import OptionGroup from '../form/OptionGroup';
+import { NotifyNegative, NotifyPositive } from '../popup/notify';
 
 export default {
   name: 'DeleteEventsModal',
@@ -38,10 +39,10 @@ export default {
   },
   props: {
     value: { type: Boolean, default: false },
+    customers: { type: Array, default: () => [] },
   },
   data () {
     return {
-      customers: [],
       deletedEvents: {},
       isEndOfIntervention: 'betweenTwoDates',
       deletetionOptions: [
@@ -50,17 +51,20 @@ export default {
       ],
     };
   },
-  async mounted () {
-    this.customers = await this.$customers.listWithIntervention();
-  },
   methods: {
     hide () {
       this.deletedEvents = {};
-      this.customers = [];
       this.$emit('hide');
     },
-    deleteEvents () {
-      console.warn('ok');
+    async deleteEvents () {
+      try {
+        await this.$events.deleteManyEvents(this.deletedEvents);
+        this.$emit('hide');
+        NotifyPositive('Les évènements ont bien étés supprimés');
+      } catch (e) {
+        console.warn(e);
+        NotifyNegative();
+      }
     },
   },
 }

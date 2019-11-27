@@ -13,7 +13,7 @@
               @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
               @goToWeek="goToWeek" />
           </div>
-          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round @click="toggleDeleteEventsModal" />
+          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round @click="openDeleteEventsModal" />
           <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
             @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
         </div>
@@ -95,7 +95,8 @@
       <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory"
         @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
-    <delete-events-modal v-model="deleteEventsModal" @hide="deleteEventsModal=false" />
+    <delete-events-modal v-model="deleteEventsModal" @hide="deleteEventsModal=false"
+      :customers="customersWithInterventions" />
   </div>
 </template>
 
@@ -165,6 +166,7 @@ export default {
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
       deleteEventsModal: false,
+      customersWithInterventions: [],
     }
   },
   beforeDestroy () {
@@ -196,7 +198,8 @@ export default {
     },
   },
   methods: {
-    toggleDeleteEventsModal () {
+    async openDeleteEventsModal () {
+      this.customersWithInterventions = await this.$customers.listWithIntervention();
       this.deleteEventsModal = !this.deleteEventsModal;
     },
     toggleAllSectors () {
