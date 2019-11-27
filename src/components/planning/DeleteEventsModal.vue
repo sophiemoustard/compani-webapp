@@ -51,7 +51,7 @@ export default {
     };
   },
   async mounted () {
-    this.customers = await this.$customers.list(); // TODO: appeler la route une fois qu'elle sera faite
+    this.customers = await this.$customers.listWithIntervention();
   },
   methods: {
     hide () {
