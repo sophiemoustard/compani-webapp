@@ -13,6 +13,7 @@
               @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
               @goToWeek="goToWeek" />
           </div>
+          <q-btn class="planning-view" size="md" icon="highlight_off" flat round @click="toggleDeleteEventsModal" />
           <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
             @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
         </div>
@@ -94,6 +95,8 @@
       <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory"
         @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
+    <delete-events-modal :deleteEventsModal="deleteEventsModal" @hide="deleteEventsModal = false">
+    </delete-events-modal>
   </div>
 </template>
 
@@ -116,6 +119,7 @@ import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
 import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from './ChipsAutocomplete';
+import DeleteEventsModal from './DeleteEventsModal';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
@@ -133,6 +137,7 @@ export default {
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
     'ni-event-history-feed': NiEventHistoryFeed,
+    'delete-events-modal': DeleteEventsModal,
   },
   props: {
     workingStats: { type: Object, default: () => ({}) },
@@ -159,6 +164,7 @@ export default {
       distanceMatrix: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
+      deleteEventsModal: false,
     }
   },
   beforeDestroy () {
@@ -187,6 +193,9 @@ export default {
     },
   },
   methods: {
+    toggleDeleteEventsModal () {
+      this.deleteEventsModal = !this.deleteEventsModal;
+    },
     toggleAllSectors () {
       this.$emit('toggleAllSectors', this.terms);
       this.terms = [];
