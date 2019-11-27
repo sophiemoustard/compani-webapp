@@ -240,7 +240,7 @@ export default {
     async getAuxiliaries () {
       try {
         this.loading = true;
-        const activeAuxiliaries = await this.$users.showAllActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const activeAuxiliaries = await this.$users.listActive({ role: [AUXILIARY, PLANNING_REFERENT] });
         this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
         this.loading = false;
       } catch (e) {

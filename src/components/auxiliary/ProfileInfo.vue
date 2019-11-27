@@ -695,13 +695,12 @@ export default {
       if (path.match(/iban/i)) value = value.split(' ').join('');
 
       const payload = this.$_.set({}, path, value);
-      payload._id = this.currentUser._id;
       if (path === 'role._id') payload.role = value;
       if (path.match(/birthCountry/i) && value !== 'FR') {
         this.user.identity.birthState = '99';
         payload.identity.birthState = '99';
       }
-      await this.$users.updateById(payload);
+      await this.$users.updateById(this.currentUser._id, payload);
     },
     async uploadImage () {
       try {
@@ -727,54 +726,57 @@ export default {
         this.loadingImage = false;
       }
     },
-    async deleteDocument (driveId, path) {
+    async deleteUserDocument (path, driveId) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await gdrive.removeFileById({ id: driveId });
-          let payload = { _id: this.currentUser._id };
-          if (path === 'certificates') {
-            payload = Object.assign(payload, { [`administrative.${path}`]: { driveId } });
-            await this.$users.updateCertificates(payload);
-          } else {
-            payload = this.$_.set(payload, path, { driveId: null, link: null });
-            await this.$users.updateById(payload);
-          }
-          await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
-          NotifyPositive('Document supprimé');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        await gdrive.removeFileById({ id: driveId });
+        let payload;
+        if (path === 'certificates') {
+          payload = { [`administrative.${path}`]: { driveId } };
+          await this.$users.updateCertificates(this.currentUser._id, payload);
+        } else {
+          payload = this.$_.set({}, path, { driveId: null, link: null });
+          await this.$users.updateById(this.currentUser._id, payload);
+        }
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
-    async deleteImage (params) {
+    async deleteDocument (driveId, path) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        ok: true,
+        cancel: 'Annuler',
+      })
+        .onOk(() => this.deleteUserDocument(path, driveId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
+    async deleteUserImage () {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          if (this.currentUser.picture && this.currentUser.picture.publicId) {
-            await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
-            this.croppa.remove();
-          }
-          await this.$users.updateById({
-            _id: this.currentUser._id,
-            picture: { link: null, publicId: null },
-          });
-          await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
-          NotifyPositive('Photo supprimée');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        if (this.currentUser.picture && this.currentUser.picture.publicId) {
+          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
+          this.croppa.remove();
+        }
+        await this.$users.updateById(this.currentUser._id, { picture: { link: null, publicId: null } });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la photo');
       }
+    },
+    async deleteImage (params) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
+        ok: true,
+        cancel: 'Annuler',
+      })
+        .onOk(this.deleteUserImage)
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async refreshUser () {
       await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });

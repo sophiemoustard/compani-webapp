@@ -87,7 +87,7 @@ export const helperMixin = {
     // Refresh
     async getUserHelpers () {
       try {
-        this.helpers = await this.$users.showAll({ customers: this.userProfile._id });
+        this.helpers = await this.$users.list({ customers: this.userProfile._id });
       } catch (e) {
         console.error(e);
       }
@@ -109,7 +109,6 @@ export const helperMixin = {
       const roles = await this.$roles.showAll({ name: HELPER });
       if (roles.length === 0) throw new Error('Role not found');
       this.newHelper.role = roles[0]._id;
-      this.newHelper.company = this.company._id;
       this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
       const payload = this.$_.pickBy(this.newHelper);
       await this.$users.create(payload);
@@ -150,9 +149,9 @@ export const helperMixin = {
         this.$v.editedHelper.$touch();
         if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = Object.assign({}, this.editedHelper);
+        const payload = Object.assign({}, this.$_.omit(this.editedHelper, ['_id']));
         delete payload.local;
-        await this.$users.updateById(payload);
+        await this.$users.updateById(this.editedHelper._id, payload);
         NotifyPositive('Aidant modifié');
 
         await this.getUserHelpers();

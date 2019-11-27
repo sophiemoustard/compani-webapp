@@ -115,7 +115,6 @@ export default {
           phone: '',
         },
         local: { email: '', password: '' },
-        company: '',
         sector: null,
         administrative: {
           transportInvoice: { transportType: 'public' },
@@ -294,7 +293,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const users = await this.$users.list({ role: [AUXILIARY, PLANNING_REFERENT] });
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);
           if (user.isActive) {
@@ -354,20 +353,21 @@ export default {
 
       payload.local.password = randomize('*', 10);
       payload.role = roles[0]._id;
-      payload.company = this.company._id;
 
       if (!payload.contact.address.fullAddress) delete payload.contact.address;
 
       return payload;
     },
     async createAlenviUser () {
+      const folderId = this.$_.get(this.company, 'folderId', null);
+      if (!folderId) throw new Error('No auxiliary folder in company drive');
       const roles = await this.$roles.showAll({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
 
       const payload = this.formatPayloadForUserCreation(roles);
 
       const newUser = await this.$users.create(payload);
-      await this.$users.createDriveFolder({ _id: newUser._id });
+      await this.$users.createDriveFolder(newUser._id, { parentFolderId: folderId });
       return newUser;
     },
     async sendSms (user) {

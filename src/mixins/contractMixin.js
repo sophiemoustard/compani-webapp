@@ -88,7 +88,7 @@ export const contractMixin = {
       }
 
       if (contract.status === CUSTOMER_CONTRACT) {
-        const helpers = await this.$users.showAll({ customers: contract.customer });
+        const helpers = await this.$users.list({ customers: contract.customer });
         const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);
         signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
         signature.title = `${translate[contract.status]} - ${currentCustomer.identity.lastname}`;

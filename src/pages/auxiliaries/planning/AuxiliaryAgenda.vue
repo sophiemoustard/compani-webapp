@@ -136,7 +136,7 @@ export default {
     },
     async getAuxiliaries () {
       try {
-        this.auxiliaries = await this.$users.showAll();
+        this.auxiliaries = await this.$users.list();
       } catch (e) {
         this.auxiliaries = [];
       }

@@ -190,7 +190,7 @@ export default {
         this.tableLoading = true;
         if (this.datesHasError) return;
         this.absences = await this.$events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
-        this.auxiliaries = await this.$users.showAllActive();
+        this.auxiliaries = await this.$users.listActive();
       } catch (e) {
         this.absences = [];
         this.auxiliaries = [];
