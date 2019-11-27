@@ -2,10 +2,12 @@
   <q-page class="neutral-background" :style="{ height: height }">
     <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
-        <div class="col-xs-12 col-sm-5 person-name" v-if="Object.keys(selectedAuxiliary).length > 0">
-          <img :src="getAvatar(selectedAuxiliary)" class="avatar">
-          <ni-select :value="selectedAuxiliary._id" :options="auxiliariesOptions" @input="updateAuxiliary"
-            ref="personSelect" behavior="menu" icon="swap_vert" no-error class="person-name-select" />
+        <div class="col-xs-12 col-sm-5 person-name">
+          <template v-if="Object.keys(selectedAuxiliary).length > 0">
+            <img :src="getAvatar(selectedAuxiliary)" class="avatar">
+            <ni-select :value="selectedAuxiliary._id" :options="auxiliariesOptions" @input="updateAuxiliary"
+              ref="personSelect" behavior="menu" icon="swap_vert" no-error class="person-name-select" />
+          </template>
         </div>
         <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :view-mode="viewMode"
@@ -37,7 +39,7 @@ import Agenda from '../../../components/planning/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
 import EventEditionModal from '../../../components/planning/EventEditionModal';
-import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, THREE_DAYS_VIEW, ABSENCE, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '../../../data/constants';
+import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, THREE_DAYS_VIEW, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '../../../data/constants';
 import Select from '../../../components/form/Select';
 import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
@@ -104,8 +106,7 @@ export default {
     this.startOfWeek = this.$moment().startOf('week').toISOString();
     this.selectedAuxiliary = this.currentUser;
     this.getTimelineDays();
-    await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh()]);
-    await this.setInternalHours();
+    await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh(), this.setInternalHours()]);
   },
   methods: {
     getAvatar (aux) {
@@ -187,18 +188,6 @@ export default {
       this.selectedAuxiliary.hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(this.selectedAuxiliary, selectedDay);
 
       this.creationModal = true;
-    },
-    // Event edition
-    openEditionModal (event) {
-      const can = this.canEditEvent(event);
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
-      this.formatEditedEvent(event);
-      if (event.type !== ABSENCE && this.selectedAuxiliary) {
-        this.selectedAuxiliary.hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(this.selectedAuxiliary, event.startDate);
-        this.selectedAuxiliary.hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(this.selectedAuxiliary, event.startDate);
-      }
-
-      this.editionModal = true
     },
   },
 }
