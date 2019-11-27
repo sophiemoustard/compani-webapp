@@ -13,7 +13,7 @@
               @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
               @goToWeek="goToWeek" />
           </div>
-          <q-btn class="planning-view" size="md" icon="highlight_off" flat round @click="toggleDeleteEventsModal" />
+          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round @click="toggleDeleteEventsModal" />
           <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
             @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
         </div>
@@ -109,6 +109,7 @@ import {
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
+  PLANNING_REFERENT,
   COACH,
   ADMIN,
   NOT_INVOICED_AND_NOT_PAID,
@@ -187,6 +188,9 @@ export default {
     }),
     isCoach () {
       return [COACH, ADMIN].includes(this.mainUser.role.name);
+    },
+    isPlanningReferent () {
+      return this.mainUser.role.name === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.$_.groupBy(this.persons, 'sector._id');
