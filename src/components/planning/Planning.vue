@@ -95,8 +95,7 @@
       <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory"
         @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
-    <delete-events-modal :deleteEventsModal="deleteEventsModal" @hide="deleteEventsModal = false">
-    </delete-events-modal>
+    <delete-events-modal v-model="deleteEventsModal" @hide="deleteEventsModal=false" />
   </div>
 </template>
 
