@@ -5,7 +5,7 @@
       :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
       :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
-      @updateFeeds="updateEventHistories" :working-stats="workingStats" />
+      @updateFeeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"

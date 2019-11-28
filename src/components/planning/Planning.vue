@@ -95,7 +95,7 @@
       <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory"
         @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
-    <delete-events-modal v-model="deleteEventsModal" @hide="deleteEventsModal=false"
+    <delete-events-modal v-model="deleteEventsModal" @hide="hideDeleteEventsModal"
       :customers="customersWithInterventions" />
   </div>
 </template>
@@ -198,6 +198,10 @@ export default {
     },
   },
   methods: {
+    hideDeleteEventsModal () {
+      this.deleteEventsModal = false;
+      this.$emit('refresh');
+    },
     async openDeleteEventsModal () {
       this.customersWithInterventions = await this.$customers.listWithIntervention();
       this.deleteEventsModal = !this.deleteEventsModal;

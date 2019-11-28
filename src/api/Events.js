@@ -17,7 +17,7 @@ export default {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/events/${id}`);
   },
   async deleteManyEvents (payload) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/events/many-events`, payload);
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/events/remove-many-events`, payload);
   },
   async deleteRepetition (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/events/${id}/repetition`);
