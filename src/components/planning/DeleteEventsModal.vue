@@ -1,5 +1,5 @@
 <template>
-  <ni-modal v-model="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)">
     <template slot="title"> Suppression d'interventions sur une période </template>
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer" :options="customersOptions"
       required-field @blur="$v.deletedEvents.customer.$touch"

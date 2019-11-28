@@ -13,11 +13,11 @@ export default {
     const event = await alenviAxios.post(`${process.env.API_HOSTNAME}/events`, data);
     return event.data.data.event;
   },
+  async deleteCustomerEvents (params = null) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/events`, { params });
+  },
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/events/${id}`);
-  },
-  async deleteCustomerEvents (params = null) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/events/remove-customer-events`, { params });
   },
   async deleteRepetition (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/events/${id}/repetition`);
