@@ -13,7 +13,8 @@
               @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
               @goToWeek="goToWeek" />
           </div>
-          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round @click="openDeleteEventsModal" />
+          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round
+            @click="openDeleteEventsModal" />
           <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
             @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
         </div>
@@ -203,8 +204,15 @@ export default {
       this.$emit('refresh');
     },
     async openDeleteEventsModal () {
-      this.customersWithInterventions = await this.$customers.listWithIntervention();
-      this.deleteEventsModal = !this.deleteEventsModal;
+      try {
+        this.customersWithInterventions = await this.$customers.listWithIntervention();
+        this.deleteEventsModal = true;
+      } catch (e) {
+        this.customersWithInterventions = [];
+        this.deleteEventsModal = false;
+        console.error(e);
+        NotifyNegative('Error lors de la récupération des bénéficiaires');
+      }
     },
     toggleAllSectors () {
       this.$emit('toggleAllSectors', this.terms);
