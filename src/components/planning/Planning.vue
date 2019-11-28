@@ -92,12 +92,12 @@
         </tbody>
       </table>
     </div>
+    <delete-events-modal v-model="deleteEventsModal" @hide="hideDeleteEventsModal"
+      :customers="customersWithInterventions" />
     <q-page-sticky expand position="right">
       <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory"
         @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
-    <delete-events-modal v-model="deleteEventsModal" @hide="hideDeleteEventsModal"
-      :customers="customersWithInterventions" />
   </div>
 </template>
 
