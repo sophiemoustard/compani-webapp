@@ -69,6 +69,8 @@ export default {
       return detail;
     },
     contractHoursDetail () {
+      if (!this.details.holidaysHours && !this.absencesHours) return '';
+
       let detail = formatHours(this.details.contractHours);
       if (this.details.holidaysHours) detail += ` - ${formatHours(this.details.holidaysHours)} (fériés)`;
       if (this.absencesHours) detail += ` - ${formatHours(this.absencesHours)} (absences)`;
