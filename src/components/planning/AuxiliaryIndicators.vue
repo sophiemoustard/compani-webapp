@@ -3,13 +3,17 @@
     <div class="economic-indicators">
       <div class="indicator row">
         <div class="col-4">Heures à travailler</div>
-        <div class="col-2 indicator-hours">{{ hoursToWork | formatHours }}</div>
-        <div class="col-6">{{ contractHoursDetail }}</div>
+        <div class="col-8 row indicator-hours">
+          <div class="col-md-3 col-xs-12">{{ hoursToWork | formatHours }}</div>
+          <div class="col-md-9 col-xs-12">{{ contractHoursDetail }}</div>
+        </div>
       </div>
       <div class="indicator row">
         <div class="col-4">Heures travaillées</div>
-        <div class="col-2 indicator-hours">{{ workedHours | formatHours }}</div>
-        <div class="col-6">{{ workedHoursDetail }}</div>
+        <div class="col-8 row indicator-hours">
+          <div class="col-md-3 col-xs-12">{{ workedHours | formatHours }}</div>
+          <div class="col-md-9 col-xs-12">{{ workedHoursDetail }}</div>
+        </div>
       </div>
       <div class="indicator row text-weight-bold">
         <div class="col-4">Soldes d'heures du mois</div>
@@ -69,6 +73,8 @@ export default {
       return detail;
     },
     contractHoursDetail () {
+      if (!this.details.holidaysHours && !this.absencesHours) return '';
+
       let detail = formatHours(this.details.contractHours);
       if (this.details.holidaysHours) detail += ` - ${formatHours(this.details.holidaysHours)} (fériés)`;
       if (this.absencesHours) detail += ` - ${formatHours(this.absencesHours)} (absences)`;
@@ -98,7 +104,6 @@ export default {
       border-bottom: 1px solid $light-grey
 
   .indicator-hours
-    display: flex
     border-left:  1px solid $light-grey
 
   .highlight

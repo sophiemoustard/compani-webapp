@@ -81,7 +81,7 @@
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      label="Payer" @click="createList" />
+      label="Payer" @click="validateCreation" />
 
     <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
       @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surchargeDetailKey="surchargeDetailKey" />
@@ -244,23 +244,25 @@ export default {
       this.surchargeDetailKey = '';
     },
     // Creation
+    async validateCreation () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(async () => this.createList())
+        .onCancel(() => NotifyPositive('Création annulée'));
+    },
     async createList () {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Cette opération est définitive. Confirmez-vous ?',
-          ok: 'Oui',
-          cancel: 'Non',
-        }).onOk(async () => {
-          if (!this.hasSelectedRows) return;
+        if (!this.hasSelectedRows) return;
 
-          const pay = this.selected.map(row => this.formatPayload(row));
-          await this.$pay.createList(pay);
+        const pay = this.selected.map(row => this.formatPayload(row));
+        await this.$pay.createList(pay);
 
-          NotifyPositive('Fiches de paie crées');
-          await this.refreshDraftPay();
-          this.selected = [];
-        }).onCancel(() => NotifyPositive('Création annulée'));
+        NotifyPositive('Fiches de paie crées');
+        await this.refreshDraftPay();
+        this.selected = [];
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création des fiches de paie');
