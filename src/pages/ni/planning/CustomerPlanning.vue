@@ -2,7 +2,7 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" />
+      @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"

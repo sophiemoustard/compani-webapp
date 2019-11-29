@@ -13,6 +13,8 @@
               @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
               @goToWeek="goToWeek" />
           </div>
+          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round
+            @click="openDeleteEventsModal" />
           <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
             @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
         </div>
@@ -90,6 +92,8 @@
         </tbody>
       </table>
     </div>
+    <delete-events-modal v-model="deleteEventsModal" @hide="hideDeleteEventsModal"
+      :customers="customersWithInterventions" />
     <q-page-sticky expand position="right">
       <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory"
         @updateFeeds="$emit('updateFeeds', $event)" />
@@ -106,6 +110,7 @@ import {
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
+  PLANNING_REFERENT,
   COACH,
   ADMIN,
   NOT_INVOICED_AND_NOT_PAID,
@@ -116,6 +121,7 @@ import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
 import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from './ChipsAutocomplete';
+import DeleteEventsModal from './DeleteEventsModal';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
@@ -133,6 +139,7 @@ export default {
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
     'ni-event-history-feed': NiEventHistoryFeed,
+    'delete-events-modal': DeleteEventsModal,
   },
   props: {
     workingStats: { type: Object, default: () => ({}) },
@@ -159,6 +166,8 @@ export default {
       distanceMatrix: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
+      deleteEventsModal: false,
+      customersWithInterventions: [],
     }
   },
   beforeDestroy () {
@@ -182,11 +191,29 @@ export default {
     isCoach () {
       return [COACH, ADMIN].includes(this.mainUser.role.name);
     },
+    isPlanningReferent () {
+      return this.mainUser.role.name === PLANNING_REFERENT;
+    },
     personsGroupedBySector () {
       return this.$_.groupBy(this.persons, 'sector._id');
     },
   },
   methods: {
+    hideDeleteEventsModal () {
+      this.deleteEventsModal = false;
+      this.$emit('refresh');
+    },
+    async openDeleteEventsModal () {
+      try {
+        this.customersWithInterventions = await this.$customers.listWithIntervention();
+        this.deleteEventsModal = true;
+      } catch (e) {
+        this.customersWithInterventions = [];
+        this.deleteEventsModal = false;
+        console.error(e);
+        NotifyNegative('Error lors de la récupération des bénéficiaires');
+      }
+    },
     toggleAllSectors () {
       this.$emit('toggleAllSectors', this.terms);
       this.terms = [];
