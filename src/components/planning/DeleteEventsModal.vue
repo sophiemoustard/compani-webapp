@@ -80,12 +80,12 @@ export default {
       try {
         const isValid = await this.waitForFormValidation(this.$v.deletedEvents);
         if (!isValid) return NotifyNegative('Champ(s) invalide(s)');
-        await this.$events.deleteCustomerEvents(this.$_.omit(this.deletedEvents, 'inRange'));
+        await this.$events.deleteList(this.$_.omit(this.deletedEvents, 'inRange'));
         this.hide();
         NotifyPositive('Les évènements ont bien étés supprimés');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) NotifyNegative('Vous n\'avez pas le droit de supprimer au moins l\'un des évènement');
+        if (e.data.statusCode === 409) NotifyNegative('Vous n\'avez pas le droit de supprimer au moins l\'un des évènements');
         else NotifyNegative('Problème lors de la suppression');
       }
     },
