@@ -5,6 +5,10 @@ export default {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers`, { params });
     return customersRaw.data.data.customers;
   },
+  async listWithFirstIntervention (params) {
+    const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/first-intervention`, { params });
+    return customersRaw.data.data.customers;
+  },
   async listWithSubscriptions (params) {
     const customersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/subscriptions`, { params });
     return customersRaw.data.data.customers;
