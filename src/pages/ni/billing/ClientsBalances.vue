@@ -144,7 +144,7 @@ export default {
     async getBalances () {
       try {
         this.tableLoading = true;
-        this.balances = await this.$balances.showAll();
+        this.balances = await this.$balances.list();
         this.balances = this.balances.map(balance => ({ ...balance, rowId: this.$_.uniqueId() }))
       } catch (e) {
         this.balances = [];

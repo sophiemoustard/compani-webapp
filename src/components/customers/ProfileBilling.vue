@@ -168,7 +168,7 @@ export default {
     },
     async getCustomerBalance () {
       try {
-        this.balances = await this.$balances.showAll({
+        this.balances = await this.$balances.list({
           customer: this.customer._id,
           date: this.billingDates.startDate,
         });
