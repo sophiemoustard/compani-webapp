@@ -241,18 +241,25 @@ export const planningActionMixin = {
         });
     },
     async onOkForEventCreation () {
-      this.loading = true;
-      const payload = this.getCreationPayload(this.newEvent);
-      if (!this.isCreationAllowed(payload)) {
-        return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+      try {
+        this.loading = true;
+        const payload = this.getCreationPayload(this.newEvent);
+        if (!this.isCreationAllowed(payload)) {
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+        }
+
+        await this.$events.create(payload);
+
+        await this.refresh();
+        this.creationModal = false;
+        NotifyPositive('Évènement créé');
+        this.loading = false;
+      } catch (e) {
+        console.error(e);
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
+        NotifyNegative('Erreur lors de la création de l\'évènement');
+        this.loading = false;
       }
-
-      await this.$events.create(payload);
-
-      await this.refresh();
-      this.creationModal = false;
-      NotifyPositive('Évènement créé');
-      this.loading = false;
     },
     onCancelForEventCreation () {
       return NotifyPositive('Création annulée');
@@ -272,9 +279,7 @@ export const planningActionMixin = {
           })
             .onOk(this.onOkForEventCreation)
             .onCancel(this.onCancelForEventCreation);
-        }
-
-        if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
+        } else if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
           return this.$q.dialog({
             title: 'Confirmation',
             message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
@@ -283,14 +288,15 @@ export const planningActionMixin = {
           })
             .onOk(this.onOkForEventCreation)
             .onCancel(this.onCancelForEventCreation);
+        } else {
+          await this.onOkForEventCreation();
         }
-        await this.onOkForEventCreation();
       } catch (e) {
         console.error(e);
         if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     // Event edition
@@ -544,7 +550,7 @@ export const planningActionMixin = {
             ],
           },
         }).onOk(async (shouldDeleteRepetition) => {
-          this.loading = true
+          this.loading = true;
           if (shouldDeleteRepetition) {
             await this.$events.deleteRepetition(this.editedEvent._id);
             await this.refresh();
@@ -554,12 +560,13 @@ export const planningActionMixin = {
           }
 
           this.editionModal = false;
+          this.loading = false;
           NotifyPositive('Évènement supprimé.');
         }).onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
   },
