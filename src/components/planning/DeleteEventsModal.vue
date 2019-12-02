@@ -16,7 +16,7 @@
         required-field in-modal/>
     </template>
     <template slot="footer">
-      <q-btn class="modal-btn full-width" color="primary" no-caps label="Supprimer les interventions" @click="deleteEvents"
+      <q-btn class="modal-btn full-width" color="primary" no-caps label="Supprimer les interventions" @click="validateEventsDeletion"
         icon-right="clear" />
     </template>
   </ni-modal>

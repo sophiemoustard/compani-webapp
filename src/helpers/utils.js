@@ -66,6 +66,7 @@ export const formatPrice = (val) => {
 };
 
 export const formatIdentity = (identity, format) => {
+  if (!identity) return '';
   const formatLower = format.toLowerCase();
   const values = [];
 
