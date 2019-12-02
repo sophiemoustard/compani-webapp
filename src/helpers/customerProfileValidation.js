@@ -1,7 +1,7 @@
 import Joi from 'joi';
 import _ from 'lodash';
 
-import { getCustomerLastMandateOrQuote } from './getCustomerLastMandateOrQuote';
+import { getLastDocument } from './utils';
 
 const customerProfileSchema = Joi.object().keys({
   identity: {
@@ -32,13 +32,11 @@ const customerProfileSchema = Joi.object().keys({
 export const customerProfileValidation = (profile, options = {}) => {
   options.allowUnknown = true;
   const profileCopy = _.cloneDeep(profile);
-  if (profileCopy.payment) {
-    profileCopy.payment.mandates = getCustomerLastMandateOrQuote(profile.payment.mandates);
-  }
+  if (profileCopy.payment) profileCopy.payment.mandates = getLastDocument(profile.payment.mandates);
+
   if (profileCopy.quotes && !profileCopy.subscriptionsAccepted) {
-    profileCopy.quotes = getCustomerLastMandateOrQuote(profileCopy.quotes);
-  } else {
-    profileCopy.quotes = [];
-  }
+    profileCopy.quotes = getLastDocument(profileCopy.quotes);
+  } else profileCopy.quotes = [];
+
   return Joi.validate(profileCopy, customerProfileSchema, options);
 };

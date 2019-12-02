@@ -56,6 +56,12 @@ export const getLastVersion = (versions, dateKey) => {
   return [...versions].sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
 };
 
+export const getLastDocument = (docs) => {
+  if (!docs || !Array.isArray(docs) || docs.length === 0) return [];
+  const sortedDocs = docs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return [sortedDocs[0]];
+};
+
 export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' });
 
 export const formatPrice = (val) => {
