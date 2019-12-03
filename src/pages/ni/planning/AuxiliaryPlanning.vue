@@ -11,7 +11,7 @@
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
       :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="createEvent" />
+      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="validateCreationEvent" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
