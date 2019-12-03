@@ -23,14 +23,14 @@
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" :personKey="personKey"
-      @documentUploaded="documentUploaded" @createEvent="createEvent" @close="closeCreationModal" />
+      @documentUploaded="documentUploaded" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @close="closeEditionModal"
       @documentUploaded="documentUploaded" @updateEvent="updateEvent" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="deleteEventRepetition" :personKey="personKey" />
+      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey" />
   </q-page>
 </template>
 

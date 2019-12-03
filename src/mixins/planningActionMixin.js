@@ -240,57 +240,58 @@ export const planningActionMixin = {
             (!type || type === event.type)
         });
     },
-    async onOkForEventCreation () {
-      this.loading = true;
-      const payload = this.getCreationPayload(this.newEvent);
-      if (!this.isCreationAllowed(payload)) {
-        return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
-      }
-
-      await this.$events.create(payload);
-
-      await this.refresh();
-      this.creationModal = false;
-      NotifyPositive('Évènement créé');
-      this.loading = false;
-    },
-    onCancelForEventCreation () {
-      return NotifyPositive('Création annulée');
-    },
     async createEvent () {
+      try {
+        this.loading = true;
+        const payload = this.getCreationPayload(this.newEvent);
+        if (!this.isCreationAllowed(payload)) {
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+        }
+
+        await this.$events.create(payload);
+
+        await this.refresh();
+        this.creationModal = false;
+        NotifyPositive('Évènement créé');
+      } catch (e) {
+        console.error(e);
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
+        NotifyNegative('Erreur lors de la création de l\'évènement');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async validateCreationEvent () {
       try {
         this.$v.newEvent.$touch();
         const isValid = await this.waitForFormValidation(this.$v.newEvent);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         if (this.newEvent.type === ABSENCE) {
-          return this.$q.dialog({
+          this.$q.dialog({
             title: 'Confirmation',
             message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
             ok: 'OK',
             cancel: 'Annuler',
           })
-            .onOk(this.onOkForEventCreation)
-            .onCancel(this.onCancelForEventCreation);
-        }
-
-        if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
-          return this.$q.dialog({
+            .onOk(this.createEvent)
+            .onCancel(() => NotifyPositive('Création annulée'));
+        } else if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
+          this.$q.dialog({
             title: 'Confirmation',
             message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
             ok: 'OK',
             cancel: 'Annuler',
           })
-            .onOk(this.onOkForEventCreation)
-            .onCancel(this.onCancelForEventCreation);
+            .onOk(this.createEvent)
+            .onCancel(() => NotifyPositive('Création annulée'));
+        } else {
+          await this.createEvent();
         }
-        await this.onOkForEventCreation();
       } catch (e) {
         console.error(e);
         if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
         NotifyNegative('Erreur lors de la création de l\'évènement');
-      } finally {
-        this.loading = false
       }
     },
     // Event edition
@@ -528,7 +529,27 @@ export const planningActionMixin = {
         this.loading = false
       }
     },
-    async deleteEventRepetition () {
+    async deleteEventRepetition (shouldDeleteRepetition) {
+      try {
+        this.loading = true;
+        if (shouldDeleteRepetition) {
+          await this.$events.deleteRepetition(this.editedEvent._id);
+          await this.refresh();
+        } else {
+          await this.$events.deleteById(this.editedEvent._id);
+          await this.refresh();
+        }
+        this.editionModal = false;
+        NotifyPositive('Évènement supprimé.');
+      } catch (e) {
+        console.error(e);
+        if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements');
+        else NotifyNegative('Erreur lors de la suppression de l\'évènement');
+      } finally {
+        this.loading = false;
+      }
+    },
+    validationDeletionEventRepetition () {
       try {
         this.$q.dialog({
           title: 'Confirmation',
@@ -543,23 +564,12 @@ export const planningActionMixin = {
               { label: 'Supprimer cet évenement et tous les suivants', value: true },
             ],
           },
-        }).onOk(async (shouldDeleteRepetition) => {
-          this.loading = true
-          if (shouldDeleteRepetition) {
-            await this.$events.deleteRepetition(this.editedEvent._id);
-            await this.refresh();
-          } else {
-            await this.$events.deleteById(this.editedEvent._id);
-            await this.refresh();
-          }
-
-          this.editionModal = false;
-          NotifyPositive('Évènement supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        }).onOk(this.deleteEventRepetition)
+          .onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
   },

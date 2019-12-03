@@ -7,14 +7,14 @@
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
-      :personKey="personKey" @resetForm="resetCreationForm" @createEvent="createEvent" @close="closeCreationModal" />
+      :personKey="personKey" @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
       :personKey="personKey" @resetForm="resetEditionForm" @updateEvent="updateEvent" @deleteDocument="deleteDocument"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="deleteEventRepetition" />
+      @deleteEventRepetition="validationDeletionEventRepetition" />
   </q-page>
 </template>
 
