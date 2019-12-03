@@ -529,7 +529,27 @@ export const planningActionMixin = {
         this.loading = false
       }
     },
-    async deleteEventRepetition () {
+    async deleteEventRepetition (shouldDeleteRepetition) {
+      try {
+        this.loading = true;
+        if (shouldDeleteRepetition) {
+          await this.$events.deleteRepetition(this.editedEvent._id);
+          await this.refresh();
+        } else {
+          await this.$events.deleteById(this.editedEvent._id);
+          await this.refresh();
+        }
+        this.editionModal = false;
+        NotifyPositive('Évènement supprimé.');
+      } catch (e) {
+        console.error(e);
+        if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements');
+        else NotifyNegative('Erreur lors de la suppression de l\'évènement');
+      } finally {
+        this.loading = false;
+      }
+    },
+    validationDeletionEventRepetition () {
       try {
         this.$q.dialog({
           title: 'Confirmation',
@@ -544,20 +564,8 @@ export const planningActionMixin = {
               { label: 'Supprimer cet évenement et tous les suivants', value: true },
             ],
           },
-        }).onOk(async (shouldDeleteRepetition) => {
-          this.loading = true;
-          if (shouldDeleteRepetition) {
-            await this.$events.deleteRepetition(this.editedEvent._id);
-            await this.refresh();
-          } else {
-            await this.$events.deleteById(this.editedEvent._id);
-            await this.refresh();
-          }
-
-          this.editionModal = false;
-          this.loading = false;
-          NotifyPositive('Évènement supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        }).onOk(async (shouldDeleteRepetition) => this.deleteEventRepetition(shouldDeleteRepetition))
+          .onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {

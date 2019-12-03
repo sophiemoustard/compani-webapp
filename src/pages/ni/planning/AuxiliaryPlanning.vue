@@ -18,7 +18,7 @@
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @updateEvent="updateEvent"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="deleteEventRepetition" :personKey="personKey" />
+      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey" />
   </q-page>
 </template>
 
