@@ -564,7 +564,7 @@ export const planningActionMixin = {
               { label: 'Supprimer cet évenement et tous les suivants', value: true },
             ],
           },
-        }).onOk(async (shouldDeleteRepetition) => this.deleteEventRepetition(shouldDeleteRepetition))
+        }).onOk(this.deleteEventRepetition)
           .onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
