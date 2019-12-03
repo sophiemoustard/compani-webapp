@@ -337,7 +337,7 @@ export default {
     async createContract () {
       try {
         const template = this.getContractTemplate(this.newContract);
-        if (!template || !template.driveId) return NotifyNegative('Template manquant');
+        if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
         this.$v.newContract.$touch();
         if (this.$v.newContract.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -388,7 +388,7 @@ export default {
     async createVersion () {
       try {
         const template = this.getVersionTemplate(this.selectedContract);
-        if (!template || !template.driveId) return NotifyNegative('Template manquant');
+        if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
         this.$v.newVersion.$touch();
         if (this.$v.newVersion.$error) return NotifyWarning('Champ(s) invalide(s)');

@@ -975,6 +975,10 @@ export default {
     },
     async downloadMandate (doc) {
       try {
+        if (!this.$_.has(this.company, 'customersConfig.templates.debitMandate.driveId')) {
+          return NotifyWarning('Template manquant');
+        }
+
         const data = {
           bankAccountOwner: this.customer.payment.bankAccountOwner || '',
           customerAddress: this.customer.contact.primaryAddress.fullAddress,
@@ -1002,6 +1006,10 @@ export default {
     // Quotes
     async downloadQuote (doc) {
       try {
+        if (!this.$_.has(this.company, 'customersConfig.templates.quote.driveId')) {
+          return NotifyWarning('Template manquant');
+        }
+
         const subscriptions = this.subscriptions.map(subscription => {
           let estimatedWeeklyRate = this.computeWeeklyRate(subscription);
           const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
