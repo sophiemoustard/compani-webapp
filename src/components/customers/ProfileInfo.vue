@@ -975,7 +975,8 @@ export default {
     },
     async downloadMandate (doc) {
       try {
-        if (!this.$_.has(this.company, 'customersConfig.templates.debitMandate.driveId')) {
+        const mandateDriveId = this.$_.get(this.company, 'customersConfig.templates.debitMandate.driveId', null);
+        if (!mandateDriveId) {
           return NotifyWarning('Template manquant');
         }
 
@@ -990,7 +991,7 @@ export default {
           companyName: this.company.name,
           companyAddress: this.company.address.fullAddress,
         };
-        const params = { driveId: this.company.customersConfig.templates.debitMandate.driveId };
+        const params = { driveId: mandateDriveId };
 
         await downloadDocxFile(params, data, 'mandat.docx');
         NotifyPositive('Mandat téléchargé.');
@@ -1006,7 +1007,8 @@ export default {
     // Quotes
     async downloadQuote (doc) {
       try {
-        if (!this.$_.has(this.company, 'customersConfig.templates.quote.driveId')) {
+        const quoteDriveId = this.$_.get(this.company, 'customersConfig.templates.quote.driveId', null);
+        if (!quoteDriveId) {
           return NotifyWarning('Template manquant');
         }
 
@@ -1036,7 +1038,7 @@ export default {
           subscriptions,
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
         }
-        const params = { driveId: this.company.customersConfig.templates.quote.driveId };
+        const params = { driveId: quoteDriveId };
         await downloadDocxFile(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
       } catch (e) {
