@@ -664,7 +664,6 @@ export default {
 
         this.loading = true;
         const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer._id };
-        console.error(payload);
         if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
         await this.$creditNotes.updateById(this.editedCreditNote._id, payload);
 
