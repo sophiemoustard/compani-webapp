@@ -449,7 +449,7 @@ export default {
     },
     async refreshCreditNotes () {
       try {
-        this.creditNotes = await this.$creditNotes.showAll();
+        this.creditNotes = await this.$creditNotes.list();
       } catch (e) {
         this.creditNotes = [];
         console.error(e);
@@ -575,6 +575,7 @@ export default {
         const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
 
         const event = this.$_.pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
+        event.bills = this.$_.omit(event.bills, '_id');
         if (cnEvent.bills.surcharges) event.bills.surcharges = cnEvent.bills.surcharges.map(sur => this.$_.omit(sur, '_id'));
 
         return event;
@@ -663,6 +664,7 @@ export default {
 
         this.loading = true;
         const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer._id };
+        console.error(payload);
         if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
         await this.$creditNotes.updateById(this.editedCreditNote._id, payload);
 
