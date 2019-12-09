@@ -43,7 +43,7 @@ export const helperMixin = {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => row.contact.phone,
+          field: row => row.contact ? row.contact.phone : '',
           format: (value) => formatPhone(value),
         },
         {

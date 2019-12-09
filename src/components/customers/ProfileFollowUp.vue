@@ -227,7 +227,7 @@ export default {
     await this.refreshCustomer();
     const promises = [this.getUserHelpers(), this.getAuxiliaries()];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
-    if (this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
+    if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
     await Promise.all(promises);
   },
   methods: {
