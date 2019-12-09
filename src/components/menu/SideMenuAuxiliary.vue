@@ -23,8 +23,8 @@
       <ni-menu-item name="profile contracts" icon="description" label="Contrats" />
     </q-expansion-item>
     <q-separator />
-    <q-expansion-item ref="team" v-model="activeRoutes.team.open" label="Équipe">
-      <ni-menu-item name="team directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
+    <q-expansion-item ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
+      <ni-menu-item name="teams directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
     </q-expansion-item>
     <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" isAuxiliary />
@@ -51,7 +51,7 @@ export default {
         planning: { open: false },
         benef: { open: false },
         administrative: { open: false },
-        team: { open: false },
+        teams: { open: false },
       },
     }
   },

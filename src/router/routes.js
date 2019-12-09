@@ -251,13 +251,13 @@ const routes = [
         },
       },
       {
-        path: 'auxiliaries/team',
-        name: 'team directory',
-        component: () => import('pages/auxiliaries/team/TeamDirectory'),
+        path: 'auxiliaries/teams',
+        name: 'teams directory',
+        component: () => import('pages/auxiliaries/teams/TeamsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'users:list',
-          parent: 'team',
+          parent: 'teams',
         },
       },
       {
