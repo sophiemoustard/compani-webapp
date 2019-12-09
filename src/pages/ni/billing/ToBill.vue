@@ -11,7 +11,7 @@
       </template>
     </ni-title-header>
     <ni-large-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
-      row-key="customerId" :loading="tableLoading" selection="multiple" :selected.sync="selected" separator="none">
+      :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected" separator="none">
       <template v-slot:header="{ props }" >
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
@@ -239,36 +239,44 @@ export default {
         this.tableLoading = false;
       }
     },
-    async createBills () {
+    async createBillsBatch (shouldBeSent) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Cette opération est définitive. Confirmez-vous ?',
-          ok: 'Oui',
-          cancel: 'Non',
-          options: {
-            type: 'checkbox',
-            model: [true],
-            items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
+        if (!this.hasSelectedRows) return;
+        const BATCH_SIZE = 50;
+        const promises = [];
+        const bills = this.selected.map(row => ({
+          ...this.$_.omit(row, ['__index']),
+          customerBills: {
+            ...row.customerBills,
+            shouldBeSent: !!shouldBeSent[0],
           },
-        }).onOk(async (shouldBeSent) => {
-          if (!this.hasSelectedRows) return;
-          const bills = this.selected.map(row => ({
-            ...this.$_.omit(row, ['__index']),
-            customerBills: {
-              ...row.customerBills,
-              shouldBeSent: !!shouldBeSent[0],
-            },
-          }));
-          await this.$bills.create({ bills });
-          NotifyPositive('Clients facturés');
-          await this.getDraftBills();
-          this.selected = [];
-        });
+        }));
+
+        for (let i = 0, l = bills.length; i < l; i += BATCH_SIZE) {
+          promises.push(this.$bills.create({ bills: bills.slice(i, i + BATCH_SIZE) }));
+        }
+        await Promise.all(promises);
+        NotifyPositive('Clients facturés');
+        await this.getDraftBills();
+        this.selected = [];
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la facturation des clients');
       }
+    },
+    async createBills () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
+        ok: 'Oui',
+        cancel: 'Non',
+        options: {
+          type: 'checkbox',
+          model: [true],
+          items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
+        },
+      }).onOk(this.createBillsBatch)
+        .onCancel(() => NotifyPositive('Facturation annulée'));
     },
     async refreshBill (row, bill) {
       try {
@@ -287,6 +295,9 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de la date de début de facturation');
       }
+    },
+    tableRowKey (row) {
+      return row.customer._id;
     },
   },
 }
