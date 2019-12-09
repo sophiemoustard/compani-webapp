@@ -9,6 +9,7 @@
     <q-expansion-item ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
       <ni-menu-item name="auxiliaries directory" icon="contacts" label="Répertoire auxiliaires" />
       <ni-menu-item v-if="isAdmin" name="staff register" icon="view_headline" label="Registre unique du personnel" />
+      <ni-menu-item name="dashboard" icon="dashboard" label="Tableau de bord" />
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="planning" v-model="activeRoutes.planning.open" label="Planning">
