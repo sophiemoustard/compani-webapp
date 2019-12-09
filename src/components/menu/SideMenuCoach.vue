@@ -6,8 +6,8 @@
       </q-item-label>
     </div>
     <q-separator />
-    <q-expansion-item ref="administrative" v-model="activeRoutes.administrative.open" label="Administratif">
-      <ni-menu-item name="administrative directory" icon="contacts" label="Répertoire auxiliaires" />
+    <q-expansion-item ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
+      <ni-menu-item name="auxiliaries directory" icon="contacts" label="Répertoire auxiliaires" />
       <ni-menu-item v-if="isAdmin" name="staff register" icon="view_headline" label="Registre unique du personnel" />
     </q-expansion-item>
     <q-separator />
@@ -74,27 +74,13 @@ export default {
     return {
       ADMIN,
       activeRoutes: {
-        planning: {
-          open: false,
-        },
-        benef: {
-          open: false,
-        },
-        administrative: {
-          open: false,
-        },
-        billing: {
-          open: false,
-        },
-        pay: {
-          open: false,
-        },
-        exports: {
-          open: false,
-        },
-        configuration: {
-          open: false,
-        },
+        planning: { open: false },
+        benef: { open: false },
+        teams: { open: false },
+        billing: { open: false },
+        pay: { open: false },
+        exports: { open: false },
+        configuration: { open: false },
       },
     };
   },
