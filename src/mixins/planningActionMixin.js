@@ -171,7 +171,7 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
-      let payload = { ...this.$_.omit(event, ['dates', '__v', '__index']) }
+      let payload = { ...this.$_.omit(event, ['dates', '__v', '__index', 'company']) }
       payload = this.$_.pickBy(payload);
 
       if (event.auxiliary) {
