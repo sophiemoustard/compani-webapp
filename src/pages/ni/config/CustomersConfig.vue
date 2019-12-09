@@ -1026,10 +1026,15 @@ export default {
     },
     // Services
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, type } = this.newService;
+      const { nature, name, defaultUnitAmount, type, exemptFromCharges } = this.newService;
       const formattedService = {
         nature,
-        versions: [{ name, defaultUnitAmount }],
+        versions: [{
+          name,
+          defaultUnitAmount,
+          exemptFromCharges,
+          startDate: this.$moment('1970-01-01').startOf('d').toISOString(), // first version does not have actual start date
+        }],
         type,
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') formattedService.versions[0].surcharge = this.newService.surcharge;

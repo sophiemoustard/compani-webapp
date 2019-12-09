@@ -71,15 +71,12 @@ export default {
     async updateUser () {
       try {
         const userToSend = {
-          _id: this.$route.params.id,
-          local: {
-            email: this.user.credentials.email,
-          },
+          local: { email: this.user.credentials.email },
         };
         if (this.user.credentials.password) {
           userToSend.local.password = this.user.credentials.password
         };
-        await this.$users.updateById(userToSend);
+        await this.$users.updateById(this.$route.params.id, userToSend);
         NotifyPositive('Profil mis à jour');
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';

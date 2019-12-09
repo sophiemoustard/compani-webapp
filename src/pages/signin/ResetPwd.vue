@@ -79,7 +79,6 @@ export default {
     async submit () {
       try {
         const userPayload = {
-          _id: this.userId,
           local: { password: this.password },
           resetPassword: {
             token: null,
@@ -87,7 +86,7 @@ export default {
             from: null,
           },
         };
-        await this.$users.updateById(userPayload, this.token);
+        await this.$users.updateById(this.userId, userPayload, this.token);
         let detail = '';
         let action = null;
         switch (this.from) {

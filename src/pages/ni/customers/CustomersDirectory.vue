@@ -59,7 +59,6 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../componen
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
-import { formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'CustomersDirectory',
@@ -82,6 +81,7 @@ export default {
       customerCreationModal: false,
       sendWelcomeMsg: true,
       civilityOptions: CIVILITY_OPTIONS,
+      firstInterventions: [],
       newCustomer: {
         identity: {
           title: '',
@@ -93,7 +93,7 @@ export default {
           primaryAddress: { fullAddress: '' },
         },
       },
-      customersList: [],
+      customers: [],
       searchStr: '',
       onlyClients: false,
       pagination: {
@@ -133,7 +133,7 @@ export default {
           field: 'firstIntervention',
           align: 'left',
           sortable: false,
-          format: (value) => value && value.startDate ? this.$moment(value.startDate).format('DD/MM/YYYY') : '',
+          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
           style: 'width: 85px',
         },
         {
@@ -174,17 +174,15 @@ export default {
     },
   },
   async mounted () {
-    this.getCustomersList();
+    await this.refresh();
   },
   computed: {
     currentUser () {
       return this.$store.getters['main/user'];
     },
-    clientsCustomerList () {
-      return this.onlyClients ? this.customersList.filter(customer => customer.firstIntervention) : this.customersList;
-    },
     filteredCustomers () {
-      return this.clientsCustomerList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
+      const customers = this.onlyClients ? this.customers.filter(customer => customer.firstIntervention) : this.customers;
+      return customers.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
     },
     primaryAddressError () {
       return !this.$v.newCustomer.contact.primaryAddress.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
@@ -194,22 +192,29 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
-    async getCustomersList () {
+    async refresh () {
+      await Promise.all([this.getCustomers(), this.getCustomersFirstIntervention()]);
+    },
+    async getCustomers () {
       try {
-        const customers = await this.$customers.list();
-        this.customersList = customers.map((customer) => {
-          return {
-            ...customer,
-            identity: {
-              ...customer.identity,
-              fullName: formatIdentity(customer.identity, 'FL'),
-            },
-            missingInfo: customerProfileValidation(customer).error !== null,
-          };
-        });
+        this.customers = await this.$customers.list();
         this.tableLoading = false;
       } catch (e) {
+        this.customers = [];
         this.tableLoading = false;
+        console.error(e);
+      }
+    },
+    async getCustomersFirstIntervention () {
+      try {
+        this.firstInterventions = await this.$customers.listWithFirstIntervention();
+        this.customers = this.customers.map(customer => ({
+          ...customer,
+          firstIntervention: this.$_.get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
+          missingInfo: customerProfileValidation(customer).error !== null,
+        }));
+      } catch (e) {
+        this.firstInterventions = [];
         console.error(e);
       }
     },
@@ -219,11 +224,7 @@ export default {
     resetForm () {
       this.$v.newCustomer.$reset();
       this.newCustomer = {
-        identity: {
-          title: '',
-          lastname: '',
-          firstname: '',
-        },
+        identity: { title: '', lastname: '', firstname: '' },
         email: '',
         contact: {
           primaryAddress: { fullAddress: '' },
@@ -240,7 +241,7 @@ export default {
         const payload = this.$_.pickBy(this.newCustomer);
         const newCustomer = await this.$customers.create(payload);
         await this.$customers.createDriveFolder(newCustomer.data.data.customer._id);
-        await this.getCustomersList();
+        await this.refresh();
         NotifyPositive('Fiche bénéficiaire créée');
         this.customerCreationModal = false;
       } catch (e) {

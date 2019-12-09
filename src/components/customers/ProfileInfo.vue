@@ -975,6 +975,11 @@ export default {
     },
     async downloadMandate (doc) {
       try {
+        const mandateDriveId = this.$_.get(this.company, 'customersConfig.templates.debitMandate.driveId', null);
+        if (!mandateDriveId) {
+          return NotifyWarning('Template manquant');
+        }
+
         const data = {
           bankAccountOwner: this.customer.payment.bankAccountOwner || '',
           customerAddress: this.customer.contact.primaryAddress.fullAddress,
@@ -986,7 +991,7 @@ export default {
           companyName: this.company.name,
           companyAddress: this.company.address.fullAddress,
         };
-        const params = { driveId: this.company.customersConfig.templates.debitMandate.driveId };
+        const params = { driveId: mandateDriveId };
 
         await downloadDocxFile(params, data, 'mandat.docx');
         NotifyPositive('Mandat téléchargé.');
@@ -1002,6 +1007,11 @@ export default {
     // Quotes
     async downloadQuote (doc) {
       try {
+        const quoteDriveId = this.$_.get(this.company, 'customersConfig.templates.quote.driveId', null);
+        if (!quoteDriveId) {
+          return NotifyWarning('Template manquant');
+        }
+
         const subscriptions = this.subscriptions.map(subscription => {
           let estimatedWeeklyRate = this.computeWeeklyRate(subscription);
           const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
@@ -1028,7 +1038,7 @@ export default {
           subscriptions,
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
         }
-        const params = { driveId: this.company.customersConfig.templates.quote.driveId };
+        const params = { driveId: quoteDriveId };
         await downloadDocxFile(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
       } catch (e) {

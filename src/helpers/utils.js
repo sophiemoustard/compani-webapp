@@ -1,4 +1,5 @@
 import moment from 'moment';
+import diacriticsMap from '../data/diacritics';
 
 export const extend = (...sources) => {
   const extended = {};
@@ -55,6 +56,12 @@ export const getLastVersion = (versions, dateKey) => {
   return [...versions].sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
 };
 
+export const getLastDocument = (docs) => {
+  if (!docs || !Array.isArray(docs) || docs.length === 0) return [];
+  const sortedDocs = docs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return [sortedDocs[0]];
+};
+
 export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' });
 
 export const formatPrice = (val) => {
@@ -65,6 +72,7 @@ export const formatPrice = (val) => {
 };
 
 export const formatIdentity = (identity, format) => {
+  if (!identity) return '';
   const formatLower = format.toLowerCase();
   const values = [];
 
@@ -94,3 +102,8 @@ export const formatHoursWithMinutes = (date) => {
 export const formatPhone = phoneNumber => phoneNumber
   ? phoneNumber.replace(/^(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})$/, '$1 $2 $3 $4 $5')
   : '';
+
+export const removeDiacritics = (str) => {
+  // eslint-disable-next-line no-control-regex
+  return str.replace(/[^\u0000-\u007E]/g, (a) => diacriticsMap[a] || a);
+}

@@ -2,19 +2,19 @@
   <q-page class="neutral-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" />
+      @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
       :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
-      :personKey="personKey" @resetForm="resetCreationForm" @createEvent="createEvent" @close="closeCreationModal" />
+      :personKey="personKey" @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
       :personKey="personKey" @resetForm="resetEditionForm" @updateEvent="updateEvent" @deleteDocument="deleteDocument"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="deleteEventRepetition" />
+      @deleteEventRepetition="validationDeletionEventRepetition" />
   </q-page>
 </template>
 
@@ -155,7 +155,7 @@ export default {
       }
     },
     async getAuxiliaries () {
-      this.auxiliaries = await this.$users.showAll({ role: [AUXILIARY, PLANNING_REFERENT] });
+      this.auxiliaries = await this.$users.list({ role: [AUXILIARY, PLANNING_REFERENT] });
     },
     // Event creation
     openCreationModal (vEvent) {

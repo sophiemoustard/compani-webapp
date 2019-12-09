@@ -2,7 +2,7 @@ import { alenviAxios } from './ressources/alenviAxios'
 import axios from 'axios'
 
 export default {
-  async showAll (params = null) {
+  async list (params = null) {
     try {
       const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
       return usersRaw.data.data.users;
@@ -10,7 +10,7 @@ export default {
       console.error(e.response);
     }
   },
-  async showAllActive (params = null) {
+  async listActive (params = null) {
     try {
       const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
       return usersRaw.data.data.users;
@@ -29,17 +29,17 @@ export default {
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${id}`);
   },
-  async updateById (data, token = null) {
-    let userUpdated;
+  async updateById (userId, data, token = null) {
+    let updatedUser;
     if (token === null) {
-      userUpdated = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data);
+      updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data);
     } else {
-      userUpdated = await axios.put(`${process.env.API_HOSTNAME}/users/${data._id}`, data, { headers: { 'x-access-token': token } });
+      updatedUser = await axios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data, { headers: { 'x-access-token': token } });
     }
-    return userUpdated;
+    return updatedUser;
   },
-  async updateCertificates (data) {
-    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data._id}/certificates`, data);
+  async updateCertificates (userId, data) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/certificates`, data);
   },
   async getRoles () {
     const rolesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`);
@@ -53,13 +53,13 @@ export default {
     const check = await axios.get(`${process.env.API_HOSTNAME}/users/checkResetPassword/${resetToken}`);
     return check.data.data;
   },
-  async createDriveFolder (data) {
-    const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${data._id}/drivefolder`, data);
+  async createDriveFolder (userId, data) {
+    const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`, data);
     return driveFolder;
   },
   // Tasks
-  async updateTask (data) {
-    const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${data.user_id}/tasks/${data.task_id}`, data)
+  async updateTask ({ userId, taskId }, data) {
+    const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/tasks/${taskId}`, data)
     return updatedTask;
   },
   async getTasks (userId) {

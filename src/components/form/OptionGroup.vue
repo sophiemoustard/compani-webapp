@@ -22,7 +22,7 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
-    value: [String, Array],
+    value: [String, Array, Boolean],
     last: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
@@ -51,4 +51,7 @@ export default {
       padding-bottom: 10px !important
       .q-radio__label
         font-size: 15px
+
+  /deep/ .q-field__control
+    min-height: 25px !important
 </style>

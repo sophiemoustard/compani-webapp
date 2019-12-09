@@ -66,6 +66,7 @@ export default {
       tableLoading: false,
       paymentEditionModal: false,
       customerDocuments: [],
+      balancesForCustomer: [],
       tppDocuments: [],
       billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
       balances: [],
@@ -160,45 +161,22 @@ export default {
     // Refresh data
     async refresh () {
       this.tableLoading = true;
-      await Promise.all([this.getBills(), this.getCreditNotes(), this.getPayments(), this.getCustomerBalance()]);
+      await this.getCustomerBalanceWithDetails();
       this.formatDocumentList();
       this.computeCustomerBalance();
       this.computeTppBalances();
       this.tableLoading = false;
     },
-    async getCustomerBalance () {
+    async getCustomerBalanceWithDetails () {
       try {
-        this.balances = await this.$balances.showAll({
-          customer: this.customer._id,
-          date: this.billingDates.startDate,
-        });
+        const balancesWithDetails = await this.$balances.listWithDetails(this.documentQuery);
+        this.balances = balancesWithDetails.balances;
+        this.payments = balancesWithDetails.payments;
+        this.bills = balancesWithDetails.bills;
+        this.creditNotes = balancesWithDetails.creditNotes;
       } catch (e) {
-        this.balances = [];
+        this.balancesForCustomer = [];
         console.error(e);
-      }
-    },
-    async getBills () {
-      try {
-        this.bills = await this.$bills.showAll(this.documentQuery);
-      } catch (e) {
-        this.bills = [];
-        console.error(e)
-      }
-    },
-    async getCreditNotes () {
-      try {
-        this.creditNotes = await this.$creditNotes.showAll(this.documentQuery);
-      } catch (e) {
-        this.creditNotes = [];
-        console.error(e)
-      }
-    },
-    async getPayments () {
-      try {
-        this.payments = await this.$payments.list(this.documentQuery);
-      } catch (e) {
-        this.payments = [];
-        console.error(e)
       }
     },
     newDocumentList (document) {

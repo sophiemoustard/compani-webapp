@@ -2,7 +2,7 @@ import { Cookies } from 'quasar';
 import { alenviAxios } from './ressources/alenviAxios';
 
 export default {
-  async showAll (params) {
+  async list (params) {
     const creditNotes = await alenviAxios.get(`${process.env.API_HOSTNAME}/creditNotes`, { params });
     return creditNotes.data.data.creditNotes;
   },

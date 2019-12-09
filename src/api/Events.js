@@ -13,6 +13,9 @@ export default {
     const event = await alenviAxios.post(`${process.env.API_HOSTNAME}/events`, data);
     return event.data.data.event;
   },
+  async deleteList (params = null) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/events`, { params });
+  },
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/events/${id}`);
   },
