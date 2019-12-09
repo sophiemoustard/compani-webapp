@@ -88,7 +88,7 @@ export default {
         } else if (this.isAuxiliary) {
           this.$router.replace({ name: 'auxiliary agenda' });
         } else {
-          this.$router.replace({ name: 'administrative directory' });
+          this.$router.replace({ name: 'auxiliaries directory' });
         }
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');

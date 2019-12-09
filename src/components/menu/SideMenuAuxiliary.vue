@@ -48,19 +48,10 @@ export default {
   data () {
     return {
       activeRoutes: {
-        planning: {
-          open: false,
-        },
-        benef: {
-          open: false,
-        },
-        administrative: {
-          open: false,
-        },
-        team: {
-          open: false,
-          hightlight: false,
-        },
+        planning: { open: false },
+        benef: { open: false },
+        administrative: { open: false },
+        team: { open: false },
       },
     }
   },
