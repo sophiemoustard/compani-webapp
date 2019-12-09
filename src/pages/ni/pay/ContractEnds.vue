@@ -65,7 +65,7 @@
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      label="Payer" @click="createList" />
+      label="Payer" @click="confirmFinalPayListCreation" />
 
     <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
       @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surchargeDetailKey="surchargeDetailKey" />
@@ -145,22 +145,24 @@ export default {
       this.surchargeDetailKey = '';
     },
     // Creation
+    confirmFinalPayListCreation () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
+        ok: 'Oui',
+        cancel: 'Non',
+      }).onOk(this.createList)
+        .onCancel(() => NotifyPositive('Création annulée'));
+    },
     async createList () {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Cette opération est définitive. Confirmez-vous ?',
-          ok: 'Oui',
-          cancel: 'Non',
-        }).onOk(async () => {
-          if (!this.hasSelectedRows) return;
+        if (!this.hasSelectedRows) return;
 
-          const finalPayList = this.selected.map(row => this.formatPayload(row));
-          await this.$finalPay.createList(finalPayList);
-          NotifyPositive('Soldes tout compte créés');
-          await this.refreshFinalPay();
-          this.selected = [];
-        });
+        const finalPayList = this.selected.map(row => this.formatPayload(row));
+        await this.$finalPay.createList(finalPayList);
+        NotifyPositive('Soldes tout compte créés');
+        await this.refreshFinalPay();
+        this.selected = [];
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création des soldes tout compte');
