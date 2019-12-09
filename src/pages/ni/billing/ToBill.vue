@@ -42,7 +42,7 @@
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      :label="totalToBillLabel" @click="createBills" />
+      :label="totalToBillLabel" @click="confirmBillListCreation" />
   </q-page>
 </template>
 
@@ -256,15 +256,15 @@ export default {
           promises.push(this.$bills.create({ bills: bills.slice(i, i + BATCH_SIZE) }));
         }
         await Promise.all(promises);
-        NotifyPositive('Clients facturés');
-        await this.getDraftBills();
         this.selected = [];
+        await this.getDraftBills();
+        NotifyPositive('Clients facturés');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la facturation des clients');
       }
     },
-    async createBills () {
+    async confirmBillListCreation () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',
