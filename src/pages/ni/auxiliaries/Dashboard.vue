@@ -39,18 +39,13 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     monthsOptions () {
-      const options = [];
       const companyCreationDate = this.$_.get(this.mainUser, 'company.createdAt', null);
       if (!companyCreationDate) {
         return [{ label: this.$moment().format('MMMM YY'), value: this.$moment().format('MMYY') }];
       }
 
       const range = Array.from(this.$moment().range(companyCreationDate, this.$moment().add(1, 'M')).by('month'));
-      for (const month of range) {
-        options.push({ label: month.format('MMMM YY'), value: month.format('MMYY') })
-      }
-
-      return options;
+      return range.map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYY') }));
     },
   },
   watch: {
