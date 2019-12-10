@@ -178,6 +178,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/auxiliaries/dashboard',
+        name: 'dashboard',
+        component: () => import('pages/ni/auxiliaries/Dashboard'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'events:read',
+          parent: 'teams',
+        },
+      },
+      {
         path: 'ni/auxiliaries/staff-register',
         name: 'staff register',
         component: () => import('pages/ni/auxiliaries/StaffRegister'),

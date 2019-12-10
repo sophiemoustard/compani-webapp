@@ -25,6 +25,7 @@
     <q-separator />
     <q-expansion-item ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
       <ni-menu-item name="teams directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
+      <ni-menu-item name="dashboard" icon="dashboard" label="Tableau de bord" />
     </q-expansion-item>
     <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" isAuxiliary />
