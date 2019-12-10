@@ -107,3 +107,5 @@ export const removeDiacritics = (str) => {
   // eslint-disable-next-line no-control-regex
   return str.replace(/[^\u0000-\u007E]/g, (a) => diacriticsMap[a] || a);
 }
+
+export const upperCaseFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1);

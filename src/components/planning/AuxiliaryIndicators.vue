@@ -70,7 +70,7 @@ export default {
         detail += ` ${formatHours(this.details.diff.workedHours)} de rattrapage`;
       }
 
-      return detail;
+      return detail !== '' ? 'dont ' + detail : detail;
     },
     contractHoursDetail () {
       if (!this.details.holidaysHours && !this.absencesHours) return '';
