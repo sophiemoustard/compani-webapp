@@ -73,7 +73,7 @@
                     <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
                       {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
                     <q-btn color="primary" @click="preOpenESignModal(props.row)"
-                      v-else-if="getRowIndex(this.customer.payment.mandates, props.row) === customer.payment.mandates.length - 1">
+                      v-else-if="getRowIndex(customer.payment.mandates, props.row) === customer.payment.mandates.length - 1">
                       Signer
                     </q-btn>
                   </template>
