@@ -11,9 +11,13 @@
         margin: 0 5px
         cursor: pointer
         font-size: 21px
+      &:after 
+        background: inherit
     & tr
       &.selected
-        background: #FFFFFF !important
+        background: white
+        & td:after
+          content: none
 
   & th
     white-space: normal;
