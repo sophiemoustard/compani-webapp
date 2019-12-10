@@ -19,7 +19,7 @@
                   </q-btn>
                   <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm"
                     :disable="loading"
-                    @click="deletePayDocument(payDocuments[getRowIndex(this.payDocuments, props.row)])">
+                    @click="deletePayDocument(payDocuments[getRowIndex(payDocuments, props.row)])">
                   </q-btn>
                 </div>
               </template>

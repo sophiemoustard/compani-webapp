@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-card v-for="(contract, index) in sortedContracts" :key="index" class="contract-card">
+    <q-card v-for="(contract, contractIndex) in sortedContracts" :key="contractIndex" class="contract-card">
       <q-card-section class="card-title" :style="{ color: cardTitle(contract.endDate).color }">
         {{ cardTitle(contract.endDate).msg }}
       </q-card-section>
@@ -21,8 +21,8 @@
               :style="col.style">
               <template v-if="col.name === 'contractEmpty'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract, index)" icon="file_download"
-                    :disable="!canDownload(props.row, contract.status, index)" />
+                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract, contractIndex)" icon="file_download"
+                    :disable="!canDownload(props.row, contract.status, contractIndex)" />
                 </div>
               </template>
               <template v-if="col.name === 'contractSigned'">
@@ -251,11 +251,11 @@ export default {
       this.$emit('refreshWithTimeout');
     },
     // Documents
-    canDownload (contract, status, contractIndex) {
+    canDownload (version, status, contractIndex) {
       if (!this.user.company || !this.user.company.rhConfig || !this.user.company.rhConfig.templates) return false;
 
       const templates = this.user.company.rhConfig.templates;
-      const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contract);
+      const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, version);
       if (status === COMPANY_CONTRACT) {
         if (versionIndex === 0) return !!templates.contractWithCompany && !!templates.contractWithCompany.driveId;
         return !!templates.contractWithCompanyVersion && !!templates.contractWithCompanyVersion.driveId;
