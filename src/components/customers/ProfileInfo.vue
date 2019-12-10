@@ -120,8 +120,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'emptyMandate'">
-                  <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary"
-                    @click="downloadMandate(props.row)">
+                  <q-btn v-if="customer.payment.mandates && getRowIndex(customer.payment.mandates, props.row) == 0" flat
+                    round small color="primary" @click="downloadMandate(props.row)">
                     <q-icon name="file_download" />
                   </q-btn>
                 </template>
@@ -138,8 +138,10 @@
                   </q-btn>
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
-                  <ni-date-input v-model="customer.payment.mandates[props.row.__index].signedAt"
-                    @blur="updateSignedAt(props.row)" @focus="saveTmpSignedAt(props.row.__index)" in-modal />
+                  <ni-date-input
+                    v-model="customer.payment.mandates[getRowIndex(customer.payment.mandates, props.row)].signedAt"
+                    @blur="updateSignedAt(props.row)"
+                    @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" in-modal />
                 </template>
                 <template v-else-if="col.name === 'signed'">
                   <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
@@ -163,8 +165,7 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="remove_red_eye"
-                      @click.native="showFundingDetails(col.value)" />
+                    <q-icon color="grey" name="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                     <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
                     <q-icon color="grey" name="delete" @click.native="removeFunding(col.value)" />
@@ -189,7 +190,7 @@
             @uploaded="documentUploaded" name="financialCertificates" collapsibleLabel="Ajouter un justificatif"
             :user-profile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />
-          </div>
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -234,12 +235,12 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading"
-      :validations="$v.newHelper" :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/>
+    <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
+      :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" />
 
     <!-- Edit helper modal -->
     <edit-helper-modal :editedHelper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
-      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/>
+      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper" />
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -292,7 +293,7 @@
       <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
         :pagination.sync="paginationHistory">
         <template v-slot:body="{ props }">
-            <q-tr :props="props">
+          <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template>{{ col.value }}</template>
             </q-td>
@@ -427,6 +428,7 @@ import ReponsiveTable from '../table/ResponsiveTable';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
+import { tableMixin } from '../../mixins/tableMixin.js';
 import { days } from '../../data/days.js';
 import {
   FUNDING_FREQ_OPTIONS,
@@ -464,6 +466,7 @@ export default {
     fundingMixin,
     validationMixin,
     helperMixin,
+    tableMixin,
   ],
   data () {
     return {

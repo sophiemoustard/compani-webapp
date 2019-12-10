@@ -28,7 +28,7 @@
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
-              :disable="customer.subscriptionsAccepted" dense/>
+              :disable="customer.subscriptionsAccepted" dense />
             <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que
               les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
                 Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
@@ -72,8 +72,8 @@
                   <template v-if="col.name === 'sign'">
                     <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
                       {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-                    <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary"
-                      @click="preOpenESignModal(props.row)">
+                    <q-btn color="primary" @click="preOpenESignModal(props.row)"
+                      v-else-if="getRowIndex(customer.payment.mandates, props.row) === customer.payment.mandates.length - 1">
                       Signer
                     </q-btn>
                   </template>
@@ -154,6 +154,7 @@ import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
+import { tableMixin } from '../../mixins/tableMixin.js';
 import cgs from '../../statics/CGS.html';
 
 export default {
@@ -165,7 +166,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
     return {
       cgs,

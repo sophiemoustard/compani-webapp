@@ -16,7 +16,7 @@
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <q-btn :disable="props.row.default" flat round small color="grey" icon="delete"
-                      @click="deleteInternalHour(col.value, props.row.__index)" />
+                      @click="confirmInternalHourDeletion(col.value, props.row)" />
                   </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
@@ -121,7 +121,7 @@
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
                       <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
-                        @click="deleteSector(col.value._id, props.row.__index)" />
+                        @click="confirmSectorDeletion(col.value._id, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -190,6 +190,7 @@ import ResponsiveTable from '../../../components/table/ResponsiveTable';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin';
+import { tableMixin } from '../../../mixins/tableMixin';
 
 export default {
   name: 'RhConfig',
@@ -200,7 +201,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
   },
-  mixins: [configMixin, validationMixin],
+  mixins: [configMixin, validationMixin, tableMixin],
   data () {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
@@ -395,23 +396,26 @@ export default {
         this.loading = false;
       }
     },
-    async deleteInternalHour (internalHourId, cell) {
+    async deleteInternalHour (internalHourId, row) {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$internalHours.remove(internalHourId);
-          await this.$store.dispatch('main/getUser', this.user._id);
-          this.internalHours.splice(cell, 1);
-          NotifyPositive('Heure interne supprimée.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.internalHours, row);
+        await this.$internalHours.remove(internalHourId);
+        await this.$store.dispatch('main/getUser', this.user._id);
+        this.internalHours.splice(index, 1);
+        NotifyPositive('Heure interne supprimée.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
+    },
+    confirmInternalHourDeletion (internalHourId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteInternalHour(internalHourId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async updateDefaultInternalHour (internalHourId) {
       const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
@@ -482,22 +486,25 @@ export default {
       this.editedSector = { name: '' };
       this.$v.editedSector.$reset();
     },
-    async deleteSector (sectorId, cell) {
+    async deleteSector (sectorId, row) {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$sectors.deleteById(sectorId);
-          this.sectors.splice(cell, 1);
-          NotifyPositive('Équipe supprimée.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.sectors, row);
+        await this.$sectors.deleteById(sectorId);
+        this.sectors.splice(index, 1);
+        NotifyPositive('Équipe supprimée.');
       } catch (e) {
         console.error(e);
         NotifyNegative("Erreur lors de la suppression de l'équipe.");
       }
+    },
+    confirmSectorDeletion (sectorId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteSector(sectorId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     nameError (obj) {
       if (!obj.name.required) return REQUIRED_LABEL;
