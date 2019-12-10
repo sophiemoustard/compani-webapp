@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background">
     <div class="title-padding row items-start">
-      <div class="col-xs-12 col-md-5 row">
+      <div class="col-xs-12 col-md-5 row q-mb-md">
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
       </div>
       <div class="col-xs-12 col-md-7 row justify-end">
@@ -44,9 +44,9 @@ export default {
         return [{ label: this.$moment().format('MMMM YY'), value: this.$moment().format('MMYY') }];
       }
 
-      const range = Array.from(this.$moment().range(companyCreationDate, this.$moment().add(1, 'M')).by('month'))
-        .sort((a, b) => b.diff(a));
-      return range.map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYY') }));
+      return Array.from(this.$moment().range(companyCreationDate, this.$moment().add(1, 'M')).by('month'))
+        .sort((a, b) => b.diff(a))
+        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYY') }));
     },
   },
   watch: {
