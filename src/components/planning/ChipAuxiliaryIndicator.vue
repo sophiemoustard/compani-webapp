@@ -68,7 +68,6 @@ export default {
       loading: false,
       indicatorsModal: false,
       selectedTab: MONTH_STATS,
-      distanceMatrix: [],
       monthDetails: {},
       prevMonthDetails: {},
     };
