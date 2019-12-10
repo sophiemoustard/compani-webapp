@@ -55,7 +55,8 @@ import LargeTable from '../../../components/table/LargeTable';
 import Select from '../../../components/form/Select';
 import TitleHeader from '../../../components/TitleHeader';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
-import { billingMixin } from '../../../mixins/billingMixin.js';
+import { billingMixin } from '../../../mixins/billingMixin';
+import { tableMixin } from '../../../mixins/tableMixin';
 import { formatPrice, formatIdentity } from '../../../helpers/utils';
 
 export default {
@@ -63,7 +64,7 @@ export default {
   metaInfo: {
     title: 'A facturer',
   },
-  mixins: [billingMixin],
+  mixins: [billingMixin, tableMixin],
   components: {
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
@@ -245,7 +246,7 @@ export default {
         const BATCH_SIZE = 50;
         const promises = [];
         const bills = this.selected.map(row => ({
-          ...this.$_.omit(row, ['__index']),
+          ...row,
           customerBills: {
             ...row.customerBills,
             shouldBeSent: !!shouldBeSent[0],
@@ -280,8 +281,10 @@ export default {
     },
     async refreshBill (row, bill) {
       try {
-        const { customer, __index } = row;
+        const { customer } = row;
         const { startDate, endDate } = bill;
+        const index = this.getRowIndex(this.draftBills, row);
+
         const draftBills = await this.$bills.getDraftBills({
           billingStartDate: startDate,
           startDate: this.$moment(startDate).startOf('d').toISOString(),
@@ -289,7 +292,7 @@ export default {
           billingPeriod: this.user.company.customersConfig.billingPeriod,
           customer: customer._id,
         });
-        this.draftBills.splice(__index, 1, ...draftBills);
+        this.draftBills.splice(index, 1, ...draftBills);
         NotifyPositive('Date de début de facturation modifiée');
       } catch (e) {
         console.error(e);

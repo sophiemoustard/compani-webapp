@@ -21,8 +21,8 @@
               :style="col.style">
               <template v-if="col.name === 'contractEmpty'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract)" icon="file_download"
-                    :disable="!canDownload(props.row, contract.status)" />
+                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract, index)" icon="file_download"
+                    :disable="!canDownload(props.row, contract.status, index)" />
                 </div>
               </template>
               <template v-if="col.name === 'contractSigned'">
@@ -96,6 +96,7 @@
 <script>
 import { Cookies } from 'quasar';
 import { contractMixin } from '../../mixins/contractMixin.js';
+import { tableMixin } from '../../mixins/tableMixin.js';
 import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from '../../data/constants.js';
 import { NotifyNegative } from '../../components/popup/notify.js';
 import { downloadDocxFile } from '../../helpers/downloadFile';
@@ -106,7 +107,7 @@ import ResponsiveTable from '../table/ResponsiveTable';
 
 export default {
   name: 'Contracts',
-  mixins: [contractMixin],
+  mixins: [contractMixin, tableMixin],
   components: {
     'ni-responsive-table': ResponsiveTable,
   },
@@ -250,16 +251,17 @@ export default {
       this.$emit('refreshWithTimeout');
     },
     // Documents
-    canDownload (contract, status) {
+    canDownload (contract, status, contractIndex) {
       if (!this.user.company || !this.user.company.rhConfig || !this.user.company.rhConfig.templates) return false;
 
       const templates = this.user.company.rhConfig.templates;
+      const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contract);
       if (status === COMPANY_CONTRACT) {
-        if (contract.__index === 0) return !!templates.contractWithCompany && !!templates.contractWithCompany.driveId;
+        if (versionIndex === 0) return !!templates.contractWithCompany && !!templates.contractWithCompany.driveId;
         return !!templates.contractWithCompanyVersion && !!templates.contractWithCompanyVersion.driveId;
       }
 
-      if (contract.__index === 0) return !!templates.contractWithCustomer && !!templates.contractWithCustomer.driveId;
+      if (versionIndex === 0) return !!templates.contractWithCustomer && !!templates.contractWithCustomer.driveId;
       return !!templates.contractWithCustomerVersion && !!templates.contractWithCustomerVersion.driveId;
     },
     docsUploadUrl (contractId) {
@@ -268,13 +270,14 @@ export default {
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;
     },
-    async dlTemplate (contractVersion, parentContract) {
+    async dlTemplate (contractVersion, parentContract, contractIndex) {
       try {
         const data = generateContractFields(parentContract.status, { user: this.user, contract: contractVersion, initialContractStartDate: parentContract.startDate });
-        if (!this.canDownload(contractVersion, parentContract.status)) return NotifyNegative('Impossible de télécharger le contrat.');
+        if (!this.canDownload(contractVersion, parentContract.status, contractIndex)) return NotifyNegative('Impossible de télécharger le contrat.');
 
+        const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contractVersion);
         const params = {
-          driveId: contractVersion.__index === 0 ? this.user.company.rhConfig.templates.contractWithCompany.driveId : this.user.company.rhConfig.templates.contractWithCompanyVersion.driveId,
+          driveId: versionIndex === 0 ? this.user.company.rhConfig.templates.contractWithCompany.driveId : this.user.company.rhConfig.templates.contractWithCompanyVersion.driveId,
         };
 
         await downloadDocxFile(params, data, 'contrat.docx');

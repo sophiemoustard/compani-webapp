@@ -15,7 +15,7 @@
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click.native="openSurchargeEditionModal(col.value)" />
                       <q-btn flat round small dense color="grey" icon="delete"
-                        @click="deleteSurcharge(col.value, props.row.__index)" />
+                        @click="confirmSurchargeDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -45,7 +45,7 @@
                         @click="openServiceEditionModal(col.value)" />
                       <q-btn flat round small dense color="grey" icon="delete"
                         :disable="props.row.subscriptionCount > 0"
-                        @click="deleteService(col.value, props.row.__index)" />
+                        @click="confirmServiceDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -113,8 +113,8 @@
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small dense color="grey"
-                        icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
+                      <q-btn :disable="isTppUsedInFundings(props.row)" flat round small dense color="grey"
+                        icon="delete" @click="confirmTppDeletion(col.value, props.row)" />
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click="openThirdPartyPayerEditionModal(col.value)" />
                     </div>
@@ -340,6 +340,7 @@ import TimeInput from '../../../components/form/TimeInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
+import { tableMixin } from '../../../mixins/tableMixin.js';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
@@ -372,7 +373,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ReponsiveTable,
   },
-  mixins: [configMixin, validationMixin],
+  mixins: [configMixin, validationMixin, tableMixin],
   watch: {
     'editedSurcharge.evening' (value) {
       if (!value) {
@@ -1007,22 +1008,25 @@ export default {
         this.loading = false;
       }
     },
-    async deleteSurcharge (surchargeId, cell) {
+    async deleteSurcharge (surchargeId, row) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$surcharges.remove(surchargeId);
-          this.surcharges.splice(cell, 1);
-          NotifyPositive('Plan de majoration supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.surcharges, row);
+        await this.$surcharges.remove(surchargeId);
+        this.surcharges.splice(index, 1);
+        NotifyPositive('Plan de majoration supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du plan de majoration.');
       }
+    },
+    confirmSurchargeDeletion (surchargeId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteSurcharge(surchargeId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Services
     formatCreatedService () {
@@ -1118,22 +1122,25 @@ export default {
         this.loading = false;
       }
     },
-    async deleteService (serviceId, cell) {
+    async deleteService (serviceId, row) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer ce service ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$services.remove(serviceId);
-          this.services.splice(cell, 1);
-          NotifyPositive('Service supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.services, row);
+        await this.$services.remove(serviceId);
+        this.services.splice(index, 1);
+        NotifyPositive('Service supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
       }
+    },
+    async confirmServiceDeletion (serviceId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer ce service ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(async () => this.deleteService(serviceId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showHistory (id) {
       this.selectedService = this.services.find(ser => ser._id === id);
@@ -1215,25 +1222,29 @@ export default {
         this.thirdPartyPayerEditionModal = false;
       }
     },
-    async deleteThirdPartyPayer (thirdPartyPayerId, cell) {
+    async deleteThirdPartyPayer (thirdPartyPayerId, row) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
-          this.thirdPartyPayers.splice(cell, 1);
-          NotifyPositive('Tiers payeur supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.thirdPartyPayers, row);
+        await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
+        this.thirdPartyPayers.splice(index, 1);
+        NotifyPositive('Tiers payeur supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
-    isTppUsedInFundings (tppIndex) {
-      return this.thirdPartyPayers[tppIndex].isUsedInFundings;
+    async confirmTppDeletion (thirdPartyPayerId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
+    isTppUsedInFundings (tpp) {
+      const index = this.getRowIndex(this.thirdPartyPayers, tpp);
+      return this.thirdPartyPayers[index].isUsedInFundings;
     },
   },
 }
