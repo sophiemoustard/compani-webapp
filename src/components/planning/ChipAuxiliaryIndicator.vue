@@ -49,6 +49,7 @@ import {
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
 } from '../../data/constants.js';
+import { upperCaseFirstLetter } from '../../helpers/utils';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
@@ -77,8 +78,8 @@ export default {
       const currentMonthLabel = this.$moment(this.startOfWeek).startOf('month').format('MMMM YY');
       const prevMonthLabel = this.$moment(this.startOfWeek).subtract(1, 'month').startOf('month').format('MMMM YY');
       return [
-        { label: currentMonthLabel, default: true, name: MONTH_STATS },
-        { label: prevMonthLabel, default: false, name: PREV_MONTH_STATS },
+        { label: upperCaseFirstLetter(currentMonthLabel), default: true, name: MONTH_STATS },
+        { label: upperCaseFirstLetter(prevMonthLabel), default: false, name: PREV_MONTH_STATS },
       ];
     },
     occupationLevel () {
