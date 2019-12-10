@@ -44,7 +44,8 @@ export default {
         return [{ label: this.$moment().format('MMMM YY'), value: this.$moment().format('MMYY') }];
       }
 
-      const range = Array.from(this.$moment().range(companyCreationDate, this.$moment().add(1, 'M')).by('month'));
+      const range = Array.from(this.$moment().range(companyCreationDate, this.$moment().add(1, 'M')).by('month'))
+        .sort((a, b) => b.diff(a));
       return range.map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYY') }));
     },
   },

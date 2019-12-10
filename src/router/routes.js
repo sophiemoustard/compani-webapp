@@ -178,7 +178,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/auxiliaries/dashbord',
+        path: 'ni/auxiliaries/dashboard',
         name: 'dashboard',
         component: () => import('pages/ni/auxiliaries/Dashboard'),
         meta: {
