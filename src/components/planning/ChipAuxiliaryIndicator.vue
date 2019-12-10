@@ -71,7 +71,6 @@ export default {
         { label: 'Stats du mois précédent', default: false, name: PREV_MONTH_STATS },
       ],
       selectedTab: MONTH_STATS,
-      distanceMatrix: [],
       monthDetails: {},
       prevMonthDetails: {},
     };
