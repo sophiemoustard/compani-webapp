@@ -66,10 +66,6 @@ export default {
     return {
       loading: false,
       indicatorsModal: false,
-      tabsContent: [
-        { label: 'Stats du mois', default: true, name: MONTH_STATS },
-        { label: 'Stats du mois précédent', default: false, name: PREV_MONTH_STATS },
-      ],
       selectedTab: MONTH_STATS,
       distanceMatrix: [],
       monthDetails: {},
@@ -77,6 +73,14 @@ export default {
     };
   },
   computed: {
+    tabsContent () {
+      const currentMonthLabel = this.$moment(this.startOfWeek).startOf('month').format('MMMM YY');
+      const prevMonthLabel = this.$moment(this.startOfWeek).subtract(1, 'month').startOf('month').format('MMMM YY');
+      return [
+        { label: currentMonthLabel, default: true, name: MONTH_STATS },
+        { label: prevMonthLabel, default: false, name: PREV_MONTH_STATS },
+      ];
+    },
     occupationLevel () {
       if (this.workingStats.hoursToWork !== 0 && this.workingStats.workedHours < this.workingStats.hoursToWork) {
         return LOW;
