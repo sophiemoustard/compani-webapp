@@ -187,25 +187,26 @@ export default {
       }
     },
     async deletePayDocument (payDocument) {
-      await PayDocuments.remove(payDocument._id);
-      NotifyPositive('Document supprimé');
-      await this.getDocuments();
-    },
-    async validatePayDocumentDeletion (payDocument) {
-      this.loading = true;
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(() => this.deletePayDocument(payDocument))
-          .onCancel(() => NotifyPositive('Suppression annulée'));
+        this.loading = true;
+        await PayDocuments.remove(payDocument._id);
+        NotifyPositive('Document supprimé');
+        await this.getDocuments();
+        this.loading = false;
       } catch (e) {
+        this.loading = false;
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');
       }
-      this.loading = false;
+    },
+    async validatePayDocumentDeletion (payDocument) {
+      await this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deletePayDocument(payDocument))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
 }
