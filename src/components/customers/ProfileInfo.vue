@@ -168,7 +168,7 @@
                     <q-icon color="grey" name="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                     <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="removeFunding(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="validationFundingRemoval(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -1154,18 +1154,20 @@ export default {
       }
     },
     async removeFunding (fundingId) {
+      const params = { fundingId, _id: this.customer._id };
+      await this.$customers.removeFunding(params);
+      await this.refreshCustomer();
+      NotifyPositive('Financement supprimé');
+    },
+    async validationFundingRemoval (fundingId) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
           ok: true,
           cancel: 'Annuler',
-        }).onOk(async () => {
-          const params = { fundingId, _id: this.customer._id };
-          await this.$customers.removeFunding(params);
-          await this.refreshCustomer();
-          NotifyPositive('Financement supprimé');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        }).onOk(() => this.removeFunding(fundingId))
+          .onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
       }
