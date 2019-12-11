@@ -67,7 +67,7 @@
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
               <td valign="top">
                 <div class="person-inner-cell">
-                  <div :class="[!staffingView && 'q-mb-md']">
+                  <div :class="[!staffingView && 'q-mb-sm']">
                     <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
                     <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
