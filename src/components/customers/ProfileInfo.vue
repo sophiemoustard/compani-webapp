@@ -45,7 +45,7 @@
                     <q-icon color="grey" name="history" @click="showHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click="startSubscriptionEdition(col.value)" />
                     <q-icon color="grey" name="delete" :disable="props.row.eventCount > 0"
-                      @click="validationSubscriptionsRemoval(col.value)" />
+                      @click="validateSubscriptionsRemoval(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -168,7 +168,7 @@
                     <q-icon color="grey" name="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                     <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="validationFundingRemoval(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="validateFundingRemoval(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -949,7 +949,7 @@ export default {
       await this.refreshCustomer();
       NotifyPositive('Souscription supprimée');
     },
-    async validationSubscriptionsRemoval (subscriptionId) {
+    async validateSubscriptionsRemoval (subscriptionId) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
@@ -1159,7 +1159,7 @@ export default {
       await this.refreshCustomer();
       NotifyPositive('Financement supprimé');
     },
-    async validationFundingRemoval (fundingId) {
+    async validateFundingRemoval (fundingId) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',

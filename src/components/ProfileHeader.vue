@@ -26,7 +26,7 @@
           <q-icon name="restore" class="on-left" size="1rem" />
           <div class="on-left">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
           <ni-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention"
-            @click=deleteCustomer />
+            @click="validateCustomerDeletion" />
         </div>
       </div>
       <div v-if="!customer" class="q-pl-lg col-xs-6 col-md-6 row profile-info-item">
@@ -196,17 +196,19 @@ export default {
       }
     },
     async deleteCustomer () {
+      await this.$customers.remove(this.user._id);
+      NotifyPositive('Bénéficiaire supprimé.');
+      this.$router.push({ name: 'customers directory' });
+    },
+    async validateCustomerDeletion () {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Confirmez-vous la suppression ?',
           ok: 'OK',
           cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$customers.remove(this.user._id);
-          NotifyPositive('Bénéficiaire supprimé.');
-          this.$router.push({ name: 'customers directory' });
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        }).onOk(() => this.deleteCustomer())
+          .onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
