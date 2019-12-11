@@ -45,7 +45,7 @@
                     <q-icon color="grey" name="history" @click="showHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click="startSubscriptionEdition(col.value)" />
                     <q-icon color="grey" name="delete" :disable="props.row.eventCount > 0"
-                      @click="removeSubscriptions(col.value)" />
+                      @click="validationSubscriptionsRemoval(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -944,18 +944,20 @@ export default {
       }
     },
     async removeSubscriptions (subscriptionId) {
+      const params = { subscriptionId, _id: this.customer._id };
+      await this.$customers.removeSubscription(params);
+      await this.refreshCustomer();
+      NotifyPositive('Souscription supprimée');
+    },
+    async validationSubscriptionsRemoval (subscriptionId) {
       try {
         await this.$q.dialog({
           title: 'Confirmation',
           message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
           ok: true,
           cancel: 'Annuler',
-        }).onOk(async () => {
-          const params = { subscriptionId, _id: this.customer._id };
-          await this.$customers.removeSubscription(params);
-          await this.refreshCustomer();
-          NotifyPositive('Souscription supprimée');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        }).onOk(() => this.removeSubscriptions(subscriptionId))
+          .onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
       }
