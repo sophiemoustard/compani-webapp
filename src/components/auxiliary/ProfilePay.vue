@@ -19,7 +19,7 @@
                   </q-btn>
                   <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm"
                     :disable="loading"
-                    @click="deletePayDocument(payDocuments[getRowIndex(payDocuments, props.row)])">
+                    @click="validatePayDocumentDeletion(payDocuments[getRowIndex(payDocuments, props.row)])">
                   </q-btn>
                 </div>
               </template>
@@ -187,6 +187,11 @@ export default {
       }
     },
     async deletePayDocument (payDocument) {
+      await PayDocuments.remove(payDocument._id);
+      NotifyPositive('Document supprimé');
+      await this.getDocuments();
+    },
+    async validatePayDocumentDeletion (payDocument) {
       this.loading = true;
       try {
         await this.$q.dialog({
@@ -194,11 +199,8 @@ export default {
           message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
           ok: true,
           cancel: 'Annuler',
-        }).onOk(async () => {
-          await PayDocuments.remove(payDocument._id);
-          NotifyPositive('Document supprimé');
-          await this.getDocuments();
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        }).onOk(() => this.deletePayDocument(payDocument))
+          .onCancel(() => NotifyPositive('Suppression annulée'));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');
