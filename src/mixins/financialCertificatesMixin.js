@@ -16,7 +16,7 @@ export const financialCertificatesMixin = {
       }
     },
     // Financial certificates
-    async confirmFinancialCertifDeletion (driveId) {
+    async validateFinancialCertifDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',

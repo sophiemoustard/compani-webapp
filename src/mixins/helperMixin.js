@@ -178,7 +178,7 @@ export const helperMixin = {
         NotifyNegative("Erreur lors de la suppression de l'aidant");
       }
     },
-    async confirmHelperDeletion (helperId) {
+    async validateHelperDeletion (helperId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',

@@ -65,7 +65,7 @@
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      label="Payer" @click="confirmFinalPayListCreation" />
+      label="Payer" @click="validateFinalPayListCreation" />
 
     <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
       @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surchargeDetailKey="surchargeDetailKey" />
@@ -145,7 +145,7 @@ export default {
       this.surchargeDetailKey = '';
     },
     // Creation
-    confirmFinalPayListCreation () {
+    validateFinalPayListCreation () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',
