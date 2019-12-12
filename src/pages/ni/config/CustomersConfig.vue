@@ -1025,7 +1025,7 @@ export default {
         message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteSurcharge(surchargeId, row))
+      }).onOk(() => this.deleteSurcharge(surchargeId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Services
@@ -1133,13 +1133,13 @@ export default {
         NotifyNegative('Erreur lors de la suppression du service.');
       }
     },
-    async validateServiceDeletion (serviceId, row) {
+    validateServiceDeletion (serviceId, row) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer ce service ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteService(serviceId, row))
+      }).onOk(() => this.deleteService(serviceId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showHistory (id) {
@@ -1233,13 +1233,13 @@ export default {
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
-    async validateTppDeletion (thirdPartyPayerId, row) {
+    validateTppDeletion (thirdPartyPayerId, row) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
+      }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     isTppUsedInFundings (tpp) {

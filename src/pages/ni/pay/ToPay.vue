@@ -244,13 +244,13 @@ export default {
       this.surchargeDetailKey = '';
     },
     // Creation
-    async validateCreation () {
+    validateCreation () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',
         ok: 'Oui',
         cancel: 'Non',
-      }).onOk(async () => this.createList())
+      }).onOk(() => this.createList())
         .onCancel(() => NotifyPositive('Création annulée'));
     },
     async createList () {

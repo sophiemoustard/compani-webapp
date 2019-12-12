@@ -744,14 +744,14 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
-    async validateDocumentDeletion (driveId, path) {
+    validateDocumentDeletion (driveId, path) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       })
-        .onOk(async () => this.deleteDocument(path, driveId))
+        .onOk(() => this.deleteDocument(path, driveId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async deleteImage () {
@@ -768,7 +768,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la photo');
       }
     },
-    async validateImageDeletion (params) {
+    validateImageDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',

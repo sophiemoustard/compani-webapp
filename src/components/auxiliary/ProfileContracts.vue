@@ -427,7 +427,7 @@ export default {
         message: 'Etes-vous sûr de vouloir supprimer cet avenant ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteVersion(contractId, versionId))
+      }).onOk(() => this.deleteVersion(contractId, versionId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async deleteVersion (contractId, versionId) {

@@ -16,13 +16,13 @@ export const financialCertificatesMixin = {
       }
     },
     // Financial certificates
-    async validateFinancialCertifDeletion (driveId) {
+    validateFinancialCertifDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteDocument(driveId))
+      }).onOk(() => this.deleteDocument(driveId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async documentUploaded () {

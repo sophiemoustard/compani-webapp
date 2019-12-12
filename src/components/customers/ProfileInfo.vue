@@ -953,13 +953,13 @@ export default {
         console.error(e);
       }
     },
-    async validateSubscriptionsDeletion (subscriptionId) {
+    validateSubscriptionsDeletion (subscriptionId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteSubscriptions(subscriptionId))
+      }).onOk(() => this.deleteSubscriptions(subscriptionId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Mandates
@@ -1163,13 +1163,13 @@ export default {
         console.error(e);
       }
     },
-    async validateFundingDeletion (fundingId) {
+    validateFundingDeletion (fundingId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteFunding(fundingId))
+      }).onOk(() => this.deleteFunding(fundingId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showFundingDetails (id) {

@@ -414,7 +414,7 @@ export default {
         message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteInternalHour(internalHourId, row))
+      }).onOk(() => this.deleteInternalHour(internalHourId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async updateDefaultInternalHour (internalHourId) {
@@ -503,7 +503,7 @@ export default {
         message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteSector(sectorId, row))
+      }).onOk(() => this.deleteSector(sectorId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     nameError (obj) {

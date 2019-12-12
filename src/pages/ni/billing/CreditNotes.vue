@@ -688,14 +688,14 @@ export default {
         NotifyNegative('Erreur lors de la suppression de l\'avoir');
       }
     },
-    async validateCNDeletion (id) {
+    validateCNDeletion (id) {
       const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
       this.$q.dialog({
         title: 'Confirmation',
         message: `Etes-vous sûr de vouloir supprimer cet avoir ${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(async () => this.deleteCreditNote(id))
+      }).onOk(() => this.deleteCreditNote(id))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     formatIdentity,

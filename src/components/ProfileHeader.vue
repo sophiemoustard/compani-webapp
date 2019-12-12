@@ -205,7 +205,7 @@ export default {
         if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
       }
     },
-    async validateCustomerDeletion () {
+    validateCustomerDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
