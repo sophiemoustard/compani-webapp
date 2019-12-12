@@ -5,15 +5,14 @@
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent" :personKey="personKey"
       :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
-      :personKey="personKey" @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
+      @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
-      :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
-      :personKey="personKey" @resetForm="resetEditionForm" @updateEvent="updateEvent" @deleteDocument="deleteDocument"
-      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
+      :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers" :personKey="personKey"
+      @resetForm="resetEditionForm" @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent"
       @deleteEventRepetition="validationDeletionEventRepetition" />
   </q-page>
 </template>
