@@ -5,7 +5,7 @@
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
       </div>
       <div class="col-xs-12 col-md-7 row justify-end">
-        <ni-select v-model="month" :options="monthsOptions" />
+        <ni-select v-model="month" :options="monthsOptions" @input="refresh" />
       </div>
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="q-ma-md row">
@@ -83,9 +83,6 @@ export default {
     },
     elementToRemove (val) {
       this.removeElementFromFilter(val);
-    },
-    async month () {
-      await this.refresh();
     },
   },
   async mounted () {
