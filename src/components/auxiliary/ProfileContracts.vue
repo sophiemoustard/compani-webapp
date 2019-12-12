@@ -4,7 +4,7 @@
       <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
         @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
-        @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="deleteVersion" />
+        @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="validateVersionDeletion" />
       <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
@@ -421,18 +421,20 @@ export default {
       this.versionEditionModal = true;
     },
     // Delete version
-    async deleteVersion ({ contractId, versionId }) {
+    validateVersionDeletion ({ contractId, versionId }) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer cet avenant ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(async () => this.deleteVersion(contractId, versionId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
+    async deleteVersion (contractId, versionId) {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer cet avenant ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$contracts.deleteVersion(contractId, versionId);
-          await this.refreshContracts();
-          NotifyPositive('Version supprimée');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        await this.$contracts.deleteVersion(contractId, versionId);
+        await this.refreshContracts();
+        NotifyPositive('Version supprimée');
       } catch (e) {
         console.error(e);
         if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant');
