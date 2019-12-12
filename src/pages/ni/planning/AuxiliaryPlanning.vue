@@ -17,7 +17,7 @@
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
-      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
+      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="validateEventDeletion"
       @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey" @updateEvent="updateEvent" />
   </q-page>
 </template>

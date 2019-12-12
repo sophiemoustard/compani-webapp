@@ -145,7 +145,7 @@ export const contractMixin = {
             message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant prenant effet ce mois-ci. Confirmez-vous ce changement ?',
             ok: true,
             cancel: 'Annuler',
-          }).onOk(this.saveVersion())
+          }).onOk(this.saveVersion)
             .onCancel(() => NotifyPositive('Edition annulée'));
         } else {
           await this.saveVersion();

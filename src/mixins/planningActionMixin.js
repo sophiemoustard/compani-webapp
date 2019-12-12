@@ -510,22 +510,25 @@ export const planningActionMixin = {
       }
     },
     // Event deletion
+    validateEventDeletion () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(this.deleteEvent)
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
     async deleteEvent () {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          this.loading = true
-          await this.$events.deleteById(this.editedEvent._id);
-          await this.refresh();
-          this.editionModal = false;
-          NotifyPositive('Évènement supprimé.');
-          this.loading = false;
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        this.loading = true
+        await this.$events.deleteById(this.editedEvent._id);
+
+        await this.refresh();
+        this.editionModal = false;
+        NotifyPositive('Évènement supprimé.');
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
         this.loading = false

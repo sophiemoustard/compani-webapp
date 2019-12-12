@@ -12,8 +12,8 @@
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers" :personKey="personKey"
-      @resetForm="resetEditionForm" @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="validationDeletionEventRepetition" />
+      @resetForm="resetEditionForm" @updateEvent="updateEvent" @close="closeEditionModal"
+      @deleteEventRepetition="validationDeletionEventRepetition" @deleteEvent="validateEventDeletion" />
   </q-page>
 </template>
 
