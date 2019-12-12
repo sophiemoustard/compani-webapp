@@ -15,7 +15,7 @@
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click.native="openSurchargeEditionModal(col.value)" />
                       <q-btn flat round small dense color="grey" icon="delete"
-                        @click="confirmSurchargeDeletion(col.value, props.row)" />
+                        @click="validateSurchargeDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -45,7 +45,7 @@
                         @click="openServiceEditionModal(col.value)" />
                       <q-btn flat round small dense color="grey" icon="delete"
                         :disable="props.row.subscriptionCount > 0"
-                        @click="confirmServiceDeletion(col.value, props.row)" />
+                        @click="validateServiceDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -114,7 +114,7 @@
                   <template v-else-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn :disable="isTppUsedInFundings(props.row)" flat round small dense color="grey"
-                        icon="delete" @click="confirmTppDeletion(col.value, props.row)" />
+                        icon="delete" @click="validateTppDeletion(col.value, props.row)" />
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click="openThirdPartyPayerEditionModal(col.value)" />
                     </div>
@@ -1019,7 +1019,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression du plan de majoration.');
       }
     },
-    confirmSurchargeDeletion (surchargeId, row) {
+    validateSurchargeDeletion (surchargeId, row) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
@@ -1133,7 +1133,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression du service.');
       }
     },
-    async confirmServiceDeletion (serviceId, row) {
+    async validateServiceDeletion (serviceId, row) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer ce service ?',
@@ -1233,7 +1233,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
-    async confirmTppDeletion (thirdPartyPayerId, row) {
+    async validateTppDeletion (thirdPartyPayerId, row) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',

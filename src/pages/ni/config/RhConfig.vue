@@ -16,7 +16,7 @@
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <q-btn :disable="props.row.default" flat round small color="grey" icon="delete"
-                      @click="confirmInternalHourDeletion(col.value, props.row)" />
+                      @click="validateInternalHourDeletion(col.value, props.row)" />
                   </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
@@ -121,7 +121,7 @@
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
                       <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
-                        @click="confirmSectorDeletion(col.value._id, props.row)" />
+                        @click="validateSectorDeletion(col.value._id, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -408,7 +408,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
     },
-    confirmInternalHourDeletion (internalHourId, row) {
+    validateInternalHourDeletion (internalHourId, row) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
@@ -497,7 +497,7 @@ export default {
         NotifyNegative("Erreur lors de la suppression de l'équipe.");
       }
     },
-    confirmSectorDeletion (sectorId, row) {
+    validateSectorDeletion (sectorId, row) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',

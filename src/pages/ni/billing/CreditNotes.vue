@@ -14,7 +14,7 @@
                 <q-btn flat round small color="grey" icon="edit"
                   @click.native="openCreditNoteEditionModal(props.row)" />
                 <q-btn flat round small color="grey" icon="delete"
-                  @click="confirmCNDeletion(col.value, props.row)" />
+                  @click="validateCNDeletion(col.value, props.row)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -688,7 +688,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression de l\'avoir');
       }
     },
-    async confirmCNDeletion (id) {
+    async validateCNDeletion (id) {
       const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
       this.$q.dialog({
         title: 'Confirmation',

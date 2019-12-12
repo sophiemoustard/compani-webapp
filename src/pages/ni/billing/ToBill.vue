@@ -42,7 +42,7 @@
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      :label="totalToBillLabel" @click="confirmBillListCreation" />
+      :label="totalToBillLabel" @click="validateBillListCreation" />
   </q-page>
 </template>
 
@@ -265,7 +265,7 @@ export default {
         NotifyNegative('Erreur lors de la facturation des clients');
       }
     },
-    async confirmBillListCreation () {
+    async validateBillListCreation () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',

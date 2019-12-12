@@ -81,7 +81,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-icon color="grey" name="edit" @click="openEditionModalHelper(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="removeHelper(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="validateHelperDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -188,7 +188,7 @@
         <div class="col-xs-12">
           <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
             @uploaded="documentUploaded" name="financialCertificates" collapsibleLabel="Ajouter un justificatif"
-            :user-profile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"
+            :user-profile="customer" :url="docsUploadUrl" @delete="validateFinancialCertifDeletion($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />
         </div>
       </div>
