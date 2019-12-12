@@ -20,17 +20,17 @@
     </div>
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent" :personKey="personKey"
       :creationModal="creationModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="deleteDocument" :personKey="personKey"
+      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="validateDocumentDeletion"
       @documentUploaded="documentUploaded" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @close="closeEditionModal"
-      @documentUploaded="documentUploaded" @updateEvent="updateEvent" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey" />
+      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
+      @documentUploaded="documentUploaded" @updateEvent="updateEvent" @deleteEvent="validateEventDeletion"
+      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey"  @close="closeEditionModal" />
   </q-page>
 </template>
 

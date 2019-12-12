@@ -953,8 +953,8 @@ export default {
         console.error(e);
       }
     },
-    async validateSubscriptionsDeletion (subscriptionId) {
-      await this.$q.dialog({
+    validateSubscriptionsDeletion (subscriptionId) {
+      this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
         ok: true,
@@ -1163,8 +1163,8 @@ export default {
         console.error(e);
       }
     },
-    async validateFundingDeletion (fundingId) {
-      await this.$q.dialog({
+    validateFundingDeletion (fundingId) {
+      this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
         ok: true,

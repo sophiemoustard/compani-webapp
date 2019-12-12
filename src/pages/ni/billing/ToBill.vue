@@ -265,7 +265,7 @@ export default {
         NotifyNegative('Erreur lors de la facturation des clients');
       }
     },
-    async validateBillListCreation () {
+    validateBillListCreation () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',

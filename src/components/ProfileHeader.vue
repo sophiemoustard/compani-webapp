@@ -205,13 +205,13 @@ export default {
         if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
       }
     },
-    async validateCustomerDeletion () {
-      await this.$q.dialog({
+    validateCustomerDeletion () {
+      this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteCustomer())
+      }).onOk(this.deleteCustomer)
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },

@@ -18,7 +18,7 @@ export const configMixin = {
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
-    async validateDocumentDeletion (driveId, type, key) {
+    validateDocumentDeletion (driveId, type, key) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',

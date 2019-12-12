@@ -52,7 +52,7 @@
       @createPayment="createPayment" :selectedCustomer="selectedCustomer" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
-      :disable="selected.length === 0" @click="createPayments" />
+      :disable="selected.length === 0" @click="validatePaymentListCreation" />
   </q-page>
 </template>
 
@@ -225,7 +225,7 @@ export default {
         this.creationLoading = false;
       }
     },
-    async createPayments () {
+    validatePaymentListCreation () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',

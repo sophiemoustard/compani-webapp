@@ -688,7 +688,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression de l\'avoir');
       }
     },
-    async validateCNDeletion (id) {
+    validateCNDeletion (id) {
       const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
       this.$q.dialog({
         title: 'Confirmation',
