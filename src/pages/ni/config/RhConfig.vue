@@ -84,27 +84,27 @@
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contractWithCompany"
               :entity="company" alt="template contrat prestataire" name="contractWithCompany" :url="docsUploadUrl"
-              @delete="deleteDocument(company.rhConfig.templates.contractWithCompany.driveId, 'contractWithCompany', 'rhConfig')"
+              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCompany.driveId, 'contractWithCompany', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat prestataire"
               path="rhConfig.templates.contractWithCompanyVersion" :entity="company" alt="template avenant prestataire"
               name="contractWithCompanyVersion" :url="docsUploadUrl"
-              @delete="deleteDocument(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
+              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat mandataire" path="rhConfig.templates.contractWithCustomer"
               :entity="company" alt="template contrat mandataire" name="contractWithCustomer" :url="docsUploadUrl"
-              @delete="deleteDocument(company.rhConfig.templates.contractWithCustomer.driveId, 'contractWithCustomer', 'rhConfig')"
+              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCustomer.driveId, 'contractWithCustomer', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_contrat_mandataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat mandataire"
               path="rhConfig.templates.contractWithCustomerVersion" :entity="company" alt="template avenant mandataire"
               name="contractWithCustomerVersion" :url="docsUploadUrl"
-              @delete="deleteDocument(company.rhConfig.templates.contractWithCustomerVersion.driveId, 'contractWithCustomerVersion', 'rhConfig')"
+              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCustomerVersion.driveId, 'contractWithCustomerVersion', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`" />
           </div>
         </div>
