@@ -1025,7 +1025,7 @@ export default {
         message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteSurcharge(surchargeId, row))
+      }).onOk(async () => this.deleteSurcharge(surchargeId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Services
@@ -1239,7 +1239,7 @@ export default {
         message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
+      }).onOk(async () => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     isTppUsedInFundings (tpp) {

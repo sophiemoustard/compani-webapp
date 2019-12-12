@@ -695,7 +695,7 @@ export default {
         message: `Etes-vous sûr de vouloir supprimer cet avoir ${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteCreditNote(id))
+      }).onOk(async () => this.deleteCreditNote(id))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     formatIdentity,

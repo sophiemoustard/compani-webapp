@@ -184,7 +184,7 @@ export const helperMixin = {
         message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteHelper(helperId))
+      }).onOk(async () => this.deleteHelper(helperId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },

@@ -22,7 +22,7 @@ export const financialCertificatesMixin = {
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteDocument(driveId))
+      }).onOk(async () => this.deleteDocument(driveId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async documentUploaded () {

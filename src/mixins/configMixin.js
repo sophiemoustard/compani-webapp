@@ -24,7 +24,7 @@ export const configMixin = {
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteDocument(driveId, type, key))
+      }).onOk(async () => this.deleteDocument(driveId, type, key))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     documentUploaded () {

@@ -751,7 +751,7 @@ export default {
         ok: true,
         cancel: 'Annuler',
       })
-        .onOk(() => this.deleteUserDocument(path, driveId))
+        .onOk(async () => this.deleteUserDocument(path, driveId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async deleteUserImage () {

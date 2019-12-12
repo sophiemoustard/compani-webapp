@@ -197,12 +197,12 @@ export default {
       }
     },
     async validatePayDocumentDeletion (payDocument) {
-      await this.$q.dialog({
+      this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deletePayDocument(payDocument))
+      }).onOk(async () => this.deletePayDocument(payDocument))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },

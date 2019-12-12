@@ -206,12 +206,12 @@ export default {
       }
     },
     async validateCustomerDeletion () {
-      await this.$q.dialog({
+      this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteCustomer())
+      }).onOk(this.deleteCustomer)
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
