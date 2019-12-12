@@ -7,9 +7,6 @@
         </div>
       </template>
     </ni-title-header>
-    <div class="title-padding">
-      <h4></h4>
-    </div>
     <ni-large-table :data="filteredBalances" :columns="columns" row-key="rowId" :loading="tableLoading"
       selection="multiple" :pagination.sync="pagination" :selected.sync="selected">
       <template v-slot:header="{ props }">
