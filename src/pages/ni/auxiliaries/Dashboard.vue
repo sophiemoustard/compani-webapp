@@ -14,7 +14,7 @@
         <div class="q-mb-md">
           <div class="row stats-row">
             <div class="col-8 stats-row-title"># bénéficiaires</div>
-            <div class="col-4 stats-row-value">{{ getCustomerAndDuration(sector).customerCount }}</div>
+            <div class="col-4 stats-row-value">{{ getCustomersAndDuration(sector).customerCount }}</div>
           </div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures / bénéficiaires</div>
@@ -22,7 +22,7 @@
           </div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getCustomerAndDuration(sector).duration) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(getCustomersAndDuration(sector).duration) }}</div>
           </div>
         </div>
         <div>
@@ -107,12 +107,12 @@ export default {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    getCustomerAndDuration (sectorId) {
+    getCustomersAndDuration (sectorId) {
       const customerAndDuration = this.customerAndDuration.find(el => el.sector === sectorId);
       return customerAndDuration || { customerCount: 0, duration: 0 };
     },
     getHoursByCustomer (sector) {
-      const customerAndDuration = this.getCustomerAndDuration(sector);
+      const customerAndDuration = this.getCustomersAndDuration(sector);
       if (!customerAndDuration) return 0;
 
       return customerAndDuration.duration / customerAndDuration.customerCount;
@@ -120,7 +120,7 @@ export default {
     async refresh () {
       try {
         const params = { month: this.month, sector: this.filteredSectors };
-        this.customerAndDuration = await this.$stats.getCustomerAndDuration(params);
+        this.customerAndDuration = await this.$stats.getCustomersAndDuration(params);
       } catch (e) {
         this.customerAndDuration = [];
       }

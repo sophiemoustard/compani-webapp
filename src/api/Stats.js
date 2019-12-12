@@ -17,7 +17,7 @@ export default {
       console.error(e.response);
     }
   },
-  async getCustomerAndDuration (params = null) {
+  async getCustomersAndDuration (params = null) {
     try {
       const customerAndDuration = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-duration`, { params });
       return customerAndDuration.data.data.customerAndDuration;
