@@ -31,7 +31,7 @@
               <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat
                 icon="mdi-square-edit-outline" size="1rem" @click="disablePictureEdition = false" />
               <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem"
-                @click="deleteImage" />
+                @click="validateImageDeletion" />
               <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
                 size="1rem" />
               <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_left" @click="croppa.rotate(-1)" round
@@ -151,20 +151,20 @@
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
             :entity="currentUser" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
-            @delete="deleteDocument(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
+            @delete="validateDocumentDeletion(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
             :error="$v.user.administrative.idCardRecto.driveId.$error" :extensions="extensions"
             :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
             :entity="currentUser" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
-            @delete="deleteDocument(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
+            @delete="validateDocumentDeletion(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
              :extensions="extensions"
             :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
         <div v-if="user.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.passport.driveId, 'administrative.passport')" name="passport"
+            @delete="validateDocumentDeletion(user.administrative.passport.driveId, 'administrative.passport')" name="passport"
             :url="docsUploadUrl" @uploaded="refreshUser" :error="$v.user.administrative.passport.driveId.$error"
             :extensions="extensions"
             :additional-value="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
@@ -172,7 +172,7 @@
         <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
             alt="titre de séjour (recto)" :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl"
-            @delete="deleteDocument(user.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
+            @delete="validateDocumentDeletion(user.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
             :error="$v.user.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
             :additional-value="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :extensions="extensions" />
@@ -180,27 +180,27 @@
         <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso"
             alt="titre de séjour (verso)" name="residencePermitVerso"
-            @delete="deleteDocument(user.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')"
+            @delete="validateDocumentDeletion(user.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')"
             :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
             :additional-value="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
             alt="attestation secu" :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
-            @delete="deleteDocument(user.administrative.healthAttest.driveId, 'administrative.healthAttest')"
+            @delete="validateDocumentDeletion(user.administrative.healthAttest.driveId, 'administrative.healthAttest')"
             name="healthAttest" @uploaded="refreshUser" :error="$v.user.administrative.healthAttest.driveId.$error"
             :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
             :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
-            @delete="deleteDocument(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
+            @delete="validateDocumentDeletion(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
             name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
             :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
-            alt="facture téléphone" @delete="deleteDocument($event, 'certificates')" name="certificates"
+            alt="facture téléphone" @delete="validateDocumentDeletion($event, 'certificates')" name="certificates"
             collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
             additional-fields-name="diplomes" @uploaded="refreshUser" :extensions="extensions" />
         </div>
@@ -231,7 +231,7 @@
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
-            @delete="deleteDocument(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
+            @delete="validateDocumentDeletion(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
             name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
             entity-url="users" :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
             :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
@@ -256,7 +256,7 @@
             alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
             :error="$v.user.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
             :extensions="extensions"
-            @delete="deleteDocument(user.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
+            @delete="validateDocumentDeletion(user.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
             :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
       </div>
@@ -267,7 +267,7 @@
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate"
             alt="certificat médical" :entity="user" name="medicalCertificate" @uploaded="refreshUser"
-            @delete="deleteDocument(user.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
+            @delete="validateDocumentDeletion(user.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
             :additional-value="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
             :url="docsUploadUrl" :extensions="extensions" />
         </div>
@@ -726,7 +726,7 @@ export default {
         this.loadingImage = false;
       }
     },
-    async deleteUserDocument (path, driveId) {
+    async deleteDocument (path, driveId) {
       try {
         await gdrive.removeFileById({ id: driveId });
         let payload;
@@ -744,17 +744,17 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document');
       }
     },
-    async deleteDocument (driveId, path) {
+    async validateDocumentDeletion (driveId, path) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       })
-        .onOk(async () => this.deleteUserDocument(path, driveId))
+        .onOk(async () => this.deleteDocument(path, driveId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
-    async deleteUserImage () {
+    async deleteImage () {
       try {
         if (this.currentUser.picture && this.currentUser.picture.publicId) {
           await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
@@ -768,14 +768,14 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la photo');
       }
     },
-    async deleteImage (params) {
+    async validateImageDeletion (params) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
         ok: true,
         cancel: 'Annuler',
       })
-        .onOk(this.deleteUserImage)
+        .onOk(this.deleteImage)
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async refreshUser () {
