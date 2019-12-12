@@ -5,9 +5,35 @@
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
       </div>
       <div class="col-xs-12 col-md-7 row justify-end">
-        <ni-select v-model="month" :options="monthsOptions" />
+        <ni-select v-model="month" :options="monthsOptions" @input="refresh" />
       </div>
     </div>
+    <q-card v-for="sector of filteredSectors" :key="sector" class="q-ma-md row">
+      <div class="col-md-6 col-xs-12 q-pa-md">
+        <div class="sector-name q-mb-lg">{{ sectorName(sector) }}</div>
+        <div class="q-mb-md">
+          <div class="row stats-row">
+            <div class="col-8 stats-row-title"># bénéficiaires</div>
+            <div class="col-4 stats-row-value">{{ getCustomersAndDuration(sector).customerCount }}</div>
+          </div>
+          <div class="row stats-row">
+            <div class="col-8 stats-row-title">Heures / bénéficiaires</div>
+            <div class="col-4 stats-row-value">{{ formatHours(getHoursByCustomer(sector)) }}</div>
+          </div>
+          <div class="row stats-row">
+            <div class="col-8 stats-row-title">Heures</div>
+            <div class="col-4 stats-row-value">{{ formatHours(getCustomersAndDuration(sector).duration) }}</div>
+          </div>
+        </div>
+        <div>
+          <div class="row stats-row">
+            <div class="col-8 stats-row-title">Heures à travailler</div>
+            <div class="col-4 stats-row-value"></div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6 col-xs-12"></div>
+    </q-card>
   </q-page>
 </template>
 
@@ -16,6 +42,7 @@ import { mapActions, mapGetters } from 'vuex';
 import Select from '../../../components/form/Select';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
 import { AUXILIARY_ROLES } from '../../../data/constants';
+import { formatHours } from '../../../helpers/utils';
 
 export default {
   name: 'Dashboard',
@@ -26,9 +53,10 @@ export default {
   },
   data () {
     return {
-      month: this.$moment().format('MMYY'),
+      month: this.$moment().format('MMYYYY'),
       terms: [],
       filteredSectors: [],
+      customerAndDuration: [],
     };
   },
   computed: {
@@ -41,12 +69,12 @@ export default {
     monthsOptions () {
       const companyCreationDate = this.$_.get(this.mainUser, 'company.createdAt', null);
       if (!companyCreationDate) {
-        return [{ label: this.$moment().format('MMMM YY'), value: this.$moment().format('MMYY') }];
+        return [{ label: this.$moment().format('MMMM YY'), value: this.$moment().format('MMYYYY') }];
       }
 
       return Array.from(this.$moment().range(companyCreationDate, this.$moment().add(1, 'M')).by('month'))
         .sort((a, b) => b.diff(a))
-        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYY') }));
+        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYYYY') }));
     },
   },
   watch: {
@@ -71,9 +99,33 @@ export default {
         if (userSector) this.$refs.teamAutocomplete.add(userSector.label);
       }
     },
+    formatHours,
+    sectorName (sectorId) {
+      const sector = this.filters.find(s => s._id === sectorId);
+      return sector.label;
+    },
+    getCustomersAndDuration (sectorId) {
+      const customerAndDuration = this.customerAndDuration.find(el => el.sector === sectorId);
+      return customerAndDuration || { customerCount: 0, duration: 0 };
+    },
+    getHoursByCustomer (sector) {
+      const customerAndDuration = this.getCustomersAndDuration(sector);
+      if (!customerAndDuration) return 0;
+
+      return customerAndDuration.duration / customerAndDuration.customerCount;
+    },
+    async refresh () {
+      try {
+        const params = { month: this.month, sector: this.filteredSectors };
+        this.customerAndDuration = await this.$stats.getCustomersAndDuration(params);
+      } catch (e) {
+        this.customerAndDuration = [];
+      }
+    },
     // Filter
     async addElementToFilter (el) {
       this.filteredSectors.push(el._id);
+      await this.refresh();
     },
     async removeElementFromFilter (el) {
       this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
@@ -81,3 +133,24 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.sector-name
+  font-size: 24px
+
+.stats-row
+  border-top: 1px solid $light-grey
+  border-left: 1px solid $light-grey
+  border-right: 1px solid $light-grey
+  &:last-child
+    border-bottom: 1px solid $light-grey
+
+.stats-row-title
+  border-right: 1px solid $light-grey
+  padding: 3px 4px
+
+.stats-row-value
+  justify-content: flex-end;
+  display: flex;
+  padding: 5px
+</style>
