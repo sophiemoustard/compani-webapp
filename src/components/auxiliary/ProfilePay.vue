@@ -188,13 +188,10 @@ export default {
     },
     async deletePayDocument (payDocument) {
       try {
-        this.loading = true;
         await PayDocuments.remove(payDocument._id);
         NotifyPositive('Document supprimé');
         await this.getDocuments();
-        this.loading = false;
       } catch (e) {
-        this.loading = false;
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');
       }
