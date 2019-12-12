@@ -45,7 +45,7 @@
                     <q-icon color="grey" name="history" @click="showHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click="startSubscriptionEdition(col.value)" />
                     <q-icon color="grey" name="delete" :disable="props.row.eventCount > 0"
-                      @click="validateSubscriptionsRemoval(col.value)" />
+                      @click="validateSubscriptionsDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -168,7 +168,7 @@
                     <q-icon color="grey" name="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                     <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="validateFundingRemoval(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="validateFundingDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -943,7 +943,7 @@ export default {
         this.loading = false;
       }
     },
-    async removeSubscriptions (subscriptionId) {
+    async deleteSubscriptions (subscriptionId) {
       try {
         const params = { subscriptionId, _id: this.customer._id };
         await this.$customers.removeSubscription(params);
@@ -953,13 +953,13 @@ export default {
         console.error(e);
       }
     },
-    async validateSubscriptionsRemoval (subscriptionId) {
+    async validateSubscriptionsDeletion (subscriptionId) {
       await this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.removeSubscriptions(subscriptionId))
+      }).onOk(() => this.deleteSubscriptions(subscriptionId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Mandates
@@ -1153,7 +1153,7 @@ export default {
         this.loading = false;
       }
     },
-    async removeFunding (fundingId) {
+    async deleteFunding (fundingId) {
       try {
         const params = { fundingId, _id: this.customer._id };
         await this.$customers.removeFunding(params);
@@ -1163,13 +1163,13 @@ export default {
         console.error(e);
       }
     },
-    async validateFundingRemoval (fundingId) {
+    async validateFundingDeletion (fundingId) {
       await this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.removeFunding(fundingId))
+      }).onOk(() => this.deleteFunding(fundingId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showFundingDetails (id) {
