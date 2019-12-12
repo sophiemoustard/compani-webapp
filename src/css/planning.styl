@@ -126,6 +126,7 @@
     @media screen and (min-width: 768px)
       height: 90px;
     @media screen and (max-width: 767px)
+      padding: 20px 10px 15px;
       height: 110px;
   &-month
     display: flex;
@@ -142,12 +143,19 @@
     @media screen and (max-width: 767px)
       margin-bottom: 10px;
   &-actions
+    display: flex
+    justify-content: center
+  &-navigation-actions
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    justify-content: center;
+    @media screen and (min-width: 768px)
+      .q-btn
+        margin: 0 5px
     @media screen and (max-width: 767px)
       justify-content: space-around;
+    div:first-child
+      flex-grow: 1
   &-view
     padding: 4px;
   &-hour

@@ -7,17 +7,11 @@
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
       <div class="col-xs-12 col-md-7">
-        <div class="row full-width justify-between">
-          <div class="col-10">
-            <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
-              @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-              @goToWeek="goToWeek" />
-          </div>
-          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round
-            @click="openDeleteEventsModal" />
-          <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
-            @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
-        </div>
+        <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+          @goToWeek="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
+          :is-customer-planning="isCustomerPlanning" @openDeleteEventsModal="openDeleteEventsModal"
+          @toggleHistory="toggleHistory" />
       </div>
     </div>
     <div class="planning-container full-width">
