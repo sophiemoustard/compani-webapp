@@ -9,9 +9,9 @@
       <div class="on-left">{{ paginationLabel }}</div>
       <div>
         <q-btn icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage" size="12px"
-          dense />
+          dense flat />
         <q-btn icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage" size="12px"
-          dense />
+          dense flat />
       </div>
     </div>
   </div>
