@@ -67,7 +67,7 @@ export const strictPositiveNumber = (value) => {
 };
 
 export const validHour = (value) => {
-  return !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-2]:[0-5][0-9]$/);
+  return !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 };
 
 export const minDate = (min) => {
