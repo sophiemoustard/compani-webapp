@@ -196,23 +196,23 @@ export default {
       }
     },
     async deleteCustomer () {
-      await this.$customers.remove(this.user._id);
-      NotifyPositive('Bénéficiaire supprimé.');
-      this.$router.push({ name: 'customers directory' });
-    },
-    async validateCustomerDeletion () {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Confirmez-vous la suppression ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(() => this.deleteCustomer())
-          .onCancel(() => NotifyPositive('Suppression annulée'));
+        await this.$customers.remove(this.user._id);
+        NotifyPositive('Bénéficiaire supprimé.');
+        this.$router.push({ name: 'customers directory' });
       } catch (e) {
         console.error(e);
         if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
       }
+    },
+    async validateCustomerDeletion () {
+      await this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Confirmez-vous la suppression ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteCustomer())
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
 }

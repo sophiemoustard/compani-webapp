@@ -944,23 +944,23 @@ export default {
       }
     },
     async removeSubscriptions (subscriptionId) {
-      const params = { subscriptionId, _id: this.customer._id };
-      await this.$customers.removeSubscription(params);
-      await this.refreshCustomer();
-      NotifyPositive('Souscription supprimée');
-    },
-    async validateSubscriptionsRemoval (subscriptionId) {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(() => this.removeSubscriptions(subscriptionId))
-          .onCancel(() => NotifyPositive('Suppression annulée'));
+        const params = { subscriptionId, _id: this.customer._id };
+        await this.$customers.removeSubscription(params);
+        await this.refreshCustomer();
+        NotifyPositive('Souscription supprimée');
       } catch (e) {
         console.error(e);
       }
+    },
+    async validateSubscriptionsRemoval (subscriptionId) {
+      await this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.removeSubscriptions(subscriptionId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Mandates
     async updateSignedAt (mandate) {
@@ -1154,23 +1154,23 @@ export default {
       }
     },
     async removeFunding (fundingId) {
-      const params = { fundingId, _id: this.customer._id };
-      await this.$customers.removeFunding(params);
-      await this.refreshCustomer();
-      NotifyPositive('Financement supprimé');
-    },
-    async validateFundingRemoval (fundingId) {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(() => this.removeFunding(fundingId))
-          .onCancel(() => NotifyPositive('Suppression annulée'));
+        const params = { fundingId, _id: this.customer._id };
+        await this.$customers.removeFunding(params);
+        await this.refreshCustomer();
+        NotifyPositive('Financement supprimé');
       } catch (e) {
         console.error(e);
       }
+    },
+    async validateFundingRemoval (fundingId) {
+      await this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.removeFunding(fundingId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showFundingDetails (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
