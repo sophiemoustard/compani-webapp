@@ -39,6 +39,7 @@ export default {
     type: { type: String, default: PLANNING },
     isCoachOrPlanningReferent: { type: Boolean, default: false },
     isCustomerPlanning: { type: Boolean, default: false },
+    displayHistory: { type: Boolean, default: false },
   },
   data () {
     return {

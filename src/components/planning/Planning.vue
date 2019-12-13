@@ -11,18 +11,18 @@
           @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
           @goToWeek="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
           :is-customer-planning="isCustomerPlanning" @openDeleteEventsModal="openDeleteEventsModal"
-          @toggleHistory="toggleHistory" />
+          @toggleHistory="toggleHistory" :display-history="displayHistory" />
       </div>
     </div>
     <div class="planning-container full-width">
-      <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
+      <table :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
-          <th :class="{ 'bottom-border': persons.length > 0 }">
+          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': persons.length > 0 }">
             <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
               @click="staffingView = !staffingView" />
           </th>
-          <th class="capitalize" :class="{ 'bottom-border': persons.length > 0 }" :key="index"
-            v-for="(day, index) in daysHeader">
+          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': persons.length > 0 }" :key="index"
+            v-for="(day, index) in daysHeader" class="capitalize">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
@@ -162,6 +162,7 @@ export default {
       UNKNOWN_AVATAR,
       deleteEventsModal: false,
       customersWithInterventions: [],
+      planningHeaderHeight: 0,
     }
   },
   beforeDestroy () {
@@ -226,6 +227,11 @@ export default {
     },
     async getDistanceMatrices () {
       this.distanceMatrices = await distanceMatrix.list();
+    },
+    updatePlanningHeaderHeight () {
+      setTimeout(() => {
+        this.planningHeaderHeight = document.getElementsByClassName('planning-header')[0].clientHeight
+      }, 100);
     },
     // Table
     updateTimeline () {

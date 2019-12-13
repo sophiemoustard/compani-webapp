@@ -245,6 +245,8 @@ export default {
     },
     // Filter
     async addElementToFilter (el) {
+      this.$refs.planningManager.updatePlanningHeaderHeight();
+
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
         const auxBySector = this.filters.filter(aux => aux.sector && aux.sector._id === el._id);
@@ -263,6 +265,8 @@ export default {
       }
     },
     removeElementFromFilter (el) {
+      this.$refs.planningManager.updatePlanningHeaderHeight();
+
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>
