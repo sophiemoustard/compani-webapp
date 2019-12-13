@@ -1,6 +1,6 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
-    <div class="row items-center planning-header">
+    <div class="row items-center planning-header" ref="planningHeader">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters" />
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
@@ -229,9 +229,7 @@ export default {
       this.distanceMatrices = await distanceMatrix.list();
     },
     updatePlanningHeaderHeight () {
-      setTimeout(() => {
-        this.planningHeaderHeight = document.getElementsByClassName('planning-header')[0].clientHeight
-      }, 100);
+      setTimeout(() => { this.planningHeaderHeight = this.$refs['planningHeader'].clientHeight; }, 100);
     },
     // Table
     updateTimeline () {
