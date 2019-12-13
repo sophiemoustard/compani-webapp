@@ -17,7 +17,7 @@
             <div class="col-4 stats-row-value">{{ getCustomersAndDuration(sector).customerCount }}</div>
           </div>
           <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures / bénéficiaires</div>
+            <div class="col-8 stats-row-title">Heures / bénéficiaire</div>
             <div class="col-4 stats-row-value">{{ formatHours(getHoursByCustomer(sector)) }}</div>
           </div>
           <div class="row stats-row">
