@@ -5,10 +5,20 @@
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
       </div>
       <div class="col-xs-12 col-md-7 row justify-end">
-        <ni-select v-model="month" :options="monthsOptions" @input="refresh" />
+        <div @click.native="monthModal = !monthModal" class="month-select">
+          <span>{{ monthLabel }}</span>
+          <q-icon name="arrow_drop_down" />
+          <q-menu v-model="monthModal" anchor="bottom right" self="top right">
+            <q-list dense padding>
+              <q-item v-for="(month, index) in monthsOptions" :key="index" clickable @click="selectMonth(month.value)">
+                <q-item-section>{{ month.label }}</q-item-section>
+              </q-item>
+            </q-list>
+          </q-menu>
+        </div>
       </div>
     </div>
-    <q-card v-for="sector of filteredSectors" :key="sector" class="q-ma-md row">
+    <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
       <div class="col-md-6 col-xs-12 q-pa-md">
         <div class="sector-name q-mb-lg">{{ sectorName(sector) }}</div>
         <div class="q-mb-md">
@@ -17,7 +27,7 @@
             <div class="col-4 stats-row-value">{{ getCustomersAndDuration(sector).customerCount }}</div>
           </div>
           <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures / bénéficiaires</div>
+            <div class="col-8 stats-row-title">Heures / bénéficiaire</div>
             <div class="col-4 stats-row-value">{{ formatHours(getHoursByCustomer(sector)) }}</div>
           </div>
           <div class="row stats-row">
@@ -39,24 +49,24 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
-import Select from '../../../components/form/Select';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
 import { AUXILIARY_ROLES } from '../../../data/constants';
 import { formatHours } from '../../../helpers/utils';
+import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   name: 'Dashboard',
   metaInfo: { title: 'Tableau de bord' },
   components: {
-    'ni-select': Select,
     'ni-chips-autocomplete': ChipsAutocomplete,
   },
   data () {
     return {
-      month: this.$moment().format('MMYYYY'),
+      selectedMonth: this.$moment().format('MMYYYY'),
       terms: [],
       filteredSectors: [],
       customerAndDuration: [],
+      monthModal: false,
     };
   },
   computed: {
@@ -67,14 +77,14 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     monthsOptions () {
-      const companyCreationDate = this.$_.get(this.mainUser, 'company.createdAt', null);
-      if (!companyCreationDate) {
-        return [{ label: this.$moment().format('MMMM YY'), value: this.$moment().format('MMYYYY') }];
-      }
-
-      return Array.from(this.$moment().range(companyCreationDate, this.$moment().add(1, 'M')).by('month'))
-        .sort((a, b) => b.diff(a))
-        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYYYY') }));
+      return [
+        { label: 'Mois en cours', value: this.$moment().format('MMYYYY') },
+        { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MMYYYY') },
+      ];
+    },
+    monthLabel () {
+      const month = this.monthsOptions.find(m => m.value === this.selectedMonth);
+      return month.label;
     },
   },
   watch: {
@@ -100,6 +110,11 @@ export default {
       }
     },
     formatHours,
+    async selectMonth (month) {
+      this.selectedMonth = month;
+      this.monthModal = false;
+      await this.refresh();
+    },
     sectorName (sectorId) {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
@@ -116,9 +131,12 @@ export default {
     },
     async refresh () {
       try {
-        const params = { month: this.month, sector: this.filteredSectors };
+        if (this.filteredSectors.length === 0) return;
+
+        const params = { month: this.selectedMonth, sector: this.filteredSectors };
         this.customerAndDuration = await this.$stats.getCustomersAndDuration(params);
       } catch (e) {
+        NotifyNegative('Erreur lors de la réception des statistiques')
         this.customerAndDuration = [];
       }
     },
@@ -150,7 +168,14 @@ export default {
   padding: 3px 4px
 
 .stats-row-value
-  justify-content: flex-end;
-  display: flex;
+  justify-content: flex-end
+  display: flex
   padding: 5px
+
+.month-select
+  .q-icon
+    margin-left: 5px
+
+.sector-card
+  margin: 0 16px 16px
 </style>
