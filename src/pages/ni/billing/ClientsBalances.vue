@@ -66,7 +66,7 @@ import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { formatPrice, getLastVersion, formatIdentity, fromPriceToFloat } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -125,9 +125,9 @@ export default {
           name: 'toPay',
           label: 'A Prélever',
           align: 'left',
-          field: row => formatPrice(row.toPay),
+          field: row => row.toPay,
+          format: value => formatPrice(value),
           sortable: true,
-          sort: (a, b) => fromPriceToFloat(a) - fromPriceToFloat(b),
         },
         {
           name: 'actions',
