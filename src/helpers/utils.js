@@ -71,6 +71,8 @@ export const formatPrice = (val) => {
   return result;
 };
 
+export const fromPriceToFloat = (val) => parseFloat(val.match(/[^€]+/g)[0].replace(/\s/g, '').replace(/,/g, '.'));
+
 export const formatIdentity = (identity, format) => {
   if (!identity) return '';
   const formatLower = format.toLowerCase();
