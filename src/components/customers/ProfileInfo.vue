@@ -128,7 +128,7 @@
                 <template v-else-if="col.name === 'signedMandate'">
                   <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
-                      field-name="signedMandate" auto-upload :accept="extensions" @uploaded="refreshMandates"
+                      field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
                   <q-btn v-else flat round small color="primary">
@@ -210,7 +210,7 @@
                 <template v-else-if="col.name === 'signedQuote'">
                   <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
-                      field-name="signedQuote" :accept="extensions" auto-upload @uploaded="refreshQuotes"
+                      field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
                       @failed="failMsg" />
                   </div>
                   <q-btn v-else flat round small color="primary">
@@ -812,12 +812,14 @@ export default {
           name: 'fileName',
           value: `mandat_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}`,
         },
+        { name: 'type', value: 'signedMandate' },
       ]
     },
     quoteFormFields (quote) {
       return [
         { name: 'quoteId', value: quote._id },
         { name: 'fileName', value: `devis_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}` },
+        { name: 'type', value: 'signedQuote' },
       ]
     },
     getServiceLastVersion (service) {
