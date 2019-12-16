@@ -83,7 +83,6 @@ export default {
       ];
     },
     monthLabel () {
-      console.warn(this.monthsOptions);
       const month = this.monthsOptions.find(m => m.value === this.selectedMonth);
       return month.label;
     },
