@@ -189,6 +189,8 @@ export default {
     },
     // Filter
     async addElementToFilter (el) {
+      this.$refs.planningManager.updatePlanningHeaderHeight();
+
       if (el.type === SECTOR) {
         this.filteredSectors.push(el._id);
         this.sectorCustomers = await this.getSectorCustomers(this.filteredSectors);
@@ -207,6 +209,8 @@ export default {
       }
     },
     async removeElementFromFilter (el) {
+      this.$refs.planningManager.updatePlanningHeaderHeight();
+
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
         await this.refreshCustomers();
