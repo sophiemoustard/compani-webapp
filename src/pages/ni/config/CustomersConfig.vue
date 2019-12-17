@@ -8,8 +8,7 @@
           <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="edit"
@@ -36,8 +35,7 @@
             :visible-columns="visibleColumnsServices">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
@@ -92,10 +90,9 @@
               :url="docsUploadUrl" />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company"
-              alt="template devis" name="quote"
-              @delete="validateDocumentDeletion(documents.quote.driveId, 'quote', 'customersConfig')" @uploaded="documentUploaded"
-              :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl" />
+            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" alt="template devis" name="quote"
+              @delete="validateDocumentDeletion(documents.quote.driveId, 'quote', 'customersConfig')" :entity="company"
+              @uploaded="documentUploaded" :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl" />
           </div>
         </div>
       </div>
@@ -106,17 +103,16 @@
             :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
                   <template v-if="col.name === 'billingMode'">
                     <div class="capitalize">{{ col.value }}</div>
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn :disable="isTppUsedInFundings(props.row)" flat round small dense color="grey"
-                        icon="delete" @click="validateTppDeletion(col.value, props.row)" />
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click="openThirdPartyPayerEditionModal(col.value)" />
+                      <q-btn :disable="isTppUsedInFundings(props.row)" flat round small dense color="grey"
+                        icon="delete" @click="validateTppDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value}}</template>
@@ -302,8 +298,7 @@
         @blur="$v.newThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
-          :loading="loading" @click="createNewThirdPartyPayer"
-          :disable="isTppCreationDisabled" />
+          :loading="loading" @click="createNewThirdPartyPayer" :disable="isTppCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -325,8 +320,7 @@
         @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
-          :loading="loading" @click="updateThirdPartyPayer"
-          :disable="isTppEditionDisabled" />
+          :loading="loading" @click="updateThirdPartyPayer" :disable="isTppEditionDisabled" />
       </template>
     </ni-modal>
   </q-page>
