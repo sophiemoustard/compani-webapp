@@ -308,14 +308,8 @@
       <template slot="title">
         Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom flat
-        binary-state-sort :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-grid-table :data="fundingDetailsData" :columns="fundingColumns"
+        :visible-columns="fundingDetailsVisibleColumns" />
     </ni-modal>
 
     <!-- Funding history modal -->
@@ -324,14 +318,8 @@
       <template slot="title">
         Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingColumns" hide-bottom flat
-        binary-state-sort :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-grid-table :data="selectedFunding.versions" :columns="fundingColumns"
+        :visible-columns="fundingHistoryVisibleColumns" />
     </ni-modal>
 
     <!-- Funding creation modal -->
@@ -425,6 +413,7 @@ import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput';
 import Modal from '../Modal';
 import ReponsiveTable from '../table/ResponsiveTable';
+import GridTable from '../table/GridTable';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
@@ -458,6 +447,7 @@ export default {
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
     'ni-responsive-table': ReponsiveTable,
+    'ni-grid-table': GridTable,
   },
   mixins: [
     customerMixin,
