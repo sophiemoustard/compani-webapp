@@ -104,14 +104,14 @@ export default {
           name: 'billed',
           label: 'Facturé TTC',
           align: 'left',
-          field: row => row.billed,
+          field: 'billed',
           format: val => formatPrice(val),
         },
         {
           name: 'paid',
           label: 'Payé TTC',
           align: 'left',
-          field: row => row.paid,
+          field: 'paid',
           format: val => formatPrice(val),
         },
         {
@@ -119,12 +119,15 @@ export default {
           label: 'Solde',
           align: 'left',
           field: row => row.balance,
+          sortable: true,
         },
         {
           name: 'toPay',
           label: 'A Prélever',
           align: 'left',
-          field: row => formatPrice(row.toPay),
+          field: 'toPay',
+          format: value => formatPrice(value),
+          sortable: true,
         },
         {
           name: 'actions',
