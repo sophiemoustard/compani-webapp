@@ -901,7 +901,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de l'ajout d'une souscription");
+        NotifyNegative('Erreur lors de l\'ajout de la souscription.');
       } finally {
         this.loading = false;
       }
@@ -940,7 +940,7 @@ export default {
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la modification d'une souscription")
+        NotifyNegative('Erreur lors de la modification de la souscription.')
       } finally {
         this.loading = false;
       }
@@ -953,6 +953,7 @@ export default {
         NotifyPositive('Souscription supprimée');
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la souscitpion.')
       }
     },
     validateSubscriptionsDeletion (subscriptionId) {
@@ -962,7 +963,7 @@ export default {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteSubscriptions(subscriptionId))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Mandates
     async updateSignedAt (mandate) {

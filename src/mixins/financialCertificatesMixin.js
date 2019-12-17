@@ -1,14 +1,12 @@
 import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
-import gdrive from '../api/GoogleDrive.js';
 
 export const financialCertificatesMixin = {
   methods: {
     async deleteDocument (driveId) {
       try {
-        await gdrive.removeFileById({ id: driveId });
-        const payload = { 'financialCertificates': { driveId } };
-        await this.$customers.updateCertificates(this.customer._id, payload);
-        this.refreshCustomer();
+        const payload = { driveId };
+        await this.$customers.deleteCertificates(this.customer._id, payload);
+        await this.refreshCustomer();
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
