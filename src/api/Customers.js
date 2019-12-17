@@ -53,7 +53,7 @@ export default {
   },
   async getMandates (id) {
     const mandates = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/mandates`);
-    return mandates.data.data.customer.mandates;
+    return mandates.data.data.customer.payment.mandates;
   },
   async updateMandate (params, data) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}`, data);
