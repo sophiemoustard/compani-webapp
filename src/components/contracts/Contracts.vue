@@ -33,7 +33,7 @@
                 <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
                   class="row justify-center table-actions">
                   <q-uploader flat :url="docsUploadUrl(contract._id)" :headers="headers"
-                    :form-fields="getFormFields(contract, props.row)" field-name="signedContract" :accept="extensions"
+                    :form-fields="getFormFields(contract, props.row)" field-name="file" :accept="extensions"
                     auto-upload @uploaded="refresh" @fail="failMsg" />
                 </div>
                 <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
@@ -216,6 +216,7 @@ export default {
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id },
         { name: 'status', value: contract.status },
+        { name: 'type', value: 'signedContract' },
       ];
 
       if (contract.status === CUSTOMER_CONTRACT) formFields.push({ name: 'customer', value: contract.customer._id });
