@@ -139,8 +139,12 @@ export default {
         if (this.filteredSectors.length === 0) return;
 
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
-        this.customerAndDuration = await this.$stats.getCustomersAndDuration(params);
-        this.hoursToWork = await this.$pay.getHoursToWork(params);
+        const [customerAndDuration, hoursToWork] = await Promise.all([
+          this.$stats.getCustomersAndDuration(params),
+          this.$pay.getHoursToWork(params),
+        ]);
+        this.customerAndDuration = customerAndDuration;
+        this.hoursToWork = hoursToWork;
       } catch (e) {
         NotifyNegative('Erreur lors de la réception des statistiques')
         this.customerAndDuration = [];
