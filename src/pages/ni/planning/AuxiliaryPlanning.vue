@@ -36,7 +36,7 @@ import { formatIdentity } from '../../../helpers/utils';
 export default {
   name: 'AuxiliaryPlanning',
   mixins: [planningActionMixin],
-  metaInfo: { title: 'Plannnig auxiliaires' },
+  metaInfo: { title: 'Plannig auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
     'ni-event-creation-modal': EventCreationModal,
