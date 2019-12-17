@@ -65,9 +65,6 @@ export default {
   async addQuote (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/quotes`, data);
   },
-  async createDriveFolder (id) {
-    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/drivefolder`, {});
-  },
   async addSubscriptionHistory (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptionshistory`, data);
   },
