@@ -117,7 +117,7 @@ export default {
     },
     async openIndicatorsModal () {
       if (!this.hasCompanyContractOnEvent) return;
-      await Promise.all([this.getMonthDetails()]);
+      await Promise.all([this.getMonthDetails(), this.getPrevMonthDetails()]);
 
       this.indicatorsModal = true;
     },
