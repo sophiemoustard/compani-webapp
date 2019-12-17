@@ -65,7 +65,6 @@ export const getLastDocument = (docs) => {
 export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' });
 
 export const formatPrice = (val) => {
-  debugger
   if (!val) return roundFrenchNumber(0)
   const result = roundFrenchNumber(val);
   if (Number.parseFloat(result) === 0) return roundFrenchNumber(0);
