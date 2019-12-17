@@ -126,14 +126,8 @@
 
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
-      <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
-        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns" flat>
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-grid-table :data="fundingData" :columns="fundingColumns"
+        :visible-columns="fundingVisibleColumns" />
     </ni-modal>
   </q-page>
 </template>
@@ -146,6 +140,7 @@ import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import Modal from '../../components/Modal';
 import ResponsiveTable from '../../components/table/ResponsiveTable';
+import GridTable from '../../components/table/GridTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
 import { FIXED, REQUIRED_LABEL } from '../../data/constants';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
@@ -165,6 +160,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
+    'ni-grid-table': GridTable,
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
