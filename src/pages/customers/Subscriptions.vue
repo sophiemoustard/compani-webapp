@@ -13,7 +13,7 @@
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
-                      <q-btn :disable="!getFunding(col.value)" flat round small color="grey" icon="mdi-calculator"
+                      <q-btn :disable="!getFunding(col.value).length" flat round small color="grey" icon="mdi-calculator"
                         @click="showFunding(col.value)" />
                     </div>
                   </template>
@@ -126,8 +126,7 @@
 
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
-      <ni-grid-table :data="fundingData" :columns="fundingColumns"
-        :visible-columns="fundingVisibleColumns" />
+      <ni-funding-grid-table :data="fundingData" :columns="fundingColumns" />
     </ni-modal>
   </q-page>
 </template>
@@ -140,9 +139,9 @@ import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import Modal from '../../components/Modal';
 import ResponsiveTable from '../../components/table/ResponsiveTable';
-import GridTable from '../../components/table/GridTable';
+import FundingGridTable from '../../components/table/FundingGridTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
-import { FIXED, REQUIRED_LABEL } from '../../data/constants';
+import { REQUIRED_LABEL } from '../../data/constants';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { getLastVersion } from '../../helpers/utils';
 import { customerMixin } from '../../mixins/customerMixin.js';
@@ -160,7 +159,7 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
-    'ni-grid-table': GridTable,
+    'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
@@ -267,12 +266,6 @@ export default {
     },
     docsUploadUrl () {
       return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload` : '';
-    },
-    fundingVisibleColumns () {
-      if (this.selectedFunding.nature === FIXED) {
-        return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC', 'customerParticipationRate'];
-      }
-      return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate'];
     },
   },
   async mounted () {
@@ -425,11 +418,11 @@ export default {
       }
     },
     getFunding (subscriptionId) {
-      return this.fundings.find(fund => fund.subscription._id === subscriptionId);
+      return this.fundings.filter(fund => fund.subscription._id === subscriptionId);
     },
     showFunding (subscriptionId) {
-      this.selectedFunding = this.getFunding(subscriptionId);
-      this.fundingData.push(this.selectedFunding);
+      // this.selectedFunding = this.getFunding(subscriptionId);
+      this.fundingData = this.getFunding(subscriptionId);
       this.fundingModal = true;
     },
     resetFundingData () {

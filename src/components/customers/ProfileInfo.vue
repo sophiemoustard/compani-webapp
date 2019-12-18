@@ -308,7 +308,7 @@
       <template slot="title">
         Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-grid-table :data="fundingDetailsData" :columns="fundingColumns"
+      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingColumns"
         :visible-columns="fundingDetailsVisibleColumns" />
     </ni-modal>
 
@@ -318,7 +318,7 @@
       <template slot="title">
         Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-grid-table :data="selectedFunding.versions" :columns="fundingColumns"
+      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingColumns"
         :visible-columns="fundingHistoryVisibleColumns" />
     </ni-modal>
 
@@ -413,7 +413,7 @@ import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput';
 import Modal from '../Modal';
 import ReponsiveTable from '../table/ResponsiveTable';
-import GridTable from '../table/GridTable';
+import FundingGridTable from '../table/FundingGridTable';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
@@ -447,7 +447,7 @@ export default {
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
     'ni-responsive-table': ReponsiveTable,
-    'ni-grid-table': GridTable,
+    'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [
     customerMixin,
