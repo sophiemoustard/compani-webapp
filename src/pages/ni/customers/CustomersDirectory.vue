@@ -239,11 +239,11 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = this.$_.pickBy(this.newCustomer);
-        const newCustomer = await this.$customers.create(payload);
-        await this.$customers.createDriveFolder(newCustomer.data.data.customer._id);
+        await this.$customers.create(payload);
+
         await this.refresh();
-        NotifyPositive('Fiche bénéficiaire créée');
         this.customerCreationModal = false;
+        NotifyPositive('Fiche bénéficiaire créée');
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
