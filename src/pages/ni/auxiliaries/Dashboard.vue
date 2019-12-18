@@ -38,7 +38,7 @@
         <div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures à travailler</div>
-            <div class="col-4 stats-row-value"></div>
+            <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector).hoursToWork) }}</div>
           </div>
         </div>
       </div>
@@ -66,6 +66,7 @@ export default {
       terms: [],
       filteredSectors: [],
       customerAndDuration: [],
+      hoursToWork: [],
       monthModal: false,
     };
   },
@@ -123,6 +124,10 @@ export default {
       const customerAndDuration = this.customerAndDuration.find(el => el.sector === sectorId);
       return customerAndDuration || { customerCount: 0, duration: 0 };
     },
+    getHoursToWork (sectorId) {
+      const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
+      return hoursToWork || { hoursToWork: 0 };
+    },
     getHoursByCustomer (sector) {
       const customerAndDuration = this.getCustomersAndDuration(sector);
       if (!customerAndDuration) return 0;
@@ -134,10 +139,16 @@ export default {
         if (this.filteredSectors.length === 0) return;
 
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
-        this.customerAndDuration = await this.$stats.getCustomersAndDuration(params);
+        const [customerAndDuration, hoursToWork] = await Promise.all([
+          this.$stats.getCustomersAndDuration(params),
+          this.$pay.getHoursToWork(params),
+        ]);
+        this.customerAndDuration = customerAndDuration;
+        this.hoursToWork = hoursToWork;
       } catch (e) {
         NotifyNegative('Erreur lors de la réception des statistiques')
         this.customerAndDuration = [];
+        this.hoursToWork = [];
       }
     },
     // Filter
