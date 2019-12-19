@@ -421,12 +421,10 @@ export default {
       return this.fundings.filter(fund => fund.subscription._id === subscriptionId);
     },
     showFunding (subscriptionId) {
-      // this.selectedFunding = this.getFunding(subscriptionId);
       this.fundingData = this.getFunding(subscriptionId);
       this.fundingModal = true;
     },
     resetFundingData () {
-      this.selectedFunding = {};
       this.fundingData = [];
       this.fundingModal = false;
     },
