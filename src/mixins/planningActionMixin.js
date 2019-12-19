@@ -261,6 +261,21 @@ export const planningActionMixin = {
         this.loading = false;
       }
     },
+    getMessageForInternalOrUnavailability (type) {
+      return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. Es-tu sûr(e) de vouloir créer cette répétition ?`;
+    },
+    getConfirmationMessage () {
+      switch (this.newEvent.type) {
+        case INTERVENTION:
+          return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?';
+        case INTERNAL_HOUR:
+          return this.getMessageForInternalOrUnavailability('heures internes');
+        case UNAVAILABILITY:
+          return this.getMessageForInternalOrUnavailability('indisponibilités');
+        default:
+          return 'Es-tu sûr(e) de vouloir créer cette répétition ?';
+      }
+    },
     async validateCreationEvent () {
       try {
         this.$v.newEvent.$touch();
@@ -279,7 +294,7 @@ export const planningActionMixin = {
         } else if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
           this.$q.dialog({
             title: 'Confirmation',
-            message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
+            message: this.getConfirmationMessage(),
             ok: 'OK',
             cancel: 'Annuler',
           })
