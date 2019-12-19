@@ -380,6 +380,7 @@ export default {
           'commencer ton enregistrement sur Compani avant ton intégration: ' +
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
       });
+      NotifyPositive('SMS bien envoyé');
     },
     async submit () {
       try {
