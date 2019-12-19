@@ -261,16 +261,19 @@ export const planningActionMixin = {
         this.loading = false;
       }
     },
+    getMessageForInternalOrUnavailability (type) {
+      return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. Es-tu sûr(e) de vouloir créer cette répétition ?`;
+    },
     getConfirmationMessage () {
       switch (this.newEvent.type) {
         case INTERVENTION:
           return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?';
         case INTERNAL_HOUR:
-          return 'Les heures internes de la répétition en conflit avec les évènements existants ne seront pas créées. Es-tu sûr(e) de vouloir créer cette répétition ?';
+          return this.getMessageForInternalOrUnavailability('heures internes');
         case UNAVAILABILITY:
-          return 'Les indisponibilités de la répétition en conflit avec les évènements existants ne seront pas créés. Es-tu sûr(e) de vouloir créer cette répétition ?';
+          return this.getMessageForInternalOrUnavailability('indisponibilités');
         default:
-          NotifyNegative('Erreur lors de la création de l\'évènement');
+          return 'Es-tu sûr(e) de vouloir créer cette répétition ?';
       }
     },
     async validateCreationEvent () {
@@ -289,11 +292,9 @@ export const planningActionMixin = {
             .onOk(this.createEvent)
             .onCancel(() => NotifyPositive('Création annulée'));
         } else if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
-          const message = this.getConfirmationMessage();
-          if (!message) return;
           this.$q.dialog({
             title: 'Confirmation',
-            message,
+            message: this.getConfirmationMessage(),
             ok: 'OK',
             cancel: 'Annuler',
           })
