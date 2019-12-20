@@ -20,7 +20,10 @@
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
       <div class="col-md-6 col-xs-12 q-pa-md">
-        <div class="sector-name q-mb-lg">{{ sectorName(sector) }}</div>
+        <div class="sector-name q-mb-lg">
+          {{ sectorName(sector) }}
+          <q-circular-progress :value="hoursRatio(sector)" size="50px" track-color="grey-3" color="primary" />
+        </div>
         <div class="q-mb-md">
           <div class="row stats-row">
             <div class="col-8 stats-row-title"># bénéficiaires</div>
@@ -38,7 +41,7 @@
         <div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures à travailler</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector).hoursToWork) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector)) }}</div>
           </div>
         </div>
       </div>
@@ -126,13 +129,18 @@ export default {
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
-      return hoursToWork || { hoursToWork: 0 };
+      if (!hoursToWork) return 0;
+
+      return hoursToWork.hoursToWork || 0;
     },
     getHoursByCustomer (sector) {
       const customerAndDuration = this.getCustomersAndDuration(sector);
       if (!customerAndDuration) return 0;
 
       return customerAndDuration.duration / customerAndDuration.customerCount;
+    },
+    hoursRatio (sector) {
+      return (this.getCustomersAndDuration(sector).duration / this.getHoursToWork(sector)) * 100;
     },
     async refresh () {
       try {
@@ -166,6 +174,8 @@ export default {
 <style lang="stylus" scoped>
 .sector-name
   font-size: 24px
+  display: flex;
+  justify-content: space-between;
 
 .stats-row
   border-top: 1px solid $light-grey
