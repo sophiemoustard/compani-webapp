@@ -31,7 +31,7 @@
             <div class="col-4 stats-row-value">{{ formatHours(getHoursByCustomer(sector)) }}</div>
           </div>
           <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures</div>
+            <div class="col-8 stats-row-title">Heures facturées</div>
             <div class="col-4 stats-row-value">{{ formatHours(getCustomersAndDuration(sector).duration) }}</div>
           </div>
         </div>
