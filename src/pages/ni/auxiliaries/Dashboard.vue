@@ -204,6 +204,6 @@ export default {
 .sector-card
   margin: 0 16px 16px
 
-.q-circular-progress__text
+/deep/ .q-circular-progress__text
   font-size: 11px
 </style>
