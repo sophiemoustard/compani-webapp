@@ -22,7 +22,9 @@
       <div class="col-md-6 col-xs-12 q-pa-md">
         <div class="sector-name q-mb-lg">
           {{ sectorName(sector) }}
-          <q-circular-progress :value="hoursRatio(sector)" size="50px" track-color="grey-3" color="primary" />
+          <q-circular-progress :value="hoursRatio(sector)" size="50px" track-color="grey-3" color="primary" show-value>
+            {{ roundFrenchPercentage(hoursRatio(sector) / 100) }}
+          </q-circular-progress>
         </div>
         <div class="q-mb-md">
           <div class="row stats-row">
@@ -54,7 +56,7 @@
 import { mapActions, mapGetters } from 'vuex';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
 import { AUXILIARY_ROLES } from '../../../data/constants';
-import { formatHours } from '../../../helpers/utils';
+import { formatHours, roundFrenchPercentage } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
@@ -114,6 +116,7 @@ export default {
       }
     },
     formatHours,
+    roundFrenchPercentage,
     async selectMonth (month) {
       this.selectedMonth = month;
       this.monthModal = false;
@@ -140,7 +143,7 @@ export default {
       return customerAndDuration.duration / customerAndDuration.customerCount;
     },
     hoursRatio (sector) {
-      return (this.getCustomersAndDuration(sector).duration / this.getHoursToWork(sector)) * 100;
+      return (this.getCustomersAndDuration(sector).duration / this.getHoursToWork(sector)) * 100 || 0;
     },
     async refresh () {
       try {
@@ -174,8 +177,9 @@ export default {
 <style lang="stylus" scoped>
 .sector-name
   font-size: 24px
-  display: flex;
-  justify-content: space-between;
+  display: flex
+  justify-content: space-between
+  align-items: center
 
 .stats-row
   border-top: 1px solid $light-grey
@@ -199,4 +203,7 @@ export default {
 
 .sector-card
   margin: 0 16px 16px
+
+.q-circular-progress__text
+  font-size: 11px
 </style>
