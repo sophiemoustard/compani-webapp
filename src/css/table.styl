@@ -184,12 +184,16 @@
         &::before
           content: attr(data-label)
           float: left
+          position: relative
 
         &:first-child
           width: 100%
 
         &:last-child
           border-bottom: 0
+        
+        & .table-actions
+          justify-content: flex-end !important
 
 .people-list
   .q-table
