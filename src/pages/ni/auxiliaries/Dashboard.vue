@@ -20,10 +20,11 @@
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
       <div class="col-md-6 col-xs-12 q-pa-md">
-        <div class="sector-name q-mb-lg">
+        <div class="sector-name q-mb-lg text-weight-bold">
           {{ sectorName(sector) }}
-          <q-circular-progress :value="hoursRatio(sector)" size="50px" track-color="grey-3" color="primary" show-value>
-            {{ roundFrenchPercentage(hoursRatio(sector) / 100) }}
+          <q-circular-progress :value="hoursRatio(sector)" size="60px" track-color="grey-5" color="primary" show-value
+            :thickness="0.3">
+            {{ roundFrenchPercentage(Math.round(hoursRatio(sector)) / 100, 0).replace('&nbsp;', '') }}
           </q-circular-progress>
         </div>
         <div class="q-mb-md">
@@ -33,17 +34,19 @@
           </div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures / bénéficiaire</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getHoursByCustomer(sector)) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getHoursByCustomer(sector)), 0) }}</div>
           </div>
           <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures facturées</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getCustomersAndDuration(sector).duration) }}</div>
+            <div class="col-8 stats-row-title text-weight-bold">Heures facturées</div>
+            <div class="col-4 stats-row-value text-weight-bold">
+              {{ formatHours(Math.round(getCustomersAndDuration(sector).duration), 0) }}
+            </div>
           </div>
         </div>
         <div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures à travailler</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector)) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getHoursToWork(sector)), 0) }}</div>
           </div>
         </div>
       </div>
@@ -205,5 +208,6 @@ export default {
   margin: 0 16px 16px
 
 /deep/ .q-circular-progress__text
-  font-size: 11px
+  font-size: 15px
+  color: black
 </style>
