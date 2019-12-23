@@ -23,7 +23,7 @@
         <div class="sector-name q-mb-lg">
           {{ sectorName(sector) }}
           <q-circular-progress :value="hoursRatio(sector)" size="50px" track-color="grey-3" color="primary" show-value>
-            {{ roundFrenchPercentage(hoursRatio(sector) / 100) }}
+            {{ roundFrenchPercentage(Math.round(hoursRatio(sector)) / 100, 0) }}
           </q-circular-progress>
         </div>
         <div class="q-mb-md">
@@ -33,17 +33,17 @@
           </div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures / bénéficiaire</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getHoursByCustomer(sector)) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getHoursByCustomer(sector)), 0) }}</div>
           </div>
           <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures facturées</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getCustomersAndDuration(sector).duration) }}</div>
+            <div class="col-8 stats-row-title text-weight-bold">Heures facturées</div>
+            <div class="col-4 stats-row-value text-weight-bold">{{ formatHours(Math.round(getCustomersAndDuration(sector).duration), 0) }}</div>
           </div>
         </div>
         <div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures à travailler</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector)) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getHoursToWork(sector)), 0) }}</div>
           </div>
         </div>
       </div>
