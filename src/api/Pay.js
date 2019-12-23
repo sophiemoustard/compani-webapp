@@ -12,4 +12,8 @@ export default {
   async createList (payload) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/pay`, payload);
   },
+  async getHoursToWork (params = null) {
+    const hoursToWork = await alenviAxios.get(`${process.env.API_HOSTNAME}/pay/hours-to-work`, { params });
+    return hoursToWork.data.data.hoursToWork;
+  },
 }

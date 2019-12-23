@@ -1,34 +1,28 @@
 <template>
   <div :class="[{ 'planning': !toggleDrawer }]">
-    <div class="row items-center planning-header">
+    <div class="row items-center planning-header" ref="planningHeader">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters" />
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
       <div class="col-xs-12 col-md-7">
-        <div class="row full-width justify-between">
-          <div class="col-10">
-            <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
-              @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-              @goToWeek="goToWeek" />
-          </div>
-          <q-btn v-if="isCoach || isPlanningReferent" class="planning-view" size="md" icon="highlight_off" flat round
-            @click="openDeleteEventsModal" />
-          <q-btn v-if="!isCustomerPlanning" class="planning-view" size="md" icon="playlist_play" flat round
-            @click="toggleHistory" :color="displayHistory ? 'primary' : ''" />
-        </div>
+        <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
+          @goToWeek="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
+          :is-customer-planning="isCustomerPlanning" @openDeleteEventsModal="openDeleteEventsModal"
+          @toggleHistory="toggleHistory" :display-history="displayHistory" />
       </div>
     </div>
     <div class="planning-container full-width">
-      <table style="width: 100%" :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
+      <table :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
-          <th :class="{ 'bottom-border': persons.length > 0 }">
+          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': persons.length > 0 }">
             <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
               @click="staffingView = !staffingView" />
           </th>
-          <th class="capitalize" :class="{ 'bottom-border': persons.length > 0 }" :key="index"
-            v-for="(day, index) in daysHeader">
+          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': persons.length > 0 }" :key="index"
+            v-for="(day, index) in daysHeader" class="capitalize">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
@@ -67,11 +61,11 @@
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
               <td valign="top">
                 <div class="person-inner-cell">
-                  <div :class="[!staffingView && 'q-mb-md']">
+                  <div :class="[!staffingView && 'q-mb-sm']">
                     <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
                     <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                      :startOfWeek="startOfWeek" :dm="distanceMatrix" :working-stats="workingStats[person._id]" />
+                      :startOfWeek="startOfWeek" :dm="distanceMatrices" :working-stats="workingStats[person._id]" />
                   </div>
                   <div class="person-name overflow-hidden-nowrap">
                     <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
@@ -163,11 +157,12 @@ export default {
       maxDays: 7,
       staffingView: false,
       PLANNING,
-      distanceMatrix: [],
+      distanceMatrices: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
       deleteEventsModal: false,
       customersWithInterventions: [],
+      planningHeaderHeight: 0,
     }
   },
   beforeDestroy () {
@@ -182,7 +177,7 @@ export default {
   async mounted () {
     this.updateTimeline();
     this.getTimelineHours();
-    if (!this.isCustomerPlanning) await this.getDistanceMatrix();
+    if (!this.isCustomerPlanning) await this.getDistanceMatrices();
   },
   computed: {
     ...mapGetters({
@@ -230,8 +225,11 @@ export default {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
     },
-    async getDistanceMatrix () {
-      this.distanceMatrix = await distanceMatrix.list();
+    async getDistanceMatrices () {
+      this.distanceMatrices = await distanceMatrix.list();
+    },
+    updatePlanningHeaderHeight () {
+      setTimeout(() => { this.planningHeaderHeight = this.$refs['planningHeader'].clientHeight; }, 100);
     },
     // Table
     updateTimeline () {

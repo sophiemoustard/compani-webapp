@@ -13,7 +13,7 @@
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
-                      <q-btn :disable="!getFunding(col.value)" flat round small color="grey" icon="mdi-calculator"
+                      <q-btn :disable="!getFunding(col.value).length" flat round small color="grey" icon="mdi-calculator"
                         @click="showFunding(col.value)" />
                     </div>
                   </template>
@@ -28,7 +28,7 @@
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
-              :disable="customer.subscriptionsAccepted" dense/>
+              :disable="customer.subscriptionsAccepted" dense />
             <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que
               les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
                 Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
@@ -42,7 +42,7 @@
             <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement"
               @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates"
               collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
-              @delete="deleteDocument($event)" multiple additional-fields-name="justificatif_financement"
+              @delete="validateFinancialCertifDeletion($event)" multiple additional-fields-name="justificatif_financement"
               :extensions="extensions" />
           </div>
         </div>
@@ -72,8 +72,8 @@
                   <template v-if="col.name === 'sign'">
                     <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
                       {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-                    <q-btn v-else-if="props.row.__index === customer.payment.mandates.length - 1" color="primary"
-                      @click="preOpenESignModal(props.row)">
+                    <q-btn color="primary" @click="preOpenESignModal(props.row)"
+                      v-else-if="getRowIndex(customer.payment.mandates, props.row) === customer.payment.mandates.length - 1">
                       Signer
                     </q-btn>
                   </template>
@@ -126,14 +126,7 @@
 
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
-      <q-table class="q-mb-xl table-grid" :data="fundingData" :columns="fundingColumns" hide-bottom binary-state-sort
-        :rows-per-page-options="[0]" :visible-columns="fundingVisibleColumns" flat>
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-funding-grid-table :data="fundingData" :columns="fundingColumns" />
     </ni-modal>
   </q-page>
 </template>
@@ -146,14 +139,16 @@ import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import Modal from '../../components/Modal';
 import ResponsiveTable from '../../components/table/ResponsiveTable';
+import FundingGridTable from '../../components/table/FundingGridTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
-import { FIXED, REQUIRED_LABEL } from '../../data/constants';
+import { REQUIRED_LABEL } from '../../data/constants';
 import { bic, iban } from '../../helpers/vuelidateCustomVal';
 import { getLastVersion } from '../../helpers/utils';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
+import { tableMixin } from '../../mixins/tableMixin.js';
 import cgs from '../../statics/CGS.html';
 
 export default {
@@ -164,8 +159,9 @@ export default {
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
+    'ni-funding-grid-table': FundingGridTable,
   },
-  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin],
+  mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
     return {
       cgs,
@@ -270,12 +266,6 @@ export default {
     },
     docsUploadUrl () {
       return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload` : '';
-    },
-    fundingVisibleColumns () {
-      if (this.selectedFunding.nature === FIXED) {
-        return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'amountTTC', 'customerParticipationRate'];
-      }
-      return ['thirdPartyPayer', 'folderNumber', 'startDate', 'frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate'];
     },
   },
   async mounted () {
@@ -428,15 +418,13 @@ export default {
       }
     },
     getFunding (subscriptionId) {
-      return this.fundings.find(fund => fund.subscription._id === subscriptionId);
+      return this.fundings.filter(fund => fund.subscription._id === subscriptionId);
     },
     showFunding (subscriptionId) {
-      this.selectedFunding = this.getFunding(subscriptionId);
-      this.fundingData.push(this.selectedFunding);
+      this.fundingData = this.getFunding(subscriptionId);
       this.fundingModal = true;
     },
     resetFundingData () {
-      this.selectedFunding = {};
       this.fundingData = [];
       this.fundingModal = false;
     },

@@ -89,6 +89,7 @@ export const helperMixin = {
       try {
         this.helpers = await this.$users.list({ customers: this.userProfile._id });
       } catch (e) {
+        this.helpers = [];
         console.error(e);
       }
     },
@@ -168,22 +169,24 @@ export const helperMixin = {
       this.editedHelper.contact = { phone: helper.contact.phone || '' };
       this.openEditedHelperModal = true;
     },
-    async removeHelper (helperId) {
+    async deleteHelper (helperId) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$users.deleteById(helperId);
-          NotifyPositive('Aidant supprimé');
-
-          await this.getUserHelpers();
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        await this.$users.deleteById(helperId);
+        await this.getUserHelpers();
+        NotifyPositive('Aidant supprimé');
       } catch (e) {
         console.error(e);
+        NotifyNegative("Erreur lors de la suppression de l'aidant");
       }
+    },
+    validateHelperDeletion (helperId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cet aidant ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteHelper(helperId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
 };

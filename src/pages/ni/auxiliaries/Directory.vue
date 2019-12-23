@@ -372,14 +372,15 @@ export default {
     },
     async sendSms (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+
       const activationCode = await this.$activationCode.create({ user });
       await this.$twilio.sendSMS({
         to: `+33${this.newUser.contact.phone.substring(1)}`,
-        from: this.company.tradeName,
         body: `${this.company.tradeName}. Bienvenue ! :)\nUtilise ce code: ${activationCode.code} pour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration: ' +
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
       });
+      NotifyPositive('SMS bien envoyé');
     },
     async submit () {
       try {

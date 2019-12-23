@@ -1,19 +1,23 @@
 .q-table
-  & tbody td
-    font-size: 13px
-    white-space: normal
-    padding: 4px
-    @media (max-width: 767px)
-      font-size: 12px
-      padding: 4px 2px
-    .q-icon
-      margin: 0 5px
-      cursor: pointer
-      font-size: 21px
-
-  tbody
-    tr.selected
-      background: $white
+  & tbody
+    & td
+      font-size: 13px
+      white-space: normal
+      padding: 4px
+      @media (max-width: 767px)
+        font-size: 12px
+        padding: 4px 2px
+      .q-icon
+        margin: 0 5px
+        cursor: pointer
+        font-size: 21px
+      &:after 
+        background: inherit
+    & tr
+      &.selected
+        background: white
+        & td:after
+          content: none
 
   & th
     white-space: normal;
@@ -180,12 +184,16 @@
         &::before
           content: attr(data-label)
           float: left
+          position: relative
 
         &:first-child
           width: 100%
 
         &:last-child
           border-bottom: 0
+        
+        & .table-actions
+          justify-content: flex-end !important
 
 .people-list
   .q-table

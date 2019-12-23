@@ -28,7 +28,7 @@ const routes = [
           store.getters['main/user'].role.name !== AUXILIARY &&
           store.getters['main/user'].role.name !== HELPER
         ) {
-          return next({ name: 'administrative directory' });
+          return next({ name: 'auxiliaries directory' });
         } else {
           next({ path: '/login' });
         }
@@ -169,12 +169,22 @@ const routes = [
       },
       {
         path: 'ni/auxiliaries',
-        name: 'administrative directory',
+        name: 'auxiliaries directory',
         component: () => import('pages/ni/auxiliaries/Directory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'users:edit',
-          parent: 'administrative',
+          parent: 'teams',
+        },
+      },
+      {
+        path: 'ni/auxiliaries/dashboard',
+        name: 'dashboard',
+        component: () => import('pages/ni/auxiliaries/Dashboard'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'events:read',
+          parent: 'teams',
         },
       },
       {
@@ -185,7 +195,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'contracts:edit',
-          parent: 'administrative',
+          parent: 'teams',
         },
       },
       {
@@ -206,7 +216,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'users:edit',
-          parent: 'administrative',
+          parent: 'teams',
         },
       },
       {
@@ -251,13 +261,13 @@ const routes = [
         },
       },
       {
-        path: 'auxiliaries/team',
-        name: 'team directory',
-        component: () => import('pages/auxiliaries/team/TeamDirectory'),
+        path: 'auxiliaries/teams',
+        name: 'teams directory',
+        component: () => import('pages/auxiliaries/teams/TeamsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'users:list',
-          parent: 'team',
+          parent: 'teams',
         },
       },
       {

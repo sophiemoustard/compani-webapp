@@ -1,7 +1,7 @@
 <template>
-  <div class="full-width row relative-position chip-container">
+  <div class="chip-container">
     <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip class="absolute-center" small text-color="white">
+    <q-chip small text-color="white">
       <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span>
       <q-icon size="14px" name="mdi-human-male" />
     </q-chip>

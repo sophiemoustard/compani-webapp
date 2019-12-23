@@ -42,9 +42,6 @@ export default {
   async updateById (id, data) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}`, data);
   },
-  async removeHelper (params) {
-    return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/helpers/${params.helperId}`);
-  },
   async addSubscription (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`, data);
   },
@@ -56,20 +53,17 @@ export default {
   },
   async getMandates (id) {
     const mandates = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/mandates`);
-    return mandates.data.data.mandates;
+    return mandates.data.data.customer.payment.mandates;
   },
   async updateMandate (params, data) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}`, data);
   },
   async getQuotes (id) {
     const quotes = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/quotes`);
-    return quotes.data.data.quotes;
+    return quotes.data.data.customer.quotes;
   },
   async addQuote (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/quotes`, data);
-  },
-  async createDriveFolder (id) {
-    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/drivefolder`, {});
   },
   async addSubscriptionHistory (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptionshistory`, data);
@@ -81,7 +75,7 @@ export default {
   async saveSignedDoc (params, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/savesigneddoc`, data);
   },
-  async updateCertificates (id, payload) {
+  async deleteCertificates (id, payload) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}/certificates`, payload);
   },
   async addFunding (id, payload) {

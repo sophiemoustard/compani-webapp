@@ -11,7 +11,7 @@
       </template>
     </ni-title-header>
     <ni-large-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
-      row-key="customerId" :loading="tableLoading" selection="multiple" :selected.sync="selected" separator="none">
+      :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected" separator="none">
       <template v-slot:header="{ props }" >
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
@@ -42,7 +42,7 @@
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      :label="totalToBillLabel" @click="createBills" />
+      :label="totalToBillLabel" @click="validateBillListCreation" />
   </q-page>
 </template>
 
@@ -55,7 +55,8 @@ import LargeTable from '../../../components/table/LargeTable';
 import Select from '../../../components/form/Select';
 import TitleHeader from '../../../components/TitleHeader';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
-import { billingMixin } from '../../../mixins/billingMixin.js';
+import { billingMixin } from '../../../mixins/billingMixin';
+import { tableMixin } from '../../../mixins/tableMixin';
 import { formatPrice, formatIdentity } from '../../../helpers/utils';
 
 export default {
@@ -63,7 +64,7 @@ export default {
   metaInfo: {
     title: 'A facturer',
   },
-  mixins: [billingMixin],
+  mixins: [billingMixin, tableMixin],
   components: {
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
@@ -239,41 +240,51 @@ export default {
         this.tableLoading = false;
       }
     },
-    async createBills () {
+    async createBillsBatch (shouldBeSent) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Cette opération est définitive. Confirmez-vous ?',
-          ok: 'Oui',
-          cancel: 'Non',
-          options: {
-            type: 'checkbox',
-            model: [true],
-            items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
+        if (!this.hasSelectedRows) return;
+        const BATCH_SIZE = 50;
+        const promises = [];
+        const bills = this.selected.map(row => ({
+          ...row,
+          customerBills: {
+            ...row.customerBills,
+            shouldBeSent: !!shouldBeSent[0],
           },
-        }).onOk(async (shouldBeSent) => {
-          if (!this.hasSelectedRows) return;
-          const bills = this.selected.map(row => ({
-            ...this.$_.omit(row, ['__index']),
-            customerBills: {
-              ...row.customerBills,
-              shouldBeSent: !!shouldBeSent[0],
-            },
-          }));
-          await this.$bills.create({ bills });
-          NotifyPositive('Clients facturés');
-          await this.getDraftBills();
-          this.selected = [];
-        });
+        }));
+
+        for (let i = 0, l = bills.length; i < l; i += BATCH_SIZE) {
+          promises.push(this.$bills.create({ bills: bills.slice(i, i + BATCH_SIZE) }));
+        }
+        await Promise.all(promises);
+        this.selected = [];
+        await this.getDraftBills();
+        NotifyPositive('Clients facturés');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la facturation des clients');
       }
     },
+    validateBillListCreation () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette opération est définitive. Confirmez-vous ?',
+        ok: 'Oui',
+        cancel: 'Non',
+        options: {
+          type: 'checkbox',
+          model: [true],
+          items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
+        },
+      }).onOk(this.createBillsBatch)
+        .onCancel(() => NotifyPositive('Facturation annulée'));
+    },
     async refreshBill (row, bill) {
       try {
-        const { customer, __index } = row;
+        const { customer } = row;
         const { startDate, endDate } = bill;
+        const index = this.getRowIndex(this.draftBills, row);
+
         const draftBills = await this.$bills.getDraftBills({
           billingStartDate: startDate,
           startDate: this.$moment(startDate).startOf('d').toISOString(),
@@ -281,12 +292,15 @@ export default {
           billingPeriod: this.user.company.customersConfig.billingPeriod,
           customer: customer._id,
         });
-        this.draftBills.splice(__index, 1, ...draftBills);
+        this.draftBills.splice(index, 1, ...draftBills);
         NotifyPositive('Date de début de facturation modifiée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de la date de début de facturation');
       }
+    },
+    tableRowKey (row) {
+      return row.customer._id;
     },
   },
 }

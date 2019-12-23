@@ -48,6 +48,7 @@
 
 .planning-table
 .agenda-table
+  width: 100%
   border-collapse: collapse;
   table-layout: fixed;
   border-style: hidden;
@@ -93,10 +94,6 @@
       position: -webkit-sticky;
       position: sticky;
       z-index: 10;
-      @media screen and (min-width: 768px)
-        top: 90px;
-      @media screen and (max-width: 767px)
-        top: 110px;
       &:not(:first-child):before
         content: '';
         position: absolute;
@@ -123,10 +120,8 @@
     width: 100%;
     padding: 20px 20px 15px;
     z-index: 10;
-    @media screen and (min-width: 768px)
-      height: 90px;
     @media screen and (max-width: 767px)
-      height: 110px;
+      padding: 15px 10px 10px;
   &-month
     display: flex;
     @media screen and (min-width: 768px)
@@ -142,12 +137,21 @@
     @media screen and (max-width: 767px)
       margin-bottom: 10px;
   &-actions
+    display: flex
+    justify-content: center
+  &-navigation-actions
     display: flex;
     align-items: center;
     flex-wrap: nowrap;
-    justify-content: center;
+    @media screen and (min-width: 768px)
+      .q-btn
+        margin: 0 5px
     @media screen and (max-width: 767px)
       justify-content: space-around;
+      .q-btn
+        width: 30px
+    div:first-child
+      flex-grow: 1
   &-view
     padding: 4px;
   &-hour

@@ -17,7 +17,7 @@
       :error-message="errorLabel">
       <q-uploader flat :bordered="false" color="white" :label="label" :url="url" :headers="headers"
         text-color="black" @failed="failMsg" :form-fields="additionalFields" :class="{ borders: inModal }"
-        @uploaded="documentUploaded" auto-upload :accept="extensions" :field-name="name" :multiple="multiple"/>
+        @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"/>
     </q-field>
   </div>
 </template>
@@ -72,7 +72,7 @@ export default {
   },
   computed: {
     additionalFields () {
-      return [{ name: 'fileName', value: this.additionalValue }];
+      return [{ name: 'fileName', value: this.additionalValue }, { name: 'type', value: this.name }];
     },
     document () {
       return this.$_.get(this.entity, this.path);

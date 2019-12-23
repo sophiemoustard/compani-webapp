@@ -49,6 +49,7 @@ import {
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
 } from '../../data/constants.js';
+import { upperCaseFirstLetter } from '../../helpers/utils';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
@@ -66,17 +67,20 @@ export default {
     return {
       loading: false,
       indicatorsModal: false,
-      tabsContent: [
-        { label: 'Stats du mois', default: true, name: MONTH_STATS },
-        { label: 'Stats du mois précédent', default: false, name: PREV_MONTH_STATS },
-      ],
       selectedTab: MONTH_STATS,
-      distanceMatrix: [],
       monthDetails: {},
       prevMonthDetails: {},
     };
   },
   computed: {
+    tabsContent () {
+      const currentMonthLabel = this.$moment(this.startOfWeek).startOf('month').format('MMMM YY');
+      const prevMonthLabel = this.$moment(this.startOfWeek).subtract(1, 'month').startOf('month').format('MMMM YY');
+      return [
+        { label: upperCaseFirstLetter(currentMonthLabel), default: true, name: MONTH_STATS },
+        { label: upperCaseFirstLetter(prevMonthLabel), default: false, name: PREV_MONTH_STATS },
+      ];
+    },
     occupationLevel () {
       if (this.workingStats.hoursToWork !== 0 && this.workingStats.workedHours < this.workingStats.hoursToWork) {
         return LOW;

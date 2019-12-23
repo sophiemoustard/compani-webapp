@@ -1,6 +1,6 @@
 <template>
   <div class="planning-container full-width full-height">
-    <table style="width: 100%" class="agenda-table full-height">
+    <table class="agenda-table full-height">
       <thead style="height: 5%">
         <th class="capitalize bottom-border" v-for="(day, index) in daysHeader" :key="index">
           <div class="row justify-center items-baseline days-header">
@@ -117,6 +117,11 @@ export default {
 
 <style lang="stylus" scoped>
   .agenda-table
+    th
+      @media screen and (min-width: 768px)
+        top: 90px;
+      @media screen and (max-width: 767px)
+        top: 110px;
     td
       padding: 0px;
       height: 100%;

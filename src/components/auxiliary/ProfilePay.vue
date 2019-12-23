@@ -5,7 +5,7 @@
         <p class="text-weight-bold">Documents</p>
       </div>
       <ni-large-table :data="payDocuments" :columns="columns" :pagination.sync="pagination" row-key="name">
-        <template v-slot:body="{ props }" >
+        <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">
@@ -14,11 +14,12 @@
                   <q-btn flat round small color="primary" :disabled="!$_.get(props, 'row.file.link', null)"
                     class="q-mx-sm" :disable="loading">
                     <a :href="$_.get(props, 'row.file.link', '')" target="_blank">
-                      <q-icon name="file_download" color="primary"/>
+                      <q-icon name="file_download" color="primary" />
                     </a>
                   </q-btn>
                   <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm"
-                    :disable="loading" @click="deletePayDocument(payDocuments[props.row.__index])">
+                    :disable="loading"
+                    @click="validatePayDocumentDeletion(payDocuments[getRowIndex(payDocuments, props.row)])">
                   </q-btn>
                 </div>
               </template>
@@ -44,8 +45,8 @@
           ref="documentUploadForm" @valid="formValid = $event">
         </ni-document-upload>
         <template slot="footer">
-          <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add"
-            color="primary" :loading="loading" @click="createDocument" />
+          <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add" color="primary"
+            :loading="loading" @click="createDocument" />
         </template>
       </ni-modal>
     </div>
@@ -64,9 +65,11 @@ import LargeTable from '../../components/table/LargeTable';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocuments from '../../api/PayDocuments';
 import { formatIdentity } from '../../helpers/utils';
+import { tableMixin } from '../../mixins/tableMixin';
 
 export default {
   name: 'ProfilePay',
+  mixins: [tableMixin],
   components: {
     'ni-document-upload': DocumentUpload,
     'ni-modal': Modal,
@@ -184,23 +187,23 @@ export default {
       }
     },
     async deletePayDocument (payDocument) {
-      this.loading = true;
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await PayDocuments.remove(payDocument._id);
-          NotifyPositive('Document supprimé');
-          await this.getDocuments();
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        await PayDocuments.remove(payDocument._id);
+        NotifyPositive('Document supprimé');
+        await this.getDocuments();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document');
       }
-      this.loading = false;
+    },
+    validatePayDocumentDeletion (payDocument) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deletePayDocument(payDocument))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
 }

@@ -189,7 +189,7 @@ export const payMixin = {
   methods: {
     formatPayload (payload) {
       return {
-        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'compensationEdition', 'paidKm', '__index']),
+        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'compensationEdition', 'paidKm']),
         hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
         auxiliary: payload.auxiliary._id,
       };

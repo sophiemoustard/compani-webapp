@@ -14,7 +14,7 @@
                 <q-btn flat round small color="grey" icon="edit"
                   @click.native="openCreditNoteEditionModal(props.row)" />
                 <q-btn flat round small color="grey" icon="delete"
-                  @click="deleteCreditNote(col.value, props.row.__index)" />
+                  @click="validateCNDeletion(col.value, props.row)" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -678,23 +678,25 @@ export default {
       }
     },
     // Deletion
-    async deleteCreditNote (id, cell) {
+    async deleteCreditNote (id) {
       try {
-        const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: `Etes-vous sûr de vouloir supprimer cet avoir ${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$creditNotes.remove(id);
-          await this.refreshCreditNotes();
-          NotifyPositive('Avoir supprimé');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        await this.$creditNotes.remove(id);
+        await this.refreshCreditNotes();
+        NotifyPositive('Avoir supprimé');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'avoir');
       }
+    },
+    validateCNDeletion (id) {
+      const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: `Etes-vous sûr de vouloir supprimer cet avoir ${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteCreditNote(id))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     formatIdentity,
   },

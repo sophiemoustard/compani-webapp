@@ -1,15 +1,20 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Balances Clients</h4>
-    </div>
-    <ni-large-table :data="balances" :columns="columns" row-key="rowId" :loading="tableLoading" selection="multiple"
-      :pagination.sync="pagination" :selected.sync="selected">
+    <ni-title-header title="Balances Clients">
+      <template slot="content">
+        <div class="col-xs-12 col-md-6 on-left">
+          <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" separator />
+        </div>
+      </template>
+    </ni-title-header>
+    <ni-large-table :data="filteredBalances" :columns="columns" row-key="rowId" :loading="tableLoading"
+      selection="multiple" :pagination.sync="pagination" :selected.sync="selected">
       <template v-slot:header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <q-th auto-width>
-            <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" dense />
+            <q-checkbox @input="selectRows(props.selected)" v-model="props.selected" indeterminate-value="some" dense
+              :disable="balancesOption === 2" />
           </q-th>
         </q-tr>
       </template>
@@ -47,14 +52,18 @@
       @createPayment="createPayment" :selectedCustomer="selectedCustomer" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
-      :disable="selected.length === 0" @click="createPayments" />
+      :disable="selected.length === 0" @click="validatePaymentListCreation" />
   </q-page>
 </template>
 
 <script>
+import orderBy from 'lodash/orderBy';
+import get from 'lodash/get';
 import LargeTable from '../../../components/table/LargeTable';
 import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
+import TitleHeader from '../../../components/TitleHeader';
+import Select from '../../../components/form/Select';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
@@ -68,6 +77,8 @@ export default {
     'ni-large-table': LargeTable,
     'ni-prefixed-cell-content': PrefixedCellContent,
     'ni-payment-creation-modal': PaymentCreationModal,
+    'ni-title-header': TitleHeader,
+    'ni-select': Select,
   },
   mixins: [paymentMixin],
   data () {
@@ -93,14 +104,14 @@ export default {
           name: 'billed',
           label: 'Facturé TTC',
           align: 'left',
-          field: row => row.billed,
+          field: 'billed',
           format: val => formatPrice(val),
         },
         {
           name: 'paid',
           label: 'Payé TTC',
           align: 'left',
-          field: row => row.paid,
+          field: 'paid',
           format: val => formatPrice(val),
         },
         {
@@ -108,12 +119,15 @@ export default {
           label: 'Solde',
           align: 'left',
           field: row => row.balance,
+          sortable: true,
         },
         {
           name: 'toPay',
           label: 'A Prélever',
           align: 'left',
-          field: row => formatPrice(row.toPay),
+          field: 'toPay',
+          format: value => formatPrice(value),
+          sortable: true,
         },
         {
           name: 'actions',
@@ -122,17 +136,36 @@ export default {
           field: row => row.customer._id,
         },
       ],
-      pagination: {
-        sortBy: 'customer',
-        ascending: true,
-        rowsPerPage: 0,
-      },
+      pagination: { rowsPerPage: 0 },
+      balancesOptions: [
+        { label: 'Tous', value: 0 },
+        { label: 'Bénéficiaires', value: 1 },
+        { label: 'Tiers payeurs', value: 2 },
+      ],
+      balancesOption: 0,
     }
+  },
+  computed: {
+    filteredBalances () {
+      const orderedByCustomerBalances = orderBy(this.balances, (row) => get(row, 'customer.identity.lastname', '').toLowerCase(), ['asc']);
+      if (this.balancesOption === 1) return orderedByCustomerBalances.filter(balance => !balance.thirdPartyPayer);
+      if (this.balancesOption === 2) {
+        return orderBy(
+          orderedByCustomerBalances.filter(balance => balance.thirdPartyPayer),
+          (row) => get(row, 'thirdPartyPayer.name', '').toLowerCase(),
+          ['asc']
+        );
+      }
+      return orderedByCustomerBalances;
+    },
   },
   async mounted () {
     await this.getBalances();
   },
   methods: {
+    resetSelected () {
+      this.selected = [];
+    },
     goToCustomerBillingPage (customerId) {
       this.$router.push({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
     },
@@ -195,7 +228,7 @@ export default {
         this.creationLoading = false;
       }
     },
-    async createPayments () {
+    validatePaymentListCreation () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Cette opération est définitive. Confirmez-vous ?',

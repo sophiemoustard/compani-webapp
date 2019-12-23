@@ -66,13 +66,13 @@ export default {
       this.$v.deletedEvents.$reset();
       this.$emit('hide');
     },
-    async validateEventsDeletion () {
+    validateEventsDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr de vouloir supprimer ces évènements ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteEvents())
+      }).onOk(this.deleteEvents)
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async deleteEvents () {

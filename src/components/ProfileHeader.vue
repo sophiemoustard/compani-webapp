@@ -26,7 +26,7 @@
           <q-icon name="restore" class="on-left" size="1rem" />
           <div class="on-left">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
           <ni-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention"
-            @click=deleteCustomer />
+            @click="validateCustomerDeletion" />
         </div>
       </div>
       <div v-if="!customer" class="q-pl-lg col-xs-6 col-md-6 row profile-info-item">
@@ -185,7 +185,6 @@ export default {
         if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
         await this.$twilio.sendSMS({
           to: `+33${this.user.contact.phone.substring(1)}`,
-          from: this.companyName,
           body: this.messageComp,
         });
         NotifyPositive('SMS bien envoyé');
@@ -197,20 +196,22 @@ export default {
     },
     async deleteCustomer () {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Confirmez-vous la suppression ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$customers.remove(this.user._id);
-          NotifyPositive('Bénéficiaire supprimé.');
-          this.$router.push({ name: 'customers directory' });
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        await this.$customers.remove(this.user._id);
+        NotifyPositive('Bénéficiaire supprimé.');
+        this.$router.push({ name: 'customers directory' });
       } catch (e) {
         console.error(e);
         if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
       }
+    },
+    validateCustomerDeletion () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Confirmez-vous la suppression ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(this.deleteCustomer)
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
 }

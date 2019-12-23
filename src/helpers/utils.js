@@ -62,12 +62,20 @@ export const getLastDocument = (docs) => {
   return [sortedDocs[0]];
 };
 
-export const roundFrenchNumber = number => number.toLocaleString('fr-FR', { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' });
+export const roundFrenchPrice = number => number.toLocaleString(
+  'fr-FR',
+  { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' }
+);
+
+export const roundFrenchPercentage = (number, digits = 2) => number.toLocaleString(
+  'fr-FR',
+  { minimumFractionDigits: digits, style: 'percent' }
+);
 
 export const formatPrice = (val) => {
-  if (!val) return roundFrenchNumber(0)
-  const result = roundFrenchNumber(val);
-  if (Number.parseFloat(result) === 0) return roundFrenchNumber(0);
+  if (!val) return roundFrenchPrice(0)
+  const result = roundFrenchPrice(val);
+  if (Number.parseFloat(result) === 0) return roundFrenchPrice(0);
   return result;
 };
 
@@ -107,3 +115,5 @@ export const removeDiacritics = (str) => {
   // eslint-disable-next-line no-control-regex
   return str.replace(/[^\u0000-\u007E]/g, (a) => diacriticsMap[a] || a);
 }
+
+export const upperCaseFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1);

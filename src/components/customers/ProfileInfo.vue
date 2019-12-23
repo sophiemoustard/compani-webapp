@@ -45,7 +45,7 @@
                     <q-icon color="grey" name="history" @click="showHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click="startSubscriptionEdition(col.value)" />
                     <q-icon color="grey" name="delete" :disable="props.row.eventCount > 0"
-                      @click="removeSubscriptions(col.value)" />
+                      @click="validateSubscriptionsDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -81,7 +81,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-icon color="grey" name="edit" @click="openEditionModalHelper(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="removeHelper(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="validateHelperDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -120,15 +120,15 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'emptyMandate'">
-                  <q-btn v-if="customer.payment.mandates && props.row.__index == 0" flat round small color="primary"
-                    @click="downloadMandate(props.row)">
+                  <q-btn v-if="customer.payment.mandates && getRowIndex(customer.payment.mandates, props.row) == 0" flat
+                    round small color="primary" @click="downloadMandate(props.row)">
                     <q-icon name="file_download" />
                   </q-btn>
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
                   <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
-                      field-name="signedMandate" auto-upload :accept="extensions" @uploaded="refreshMandates"
+                      field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
                   <q-btn v-else flat round small color="primary">
@@ -138,8 +138,10 @@
                   </q-btn>
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
-                  <ni-date-input v-model="customer.payment.mandates[props.row.__index].signedAt"
-                    @blur="updateSignedAt(props.row)" @focus="saveTmpSignedAt(props.row.__index)" in-modal />
+                  <ni-date-input
+                    v-model="customer.payment.mandates[getRowIndex(customer.payment.mandates, props.row)].signedAt"
+                    @blur="updateSignedAt(props.row)"
+                    @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" in-modal />
                 </template>
                 <template v-else-if="col.name === 'signed'">
                   <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
@@ -163,11 +165,10 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="remove_red_eye"
-                      @click.native="showFundingDetails(col.value)" />
+                    <q-icon color="grey" name="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                     <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
                     <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="removeFunding(col.value)" />
+                    <q-icon color="grey" name="delete" @click.native="validateFundingDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -187,9 +188,9 @@
         <div class="col-xs-12">
           <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
             @uploaded="documentUploaded" name="financialCertificates" collapsibleLabel="Ajouter un justificatif"
-            :user-profile="customer" :url="docsUploadUrl" @delete="deleteDocument($event)"
+            :user-profile="customer" :url="docsUploadUrl" @delete="validateFinancialCertifDeletion($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />
-          </div>
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -209,7 +210,7 @@
                 <template v-else-if="col.name === 'signedQuote'">
                   <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
-                      field-name="signedQuote" :accept="extensions" auto-upload @uploaded="refreshQuotes"
+                      field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
                       @failed="failMsg" />
                   </div>
                   <q-btn v-else flat round small color="primary">
@@ -234,12 +235,12 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading"
-      :validations="$v.newHelper" :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm"/>
+    <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
+      :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" />
 
     <!-- Edit helper modal -->
     <edit-helper-modal :editedHelper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
-      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper"/>
+      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper" />
 
     <!-- Subscription creation modal -->
     <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
@@ -292,7 +293,7 @@
       <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
         :pagination.sync="paginationHistory">
         <template v-slot:body="{ props }">
-            <q-tr :props="props">
+          <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template>{{ col.value }}</template>
             </q-td>
@@ -307,14 +308,8 @@
       <template slot="title">
         Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <q-table class="q-mb-xl table-grid" :data="fundingDetailsData" :columns="fundingColumns" hide-bottom flat
-        binary-state-sort :visible-columns="fundingDetailsVisibleColumns" :rows-per-page-options="[0]">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingColumns"
+        :visible-columns="fundingDetailsVisibleColumns" />
     </ni-modal>
 
     <!-- Funding history modal -->
@@ -323,14 +318,8 @@
       <template slot="title">
         Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <q-table class="q-mb-xl table-grid" :data="selectedFunding.versions" :columns="fundingColumns" hide-bottom flat
-        binary-state-sort :pagination.sync="paginationFundingHistory" :visible-columns="fundingHistoryVisibleColumns">
-        <q-tr slot="body" slot-scope="props" :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </q-table>
+      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingColumns"
+        :visible-columns="fundingHistoryVisibleColumns" />
     </ni-modal>
 
     <!-- Funding creation modal -->
@@ -424,9 +413,11 @@ import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput';
 import Modal from '../Modal';
 import ReponsiveTable from '../table/ResponsiveTable';
+import FundingGridTable from '../table/FundingGridTable';
 import { downloadDocxFile } from '../../helpers/downloadFile';
 import { customerMixin } from '../../mixins/customerMixin.js';
 import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
+import { tableMixin } from '../../mixins/tableMixin.js';
 import { days } from '../../data/days.js';
 import {
   FUNDING_FREQ_OPTIONS,
@@ -456,6 +447,7 @@ export default {
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
     'ni-responsive-table': ReponsiveTable,
+    'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [
     customerMixin,
@@ -464,6 +456,7 @@ export default {
     fundingMixin,
     validationMixin,
     helperMixin,
+    tableMixin,
   ],
   data () {
     return {
@@ -809,12 +802,14 @@ export default {
           name: 'fileName',
           value: `mandat_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}`,
         },
+        { name: 'type', value: 'signedMandate' },
       ]
     },
     quoteFormFields (quote) {
       return [
         { name: 'quoteId', value: quote._id },
         { name: 'fileName', value: `devis_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}` },
+        { name: 'type', value: 'signedQuote' },
       ]
     },
     getServiceLastVersion (service) {
@@ -896,7 +891,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de l'ajout d'une souscription");
+        NotifyNegative('Erreur lors de l\'ajout de la souscription.');
       } finally {
         this.loading = false;
       }
@@ -935,27 +930,30 @@ export default {
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la modification d'une souscription")
+        NotifyNegative('Erreur lors de la modification de la souscription.')
       } finally {
         this.loading = false;
       }
     },
-    async removeSubscriptions (subscriptionId) {
+    async deleteSubscriptions (subscriptionId) {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          const params = { subscriptionId, _id: this.customer._id };
-          await this.$customers.removeSubscription(params);
-          await this.refreshCustomer();
-          NotifyPositive('Souscription supprimée');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const params = { subscriptionId, _id: this.customer._id };
+        await this.$customers.removeSubscription(params);
+        await this.refreshCustomer();
+        NotifyPositive('Souscription supprimée');
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la souscitpion.')
       }
+    },
+    validateSubscriptionsDeletion (subscriptionId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette souscription ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteSubscriptions(subscriptionId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Mandates
     async updateSignedAt (mandate) {
@@ -1148,22 +1146,24 @@ export default {
         this.loading = false;
       }
     },
-    async removeFunding (fundingId) {
+    async deleteFunding (fundingId) {
       try {
-        await this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          const params = { fundingId, _id: this.customer._id };
-          await this.$customers.removeFunding(params);
-          await this.refreshCustomer();
-          NotifyPositive('Financement supprimé');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const params = { fundingId, _id: this.customer._id };
+        await this.$customers.removeFunding(params);
+        await this.refreshCustomer();
+        NotifyPositive('Financement supprimé');
       } catch (e) {
         console.error(e);
       }
+    },
+    validateFundingDeletion (fundingId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce financement ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteFunding(fundingId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showFundingDetails (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);

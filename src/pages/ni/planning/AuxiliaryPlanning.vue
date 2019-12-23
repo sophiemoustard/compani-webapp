@@ -8,17 +8,17 @@
       @updateFeeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent" :customers="customers"
       :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
-      :activeAuxiliaries="activeAuxiliaries" :customers="customers" @resetForm="resetCreationForm"
-      @deleteDocument="deleteDocument" @documentUploaded="documentUploaded" @createEvent="validateCreationEvent" />
+      :activeAuxiliaries="activeAuxiliaries" @resetForm="resetCreationForm" @createEvent="validateCreationEvent"
+      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="deleteDocument" @updateEvent="updateEvent"
-      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="deleteEvent"
-      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey" />
+      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
+      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="validateEventDeletion"
+      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey" @updateEvent="updateEvent" />
   </q-page>
 </template>
 
@@ -36,7 +36,7 @@ import { formatIdentity } from '../../../helpers/utils';
 export default {
   name: 'AuxiliaryPlanning',
   mixins: [planningActionMixin],
-  metaInfo: { title: 'Plannnig auxiliaires' },
+  metaInfo: { title: 'Planning auxiliaires' },
   components: {
     'ni-planning-manager': Planning,
     'ni-event-creation-modal': EventCreationModal,
@@ -245,6 +245,8 @@ export default {
     },
     // Filter
     async addElementToFilter (el) {
+      this.$refs.planningManager.updatePlanningHeaderHeight();
+
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
         const auxBySector = this.filters.filter(aux => aux.sector && aux.sector._id === el._id);
@@ -263,6 +265,8 @@ export default {
       }
     },
     removeElementFromFilter (el) {
+      this.$refs.planningManager.updatePlanningHeaderHeight();
+
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.auxiliaries = this.auxiliaries.filter(auxiliary =>

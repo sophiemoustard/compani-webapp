@@ -29,7 +29,7 @@ export default {
     columns: { type: Array, default: () => [] },
     pagination: { type: Object, default: () => ({ page: 1, rowsPerPage: 15 }) },
     loading: { type: Boolean, default: false },
-    rowKey: { type: String, default: 'id' },
+    rowKey: { type: [String, Function], default: 'id' },
     selection: { type: String, default: 'none' },
     selected: { type: Array, default: () => [] },
     separator: { type: String, default: 'horizontal' },

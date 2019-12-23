@@ -8,14 +8,13 @@
           <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click.native="openSurchargeEditionModal(col.value)" />
                       <q-btn flat round small dense color="grey" icon="delete"
-                        @click="deleteSurcharge(col.value, props.row.__index)" />
+                        @click="validateSurchargeDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -36,8 +35,7 @@
             :visible-columns="visibleColumnsServices">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
@@ -45,7 +43,7 @@
                         @click="openServiceEditionModal(col.value)" />
                       <q-btn flat round small dense color="grey" icon="delete"
                         :disable="props.row.subscriptionCount > 0"
-                        @click="deleteService(col.value, props.row.__index)" />
+                        @click="validateServiceDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -87,15 +85,14 @@
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate"
               :entity="company" alt="template mandat prelevement" name="debitMandate"
-              @delete="deleteDocument(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
+              @delete="validateDocumentDeletion(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`"
               :url="docsUploadUrl" />
           </div>
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" :entity="company"
-              alt="template devis" name="quote"
-              @delete="deleteDocument(documents.quote.driveId, 'quote', 'customersConfig')" @uploaded="documentUploaded"
-              :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl" />
+            <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" alt="template devis" name="quote"
+              @delete="validateDocumentDeletion(documents.quote.driveId, 'quote', 'customersConfig')" :entity="company"
+              @uploaded="documentUploaded" :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl" />
           </div>
         </div>
       </div>
@@ -106,17 +103,16 @@
             :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
                   <template v-if="col.name === 'billingMode'">
                     <div class="capitalize">{{ col.value }}</div>
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn :disable="isTppUsedInFundings(props.row.__index)" flat round small dense color="grey"
-                        icon="delete" @click="deleteThirdPartyPayer(col.value, props.row.__index)" />
                       <q-btn flat round small dense color="grey" icon="edit"
                         @click="openThirdPartyPayerEditionModal(col.value)" />
+                      <q-btn :disable="isTppUsedInFundings(props.row)" flat round small dense color="grey"
+                        icon="delete" @click="validateTppDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value}}</template>
@@ -302,8 +298,7 @@
         @blur="$v.newThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
-          :loading="loading" @click="createNewThirdPartyPayer"
-          :disable="isTppCreationDisabled" />
+          :loading="loading" @click="createNewThirdPartyPayer" :disable="isTppCreationDisabled" />
       </template>
     </ni-modal>
 
@@ -325,8 +320,7 @@
         @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
-          :loading="loading" @click="updateThirdPartyPayer"
-          :disable="isTppEditionDisabled" />
+          :loading="loading" @click="updateThirdPartyPayer" :disable="isTppEditionDisabled" />
       </template>
     </ni-modal>
   </q-page>
@@ -340,6 +334,7 @@ import TimeInput from '../../../components/form/TimeInput.vue';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
+import { tableMixin } from '../../../mixins/tableMixin.js';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
@@ -372,7 +367,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ReponsiveTable,
   },
-  mixins: [configMixin, validationMixin],
+  mixins: [configMixin, validationMixin, tableMixin],
   watch: {
     'editedSurcharge.evening' (value) {
       if (!value) {
@@ -1007,22 +1002,25 @@ export default {
         this.loading = false;
       }
     },
-    async deleteSurcharge (surchargeId, cell) {
+    async deleteSurcharge (surchargeId, row) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$surcharges.remove(surchargeId);
-          this.surcharges.splice(cell, 1);
-          NotifyPositive('Plan de majoration supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.surcharges, row);
+        await this.$surcharges.remove(surchargeId);
+        this.surcharges.splice(index, 1);
+        NotifyPositive('Plan de majoration supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du plan de majoration.');
       }
+    },
+    validateSurchargeDeletion (surchargeId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer ce plan de majoration ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteSurcharge(surchargeId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Services
     formatCreatedService () {
@@ -1118,22 +1116,25 @@ export default {
         this.loading = false;
       }
     },
-    async deleteService (serviceId, cell) {
+    async deleteService (serviceId, row) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer ce service ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$services.remove(serviceId);
-          this.services.splice(cell, 1);
-          NotifyPositive('Service supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.services, row);
+        await this.$services.remove(serviceId);
+        this.services.splice(index, 1);
+        NotifyPositive('Service supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du service.');
       }
+    },
+    validateServiceDeletion (serviceId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer ce service ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteService(serviceId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     showHistory (id) {
       this.selectedService = this.services.find(ser => ser._id === id);
@@ -1215,25 +1216,29 @@ export default {
         this.thirdPartyPayerEditionModal = false;
       }
     },
-    async deleteThirdPartyPayer (thirdPartyPayerId, cell) {
+    async deleteThirdPartyPayer (thirdPartyPayerId, row) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
-          this.thirdPartyPayers.splice(cell, 1);
-          NotifyPositive('Tiers payeur supprimé.');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        const index = this.getRowIndex(this.thirdPartyPayers, row);
+        await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
+        this.thirdPartyPayers.splice(index, 1);
+        NotifyPositive('Tiers payeur supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du tiers payeur.');
       }
     },
-    isTppUsedInFundings (tppIndex) {
-      return this.thirdPartyPayers[tppIndex].isUsedInFundings;
+    validateTppDeletion (thirdPartyPayerId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer ce tiers payeur ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
+    isTppUsedInFundings (tpp) {
+      const index = this.getRowIndex(this.thirdPartyPayers, tpp);
+      return this.thirdPartyPayers[index].isUsedInFundings;
     },
   },
 }

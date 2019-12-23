@@ -171,7 +171,7 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
-      let payload = { ...this.$_.omit(event, ['dates', '__v', '__index', 'company']) }
+      let payload = { ...this.$_.omit(event, ['dates', '__v', 'company']) }
       payload = this.$_.pickBy(payload);
 
       if (event.auxiliary) {
@@ -261,6 +261,21 @@ export const planningActionMixin = {
         this.loading = false;
       }
     },
+    getMessageForInternalOrUnavailability (type) {
+      return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. Es-tu sûr(e) de vouloir créer cette répétition ?`;
+    },
+    getConfirmationMessage () {
+      switch (this.newEvent.type) {
+        case INTERVENTION:
+          return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?';
+        case INTERNAL_HOUR:
+          return this.getMessageForInternalOrUnavailability('heures internes');
+        case UNAVAILABILITY:
+          return this.getMessageForInternalOrUnavailability('indisponibilités');
+        default:
+          return 'Es-tu sûr(e) de vouloir créer cette répétition ?';
+      }
+    },
     async validateCreationEvent () {
       try {
         this.$v.newEvent.$touch();
@@ -279,7 +294,7 @@ export const planningActionMixin = {
         } else if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
           this.$q.dialog({
             title: 'Confirmation',
-            message: 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?',
+            message: this.getConfirmationMessage(),
             ok: 'OK',
             cancel: 'Annuler',
           })
@@ -490,40 +505,45 @@ export const planningActionMixin = {
       if (this.creationModal) this.newEvent.attachment = { ...json.data.payload.attachment };
       if (this.editionModal) this.editedEvent.attachment = { ...json.data.payload.attachment };
     },
+    validateDocumentDeletion (driveId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteDocument(driveId))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
     async deleteDocument (driveId) {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          await this.$gdrive.removeFileById({ id: driveId });
-          if (this.creationModal) this.newEvent.attachment = {};
-          if (this.editionModal) this.editedEvent.attachment = {};
-          NotifyPositive('Document supprimé');
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        await this.$gdrive.removeFileById({ id: driveId });
+        if (this.creationModal) this.newEvent.attachment = {};
+        if (this.editionModal) this.editedEvent.attachment = {};
+        NotifyPositive('Document supprimé');
       } catch (e) {
         return NotifyPositive('Suppression annulée');
       }
     },
     // Event deletion
+    validateEventDeletion () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(this.deleteEvent)
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
     async deleteEvent () {
       try {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Es-tu sûr(e) de vouloir supprimer cet évènement ?',
-          ok: 'OK',
-          cancel: 'Annuler',
-        }).onOk(async () => {
-          this.loading = true
-          await this.$events.deleteById(this.editedEvent._id);
-          await this.refresh();
-          this.editionModal = false;
-          NotifyPositive('Évènement supprimé.');
-          this.loading = false;
-        }).onCancel(() => NotifyPositive('Suppression annulée'));
+        this.loading = true
+        await this.$events.deleteById(this.editedEvent._id);
+
+        await this.refresh();
+        this.editionModal = false;
+        NotifyPositive('Évènement supprimé.');
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
         this.loading = false
