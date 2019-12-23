@@ -89,6 +89,7 @@ export const helperMixin = {
       try {
         this.helpers = await this.$users.list({ customers: this.userProfile._id });
       } catch (e) {
+        this.helpers = [];
         console.error(e);
       }
     },
