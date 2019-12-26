@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { ADMIN, COACH, AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
+import { COACH_ROLES, AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
 
 export default {
   props: {
@@ -32,7 +32,7 @@ export default {
       return this.$store.getters['main/user'];
     },
     userCanFeedback () {
-      return [COACH, ADMIN, AUXILIARY, PLANNING_REFERENT].indexOf(this.user.role.name) !== -1;
+      return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.user.role.name);
     },
   },
   methods: {

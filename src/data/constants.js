@@ -116,12 +116,14 @@ export const CANCELLATION_REASONS = [
 // ROLES
 export const COACH = 'coach';
 export const ADMIN = 'admin';
+export const SUPER_ADMIN = 'superAdmin';
 export const CUSTOMER = 'customer';
 export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planningReferent';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
-export const COACH_ROLES = [ADMIN, COACH];
+export const COACH_ROLES = [SUPER_ADMIN, ADMIN, COACH];
+export const ADMIN_ROLES = [SUPER_ADMIN, ADMIN];
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
