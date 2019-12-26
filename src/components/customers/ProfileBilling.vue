@@ -9,9 +9,9 @@
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates"
-        :displayActions="user.role.name === ADMIN" @openEditionModal="openEditionModal"
+        :displayActions="isAdmin" @openEditionModal="openEditionModal"
         :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerDocuments)" />
-      <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
+      <div v-if="isCoach" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
           no-caps flat color="white" icon="add" />
       </div>
@@ -19,10 +19,10 @@
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
       <p class="text-weight-bold">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates"
-        :displayActions="user.role.name === ADMIN || user.role.name === COACH" @openEditionModal="openEditionModal"
+        :displayActions="isCoach" @openEditionModal="openEditionModal"
         :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
         :endBalance="getEndBalance(tpp.documents, tpp)" />
-      <div v-if="user.role.name === ADMIN || user.role.name === COACH" align="right">
+      <div v-if="isCoach" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].client)"/>
       </div>
@@ -42,7 +42,21 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import { CREDIT_NOTE, BILL, DIRECT_DEBIT, BANK_TRANSFER, CHECK, CESU, REFUND, ADMIN, COACH, CUSTOMER, THIRD_PARTY_PAYER, HELPER } from '../../data/constants';
+import {
+  CREDIT_NOTE,
+  BILL,
+  DIRECT_DEBIT,
+  BANK_TRANSFER,
+  CHECK,
+  CESU,
+  REFUND,
+  ADMIN,
+  SUPER_ADMIN,
+  COACH,
+  CUSTOMER,
+  THIRD_PARTY_PAYER,
+  HELPER,
+} from '../../data/constants';
 import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
 import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
 import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
@@ -72,6 +86,7 @@ export default {
       balances: [],
       COACH,
       ADMIN,
+      SUPER_ADMIN,
       CUSTOMER,
       THIRD_PARTY_PAYER,
       editedPayment: {},
@@ -91,6 +106,12 @@ export default {
         startDate: this.billingDates.startDate,
         endDate: this.billingDates.endDate,
       };
+    },
+    isAdmin () {
+      return [SUPER_ADMIN, ADMIN].includes(this.user.role.name);
+    },
+    isCoach () {
+      return [SUPER_ADMIN, ADMIN, COACH].includes(this.user.role.name);
     },
   },
   async mounted () {

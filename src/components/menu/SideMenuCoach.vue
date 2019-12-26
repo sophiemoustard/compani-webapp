@@ -60,7 +60,7 @@
 import { sideMenuMixin } from '../../mixins/sideMenuMixin';
 import MenuItem from './MenuItem.vue';
 import SideMenuFooter from './SideMenuFooter.vue';
-import { ADMIN } from '../../data/constants';
+import { SUPER_ADMIN, ADMIN } from '../../data/constants';
 
 export default {
   props: {
@@ -74,6 +74,7 @@ export default {
   data () {
     return {
       ADMIN,
+      SUPER_ADMIN,
       activeRoutes: {
         planning: { open: false },
         benef: { open: false },
@@ -90,7 +91,7 @@ export default {
   },
   computed: {
     isAdmin () {
-      return this.user.role.name === ADMIN;
+      return [SUPER_ADMIN, ADMIN].includes(this.user.role.name);
     },
   },
 }
