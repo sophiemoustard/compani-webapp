@@ -50,9 +50,8 @@ import {
   CHECK,
   CESU,
   REFUND,
-  ADMIN,
-  SUPER_ADMIN,
-  COACH,
+  COACH_ROLES,
+  ADMIN_ROLES,
   CUSTOMER,
   THIRD_PARTY_PAYER,
   HELPER,
@@ -84,9 +83,8 @@ export default {
       tppDocuments: [],
       billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
       balances: [],
-      COACH,
-      ADMIN,
-      SUPER_ADMIN,
+      COACH_ROLES,
+      ADMIN_ROLES,
       CUSTOMER,
       THIRD_PARTY_PAYER,
       editedPayment: {},
@@ -108,10 +106,10 @@ export default {
       };
     },
     isAdmin () {
-      return [SUPER_ADMIN, ADMIN].includes(this.user.role.name);
+      return ADMIN_ROLES.includes(this.user.role.name);
     },
     isCoach () {
-      return [SUPER_ADMIN, ADMIN, COACH].includes(this.user.role.name);
+      return COACH_ROLES.includes(this.user.role.name);
     },
   },
   async mounted () {

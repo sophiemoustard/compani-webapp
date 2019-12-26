@@ -26,9 +26,7 @@ import {
   WORK_ACCIDENT,
   CUSTOMER_CONTRACT,
   COMPANY_CONTRACT,
-  ADMIN,
-  SUPER_ADMIN,
-  COACH,
+  COACH_ROLES,
   EVENT_TYPES,
   CUSTOMER,
   UNKNOWN_AVATAR,
@@ -199,7 +197,7 @@ export const planningModalMixin = {
       ];
     },
     customerProfileRedirect () {
-      return [SUPER_ADMIN, ADMIN, COACH].includes(this.mainUser.role.name)
+      return COACH_ROLES.includes(this.mainUser.role.name)
         ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
         : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
     },

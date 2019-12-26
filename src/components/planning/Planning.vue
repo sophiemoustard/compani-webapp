@@ -105,9 +105,7 @@ import {
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
   PLANNING_REFERENT,
-  COACH,
-  ADMIN,
-  SUPER_ADMIN,
+  COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
@@ -185,7 +183,7 @@ export default {
       mainUser: 'main/user',
     }),
     isCoach () {
-      return [SUPER_ADMIN, ADMIN, COACH].includes(this.mainUser.role.name);
+      return COACH_ROLES.includes(this.mainUser.role.name);
     },
     isPlanningReferent () {
       return this.mainUser.role.name === PLANNING_REFERENT;
