@@ -72,7 +72,7 @@ export const planningActionMixin = {
           },
         },
         auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
-        sector: { required },
+        sector: { required: requiredIf((item) => item && !item.auxiliary) },
         customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
@@ -173,11 +173,6 @@ export const planningActionMixin = {
     getPayload (event) {
       let payload = { ...this.$_.omit(event, ['dates', '__v', 'company']) }
       payload = this.$_.pickBy(payload);
-
-      if (event.auxiliary) {
-        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === event.auxiliary);
-        payload.sector = auxiliary.sector._id;
-      }
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
         payload.startDate = this.$moment(event.dates.startDate).startOf('d').toDate();
@@ -387,7 +382,6 @@ export const planningActionMixin = {
       if (!event.auxiliary) { // Unassigned event
         return this.$can({
           user: this.$store.getters['main/user'],
-          auxiliarySectorEvent: event.sector,
           permissions: [{ name: 'events:edit' }],
         });
       }
@@ -395,7 +389,6 @@ export const planningActionMixin = {
       return this.$can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: event.auxiliary._id,
-        auxiliarySectorEvent: event.sector,
         permissions: [
           { name: 'events:edit' },
           { name: 'events:own:edit', rule: 'isOwner' },
@@ -458,14 +451,8 @@ export const planningActionMixin = {
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
-      else if (this.personKey === CUSTOMER) {
-        payload.auxiliary = draggedObject.auxiliary._id;
-        payload.sector = draggedObject.sector;
-      } else {
-        payload.auxiliary = target._id;
-        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === target._id);
-        payload.sector = auxiliary.sector._id;
-      }
+      else if (this.personKey === CUSTOMER) payload.auxiliary = draggedObject.auxiliary._id;
+      else payload.auxiliary = target._id;
 
       return payload;
     },
