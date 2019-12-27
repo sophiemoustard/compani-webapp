@@ -19,7 +19,7 @@
 
 <script>
 import LargeTable from '../../../components/table/LargeTable';
-import { formatIdentity } from '../../../helpers/utils';
+import { formatIdentity, formatHours } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
@@ -86,19 +86,19 @@ export default {
         {
           name: 'prevMonthCareHours',
           label: 'Mois précédent',
-          field: 'prevMonthCareHours',
+          field: row => row.prevMonthCareHours === -1 ? 'N/A' : formatHours(row.prevMonthCareHours, 1),
           align: 'center',
         },
         {
           name: 'currentMonthCareHours',
           label: 'Mois en cours',
-          field: 'currentMonthCareHours',
+          field: row => formatHours(row.currentMonthCareHours, 1),
           align: 'center',
         },
         {
           name: 'nextMonthCareHours',
           label: 'Mois prochain',
-          field: 'nextMonthCareHours',
+          field: row => row.nextMonthCareHours === -1 ? 'N/A' : formatHours(row.nextMonthCareHours, 1),
           align: 'center',
         },
       ],
