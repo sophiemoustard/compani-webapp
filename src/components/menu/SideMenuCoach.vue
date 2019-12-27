@@ -19,6 +19,7 @@
     <q-separator />
     <q-expansion-item ref="benef" v-model="activeRoutes.benef.open" label="Bénéficiaires">
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
+      <ni-menu-item name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
     </q-expansion-item>
     <template v-if="isAdmin">
       <q-separator />
