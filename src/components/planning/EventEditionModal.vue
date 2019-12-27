@@ -7,7 +7,7 @@
         <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" :options="[]"
           v-model="editedEvent.auxiliary" :selectedPerson="selectedAuxiliary" @close="close" />
         <ni-planning-modal-header v-else v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
-          :selectedPerson="selectedAuxiliary" @close="close" />
+          :selectedPerson="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
@@ -184,6 +184,10 @@ export default {
     },
     deleteEvent (value) {
       this.$emit('deleteEvent', value);
+    },
+    updateSectorEvent (auxId) {
+      const auxiliary = this.activeAuxiliaries.find(aux => aux._id === auxId);
+      this.editedEvent.sector = auxiliary ? auxiliary.sector._id : '';
     },
   },
 }
