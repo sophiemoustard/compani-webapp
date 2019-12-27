@@ -2,10 +2,10 @@
   <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="resetForm(false)">
     <div class="modal-container-md">
       <div class="modal-padding">
-        <ni-planning-modal-header v-if="isCustomerPlanning" v-model="newEvent.customer" :selectedPerson="selectedCustomer"
-          @close="close" />
+        <ni-planning-modal-header v-if="isCustomerPlanning" v-model="newEvent.customer"
+          :selectedPerson="selectedCustomer" @close="close" />
         <ni-planning-modal-header v-else v-model="newEvent.auxiliary" :options="auxiliariesOptions"
-          :selectedPerson="selectedAuxiliary" @close="close" />
+          :selectedPerson="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap v-model="newEvent.type" unelevated toggle-color="primary" :options="eventTypeOptions"
             @input="resetForm(true, newEvent.type)" text-color="black" />
@@ -35,10 +35,11 @@
               :min="newEvent.dates.startDate" />
             <ni-select in-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
               :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
-            <ni-file-uploader v-if="newEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(newEvent.absence)" caption="Justificatif d'absence"
-              path="attachment" :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
-              @uploaded="documentUploaded" :additionalValue="additionalValue" required-field withBorders
-              @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+            <ni-file-uploader v-if="newEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(newEvent.absence)"
+              caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence"
+              name="file" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
+              required-field withBorders@delete="deleteDocument(newEvent.attachment.driveId)"
+              :disable="!selectedAuxiliary._id" />
           </template>
           <template v-if="newEvent.absenceNature === HOURLY">
             <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
@@ -177,6 +178,10 @@ export default {
       if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY) {
         this.newEvent.absence = UNJUSTIFIED;
       }
+    },
+    updateSectorEvent (auxId) {
+      const auxiliary = this.activeAuxiliaries.find(aux => aux._id === auxId);
+      this.newEvent.sector = auxiliary ? auxiliary.sector._id : '';
     },
   },
 }
