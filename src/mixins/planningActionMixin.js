@@ -455,6 +455,12 @@ export const planningActionMixin = {
       else if (this.personKey === CUSTOMER) payload.auxiliary = draggedObject.auxiliary._id;
       else payload.auxiliary = target._id;
 
+      if (draggedObject.isCancelled) {
+        payload.isCancelled = draggedObject.isCancelled;
+        payload.cancel = draggedObject.cancel;
+        payload.misc = draggedObject.misc;
+      }
+
       return payload;
     },
     async updateEventOnDrop (vEvent) {
