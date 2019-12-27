@@ -408,6 +408,7 @@ export const planningActionMixin = {
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
       if (event.shouldUpdateRepetition) delete payload.misc;
+      if (event.auxiliary) delete payload.sector;
 
       return this.$_.omit(payload, ['customer', 'repetition', 'staffingBeginning', 'staffingDuration', 'type']);
     },
