@@ -1,8 +1,7 @@
-`<template>
+<template>
   <q-page class="neutral-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Suivi des plans d'aide</h4>
-    </div>
+    <ni-title-header title="Suivi des plans d'aide">
+    </ni-title-header>
     <ni-large-table :data="allCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
       :pagination.sync="pagination">
       <template v-slot:body="{ props }" >
@@ -19,7 +18,8 @@
 
 <script>
 import LargeTable from '../../../components/table/LargeTable';
-import { formatIdentity, formatHours } from '../../../helpers/utils';
+import TitleHeader from '../../../components/TitleHeader';
+import { formatIdentity, formatHours, formatPrice } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
@@ -29,6 +29,7 @@ export default {
   },
   components: {
     'ni-large-table': LargeTable,
+    'ni-title-header': TitleHeader,
   },
   data () {
     return {
@@ -50,13 +51,15 @@ export default {
         {
           name: 'customer',
           label: 'Bénéficiaire',
-          field: row => formatIdentity(row.customer, 'fL'),
+          field: 'customer',
+          format: value => formatIdentity(value, 'fL'),
           align: 'left',
         },
         {
           name: 'referent',
           label: 'Référent',
-          field: row => formatIdentity(row.referent, 'FL'),
+          field: 'referent',
+          format: value => formatIdentity(value, 'FL'),
           align: 'left',
         },
         {
@@ -75,30 +78,35 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire',
           field: 'unitTTCRate',
+          format: value => formatPrice(value),
           align: 'center',
         },
         {
           name: 'plannedCareHours',
           label: 'Nb d\'heures',
           field: 'plannedCareHours',
+          format: value => formatHours(value),
           align: 'center',
         },
         {
           name: 'prevMonthCareHours',
           label: 'Mois précédent',
-          field: row => row.prevMonthCareHours === -1 ? 'N/A' : formatHours(row.prevMonthCareHours, 1),
+          field: 'prevMonthCareHours',
+          format: value => value === -1 ? 'N/A' : formatHours(value, 1),
           align: 'center',
         },
         {
           name: 'currentMonthCareHours',
           label: 'Mois en cours',
-          field: row => formatHours(row.currentMonthCareHours, 1),
+          field: 'currentMonthCareHours',
+          format: value => formatHours(value, 1),
           align: 'center',
         },
         {
           name: 'nextMonthCareHours',
           label: 'Mois prochain',
-          field: row => row.nextMonthCareHours === -1 ? 'N/A' : formatHours(row.nextMonthCareHours, 1),
+          field: 'nextMonthCareHours',
+          format: value => value === -1 ? 'N/A' : formatHours(value, 1),
           align: 'center',
         },
       ],
@@ -111,7 +119,7 @@ export default {
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
       this.tableLoading = true;
-      NotifyNegative('Problème lors de la récupération des plans d\'aide');
+      NotifyNegative('Erreur lors de la récupération des plans d\'aide');
     } finally {
       this.tableLoading = false;
     }
