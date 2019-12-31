@@ -214,6 +214,7 @@ export const EXPORT_TYPES = [
   { label: 'Auxiliaires', value: AUXILIARY },
   { label: 'Bénéficiaires', value: CUSTOMER },
   { label: 'Aidants', value: HELPER },
+  { label: 'Equipes', value: SECTOR },
 ];
 export const EXPORT_HISTORY_TYPES = [
   { label: 'Interventions et heures internes', value: WORKING_EVENT },
