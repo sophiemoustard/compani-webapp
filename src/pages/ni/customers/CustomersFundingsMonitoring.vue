@@ -6,6 +6,9 @@
           <div class="col-xs-12 col-sm-6 col-md-4">
             <ni-select-sector class="q-pl-sm" v-model="selectedSector" allow-null-option />
           </div>
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <ni-select class="q-pl-sm" :options="thirdPartyPayerOptions" v-model="selectedThirdPartyPayer" allow-null-option />
+          </div>
         </div>
       </template>
     </ni-title-header>
@@ -26,6 +29,7 @@
 <script>
 import LargeTable from '../../../components/table/LargeTable';
 import TitleHeader from '../../../components/TitleHeader';
+import Select from '../../../components/form/Select';
 import SelectSector from '../../../components/form/SelectSector';
 import { formatIdentity, formatHours, formatPrice } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
@@ -38,6 +42,7 @@ export default {
   components: {
     'ni-large-table': LargeTable,
     'ni-title-header': TitleHeader,
+    'ni-select': Select,
     'ni-select-sector': SelectSector,
   },
   data () {
@@ -50,6 +55,8 @@ export default {
         rowsPerPage: 15,
       },
       selectedSector: '',
+      selectedThirdPartyPayer: '',
+      thirdPartyPayerOptions: [],
       allCustomersFundingsMonitoring: [],
       columns: [
         {
@@ -124,13 +131,23 @@ export default {
   },
   computed: {
     displayedAllCustomersFundingsMonitoring () {
-      if (this.selectedSector !== '') return this.allCustomersFundingsMonitoring.filter(elem => elem.sectorId === this.selectedSector);
-      return this.allCustomersFundingsMonitoring;
+      let allCustomersFundingsMonitoring = this.allCustomersFundingsMonitoring;
+      if (this.selectedSector !== '') {
+        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
+          elem.sectorId === this.selectedSector);
+      }
+      if (this.selectedThirdPartyPayer !== '') {
+        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
+          elem.thirdPartyPayerId === this.selectedThirdPartyPayer);
+      }
+      return allCustomersFundingsMonitoring;
     },
   },
   async mounted () {
     try {
       this.tableLoading = true;
+      this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => { return { value: elem._id, label: elem.name } });
+      this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les Financeurs' });
       this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring();
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
