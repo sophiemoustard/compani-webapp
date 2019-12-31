@@ -115,6 +115,7 @@ export default {
   async mounted () {
     try {
       this.tableLoading = true;
+      this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring({ limit: 15 });
       this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring();
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
