@@ -1,8 +1,15 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide">
+      <template slot="content">
+        <div class=" col-xs-12 row items-baseline justify-end fill-width">
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <ni-select-sector class="q-pl-sm" v-model="selectedSector" allow-null-option />
+          </div>
+        </div>
+      </template>
     </ni-title-header>
-    <ni-large-table :data="allCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
+    <ni-large-table :data="displayedAllCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
       :pagination.sync="pagination">
       <template v-slot:body="{ props }" >
         <q-tr :props="props">
@@ -19,6 +26,7 @@
 <script>
 import LargeTable from '../../../components/table/LargeTable';
 import TitleHeader from '../../../components/TitleHeader';
+import SelectSector from '../../../components/form/SelectSector';
 import { formatIdentity, formatHours, formatPrice } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
@@ -30,6 +38,7 @@ export default {
   components: {
     'ni-large-table': LargeTable,
     'ni-title-header': TitleHeader,
+    'ni-select-sector': SelectSector,
   },
   data () {
     return {
@@ -40,6 +49,7 @@ export default {
         page: 1,
         rowsPerPage: 15,
       },
+      selectedSector: '',
       allCustomersFundingsMonitoring: [],
       columns: [
         {
@@ -111,6 +121,12 @@ export default {
         },
       ],
     };
+  },
+  computed: {
+    displayedAllCustomersFundingsMonitoring () {
+      if (this.selectedSector !== '') return this.allCustomersFundingsMonitoring.filter(elem => elem.sectorId === this.selectedSector);
+      return this.allCustomersFundingsMonitoring;
+    },
   },
   async mounted () {
     try {
