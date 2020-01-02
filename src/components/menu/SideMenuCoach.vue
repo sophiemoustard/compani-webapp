@@ -27,6 +27,7 @@
         <ni-menu-item name="to bill" icon="credit_card" label="À facturer" />
         <ni-menu-item name="credit note" icon="mdi-credit-card-refund" label="Avoirs" />
         <ni-menu-item name="clients balances" icon="mdi-scale-balance" label="Balances clients" />
+        <ni-menu-item name="tpp bill slips" icon="view_headline" label="Bordereaux tiers payeurs" />
         <ni-menu-item name="debits archive" icon="mdi-archive" label="Archive prélèvements" />
       </q-expansion-item>
     </template>

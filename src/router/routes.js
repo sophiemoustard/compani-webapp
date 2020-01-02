@@ -98,6 +98,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/billing/tpp-bill-slips',
+        name: 'tpp bill slips',
+        component: () => import('pages/ni/billing/TppBillSlips'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'bills:edit',
+          parent: 'billing',
+        },
+      },
+      {
         path: 'ni/billing/debits-archive',
         name: 'debits archive',
         component: () => import('pages/ni/billing/DebitsArchive'),
