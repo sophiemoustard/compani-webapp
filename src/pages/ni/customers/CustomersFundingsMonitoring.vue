@@ -1,8 +1,18 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide">
+      <template slot="content">
+        <div class=" col-xs-12 row items-baseline justify-end fill-width">
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <ni-select-sector class="q-pl-sm" v-model="selectedSector" allow-null-option />
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-4">
+            <ni-select class="q-pl-sm" :options="thirdPartyPayerOptions" v-model="selectedThirdPartyPayer" allow-null-option />
+          </div>
+        </div>
+      </template>
     </ni-title-header>
-    <ni-large-table :data="allCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
+    <ni-large-table :data="displayedCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
       :pagination.sync="pagination">
       <template v-slot:body="{ props }" >
         <q-tr :props="props">
@@ -19,6 +29,8 @@
 <script>
 import LargeTable from '../../../components/table/LargeTable';
 import TitleHeader from '../../../components/TitleHeader';
+import Select from '../../../components/form/Select';
+import SelectSector from '../../../components/form/SelectSector';
 import { formatIdentity, formatHours, formatPrice } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
@@ -30,6 +42,8 @@ export default {
   components: {
     'ni-large-table': LargeTable,
     'ni-title-header': TitleHeader,
+    'ni-select': Select,
+    'ni-select-sector': SelectSector,
   },
   data () {
     return {
@@ -40,12 +54,15 @@ export default {
         page: 1,
         rowsPerPage: 15,
       },
+      selectedSector: '',
+      selectedThirdPartyPayer: '',
+      thirdPartyPayerOptions: [{ value: '', label: 'Tous les financeurs' }],
       allCustomersFundingsMonitoring: [],
       columns: [
         {
           name: 'tpp',
           label: 'Financeur',
-          field: 'thirdPartyPayer',
+          field: row => this.$_.get(row, 'tpp.name', ''),
           align: 'left',
         },
         {
@@ -65,7 +82,7 @@ export default {
         {
           name: 'sector',
           label: 'Equipe',
-          field: 'sector',
+          field: row => this.$_.get(row, 'sector.name', ''),
           align: 'left',
         },
         {
@@ -112,9 +129,35 @@ export default {
       ],
     };
   },
+  computed: {
+    displayedCustomersFundingsMonitoring () {
+      let allCustomersFundingsMonitoring = this.allCustomersFundingsMonitoring;
+      if (this.selectedSector !== '') {
+        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
+          this.$_.get(elem, 'sector._id', null) === this.selectedSector);
+      }
+      if (this.selectedThirdPartyPayer !== '') {
+        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem => {
+          return elem.tpp._id === this.selectedThirdPartyPayer
+        });
+      }
+      return allCustomersFundingsMonitoring;
+    },
+  },
+  methods: {
+    async getThirdPartyPayerOptions () {
+      try {
+        this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => ({ value: elem._id, label: elem.name }));
+        this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
+      } catch (e) {
+        this.thirdPartyPayerOptions = [{ value: '', label: 'Tous les financeurs' }];
+      }
+    },
+  },
   async mounted () {
     try {
       this.tableLoading = true;
+      await this.getThirdPartyPayerOptions();
       this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring();
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
