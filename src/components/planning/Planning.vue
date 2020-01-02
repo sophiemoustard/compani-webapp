@@ -296,16 +296,11 @@ export default {
     createEvent (eventInfo) {
       let can = true;
       if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
-        can = this.$can({
-          user: this.$store.getters['main/user'],
-          auxiliarySectorEvent: eventInfo.sectorId,
-          permissions: [{ name: 'events:edit' }],
-        });
+        can = this.$can({ user: this.$store.getters['main/user'], permissions: [{ name: 'events:edit' }] });
       } else if (this.personKey === 'auxiliary') {
         can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person._id,
-          auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'events:edit' },
             { name: 'events:own:edit', rule: 'isOwner' },
