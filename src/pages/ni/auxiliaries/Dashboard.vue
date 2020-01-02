@@ -76,6 +76,7 @@ export default {
       customerAndDuration: [],
       hoursToWork: [],
       monthModal: false,
+      firstIntervention: '',
     };
   },
   computed: {
@@ -86,10 +87,15 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     monthsOptions () {
-      return [
-        { label: 'Mois en cours', value: this.$moment().format('MMYYYY') },
-        { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MMYYYY') },
-      ];
+      if (this.firstIntervention === '') {
+        return [
+          { label: 'Mois en cours', value: this.$moment().format('MMYYYY') },
+          { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MMYYYY') },
+        ];
+      }
+      return Array.from(this.$moment().range(this.firstIntervention, this.$moment().add(1, 'M')).by('month'))
+        .sort((a, b) => b.diff(a))
+        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYYYY') }));
     },
     monthLabel () {
       const month = this.monthsOptions.find(m => m.value === this.selectedMonth);
@@ -106,6 +112,7 @@ export default {
   },
   async mounted () {
     await this.fillFilter();
+    this.firstIntervention = await this.$companies.getFirstIntervention();
     this.initFilters();
   },
   methods: {
