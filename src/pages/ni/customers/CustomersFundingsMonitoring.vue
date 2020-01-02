@@ -144,11 +144,21 @@ export default {
       return allCustomersFundingsMonitoring;
     },
   },
+  methods: {
+    async getThirdPartyPayerOptions () {
+      try {
+        const thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => { return { value: elem._id, label: elem.name } });
+        thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
+        return thirdPartyPayerOptions;
+      } catch (e) {
+        this.thirdPartyPayerOptions = [];
+      }
+    },
+  },
   async mounted () {
     try {
       this.tableLoading = true;
-      this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => { return { value: elem._id, label: elem.name } });
-      this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
+      this.thirdPartyPayerOptions = await this.getThirdPartyPayerOptions();
       this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring();
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
