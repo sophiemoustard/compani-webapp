@@ -56,7 +56,7 @@ export default {
       },
       selectedSector: '',
       selectedThirdPartyPayer: '',
-      thirdPartyPayerOptions: [],
+      thirdPartyPayerOptions: [{ value: '', label: 'Tous les financeurs' }],
       allCustomersFundingsMonitoring: [],
       columns: [
         {
@@ -147,10 +147,10 @@ export default {
   methods: {
     async getThirdPartyPayerOptions () {
       try {
-        this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => { return { value: elem._id, label: elem.name } });
+        this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => ({ value: elem._id, label: elem.name }));
         this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
       } catch (e) {
-        this.thirdPartyPayerOptions = [];
+        this.thirdPartyPayerOptions = [{ value: '', label: 'Tous les financeurs' }];
       }
     },
   },
