@@ -12,7 +12,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="displayedAllCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
+    <ni-large-table :data="displayedCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
       :pagination.sync="pagination">
       <template v-slot:body="{ props }" >
         <q-tr :props="props">
@@ -62,7 +62,7 @@ export default {
         {
           name: 'tpp',
           label: 'Financeur',
-          field: 'thirdPartyPayer',
+          field: row => this.$_.get(row, 'tpp.name', ''),
           align: 'left',
         },
         {
@@ -82,7 +82,7 @@ export default {
         {
           name: 'sector',
           label: 'Equipe',
-          field: 'sector',
+          field: row => this.$_.get(row, 'sector.name', ''),
           align: 'left',
         },
         {
@@ -130,15 +130,16 @@ export default {
     };
   },
   computed: {
-    displayedAllCustomersFundingsMonitoring () {
+    displayedCustomersFundingsMonitoring () {
       let allCustomersFundingsMonitoring = this.allCustomersFundingsMonitoring;
       if (this.selectedSector !== '') {
         allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
-          elem.sectorId === this.selectedSector);
+          this.$_.get(elem, 'sector._id', null) === this.selectedSector);
       }
       if (this.selectedThirdPartyPayer !== '') {
-        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
-          elem.thirdPartyPayerId === this.selectedThirdPartyPayer);
+        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem => {
+          return elem.tpp._id === this.selectedThirdPartyPayer
+        });
       }
       return allCustomersFundingsMonitoring;
     },
@@ -147,7 +148,7 @@ export default {
     try {
       this.tableLoading = true;
       this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => { return { value: elem._id, label: elem.name } });
-      this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les Financeurs' });
+      this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
       this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring();
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
