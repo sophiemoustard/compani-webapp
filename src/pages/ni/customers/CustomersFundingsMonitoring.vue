@@ -147,9 +147,8 @@ export default {
   methods: {
     async getThirdPartyPayerOptions () {
       try {
-        const thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => { return { value: elem._id, label: elem.name } });
-        thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
-        return thirdPartyPayerOptions;
+        this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => { return { value: elem._id, label: elem.name } });
+        this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
       } catch (e) {
         this.thirdPartyPayerOptions = [];
       }
@@ -158,7 +157,7 @@ export default {
   async mounted () {
     try {
       this.tableLoading = true;
-      this.thirdPartyPayerOptions = await this.getThirdPartyPayerOptions();
+      await this.getThirdPartyPayerOptions();
       this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring();
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
