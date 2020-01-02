@@ -163,13 +163,13 @@ export default {
           name: 'prevMonthCareHours',
           align: 'center',
           label: 'Mois dernier',
-          field: row => row.prevMonthCareHours === -1 ? 'N/A' : row.prevMonthCareHours,
+          field: row => row.prevMonthCareHours === -1 ? 'N/A' : formatHours(row.prevMonthCareHours, 1),
         },
         {
           name: 'currentMonthCareHours',
           align: 'center',
           label: 'Mois en cours',
-          field: 'currentMonthCareHours',
+          field: row => formatHours(row.currentMonthCareHours, 1),
         },
       ],
     };
