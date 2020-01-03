@@ -4,7 +4,7 @@
       <img :src="avatar" class="avatar">
       <div class="person-name-text" v-if="options.length === 0">{{ formattedIdentity }}</div>
       <div v-else :class="{ 'col-md-6': $q.platform.is.desktop }" class="person-name-select">
-        <ni-select :value="value" :options="options" @input="input" no-error icon="swap_vert" />
+        <ni-select :value="value" :options="options" @input="$emit('input', $event)" no-error icon="swap_vert" />
       </div>
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
@@ -46,12 +46,6 @@ export default {
       return (firstname && lastname)
         ? `${firstname} ${lastname}`
         : 'À affecter';
-    },
-  },
-  methods: {
-    input ($event) {
-      if (!$event) this.$emit('update:sector', this.value);
-      this.$emit('input', $event)
     },
   },
 }
