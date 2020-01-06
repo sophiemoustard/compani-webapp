@@ -192,6 +192,8 @@ export const planningActionMixin = {
         }
       }
 
+      if (event.auxiliary) delete payload.sector;
+
       if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
 
       return payload;
@@ -329,14 +331,10 @@ export const planningActionMixin = {
         address,
         customer,
         internalHour,
+        sector,
         ...eventData
       } = this.$_.cloneDeep(event);
-      const dates = {
-        startDate,
-        endDate,
-        startHour: this.formatHour(startDate),
-        endHour: this.formatHour(endDate),
-      };
+      const dates = { startDate, endDate, startHour: this.formatHour(startDate), endHour: this.formatHour(endDate) };
 
       switch (event.type) {
         case INTERVENTION:
@@ -347,6 +345,7 @@ export const planningActionMixin = {
             shouldUpdateRepetition: false,
             ...eventData,
             dates,
+            sector: sector || auxiliary.sector._id,
             auxiliary: auxiliary ? auxiliary._id : '',
             customer: customer ? customer._id : '',
             subscription,

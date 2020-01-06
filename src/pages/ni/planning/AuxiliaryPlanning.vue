@@ -233,7 +233,7 @@ export default {
         address: {},
         attachment: {},
         auxiliary: person ? person._id : '',
-        sector: person ? '' : sectorId,
+        sector: person ? person.sector._id : sectorId,
         dates: {
           startDate: selectedDay.toISOString(),
           startHour: '08:00',

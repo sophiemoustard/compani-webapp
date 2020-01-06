@@ -1,3 +1,4 @@
+import { mapGetters } from 'vuex';
 import SelectSector from '../components/form/SelectSector';
 import DateInput from '../components/form/DateInput.vue';
 import DatetimeRange from '../components/form/DatetimeRange.vue';
@@ -34,6 +35,7 @@ import {
   CANCELLATION_OPTIONS,
   CANCELLATION_REASONS,
   OTHER,
+  SECTOR,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -68,9 +70,10 @@ export const planningModalMixin = {
     };
   },
   computed: {
-    mainUser () {
-      return this.$store.getters['main/user'];
-    },
+    ...mapGetters({
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+    }),
     absenceOptions () {
       if (this.newEvent && this.newEvent.absenceNature === HOURLY) {
         return ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED);
@@ -151,8 +154,11 @@ export const planningModalMixin = {
         return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
       }
 
+      const sectorId = this.newEvent ? this.newEvent.sector : this.editedEvent.sector;
+      const sector = this.filters.find(f => f.type === SECTOR && f._id === sectorId);
+
       return [
-        { label: 'À affecter', value: '' },
+        { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
         ...this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux)),
       ];
     },
