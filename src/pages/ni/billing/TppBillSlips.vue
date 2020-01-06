@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="Bordereaux tiers payeurs" />
-    <ni-large-table :data="billSlipList" :columns="columns" row-key="name">
+    <ni-large-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination">
       <template v-slot:body="{ props }" >
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -67,6 +67,11 @@ export default {
           format: value => formatPrice(value),
         },
       ],
+      pagination: {
+        sortBy: 'month',
+        descending: true,
+        rowsPerPage: 0,
+      },
     };
   },
   async mounted () {
