@@ -9,7 +9,7 @@
             <template v-if="col.name === 'document'">
               <div class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
-                  <a :href="col.value" target="_blank">
+                  <a :href="billSlipUrl(col.value)" target="_blank">
                     <q-icon name="file_download" />
                   </a>
                 </q-btn>
@@ -66,6 +66,12 @@ export default {
           field: 'netInclTaxes',
           format: value => formatPrice(value),
         },
+        {
+          name: 'document',
+          label: '',
+          align: 'left',
+          field: '_id',
+        },
       ],
       pagination: {
         sortBy: 'month',
@@ -87,6 +93,9 @@ export default {
         NotifyNegative('Erreur lors de la récuperation des bordereaux.')
         console.error(e);
       }
+    },
+    billSlipUrl (id) {
+      return this.$billSlips.getPDFUrl(id);
     },
   },
 }
