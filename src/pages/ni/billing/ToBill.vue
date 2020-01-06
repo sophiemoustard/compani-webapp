@@ -244,19 +244,15 @@ export default {
       try {
         if (!this.hasSelectedRows) return;
         const BATCH_SIZE = 50;
-        const promises = [];
         const bills = this.selected.map(row => ({
           ...row,
-          customerBills: {
-            ...row.customerBills,
-            shouldBeSent: !!shouldBeSent[0],
-          },
+          customerBills: { ...row.customerBills, shouldBeSent: !!shouldBeSent[0] },
         }));
 
         for (let i = 0, l = bills.length; i < l; i += BATCH_SIZE) {
-          promises.push(this.$bills.create({ bills: bills.slice(i, i + BATCH_SIZE) }));
+          await this.$bills.create({ bills: bills.slice(i, i + BATCH_SIZE) });
         }
-        await Promise.all(promises);
+
         this.selected = [];
         await this.getDraftBills();
         NotifyPositive('Clients facturés');
