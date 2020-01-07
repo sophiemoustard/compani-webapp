@@ -9,7 +9,7 @@ export const fillFilter = async ({ commit }, roleToSearch) => {
   const rawPromises = [];
   let elems = [];
   rawPromises.push(Sectors.list());
-  if (roleToSearch === AUXILIARY) rawPromises.push(Users.list({ role: [AUXILIARY, PLANNING_REFERENT] }));
+  if (roleToSearch === AUXILIARY) rawPromises.push(Users.listWithSectorHistories({ role: [AUXILIARY, PLANNING_REFERENT] }));
   else if (roleToSearch === CUSTOMER) rawPromises.push(Customers.listWithSubscriptions());
 
   const filterPromises = await Promise.all(rawPromises);

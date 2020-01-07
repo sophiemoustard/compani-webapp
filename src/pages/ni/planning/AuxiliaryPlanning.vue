@@ -103,10 +103,7 @@ export default {
         .map((aux) => {
           const sectorHistories = aux.sectorHistories.find(sectorHistory =>
             this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek) && this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek));
-          const auxWithSector = cloneDeep(aux);
-          if (!sectorHistories) auxWithSector.sector = null;
-          else auxWithSector.sector = sectorHistories.sector;
-          return auxWithSector;
+          return { ...aux, sector: sectorHistories.sector };
         })
         .filter(aux => aux.sector);
     },
@@ -269,11 +266,13 @@ export default {
       this.creationModal = true;
     },
     getAuxBySector (el) {
-      const { startOfWeek, endOfWeek } = this;
       return this.filters.filter(aux =>
-        aux.sectorHistories && aux.sectorHistories.find(sectorHistory =>
-          sectorHistory.sector._id === el._id && this.$moment(sectorHistory.startDate).isSameOrBefore(endOfWeek) && this.$moment(sectorHistory.endDate).isSameOrAfter(startOfWeek)
-        )
+        aux.sectorHistories && aux.sectorHistories.find((sectorHistory) => {
+          const isSameSector = sectorHistory.sector._id === el._id;
+          const isStartDateBeforeEndOfWeek = this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek);
+          const isEndDateAfterStartOfWeek = this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek)
+          return isSameSector && isStartDateBeforeEndOfWeek && isEndDateAfterStartOfWeek;
+        })
       );
     },
     // Filter
