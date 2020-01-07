@@ -1170,11 +1170,10 @@ export default {
         billingMode: '',
       }
     },
-    formatThirdPartyPayerPayload (payload) {
-      if (payload.address) {
-        payload.address = this.$_.omit(payload.address, ['location']);
-        if (!payload.address.fullAddress) payload.address = {};
-      }
+    formatThirdPartyPayerPayload (tpp) {
+      const payload = this.$_.cloneDeep(tpp);
+      if (payload.address && !payload.address.fullAddress) delete payload.address;
+
       return this.$_.pickBy(payload);
     },
     async createNewThirdPartyPayer () {
