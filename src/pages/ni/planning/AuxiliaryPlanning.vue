@@ -97,8 +97,18 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     displayedAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
-        this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+      return this.auxiliaries
+        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek))
+        .map((aux) => {
+          const sectorHistories = aux.sectorHistories.find(sectorHistory =>
+            this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek) && this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek));
+          const auxWithSector = cloneDeep(aux);
+          if (!sectorHistories) auxWithSector.sector = null;
+          else auxWithSector.sector = sectorHistories.sector;
+          return auxWithSector;
+        })
+        .filter(aux => aux.sector);
     },
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
