@@ -169,7 +169,22 @@ export default {
           endDate: this.endOfWeek,
           groupBy: AUXILIARY,
         };
+
         if (!this.displayAllSectors) {
+          this.auxiliaries = [];
+          for (const sector of this.filteredSectors) {
+            const auxBySector = this.getAuxBySector(sector);
+            for (let i = 0, l = auxBySector.length; i < l; i++) {
+              if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
+                this.auxiliaries.push(auxBySector[i]);
+              }
+            }
+          }
+          for (const auxiliary of this.filteredAuxiliaries) {
+            if (!this.auxiliaries.some(aux => aux._id === auxiliary._id)) {
+              this.auxiliaries.push(auxiliary);
+            }
+          }
           params.auxiliary = this.auxiliaries.map(aux => aux._id);
           params.sector = this.filteredSectors.map(sector => sector._id);
         }
@@ -181,7 +196,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.events = [];
-        this.workingStats = [];
+        this.workingStats = {};
       }
     },
     async getCustomers () {
@@ -243,26 +258,24 @@ export default {
       };
       this.creationModal = true;
     },
+    getAuxBySector (el) {
+      const { startOfWeek, endOfWeek } = this;
+      return this.filters.filter(aux =>
+        aux.sectorHistories && aux.sectorHistories.find(sectorHistory =>
+          sectorHistory.sector._id === el._id && this.$moment(sectorHistory.startDate).isSameOrBefore(endOfWeek) && this.$moment(sectorHistory.endDate).isSameOrAfter(startOfWeek)
+        )
+      );
+    },
     // Filter
     async addElementToFilter (el) {
       this.$refs.planningManager.updatePlanningHeaderHeight();
 
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
-        const auxBySector = this.filters.filter(aux => aux.sector && aux.sector._id === el._id);
-        for (let i = 0, l = auxBySector.length; i < l; i++) {
-          if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
-            this.auxiliaries.push(auxBySector[i]);
-          }
-        }
-        await this.refresh();
       } else { // el = auxiliary
         if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
-        if (!this.auxiliaries.some(aux => aux._id === el._id)) {
-          this.auxiliaries.push(el);
-          await this.refresh();
-        }
       }
+      await this.refresh();
     },
     removeElementFromFilter (el) {
       this.$refs.planningManager.updatePlanningHeaderHeight();
