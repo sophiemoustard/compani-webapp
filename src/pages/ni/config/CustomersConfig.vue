@@ -68,6 +68,7 @@
           <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
+          <ni-input caption="SIREN" v-model="company.siren" @focus="saveTmp('siren')" @blur="updateCompany('siren')" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
             @blur="updateCompany('rcs')" />
@@ -718,6 +719,7 @@ export default {
       name: { required },
       tradeName: { required, maxLength: maxLength(11) },
       type: { required },
+      siren: { required: requiredIf(item => item.type === COMPANY) },
       rcs: { required: requiredIf(item => item.type === COMPANY) },
       rna: { required: requiredIf(item => item.type === ASSOCIATION) },
       iban: { required, iban },
