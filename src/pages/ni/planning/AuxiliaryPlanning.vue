@@ -98,14 +98,8 @@ export default {
     }),
     displayedAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
-          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek))
-        .map((aux) => {
-          const sectorHistories = aux.sectorHistories.find(sectorHistory =>
-            this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek) && this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek));
-          return { ...aux, sector: sectorHistories.sector };
-        })
-        .filter(aux => aux.sector);
+        .filter(aux => aux.sector && (this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek)));
     },
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
@@ -164,7 +158,11 @@ export default {
       } else {
         this.savedSearch = search;
         this.filteredAuxiliaries = [];
-        this.auxiliaries = this.filters.filter(fil => fil.type === PERSON);
+        this.auxiliaries = this.filters.filter(fil => fil.type === PERSON)
+          .map((aux) => {
+            const sectorHistory = this.getSectorHistory(aux);
+            return { ...aux, sector: sectorHistory ? sectorHistory.sector : null }
+          });
         this.filteredSectors = this.filters.filter(fil => fil.type === SECTOR);
         await this.refresh();
       }
@@ -183,13 +181,15 @@ export default {
             const auxBySector = this.getAuxBySector(sector);
             for (let i = 0, l = auxBySector.length; i < l; i++) {
               if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
-                this.auxiliaries.push(auxBySector[i]);
+                const sectorHistory = this.getSectorHistory(auxBySector[i]);
+                this.auxiliaries.push({ ...auxBySector[i], sector: sectorHistory ? sectorHistory.sector : null });
               }
             }
           }
           for (const auxiliary of this.filteredAuxiliaries) {
             if (!this.auxiliaries.some(aux => aux._id === auxiliary._id)) {
-              this.auxiliaries.push(auxiliary);
+              const sectorHistory = this.getSectorHistory(auxiliary);
+              this.auxiliaries.push({ ...auxiliary, sector: sectorHistory ? sectorHistory.sector : null });
             }
           }
           params.auxiliary = this.auxiliaries.map(aux => aux._id);
@@ -265,6 +265,15 @@ export default {
       };
       this.creationModal = true;
     },
+    getSectorHistory (aux, sector) {
+      const sectorHistory = aux.sectorHistories.find(sectorHistory => {
+        const isSameSector = sector ? sectorHistory.sector._id === sector._id : true;
+        const isStartDateBeforeEndOfWeek = this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek);
+        const isEndDateAfterStartOfWeek = this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek);
+        return isSameSector && isStartDateBeforeEndOfWeek && isEndDateAfterStartOfWeek;
+      });
+      return sectorHistory;
+    },
     getAuxBySector (el) {
       return this.filters.filter(aux =>
         aux.sectorHistories && aux.sectorHistories.find((sectorHistory) => {
@@ -291,18 +300,20 @@ export default {
 
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
-        this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id));
+        this.auxiliaries = this.auxiliaries.filter(auxiliary => {
+          return auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id);
+        });
         this.eventHistories = this.eventHistories.filter(history =>
           !history.sectors.includes(el._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
         if (this.eventHistories.length === 0) this.displayHistory = false;
       } else { // el = auxiliary
-        this.filteredAuxiliaries = this.filteredAuxiliaries.filter(auxiliary => auxiliary._id !== el._id);
-        if (this.filteredSectors.some(sector => sector._id === el.sector._id)) return;
-        this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary._id !== el._id);
+        const auxiliary = this.auxiliaries.find(auxiliary => auxiliary._id === el._id);
+        this.filteredAuxiliaries = this.filteredAuxiliaries.filter(aux => aux._id !== auxiliary._id);
+        if (this.filteredSectors.some(sector => sector._id === auxiliary.sector._id)) return;
+        this.auxiliaries = this.auxiliaries.filter(aux => aux._id !== auxiliary._id);
         this.eventHistories = this.eventHistories.filter(history =>
-          !history.auxiliaries.map(aux => aux._id).includes(el._id) ||
+          !history.auxiliaries.map(aux => aux._id).includes(auxiliary._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
         if (this.eventHistories.length === 0) this.displayHistory = false;
       }
