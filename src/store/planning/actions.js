@@ -3,13 +3,13 @@ import Users from '../../api/Users'
 import Customers from '../../api/Customers'
 import { formatIdentity } from '../../helpers/utils';
 
-import { AUXILIARY, PLANNING_REFERENT, SECTOR, PERSON, CUSTOMER } from '../../data/constants';
+import { AUXILIARY, SECTOR, PERSON, CUSTOMER } from '../../data/constants';
 
 export const fillFilter = async ({ commit }, roleToSearch) => {
   const rawPromises = [];
   let elems = [];
   rawPromises.push(Sectors.list());
-  if (roleToSearch === AUXILIARY) rawPromises.push(Users.list({ role: [AUXILIARY, PLANNING_REFERENT] }));
+  if (roleToSearch === AUXILIARY) rawPromises.push(Users.listWithSectorHistories());
   else if (roleToSearch === CUSTOMER) rawPromises.push(Customers.listWithSubscriptions());
 
   const filterPromises = await Promise.all(rawPromises);
