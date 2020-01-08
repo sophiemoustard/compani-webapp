@@ -161,7 +161,7 @@ export default {
         this.auxiliaries = this.filters.filter(fil => fil.type === PERSON)
           .map((aux) => {
             const sectorHistory = this.getSectorHistory(aux);
-            return { ...aux, sector: sectorHistory ? sectorHistory.sector : null }
+            return this.formatAuxiliaryWithSector(aux, sectorHistory);
           });
         this.filteredSectors = this.filters.filter(fil => fil.type === SECTOR);
         await this.refresh();
@@ -182,14 +182,14 @@ export default {
             for (let i = 0, l = auxBySector.length; i < l; i++) {
               if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
                 const sectorHistory = this.getSectorHistory(auxBySector[i]);
-                this.auxiliaries.push({ ...auxBySector[i], sector: sectorHistory ? sectorHistory.sector : null });
+                this.auxiliaries.push(this.formatAuxiliaryWithSector(auxBySector[i], sectorHistory));
               }
             }
           }
           for (const auxiliary of this.filteredAuxiliaries) {
             if (!this.auxiliaries.some(aux => aux._id === auxiliary._id)) {
               const sectorHistory = this.getSectorHistory(auxiliary);
-              this.auxiliaries.push({ ...auxiliary, sector: sectorHistory ? sectorHistory.sector : null });
+              this.auxiliaries.push(this.formatAuxiliaryWithSector(auxiliary, sectorHistory));
             }
           }
           params.auxiliary = this.auxiliaries.map(aux => aux._id);
@@ -265,6 +265,9 @@ export default {
       };
       this.creationModal = true;
     },
+    formatAuxiliaryWithSector (aux, sectorHistory) {
+      return { ...aux, sector: sectorHistory ? sectorHistory.sector : null };
+    },
     getSectorHistory (aux, sector) {
       const sectorHistory = aux.sectorHistories.find(sectorHistory => {
         const isSameSector = sector ? sectorHistory.sector._id === sector._id : true;
@@ -274,15 +277,11 @@ export default {
       });
       return sectorHistory;
     },
-    getAuxBySector (el) {
-      return this.filters.filter(aux =>
-        aux.sectorHistories && aux.sectorHistories.find((sectorHistory) => {
-          const isSameSector = sectorHistory.sector._id === el._id;
-          const isStartDateBeforeEndOfWeek = this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek);
-          const isEndDateAfterStartOfWeek = this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek)
-          return isSameSector && isStartDateBeforeEndOfWeek && isEndDateAfterStartOfWeek;
-        })
-      );
+    getAuxBySector (sector) {
+      return this.filters.filter(aux => {
+        if (!aux.sectorHistories) return false;
+        return this.getSectorHistory(aux, sector);
+      });
     },
     // Filter
     async addElementToFilter (el) {
@@ -300,9 +299,7 @@ export default {
 
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
-        this.auxiliaries = this.auxiliaries.filter(auxiliary => {
-          return auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id);
-        });
+        this.auxiliaries = this.auxiliaries.filter(auxiliary => auxiliary.sector._id !== el._id || this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id));
         this.eventHistories = this.eventHistories.filter(history =>
           !history.sectors.includes(el._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
