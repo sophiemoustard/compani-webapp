@@ -154,10 +154,10 @@ export default {
           field: 'thirdPartyPayer',
         },
         {
-          name: 'plannedCareHours',
+          name: 'careHours',
           align: 'center',
           label: 'Heures attribuées',
-          field: 'plannedCareHours',
+          field: 'careHours',
         },
         {
           name: 'prevMonthCareHours',
