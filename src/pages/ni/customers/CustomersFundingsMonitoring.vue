@@ -31,7 +31,7 @@ import LargeTable from '../../../components/table/LargeTable';
 import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import SelectSector from '../../../components/form/SelectSector';
-import { formatIdentity, formatHours, formatPrice } from '../../../helpers/utils';
+import { formatIdentity, formatHours, formatPrice, roundFrenchPercentage } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
@@ -89,6 +89,7 @@ export default {
           name: 'customerParticipationRate',
           label: 'Taux participation bénéficiaire',
           field: 'customerParticipationRate',
+          format: value => roundFrenchPercentage(value / 100),
           align: 'center',
         },
         {
