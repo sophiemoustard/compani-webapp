@@ -263,7 +263,8 @@ export default {
       this.creationModal = true;
     },
     formatAuxiliaryWithSector (aux) {
-      return { ...aux, sector: this.getSectorHistory(aux) };
+      const sectorHistory = this.getSectorHistory(aux);
+      return { ...aux, sector: sectorHistory ? sectorHistory.sector : null };
     },
     getSectorHistory (aux, sector) {
       if (!aux.sectorHistories) return null;
