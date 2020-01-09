@@ -99,9 +99,9 @@ export default {
           align: 'center',
         },
         {
-          name: 'plannedCareHours',
+          name: 'careHours',
           label: 'Nb d\'heures',
-          field: 'plannedCareHours',
+          field: 'careHours',
           format: value => formatHours(value),
           align: 'center',
         },
