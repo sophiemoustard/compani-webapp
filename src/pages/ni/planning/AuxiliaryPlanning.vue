@@ -271,7 +271,7 @@ export default {
       const sectorHistory = aux.sectorHistories.find(sectorHistory => {
         const isSameSector = sector ? sectorHistory.sector._id === sector._id : true;
         const isStartDateBeforeEndOfWeek = this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek);
-        const isEndDateAfterStartOfWeek = this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek);
+        const isEndDateAfterStartOfWeek = !sectorHistory.endDate || this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek);
         return isSameSector && isStartDateBeforeEndOfWeek && isEndDateAfterStartOfWeek;
       });
       return sectorHistory;
