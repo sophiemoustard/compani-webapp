@@ -71,9 +71,10 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           field: 'customer',
-          format: value => formatIdentity(value, 'fL'),
+          format: value => formatIdentity(value, 'Lf'),
           align: 'left',
           classes: 'text-weight-bold',
+          sort: (a, b) => b.lastname.localeCompare(a.lastname),
         },
         {
           name: 'referent',
