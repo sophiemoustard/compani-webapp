@@ -31,7 +31,7 @@ import LargeTable from '../../../components/table/LargeTable';
 import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import SelectSector from '../../../components/form/SelectSector';
-import { formatIdentity, formatHours, formatPrice, roundFrenchPercentage } from '../../../helpers/utils';
+import { formatIdentity, formatHours, formatPrice, roundFrenchPercentage, truncate } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
@@ -63,14 +63,18 @@ export default {
           name: 'tpp',
           label: 'Financeur',
           field: row => this.$_.get(row, 'tpp.name', ''),
+          format: value => truncate(value),
           align: 'left',
+          classes: 'text-weight-bold',
         },
         {
           name: 'customer',
           label: 'Bénéficiaire',
           field: 'customer',
-          format: value => formatIdentity(value, 'fL'),
+          format: value => formatIdentity(value, 'Lf'),
           align: 'left',
+          classes: 'text-weight-bold',
+          sort: (a, b) => b.lastname.localeCompare(a.lastname),
         },
         {
           name: 'referent',
@@ -105,6 +109,7 @@ export default {
           field: 'careHours',
           format: value => formatHours(value),
           align: 'center',
+          classes: 'text-weight-bold',
         },
         {
           name: 'prevMonthCareHours',
@@ -119,6 +124,7 @@ export default {
           field: 'currentMonthCareHours',
           format: value => formatHours(value, 1),
           align: 'center',
+          classes: 'text-weight-bold',
         },
         {
           name: 'nextMonthCareHours',

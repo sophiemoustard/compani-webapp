@@ -22,10 +22,7 @@
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">
-            <template v-if="col.name === 'client' || col.name === 'customer'">
-              <span class="uppercase text-weight-bold">{{ col.value }}</span>
-            </template>
-            <template v-else-if="col.name === 'actions'">
+            <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions">
                 <q-btn flat round color="grey" icon="remove_red_eye" size="12px"
                   @click="goToCustomerBillingPage(col.value)" />
@@ -66,7 +63,7 @@ import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity, truncate } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -92,13 +89,15 @@ export default {
           label: 'Client',
           align: 'left',
           field: row => row.thirdPartyPayer ? row.thirdPartyPayer.name : formatIdentity(row.customer.identity, 'Lf'),
-          format: val => val.length > 30 ? `${val.slice(0, 30)}...` : val,
+          format: val => truncate(val),
+          classes: 'uppercase text-weight-bold',
         },
         {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
           field: row => formatIdentity(row.customer.identity, 'Lf'),
+          classes: 'uppercase text-weight-bold',
         },
         {
           name: 'billed',
