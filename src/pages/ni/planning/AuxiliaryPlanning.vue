@@ -98,7 +98,8 @@ export default {
     }),
     displayedAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => aux.sector && (this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+        .filter(aux => aux.sector &&
+          (this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
           this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek)));
     },
     endOfWeek () {
@@ -112,7 +113,8 @@ export default {
     },
     activeFilters () {
       return this.filters
-        .filter(f => f.type === SECTOR || this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+        .filter(f => f.type === SECTOR ||
+          this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
           this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
           (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id)); // add targeted auxiliary even if not active on strat of week to display future events
     },
@@ -241,7 +243,9 @@ export default {
       const { dayIndex, person, sectorId } = vEvent;
       const selectedDay = this.days[dayIndex];
 
-      if (person && !this.canCreateEvent(person, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      if (person && !this.canCreateEvent(person, selectedDay)) {
+        return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      }
 
       this.newEvent = {
         type: INTERVENTION,
@@ -297,14 +301,14 @@ export default {
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.updateAuxiliariesList();
-        await this.updateDisplayedEventHistories();
       } else { // el = auxiliary
         const auxiliary = this.auxiliaries.find(auxiliary => auxiliary._id === el._id);
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(aux => aux._id !== auxiliary._id);
         this.updateAuxiliariesList();
         if (this.auxiliaries.some(aux => aux._id === auxiliary._id)) return;
-        await this.updateDisplayedEventHistories();
       }
+
+      await this.updateDisplayedEventHistories();
     },
     async updateDisplayedEventHistories () {
       this.eventHistories = this.eventHistories.filter(history =>
