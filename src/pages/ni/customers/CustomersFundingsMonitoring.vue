@@ -31,7 +31,7 @@ import LargeTable from '../../../components/table/LargeTable';
 import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import SelectSector from '../../../components/form/SelectSector';
-import { formatIdentity, formatHours, formatPrice, roundFrenchPercentage } from '../../../helpers/utils';
+import { formatIdentity, formatHours, formatPrice, roundFrenchPercentage, truncate } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
@@ -63,6 +63,7 @@ export default {
           name: 'tpp',
           label: 'Financeur',
           field: row => this.$_.get(row, 'tpp.name', ''),
+          format: value => truncate(value),
           align: 'left',
         },
         {

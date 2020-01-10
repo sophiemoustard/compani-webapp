@@ -66,7 +66,7 @@ import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity, truncate } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -92,7 +92,7 @@ export default {
           label: 'Client',
           align: 'left',
           field: row => row.thirdPartyPayer ? row.thirdPartyPayer.name : formatIdentity(row.customer.identity, 'Lf'),
-          format: val => val.length > 30 ? `${val.slice(0, 30)}...` : val,
+          format: val => truncate(val),
         },
         {
           name: 'customer',
