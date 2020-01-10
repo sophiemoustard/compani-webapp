@@ -85,8 +85,8 @@ export default {
     async elementToAdd (val) {
       await this.addElementToFilter(val);
     },
-    elementToRemove (val) {
-      this.removeElementFromFilter(val);
+    async elementToRemove (val) {
+      await this.removeElementFromFilter(val);
     },
   },
   computed: {
@@ -166,7 +166,7 @@ export default {
         await this.refresh();
       }
     },
-    updateAuxiliaryList () {
+    updateAuxiliariesList () {
       const auxiliaries = [];
       for (const sector of this.filteredSectors) {
         const auxBySector = this.getAuxBySector(sector);
@@ -189,7 +189,7 @@ export default {
         let params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
 
         if (!this.displayAllSectors) {
-          this.updateAuxiliaryList();
+          this.updateAuxiliariesList();
           params.auxiliary = this.auxiliaries.map(aux => aux._id);
           params.sector = this.filteredSectors.map(sector => sector._id);
         }
@@ -291,27 +291,26 @@ export default {
       }
       await this.refresh();
     },
-    removeElementFromFilter (el) {
+    async removeElementFromFilter (el) {
       this.$refs.planningManager.updatePlanningHeaderHeight();
 
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
-        this.updateAuxiliaryList();
-        this.eventHistories = this.eventHistories.filter(history =>
-          !history.sectors.includes(el._id) ||
-            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
-        if (this.eventHistories.length === 0) this.displayHistory = false;
+        this.updateAuxiliariesList();
+        await this.updateDisplayedEventHistories();
       } else { // el = auxiliary
         const auxiliary = this.auxiliaries.find(auxiliary => auxiliary._id === el._id);
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(aux => aux._id !== auxiliary._id);
-        this.updateAuxiliaryList();
+        this.updateAuxiliariesList();
         if (this.auxiliaries.some(aux => aux._id === auxiliary._id)) return;
-
-        this.eventHistories = this.eventHistories.filter(history =>
-          !history.auxiliaries.map(aux => aux._id).includes(auxiliary._id) ||
-            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
-        if (this.eventHistories.length === 0) this.displayHistory = false;
+        await this.updateDisplayedEventHistories();
       }
+    },
+    async updateDisplayedEventHistories () {
+      this.eventHistories = this.eventHistories.filter(history =>
+        this.auxiliaries.some(aux => history.auxiliaries.map(a => a._id).includes(aux._id)));
+      if (this.auxiliaries.length) await this.getEventHistories();
+      if (this.eventHistories.length === 0) this.displayHistory = false;
     },
     async updateEventHistories (done) {
       const lastCreatedAt = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1].createdAt : null
