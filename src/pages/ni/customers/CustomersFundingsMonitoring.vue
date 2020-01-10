@@ -65,6 +65,7 @@ export default {
           field: row => this.$_.get(row, 'tpp.name', ''),
           format: value => truncate(value),
           align: 'left',
+          classes: 'text-weight-bold',
         },
         {
           name: 'customer',
@@ -72,6 +73,7 @@ export default {
           field: 'customer',
           format: value => formatIdentity(value, 'fL'),
           align: 'left',
+          classes: 'text-weight-bold',
         },
         {
           name: 'referent',
@@ -106,6 +108,7 @@ export default {
           field: 'careHours',
           format: value => formatHours(value),
           align: 'center',
+          classes: 'text-weight-bold',
         },
         {
           name: 'prevMonthCareHours',
@@ -120,6 +123,7 @@ export default {
           field: 'currentMonthCareHours',
           format: value => formatHours(value, 1),
           align: 'center',
+          classes: 'text-weight-bold',
         },
         {
           name: 'nextMonthCareHours',
