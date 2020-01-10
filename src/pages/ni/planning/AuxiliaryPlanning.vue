@@ -166,29 +166,30 @@ export default {
         await this.refresh();
       }
     },
+    updateAuxiliaryList () {
+      const auxiliaries = [];
+      for (const sector of this.filteredSectors) {
+        const auxBySector = this.getAuxBySector(sector);
+        for (let i = 0, l = auxBySector.length; i < l; i++) {
+          if (!auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
+            auxiliaries.push(this.formatAuxiliaryWithSector(auxBySector[i]));
+          }
+        }
+      }
+      for (const auxiliary of this.filteredAuxiliaries) {
+        if (!auxiliaries.some(aux => aux._id === auxiliary._id)) {
+          auxiliaries.push(this.formatAuxiliaryWithSector(auxiliary));
+        }
+      }
+
+      this.auxiliaries = auxiliaries;
+    },
     async refresh () {
       try {
-        let params = {
-          startDate: this.startOfWeek,
-          endDate: this.endOfWeek,
-          groupBy: AUXILIARY,
-        };
+        let params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
 
         if (!this.displayAllSectors) {
-          this.auxiliaries = [];
-          for (const sector of this.filteredSectors) {
-            const auxBySector = this.getAuxBySector(sector);
-            for (let i = 0, l = auxBySector.length; i < l; i++) {
-              if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
-                this.auxiliaries.push(this.formatAuxiliaryWithSector(auxBySector[i]));
-              }
-            }
-          }
-          for (const auxiliary of this.filteredAuxiliaries) {
-            if (!this.auxiliaries.some(aux => aux._id === auxiliary._id)) {
-              this.auxiliaries.push(this.formatAuxiliaryWithSector(auxiliary));
-            }
-          }
+          this.updateAuxiliaryList();
           params.auxiliary = this.auxiliaries.map(aux => aux._id);
           params.sector = this.filteredSectors.map(sector => sector._id);
         }
@@ -295,9 +296,7 @@ export default {
 
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
-        this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector._id !== el._id ||
-            this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id));
+        this.updateAuxiliaryList();
         this.eventHistories = this.eventHistories.filter(history =>
           !history.sectors.includes(el._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
@@ -305,8 +304,9 @@ export default {
       } else { // el = auxiliary
         const auxiliary = this.auxiliaries.find(auxiliary => auxiliary._id === el._id);
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(aux => aux._id !== auxiliary._id);
-        if (this.filteredSectors.some(sector => sector._id === auxiliary.sector._id)) return;
-        this.auxiliaries = this.auxiliaries.filter(aux => aux._id !== auxiliary._id);
+        this.updateAuxiliaryList();
+        if (this.auxiliaries.some(aux => aux._id === auxiliary._id)) return;
+
         this.eventHistories = this.eventHistories.filter(history =>
           !history.auxiliaries.map(aux => aux._id).includes(auxiliary._id) ||
             this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
