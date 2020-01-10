@@ -85,8 +85,8 @@ export default {
     async elementToAdd (val) {
       await this.addElementToFilter(val);
     },
-    elementToRemove (val) {
-      this.removeElementFromFilter(val);
+    async elementToRemove (val) {
+      await this.removeElementFromFilter(val);
     },
   },
   computed: {
@@ -98,7 +98,8 @@ export default {
     }),
     displayedAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => aux.sector && (this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
+        .filter(aux => aux.sector &&
+          (this.hasCustomerContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek) ||
           this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek)));
     },
     endOfWeek () {
@@ -112,7 +113,8 @@ export default {
     },
     activeFilters () {
       return this.filters
-        .filter(f => f.type === SECTOR || this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+        .filter(f => f.type === SECTOR ||
+          this.hasCustomerContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
           this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
           (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id)); // add targeted auxiliary even if not active on strat of week to display future events
     },
@@ -166,29 +168,30 @@ export default {
         await this.refresh();
       }
     },
+    updateAuxiliariesList () {
+      const auxiliaries = [];
+      for (const sector of this.filteredSectors) {
+        const auxBySector = this.getAuxBySector(sector);
+        for (let i = 0, l = auxBySector.length; i < l; i++) {
+          if (!auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
+            auxiliaries.push(this.formatAuxiliaryWithSector(auxBySector[i]));
+          }
+        }
+      }
+      for (const auxiliary of this.filteredAuxiliaries) {
+        if (!auxiliaries.some(aux => aux._id === auxiliary._id)) {
+          auxiliaries.push(this.formatAuxiliaryWithSector(auxiliary));
+        }
+      }
+
+      this.auxiliaries = auxiliaries;
+    },
     async refresh () {
       try {
-        let params = {
-          startDate: this.startOfWeek,
-          endDate: this.endOfWeek,
-          groupBy: AUXILIARY,
-        };
+        let params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
 
         if (!this.displayAllSectors) {
-          this.auxiliaries = [];
-          for (const sector of this.filteredSectors) {
-            const auxBySector = this.getAuxBySector(sector);
-            for (let i = 0, l = auxBySector.length; i < l; i++) {
-              if (!this.auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
-                this.auxiliaries.push(this.formatAuxiliaryWithSector(auxBySector[i]));
-              }
-            }
-          }
-          for (const auxiliary of this.filteredAuxiliaries) {
-            if (!this.auxiliaries.some(aux => aux._id === auxiliary._id)) {
-              this.auxiliaries.push(this.formatAuxiliaryWithSector(auxiliary));
-            }
-          }
+          this.updateAuxiliariesList();
           params.auxiliary = this.auxiliaries.map(aux => aux._id);
           params.sector = this.filteredSectors.map(sector => sector._id);
         }
@@ -240,7 +243,9 @@ export default {
       const { dayIndex, person, sectorId } = vEvent;
       const selectedDay = this.days[dayIndex];
 
-      if (person && !this.canCreateEvent(person, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      if (person && !this.canCreateEvent(person, selectedDay)) {
+        return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      }
 
       this.newEvent = {
         type: INTERVENTION,
@@ -290,28 +295,26 @@ export default {
       }
       await this.refresh();
     },
-    removeElementFromFilter (el) {
+    async removeElementFromFilter (el) {
       this.$refs.planningManager.updatePlanningHeaderHeight();
 
       if (el.type === SECTOR) {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
-        this.auxiliaries = this.auxiliaries.filter(auxiliary =>
-          auxiliary.sector._id !== el._id ||
-            this.filteredAuxiliaries.some(filteredAux => filteredAux._id === auxiliary._id));
-        this.eventHistories = this.eventHistories.filter(history =>
-          !history.sectors.includes(el._id) ||
-            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
-        if (this.eventHistories.length === 0) this.displayHistory = false;
+        this.updateAuxiliariesList();
       } else { // el = auxiliary
         const auxiliary = this.auxiliaries.find(auxiliary => auxiliary._id === el._id);
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(aux => aux._id !== auxiliary._id);
-        if (this.filteredSectors.some(sector => sector._id === auxiliary.sector._id)) return;
-        this.auxiliaries = this.auxiliaries.filter(aux => aux._id !== auxiliary._id);
-        this.eventHistories = this.eventHistories.filter(history =>
-          !history.auxiliaries.map(aux => aux._id).includes(auxiliary._id) ||
-            this.filteredAuxiliaries.some(filteredAux => history.auxiliaries.map(aux => aux._id).includes(filteredAux._id)));
-        if (this.eventHistories.length === 0) this.displayHistory = false;
+        this.updateAuxiliariesList();
+        if (this.auxiliaries.some(aux => aux._id === auxiliary._id)) return;
       }
+
+      await this.updateDisplayedEventHistories();
+    },
+    async updateDisplayedEventHistories () {
+      this.eventHistories = this.eventHistories.filter(history =>
+        this.auxiliaries.some(aux => history.auxiliaries.map(a => a._id).includes(aux._id)));
+      if (this.auxiliaries.length) await this.getEventHistories();
+      if (this.eventHistories.length === 0) this.displayHistory = false;
     },
     async updateEventHistories (done) {
       const lastCreatedAt = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1].createdAt : null
