@@ -117,3 +117,5 @@ export const removeDiacritics = (str) => {
 }
 
 export const upperCaseFirstLetter = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+export const truncate = (string, limit = 30) => string.length > limit ? `${string.slice(0, limit)}...` : string;

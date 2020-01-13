@@ -154,7 +154,6 @@ export default {
       const can = this.$can({
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
-        auxiliarySectorEvent: this.selectedAuxiliary.sector,
         permissions: [
           { name: 'events:edit' },
           { name: 'events:own:edit', rule: 'isOwner' },
@@ -175,7 +174,7 @@ export default {
         address: {},
         attachment: {},
         auxiliary: this.selectedAuxiliary._id,
-        sector: this.selectedAuxiliary.sector,
+        sector: '',
         dates: {
           startDate: selectedDay.toISOString(),
           startHour: '08:00',

@@ -28,7 +28,7 @@
           </q-tabs>
           <q-tab-panels v-model="selectedTab" animated>
             <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
-              <ni-auxiliary-indicators :details="details" />
+              <ni-auxiliary-indicators :hours-details="hoursDetails" :customers-details="customersDetails" />
             </q-tab-panel>
           </q-tab-panels>
         </div>
@@ -68,8 +68,9 @@ export default {
       loading: false,
       indicatorsModal: false,
       selectedTab: MONTH_STATS,
-      monthDetails: {},
-      prevMonthDetails: {},
+      monthHoursDetails: {},
+      prevMonthHoursDetails: {},
+      customersDetails: {},
     };
   },
   computed: {
@@ -89,8 +90,8 @@ export default {
       }
       return EXTREME;
     },
-    details () {
-      return this.selectedTab === MONTH_STATS ? this.monthDetails : this.prevMonthDetails;
+    hoursDetails () {
+      return this.selectedTab === MONTH_STATS ? this.monthHoursDetails : this.prevMonthHoursDetails;
     },
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
@@ -124,19 +125,23 @@ export default {
     async getMonthDetails () {
       const month = this.$moment(this.startOfWeek).format('MM-YYYY');
       try {
-        this.monthDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
+        this.monthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
+        const customersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        this.customersDetails = customersDetails[0];
       } catch (e) {
         console.error(e);
-        this.monthDetails = {};
+        this.monthHoursDetails = {};
       }
     },
     async getPrevMonthDetails () {
       const month = this.$moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
       try {
-        this.prevMonthDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
+        this.prevMonthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
+        const customersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        this.customersDetails = customersDetails[0];
       } catch (e) {
         console.error(e);
-        this.prevMonthDetails = {};
+        this.prevMonthHoursDetails = {};
       }
     },
   },

@@ -1,3 +1,4 @@
+import { mapGetters } from 'vuex';
 import SelectSector from '../components/form/SelectSector';
 import DateInput from '../components/form/DateInput.vue';
 import DatetimeRange from '../components/form/DatetimeRange.vue';
@@ -26,8 +27,7 @@ import {
   WORK_ACCIDENT,
   CUSTOMER_CONTRACT,
   COMPANY_CONTRACT,
-  ADMIN,
-  COACH,
+  COACH_ROLES,
   EVENT_TYPES,
   CUSTOMER,
   UNKNOWN_AVATAR,
@@ -35,6 +35,7 @@ import {
   CANCELLATION_OPTIONS,
   CANCELLATION_REASONS,
   OTHER,
+  SECTOR,
 } from '../data/constants';
 
 export const planningModalMixin = {
@@ -69,9 +70,10 @@ export const planningModalMixin = {
     };
   },
   computed: {
-    mainUser () {
-      return this.$store.getters['main/user'];
-    },
+    ...mapGetters({
+      mainUser: 'main/user',
+      filters: 'planning/getFilters',
+    }),
     absenceOptions () {
       if (this.newEvent && this.newEvent.absenceNature === HOURLY) {
         return ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED);
@@ -121,8 +123,7 @@ export const planningModalMixin = {
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
         case INTERVENTION:
-          const shouldDisableButton = (this.isCustomerPlanning && !this.editedEvent.sector) ||
-            !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
+          const shouldDisableButton = !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
           if (this.editedEvent.isCancelled) {
             return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason ||
@@ -153,8 +154,11 @@ export const planningModalMixin = {
         return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
       }
 
+      const sectorId = this.newEvent ? this.newEvent.sector : this.editedEvent.sector;
+      const sector = this.filters.find(f => f.type === SECTOR && f._id === sectorId);
+
       return [
-        { label: 'À affecter', value: '' },
+        { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
         ...this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux)),
       ];
     },
@@ -198,7 +202,7 @@ export const planningModalMixin = {
       ];
     },
     customerProfileRedirect () {
-      return this.mainUser.role.name === COACH || this.mainUser.role.name === ADMIN
+      return COACH_ROLES.includes(this.mainUser.role.name)
         ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
         : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
     },

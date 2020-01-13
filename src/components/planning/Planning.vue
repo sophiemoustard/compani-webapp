@@ -105,8 +105,7 @@ import {
   STAFFING_VIEW_END_HOUR,
   UNKNOWN_AVATAR,
   PLANNING_REFERENT,
-  COACH,
-  ADMIN,
+  COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
@@ -184,7 +183,7 @@ export default {
       mainUser: 'main/user',
     }),
     isCoach () {
-      return [COACH, ADMIN].includes(this.mainUser.role.name);
+      return COACH_ROLES.includes(this.mainUser.role.name);
     },
     isPlanningReferent () {
       return this.mainUser.role.name === PLANNING_REFERENT;
@@ -297,16 +296,11 @@ export default {
     createEvent (eventInfo) {
       let can = true;
       if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
-        can = this.$can({
-          user: this.$store.getters['main/user'],
-          auxiliarySectorEvent: eventInfo.sectorId,
-          permissions: [{ name: 'events:edit' }],
-        });
+        can = this.$can({ user: this.$store.getters['main/user'], permissions: [{ name: 'events:edit' }] });
       } else if (this.personKey === 'auxiliary') {
         can = this.$can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person._id,
-          auxiliarySectorEvent: eventInfo.person.sector._id,
           permissions: [
             { name: 'events:edit' },
             { name: 'events:own:edit', rule: 'isOwner' },

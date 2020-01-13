@@ -19,6 +19,7 @@
     <q-separator />
     <q-expansion-item ref="benef" v-model="activeRoutes.benef.open" label="Bénéficiaires">
       <ni-menu-item name="customers directory" icon="contacts" label="Répertoire bénéficiaires" />
+      <ni-menu-item name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
     </q-expansion-item>
     <template v-if="isAdmin">
       <q-separator />
@@ -26,6 +27,7 @@
         <ni-menu-item name="to bill" icon="credit_card" label="À facturer" />
         <ni-menu-item name="credit note" icon="mdi-credit-card-refund" label="Avoirs" />
         <ni-menu-item name="clients balances" icon="mdi-scale-balance" label="Balances clients" />
+        <ni-menu-item name="tpp bill slips" icon="view_headline" label="Bordereaux tiers payeurs" />
         <ni-menu-item name="debits archive" icon="mdi-archive" label="Archive prélèvements" />
       </q-expansion-item>
     </template>
@@ -60,7 +62,7 @@
 import { sideMenuMixin } from '../../mixins/sideMenuMixin';
 import MenuItem from './MenuItem.vue';
 import SideMenuFooter from './SideMenuFooter.vue';
-import { ADMIN } from '../../data/constants';
+import { ADMIN_ROLES } from '../../data/constants';
 
 export default {
   props: {
@@ -73,7 +75,7 @@ export default {
   },
   data () {
     return {
-      ADMIN,
+      ADMIN_ROLES,
       activeRoutes: {
         planning: { open: false },
         benef: { open: false },
@@ -90,7 +92,7 @@ export default {
   },
   computed: {
     isAdmin () {
-      return this.user.role.name === ADMIN;
+      return ADMIN_ROLES.includes(this.user.role.name);
     },
   },
 }

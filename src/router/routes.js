@@ -98,6 +98,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/billing/tpp-bill-slips',
+        name: 'tpp bill slips',
+        component: () => import('pages/ni/billing/TppBillSlips'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'bills:edit',
+          parent: 'billing',
+        },
+      },
+      {
         path: 'ni/billing/debits-archive',
         name: 'debits archive',
         component: () => import('pages/ni/billing/DebitsArchive'),
@@ -202,6 +212,16 @@ const routes = [
         path: 'ni/customers',
         name: 'customers directory',
         component: () => import('pages/ni/customers/CustomersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'users:edit',
+          parent: 'benef',
+        },
+      },
+      {
+        path: 'ni/customers/fundings',
+        name: 'customers fundings monitoring',
+        component: () => import('pages/ni/customers/CustomersFundingsMonitoring'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'users:edit',

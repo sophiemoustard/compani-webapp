@@ -72,7 +72,7 @@ export const planningActionMixin = {
           },
         },
         auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
-        sector: { required },
+        sector: { required: requiredIf((item) => item && !item.auxiliary) },
         customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
@@ -174,11 +174,6 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', 'company']) }
       payload = this.$_.pickBy(payload);
 
-      if (event.auxiliary) {
-        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === event.auxiliary);
-        payload.sector = auxiliary.sector._id;
-      }
-
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
         payload.startDate = this.$moment(event.dates.startDate).startOf('d').toDate();
         payload.endDate = this.$moment(event.dates.endDate).endOf('d').toDate();
@@ -196,6 +191,8 @@ export const planningActionMixin = {
           if (subscription && subscription.service) payload.status = subscription.service.type;
         }
       }
+
+      if (event.auxiliary) delete payload.sector;
 
       if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
 
@@ -334,14 +331,10 @@ export const planningActionMixin = {
         address,
         customer,
         internalHour,
+        sector,
         ...eventData
       } = this.$_.cloneDeep(event);
-      const dates = {
-        startDate,
-        endDate,
-        startHour: this.formatHour(startDate),
-        endHour: this.formatHour(endDate),
-      };
+      const dates = { startDate, endDate, startHour: this.formatHour(startDate), endHour: this.formatHour(endDate) };
 
       switch (event.type) {
         case INTERVENTION:
@@ -352,6 +345,7 @@ export const planningActionMixin = {
             shouldUpdateRepetition: false,
             ...eventData,
             dates,
+            sector: sector || auxiliary.sector._id,
             auxiliary: auxiliary ? auxiliary._id : '',
             customer: customer ? customer._id : '',
             subscription,
@@ -387,7 +381,6 @@ export const planningActionMixin = {
       if (!event.auxiliary) { // Unassigned event
         return this.$can({
           user: this.$store.getters['main/user'],
-          auxiliarySectorEvent: event.sector,
           permissions: [{ name: 'events:edit' }],
         });
       }
@@ -395,7 +388,6 @@ export const planningActionMixin = {
       return this.$can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: event.auxiliary._id,
-        auxiliarySectorEvent: event.sector,
         permissions: [
           { name: 'events:edit' },
           { name: 'events:own:edit', rule: 'isOwner' },
@@ -415,6 +407,7 @@ export const planningActionMixin = {
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
       if (event.shouldUpdateRepetition) delete payload.misc;
+      if (event.auxiliary) delete payload.sector;
 
       return this.$_.omit(payload, ['customer', 'repetition', 'staffingBeginning', 'staffingDuration', 'type']);
     },
@@ -458,13 +451,13 @@ export const planningActionMixin = {
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
-      else if (this.personKey === CUSTOMER) {
-        payload.auxiliary = draggedObject.auxiliary._id;
-        payload.sector = draggedObject.sector;
-      } else {
-        payload.auxiliary = target._id;
-        const auxiliary = this.activeAuxiliaries.find(aux => aux._id === target._id);
-        payload.sector = auxiliary.sector._id;
+      else if (this.personKey === CUSTOMER) payload.auxiliary = draggedObject.auxiliary._id;
+      else payload.auxiliary = target._id;
+
+      if (draggedObject.isCancelled) {
+        payload.isCancelled = draggedObject.isCancelled;
+        payload.cancel = draggedObject.cancel;
+        payload.misc = draggedObject.misc;
       }
 
       return payload;

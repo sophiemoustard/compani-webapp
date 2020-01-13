@@ -22,7 +22,7 @@
       <div class="col-md-6 col-xs-12 q-pa-md">
         <div class="sector-name q-mb-lg text-weight-bold">
           {{ sectorName(sector) }}
-          <q-circular-progress :value="hoursRatio(sector)" size="60px" track-color="grey-5" color="primary" show-value
+          <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5" color="primary" show-value
             :thickness="0.3">
             {{ roundFrenchPercentage(Math.round(hoursRatio(sector)) / 100, 0).replace('&nbsp;', '') }}
           </q-circular-progress>
@@ -76,6 +76,7 @@ export default {
       customerAndDuration: [],
       hoursToWork: [],
       monthModal: false,
+      firstInterventionStartDate: '',
     };
   },
   computed: {
@@ -86,10 +87,15 @@ export default {
       elementToRemove: 'planning/getElementToRemove',
     }),
     monthsOptions () {
-      return [
-        { label: 'Mois en cours', value: this.$moment().format('MMYYYY') },
-        { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MMYYYY') },
-      ];
+      if (this.firstInterventionStartDate === '') {
+        return [
+          { label: 'Mois en cours', value: this.$moment().format('MMYYYY') },
+          { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MMYYYY') },
+        ];
+      }
+      return Array.from(this.$moment().range(this.firstInterventionStartDate, this.$moment().add(1, 'M')).by('month'))
+        .sort((a, b) => b.diff(a))
+        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYYYY') }));
     },
     monthLabel () {
       const month = this.monthsOptions.find(m => m.value === this.selectedMonth);
@@ -106,6 +112,8 @@ export default {
   },
   async mounted () {
     await this.fillFilter();
+    const firstIntervention = await this.$companies.getFirstIntervention();
+    this.firstInterventionStartDate = this.$_.get(firstIntervention, 'startDate', null) || '';
     this.initFilters();
   },
   methods: {

@@ -22,11 +22,11 @@
     </div>
     <div class="quality-indicators">
       <div class="quality-indicators-item">
-        <span class="highlight">{{ details.customersCount }}</span> bénéficiaires accompagnés,
+        <span class="highlight">{{ customersDetails.customerCount }}</span> bénéficiaires accompagnés,
         <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }} en moyenne</span>
       </div>
       <div class="quality-indicators-item">
-        <span class="highlight">{{ details.paidTransportHours | formatHours }}</span> de transport rémunéré
+        <span class="highlight">{{ hoursDetails.paidTransportHours | formatHours }}</span> de transport rémunéré
       </div>
     </div>
   </div>
@@ -38,20 +38,21 @@ import { formatHours } from '../../helpers/utils';
 export default {
   name: 'AuxiliaryIndicators',
   props: {
-    details: { type: Object, default: () => ({}) },
+    hoursDetails: { type: Object, default: () => ({}) },
+    customersDetails: { type: Object, default: () => ({}) },
   },
   filters: {
     formatHours: hours => formatHours(hours),
   },
   computed: {
     averageTimeByCustomer () {
-      if (!this.details.customersCount) return 0;
-      return this.workedHours / this.details.customersCount;
+      if (!this.customersDetails.customerCount) return 0;
+      return (this.customersDetails.duration) / this.customersDetails.customerCount;
     },
     hoursToWork () {
-      return this.details.diff && this.details.diff.absencesHours
-        ? this.details.hoursToWork - this.details.diff.absencesHours
-        : this.details.hoursToWork;
+      return this.hoursDetails.diff && this.hoursDetails.diff.absencesHours
+        ? this.hoursDetails.hoursToWork - this.hoursDetails.diff.absencesHours
+        : this.hoursDetails.hoursToWork;
     },
     absencesHours () {
       return this.getHoursWithDiff('absencesHours');
@@ -64,19 +65,19 @@ export default {
     },
     workedHoursDetail () {
       let detail = '';
-      if (this.details.internalHours) detail += ` ${formatHours(this.details.internalHours)} internes`;
-      if (this.details.diff && this.details.diff.workedHours) {
+      if (this.hoursDetails.internalHours) detail += ` ${formatHours(this.hoursDetails.internalHours)} internes`;
+      if (this.hoursDetails.diff && this.hoursDetails.diff.workedHours) {
         if (detail !== '') detail += ' et'
-        detail += ` ${formatHours(this.details.diff.workedHours)} de rattrapage`;
+        detail += ` ${formatHours(this.hoursDetails.diff.workedHours)} de rattrapage`;
       }
 
       return detail !== '' ? 'dont ' + detail : detail;
     },
     contractHoursDetail () {
-      if (!this.details.holidaysHours && !this.absencesHours) return '';
+      if (!this.hoursDetails.holidaysHours && !this.absencesHours) return '';
 
-      let detail = formatHours(this.details.contractHours);
-      if (this.details.holidaysHours) detail += ` - ${formatHours(this.details.holidaysHours)} (fériés)`;
+      let detail = formatHours(this.hoursDetails.contractHours);
+      if (this.hoursDetails.holidaysHours) detail += ` - ${formatHours(this.hoursDetails.holidaysHours)} (fériés)`;
       if (this.absencesHours) detail += ` - ${formatHours(this.absencesHours)} (absences)`;
 
       return detail;
@@ -84,9 +85,9 @@ export default {
   },
   methods: {
     getHoursWithDiff (key) {
-      return this.details.diff && this.details.diff[key]
-        ? this.details.diff[key] + this.details[key]
-        : this.details[key];
+      return this.hoursDetails.diff && this.hoursDetails.diff[key]
+        ? this.hoursDetails.diff[key] + this.hoursDetails[key]
+        : this.hoursDetails[key];
     },
   },
 }
