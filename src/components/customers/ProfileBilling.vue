@@ -29,7 +29,25 @@
     </div>
     <div class="q-pa-sm q-mb-lg">
       <p class="text-weight-bold">Attestations fiscales</p>
-      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" />
+      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns">
+        <template v-slot:body="{ props }" >
+        <q-tr :props="props">
+          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'actions'">
+                <div  class="row justify-center table-actions">
+                  <q-btn flat round small color="primary">
+                    <a :href="taxCertificatesUrl(props.row)" target="_blank">
+                      <q-icon name="file_download" />
+                    </a>
+                  </q-btn>
+                </div>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </template>
+      </ni-simple-table>
     </div>
 
     <!-- Payment creation modal -->
@@ -197,6 +215,12 @@ export default {
           if (doc.nature === REFUND) return -doc.netInclTaxes;
           return doc.netInclTaxes;
       }
+    },
+    // Tax certificates
+    taxCertificatesUrl (certificate) {
+      return this.$_.get(certificate, 'driveFile.link')
+        ? certificate.driveFile.link
+        : this.$taxCertificates.getPDFUrl(certificate._id);
     },
     // Refresh data
     async getTaxCertificates () {
