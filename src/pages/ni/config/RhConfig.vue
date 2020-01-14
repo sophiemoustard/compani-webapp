@@ -83,7 +83,7 @@
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
-              v-model="company.apeCode" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
+              v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
           </div>
         </div>
       </div>
@@ -189,9 +189,9 @@
 </template>
 
 <script>
-import { required, maxValue, maxLength, minLength } from 'vuelidate/lib/validators';
+import { required, maxValue } from 'vuelidate/lib/validators';
 
-import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
+import { posDecimals, sector, apeCode } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
@@ -282,7 +282,7 @@ export default {
   validations () {
     return {
       company: {
-        apeCode: { maxLength: maxLength(5), minLength: minLength(4), required },
+        apeCode: { required, apeCode },
         rhConfig: {
           contractWithCompany: {
             grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) },

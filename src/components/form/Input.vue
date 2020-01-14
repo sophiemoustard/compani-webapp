@@ -21,7 +21,7 @@
     <template v-else>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
-        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup:enter')" :error-message="errorLabel"
+        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup:enter')" :error-message="errorLabel" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
         :class="{ 'borders': inModal }">
         <template v-if="icon" v-slot:prepend>
@@ -62,6 +62,7 @@ export default {
     debounce: { type: Number, default: undefined },
     placeholder: { type: String, default: '' },
     icon: { type: String, default: '' },
+    mask: { type: String, default: '' },
   },
   data () {
     return {
