@@ -51,6 +51,23 @@
         </div>
       </div>
       <div class="col-md-6 col-xs-12"></div>
+      <div class="col-md-12 col-xs-12">
+        <q-card-actions align="right">
+          <template>
+            <q-btn v-if="!auxiliariesDetailsIsOpened[sector]" flat no-caps color="primary" icon="expand_more"
+              label="Voir le détail par auxiliaire" @click="openAuxiliariesDetails(sector)" />
+            <q-btn v-else flat no-caps color="primary" icon="expand_less"
+              label="Voir le détail par auxiliaire" @click="openAuxiliariesDetails(sector)" />
+          </template>
+        </q-card-actions>
+      </div>
+      <q-slide-transition>
+        <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
+          <div v-for="auxiliary in auxiliariesBySector[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+            {{ auxiliary.identity.firstname }} {{ auxiliary.identity.lastname }}
+          </div>
+        </span>
+      </q-slide-transition>
     </q-card>
   </q-page>
 </template>
@@ -77,6 +94,8 @@ export default {
       hoursToWork: [],
       monthModal: false,
       firstInterventionStartDate: '',
+      auxiliariesBySector: {},
+      auxiliariesDetailsIsOpened: {},
     };
   },
   computed: {
@@ -108,6 +127,19 @@ export default {
     },
     elementToRemove (val) {
       this.removeElementFromFilter(val);
+    },
+    auxiliariesDetailsIsOpened: {
+      deep: true,
+      immediate: true,
+      async handler (sectors) {
+        for (const sector in sectors) {
+          if (this.auxiliariesBySector[sector]) continue;
+          const auxiliariesBySectorArray = await this.$users.listFromSector({ sector, month: this.selectedMonth });
+          for (const auxiliariesBySector of auxiliariesBySectorArray) {
+            this.$set(this.auxiliariesBySector, auxiliariesBySector._id, auxiliariesBySector.auxiliaries);
+          }
+        }
+      },
     },
   },
   async mounted () {
@@ -153,6 +185,13 @@ export default {
 
       return customerAndDuration.duration / customerAndDuration.customerCount;
     },
+    async openAuxiliariesDetails (sectorId) {
+      if (this.auxiliariesDetailsIsOpened[sectorId]) {
+        this.$set(this.auxiliariesDetailsIsOpened, sectorId, false);
+        return;
+      }
+      this.$set(this.auxiliariesDetailsIsOpened, sectorId, true);
+    },
     hoursRatio (sector) {
       return (this.getCustomersAndDuration(sector).duration / this.getHoursToWork(sector)) * 100 || 0;
     },
@@ -165,6 +204,9 @@ export default {
           this.$stats.getCustomersAndDuration(params),
           this.$pay.getHoursToWork(params),
         ]);
+        for (const sector of this.filteredSectors) {
+          if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) this.$set(this.auxiliariesDetailsIsOpened, sector, false);
+        }
         this.customerAndDuration = customerAndDuration;
         this.hoursToWork = hoursToWork;
       } catch (e) {
@@ -174,12 +216,12 @@ export default {
       }
     },
     // Filter
-    async addElementToFilter (el) {
-      this.filteredSectors.push(el._id);
+    async addElementToFilter (sector) {
+      this.filteredSectors.push(sector._id);
       await this.refresh();
     },
-    async removeElementFromFilter (el) {
-      this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
+    async removeElementFromFilter (sector) {
+      this.filteredSectors = this.filteredSectors.filter(sec => sec !== sector._id);
     },
   },
 }

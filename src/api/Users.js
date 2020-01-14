@@ -18,6 +18,14 @@ export default {
       console.error(e.response);
     }
   },
+  async listFromSector (params = null) {
+    try {
+      const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/from-sector`, { params });
+      return usersRaw.data.data.sectors;
+    } catch (e) {
+      console.error(e.response);
+    }
+  },
   async listActive (params = null) {
     try {
       const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/active`, { params });
