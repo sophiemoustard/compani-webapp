@@ -70,7 +70,8 @@ export default {
       selectedTab: MONTH_STATS,
       monthHoursDetails: {},
       prevMonthHoursDetails: {},
-      customersDetails: {},
+      monthCustomersDetails: {},
+      prevMonthCustomersDetails: {},
     };
   },
   computed: {
@@ -92,6 +93,9 @@ export default {
     },
     hoursDetails () {
       return this.selectedTab === MONTH_STATS ? this.monthHoursDetails : this.prevMonthHoursDetails;
+    },
+    customersDetails () {
+      return this.selectedTab === MONTH_STATS ? this.monthCustomersDetails : this.prevMonthCustomersDetails;
     },
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
@@ -126,8 +130,8 @@ export default {
       const month = this.$moment(this.startOfWeek).format('MM-YYYY');
       try {
         this.monthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
-        const customersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
-        this.customersDetails = customersDetails[0];
+        const monthCustomersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        this.monthCustomersDetails = monthCustomersDetails[0];
       } catch (e) {
         console.error(e);
         this.monthHoursDetails = {};
@@ -137,8 +141,8 @@ export default {
       const month = this.$moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
       try {
         this.prevMonthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
-        const customersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
-        this.customersDetails = customersDetails[0];
+        const prevMonthCustomersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        this.prevMonthCustomersDetails = prevMonthCustomersDetails[0];
       } catch (e) {
         console.error(e);
         this.prevMonthHoursDetails = {};
