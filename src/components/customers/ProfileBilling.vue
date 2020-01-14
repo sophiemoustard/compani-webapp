@@ -27,6 +27,10 @@
           @click="openPaymentCreationModal(customer, tpp.documents[0].client)"/>
       </div>
     </div>
+    <div class="q-pa-sm q-mb-lg">
+      <p class="text-weight-bold">Attestations fiscales</p>
+      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" />
+    </div>
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
@@ -60,6 +64,7 @@ import CustomerBillingTable from '../../components/customers/CustomerBillingTabl
 import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
 import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
 import DateRange from '../../components/form/DateRange';
+import SimpleTable from '../../components/table/SimpleTable';
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
 import { formatIdentity } from '../../helpers/utils';
@@ -71,6 +76,7 @@ export default {
     'ni-date-range': DateRange,
     'ni-payment-creation-modal': PaymentCreationModal,
     'ni-payment-edition-modal': PaymentEditionModal,
+    'ni-simple-table': SimpleTable,
   },
   mixins: [paymentMixin],
   data () {
@@ -89,6 +95,20 @@ export default {
       THIRD_PARTY_PAYER,
       editedPayment: {},
       HELPER,
+      taxCertificates: [],
+      taxCertificatesColumns: [
+        {
+          name: 'year',
+          field: 'year',
+          align: 'left',
+          label: 'Attestation',
+        },
+        {
+          name: 'actions',
+          field: '_id',
+          align: 'center',
+        },
+      ],
     }
   },
   computed: {
@@ -115,6 +135,7 @@ export default {
   async mounted () {
     this.setBillingDates();
     await this.refresh();
+    await this.getTaxCertificates();
   },
   validations: {
     editedPayment: {
@@ -178,6 +199,14 @@ export default {
       }
     },
     // Refresh data
+    async getTaxCertificates () {
+      try {
+        this.taxCertificates = await this.$taxCertificates.list({ customer: this.customer._id });
+      } catch (e) {
+        console.error(e);
+        this.taxCertificates = [];
+      }
+    },
     async refresh () {
       this.tableLoading = true;
       await this.getCustomerBalanceWithDetails();
