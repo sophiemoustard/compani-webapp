@@ -130,7 +130,7 @@ export default {
       const month = this.$moment(this.startOfWeek).format('MM-YYYY');
       try {
         this.monthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
-        const monthCustomersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        const monthCustomersDetails = await this.$stats.getCustomersAndDurationByAuxiliary({ auxiliary: this.person._id, month });
         this.monthCustomersDetails = monthCustomersDetails[0];
       } catch (e) {
         console.error(e);
@@ -141,7 +141,7 @@ export default {
       const month = this.$moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
       try {
         this.prevMonthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
-        const prevMonthCustomersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        const prevMonthCustomersDetails = await this.$stats.getCustomersAndDurationByAuxiliary({ auxiliary: this.person._id, month });
         this.prevMonthCustomersDetails = prevMonthCustomersDetails[0];
       } catch (e) {
         console.error(e);
