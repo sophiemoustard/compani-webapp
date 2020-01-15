@@ -14,6 +14,7 @@
     <q-separator />
     <q-expansion-item ref="benef" v-model="activeRoutes.benef.open" label="Bénéficiaires">
       <ni-menu-item name="profile customers" :params="{ id: user._id }" icon="account_box" label="Fiches" />
+      <ni-menu-item name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="administrative" v-model="activeRoutes.administrative.open" label="Administratif">
