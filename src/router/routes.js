@@ -214,7 +214,7 @@ const routes = [
         component: () => import('pages/ni/customers/CustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'customers:edit',
+          permissions: 'customers:create',
           parent: 'benef',
         },
       },
@@ -224,7 +224,7 @@ const routes = [
         component: () => import('pages/ni/customers/CustomersFundingsMonitoring'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'customers:edit',
+          permissions: 'customers:read',
           parent: 'benef',
         },
       },
@@ -296,7 +296,7 @@ const routes = [
         component: () => import('pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          permissions: 'customers:edit',
+          permissions: 'customers:read',
           parent: 'benef',
         },
       },
