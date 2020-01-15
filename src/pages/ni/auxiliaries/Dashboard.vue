@@ -63,7 +63,7 @@
       </div>
       <q-slide-transition>
         <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
-          <div v-for="auxiliary in auxiliariesBySector[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+          <div v-for="auxiliary in statsAuxiliariesBySector[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
             {{ auxiliary }}
           </div>
         </span>
@@ -94,7 +94,7 @@ export default {
       hoursToWork: [],
       monthModal: false,
       firstInterventionStartDate: '',
-      auxiliariesBySector: {},
+      statsAuxiliariesBySector: {},
       auxiliariesDetailsIsOpened: {},
     };
   },
@@ -132,13 +132,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (sectors) {
-        for (const sector in sectors) {
-          if (this.auxiliariesBySector[sector]) continue;
-          const auxiliariesBySectorArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector, month: this.selectedMonth });
-          for (const auxiliariesBySector of auxiliariesBySectorArray) {
-            this.$set(this.auxiliariesBySector, auxiliariesBySector._id, auxiliariesBySector.auxiliaries);
-          }
-        }
+        await this.getStatsAuxiliariesBySector(sectors);
       },
     },
   },
@@ -163,11 +157,22 @@ export default {
     async selectMonth (month) {
       this.selectedMonth = month;
       this.monthModal = false;
+      this.statsAuxiliariesBySector = {};
       await this.refresh();
     },
     sectorName (sectorId) {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
+    },
+    async getStatsAuxiliariesBySector (sectors) {
+      for (let i = 0; i < sectors.length; i++) {
+        const sector = sectors[i];
+        if (this.statsAuxiliariesBySector[sector]) continue;
+        const statsAuxiliariesBySectorArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector, month: this.selectedMonth });
+        for (const statsAuxiliariesBySector of statsAuxiliariesBySectorArray) {
+          this.$set(this.statsAuxiliariesBySector, statsAuxiliariesBySector._id, statsAuxiliariesBySector.auxiliaries);
+        }
+      }
     },
     getCustomersAndDurationBySector (sectorId) {
       const customerAndDuration = this.customerAndDuration.find(el => el.sector === sectorId);
@@ -209,6 +214,7 @@ export default {
         }
         this.customerAndDuration = customerAndDuration;
         this.hoursToWork = hoursToWork;
+        await this.getStatsAuxiliariesBySector(this.filteredSectors);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
