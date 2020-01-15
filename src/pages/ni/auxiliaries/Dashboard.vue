@@ -130,7 +130,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (sectors) {
-        await this.getcustomersAndDurationByAuxiliary(sectors);
+        await this.getcustomersAndDurationByAuxiliary();
       },
     },
   },
@@ -165,14 +165,16 @@ export default {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    async getcustomersAndDurationByAuxiliary (sectors) {
-      for (let i = 0; i < sectors.length; i++) {
-        const sector = sectors[i];
-        if (this.customersAndDurationByAuxiliary[sector]) continue;
-        const customersAndDurationByAuxiliaryArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector, month: this.selectedMonth });
-        for (const customersAndDurationByAuxiliary of customersAndDurationByAuxiliaryArray) {
-          this.$set(this.customersAndDurationByAuxiliary, customersAndDurationByAuxiliary.sector, customersAndDurationByAuxiliary.customersAndDuration);
-        }
+    async getcustomersAndDurationByAuxiliary () {
+      const sectors = [];
+      for (const sector of this.filteredSectors) {
+        if (this.customersAndDurationByAuxiliary[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
+        sectors.push(sector);
+      }
+      if (!sectors.length) return;
+      const customersAndDurationByAuxiliaryArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector: sectors, month: this.selectedMonth });
+      for (const customersAndDurationByAuxiliary of customersAndDurationByAuxiliaryArray) {
+        this.$set(this.customersAndDurationByAuxiliary, customersAndDurationByAuxiliary.sector, customersAndDurationByAuxiliary.customersAndDuration);
       }
     },
     getCustomersAndDurationBySector (sectorId) {
@@ -191,7 +193,7 @@ export default {
 
       return customersAndDuration.duration / customersAndDuration.customerCount;
     },
-    async openAuxiliariesDetails (sectorId) {
+    openAuxiliariesDetails (sectorId) {
       if (this.auxiliariesDetailsIsOpened[sectorId]) {
         this.$set(this.auxiliariesDetailsIsOpened, sectorId, false);
         return;
@@ -215,7 +217,7 @@ export default {
         }
         this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
-        await this.getcustomersAndDurationByAuxiliary(this.filteredSectors);
+        await this.getcustomersAndDurationByAuxiliary();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
