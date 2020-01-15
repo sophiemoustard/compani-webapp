@@ -73,3 +73,5 @@ export const validHour = (value) => {
 export const minDate = (min) => {
   return (value) => moment(min).isSameOrBefore(value);
 };
+
+export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);

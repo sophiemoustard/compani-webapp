@@ -79,6 +79,15 @@
         </div>
       </div>
       <div class="q-mb-xl">
+        <p class="text-weight-bold">Paie</p>
+        <div class="row gutter-profile">
+          <div class="col-xs-12 col-md-6">
+            <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
+              v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
+          </div>
+        </div>
+      </div>
+      <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
@@ -119,7 +128,8 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
+                      <q-btn flat round small color="grey" icon="edit"
+                        @click.native="openEditionModal(col.value._id)" />
                       <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
                         @click="validateSectorDeletion(col.value._id, props.row)" />
                     </div>
@@ -181,7 +191,7 @@
 <script>
 import { required, maxValue } from 'vuelidate/lib/validators';
 
-import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
+import { posDecimals, sector, apeCode } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
@@ -272,6 +282,7 @@ export default {
   validations () {
     return {
       company: {
+        apeCode: { required, apeCode },
         rhConfig: {
           contractWithCompany: {
             grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) },
