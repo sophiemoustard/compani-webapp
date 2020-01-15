@@ -54,16 +54,14 @@
       <div class="col-md-12 col-xs-12">
         <q-card-actions align="right">
           <template>
-            <q-btn v-if="!auxiliariesDetailsIsOpened[sector]" flat no-caps color="primary" icon="expand_more"
-              label="Voir le détail par auxiliaire" @click="openAuxiliariesDetails(sector)" />
-            <q-btn v-else flat no-caps color="primary" icon="expand_less"
-              label="Voir le détail par auxiliaire" @click="openAuxiliariesDetails(sector)" />
+            <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
+              @click="openAuxiliariesDetails(sector)" />
           </template>
         </q-card-actions>
       </div>
       <q-slide-transition>
         <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
-          <div v-for="auxiliary in statsAuxiliariesBySector[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+          <div v-for="auxiliary in customersAndDurationByAuxiliary[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
             {{ auxiliary }}
           </div>
         </span>
@@ -90,11 +88,11 @@ export default {
       selectedMonth: this.$moment().format('MMYYYY'),
       terms: [],
       filteredSectors: [],
-      customerAndDuration: [],
+      customersAndDuration: [],
       hoursToWork: [],
       monthModal: false,
       firstInterventionStartDate: '',
-      statsAuxiliariesBySector: {},
+      customersAndDurationByAuxiliary: {},
       auxiliariesDetailsIsOpened: {},
     };
   },
@@ -132,7 +130,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (sectors) {
-        await this.getStatsAuxiliariesBySector(sectors);
+        await this.getcustomersAndDurationByAuxiliary(sectors);
       },
     },
   },
@@ -157,26 +155,29 @@ export default {
     async selectMonth (month) {
       this.selectedMonth = month;
       this.monthModal = false;
-      this.statsAuxiliariesBySector = {};
+      this.customersAndDurationByAuxiliary = {};
       await this.refresh();
+    },
+    getIcon (sector) {
+      return this.auxiliariesDetailsIsOpened[sector] ? 'expand_less' : 'expand_more';
     },
     sectorName (sectorId) {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    async getStatsAuxiliariesBySector (sectors) {
+    async getcustomersAndDurationByAuxiliary (sectors) {
       for (let i = 0; i < sectors.length; i++) {
         const sector = sectors[i];
-        if (this.statsAuxiliariesBySector[sector]) continue;
-        const statsAuxiliariesBySectorArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector, month: this.selectedMonth });
-        for (const statsAuxiliariesBySector of statsAuxiliariesBySectorArray) {
-          this.$set(this.statsAuxiliariesBySector, statsAuxiliariesBySector._id, statsAuxiliariesBySector.auxiliaries);
+        if (this.customersAndDurationByAuxiliary[sector]) continue;
+        const customersAndDurationByAuxiliaryArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector, month: this.selectedMonth });
+        for (const customersAndDurationByAuxiliary of customersAndDurationByAuxiliaryArray) {
+          this.$set(this.customersAndDurationByAuxiliary, customersAndDurationByAuxiliary.sector, customersAndDurationByAuxiliary.customersAndDuration);
         }
       }
     },
     getCustomersAndDurationBySector (sectorId) {
-      const customerAndDuration = this.customerAndDuration.find(el => el.sector === sectorId);
-      return customerAndDuration || { customerCount: 0, duration: 0 };
+      const customersAndDuration = this.customersAndDuration.find(el => el.sector === sectorId);
+      return customersAndDuration || { customerCount: 0, duration: 0 };
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
@@ -185,10 +186,10 @@ export default {
       return hoursToWork.hoursToWork || 0;
     },
     getHoursByCustomer (sector) {
-      const customerAndDuration = this.getCustomersAndDurationBySector(sector);
-      if (!customerAndDuration) return 0;
+      const customersAndDuration = this.getCustomersAndDurationBySector(sector);
+      if (!customersAndDuration) return 0;
 
-      return customerAndDuration.duration / customerAndDuration.customerCount;
+      return customersAndDuration.duration / customersAndDuration.customerCount;
     },
     async openAuxiliariesDetails (sectorId) {
       if (this.auxiliariesDetailsIsOpened[sectorId]) {
@@ -205,20 +206,20 @@ export default {
         if (this.filteredSectors.length === 0) return;
 
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
-        const [customerAndDuration, hoursToWork] = await Promise.all([
+        const [customersAndDuration, hoursToWork] = await Promise.all([
           this.$stats.getCustomersAndDurationBySector(params),
           this.$pay.getHoursToWork(params),
         ]);
         for (const sector of this.filteredSectors) {
           if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) this.$set(this.auxiliariesDetailsIsOpened, sector, false);
         }
-        this.customerAndDuration = customerAndDuration;
+        this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
-        await this.getStatsAuxiliariesBySector(this.filteredSectors);
+        await this.getcustomersAndDurationByAuxiliary(this.filteredSectors);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
-        this.customerAndDuration = [];
+        this.customersAndDuration = [];
         this.hoursToWork = [];
       }
     },
