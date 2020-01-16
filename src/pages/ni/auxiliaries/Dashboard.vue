@@ -22,28 +22,16 @@
       <div class="col-md-6 col-xs-12 q-pa-md">
         <div class="sector-name q-mb-lg text-weight-bold">
           {{ sectorName(sector) }}
-          <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5" color="primary" show-value
-            :thickness="0.3">
+          <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
+            color="primary" show-value :thickness="0.3">
             {{ roundFrenchPercentage(Math.round(hoursRatio(sector)) / 100, 0).replace('&nbsp;', '') }}
           </q-circular-progress>
         </div>
         <div class="q-mb-md">
           <div class="row stats-row">
-            <div class="col-8 stats-row-title"># bénéficiaires</div>
-            <div class="col-4 stats-row-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
+            <div class="col-8 stats-row-title">Heures facturées</div>
+            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getBilledHours(sector)), 0) }}</div>
           </div>
-          <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures / bénéficiaire</div>
-            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getHoursByCustomer(sector)), 0) }}</div>
-          </div>
-          <div class="row stats-row">
-            <div class="col-8 stats-row-title text-weight-bold">Heures facturées</div>
-            <div class="col-4 stats-row-value text-weight-bold">
-              {{ formatHours(Math.round(getCustomersAndDurationBySector(sector).duration), 0) }}
-            </div>
-          </div>
-        </div>
-        <div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures à travailler</div>
             <div class="col-4 stats-row-value">{{ formatHours(Math.round(getHoursToWork(sector)), 0) }}</div>
@@ -61,7 +49,8 @@
       </div>
       <q-slide-transition>
         <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
-          <div v-for="auxiliary in customersAndDurationByAuxiliary[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+          <div v-for="auxiliary in customersAndDurationByAuxiliary[sector]" :key="auxiliary._id"
+            class="col-md-6 col-xs-12">
             {{ auxiliary }}
           </div>
         </span>
@@ -89,6 +78,7 @@ export default {
       terms: [],
       filteredSectors: [],
       customersAndDuration: [],
+      internalAndBilledHours: [],
       hoursToWork: [],
       monthModal: false,
       firstInterventionStartDate: '',
@@ -181,6 +171,10 @@ export default {
       const customersAndDuration = this.customersAndDuration.find(el => el.sector === sectorId);
       return customersAndDuration || { customerCount: 0, duration: 0 };
     },
+    getBilledHours (sectorId) {
+      const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
+      return billedHours ? billedHours.interventions : 0;
+    },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
       if (!hoursToWork) return 0;
@@ -208,13 +202,17 @@ export default {
         if (this.filteredSectors.length === 0) return;
 
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
-        const [customersAndDuration, hoursToWork] = await Promise.all([
+        const [customersAndDuration, internalAndBilledHours, hoursToWork] = await Promise.all([
           this.$stats.getCustomersAndDurationBySector(params),
+          this.$stats.getInternalAndBilledHours(params),
           this.$pay.getHoursToWork(params),
         ]);
         for (const sector of this.filteredSectors) {
-          if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) this.$set(this.auxiliariesDetailsIsOpened, sector, false);
+          if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) {
+            this.$set(this.auxiliariesDetailsIsOpened, sector, false);
+          }
         }
+        this.internalAndBilledHours = internalAndBilledHours;
         this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
         await this.getcustomersAndDurationByAuxiliary();
