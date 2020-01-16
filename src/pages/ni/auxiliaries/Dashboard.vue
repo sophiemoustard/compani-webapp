@@ -37,6 +37,9 @@
             <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
         </div>
+        <div class="q-mb-md">
+          <div>{{ getInternalHoursRatio(sector) }}%</div>
+        </div>
       </div>
       <div class="col-md-6 col-xs-12 customer-stats">
         <div class="row items-center justify-center">
@@ -189,6 +192,12 @@ export default {
     getBilledHours (sectorId) {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
       return billedHours ? billedHours.interventions : 0;
+    },
+    getInternalHoursRatio (sectorId) {
+      const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
+      const internalHours = billedHours ? billedHours.internalHours : 0;
+
+      return (internalHours / this.getHoursToWork(sectorId)) * 100 || 0
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
