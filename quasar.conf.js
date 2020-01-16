@@ -88,6 +88,7 @@ module.exports = function (ctx) {
         'QPopupProxy',
         'QSelect',
         'QSeparator',
+        'QSlideTransition',
         'QSpinner',
         'QSpinnerDots',
         'QTabs',

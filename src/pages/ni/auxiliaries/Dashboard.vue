@@ -30,7 +30,7 @@
         <div class="q-mb-md">
           <div class="row stats-row">
             <div class="col-8 stats-row-title"># bénéficiaires</div>
-            <div class="col-4 stats-row-value">{{ getCustomersAndDuration(sector).customerCount }}</div>
+            <div class="col-4 stats-row-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
           </div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures / bénéficiaire</div>
@@ -39,7 +39,7 @@
           <div class="row stats-row">
             <div class="col-8 stats-row-title text-weight-bold">Heures facturées</div>
             <div class="col-4 stats-row-value text-weight-bold">
-              {{ formatHours(Math.round(getCustomersAndDuration(sector).duration), 0) }}
+              {{ formatHours(Math.round(getCustomersAndDurationBySector(sector).duration), 0) }}
             </div>
           </div>
         </div>
@@ -51,6 +51,21 @@
         </div>
       </div>
       <div class="col-md-6 col-xs-12"></div>
+      <div class="col-md-12 col-xs-12">
+        <q-card-actions align="right">
+          <template>
+            <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
+              @click="openAuxiliariesDetails(sector)" />
+          </template>
+        </q-card-actions>
+      </div>
+      <q-slide-transition>
+        <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
+          <div v-for="auxiliary in customersAndDurationByAuxiliary[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+            {{ auxiliary }}
+          </div>
+        </span>
+      </q-slide-transition>
     </q-card>
   </q-page>
 </template>
@@ -73,10 +88,12 @@ export default {
       selectedMonth: this.$moment().format('MMYYYY'),
       terms: [],
       filteredSectors: [],
-      customerAndDuration: [],
+      customersAndDuration: [],
       hoursToWork: [],
       monthModal: false,
       firstInterventionStartDate: '',
+      customersAndDurationByAuxiliary: {},
+      auxiliariesDetailsIsOpened: {},
     };
   },
   computed: {
@@ -109,6 +126,13 @@ export default {
     elementToRemove (val) {
       this.removeElementFromFilter(val);
     },
+    auxiliariesDetailsIsOpened: {
+      deep: true,
+      immediate: true,
+      async handler (sectors) {
+        await this.getcustomersAndDurationByAuxiliary();
+      },
+    },
   },
   async mounted () {
     await this.fillFilter();
@@ -131,15 +155,31 @@ export default {
     async selectMonth (month) {
       this.selectedMonth = month;
       this.monthModal = false;
+      this.customersAndDurationByAuxiliary = {};
       await this.refresh();
+    },
+    getIcon (sector) {
+      return this.auxiliariesDetailsIsOpened[sector] ? 'expand_less' : 'expand_more';
     },
     sectorName (sectorId) {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    getCustomersAndDuration (sectorId) {
-      const customerAndDuration = this.customerAndDuration.find(el => el.sector === sectorId);
-      return customerAndDuration || { customerCount: 0, duration: 0 };
+    async getcustomersAndDurationByAuxiliary () {
+      const sectors = [];
+      for (const sector of this.filteredSectors) {
+        if (this.customersAndDurationByAuxiliary[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
+        sectors.push(sector);
+      }
+      if (!sectors.length) return;
+      const customersAndDurationByAuxiliaryArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector: sectors, month: this.selectedMonth });
+      for (const customersAndDurationByAuxiliary of customersAndDurationByAuxiliaryArray) {
+        this.$set(this.customersAndDurationByAuxiliary, customersAndDurationByAuxiliary.sector, customersAndDurationByAuxiliary.customersAndDuration);
+      }
+    },
+    getCustomersAndDurationBySector (sectorId) {
+      const customersAndDuration = this.customersAndDuration.find(el => el.sector === sectorId);
+      return customersAndDuration || { customerCount: 0, duration: 0 };
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
@@ -148,38 +188,50 @@ export default {
       return hoursToWork.hoursToWork || 0;
     },
     getHoursByCustomer (sector) {
-      const customerAndDuration = this.getCustomersAndDuration(sector);
-      if (!customerAndDuration) return 0;
+      const customersAndDuration = this.getCustomersAndDurationBySector(sector);
+      if (!customersAndDuration) return 0;
 
-      return customerAndDuration.duration / customerAndDuration.customerCount;
+      return customersAndDuration.duration / customersAndDuration.customerCount;
+    },
+    openAuxiliariesDetails (sectorId) {
+      if (this.auxiliariesDetailsIsOpened[sectorId]) {
+        this.$set(this.auxiliariesDetailsIsOpened, sectorId, false);
+        return;
+      }
+      this.$set(this.auxiliariesDetailsIsOpened, sectorId, true);
     },
     hoursRatio (sector) {
-      return (this.getCustomersAndDuration(sector).duration / this.getHoursToWork(sector)) * 100 || 0;
+      return (this.getCustomersAndDurationBySector(sector).duration / this.getHoursToWork(sector)) * 100 || 0;
     },
     async refresh () {
       try {
         if (this.filteredSectors.length === 0) return;
 
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
-        const [customerAndDuration, hoursToWork] = await Promise.all([
-          this.$stats.getCustomersAndDuration(params),
+        const [customersAndDuration, hoursToWork] = await Promise.all([
+          this.$stats.getCustomersAndDurationBySector(params),
           this.$pay.getHoursToWork(params),
         ]);
-        this.customerAndDuration = customerAndDuration;
+        for (const sector of this.filteredSectors) {
+          if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) this.$set(this.auxiliariesDetailsIsOpened, sector, false);
+        }
+        this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
+        await this.getcustomersAndDurationByAuxiliary();
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
-        this.customerAndDuration = [];
+        this.customersAndDuration = [];
         this.hoursToWork = [];
       }
     },
     // Filter
-    async addElementToFilter (el) {
-      this.filteredSectors.push(el._id);
+    async addElementToFilter (sector) {
+      this.filteredSectors.push(sector._id);
       await this.refresh();
     },
-    async removeElementFromFilter (el) {
-      this.filteredSectors = this.filteredSectors.filter(sec => sec !== el._id);
+    async removeElementFromFilter (sector) {
+      this.filteredSectors = this.filteredSectors.filter(sec => sec !== sector._id);
     },
   },
 }

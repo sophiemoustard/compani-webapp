@@ -13,8 +13,12 @@ export default {
     const fundingsMonitoring = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/all-customers-fundings-monitoring`, { params });
     return fundingsMonitoring.data.data.allCustomersFundingsMonitoring;
   },
-  async getCustomersAndDuration (params = null) {
-    const customerAndDuration = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-duration`, { params });
-    return customerAndDuration.data.data.customerAndDuration;
+  async getCustomersAndDurationByAuxiliary (params = null) {
+    const customersAndDuration = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-duration/auxiliary`, { params });
+    return customersAndDuration.data.data.customersAndDuration;
+  },
+  async getCustomersAndDurationBySector (params = null) {
+    const customersAndDuration = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-duration/sector`, { params });
+    return customersAndDuration.data.data.customersAndDuration;
   },
 }
