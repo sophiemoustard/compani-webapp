@@ -30,15 +30,30 @@
         <div class="q-mb-md">
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures facturées</div>
-            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getBilledHours(sector)), 0) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
           </div>
           <div class="row stats-row">
             <div class="col-8 stats-row-title">Heures à travailler</div>
-            <div class="col-4 stats-row-value">{{ formatHours(Math.round(getHoursToWork(sector)), 0) }}</div>
+            <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
         </div>
       </div>
-      <div class="col-md-6 col-xs-12"></div>
+      <div class="col-md-6 col-xs-12 customer-stats">
+        <div class="row items-center justify-center">
+          <div class="col-4 customer-stats-item">
+            <div class="customer-stats-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
+            <div class="customer-stats-label">Bénéficiaires accompagnés</div>
+          </div>
+          <div class="col-4 customer-stats-item">
+            <div class="customer-stats-value">{{ Math.round(getCustomersAndDurationBySector(sector).duration) }}</div>
+            <div class="customer-stats-label">Heures par bénéficiaire</div>
+          </div>
+          <div class="col-4 customer-stats-item">
+            <div class="customer-stats-value">0</div>
+            <div class="customer-stats-label">Auxiliaires par bénéficiaires</div>
+          </div>
+        </div>
+      </div>
       <div class="col-md-12 col-xs-12">
         <q-card-actions align="right">
           <template>
@@ -268,4 +283,24 @@ export default {
 /deep/ .q-circular-progress__text
   font-size: 15px
   color: black
+
+.customer-stats
+  display: flex
+  align-items: center
+  justify-content: center;
+  &-item
+    display: flex
+    align-items: center
+    flex-direction column
+    &:first-child
+      color: $primary
+    &:nth-child(2)
+      color: $grey
+    &:nth-child(3)
+      color: $primary-dark
+  &-value
+    font-size: 48px
+  &-label
+    padding: 0 10px
+    text-align: center
 </style>

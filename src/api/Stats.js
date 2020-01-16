@@ -22,7 +22,7 @@ export default {
     return stats.data.data.customersAndDuration;
   },
   async getInternalAndBilledHours (params = null) {
-    const stats = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/billed-internal-hours`, { params });
+    const stats = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/internal-billed-hours`, { params });
     return stats.data.data.internalAndBilledHours;
   },
 }
