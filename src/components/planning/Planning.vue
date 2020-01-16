@@ -186,7 +186,7 @@ export default {
       return this.mainUser.role.name === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
-      return this.$_.groupBy(this.persons, 'sector._id');
+      return this.$_.groupBy(this.persons, 'sector');
     },
   },
   methods: {
