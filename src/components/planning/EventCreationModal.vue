@@ -38,7 +38,7 @@
             <ni-file-uploader v-if="newEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(newEvent.absence)"
               caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence"
               name="file" :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue"
-              required-field withBorders@delete="deleteDocument(newEvent.attachment.driveId)"
+              required-field withBorders @delete="deleteDocument(newEvent.attachment.driveId)"
               :disable="!selectedAuxiliary._id" />
           </template>
           <template v-if="newEvent.absenceNature === HOURLY">
