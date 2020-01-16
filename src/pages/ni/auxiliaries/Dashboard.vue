@@ -65,8 +65,7 @@
       </div>
       <q-slide-transition>
         <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
-          <div v-for="auxiliary in customersAndDurationByAuxiliary[sector]" :key="auxiliary._id"
-            class="col-md-6 col-xs-12">
+          <div v-for="auxiliary in paidInterventionStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
             {{ auxiliary }}
           </div>
         </span>
@@ -98,7 +97,7 @@ export default {
       hoursToWork: [],
       monthModal: false,
       firstInterventionStartDate: '',
-      customersAndDurationByAuxiliary: {},
+      paidInterventionStats: {},
       auxiliariesDetailsIsOpened: {},
     };
   },
@@ -136,7 +135,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (sectors) {
-        await this.getcustomersAndDurationByAuxiliary();
+        await this.getPaidInterventionStats();
       },
     },
   },
@@ -161,7 +160,7 @@ export default {
     async selectMonth (month) {
       this.selectedMonth = month;
       this.monthModal = false;
-      this.customersAndDurationByAuxiliary = {};
+      this.paidInterventionStats = {};
       await this.refresh();
     },
     getIcon (sector) {
@@ -171,16 +170,29 @@ export default {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    async getcustomersAndDurationByAuxiliary () {
+    async getPaidInterventionStats () {
       const sectors = [];
+      const paidInterventionStats = {}
       for (const sector of this.filteredSectors) {
-        if (this.customersAndDurationByAuxiliary[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
+        if (this.paidInterventionStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
         sectors.push(sector);
+        paidInterventionStats[sector] = [];
       }
       if (!sectors.length) return;
-      const customersAndDurationByAuxiliaryArray = await this.$stats.getCustomersAndDurationByAuxiliary({ sector: sectors, month: this.selectedMonth });
-      for (const customersAndDurationByAuxiliary of customersAndDurationByAuxiliaryArray) {
-        this.$set(this.customersAndDurationByAuxiliary, customersAndDurationByAuxiliary.sector, customersAndDurationByAuxiliary.customersAndDuration);
+      const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({ sector: sectors, month: this.selectedMonth });
+      for (const paidInterventionStatsForOneSector of paidInterventionStatsByAuxiliary) {
+        const auxiliarySectors = paidInterventionStatsForOneSector.sectors.reduce((acc, auxiliarySectorsArray) => {
+          for (const auxiliarySector of auxiliarySectorsArray) {
+            if (!acc.includes(auxiliarySector)) acc.push(auxiliarySector);
+          }
+          return acc;
+        }, []);
+
+        for (const sector of auxiliarySectors) {
+          if (!sectors.includes(sector)) continue;
+          paidInterventionStats[sector].push(this.$_.omit(paidInterventionStatsForOneSector, 'sectors'));
+          this.$set(this.paidInterventionStats, sector, paidInterventionStats[sector]);
+        }
       }
     },
     getCustomersAndDurationBySector (sectorId) {
@@ -237,7 +249,7 @@ export default {
         this.internalAndBilledHours = internalAndBilledHours;
         this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
-        await this.getcustomersAndDurationByAuxiliary();
+        await this.getPaidInterventionStats();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')

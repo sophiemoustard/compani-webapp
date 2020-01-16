@@ -18,7 +18,6 @@ export default {
   },
   async getCustomersAndDurationByAuxiliary (params = null) {
     const stats = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/customer-duration/auxiliary`, { params });
-
     return stats.data.data.customersAndDuration;
   },
   async getCustomersAndDurationBySector (params = null) {
