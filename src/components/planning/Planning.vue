@@ -65,7 +65,7 @@
                     <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
                     <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                      :startOfWeek="startOfWeek" :dm="distanceMatrices" :working-stats="workingStats[person._id]" />
+                      :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" />
                   </div>
                   <div class="person-name overflow-hidden-nowrap">
                     <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
@@ -118,7 +118,6 @@ import DeleteEventsModal from './DeleteEventsModal';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
-import distanceMatrix from '../../api/DistanceMatrix';
 import { formatIdentity } from '../../helpers/utils';
 import { mapGetters } from 'vuex';
 
@@ -156,7 +155,6 @@ export default {
       maxDays: 7,
       staffingView: false,
       PLANNING,
-      distanceMatrices: [],
       hourWidth: 100 / 12,
       UNKNOWN_AVATAR,
       deleteEventsModal: false,
@@ -176,7 +174,6 @@ export default {
   async mounted () {
     this.updateTimeline();
     this.getTimelineHours();
-    if (!this.isCustomerPlanning) await this.getDistanceMatrices();
   },
   computed: {
     ...mapGetters({
@@ -223,9 +220,6 @@ export default {
     getTimelineHours () {
       const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
-    },
-    async getDistanceMatrices () {
-      this.distanceMatrices = await distanceMatrix.list();
     },
     updatePlanningHeaderHeight () {
       setTimeout(() => { this.planningHeaderHeight = this.$refs['planningHeader'].clientHeight; }, 100);

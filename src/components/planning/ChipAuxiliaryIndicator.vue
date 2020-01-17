@@ -60,7 +60,6 @@ export default {
     person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {}, contracts: [] }) },
     events: { type: Array, default: () => [] },
     startOfWeek: { type: String, default: '' },
-    dm: { type: Array, default: () => [] },
     workingStats: { type: Object, default: () => ({ workedHours: 0, hoursToWork: 0 }) },
   },
   data () {
