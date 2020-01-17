@@ -167,7 +167,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        address: {},
+        address: this.$_.get(person, 'contact.primaryAddress', {}),
         attachment: {},
         auxiliary: '',
         sector: '',
