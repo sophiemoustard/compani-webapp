@@ -1,20 +1,28 @@
 <template>
-  <div class="chip-container">
-    <q-chip small text-color="white">
-      <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span>
-      <q-icon size="14px" name="mdi-human-male" />
-    </q-chip>
+  <div class="person-inner-cell">
+    <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('fL') }}</div>
+    <div :class="[!staffingView && 'q-mb-sm']">
+      <div class="chip-container">
+        <q-chip small text-color="white">
+          <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span>
+          <q-icon size="14px" name="mdi-human-male" />
+        </q-chip>
+      </div>
+    </div>
+    <div class="referent-name overflow-hidden-nowrap">{{ getReferent(person) | formatIdentity('fL') }}</div>
   </div>
 </template>
 
 <script>
 import { DEFAULT_AVATAR } from '../../data/constants.js';
+import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ChipCustomerIndicator',
   props: {
     events: { type: Array, default: () => [] },
     person: { type: Object, default: () => ({}) },
+    staffingView: { type: Boolean, default: false },
   },
   computed: {
     indicators () {
@@ -28,9 +36,44 @@ export default {
     },
   },
   methods: {
+    getReferent (person) {
+      return this.$_.get(person, 'referent.identity', {});
+    },
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
   },
+  filters: {
+    formatIdentity,
+  },
 }
 </script>
+
+<style lang="stylus" scoped>
+  .referent-name
+    font-style: italic;
+    @media (min-width: 1025px)
+      margin-top: 15px;
+      font-size: 12px;
+    @media (min-width: 421px) and (max-width: 1024px)
+      margin-top: 15px;
+      font-size: 8px;
+    @media (max-width: 420px)
+      font-size: 8px;
+      margin-top: 0px;
+
+  .person
+    &-name
+      font-weight: 600;
+      font-size: 14px;
+      @media (min-width: 1025px)
+        margin-bottom: 15px;
+      @media (min-width: 421px) and (max-width: 1024px)
+        margin-bottom: 15px;
+        font-size: 12px;
+      @media (max-width: 420px)
+        font-size: 8px;
+        margin-bottom: 0px;
+    &-inner-cell
+      margin-top: 4px;
+</style>

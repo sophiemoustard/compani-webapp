@@ -1,39 +1,45 @@
 <template>
-  <div class="chip-container" @click="openIndicatorsModal">
-    <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
-      <q-spinner-dots v-if="loading" />
-      <span v-else class="chip-indicator">
-        {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
-      </span>
-    </q-chip>
+  <div class="person-inner-cell">
+    <div :class="[!staffingView && 'q-mb-sm']">
 
-    <!-- Indicators modal -->
-    <q-dialog v-model="indicatorsModal">
-      <div class="modal-container modal-container-md">
-        <div class="q-mb-md">
-          <div class="row justify-between items-center q-pa-lg">
-            <div class="col-11 row person-name">
-              <img :src="getAvatar(person.picture)" class="avatar">
-              <div class="q-pl-md">{{ person.identity.firstname }} {{ person.identity.lastname.toUpperCase() }}</div>
-            </div>
-            <div class="col-1 cursor-pointer modal-btn-close">
-              <span>
-                <q-icon name="clear" v-close-popup />
-              </span>
+      <div class="chip-container" @click="openIndicatorsModal">
+        <img :src="getAvatar(person.picture)" class="avatar">
+        <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
+          <q-spinner-dots v-if="loading" />
+          <span v-else class="chip-indicator">
+            {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
+          </span>
+        </q-chip>
+
+        <!-- Indicators modal -->
+        <q-dialog v-model="indicatorsModal">
+          <div class="modal-container modal-container-md">
+            <div class="q-mb-md">
+              <div class="row justify-between items-center q-pa-lg">
+                <div class="col-11 row person-name">
+                  <img :src="getAvatar(person.picture)" class="avatar">
+                  <div class="q-pl-md">{{ person.identity.firstname }} {{ person.identity.lastname.toUpperCase() }}</div>
+                </div>
+                <div class="col-1 cursor-pointer modal-btn-close">
+                  <span>
+                    <q-icon name="clear" v-close-popup />
+                  </span>
+                </div>
+              </div>
+              <q-tabs active-color="primary" align="justify" dense v-model="selectedTab">
+                <q-tab class="col-6" v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" />
+              </q-tabs>
+              <q-tab-panels v-model="selectedTab" animated>
+                <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
+                  <ni-auxiliary-indicators :hours-details="hoursDetails" :customers-details="customersDetails" />
+                </q-tab-panel>
+              </q-tab-panels>
             </div>
           </div>
-          <q-tabs active-color="primary" align="justify" dense v-model="selectedTab">
-            <q-tab class="col-6" v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" />
-          </q-tabs>
-          <q-tab-panels v-model="selectedTab" animated>
-            <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
-              <ni-auxiliary-indicators :hours-details="hoursDetails" :customers-details="customersDetails" />
-            </q-tab-panel>
-          </q-tab-panels>
-        </div>
+        </q-dialog>
       </div>
-    </q-dialog>
+    </div>
+    <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('Fl') }}</div>
   </div>
 </template>
 
@@ -49,7 +55,7 @@ import {
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
 } from '../../data/constants.js';
-import { upperCaseFirstLetter } from '../../helpers/utils';
+import { upperCaseFirstLetter, formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
@@ -61,6 +67,7 @@ export default {
     events: { type: Array, default: () => [] },
     startOfWeek: { type: String, default: '' },
     workingStats: { type: Object, default: () => ({ workedHours: 0, hoursToWork: 0 }) },
+    staffingView: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -148,6 +155,9 @@ export default {
       }
     },
   },
+  filters: {
+    formatIdentity,
+  },
 }
 </script>
 
@@ -173,4 +183,19 @@ export default {
     background: none !important
   /deep/ .q-ripple
     display: none
+
+  .person
+    &-name
+      font-weight: 600;
+      font-size: 14px;
+      @media (min-width: 1025px)
+        margin-bottom: 15px;
+      @media (min-width: 421px) and (max-width: 1024px)
+        margin-bottom: 15px;
+        font-size: 12px;
+      @media (max-width: 420px)
+        font-size: 8px;
+        margin-bottom: 0px;
+    &-inner-cell
+      margin-top: 4px;
 </style>

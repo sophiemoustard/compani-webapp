@@ -59,28 +59,13 @@
               </td>
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
-<<<<<<< HEAD
               <td v-if="isCustomerPlanning" valign="top">
-                <div class="person-inner-cell">
-                  <div class="person-name overflow-hidden-nowrap">
-                    <template>{{ person.identity | formatIdentity('fL') }}</template>
-                  </div>
-                  <div :class="[!staffingView && 'q-mb-sm']">
-                    <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
-                      :events="getPersonEvents(person)" />
-                    <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                      :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" />
-                  </div>
-                  <div class="person-name overflow-hidden-nowrap">
-                    <template>{{ person.identity | formatIdentity('Fl') }}</template>
-                  </div>
-                </div>
+                <ni-chip-customer-indicator :person="person" :events="personEvents" :staffing-view="staffingView"  />
               </td>
-=======
-              <ni-chip-person-indicator :is-customer-planning="isCustomerPlanning" :person="person"
-                :working-stats="workingStats[person._id]" :person-events="getPersonEvents(person)"
-                  :start-of-week="startOfWeek" :staffing-view="staffingView" />
->>>>>>> COM-962 fix from pr comments
+              <td v-else valign="top">
+                <ni-chip-auxiliary-indicator :person="person" :events="personEvents" :startOfWeek="startOfWeek"
+                  :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
+              </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
                 <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
@@ -117,8 +102,9 @@ import {
   NOT_INVOICED_AND_NOT_PAID,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
-import NiChipPersonIndicator from './ChipPersonIndicator';
 import NiPlanningEvent from './PlanningEvent';
+import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
+import ChipCustomerIndicator from './ChipCustomerIndicator';
 import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from './ChipsAutocomplete';
 import DeleteEventsModal from './DeleteEventsModal';
@@ -136,12 +122,13 @@ export default {
   name: 'PlanningManager',
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
-    'ni-chip-person-indicator': NiChipPersonIndicator,
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
     'ni-event-history-feed': NiEventHistoryFeed,
     'delete-events-modal': DeleteEventsModal,
+    'ni-chip-customer-indicator': ChipCustomerIndicator,
+    'ni-chip-auxiliary-indicator': ChipAuxiliaryIndicator,
   },
   props: {
     workingStats: { type: Object, default: () => ({}) },
@@ -196,11 +183,7 @@ export default {
       return this.mainUser.role.name === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
-      if (this.isCustomerPlanning) {
-        return { allSector: this.persons };
-      } else {
-        return this.$_.groupBy(this.persons, 'sector._id');
-      }
+      return this.isCustomerPlanning ? { allSectors: this.persons } : this.$_.groupBy(this.persons, 'sector._id');
     },
   },
   methods: {
