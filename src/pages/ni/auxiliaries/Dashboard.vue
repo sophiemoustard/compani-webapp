@@ -185,7 +185,7 @@ export default {
     },
     getCustomersAndDurationBySector (sectorId) {
       const customersAndDuration = this.customersAndDuration.find(el => el.sector === sectorId);
-      return customersAndDuration || { customerCount: 0, duration: 0 };
+      return customersAndDuration || { customerCount: 0, duration: 0, auxiliaryTurnOver: 0 };
     },
     getBilledHours (sectorId) {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
