@@ -59,8 +59,11 @@
               </td>
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
-              <td valign="top">
+              <td v-if="isCustomerPlanning" valign="top">
                 <div class="person-inner-cell">
+                  <div class="person-name overflow-hidden-nowrap">
+                    <template>{{ person.identity | formatIdentity('fL') }}</template>
+                  </div>
                   <div :class="[!staffingView && 'q-mb-sm']">
                     <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
                       :events="getPersonEvents(person)" />
@@ -68,8 +71,7 @@
                       :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" />
                   </div>
                   <div class="person-name overflow-hidden-nowrap">
-                    <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
-                    <template v-else>{{ person.identity | formatIdentity('Fl') }}</template>
+                    <template>{{ person.identity | formatIdentity('Fl') }}</template>
                   </div>
                 </div>
               </td>
@@ -190,6 +192,9 @@ export default {
     },
   },
   methods: {
+    getReferent (person) {
+      return this.$_.get(person, 'referent.identity', {});
+    },
     hideDeleteEventsModal () {
       this.deleteEventsModal = false;
       this.$emit('refresh');
@@ -329,12 +334,25 @@ export default {
     &-name
       font-weight: 600;
       font-size: 14px;
+      @media (min-width: 421px)
+        margin-bottom: 15px;
       @media (max-width: 1024px)
         font-size: 12px;
       @media (max-width: 420px)
         font-size: 8px;
+        margin-bottom: 0px;
     &-inner-cell
       margin-top: 4px;
+
+  .referent-name
+    font-style: italic;
+    @media (min-width: 421px)
+      margin-top: 15px;
+    @media (max-width: 1024px)
+      font-size: 10px;
+    @media (max-width: 420px)
+      font-size: 8px;
+      margin-top: 0px;
 
   .staffing
     .person

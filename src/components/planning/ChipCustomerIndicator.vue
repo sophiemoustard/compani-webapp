@@ -1,6 +1,5 @@
 <template>
   <div class="chip-container">
-    <img :src="getAvatar(person.picture)" class="avatar">
     <q-chip small text-color="white">
       <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span>
       <q-icon size="14px" name="mdi-human-male" />
@@ -35,10 +34,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  /deep/ .q-chip
-      .q-icon
-        width: 8px;
-
-</style>
