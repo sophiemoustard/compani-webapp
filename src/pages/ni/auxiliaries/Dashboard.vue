@@ -28,33 +28,31 @@
           </q-circular-progress>
         </div>
         <div class="q-mb-md">
-          <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures facturées</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
+          <div class="row auxiliary">
+            <div class="col-8 auxiliary-label">Heures facturées</div>
+            <div class="col-4 auxiliary-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
           </div>
-          <div class="row stats-row">
-            <div class="col-8 stats-row-title">Heures à travailler</div>
-            <div class="col-4 stats-row-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
+          <div class="row auxiliary">
+            <div class="col-8 auxiliary-label">Heures à travailler</div>
+            <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
         </div>
         <div class="q-mb-md">
           <div>{{ getInternalHoursRatio(sector) }}%</div>
         </div>
       </div>
-      <div class="col-md-6 col-xs-12 customer-stats">
-        <div class="row items-center justify-center">
-          <div class="col-4 customer-stats-item">
-            <div class="customer-stats-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
-            <div class="customer-stats-label">Bénéficiaires accompagnés</div>
-          </div>
-          <div class="col-4 customer-stats-item">
-            <div class="customer-stats-value">{{ Math.round(getCustomersAndDurationBySector(sector).duration) }}</div>
-            <div class="customer-stats-label">Heures par bénéficiaire</div>
-          </div>
-          <div class="col-4 customer-stats-item">
-            <div class="customer-stats-value">0</div>
-            <div class="customer-stats-label">Auxiliaires par bénéficiaires</div>
-          </div>
+      <div class="col-md-6 col-xs-12 customer">
+        <div class="row">
+            <div class="col-4 customer-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
+            <div class="col-4 customer-value">{{ Math.round(getCustomersAndDurationBySector(sector).duration) }}</div>
+            <div class="col-4 customer-value">
+              {{ Math.round(getCustomersAndDurationBySector(sector).auxiliaryTurnOver) }}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-4 customer-label">Bénéficiaires accompagnés</div>
+            <div class="col-4 customer-label">Heures par bénéficiaire</div>
+            <div class="col-4 customer-label">Auxiliaires par bénéficiaires</div>
         </div>
       </div>
       <div class="col-md-12 col-xs-12">
@@ -187,7 +185,7 @@ export default {
     },
     getCustomersAndDurationBySector (sectorId) {
       const customersAndDuration = this.customersAndDuration.find(el => el.sector === sectorId);
-      return customersAndDuration || { customerCount: 0, duration: 0 };
+      return customersAndDuration || { customerCount: 0, duration: 0, auxiliaryTurnOver: 0 };
     },
     getBilledHours (sectorId) {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
@@ -219,7 +217,7 @@ export default {
       this.$set(this.auxiliariesDetailsIsOpened, sectorId, true);
     },
     hoursRatio (sector) {
-      return (this.getCustomersAndDurationBySector(sector).duration / this.getHoursToWork(sector)) * 100 || 0;
+      return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;
     },
     async refresh () {
       try {
@@ -266,18 +264,18 @@ export default {
   justify-content: space-between
   align-items: center
 
-.stats-row
+.auxiliary
   border-top: 1px solid $light-grey
   border-left: 1px solid $light-grey
   border-right: 1px solid $light-grey
   &:last-child
     border-bottom: 1px solid $light-grey
 
-.stats-row-title
+.auxiliary-label
   border-right: 1px solid $light-grey
   padding: 3px 4px
 
-.stats-row-value
+.auxiliary-value
   justify-content: flex-end
   display: flex
   padding: 5px
@@ -293,14 +291,13 @@ export default {
   font-size: 15px
   color: black
 
-.customer-stats
+.customer
   display: flex
-  align-items: center
+  flex-direction: column
   justify-content: center;
-  &-item
+  .col-4
     display: flex
-    align-items: center
-    flex-direction column
+    justify-content: center
     &:first-child
       color: $primary
     &:nth-child(2)
