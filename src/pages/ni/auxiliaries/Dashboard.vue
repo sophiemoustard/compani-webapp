@@ -179,18 +179,16 @@ export default {
         paidInterventionStats[sector] = [];
       }
       if (!sectors.length) return;
-      const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({ sector: sectors, month: this.selectedMonth });
-      for (const paidInterventionStatsForOneSector of paidInterventionStatsByAuxiliary) {
-        const auxiliarySectors = paidInterventionStatsForOneSector.sectors.reduce((acc, auxiliarySectorsArray) => {
-          for (const auxiliarySector of auxiliarySectorsArray) {
-            if (!acc.includes(auxiliarySector)) acc.push(auxiliarySector);
-          }
-          return acc;
-        }, []);
 
-        for (const sector of auxiliarySectors) {
+      const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({
+        sector: sectors,
+        month: this.selectedMonth,
+      });
+
+      for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
+        for (const sector of auxiliaryPaidInterventions.sectors) {
           if (!sectors.includes(sector)) continue;
-          paidInterventionStats[sector].push(this.$_.omit(paidInterventionStatsForOneSector, 'sectors'));
+          paidInterventionStats[sector].push(this.$_.omit(auxiliaryPaidInterventions, 'sectors'));
           this.$set(this.paidInterventionStats, sector, paidInterventionStats[sector]);
         }
       }
