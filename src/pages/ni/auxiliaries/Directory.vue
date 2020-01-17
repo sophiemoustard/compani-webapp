@@ -359,7 +359,7 @@ export default {
       return payload;
     },
     async createAlenviUser () {
-      const folderId = this.$_.get(this.company, 'folderId', null);
+      const folderId = this.$_.get(this.company, 'auxiliariesFolderId', null);
       if (!folderId) throw new Error('No auxiliary folder in company drive');
       const roles = await this.$roles.showAll({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
