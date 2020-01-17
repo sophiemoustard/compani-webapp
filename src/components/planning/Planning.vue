@@ -174,7 +174,6 @@ export default {
   async mounted () {
     this.updateTimeline();
     this.getTimelineHours();
-    if (!this.isCustomerPlanning) await this.getDistanceMatrices();
   },
   computed: {
     ...mapGetters({
