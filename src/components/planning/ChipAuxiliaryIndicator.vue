@@ -1,12 +1,17 @@
 <template>
-  <div class="chip-container" @click="openIndicatorsModal">
-    <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
-      <q-spinner-dots v-if="loading" />
-      <span v-else class="chip-indicator">
-        {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
-      </span>
-    </q-chip>
+  <div class="person-inner-cell">
+    <div :class="[!staffingView && 'q-mb-sm']">
+      <div class="chip-container" @click="openIndicatorsModal">
+        <img :src="getAvatar(person.picture)" class="avatar">
+        <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
+          <q-spinner-dots v-if="loading" />
+          <span v-else class="chip-indicator">
+            {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
+          </span>
+        </q-chip>
+      </div>
+    </div>
+    <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('Fl') }}</div>
 
     <!-- Indicators modal -->
     <q-dialog v-model="indicatorsModal">
@@ -49,7 +54,7 @@ import {
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
 } from '../../data/constants.js';
-import { upperCaseFirstLetter } from '../../helpers/utils';
+import { upperCaseFirstLetter, formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
@@ -61,6 +66,7 @@ export default {
     events: { type: Array, default: () => [] },
     startOfWeek: { type: String, default: '' },
     workingStats: { type: Object, default: () => ({ workedHours: 0, hoursToWork: 0 }) },
+    staffingView: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -148,6 +154,9 @@ export default {
       }
     },
   },
+  filters: {
+    formatIdentity,
+  },
 }
 </script>
 
@@ -173,4 +182,5 @@ export default {
     background: none !important
   /deep/ .q-ripple
     display: none
+
 </style>

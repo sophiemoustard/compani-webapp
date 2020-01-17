@@ -60,18 +60,10 @@
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
               <td valign="top">
-                <div class="person-inner-cell">
-                  <div :class="[!staffingView && 'q-mb-sm']">
-                    <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person"
-                      :events="getPersonEvents(person)" />
-                    <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                      :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" />
-                  </div>
-                  <div class="person-name overflow-hidden-nowrap">
-                    <template v-if="isCustomerPlanning">{{ person.identity | formatIdentity('fL') }}</template>
-                    <template v-else>{{ person.identity | formatIdentity('Fl') }}</template>
-                  </div>
-                </div>
+                <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)"
+                  :staffing-view="staffingView"  />
+                <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
+                  :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
@@ -109,29 +101,28 @@ import {
   NOT_INVOICED_AND_NOT_PAID,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
-import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
-import NiChipCustomerIndicator from './ChipCustomerIndicator';
 import NiPlanningEvent from './PlanningEvent';
+import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
+import ChipCustomerIndicator from './ChipCustomerIndicator';
 import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from './ChipsAutocomplete';
 import DeleteEventsModal from './DeleteEventsModal';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
-import { formatIdentity } from '../../helpers/utils';
 import { mapGetters } from 'vuex';
 
 export default {
   name: 'PlanningManager',
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
-    'ni-chip-customer-indicator': NiChipCustomerIndicator,
-    'ni-chip-auxiliary-indicator': ChipAuxiliaryIndicator,
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
     'ni-event-history-feed': NiEventHistoryFeed,
     'delete-events-modal': DeleteEventsModal,
+    'ni-chip-customer-indicator': ChipCustomerIndicator,
+    'ni-chip-auxiliary-indicator': ChipAuxiliaryIndicator,
   },
   props: {
     workingStats: { type: Object, default: () => ({}) },
@@ -186,7 +177,7 @@ export default {
       return this.mainUser.role.name === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
-      return this.$_.groupBy(this.persons, 'sector._id');
+      return this.isCustomerPlanning ? { allSectors: this.persons } : this.$_.groupBy(this.persons, 'sector._id');
     },
   },
   methods: {
@@ -309,9 +300,6 @@ export default {
       this.$emit('editEvent', event);
     },
   },
-  filters: {
-    formatIdentity,
-  },
 }
 </script>
 
@@ -321,20 +309,6 @@ export default {
       width: 100px;
     @media (min-width: 1025px)
       width: 110px;
-
-  .person
-    &-row
-      border-right: 1px solid $light-grey;
-      height: 100px;
-    &-name
-      font-weight: 600;
-      font-size: 14px;
-      @media (max-width: 1024px)
-        font-size: 12px;
-      @media (max-width: 420px)
-        font-size: 8px;
-    &-inner-cell
-      margin-top: 4px;
 
   .staffing
     .person
