@@ -59,6 +59,7 @@
               </td>
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
+<<<<<<< HEAD
               <td v-if="isCustomerPlanning" valign="top">
                 <div class="person-inner-cell">
                   <div class="person-name overflow-hidden-nowrap">
@@ -75,6 +76,11 @@
                   </div>
                 </div>
               </td>
+=======
+              <ni-chip-person-indicator :is-customer-planning="isCustomerPlanning" :person="person"
+                :working-stats="workingStats[person._id]" :person-events="getPersonEvents(person)"
+                  :start-of-week="startOfWeek" :staffing-view="staffingView" />
+>>>>>>> COM-962 fix from pr comments
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
                 <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
@@ -111,8 +117,7 @@ import {
   NOT_INVOICED_AND_NOT_PAID,
 } from '../../data/constants';
 import { NotifyNegative, NotifyWarning } from '../popup/notify';
-import ChipAuxiliaryIndicator from './ChipAuxiliaryIndicator';
-import NiChipCustomerIndicator from './ChipCustomerIndicator';
+import NiChipPersonIndicator from './ChipPersonIndicator';
 import NiPlanningEvent from './PlanningEvent';
 import NiEventHistoryFeed from './EventHistoryFeed';
 import ChipsAutocomplete from './ChipsAutocomplete';
@@ -120,15 +125,18 @@ import DeleteEventsModal from './DeleteEventsModal';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
+<<<<<<< HEAD
 import { formatIdentity } from '../../helpers/utils';
+=======
+import distanceMatrix from '../../api/DistanceMatrix';
+>>>>>>> COM-962 fix from pr comments
 import { mapGetters } from 'vuex';
 
 export default {
   name: 'PlanningManager',
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
-    'ni-chip-customer-indicator': NiChipCustomerIndicator,
-    'ni-chip-auxiliary-indicator': ChipAuxiliaryIndicator,
+    'ni-chip-person-indicator': NiChipPersonIndicator,
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,
@@ -188,13 +196,14 @@ export default {
       return this.mainUser.role.name === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
-      return this.$_.groupBy(this.persons, 'sector');
+      if (this.isCustomerPlanning) {
+        return { allSector: this.persons };
+      } else {
+        return this.$_.groupBy(this.persons, 'sector._id');
+      }
     },
   },
   methods: {
-    getReferent (person) {
-      return this.$_.get(person, 'referent.identity', {});
-    },
     hideDeleteEventsModal () {
       this.deleteEventsModal = false;
       this.$emit('refresh');
@@ -314,9 +323,6 @@ export default {
       this.$emit('editEvent', event);
     },
   },
-  filters: {
-    formatIdentity,
-  },
 }
 </script>
 
@@ -334,25 +340,16 @@ export default {
     &-name
       font-weight: 600;
       font-size: 14px;
-      @media (min-width: 421px)
+      @media (min-width: 1025px)
         margin-bottom: 15px;
-      @media (max-width: 1024px)
+      @media (min-width: 421px) and (max-width: 1024px)
+        margin-bottom: 15px;
         font-size: 12px;
       @media (max-width: 420px)
         font-size: 8px;
         margin-bottom: 0px;
     &-inner-cell
       margin-top: 4px;
-
-  .referent-name
-    font-style: italic;
-    @media (min-width: 421px)
-      margin-top: 15px;
-    @media (max-width: 1024px)
-      font-size: 10px;
-    @media (max-width: 420px)
-      font-size: 8px;
-      margin-top: 0px;
 
   .staffing
     .person
