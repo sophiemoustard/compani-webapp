@@ -59,12 +59,11 @@
               </td>
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
-              <td v-if="isCustomerPlanning" valign="top">
-                <ni-chip-customer-indicator :person="person" :events="getPersonEvents(person)" :staffing-view="staffingView"  />
-              </td>
-              <td v-else valign="top">
-                <ni-chip-auxiliary-indicator :person="person" :events="getPersonEvents(person)" :startOfWeek="startOfWeek"
-                  :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
+              <td valign="top">
+                <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)"
+                  :staffing-view="staffingView"  />
+                <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
+                  :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
@@ -111,11 +110,6 @@ import DeleteEventsModal from './DeleteEventsModal';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
-<<<<<<< HEAD
-import { formatIdentity } from '../../helpers/utils';
-=======
-import distanceMatrix from '../../api/DistanceMatrix';
->>>>>>> COM-962 fix from pr comments
 import { mapGetters } from 'vuex';
 
 export default {

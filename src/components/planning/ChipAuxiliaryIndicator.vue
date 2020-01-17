@@ -1,7 +1,6 @@
 <template>
   <div class="person-inner-cell">
     <div :class="[!staffingView && 'q-mb-sm']">
-
       <div class="chip-container" @click="openIndicatorsModal">
         <img :src="getAvatar(person.picture)" class="avatar">
         <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
