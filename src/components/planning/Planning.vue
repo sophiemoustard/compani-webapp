@@ -60,10 +60,10 @@
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
               <td v-if="isCustomerPlanning" valign="top">
-                <ni-chip-customer-indicator :person="person" :events="personEvents" :staffing-view="staffingView"  />
+                <ni-chip-customer-indicator :person="person" :events="getPersonEvents(person)" :staffing-view="staffingView"  />
               </td>
               <td v-else valign="top">
-                <ni-chip-auxiliary-indicator :person="person" :events="personEvents" :startOfWeek="startOfWeek"
+                <ni-chip-auxiliary-indicator :person="person" :events="getPersonEvents(person)" :startOfWeek="startOfWeek"
                   :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
@@ -315,24 +315,6 @@ export default {
       width: 100px;
     @media (min-width: 1025px)
       width: 110px;
-
-  .person
-    &-row
-      border-right: 1px solid $light-grey;
-      height: 100px;
-    &-name
-      font-weight: 600;
-      font-size: 14px;
-      @media (min-width: 1025px)
-        margin-bottom: 15px;
-      @media (min-width: 421px) and (max-width: 1024px)
-        margin-bottom: 15px;
-        font-size: 12px;
-      @media (max-width: 420px)
-        font-size: 8px;
-        margin-bottom: 0px;
-    &-inner-cell
-      margin-top: 4px;
 
   .staffing
     .person
