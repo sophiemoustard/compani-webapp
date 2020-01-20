@@ -66,8 +66,11 @@
       </div>
       <q-slide-transition>
         <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
-          <div v-for="auxiliary in paidInterventionStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
-            {{ auxiliary }}
+          <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+            <div class="row person-name">
+              <img :src="getAvatar(auxiliary.picture)" class="avatar">
+            </div>
+            <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail" :customers-details="auxiliary.paidIntervention" />
           </div>
         </span>
       </q-slide-transition>
@@ -78,15 +81,17 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
-import { AUXILIARY_ROLES } from '../../../data/constants';
+import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '../../../data/constants';
 import { formatHours, roundFrenchPercentage } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
+import AuxiliaryIndicators from '../../../components/planning/AuxiliaryIndicators';
 
 export default {
   name: 'Dashboard',
   metaInfo: { title: 'Tableau de bord' },
   components: {
     'ni-chips-autocomplete': ChipsAutocomplete,
+    'ni-auxiliary-indicators': AuxiliaryIndicators,
   },
   data () {
     return {
@@ -99,7 +104,7 @@ export default {
       paidTransportStats: [],
       monthModal: false,
       firstInterventionStartDate: '',
-      paidInterventionStats: {},
+      auxiliariesStats: {},
       auxiliariesDetailsIsOpened: {},
     };
   },
@@ -137,7 +142,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (sectors) {
-        await this.getPaidInterventionStats();
+        await this.getAuxiliariesStats();
       },
     },
   },
@@ -151,6 +156,9 @@ export default {
     ...mapActions({
       fillFilter: 'planning/fillFilter',
     }),
+    getAvatar (picture) {
+      return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
+    },
     initFilters () {
       if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         const userSector = this.filters.find(filter => filter._id === this.mainUser.sector);
@@ -162,7 +170,7 @@ export default {
     async selectMonth (month) {
       this.selectedMonth = month;
       this.monthModal = false;
-      this.paidInterventionStats = {};
+      this.auxiliariesStats = {};
       await this.refresh();
     },
     getIcon (sector) {
@@ -172,13 +180,13 @@ export default {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    async getPaidInterventionStats () {
+    async getAuxiliariesStats () {
       const sectors = [];
-      const paidInterventionStats = {}
+      const auxiliariesStats = {}
       for (const sector of this.filteredSectors) {
-        if (this.paidInterventionStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
+        if (this.auxiliariesStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
         sectors.push(sector);
-        paidInterventionStats[sector] = [];
+        auxiliariesStats[sector] = [];
       }
       if (!sectors.length) return;
 
@@ -187,11 +195,21 @@ export default {
         month: this.selectedMonth,
       });
 
+      const hoursBalanceDetail = await this.$pay.getHoursBalanceDetail({
+        sector: sectors,
+        month: this.selectedMonth,
+      });
+
       for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
         for (const sector of auxiliaryPaidInterventions.sectors) {
           if (!sectors.includes(sector)) continue;
-          paidInterventionStats[sector].push(this.$_.omit(auxiliaryPaidInterventions, 'sectors'));
-          this.$set(this.paidInterventionStats, sector, paidInterventionStats[sector]);
+          const auxiliaryStats = {
+            _id: auxiliaryPaidInterventions._id,
+            paidIntervention: this.$_.omit(auxiliaryPaidInterventions, 'sectors'),
+            hoursBalanceDetail: this.$_.omit(hoursBalanceDetail.find(hbd => hbd.auxiliaryId === auxiliaryPaidInterventions._id), 'sectors'),
+          }
+          auxiliariesStats[sector].push(auxiliaryStats);
+          this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
         }
       }
     },
@@ -257,7 +275,7 @@ export default {
         this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
         this.paidTransportStats = paidTransportStats;
-        await this.getPaidInterventionStats();
+        await this.getAuxiliariesStats();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
