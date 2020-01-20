@@ -41,6 +41,7 @@ module.exports = function (ctx) {
       'internalHours',
       'billSlips',
       'taxCertificates',
+      'establishments',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [
