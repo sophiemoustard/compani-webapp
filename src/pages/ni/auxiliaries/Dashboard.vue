@@ -39,6 +39,7 @@
         </div>
         <div class="q-mb-md">
           <div>{{ getInternalHoursRatio(sector) }}%</div>
+          <div>{{ getPaidTransportStats(sector) }}%</div>
         </div>
       </div>
       <div class="col-md-6 col-xs-12 customer">
@@ -95,6 +96,7 @@ export default {
       customersAndDuration: [],
       internalAndBilledHours: [],
       hoursToWork: [],
+      paidTransportStats: [],
       monthModal: false,
       firstInterventionStartDate: '',
       paidInterventionStats: {},
@@ -205,13 +207,19 @@ export default {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
       const internalHours = billedHours ? billedHours.internalHours : 0;
 
-      return (internalHours / this.getHoursToWork(sectorId)) * 100 || 0
+      return (internalHours / this.getBilledHours(sectorId)) * 100 || 0
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
       if (!hoursToWork) return 0;
 
       return hoursToWork.hoursToWork || 0;
+    },
+    getPaidTransportStats (sectorId) {
+      const paidTransportStats = this.paidTransportStats.find(el => el.sector === sectorId);
+      if (!paidTransportStats) return 0;
+
+      return (paidTransportStats.duration / this.getBilledHours(sectorId)) * 100 || 0;
     },
     getHoursByCustomer (sector) {
       const customersAndDuration = this.getCustomersAndDurationBySector(sector);
@@ -234,10 +242,11 @@ export default {
         if (this.filteredSectors.length === 0) return;
 
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
-        const [customersAndDuration, internalAndBilledHours, hoursToWork] = await Promise.all([
+        const [customersAndDuration, internalAndBilledHours, hoursToWork, paidTransportStats] = await Promise.all([
           this.$stats.getCustomersAndDurationBySector(params),
           this.$stats.getInternalAndBilledHours(params),
           this.$pay.getHoursToWork(params),
+          this.$events.getPaidTransportStatsBySector(params),
         ]);
         for (const sector of this.filteredSectors) {
           if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) {
@@ -247,12 +256,15 @@ export default {
         this.internalAndBilledHours = internalAndBilledHours;
         this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
+        this.paidTransportStats = paidTransportStats;
         await this.getPaidInterventionStats();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
         this.customersAndDuration = [];
+        this.internalAndBilledHours = [];
         this.hoursToWork = [];
+        this.paidTransportStats = [];
       }
     },
     // Filter
