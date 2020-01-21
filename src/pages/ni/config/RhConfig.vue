@@ -270,9 +270,6 @@
 
 <script>
 import { required, maxValue, maxLength } from 'vuelidate/lib/validators';
-import get from 'lodash/get';
-import cloneDeep from 'lodash/cloneDeep';
-import pick from 'lodash/pick';
 
 import {
   posDecimals,
@@ -383,7 +380,7 @@ export default {
           name: 'address',
           label: 'Adresse',
           align: 'left',
-          field: row => get(row, 'address.fullAddress') || '',
+          field: row => this.$_.get(row, 'address.fullAddress') || '',
         },
         {
           name: 'phone',
@@ -792,7 +789,9 @@ export default {
       }
     },
     openEstablishmentEditionModal (establishmentId) {
-      this.editedEstablishment = cloneDeep(this.establishments.find(est => est._id === establishmentId) || this.editedEstablishment);
+      this.editedEstablishment = this.$_.cloneDeep(
+        this.establishments.find(est => est._id === establishmentId) || this.editedEstablishment
+      );
       this.establishmentEditionModal = true;
     },
     resetEstablishmentEditionModal () {
@@ -813,7 +812,10 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, Object.keys(this.newEstablishment)));
+        await this.$establishments.update(
+          this.editedEstablishment._id,
+          this.$_.pick(this.editedEstablishment, Object.keys(this.newEstablishment))
+        );
         NotifyPositive('Établissement modifié.');
         this.resetEstablishmentEditionModal();
         await this.getEstablishments();
