@@ -48,7 +48,8 @@
     <template v-if="isAdmin">
       <q-separator />
       <q-expansion-item ref="configuration" v-model="activeRoutes.configuration.open" label="Configuration">
-        <ni-menu-item name="rh config" icon="settings" label="Configuration RH" />
+        <ni-menu-item name="company config" icon="house" label="Configuration générale" />
+        <ni-menu-item name="rh config" icon="accessibility" label="Configuration RH" />
         <ni-menu-item name="customers config" icon="settings" label="Configuration bénéficiaires" />
         <ni-menu-item name="tags config" icon="list_alt" label="Tags" />
       </q-expansion-item>

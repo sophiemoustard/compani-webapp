@@ -80,12 +80,6 @@
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Paie</p>
-        <div class="row gutter-profile">
-          <div class="col-xs-12 col-md-6">
-            <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
-              v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
-          </div>
-        </div>
         <q-card>
           <ni-responsive-table :data="establishments" :columns="establishmentsColumns"
             :pagination.sync="establishmentsPagination">
@@ -281,7 +275,6 @@ import { required, maxValue, maxLength } from 'vuelidate/lib/validators';
 import {
   posDecimals,
   sector,
-  apeCode,
   validWorkHealthService,
   validUrssafCode,
   validSiret,
@@ -319,7 +312,6 @@ export default {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
       company: null,
-      tmpInput: '',
       internalHours: [],
       internalHoursColumns: [
         {
@@ -462,7 +454,6 @@ export default {
   validations () {
     return {
       company: {
-        apeCode: { required, apeCode },
         rhConfig: {
           contractWithCompany: {
             grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) },
@@ -501,32 +492,10 @@ export default {
     await this.getEstablishments();
   },
   methods: {
-    saveTmp (path) {
-      this.tmpInput = this.$_.get(this.company, path);
-    },
-    async updateCompany (path) {
-      try {
-        if (this.tmpInput === this.$_.get(this.company, path)) return;
-        this.$_.get(this.$v.company, path).$touch();
-        if (this.$_.get(this.$v.company, path).$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const value = this.$_.get(this.company, path);
-        const payload = this.$_.set({}, path, value);
-        await this.$companies.updateById(this.company._id, payload);
-        NotifyPositive('Modification enregistrée');
-        this.tmpInput = '';
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification');
-        this.tmpInput = '';
-      }
-    },
     async updateCompanyTransportSubs (params) {
       try {
         this.$_.get(this.$v.company, params.vuelidatePath).$touch();
-        if (this.$_.get(this.$v.company, params.vuelidatePath).$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        if (this.$_.get(this.$v.company, params.vuelidatePath).$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const price = this.company.rhConfig.transportSubs[params.index].price
         if (this.tmpInput === price) return;
@@ -612,14 +581,20 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async updateDefaultInternalHour (internalHourId) {
-      const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
-      if (defaultInternalHour) {
-        await this.$internalHours.update(defaultInternalHour._id, { default: false });
-      }
+      try {
+        const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
+        if (defaultInternalHour) {
+          await this.$internalHours.update(defaultInternalHour._id, { default: false });
+        }
 
-      await this.$internalHours.update(internalHourId, { default: true });
-      await this.refreshInternalHours();
-      await this.$store.dispatch('main/getUser', this.user._id);
+        await this.$internalHours.update(internalHourId, { default: true });
+        await this.refreshInternalHours();
+        await this.$store.dispatch('main/getUser', this.user._id);
+        NotifyPositive('Heures internes mises à jour')
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour des heures internes.')
+      }
     },
     // Sectors
     async getSectors () {

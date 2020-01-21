@@ -38,6 +38,16 @@ const routes = [
     },
     children: [
       {
+        path: 'ni/config/company',
+        name: 'company config',
+        component: () => import('pages/ni/config/CompanyConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          permissions: 'config:edit',
+          parent: 'configuration',
+        },
+      },
+      {
         path: 'ni/config/rh',
         name: 'rh config',
         component: () => import('pages/ni/config/RhConfig'),
