@@ -20,10 +20,13 @@
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
       <div class="col-md-6 col-xs-12 q-pa-md">
-        <div class="sector-name q-mb-lg text-weight-bold">
-          {{ sectorName(sector) }}
+        <div class="q-mb-lg stats-header">
+          <div class="text-capitalize">
+            <div class="sector-name text-weight-bold">{{ sectorName(sector) }}</div>
+            <div class="month-label">{{ monthLabel }}</div>
+          </div>
           <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
-            color="primary" show-value :thickness="0.3">
+            color="primary" show-value :thickness="0.3" class="text-weight-bold">
             {{ roundFrenchPercentage(Math.round(hoursRatio(sector)) / 100, 0).replace('&nbsp;', '') }}
           </q-circular-progress>
         </div>
@@ -278,11 +281,17 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.sector-name
-  font-size: 24px
+.stats-header
   display: flex
   justify-content: space-between
   align-items: center
+
+.sector-name
+  font-size: 24px
+
+.month-label
+  font-size: 14px
+  font-style: italic
 
 .auxiliary
   border-top: 1px solid $light-grey
