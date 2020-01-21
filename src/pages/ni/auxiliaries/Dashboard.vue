@@ -64,13 +64,18 @@
           </template>
         </q-card-actions>
       </div>
+      <div v-show="loadingAuxiliariesDetails" class="col-md-12 col-xs-12 spinner-container"> <q-spinner /> </div>
       <q-slide-transition>
-        <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
+        <span v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails" class="sector-card row">
           <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
             <div class="row person-name">
               <img :src="getAvatar(auxiliary.picture)" class="avatar">
+              <div class="q-pl-md">
+                {{ auxiliary.identity.firstname }} {{ auxiliary.identity.lastname.toUpperCase() }}
+              </div>
             </div>
-            <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail" :customers-details="auxiliary.paidIntervention" />
+            <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail"
+              :customers-details="auxiliary.paidIntervention" />
           </div>
         </span>
       </q-slide-transition>
@@ -106,6 +111,7 @@ export default {
       firstInterventionStartDate: '',
       auxiliariesStats: {},
       auxiliariesDetailsIsOpened: {},
+      loadingAuxiliariesDetails: false,
     };
   },
   computed: {
@@ -181,36 +187,48 @@ export default {
       return sector.label;
     },
     async getAuxiliariesStats () {
-      const sectors = [];
-      const auxiliariesStats = {}
-      for (const sector of this.filteredSectors) {
-        if (this.auxiliariesStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
-        sectors.push(sector);
-        auxiliariesStats[sector] = [];
-      }
-      if (!sectors.length) return;
-
-      const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({
-        sector: sectors,
-        month: this.selectedMonth,
-      });
-
-      const hoursBalanceDetail = await this.$pay.getHoursBalanceDetail({
-        sector: sectors,
-        month: this.selectedMonth,
-      });
-
-      for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
-        for (const sector of auxiliaryPaidInterventions.sectors) {
-          if (!sectors.includes(sector)) continue;
-          const auxiliaryStats = {
-            _id: auxiliaryPaidInterventions._id,
-            paidIntervention: this.$_.omit(auxiliaryPaidInterventions, 'sectors'),
-            hoursBalanceDetail: this.$_.omit(hoursBalanceDetail.find(hbd => hbd.auxiliaryId === auxiliaryPaidInterventions._id), 'sectors'),
-          }
-          auxiliariesStats[sector].push(auxiliaryStats);
-          this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
+      try {
+        this.loadingAuxiliariesDetails = true;
+        const sectors = [];
+        const auxiliariesStats = {}
+        for (const sector of this.filteredSectors) {
+          if (this.auxiliariesStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
+          sectors.push(sector);
+          auxiliariesStats[sector] = [];
         }
+        if (!sectors.length) return;
+
+        const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({
+          sector: sectors,
+          month: this.selectedMonth,
+        });
+
+        const hoursBalanceDetail = await this.$pay.getHoursBalanceDetail({
+          sector: sectors,
+          month: this.selectedMonth,
+        });
+
+        for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
+          for (const sector of auxiliaryPaidInterventions.sectors) {
+            if (!sectors.includes(sector)) continue;
+            const auxiliaryHoursDetails = hoursBalanceDetail.find(hbd =>
+              hbd.auxiliaryId === auxiliaryPaidInterventions._id);
+            const auxiliaryStats = {
+              _id: auxiliaryPaidInterventions._id,
+              identity: auxiliaryHoursDetails.identity,
+              picture: auxiliaryHoursDetails.picture,
+              paidIntervention: this.$_.omit(auxiliaryPaidInterventions, 'sectors'),
+              hoursBalanceDetail: this.$_.omit(auxiliaryHoursDetails, ['sectors', 'auxiliary']),
+            }
+            auxiliariesStats[sector].push(auxiliaryStats);
+            this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des données')
+      } finally {
+        this.loadingAuxiliariesDetails = false;
       }
     },
     getCustomersAndDurationBySector (sectorId) {
@@ -349,4 +367,8 @@ export default {
   &-label
     padding: 0 10px
     text-align: center
+
+.spinner-container
+  display: flex;
+  justify-content: center;
 </style>
