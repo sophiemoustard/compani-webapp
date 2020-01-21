@@ -97,7 +97,7 @@
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="grey" icon="edit"
                         @click="openEstablishmentEditionModal(col.value)" />
-                      <q-btn flat round small color="grey" icon="delete" :disable="props.row.users > 0"
+                      <q-btn flat round small color="grey" icon="delete" :disable="props.row.usersCount > 0"
                         @click="validateEstablishmentDeletion(col.value)" />
                     </div>
                   </template>
