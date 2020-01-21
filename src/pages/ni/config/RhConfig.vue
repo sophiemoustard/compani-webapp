@@ -87,7 +87,8 @@
           </div>
         </div>
         <q-card>
-          <ni-responsive-table :data="establishments" :columns="establishmentsColumns" :pagination.sync="establishmentsPagination">
+          <ni-responsive-table :data="establishments" :columns="establishmentsColumns"
+            :pagination.sync="establishmentsPagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -219,19 +220,21 @@
         :error-label="establishmentNameError" @blur="$v.newEstablishment.name.$touch" required-field />
       <ni-input in-modal caption="SIRET" v-model="newEstablishment.siret" :error="$v.newEstablishment.siret.$error"
         :error-label="establishmentSiretError" @blur="$v.newEstablishment.siret.$touch" required-field />
-      <ni-search-address in-modal v-model="newEstablishment.address" color="white" @blur="$v.newEstablishment.address.$touch"
-        :error-label="establishmentAddressError" :error="$v.newEstablishment.address.$error" required-field />
+      <ni-search-address in-modal v-model="newEstablishment.address" color="white"
+        @blur="$v.newEstablishment.address.$touch" :error-label="establishmentAddressError"
+        :error="$v.newEstablishment.address.$error" required-field />
       <ni-input in-modal caption="Téléphone" v-model="newEstablishment.phone" :error="$v.newEstablishment.phone.$error"
         :error-label="establishmentPhoneError" @blur="$v.newEstablishment.phone.$touch" required-field />
       <ni-select in-modal caption="Service de santé du travail" v-model="newEstablishment.workHealthService"
-        :options="workHealthServices" :error="$v.newEstablishment.workHealthService.$error" :error-label="establishmentWhsError"
-        @blur="$v.newEstablishment.workHealthService.$touch" required-field />
-      <ni-select in-modal caption="Code URSSAF" v-model="newEstablishment.urssafCode"
-        :options="urssafCodes" :error="$v.newEstablishment.urssafCode.$error" :error-label="establishmentUrssafCodeError"
+        :options="workHealthServices" :error="$v.newEstablishment.workHealthService.$error"
+        :error-label="establishmentWhsError" @blur="$v.newEstablishment.workHealthService.$touch" required-field />
+      <ni-select in-modal caption="Code URSSAF" v-model="newEstablishment.urssafCode" :options="urssafCodes"
+        :error="$v.newEstablishment.urssafCode.$error" :error-label="establishmentUrssafCodeError"
         @blur="$v.newEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un établissement" icon-right="add" color="primary"
-          :disable="!$v.newEstablishment.$anyDirty || $v.newEstablishment.$invalid" :loading="loading" @click="createNewEstablishment" />
+          :disable="!$v.newEstablishment.$anyDirty || $v.newEstablishment.$invalid" :loading="loading"
+          @click="createNewEstablishment" />
       </template>
     </ni-modal>
 
@@ -242,17 +245,20 @@
       </template>
       <ni-input in-modal caption="Nom" v-model="editedEstablishment.name" :error="$v.editedEstablishment.name.$error"
         :error-label="establishmentNameError" @blur="$v.editedEstablishment.name.$touch" required-field />
-      <ni-input in-modal caption="SIRET" v-model="editedEstablishment.siret" :error="$v.editedEstablishment.siret.$error"
-        :error-label="establishmentSiretError" @blur="$v.editedEstablishment.siret.$touch" required-field />
-      <ni-search-address in-modal v-model="editedEstablishment.address" color="white" @blur="$v.editedEstablishment.address.$touch"
-        :error-label="establishmentAddressError" :error="$v.editedEstablishment.address.$error" required-field />
-      <ni-input in-modal caption="Téléphone" v-model="editedEstablishment.phone" :error="$v.editedEstablishment.phone.$error"
-        :error-label="establishmentPhoneError" @blur="$v.editedEstablishment.phone.$touch" required-field />
+      <ni-input in-modal caption="SIRET" v-model="editedEstablishment.siret"
+        :error="$v.editedEstablishment.siret.$error" :error-label="establishmentSiretError"
+        @blur="$v.editedEstablishment.siret.$touch" required-field />
+      <ni-search-address in-modal v-model="editedEstablishment.address" color="white"
+        @blur="$v.editedEstablishment.address.$touch" :error-label="establishmentAddressError"
+        :error="$v.editedEstablishment.address.$error" required-field />
+      <ni-input in-modal caption="Téléphone" v-model="editedEstablishment.phone"
+        :error="$v.editedEstablishment.phone.$error" :error-label="establishmentPhoneError"
+        @blur="$v.editedEstablishment.phone.$touch" required-field />
       <ni-select in-modal caption="Service de santé du travail" v-model="editedEstablishment.workHealthService"
-        :options="workHealthServices" :error="$v.editedEstablishment.workHealthService.$error" :error-label="establishmentWhsError"
-        @blur="$v.editedEstablishment.workHealthService.$touch" required-field />
-      <ni-select in-modal caption="Code URSSAF" v-model="editedEstablishment.urssafCode"
-        :options="urssafCodes" :error="$v.editedEstablishment.urssafCode.$error" :error-label="establishmentUrssafCodeError"
+        :options="workHealthServices" :error="$v.editedEstablishment.workHealthService.$error"
+        :error-label="establishmentWhsError" @blur="$v.editedEstablishment.workHealthService.$touch" required-field />
+      <ni-select in-modal caption="Code URSSAF" v-model="editedEstablishment.urssafCode" :options="urssafCodes"
+        :error="$v.editedEstablishment.urssafCode.$error" :error-label="establishmentUrssafCodeError"
         @blur="$v.editedEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'établissement" icon-right="add" color="primary"
