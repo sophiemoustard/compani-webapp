@@ -102,7 +102,7 @@ export default {
   },
   data () {
     return {
-      selectedMonth: this.$moment().format('MMYYYY'),
+      selectedMonth: this.$moment().format('MM-YYYY'),
       terms: [],
       filteredSectors: [],
       customersAndDuration: [],
@@ -126,13 +126,13 @@ export default {
     monthsOptions () {
       if (this.firstInterventionStartDate === '') {
         return [
-          { label: 'Mois en cours', value: this.$moment().format('MMYYYY') },
-          { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MMYYYY') },
+          { label: 'Mois en cours', value: this.$moment().format('MM-YYYY') },
+          { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MM-YYYY') },
         ];
       }
       return Array.from(this.$moment().range(this.firstInterventionStartDate, this.$moment().add(1, 'M')).by('month'))
         .sort((a, b) => b.diff(a))
-        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYYYY') }));
+        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MM-YYYY') }));
     },
     monthLabel () {
       const month = this.monthsOptions.find(m => m.value === this.selectedMonth);
