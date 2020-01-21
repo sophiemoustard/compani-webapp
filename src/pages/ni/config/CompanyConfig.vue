@@ -25,12 +25,24 @@
         </div>
       </div>
       <div class="q-mb-xl">
+        <p class="text-weight-bold">Représentant légal</p>
+        <div class="row gutter-profile">
+          <ni-input caption="Prénom" :error="$v.company.legalRepresentative.firstname.$error"
+            v-model="company.legalRepresentative.firstname" @focus="saveTmp('legalRepresentative.firstname')"
+            error-label="Prénom invalide" @blur="updateCompany('legalRepresentative.firstname')" />
+          <ni-input caption="Nom" :error="$v.company.legalRepresentative.lastname.$error" error-label="Nom invalide"
+            v-model="company.legalRepresentative.lastname" @focus="saveTmp('legalRepresentative.lastname')"
+            @blur="updateCompany('legalRepresentative.lastname')" />
+          <ni-input caption="Fonction" :error="$v.company.legalRepresentative.position.$error"
+            v-model="company.legalRepresentative.position" @focus="saveTmp('legalRepresentative.position')"
+            error-label="Fonction invalide" @blur="updateCompany('legalRepresentative.position')" />
+        </div>
+      </div>
+      <div class="q-mb-xl">
         <p class="text-weight-bold">Paie</p>
         <div class="row gutter-profile">
-          <div class="col-xs-12 col-md-6">
-            <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
-              v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
-          </div>
+          <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
+            v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
         </div>
       </div>
     </div>
@@ -73,6 +85,11 @@ export default {
       rna: { required: requiredIf(item => item.type === ASSOCIATION) },
       iban: { required, iban },
       bic: { required, bic },
+      legalRepresentative: {
+        lastname: { required },
+        firstname: { required },
+        position: { required },
+      },
       address: {
         zipCode: { required },
         street: { required },
@@ -116,6 +133,8 @@ export default {
       await this.$store.dispatch('main/getUser', this.user._id);
       this.company = this.user.company;
       this.company.address = this.company.address || { fullAddress: '' };
+      this.company.legalRepresentative =
+        this.company.legalRepresentative || { lastname: '', firstname: '', position: '' };
     },
   },
 }
