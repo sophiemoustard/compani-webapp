@@ -64,9 +64,11 @@
           </template>
         </q-card-actions>
       </div>
-      <div v-show="loadingAuxiliariesDetails" class="col-md-12 col-xs-12 spinner-container"> <q-spinner /> </div>
+      <div v-show="loadingAuxiliariesDetails[sector]" class="col-md-12 col-xs-12 spinner-container">
+        <q-spinner size="25px" color="primary" />
+      </div>
       <q-slide-transition>
-        <span v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails" class="sector-card row">
+        <span v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails[sector]" class="sector-card row">
           <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
             <div class="row person-name">
               <img :src="getAvatar(auxiliary.picture)" class="avatar">
@@ -111,7 +113,7 @@ export default {
       firstInterventionStartDate: '',
       auxiliariesStats: {},
       auxiliariesDetailsIsOpened: {},
-      loadingAuxiliariesDetails: false,
+      loadingAuxiliariesDetails: {},
     };
   },
   computed: {
@@ -188,12 +190,12 @@ export default {
     },
     async getAuxiliariesStats () {
       try {
-        this.loadingAuxiliariesDetails = true;
         const sectors = [];
         const auxiliariesStats = {}
         for (const sector of this.filteredSectors) {
           if (this.auxiliariesStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
           sectors.push(sector);
+          this.$set(this.loadingAuxiliariesDetails, sector, true);
           auxiliariesStats[sector] = [];
         }
         if (!sectors.length) return;
@@ -228,7 +230,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données')
       } finally {
-        this.loadingAuxiliariesDetails = false;
+        this.loadingAuxiliariesDetails = {}
       }
     },
     getCustomersAndDurationBySector (sectorId) {
@@ -371,4 +373,5 @@ export default {
 .spinner-container
   display: flex;
   justify-content: center;
+  margin-bottom: 10px;
 </style>
