@@ -43,18 +43,22 @@
         </div>
       </div>
       <div class="col-md-6 col-xs-12 customer">
-        <div class="row">
+        <template v-if="getCustomersAndDurationBySector(sector).customerCount !== 0">
+          <div class="row">
             <div class="col-4 customer-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
-            <div class="col-4 customer-value">{{ Math.round(getCustomersAndDurationBySector(sector).duration) }}</div>
+            <div class="col-4 customer-value">
+              {{ Math.round(getCustomersAndDurationBySector(sector).averageDuration) }}
+            </div>
             <div class="col-4 customer-value">
               {{ Math.round(getCustomersAndDurationBySector(sector).auxiliaryTurnOver) }}
             </div>
-        </div>
-        <div class="row">
+          </div>
+          <div class="row">
             <div class="col-4 customer-label">Bénéficiaires accompagnés</div>
             <div class="col-4 customer-label">Heures par bénéficiaire</div>
             <div class="col-4 customer-label">Auxiliaires par bénéficiaires</div>
-        </div>
+          </div>
+        </template>
       </div>
       <div class="col-md-12 col-xs-12">
         <q-card-actions align="right">
@@ -197,7 +201,7 @@ export default {
     },
     getCustomersAndDurationBySector (sectorId) {
       const customersAndDuration = this.customersAndDuration.find(el => el.sector === sectorId);
-      return customersAndDuration || { customerCount: 0, duration: 0, auxiliaryTurnOver: 0 };
+      return customersAndDuration || { customerCount: 0, averageDuration: 0, auxiliaryTurnOver: 0 };
     },
     getBilledHours (sectorId) {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
@@ -220,12 +224,6 @@ export default {
       if (!paidTransportStats) return 0;
 
       return (paidTransportStats.duration / this.getBilledHours(sectorId)) * 100 || 0;
-    },
-    getHoursByCustomer (sector) {
-      const customersAndDuration = this.getCustomersAndDurationBySector(sector);
-      if (!customersAndDuration) return 0;
-
-      return customersAndDuration.duration / customersAndDuration.customerCount;
     },
     openAuxiliariesDetails (sectorId) {
       if (this.auxiliariesDetailsIsOpened[sectorId]) {
