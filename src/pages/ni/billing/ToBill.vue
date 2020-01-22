@@ -2,10 +2,10 @@
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="À facturer">
       <template slot="content">
-        <div class="col-xs-12 col-md-6 on-left">
+        <div class="col-xs-12 col-md-3 col-lg-5 on-left">
           <ni-select :options="toBillOptions" v-model="toBillOption" separator />
         </div>
-        <div class="col-xs-12 col-md-5">
+        <div class="col-xs-12 col-md-8 col-lg-6">
           <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
         </div>
       </template>
