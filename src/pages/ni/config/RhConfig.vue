@@ -79,34 +79,6 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Paie</p>
-        <q-card>
-          <ni-responsive-table :data="establishments" :columns="establishmentsColumns"
-            :pagination.sync="establishmentsPagination">
-            <template v-slot:body="{ props }">
-              <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
-                  <template v-if="col.name === 'actions'">
-                    <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="edit"
-                        @click="openEstablishmentEditionModal(col.value)" />
-                      <q-btn flat round small color="grey" icon="delete" :disable="props.row.usersCount > 0"
-                        @click="validateEstablishmentDeletion(col.value)" />
-                    </div>
-                  </template>
-                  <template v-else>{{ col.value }}</template>
-                </q-td>
-              </q-tr>
-            </template>
-          </ni-responsive-table>
-          <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un établissement"
-              @click="establishmentCreationModal = true" />
-          </q-card-actions>
-        </q-card>
-      </div>
-      <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
@@ -185,7 +157,7 @@
         Ajouter une <span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
-        :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
+        :error-label="sectorNameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
           :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
@@ -198,103 +170,27 @@
         Editer l'<span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
-        :error-label="nameError($v.editedSector)" required-field />
+        :error-label="sectorNameError($v.editedSector)" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
           :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
-      </template>
-    </ni-modal>
-
-    <!-- Establishment creation modal -->
-    <ni-modal v-model="establishmentCreationModal" @hide="resetEstablishmentCreationModal">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">établissement</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newEstablishment.name" :error="$v.newEstablishment.name.$error"
-        :error-label="establishmentNameError($v.newEstablishment)" @blur="$v.newEstablishment.name.$touch"
-        required-field />
-      <ni-input in-modal caption="SIRET" v-model="newEstablishment.siret" :error="$v.newEstablishment.siret.$error"
-        :error-label="establishmentSiretError($v.newEstablishment)" @blur="$v.newEstablishment.siret.$touch"
-        required-field />
-      <ni-search-address in-modal v-model="newEstablishment.address" color="white"
-        @blur="$v.newEstablishment.address.$touch" :error-label="establishmentAddressError($v.newEstablishment)"
-        :error="$v.newEstablishment.address.$error" required-field />
-      <ni-input in-modal caption="Téléphone" v-model="newEstablishment.phone" :error="$v.newEstablishment.phone.$error"
-        :error-label="establishmentPhoneError($v.newEstablishment)" @blur="$v.newEstablishment.phone.$touch"
-        required-field />
-      <ni-select in-modal caption="Service de santé du travail" v-model="newEstablishment.workHealthService"
-        :options="workHealthServices" :error="$v.newEstablishment.workHealthService.$error"
-        :error-label="establishmentWhsError($v.newEstablishment)" @blur="$v.newEstablishment.workHealthService.$touch"
-        required-field />
-      <ni-select in-modal caption="Code URSSAF" v-model="newEstablishment.urssafCode" :options="urssafCodes"
-        :error="$v.newEstablishment.urssafCode.$error" :error-label="establishmentUrssafCodeError($v.newEstablishment)"
-        @blur="$v.newEstablishment.urssafCode.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un établissement" icon-right="add" color="primary"
-          :disable="!$v.newEstablishment.$anyDirty || $v.newEstablishment.$invalid" :loading="loading"
-          @click="createNewEstablishment" />
-      </template>
-    </ni-modal>
-
-    <!-- Establishment edition modal -->
-    <ni-modal v-model="establishmentEditionModal" @hide="resetEstablishmentEditionModal">
-      <template slot="title">
-        Éditer l'<span class="text-weight-bold">établissement</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedEstablishment.name" :error="$v.editedEstablishment.name.$error"
-        :error-label="establishmentNameError($v.editedEstablishment)" @blur="$v.editedEstablishment.name.$touch"
-        required-field />
-      <ni-input in-modal caption="SIRET" v-model="editedEstablishment.siret"
-        :error="$v.editedEstablishment.siret.$error" :error-label="establishmentSiretError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.siret.$touch" required-field />
-      <ni-search-address in-modal v-model="editedEstablishment.address" color="white"
-        @blur="$v.editedEstablishment.address.$touch" :error-label="establishmentAddressError($v.editedEstablishment)"
-        :error="$v.editedEstablishment.address.$error" required-field />
-      <ni-input in-modal caption="Téléphone" v-model="editedEstablishment.phone"
-        :error="$v.editedEstablishment.phone.$error" :error-label="establishmentPhoneError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.phone.$touch" required-field />
-      <ni-select in-modal caption="Service de santé du travail" v-model="editedEstablishment.workHealthService"
-        :options="workHealthServices" :error="$v.editedEstablishment.workHealthService.$error"
-        :error-label="establishmentWhsError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.workHealthService.$touch" required-field />
-      <ni-select in-modal caption="Code URSSAF" v-model="editedEstablishment.urssafCode" :options="urssafCodes"
-        :error="$v.editedEstablishment.urssafCode.$error"
-        :error-label="establishmentUrssafCodeError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.urssafCode.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer l'établissement" icon-right="add" color="primary"
-          :disable="$v.editedEstablishment.$invalid" :loading="loading" @click="updateEstablishment" />
       </template>
     </ni-modal>
   </q-page>
 </template>
 
 <script>
-import { required, maxValue, maxLength } from 'vuelidate/lib/validators';
-
-import {
-  posDecimals,
-  sector,
-  validWorkHealthService,
-  validUrssafCode,
-  validSiret,
-  validEstablishmentName,
-  frAddress,
-  frPhoneNumber,
-} from '../../../helpers/vuelidateCustomVal';
+import { required, maxValue } from 'vuelidate/lib/validators';
+import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
 import Modal from '../../../components/Modal';
 import ResponsiveTable from '../../../components/table/ResponsiveTable';
-import Select from '../../../components/form/Select';
-import SearchAddress from '../../../components/form/SearchAddress';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin';
 import { tableMixin } from '../../../mixins/tableMixin';
-import { urssafCodes } from '../../../data/urssafCodes';
-import { workHealthServices } from '../../../data/workHealthServices';
 
 export default {
   name: 'RhConfig',
@@ -304,8 +200,6 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
-    'ni-select': Select,
-    'ni-search-address': SearchAddress,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
@@ -361,83 +255,6 @@ export default {
       newSector: { name: '' },
       sectorEditionModal: false,
       editedSector: { name: '' },
-      establishments: [],
-      establishmentsColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
-        {
-          name: 'siret',
-          label: 'SIRET',
-          align: 'left',
-          field: 'siret',
-        },
-        {
-          name: 'address',
-          label: 'Adresse',
-          align: 'left',
-          field: row => this.$_.get(row, 'address.fullAddress') || '',
-        },
-        {
-          name: 'phone',
-          label: 'Téléphone',
-          align: 'left',
-          field: 'phone',
-        },
-        {
-          name: 'workHealthService',
-          label: 'Service de santé du travail',
-          align: 'left',
-          field: 'workHealthService',
-        },
-        {
-          name: 'urssafCode',
-          label: 'Code URSSAF',
-          align: 'left',
-          field: 'urssafCode',
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
-      ],
-      establishmentsPagination: {
-        rowsPerPage: 0,
-        sortBy: 'name',
-      },
-      establishmentCreationModal: false,
-      newEstablishment: {
-        name: '',
-        siret: '',
-        address: { fullAddress: '' },
-        phone: '',
-        workHealthService: '',
-        urssafCode: '',
-      },
-      editedEstablishment: {
-        name: '',
-        siret: '',
-        address: { fullAddress: '' },
-        phone: '',
-        workHealthService: '',
-        urssafCode: '',
-      },
-      establishmentEditionModal: false,
-      workHealthServices,
-      urssafCodes,
-      establishmentValidation: {
-        name: { required, validEstablishmentName, maxLength: maxLength(32) },
-        siret: { required, validSiret },
-        address: { fullAddress: { required, frAddress } },
-        phone: { required, frPhoneNumber },
-        workHealthService: { required, validWorkHealthService },
-        urssafCode: { required, validUrssafCode },
-      },
     }
   },
   computed: {
@@ -479,8 +296,6 @@ export default {
       editedSector: {
         name: { required, sector },
       },
-      newEstablishment: this.establishmentValidation,
-      editedEstablishment: this.establishmentValidation,
     }
   },
   async mounted () {
@@ -489,7 +304,6 @@ export default {
 
     await this.refreshInternalHours();
     await this.getSectors();
-    await this.getEstablishments();
   },
   methods: {
     async updateCompanyTransportSubs (params) {
@@ -675,154 +489,9 @@ export default {
       }).onOk(() => this.deleteSector(sectorId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
-    nameError (obj) {
+    sectorNameError (obj) {
       if (!obj.name.required) return REQUIRED_LABEL;
       else if (!obj.name.sector) return 'Nom déjà existant';
-    },
-    async getEstablishments () {
-      try {
-        this.establishments = await this.$establishments.list();
-      } catch (e) {
-        console.error(e);
-        this.establishments = [];
-        NotifyNegative('Erreur lors de la récupération des établissements.')
-      }
-    },
-    resetEstablishmentCreationModal () {
-      this.newEstablishment = {
-        name: '',
-        siret: '',
-        address: {},
-        phone: '',
-        workHealthService: '',
-        urssafCode: '',
-      };
-      this.$v.newEstablishment.$reset();
-    },
-    async createNewEstablishment () {
-      try {
-        const isValid = await this.waitForFormValidation(this.$v.newEstablishment);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        await this.$establishments.create(this.newEstablishment);
-        NotifyPositive('Établissement créé.');
-        this.establishmentCreationModal = false;
-        await this.getEstablishments();
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        return NotifyNegative("Erreur lors de la création de l'établissement");
-      } finally {
-        this.loading = false;
-      }
-    },
-    openEstablishmentEditionModal (establishmentId) {
-      this.editedEstablishment = this.$_.cloneDeep(
-        this.establishments.find(est => est._id === establishmentId)
-      ) || this.editedEstablishment;
-      this.establishmentEditionModal = true;
-    },
-    resetEstablishmentEditionModal () {
-      this.editedEstablishment = {
-        name: '',
-        siret: '',
-        address: {},
-        phone: '',
-        workHealthService: '',
-        urssafCode: '',
-      };
-      this.$v.editedEstablishment.$reset();
-    },
-    async updateEstablishment () {
-      try {
-        const isValid = await this.waitForFormValidation(this.$v.editedEstablishment);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.loading = true;
-        await this.$establishments.update(
-          this.editedEstablishment._id,
-          this.$_.pick(this.editedEstablishment, Object.keys(this.newEstablishment))
-        );
-        NotifyPositive('Établissement modifié.');
-        this.establishmentEditionModal = false;
-        await this.getEstablishments();
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        return NotifyNegative("Erreur lors de la modification de l'établissement");
-      } finally {
-        this.loading = false;
-      }
-    },
-    async deleteEstablishment (establishmentId) {
-      try {
-        await this.$establishments.remove(establishmentId);
-        await this.getEstablishments();
-        NotifyPositive('Établissement supprimé.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'établissement.");
-      }
-    },
-    validateEstablishmentDeletion (sectorId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cet établissement ?',
-        ok: 'OK',
-        cancel: 'Annuler',
-      }).onOk(() => this.deleteEstablishment(sectorId))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
-    },
-    establishmentNameError (validationObj) {
-      if (!validationObj.name.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.name.maxLength) {
-        return '32 caractères maximimum';
-      } else if (!validationObj.name.validEstablishmentName) {
-        return 'Caractère(s) invalide(s)';
-      }
-      return '';
-    },
-    establishmentSiretError (validationObj) {
-      if (!validationObj.siret.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.siret.validSiret) {
-        return 'Siret non valide';
-      }
-      return '';
-    },
-    establishmentAddressError (validationObj) {
-      if (!validationObj.address.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.address.frAddress) {
-        return 'Adresse invalide';
-      }
-      return '';
-    },
-    establishmentPhoneError (validationObj) {
-      if (!validationObj.phone.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.phone.frPhoneNumber) {
-        return 'Numéro de téléphone invalide';
-      }
-      return '';
-    },
-    establishmentWhsError (validationObj) {
-      if (!validationObj.workHealthService.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.workHealthService.validWorkHealthService) {
-        return 'Service de santé du travail invalide';
-      }
-      return '';
-    },
-    establishmentUrssafCodeError (validationObj) {
-      if (!validationObj.urssafCode.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.urssafCode.validUrssafCode) {
-        return 'Code URSSAF invalide';
-      }
-      return '';
     },
   },
 }
