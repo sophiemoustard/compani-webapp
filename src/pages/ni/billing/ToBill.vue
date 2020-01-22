@@ -2,10 +2,10 @@
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="À facturer">
       <template slot="content">
-        <div class="col-xs-12 col-md-3 col-lg-5 on-left">
+        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-5 on-left selects">
           <ni-select :options="toBillOptions" v-model="toBillOption" separator />
         </div>
-        <div class="col-xs-12 col-md-8 col-lg-6">
+        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 selects">
           <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
         </div>
       </template>
@@ -301,3 +301,12 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.selects
+  @media screen and (min-width: 768px) and (max-width: 1023px)
+    padding-left: 10px;
+    padding-right: 10px;
+  @media screen and (max-width: 1023px)
+    margin: 0px !important;
+</style>
