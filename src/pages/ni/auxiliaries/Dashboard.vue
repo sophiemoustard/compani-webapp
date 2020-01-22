@@ -57,7 +57,7 @@
             </div>
           </div>
           <div class="row">
-            <div class="col-4 customer-label">Bénéficiaires accompagnés</div>
+            <div class="col-4 customer-label">Bénéficiaires</div>
             <div class="col-4 customer-label">Heures par bénéficiaire</div>
             <div class="col-4 customer-label">Auxiliaires par bénéficiaires</div>
           </div>
