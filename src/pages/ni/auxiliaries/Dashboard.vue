@@ -89,12 +89,14 @@
         </span>
       </q-slide-transition>
     </q-card>
+    <gauge />
   </q-page>
 </template>
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
+import Gauge from '../../../components/Gauge';
 import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '../../../data/constants';
 import { formatHours, roundFrenchPercentage } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
@@ -106,6 +108,7 @@ export default {
   components: {
     'ni-chips-autocomplete': ChipsAutocomplete,
     'ni-auxiliary-indicators': AuxiliaryIndicators,
+    Gauge,
   },
   data () {
     return {
@@ -121,6 +124,12 @@ export default {
       auxiliariesStats: {},
       auxiliariesDetailsIsOpened: {},
       loadingAuxiliariesDetails: {},
+      gaugeOptions: {
+        angle: 0,
+        radiusScale: 0.8,
+        minValue: -100,
+        maxValue: 0,
+      },
     };
   },
   computed: {
@@ -252,7 +261,7 @@ export default {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
       const internalHours = billedHours ? billedHours.internalHours : 0;
 
-      return (internalHours / this.getBilledHours(sectorId)) * 100 || 0
+      return (internalHours / this.getBilledHours(sectorId)) * 100 || 0;
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
