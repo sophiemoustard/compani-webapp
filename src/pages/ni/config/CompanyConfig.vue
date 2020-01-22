@@ -178,6 +178,7 @@ export default {
       company: null,
       documents: null,
       COMPANY,
+      loading: false,
       // Establishment
       establishments: [],
       establishmentsColumns: [
