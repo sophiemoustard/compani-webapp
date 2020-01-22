@@ -89,7 +89,7 @@
         </span>
       </q-slide-transition>
     </q-card>
-    <gauge />
+    <ni-gauge :radius="100" />
   </q-page>
 </template>
 
@@ -108,7 +108,7 @@ export default {
   components: {
     'ni-chips-autocomplete': ChipsAutocomplete,
     'ni-auxiliary-indicators': AuxiliaryIndicators,
-    Gauge,
+    'ni-gauge': Gauge,
   },
   data () {
     return {
@@ -124,12 +124,6 @@ export default {
       auxiliariesStats: {},
       auxiliariesDetailsIsOpened: {},
       loadingAuxiliariesDetails: {},
-      gaugeOptions: {
-        angle: 0,
-        radiusScale: 0.8,
-        minValue: -100,
-        maxValue: 0,
-      },
     };
   },
   computed: {
