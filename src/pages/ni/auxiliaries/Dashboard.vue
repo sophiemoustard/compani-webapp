@@ -71,10 +71,20 @@
           </template>
         </q-card-actions>
       </div>
+      <div v-show="loadingAuxiliariesDetails[sector]" class="col-md-12 col-xs-12 spinner-container">
+        <q-spinner size="25px" color="primary" />
+      </div>
       <q-slide-transition>
-        <span v-show="auxiliariesDetailsIsOpened[sector]" class="sector-card row">
-          <div v-for="auxiliary in paidInterventionStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
-            {{ auxiliary }}
+        <span v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails[sector]" class="sector-card row">
+          <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+            <div class="row person-name">
+              <img :src="getAvatar(auxiliary.picture)" class="avatar">
+              <div class="q-pl-md">
+                {{ auxiliary.identity.firstname }} {{ auxiliary.identity.lastname.toUpperCase() }}
+              </div>
+            </div>
+            <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail"
+              :customers-details="auxiliary.paidIntervention" />
           </div>
         </span>
       </q-slide-transition>
@@ -85,19 +95,21 @@
 <script>
 import { mapActions, mapGetters } from 'vuex';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
-import { AUXILIARY_ROLES } from '../../../data/constants';
+import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '../../../data/constants';
 import { formatHours, roundFrenchPercentage } from '../../../helpers/utils';
 import { NotifyNegative } from '../../../components/popup/notify';
+import AuxiliaryIndicators from '../../../components/planning/AuxiliaryIndicators';
 
 export default {
   name: 'Dashboard',
   metaInfo: { title: 'Tableau de bord' },
   components: {
     'ni-chips-autocomplete': ChipsAutocomplete,
+    'ni-auxiliary-indicators': AuxiliaryIndicators,
   },
   data () {
     return {
-      selectedMonth: this.$moment().format('MMYYYY'),
+      selectedMonth: this.$moment().format('MM-YYYY'),
       terms: [],
       filteredSectors: [],
       customersAndDuration: [],
@@ -106,8 +118,9 @@ export default {
       paidTransportStats: [],
       monthModal: false,
       firstInterventionStartDate: '',
-      paidInterventionStats: {},
+      auxiliariesStats: {},
       auxiliariesDetailsIsOpened: {},
+      loadingAuxiliariesDetails: {},
     };
   },
   computed: {
@@ -120,13 +133,13 @@ export default {
     monthsOptions () {
       if (this.firstInterventionStartDate === '') {
         return [
-          { label: 'Mois en cours', value: this.$moment().format('MMYYYY') },
-          { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MMYYYY') },
+          { label: 'Mois en cours', value: this.$moment().format('MM-YYYY') },
+          { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MM-YYYY') },
         ];
       }
       return Array.from(this.$moment().range(this.firstInterventionStartDate, this.$moment().add(1, 'M')).by('month'))
         .sort((a, b) => b.diff(a))
-        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MMYYYY') }));
+        .map(month => ({ label: month.format('MMMM YY'), value: month.format('MM-YYYY') }));
     },
     monthLabel () {
       const month = this.monthsOptions.find(m => m.value === this.selectedMonth);
@@ -144,7 +157,7 @@ export default {
       deep: true,
       immediate: true,
       async handler (sectors) {
-        await this.getPaidInterventionStats();
+        await this.getAuxiliariesStats();
       },
     },
   },
@@ -158,6 +171,9 @@ export default {
     ...mapActions({
       fillFilter: 'planning/fillFilter',
     }),
+    getAvatar (picture) {
+      return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
+    },
     initFilters () {
       if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
         const userSector = this.filters.find(filter => filter._id === this.mainUser.sector);
@@ -169,7 +185,7 @@ export default {
     async selectMonth (month) {
       this.selectedMonth = month;
       this.monthModal = false;
-      this.paidInterventionStats = {};
+      this.auxiliariesStats = {};
       await this.refresh();
     },
     getIcon (sector) {
@@ -179,27 +195,49 @@ export default {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    async getPaidInterventionStats () {
-      const sectors = [];
-      const paidInterventionStats = {}
-      for (const sector of this.filteredSectors) {
-        if (this.paidInterventionStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
-        sectors.push(sector);
-        paidInterventionStats[sector] = [];
-      }
-      if (!sectors.length) return;
-
-      const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({
-        sector: sectors,
-        month: this.selectedMonth,
-      });
-
-      for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
-        for (const sector of auxiliaryPaidInterventions.sectors) {
-          if (!sectors.includes(sector)) continue;
-          paidInterventionStats[sector].push(this.$_.omit(auxiliaryPaidInterventions, 'sectors'));
-          this.$set(this.paidInterventionStats, sector, paidInterventionStats[sector]);
+    async getAuxiliariesStats () {
+      try {
+        const sectors = [];
+        const auxiliariesStats = {}
+        for (const sector of this.filteredSectors) {
+          if (this.auxiliariesStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
+          sectors.push(sector);
+          this.$set(this.loadingAuxiliariesDetails, sector, true);
+          auxiliariesStats[sector] = [];
         }
+        if (!sectors.length) return;
+
+        const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({
+          sector: sectors,
+          month: this.selectedMonth,
+        });
+
+        const hoursBalanceDetail = await this.$pay.getHoursBalanceDetail({
+          sector: sectors,
+          month: this.selectedMonth,
+        });
+
+        for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
+          for (const sector of auxiliaryPaidInterventions.sectors) {
+            if (!sectors.includes(sector)) continue;
+            const auxiliaryHoursDetails = hoursBalanceDetail.find(hbd =>
+              hbd.auxiliaryId === auxiliaryPaidInterventions._id);
+            const auxiliaryStats = {
+              _id: auxiliaryPaidInterventions._id,
+              identity: auxiliaryHoursDetails.identity,
+              picture: auxiliaryHoursDetails.picture,
+              paidIntervention: this.$_.omit(auxiliaryPaidInterventions, 'sectors'),
+              hoursBalanceDetail: this.$_.omit(auxiliaryHoursDetails, ['sectors', 'auxiliary']),
+            }
+            auxiliariesStats[sector].push(auxiliaryStats);
+            this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des données')
+      } finally {
+        this.loadingAuxiliariesDetails = {}
       }
     },
     getCustomersAndDurationBySector (sectorId) {
@@ -258,7 +296,7 @@ export default {
         this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
         this.paidTransportStats = paidTransportStats;
-        await this.getPaidInterventionStats();
+        await this.getAuxiliariesStats();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
@@ -338,4 +376,9 @@ export default {
   &-label
     padding: 0 10px
     text-align: center
+
+.spinner-container
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
 </style>
