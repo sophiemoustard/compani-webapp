@@ -42,11 +42,10 @@
         </div>
         <div class="q-mb-md q-pt-md gauge-wrapper">
           <div>
-            <ni-gauge :min="5" :max="20" :value="getInternalHoursRatio(sector)" />
+            <ni-gauge :min="5" :max="20" :value="getInternalHoursRatio(sector)" title="Heures internes" />
           </div>
           <div>
-            <ni-gauge :min="7" :max="16" :value="getPaidTransportStats(sector)" />
-            {{ getPaidTransportStats(sector) }}%
+            <ni-gauge :min="7" :max="16" :value="getPaidTransportStats(sector)" title="Transports" />
           </div>
         </div>
       </div>

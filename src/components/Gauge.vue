@@ -1,12 +1,21 @@
 <template>
-  <div class="gauge-container" ref="wrapper">
-    <svg id="meter">
-      <path :d="this.first" fill="none" stroke="#E2007A" stroke-width="8" />
-      <path :d="this.second" fill="none" stroke="#E6C6D6" stroke-width="8" />
-      <path :d="this.third" fill="none" stroke="#D0D0D0" stroke-width="8" />
-      <circle cx="100" cy="100" r="1" fill="black" style="position: fixed"/>
-    </svg>
-    <img id="meter_needle" src="~assets/gauge-needle.svg" alt="" :style="`transform: rotate(${needleAngle}deg)`">
+  <div class="gauge">
+    <div class="gauge-container" ref="wrapper">
+      <svg id="meter">
+        <path :d="this.first" fill="none" stroke="#D0D0D0" stroke-width="8" />
+        <path :d="this.second" fill="none" stroke="#E6C6D6" stroke-width="8" />
+        <path :d="this.third" fill="none" stroke="#E2007A" stroke-width="8" />
+        <text :x="maxLabel.x" :y="maxLabel.y" class="gauge-limit">{{ max }}%</text>
+        <text :x="minLabel.x" :y="minLabel.y" class="gauge-limit">{{ min }}%</text>
+        <text :x="intermediateMinLabel.x" :y="intermediateMinLabel.y" class="gauge-limit">
+          {{ Math.round(intermediateMin) }}%</text>
+        <text :x="intermediateMaxLabel.x" :y="intermediateMaxLabel.y" class="gauge-limit">
+          {{ Math.round(intermediateMax) }}%
+        </text>
+      </svg>
+      <img id="meter_needle" src="~assets/gauge-needle.svg" alt="" :style="`transform: rotate(${needleAngle}deg)`">
+    </div>
+    <div class="gauge-title text-weight-bold">{{ title }}</div>
   </div>
 </template>
 
@@ -17,11 +26,12 @@ export default {
     max: { type: Number, default: 15 },
     min: { type: Number, default: 5 },
     value: { type: Number, default: 7.5 },
+    title: { type: String, default: '' },
   },
   data () {
     return {
       radius: 70,
-    }
+    };
   },
   computed: {
     reference () {
@@ -30,8 +40,26 @@ export default {
     range () {
       return this.max - this.reference;
     },
+    intermediateMin () {
+      return this.min + (this.max - this.min) / 3;
+    },
+    intermediateMax () {
+      return this.max - (this.max - this.min) / 3;
+    },
     needleAngle () {
       return (this.reference - Math.max(Math.min(this.value, this.max), this.min)) / this.range * 90;
+    },
+    minLabel () {
+      return { x: 2 * this.radius + 5, y: this.radius };
+    },
+    intermediateMaxLabel () {
+      return { x: this.radius / 2 - 23, y: this.radius * (1 - Math.sqrt(3) / 2) };
+    },
+    intermediateMinLabel () {
+      return { x: this.radius * 3 / 2 + 7, y: this.radius * (1 - Math.sqrt(3) / 2) };
+    },
+    maxLabel () {
+      return { x: -21, y: this.radius };
     },
     first () {
       const origin = `0,${this.radius}`;
@@ -65,8 +93,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .gauge-container
+  .gauge
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    &-container
       position: relative
+    &-limit
+      font-size: 9px
 
   #meter
     width: 100%
