@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
     <div v-if="company">
-      <h4>Configuration Bénéficiaires</h4>
+      <h4>Configuration bénéficiaires</h4>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
@@ -56,28 +56,6 @@
               @click="serviceCreationModal = true" />
           </q-card-actions>
         </q-card>
-      </div>
-      <div class="q-mb-xl">
-        <p class="text-weight-bold">Informations de l'organisation</p>
-        <div class="row gutter-profile">
-          <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
-            @blur="updateCompany('name')" />
-          <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
-            @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
-            :error-label="tradeNameError" />
-          <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
-            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
-            :error="$v.company.address.$error" />
-          <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
-          <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
-            @blur="updateCompany('rcs')" />
-          <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
-            @blur="updateCompany('rna')" />
-          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
-            @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
-          <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
-            v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
-        </div>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Documents</p>
@@ -327,7 +305,7 @@
 </template>
 
 <script>
-import { required, numeric, requiredIf, maxLength } from 'vuelidate/lib/validators';
+import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import DateInput from '../../../components/form/DateInput.vue';
 import TimeInput from '../../../components/form/TimeInput.vue';
@@ -340,18 +318,16 @@ import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import Modal from '../../../components/Modal';
 import ReponsiveTable from '../../../components/table/ResponsiveTable';
-import { frAddress, posDecimals, positiveNumber, iban, bic } from '../../../helpers/vuelidateCustomVal';
+import { frAddress, posDecimals, positiveNumber } from '../../../helpers/vuelidateCustomVal';
 import {
   BILLING_DIRECT,
   BILLING_INDIRECT,
-  REQUIRED_LABEL,
   CONTRACT_STATUS_OPTIONS,
   TWO_WEEKS,
   MONTH,
   NATURE_OPTIONS,
   FIXED,
   COMPANY,
-  ASSOCIATION,
 } from '../../../data/constants.js';
 
 export default {
@@ -396,7 +372,6 @@ export default {
   },
   data () {
     return {
-      selectEveningStartTime: false,
       loading: false,
       company: null,
       documents: null,
@@ -714,20 +689,6 @@ export default {
       vat: { positiveNumber },
     },
     company: {
-      ics: { required },
-      name: { required },
-      tradeName: { required, maxLength: maxLength(11) },
-      type: { required },
-      rcs: { required: requiredIf(item => item.type === COMPANY) },
-      rna: { required: requiredIf(item => item.type === ASSOCIATION) },
-      iban: { required, iban },
-      bic: { required, bic },
-      address: {
-        zipCode: { required },
-        street: { required },
-        city: { required },
-        fullAddress: { required, frAddress },
-      },
       customersConfig: {
         bllingPeriod: { required },
       },
@@ -762,9 +723,6 @@ export default {
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
-    addressError () {
-      return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
-    },
     isTppEditionDisabled () {
       return this.$v.editedThirdPartyPayer.$error || !this.editedThirdPartyPayer.name || !this.editedThirdPartyPayer.billingMode;
     },
@@ -789,30 +747,6 @@ export default {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
       return selectedService ? this.$moment(selectedService.startDate).add(1, 'd').toISOString() : '';
     },
-    ibanError () {
-      if (!this.$v.company.iban.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.company.iban.iban) {
-        return 'IBAN non valide';
-      }
-      return '';
-    },
-    bicError () {
-      if (!this.$v.company.bic.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.company.bic.bic) {
-        return 'BIC non valide';
-      }
-      return '';
-    },
-    tradeNameError () {
-      if (!this.$v.company.tradeName.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.company.tradeName.maxLength) {
-        return 'Doit contenir 11 caractères max (espaces inclus).';
-      }
-      return '';
-    },
   },
   async mounted () {
     await this.refreshCompany();
@@ -826,22 +760,25 @@ export default {
 
       return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
     },
-    saveTmp (path) {
-      this.tmpInput = this.$_.get(this.company, path)
-    },
     // Refresh data
     async refreshSurcharges () {
       try {
         this.surchargesOptions = [];
         this.surcharges = await this.$surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
-          if (this.surcharges[i].eveningStartTime) this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
-          if (this.surcharges[i].eveningEndTime) this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
-          if (this.surcharges[i].customStartTime) this.surcharges[i].customStartTime = this.$moment(this.surcharges[i].customStartTime, 'HH:mm');
-          if (this.surcharges[i].customEndTime) this.surcharges[i].customEndTime = this.$moment(this.surcharges[i].customEndTime, 'HH:mm');
-          this.surchargesOptions.push({
-            label: this.surcharges[i].name, value: this.surcharges[i]._id,
-          });
+          if (this.surcharges[i].eveningStartTime) {
+            this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
+          }
+          if (this.surcharges[i].eveningEndTime) {
+            this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
+          }
+          if (this.surcharges[i].customStartTime) {
+            this.surcharges[i].customStartTime = this.$moment(this.surcharges[i].customStartTime, 'HH:mm');
+          }
+          if (this.surcharges[i].customEndTime) {
+            this.surcharges[i].customEndTime = this.$moment(this.surcharges[i].customEndTime, 'HH:mm');
+          }
+          this.surchargesOptions.push({ label: this.surcharges[i].name, value: this.surcharges[i]._id });
         }
       } catch (e) {
         NotifyNegative('Erreur lors du rafraîchissement des plans de majoration.');
@@ -876,27 +813,6 @@ export default {
         console.error(e);
       }
     },
-    // Company
-    async updateCompany (path) {
-      try {
-        if (this.tmpInput === this.$_.get(this.company, path)) return;
-        if (this.$_.get(this.$v.company, path)) {
-          this.$_.get(this.$v.company, path).$touch();
-          const isValid = await this.waitForValidation(this.$v.company, path);
-          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
-        }
-
-        const value = this.$_.get(this.company, path);
-        const payload = this.$_.set({}, path, value);
-        await this.$companies.updateById(this.company._id, payload);
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification');
-      } finally {
-        this.tmpInput = '';
-      }
-    },
     // Surcharges
     resetCreationSurchargeData () {
       this.surchargeCreationModal = false;
@@ -917,11 +833,20 @@ export default {
       this.$v.newSurcharge.$reset();
     },
     getSurchargePayload (surchargeType) {
-      const payload = surchargeType;
-      if (surchargeType.eveningStartTime) payload.eveningStartTime = this.$moment(surchargeType.eveningStartTime, 'HH:mm').format('HH:mm');
-      if (surchargeType.eveningEndTime) payload.eveningEndTime = this.$moment(surchargeType.eveningEndTime, 'HH:mm').format('HH:mm');
-      if (surchargeType.customStartTime) payload.customStartTime = this.$moment(surchargeType.customStartTime, 'HH:mm').format('HH:mm');
-      if (surchargeType.customEndTime) payload.customEndTime = this.$moment(surchargeType.customEndTime, 'HH:mm').format('HH:mm');
+      const payload = this.$_.cloneDeep(surchargeType);
+      if (surchargeType.eveningStartTime) {
+        payload.eveningStartTime = this.$moment(surchargeType.eveningStartTime, 'HH:mm').format('HH:mm');
+      }
+      if (surchargeType.eveningEndTime) {
+        payload.eveningEndTime = this.$moment(surchargeType.eveningEndTime, 'HH:mm').format('HH:mm');
+      }
+      if (surchargeType.customStartTime) {
+        payload.customStartTime = this.$moment(surchargeType.customStartTime, 'HH:mm').format('HH:mm');
+      }
+      if (surchargeType.customEndTime) {
+        payload.customEndTime = this.$moment(surchargeType.customEndTime, 'HH:mm').format('HH:mm');
+      }
+
       return payload;
     },
     async createNewSurcharge () {
