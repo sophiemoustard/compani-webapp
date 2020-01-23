@@ -89,7 +89,7 @@
         </span>
       </q-slide-transition>
     </q-card>
-    <ni-gauge :radius="100" :strokes="strokes" />
+    <ni-gauge :radius="100" />
   </q-page>
 </template>
 
@@ -124,11 +124,6 @@ export default {
       auxiliariesStats: {},
       auxiliariesDetailsIsOpened: {},
       loadingAuxiliariesDetails: {},
-      strokes: [
-        { color: '#E2007A', width: 30 },
-        { color: '#F29400', width: 30 },
-        { color: '#D0D0D0', width: 30 },
-      ],
     };
   },
   computed: {
