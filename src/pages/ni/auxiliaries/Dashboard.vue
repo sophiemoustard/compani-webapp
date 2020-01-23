@@ -19,7 +19,7 @@
       </div>
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
-      <div class="col-md-6 col-xs-12 q-pa-md">
+      <div class="col-md-6 col-xs-12 q-pl-md q-pr-md q-pt-md">
         <div class="q-mb-lg stats-header">
           <div class="text-capitalize">
             <div class="sector-name text-weight-bold">{{ sectorName(sector) }}</div>
@@ -40,9 +40,14 @@
             <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
         </div>
-        <div class="q-mb-md">
-          <div>{{ getInternalHoursRatio(sector) }}%</div>
-          <div>{{ getPaidTransportStats(sector) }}%</div>
+        <div class="q-mb-md q-pt-md gauge-wrapper">
+          <div>
+            <ni-gauge :min="5" :max="20" :value="getInternalHoursRatio(sector)" />
+          </div>
+          <div>
+            <ni-gauge :min="7" :max="16" :value="getPaidTransportStats(sector)" />
+            {{ getPaidTransportStats(sector) }}%
+          </div>
         </div>
       </div>
       <div class="col-md-6 col-xs-12 customer">
@@ -89,7 +94,6 @@
         </span>
       </q-slide-transition>
     </q-card>
-    <ni-gauge :radius="100" />
   </q-page>
 </template>
 
@@ -384,4 +388,8 @@ export default {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
+
+.gauge-wrapper
+  display: flex
+  justify-content: space-around
 </style>
