@@ -43,6 +43,9 @@
           <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
             v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
         </div>
+      </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Établissements</p>
         <q-card>
           <ni-responsive-table :data="establishments" :columns="establishmentsColumns"
             :pagination.sync="establishmentsPagination">
