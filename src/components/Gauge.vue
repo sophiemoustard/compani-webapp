@@ -4,27 +4,27 @@
       <svg id="meter">
         <defs>
           <linearGradient id="linear" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
-            <stop offset="0%" :stop-color="maxColor"/>
-            <stop offset="100%" :stop-color="intermediateMaxColor"/>
+            <stop offset="0%" :stop-color="maximum.color"/>
+            <stop offset="100%" :stop-color="intermediateMax.color"/>
           </linearGradient>
           <linearGradient id="linear2" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
-            <stop offset="0%" :stop-color="intermediateMaxColor"/>
-            <stop offset="100%" :stop-color="intermediateMinColor"/>
+            <stop offset="0%" :stop-color="intermediateMax.color"/>
+            <stop offset="100%" :stop-color="intermediateMin.color"/>
           </linearGradient>
           <linearGradient id="linear3" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
-            <stop offset="0%" :stop-color="intermediateMinColor"/>
-            <stop offset="100%" :stop-color="minColor"/>
+            <stop offset="0%" :stop-color="intermediateMin.color"/>
+            <stop offset="100%" :stop-color="minimum.color"/>
           </linearGradient>
         </defs>
-        <path :d="this.first" fill="none" stroke="url(#linear)" stroke-width="8" opacity="0.4" />
-        <path :d="this.second" fill="none" stroke="url(#linear2)" stroke-width="8" opacity="0.4" />
-        <path :d="this.third" fill="none" stroke="url(#linear3)" stroke-width="8" opacity="0.4" />
-        <text :x="maxLabel.x" :y="maxLabel.y" class="gauge-limit">{{ max }}%</text>
-        <text :x="minLabel.x" :y="minLabel.y" class="gauge-limit">{{ min }}%</text>
-        <text :x="intermediateMinLabel.x" :y="intermediateMinLabel.y" class="gauge-limit">
-          {{ Math.round(intermediateMin) }}%</text>
-        <text :x="intermediateMaxLabel.x" :y="intermediateMaxLabel.y" class="gauge-limit">
-          {{ Math.round(intermediateMax) }}%
+        <path :d="this.first" fill="none" stroke="url(#linear)" stroke-width="8" opacity="0.6" />
+        <path :d="this.second" fill="none" stroke="url(#linear2)" stroke-width="8" opacity="0.6" />
+        <path :d="this.third" fill="none" stroke="url(#linear3)" stroke-width="8" opacity="0.6" />
+        <text :x="maximum.x" :y="maximum.y" class="gauge-limit">{{ maximum.value }}%</text>
+        <text :x="minimum.x" :y="minimum.y" class="gauge-limit">{{ minimum.value }}%</text>
+        <text :x="intermediateMin.x" :y="intermediateMin.y" class="gauge-limit">
+          {{ Math.round(intermediateMin.value) }}%</text>
+        <text :x="intermediateMax.x" :y="intermediateMax.y" class="gauge-limit">
+          {{ Math.round(intermediateMax.value) }}%
         </text>
       </svg>
       <img id="meter_needle" src="~assets/gauge-needle.svg" alt="" :style="`transform: rotate(${needleAngle}deg)`">
@@ -54,38 +54,40 @@ export default {
     range () {
       return this.max - this.reference;
     },
+    minimum () {
+      return {
+        value: this.min,
+        x: 2 * this.radius + 5,
+        y: this.radius,
+        color: '#9EE945',
+      };
+    },
     intermediateMin () {
-      return this.min + (this.max - this.min) / 3;
+      return {
+        value: this.min + (this.max - this.min) / 3,
+        x: this.radius * 3 / 2 + 7,
+        y: this.radius * (1 - Math.sqrt(3) / 2),
+        color: '#FCF100',
+      };
     },
     intermediateMax () {
-      return this.max - (this.max - this.min) / 3;
+      return {
+        value: this.max - (this.max - this.min) / 3,
+        x: this.radius / 2 - 23,
+        y: this.radius * (1 - Math.sqrt(3) / 2),
+        color: '#F29400',
+      };
+    },
+    maximum () {
+      return {
+        value: this.max,
+        x: -21,
+        y: this.radius,
+        color: '#e20009',
+      };
     },
     needleAngle () {
       return (this.reference - Math.max(Math.min(this.value, this.max), this.min)) / this.range * 90;
-    },
-    minLabel () {
-      return { x: 2 * this.radius + 5, y: this.radius };
-    },
-    intermediateMinLabel () {
-      return { x: this.radius * 3 / 2 + 7, y: this.radius * (1 - Math.sqrt(3) / 2) };
-    },
-    maxLabel () {
-      return { x: -21, y: this.radius };
-    },
-    intermediateMaxLabel () {
-      return { x: this.radius / 2 - 23, y: this.radius * (1 - Math.sqrt(3) / 2) };
-    },
-    minColor () {
-      return '#9EE945';
-    },
-    intermediateMinColor () {
-      return '#fcf100';
-    },
-    intermediateMaxColor () {
-      return '#F29400';
-    },
-    maxColor () {
-      return '#F25700';
     },
     first () {
       const origin = `0,${this.radius}`;
