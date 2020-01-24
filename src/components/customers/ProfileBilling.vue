@@ -11,7 +11,7 @@
       <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
         @openEditionModal="openEditionModal" :type="CUSTOMER" :startBalance="getStartBalance()"
         :endBalance="getEndBalance(customerDocuments)" />
-      <div v-if="isCoach" align="right">
+      <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
           color="white" icon="add" />
       </div>
@@ -21,7 +21,7 @@
       <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :displayActions="isCoach"
         @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
         :endBalance="getEndBalance(tpp.documents, tpp)" />
-      <div v-if="isCoach" align="right">
+      <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].client)" />
       </div>
@@ -47,7 +47,7 @@
           </q-tr>
         </template>
       </ni-simple-table>
-      <div v-if="isCoach" align="right">
+      <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter une attestation" no-caps flat color="white" icon="add"
           @click="taxCertificateModal = true" />
       </div>
@@ -171,7 +171,7 @@ export default {
         rowsPerPage: 0,
       },
       taxCertificate: {
-        date: '',
+        date: this.$moment().toISOString(),
         year: this.$moment().subtract(1, 'y').format('YYYY'),
         file: null,
       },
@@ -431,7 +431,7 @@ export default {
     },
     resetTaxCertificateModal () {
       this.taxCertificate = {
-        date: '',
+        date: this.$moment().toISOString(),
         year: this.$moment().subtract(1, 'y').format('YYYY'),
         file: null,
       };
