@@ -29,7 +29,7 @@
       </svg>
       <img id="meter_needle" src="~assets/gauge-needle.svg" alt="" :style="`transform: rotate(${needleAngle}deg)`">
     </div>
-    <div class="q-mt-sm">{{ title }}</div>
+    <slot name="title" />
   </div>
 </template>
 
@@ -44,12 +44,10 @@ export default {
     value: { type: Number, default: 0 },
     title: { type: String, default: '' },
   },
-  data () {
-    return {
-      radius: 70,
-    };
-  },
   computed: {
+    radius () {
+      return this.$q.platform.is.mobile ? 40 : 70;
+    },
     reference () {
       return (this.max + this.min) / 2;
     },
@@ -78,34 +76,37 @@ export default {
       return { x: this.radius / 2 - 23, y: this.radius * (1 - Math.sqrt(3) / 2) };
     },
     minColor () {
-      return '#FEF86C';
+      return '#9EE945';
     },
     intermediateMinColor () {
-      return '#FFAF14';
+      return '#fcf100';
     },
     intermediateMaxColor () {
-      return '#FF6A0F';
+      return '#F29400';
     },
     maxColor () {
-      return '#FF0C00';
+      return '#F25700';
     },
     first () {
       const origin = `0,${this.radius}`;
       const control = `0,${-this.radius / Math.sqrt(3)}`;
       const end = `${this.radius / 2},${-this.radius * Math.sqrt(3) / 2}`;
-      return `M${origin} q${control} ${end}`
+
+      return `M${origin} q${control} ${end}`;
     },
     second () {
       const origin = `${this.radius / 2},${this.radius * (1 - Math.sqrt(3) / 2)}`;
       const control = `${this.radius / 2},${-this.radius * (Math.sqrt(3) / 6)}`;
       const end = `${this.radius},0`;
-      return `M${origin} q${control} ${end}`
+
+      return `M${origin} q${control} ${end}`;
     },
     third () {
       const origin = `${this.radius * 2},${this.radius}`;
       const control = `0,${-this.radius / Math.sqrt(3)}`;
       const end = `${-this.radius / 2},${-this.radius * Math.sqrt(3) / 2}`;
-      return `M${origin} q${control} ${end}`
+
+      return `M${origin} q${control} ${end}`;
     },
   },
   mounted () {
@@ -113,8 +114,8 @@ export default {
   },
   methods: {
     setWrapperDimensions () {
-      this.$refs.wrapper.style.width = `${2 * this.radius}px`
-      this.$refs.wrapper.style.height = `${this.radius}px`
+      this.$refs.wrapper.style.width = `${2 * this.radius}px`;
+      this.$refs.wrapper.style.height = `${this.radius}px`;
     },
     roundFrenchPercentage,
   },

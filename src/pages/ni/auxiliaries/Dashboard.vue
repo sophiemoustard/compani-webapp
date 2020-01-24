@@ -41,10 +41,16 @@
           </div>
         </div>
         <div class="q-pt-md gauge-wrapper">
-          <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)"
-            :title="`Heures internes - ${formatHours(getInternalHours(sector))}`" />
-          <ni-gauge v-if="getPaidTransportRatio(sector) !== 0" :min="7" :max="16" :value="getPaidTransportRatio(sector)"
-            :title="`Transports - ${formatHours(getPaidTransport(sector))}`" />
+          <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)">
+            <div slot="title" class="q-mt-sm" >
+              <span class="text-weight-bold">Heures internes</span> - {{ formatHours(getInternalHours(sector)) }}
+            </div>
+          </ni-gauge>
+          <ni-gauge v-if="getPaidTransport(sector) !== 0" :min="7" :max="16" :value="getPaidTransportRatio(sector)">
+            <div slot="title" class="q-mt-sm" >
+              <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
+            </div>
+          </ni-gauge>
         </div>
       </div>
       <div class="col-md-6 col-xs-12 customer">
@@ -373,11 +379,11 @@ export default {
     display: flex
     justify-content: center
     &:first-child
-      color: $secondary
-    &:nth-child(2)
       color: $primary
+    &:nth-child(2)
+      color: $secondary
     &:nth-child(3)
-      color: $primary-dark
+      color: $grey
   &-value
     font-size: 48px
   &-label
