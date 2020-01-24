@@ -85,7 +85,8 @@
       <q-slide-transition>
         <span v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails[sector]" class="sector-card row
           item-stretch">
-          <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id" class="col-md-6 col-xs-12">
+          <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
+            class="col-md-6 col-xs-12 auxiliary-indicators q-mb-md">
             <div class="row person-name">
               <img :src="getAvatar(auxiliary.picture)" class="avatar">
               <div class="q-pl-md">
@@ -94,7 +95,6 @@
             </div>
             <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail"
               :customers-details="auxiliary.paidIntervention" />
-            <hr>
           </div>
         </span>
       </q-slide-transition>
@@ -401,6 +401,6 @@ export default {
   display: flex
   justify-content: space-around
 
-hr
-  border-top: 1px solid $light-grey
+.auxiliary-indicators
+  border-bottom: 1px solid $light-grey
 </style>
