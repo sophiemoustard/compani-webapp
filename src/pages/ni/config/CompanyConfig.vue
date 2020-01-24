@@ -214,12 +214,14 @@ export default {
           label: 'Service de santé du travail',
           align: 'left',
           field: 'workHealthService',
+          format: value => value ? this.$_.get(workHealthServices.find(whs => whs.value === value), 'label', '') : '',
         },
         {
           name: 'urssafCode',
           label: 'Code URSSAF',
           align: 'left',
           field: 'urssafCode',
+          format: value => value ? this.$_.get(urssafCodes.find(code => code.value === value), 'label', '') : '',
         },
         {
           name: 'actions',
