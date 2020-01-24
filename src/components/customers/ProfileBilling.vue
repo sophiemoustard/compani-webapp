@@ -47,7 +47,7 @@
           </q-tr>
         </template>
       </ni-simple-table>
-      <div v-if="isAdmin" align="right">
+      <div v-if="isCoach" align="right">
         <q-btn class="add-payment" label="Ajouter une attestation" no-caps flat color="white" icon="add"
           @click="taxCertificateModal = true" />
       </div>
