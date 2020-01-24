@@ -26,7 +26,7 @@
             <div class="month-label">{{ monthLabel }}</div>
           </div>
           <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
-            color="primary" show-value :thickness="0.3" class="text-weight-bold">
+            color="primary" show-value :thickness="0.2" class="text-weight-bold">
             {{ roundFrenchPercentage(hoursRatio(sector), 0).replace('&nbsp;', '') }}
           </q-circular-progress>
         </div>
@@ -40,11 +40,11 @@
             <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
         </div>
-        <div class="q-mb-md q-pt-md gauge-wrapper">
-          <ni-gauge v-if="getInternalHoursRatio(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)"
-            title="Heures internes" />
-          <ni-gauge v-if="getPaidTransportStats(sector) !== 0" :min="7" :max="16" :value="getPaidTransportStats(sector)"
-            title="Transports" />
+        <div class="q-pt-md gauge-wrapper">
+          <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)"
+            :title="`Heures internes - ${formatHours(getInternalHours(sector))}`" />
+          <ni-gauge v-if="getPaidTransportRatio(sector) !== 0" :min="7" :max="16" :value="getPaidTransportRatio(sector)"
+            :title="`Transports - ${formatHours(getPaidTransport(sector))}`" />
         </div>
       </div>
       <div class="col-md-6 col-xs-12 customer">
@@ -252,11 +252,12 @@ export default {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
       return billedHours ? billedHours.interventions : 0;
     },
-    getInternalHoursRatio (sectorId) {
+    getInternalHours (sectorId) {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
-      const internalHours = billedHours ? billedHours.internalHours : 0;
-
-      return (internalHours / this.getBilledHours(sectorId)) * 100 || 0;
+      return billedHours ? billedHours.internalHours : 0;
+    },
+    getInternalHoursRatio (sectorId) {
+      return (this.getInternalHours(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
@@ -264,11 +265,13 @@ export default {
 
       return hoursToWork.hoursToWork || 0;
     },
-    getPaidTransportStats (sectorId) {
+    getPaidTransport (sectorId) {
       const paidTransportStats = this.paidTransportStats.find(el => el.sector === sectorId);
-      if (!paidTransportStats) return 0;
 
-      return (paidTransportStats.duration / this.getBilledHours(sectorId)) * 100 || 0;
+      return paidTransportStats ? paidTransportStats.duration : 0;
+    },
+    getPaidTransportRatio (sectorId) {
+      return (this.getPaidTransport(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
     },
     openAuxiliariesDetails (sectorId) {
       if (this.auxiliariesDetailsIsOpened[sectorId]) {
@@ -370,9 +373,9 @@ export default {
     display: flex
     justify-content: center
     &:first-child
-      color: $primary
+      color: $secondary
     &:nth-child(2)
-      color: $grey
+      color: $primary
     &:nth-child(3)
       color: $primary-dark
   &-value

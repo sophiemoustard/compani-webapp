@@ -2,9 +2,23 @@
   <div class="gauge">
     <div class="gauge-container" ref="wrapper">
       <svg id="meter">
-        <path :d="this.first" fill="none" stroke="#D0D0D0" stroke-width="8" />
-        <path :d="this.second" fill="none" stroke="#E6C6D6" stroke-width="8" />
-        <path :d="this.third" fill="none" stroke="#E2007A" stroke-width="8" />
+        <defs>
+          <linearGradient id="linear" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
+            <stop offset="0%" :stop-color="maxColor"/>
+            <stop offset="100%" :stop-color="intermediateMaxColor"/>
+          </linearGradient>
+          <linearGradient id="linear2" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
+            <stop offset="0%" :stop-color="intermediateMaxColor"/>
+            <stop offset="100%" :stop-color="intermediateMinColor"/>
+          </linearGradient>
+          <linearGradient id="linear3" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
+            <stop offset="0%" :stop-color="intermediateMinColor"/>
+            <stop offset="100%" :stop-color="minColor"/>
+          </linearGradient>
+        </defs>
+        <path :d="this.first" fill="none" stroke="url(#linear)" stroke-width="8" opacity="0.4" />
+        <path :d="this.second" fill="none" stroke="url(#linear2)" stroke-width="8" opacity="0.4" />
+        <path :d="this.third" fill="none" stroke="url(#linear3)" stroke-width="8" opacity="0.4" />
         <text :x="maxLabel.x" :y="maxLabel.y" class="gauge-limit">{{ max }}%</text>
         <text :x="minLabel.x" :y="minLabel.y" class="gauge-limit">{{ min }}%</text>
         <text :x="intermediateMinLabel.x" :y="intermediateMinLabel.y" class="gauge-limit">
@@ -15,9 +29,7 @@
       </svg>
       <img id="meter_needle" src="~assets/gauge-needle.svg" alt="" :style="`transform: rotate(${needleAngle}deg)`">
     </div>
-    <div class="gauge-title text-weight-bold">
-      {{ title }} ({{ roundFrenchPercentage(value, 2) }})
-    </div>
+    <div class="q-mt-sm">{{ title }}</div>
   </div>
 </template>
 
@@ -27,9 +39,9 @@ import { roundFrenchPercentage } from '../helpers/utils';
 export default {
   name: 'Gauge',
   props: {
-    max: { type: Number, default: 15 },
-    min: { type: Number, default: 5 },
-    value: { type: Number, default: 7.5 },
+    max: { type: Number, default: 100 },
+    min: { type: Number, default: 0 },
+    value: { type: Number, default: 0 },
     title: { type: String, default: '' },
   },
   data () {
@@ -56,14 +68,26 @@ export default {
     minLabel () {
       return { x: 2 * this.radius + 5, y: this.radius };
     },
-    intermediateMaxLabel () {
-      return { x: this.radius / 2 - 23, y: this.radius * (1 - Math.sqrt(3) / 2) };
-    },
     intermediateMinLabel () {
       return { x: this.radius * 3 / 2 + 7, y: this.radius * (1 - Math.sqrt(3) / 2) };
     },
     maxLabel () {
       return { x: -21, y: this.radius };
+    },
+    intermediateMaxLabel () {
+      return { x: this.radius / 2 - 23, y: this.radius * (1 - Math.sqrt(3) / 2) };
+    },
+    minColor () {
+      return '#FEF86C';
+    },
+    intermediateMinColor () {
+      return '#FFAF14';
+    },
+    intermediateMaxColor () {
+      return '#FF6A0F';
+    },
+    maxColor () {
+      return '#FF0C00';
     },
     first () {
       const origin = `0,${this.radius}`;
