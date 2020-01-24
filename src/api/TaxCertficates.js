@@ -9,4 +9,7 @@ export default {
   getPDFUrl (id) {
     return `${process.env.API_HOSTNAME}/taxcertificates/${id}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
   },
+  async create (data) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/taxcertificates`, data);
+  },
 }
