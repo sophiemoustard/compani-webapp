@@ -15,11 +15,15 @@
       </svg>
       <img id="meter_needle" src="~assets/gauge-needle.svg" alt="" :style="`transform: rotate(${needleAngle}deg)`">
     </div>
-    <div class="gauge-title text-weight-bold">{{ title }}</div>
+    <div class="gauge-title text-weight-bold">
+      {{ title }} ({{ roundFrenchPercentage(value, 2) }})
+    </div>
   </div>
 </template>
 
 <script>
+import { roundFrenchPercentage } from '../helpers/utils';
+
 export default {
   name: 'Gauge',
   props: {
@@ -88,6 +92,7 @@ export default {
       this.$refs.wrapper.style.width = `${2 * this.radius}px`
       this.$refs.wrapper.style.height = `${this.radius}px`
     },
+    roundFrenchPercentage,
   },
 }
 </script>

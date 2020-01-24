@@ -27,7 +27,7 @@
           </div>
           <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
             color="primary" show-value :thickness="0.3" class="text-weight-bold">
-            {{ roundFrenchPercentage(Math.round(hoursRatio(sector)) / 100, 0).replace('&nbsp;', '') }}
+            {{ roundFrenchPercentage(hoursRatio(sector), 0).replace('&nbsp;', '') }}
           </q-circular-progress>
         </div>
         <div class="q-mb-md">
