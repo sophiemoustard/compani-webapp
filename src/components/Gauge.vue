@@ -1,35 +1,114 @@
 <template>
-  <div id="wrapper" ref="wrapper">
-    <svg id="meter">
-      <circle class="range" :r="radius" cx="50%" cy="50%" stroke="#930F59" :stroke-dasharray="strokes.first"
-        fill="none" />
-      <circle class="range" :r="radius" cx="50%" cy="50%" stroke="#F29400" :stroke-dasharray="strokes.second"
-        fill="none" />
-      <circle class="range" :r="radius" cx="50%" cy="50%" stroke="#D0D0D0" :stroke-dasharray="strokes.third"
-        fill="none" />
-    </svg>
-    <img id="meter_needle" src="~assets/gauge-needle.svg" alt="">
+  <div class="gauge">
+    <div class="gauge-container" ref="wrapper">
+      <svg id="meter">
+        <defs>
+          <linearGradient id="linear" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
+            <stop offset="0%" :stop-color="maximum.color"/>
+            <stop offset="100%" :stop-color="intermediateMax.color"/>
+          </linearGradient>
+          <linearGradient id="linear2" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
+            <stop offset="0%" :stop-color="intermediateMax.color"/>
+            <stop offset="100%" :stop-color="intermediateMin.color"/>
+          </linearGradient>
+          <linearGradient id="linear3" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
+            <stop offset="0%" :stop-color="intermediateMin.color"/>
+            <stop offset="100%" :stop-color="minimum.color"/>
+          </linearGradient>
+        </defs>
+        <path :d="this.first" fill="none" stroke="url(#linear)" stroke-width="8" opacity="0.6" />
+        <path :d="this.second" fill="none" stroke="url(#linear2)" stroke-width="8" opacity="0.6" />
+        <path :d="this.third" fill="none" stroke="url(#linear3)" stroke-width="8" opacity="0.6" />
+        <text :x="maximum.x" :y="maximum.y" class="gauge-limit">{{ maximum.value }}%</text>
+        <text :x="minimum.x" :y="minimum.y" class="gauge-limit">{{ minimum.value }}%</text>
+        <text :x="intermediateMin.x" :y="intermediateMin.y" class="gauge-limit">
+          {{ Math.round(intermediateMin.value) }}%</text>
+        <text :x="intermediateMax.x" :y="intermediateMax.y" class="gauge-limit">
+          {{ Math.round(intermediateMax.value) }}%
+        </text>
+      </svg>
+      <img id="meter_needle" src="~assets/gauge-needle.svg" alt="" :style="`transform: rotate(${needleAngle}deg)`">
+    </div>
+    <slot name="title" />
   </div>
 </template>
 
 <script>
+import { roundFrenchPercentage } from '../helpers/utils';
+
 export default {
   name: 'Gauge',
   props: {
-    radius: { type: Number, default: 100 },
+    max: { type: Number, default: 100 },
+    min: { type: Number, default: 0 },
+    value: { type: Number, default: 0 },
+    title: { type: String, default: '' },
   },
   computed: {
-    circumference () {
-      return 2 * Math.PI * this.radius;
+    radius () {
+      return this.$q.platform.is.mobile ? 40 : 70;
     },
-    strokes () {
-      const semiCircumference = this.circumference / 2;
-
+    reference () {
+      return (this.max + this.min) / 2;
+    },
+    range () {
+      return this.max - this.reference;
+    },
+    minimum () {
       return {
-        first: `${semiCircumference}, ${this.circumference}`,
-        second: `${semiCircumference / 3 * 2}, ${this.circumference}`,
-        third: `${semiCircumference / 3}, ${this.circumference}`,
-      }
+        value: this.min,
+        x: 2 * this.radius + 5,
+        y: this.radius,
+        color: '#9EE945',
+      };
+    },
+    intermediateMin () {
+      return {
+        value: this.min + (this.max - this.min) / 3,
+        x: this.radius * 3 / 2 + 7,
+        y: this.radius * (1 - Math.sqrt(3) / 2),
+        color: '#FCF100',
+      };
+    },
+    intermediateMax () {
+      return {
+        value: this.max - (this.max - this.min) / 3,
+        x: this.radius / 2 - 23,
+        y: this.radius * (1 - Math.sqrt(3) / 2),
+        color: '#F29400',
+      };
+    },
+    maximum () {
+      return {
+        value: this.max,
+        x: -21,
+        y: this.radius,
+        color: '#e20009',
+      };
+    },
+    needleAngle () {
+      return (this.reference - Math.max(Math.min(this.value, this.max), this.min)) / this.range * 90;
+    },
+    first () {
+      const origin = `0,${this.radius}`;
+      const control = `0,${-this.radius / Math.sqrt(3)}`;
+      const end = `${this.radius / 2},${-this.radius * Math.sqrt(3) / 2}`;
+
+      return `M${origin} q${control} ${end}`;
+    },
+    second () {
+      const origin = `${this.radius / 2},${this.radius * (1 - Math.sqrt(3) / 2)}`;
+      const control = `${this.radius / 2},${-this.radius * (Math.sqrt(3) / 6)}`;
+      const end = `${this.radius},0`;
+
+      return `M${origin} q${control} ${end}`;
+    },
+    third () {
+      const origin = `${this.radius * 2},${this.radius}`;
+      const control = `0,${-this.radius / Math.sqrt(3)}`;
+      const end = `${-this.radius / 2},${-this.radius * Math.sqrt(3) / 2}`;
+
+      return `M${origin} q${control} ${end}`;
     },
   },
   mounted () {
@@ -37,33 +116,35 @@ export default {
   },
   methods: {
     setWrapperDimensions () {
-      const wrapperDimension = 2 * this.radius + 100;
-      this.$refs.wrapper.style.width = `${wrapperDimension}px`
-      this.$refs.wrapper.style.height = `${wrapperDimension}px`
+      this.$refs.wrapper.style.width = `${2 * this.radius}px`;
+      this.$refs.wrapper.style.height = `${this.radius}px`;
     },
+    roundFrenchPercentage,
   },
 }
 </script>
 
 <style lang="stylus" scoped>
-  #wrapper
-    position: relative
+  .gauge
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    &-container
+      position: relative
+    &-limit
+      font-size: 9px
 
   #meter
     width: 100%
     height: 100%
-    transform: rotateX(180deg)
+    overflow: visible
 
   #meter_needle
-    height: 35%
-    left: 0
+    position: absolute;
+    transform-origin: bottom center;
+    bottom: 0;
+    left: 0;
+    right: 0;
     margin: auto
-    position: absolute
-    right: 0
-    top: 15%
-    transform-origin: bottom center
-    transform: rotate(340deg)
-
-  .range
-    stroke-width: 30
+    height: 100%
 </style>

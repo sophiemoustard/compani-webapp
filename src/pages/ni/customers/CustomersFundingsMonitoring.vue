@@ -95,7 +95,7 @@ export default {
           name: 'customerParticipationRate',
           label: 'Taux participation bénéficiaire',
           field: 'customerParticipationRate',
-          format: value => roundFrenchPercentage(value / 100),
+          format: value => roundFrenchPercentage(value),
           align: 'center',
         },
         {

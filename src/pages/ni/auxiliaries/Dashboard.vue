@@ -19,15 +19,15 @@
       </div>
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
-      <div class="col-md-6 col-xs-12 q-pa-md">
+      <div class="col-md-6 col-xs-12 q-pl-md q-pr-md q-pt-md">
         <div class="q-mb-lg stats-header">
           <div class="text-capitalize">
             <div class="sector-name text-weight-bold">{{ sectorName(sector) }}</div>
             <div class="month-label">{{ monthLabel }}</div>
           </div>
           <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
-            color="primary" show-value :thickness="0.3" class="text-weight-bold">
-            {{ roundFrenchPercentage(Math.round(hoursRatio(sector)) / 100, 0).replace('&nbsp;', '') }}
+            color="primary" show-value :thickness="0.2" class="text-weight-bold">
+            {{ roundFrenchPercentage(hoursRatio(sector), 0).replace('&nbsp;', '') }}
           </q-circular-progress>
         </div>
         <div class="q-mb-md">
@@ -40,9 +40,17 @@
             <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
         </div>
-        <div class="q-mb-md">
-          <div>{{ getInternalHoursRatio(sector) }}%</div>
-          <div>{{ getPaidTransportStats(sector) }}%</div>
+        <div class="q-pt-md gauge-wrapper">
+          <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)">
+            <div slot="title" class="q-mt-sm" >
+              <span class="text-weight-bold">Heures internes</span> - {{ formatHours(getInternalHours(sector)) }}
+            </div>
+          </ni-gauge>
+          <ni-gauge v-if="getPaidTransport(sector) !== 0" :min="7" :max="16" :value="getPaidTransportRatio(sector)">
+            <div slot="title" class="q-mt-sm" >
+              <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
+            </div>
+          </ni-gauge>
         </div>
       </div>
       <div class="col-md-6 col-xs-12 customer">
@@ -89,7 +97,6 @@
         </span>
       </q-slide-transition>
     </q-card>
-    <ni-gauge :radius="100" />
   </q-page>
 </template>
 
@@ -251,11 +258,12 @@ export default {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
       return billedHours ? billedHours.interventions : 0;
     },
-    getInternalHoursRatio (sectorId) {
+    getInternalHours (sectorId) {
       const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
-      const internalHours = billedHours ? billedHours.internalHours : 0;
-
-      return (internalHours / this.getBilledHours(sectorId)) * 100 || 0;
+      return billedHours ? billedHours.internalHours : 0;
+    },
+    getInternalHoursRatio (sectorId) {
+      return (this.getInternalHours(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
     },
     getHoursToWork (sectorId) {
       const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
@@ -263,11 +271,13 @@ export default {
 
       return hoursToWork.hoursToWork || 0;
     },
-    getPaidTransportStats (sectorId) {
+    getPaidTransport (sectorId) {
       const paidTransportStats = this.paidTransportStats.find(el => el.sector === sectorId);
-      if (!paidTransportStats) return 0;
 
-      return (paidTransportStats.duration / this.getBilledHours(sectorId)) * 100 || 0;
+      return paidTransportStats ? paidTransportStats.duration : 0;
+    },
+    getPaidTransportRatio (sectorId) {
+      return (this.getPaidTransport(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
     },
     openAuxiliariesDetails (sectorId) {
       if (this.auxiliariesDetailsIsOpened[sectorId]) {
@@ -371,9 +381,9 @@ export default {
     &:first-child
       color: $primary
     &:nth-child(2)
-      color: $grey
+      color: $secondary
     &:nth-child(3)
-      color: $primary-dark
+      color: $grey
   &-value
     font-size: 48px
   &-label
@@ -384,4 +394,8 @@ export default {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
+
+.gauge-wrapper
+  display: flex
+  justify-content: space-around
 </style>
