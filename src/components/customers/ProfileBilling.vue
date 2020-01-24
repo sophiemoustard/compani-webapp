@@ -28,7 +28,7 @@
     </div>
     <div class="q-pa-sm q-mb-lg">
       <p class="text-weight-bold text-primary">Attestations fiscales</p>
-      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns">
+      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" :pagination="taxCertificatesPagination">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -153,11 +153,23 @@ export default {
           label: 'Attestation',
         },
         {
+          name: 'date',
+          field: 'date',
+          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          align: 'left',
+          label: 'Date',
+        },
+        {
           name: 'actions',
           field: '_id',
           align: 'center',
         },
       ],
+      taxCertificatesPagination: {
+        sortBy: 'year',
+        descending: true,
+        rowsPerPage: 0,
+      },
       taxCertificate: {
         date: '',
         year: this.$moment().subtract(1, 'y').format('YYYY'),
