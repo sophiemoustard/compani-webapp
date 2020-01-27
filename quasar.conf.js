@@ -40,6 +40,8 @@ module.exports = function (ctx) {
       'eventHistories',
       'internalHours',
       'billSlips',
+      'taxCertificates',
+      'establishments',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [
@@ -87,6 +89,7 @@ module.exports = function (ctx) {
         'QPopupProxy',
         'QSelect',
         'QSeparator',
+        'QSlideTransition',
         'QSpinner',
         'QSpinnerDots',
         'QTabs',

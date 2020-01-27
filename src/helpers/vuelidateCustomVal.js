@@ -1,4 +1,6 @@
 import sectors from '../api/Sectors';
+import { workHealthServices } from '../data/workHealthServices';
+import { urssafCodes } from '../data/urssafCodes';
 const ibantools = require('ibantools');
 const axios = require('axios');
 const moment = require('moment');
@@ -73,3 +75,17 @@ export const validHour = (value) => {
 export const minDate = (min) => {
   return (value) => moment(min).isSameOrBefore(value);
 };
+
+export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
+
+export const validWorkHealthService = value => !value || workHealthServices.map(whs => whs.value).includes(value);
+
+export const validUrssafCode = value => !value || urssafCodes.map(code => code.value).includes(value);
+
+export const validEstablishmentName = value => !value || !/[^a-zA-Z0-9éèêëâàäöôûüîïç°2!#$%&'()*+,\-./:;<=>?@\s]/.test(value);
+
+export const validSiret = value => !value || /^\d{14}$/.test(value);
+
+export const rcs = value => !value || /^[0-9]*[1-9][0-9]*$/.test(value);
+
+export const validYear = value => !value || /^[2]{1}[0]{1}[0-9]{2}$/.test(value);

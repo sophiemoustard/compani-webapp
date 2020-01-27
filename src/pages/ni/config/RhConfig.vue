@@ -119,7 +119,8 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="edit" @click.native="openEditionModal(col.value._id)" />
+                      <q-btn flat round small color="grey" icon="edit"
+                        @click.native="openEditionModal(col.value._id)" />
                       <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
                         @click="validateSectorDeletion(col.value._id, props.row)" />
                     </div>
@@ -156,7 +157,7 @@
         Ajouter une <span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
-        :error-label="nameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
+        :error-label="sectorNameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
           :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
@@ -169,7 +170,7 @@
         Editer l'<span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
-        :error-label="nameError($v.editedSector)" required-field />
+        :error-label="sectorNameError($v.editedSector)" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
           :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
@@ -180,7 +181,6 @@
 
 <script>
 import { required, maxValue } from 'vuelidate/lib/validators';
-
 import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input';
@@ -206,7 +206,6 @@ export default {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
       company: null,
-      tmpInput: '',
       internalHours: [],
       internalHoursColumns: [
         {
@@ -307,32 +306,10 @@ export default {
     await this.getSectors();
   },
   methods: {
-    saveTmp (path) {
-      this.tmpInput = this.$_.get(this.company, path);
-    },
-    async updateCompany (path) {
-      try {
-        if (this.tmpInput === this.$_.get(this.company, path)) return;
-        this.$_.get(this.$v.company, path).$touch();
-        if (this.$_.get(this.$v.company, path).$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const value = this.$_.get(this.company, path);
-        const payload = this.$_.set({}, path, value);
-        await this.$companies.updateById(this.company._id, payload);
-        NotifyPositive('Modification enregistrée');
-        this.tmpInput = '';
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification');
-        this.tmpInput = '';
-      }
-    },
     async updateCompanyTransportSubs (params) {
       try {
         this.$_.get(this.$v.company, params.vuelidatePath).$touch();
-        if (this.$_.get(this.$v.company, params.vuelidatePath).$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        if (this.$_.get(this.$v.company, params.vuelidatePath).$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const price = this.company.rhConfig.transportSubs[params.index].price
         if (this.tmpInput === price) return;
@@ -418,14 +395,20 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async updateDefaultInternalHour (internalHourId) {
-      const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
-      if (defaultInternalHour) {
-        await this.$internalHours.update(defaultInternalHour._id, { default: false });
-      }
+      try {
+        const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
+        if (defaultInternalHour) {
+          await this.$internalHours.update(defaultInternalHour._id, { default: false });
+        }
 
-      await this.$internalHours.update(internalHourId, { default: true });
-      await this.refreshInternalHours();
-      await this.$store.dispatch('main/getUser', this.user._id);
+        await this.$internalHours.update(internalHourId, { default: true });
+        await this.refreshInternalHours();
+        await this.$store.dispatch('main/getUser', this.user._id);
+        NotifyPositive('Heures internes mises à jour')
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour des heures internes.')
+      }
     },
     // Sectors
     async getSectors () {
@@ -506,7 +489,7 @@ export default {
       }).onOk(() => this.deleteSector(sectorId, row))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
-    nameError (obj) {
+    sectorNameError (obj) {
       if (!obj.name.required) return REQUIRED_LABEL;
       else if (!obj.name.sector) return 'Nom déjà existant';
     },

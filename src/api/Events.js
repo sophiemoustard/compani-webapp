@@ -30,4 +30,8 @@ export default {
     const workingStats = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/working-stats`, { params });
     return workingStats.data.data.workingStats;
   },
+  async getPaidTransportStatsBySector (params = null) {
+    const paidTransportStatsBySector = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/paid-transport`, { params });
+    return paidTransportStatsBySector.data.data.paidTransportStatsBySector;
+  },
 };

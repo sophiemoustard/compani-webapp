@@ -1,12 +1,17 @@
 <template>
-  <div class="chip-container" @click="openIndicatorsModal">
-    <img :src="getAvatar(person.picture)" class="avatar">
-    <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
-      <q-spinner-dots v-if="loading" />
-      <span v-else class="chip-indicator">
-        {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
-      </span>
-    </q-chip>
+  <div class="person-inner-cell">
+    <div :class="[!staffingView && 'q-mb-sm']">
+      <div class="chip-container" @click="openIndicatorsModal">
+        <img :src="getAvatar(person.picture)" class="avatar">
+        <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
+          <q-spinner-dots v-if="loading" />
+          <span v-else class="chip-indicator">
+            {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
+          </span>
+        </q-chip>
+      </div>
+    </div>
+    <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('Fl') }}</div>
 
     <!-- Indicators modal -->
     <q-dialog v-model="indicatorsModal">
@@ -27,7 +32,7 @@
             <q-tab class="col-6" v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" />
           </q-tabs>
           <q-tab-panels v-model="selectedTab" animated>
-            <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
+            <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name" class="q-mt-lg">
               <ni-auxiliary-indicators :hours-details="hoursDetails" :customers-details="customersDetails" />
             </q-tab-panel>
           </q-tab-panels>
@@ -49,7 +54,7 @@ import {
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
 } from '../../data/constants.js';
-import { upperCaseFirstLetter } from '../../helpers/utils';
+import { upperCaseFirstLetter, formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ChipAuxiliaryIndicator',
@@ -60,8 +65,8 @@ export default {
     person: { type: Object, default: () => ({ picture: { link: '' }, administrative: {}, contracts: [] }) },
     events: { type: Array, default: () => [] },
     startOfWeek: { type: String, default: '' },
-    dm: { type: Array, default: () => [] },
     workingStats: { type: Object, default: () => ({ workedHours: 0, hoursToWork: 0 }) },
+    staffingView: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -130,7 +135,7 @@ export default {
       const month = this.$moment(this.startOfWeek).format('MM-YYYY');
       try {
         this.monthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
-        const monthCustomersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        const monthCustomersDetails = await this.$stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
         this.monthCustomersDetails = monthCustomersDetails[0];
       } catch (e) {
         console.error(e);
@@ -141,13 +146,16 @@ export default {
       const month = this.$moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
       try {
         this.prevMonthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
-        const prevMonthCustomersDetails = await this.$stats.getCustomersAndDuration({ auxiliary: this.person._id, month });
+        const prevMonthCustomersDetails = await this.$stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
         this.prevMonthCustomersDetails = prevMonthCustomersDetails[0];
       } catch (e) {
         console.error(e);
         this.prevMonthHoursDetails = {};
       }
     },
+  },
+  filters: {
+    formatIdentity,
   },
 }
 </script>
@@ -174,4 +182,5 @@ export default {
     background: none !important
   /deep/ .q-ripple
     display: none
+
 </style>
