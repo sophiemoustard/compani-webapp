@@ -83,10 +83,9 @@
         <q-spinner size="25px" color="primary" />
       </div>
       <q-slide-transition>
-        <span v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails[sector]" class="sector-card row
-          item-stretch">
+        <div v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails[sector]" class="sector-card row">
           <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
-            class="col-md-6 col-xs-12 auxiliary-indicators q-mb-md">
+            class="col-md-6 col-xs-12 auxiliary-card q-mb-lg q-pb-lg">
             <div class="row person-name">
               <img :src="getAvatar(auxiliary.picture)" class="avatar">
               <div class="q-pl-md">
@@ -96,7 +95,7 @@
             <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail"
               :customers-details="auxiliary.paidIntervention" />
           </div>
-        </span>
+        </div>
       </q-slide-transition>
     </q-card>
   </q-page>
@@ -401,6 +400,8 @@ export default {
   display: flex
   justify-content: space-around
 
-.auxiliary-indicators
+.auxiliary-card
   border-bottom: 1px solid $light-grey
+  display: flex
+  flex-direction: column
 </style>
