@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     radius () {
-      return this.$q.platform.is.mobile ? 40 : 70;
+      return this.$q.platform.is.mobile ? 35 : 55;
     },
     reference () {
       return (this.max + this.min) / 2;
