@@ -2,40 +2,39 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p class="text-weight-bold">{{ this.customer.identity | formatIdentity('FL') }}</p>
+        <p class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <div v-if="user.role.name === HELPER" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
-      <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates"
-        :displayActions="isAdmin" @openEditionModal="openEditionModal"
-        :type="CUSTOMER" :startBalance="getStartBalance()" :endBalance="getEndBalance(customerDocuments)" />
-      <div v-if="isCoach" align="right">
-        <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)"
-          no-caps flat color="white" icon="add" />
+      <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
+        @openEditionModal="openEditionModal" :type="CUSTOMER" :startBalance="getStartBalance()"
+        :endBalance="getEndBalance(customerDocuments)" />
+      <div v-if="isCoach" class="q-mt-md" align="right">
+        <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
+          color="white" icon="add" />
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
-      <p class="text-weight-bold">{{ tpp.name }}</p>
-      <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates"
-        :displayActions="isCoach" @openEditionModal="openEditionModal"
-        :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
+      <p class="text-weight-bold text-primary">{{ tpp.name }}</p>
+      <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :displayActions="isCoach"
+        @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
         :endBalance="getEndBalance(tpp.documents, tpp)" />
-      <div v-if="isCoach" align="right">
+      <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
-          @click="openPaymentCreationModal(customer, tpp.documents[0].client)"/>
+          @click="openPaymentCreationModal(customer, tpp.documents[0].client)" />
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg">
-      <p class="text-weight-bold">Attestations fiscales</p>
-      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns">
-        <template v-slot:body="{ props }" >
-        <q-tr :props="props">
-          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
-            :style="col.style">
-            <template v-if="col.name === 'actions'">
-                <div  class="row justify-center table-actions">
+      <p class="text-weight-bold text-primary">Attestations fiscales</p>
+      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" :pagination="taxCertificatesPagination">
+        <template v-slot:body="{ props }">
+          <q-tr :props="props">
+            <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+              :style="col.style">
+              <template v-if="col.name === 'actions'">
+                <div class="row justify-center table-actions">
                   <q-btn flat round small color="primary">
                     <a :href="taxCertificatesUrl(props.row)" target="_blank">
                       <q-icon name="file_download" />
@@ -48,6 +47,10 @@
           </q-tr>
         </template>
       </ni-simple-table>
+      <div v-if="isCoach" class="q-mt-md" align="right">
+        <q-btn class="add-payment" label="Ajouter une attestation" no-caps flat color="white" icon="add"
+          @click="taxCertificateModal = true" />
+      </div>
     </div>
 
     <!-- Payment creation modal -->
@@ -58,12 +61,30 @@
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
       v-model="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
-      @updatePayment="updatePayment"  @resetForm="resetPaymentEditionModal" />
+      @updatePayment="updatePayment" @resetForm="resetPaymentEditionModal" />
+
+    <!-- Tax certificate upload modal -->
+    <ni-modal v-model="taxCertificateModal" @hide="resetTaxCertificateModal">
+      <template slot="title">
+        Ajouter une <span class="text-weight-bold">attestation fiscale</span>
+      </template>
+      <ni-date-input caption="Date" v-model="taxCertificate.date" @blur="$v.taxCertificate.date.$touch"
+        :error-label="REQUIRED_LABEL" in-modal required-field />
+      <ni-select caption="Année" :value="taxCertificate.year" :options="yearOptions"
+        @blur="$v.taxCertificate.year.$touch" :error="$v.taxCertificate.year.$error" in-modal required-field />
+      <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="$v.taxCertificate.file.$error"
+        @blur="$v.taxCertificate.file.$touch" in-modal required-field last />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
+          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading" @click="createTaxCertificate" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import { validYear } from '../../helpers/vuelidateCustomVal';
 import {
   CREDIT_NOTE,
   BILL,
@@ -77,12 +98,18 @@ import {
   CUSTOMER,
   THIRD_PARTY_PAYER,
   HELPER,
+  REQUIRED_LABEL,
 } from '../../data/constants';
-import CustomerBillingTable from '../../components/customers/CustomerBillingTable';
-import PaymentCreationModal from '../../components/customers/PaymentCreationModal';
-import PaymentEditionModal from '../../components/customers/PaymentEditionModal';
-import DateRange from '../../components/form/DateRange';
-import SimpleTable from '../../components/table/SimpleTable';
+import CustomerBillingTable from '../customers/CustomerBillingTable';
+import PaymentCreationModal from '../customers/PaymentCreationModal';
+import PaymentEditionModal from '../customers/PaymentEditionModal';
+import DateRange from '../form/DateRange';
+import SimpleTable from '../table/SimpleTable';
+import DateInput from '../form/DateInput';
+import Input from '../form/Input';
+import Select from '../form/Select';
+import Modal from '../Modal';
+
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
 import { formatIdentity } from '../../helpers/utils';
@@ -95,6 +122,10 @@ export default {
     'ni-payment-creation-modal': PaymentCreationModal,
     'ni-payment-edition-modal': PaymentEditionModal,
     'ni-simple-table': SimpleTable,
+    'ni-date-input': DateInput,
+    'ni-input': Input,
+    'ni-select': Select,
+    'ni-modal': Modal,
   },
   mixins: [paymentMixin],
   data () {
@@ -122,16 +153,38 @@ export default {
           label: 'Attestation',
         },
         {
+          name: 'date',
+          field: 'date',
+          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          align: 'left',
+          label: 'Date',
+        },
+        {
           name: 'actions',
           field: '_id',
           align: 'center',
         },
       ],
+      taxCertificatesPagination: {
+        sortBy: 'year',
+        descending: true,
+        rowsPerPage: 0,
+      },
+      taxCertificate: {
+        date: this.$moment().toISOString(),
+        year: this.$moment().subtract(1, 'y').format('YYYY'),
+        file: null,
+      },
+      taxCertificateModal: false,
+      REQUIRED_LABEL,
     }
   },
   computed: {
     customer () {
       return this.$store.getters['rh/getUserProfile'];
+    },
+    customerFolder () {
+      return this.$_.get(this.customer, 'driveFolder.driveId', null);
     },
     user () {
       return this.$store.getters['main/user'];
@@ -149,6 +202,21 @@ export default {
     isCoach () {
       return COACH_ROLES.includes(this.user.role.name);
     },
+    taxCertificateFileError () {
+      if (!this.$v.taxCertificate.file.required) return REQUIRED_LABEL;
+      if (!this.$v.taxCertificate.file.maxSize) return 'Fichier trop volumineux (> 5 Mo)';
+      return '';
+    },
+    taxCertificateYearError () {
+      if (!this.$v.taxCertificate.year.required) return REQUIRED_LABEL;
+      if (!this.$v.taxCertificate.year.validYear) return 'Année invalide';
+      return '';
+    },
+    yearOptions () {
+      const range = this.$moment.range(this.$moment('2000-01-01'), this.$moment('2099-12-31'));
+      const years = Array.from(range.by('years'));
+      return years.map(year => ({ label: year.format('YYYY'), value: year.format('YYYY') }));
+    },
   },
   async mounted () {
     this.setBillingDates();
@@ -165,6 +233,11 @@ export default {
       netInclTaxes: { required },
       type: { required },
       date: { required },
+    },
+    taxCertificate: {
+      date: { required },
+      year: { required, validYear },
+      file: { required, maxSize: file => !!file && file.size < 5000000 },
     },
   },
   methods: {
@@ -339,6 +412,50 @@ export default {
         this.modalLoading = false;
       }
     },
+    formatTaxCertificatePayload () {
+      const { file, date, year } = this.taxCertificate;
+      const form = new FormData();
+      const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
+      const customerName = formatIdentity(this.customer.identity, 'FL');
+      const fileName = this.$_.snakeCase(`attestation_fiscale_${customerName}_${formattedDate}`);
+
+      form.append('date', date);
+      form.append('year', year);
+      form.append('taxCertificate', file);
+      form.append('mimeType', file.type || 'application/octet-stream');
+      form.append('fileName', fileName);
+      form.append('driveFolderId', this.customerFolder);
+      form.append('customer', this.customer._id);
+
+      return form;
+    },
+    resetTaxCertificateModal () {
+      this.taxCertificate = {
+        date: this.$moment().toISOString(),
+        year: this.$moment().subtract(1, 'y').format('YYYY'),
+        file: null,
+      };
+      this.$v.taxCertificate.$reset();
+    },
+    async createTaxCertificate () {
+      if (!this.customerFolder) return NotifyNegative('Dossier du bénéficiaire manquant');
+      this.$v.taxCertificate.$touch();
+      if (this.$v.taxCertificate.$error) return NotifyWarning('Champ(s) invalide(s)');
+      this.modalLoading = true;
+
+      try {
+        await this.$taxCertificates.create(this.formatTaxCertificatePayload());
+
+        this.taxCertificateModal = false;
+        NotifyPositive('Attestation fiscale sauvegardée');
+        await this.getTaxCertificates();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative("Erreur lors de l'envoi de l'attestation fiscale");
+      } finally {
+        this.modalLoading = false;
+      }
+    },
   },
   filters: {
     formatIdentity,
@@ -349,9 +466,6 @@ export default {
 <style lang="stylus" scoped>
   .add-payment
     background-color: $primary;
-
-  .text-weight-bold
-    color: $primary;
 
   .title
     display: flex;
