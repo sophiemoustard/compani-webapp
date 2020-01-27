@@ -32,7 +32,7 @@
             <q-tab class="col-6" v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" />
           </q-tabs>
           <q-tab-panels v-model="selectedTab" animated>
-            <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name">
+            <q-tab-panel v-for="(tab, index) in tabsContent" :key="index" :name="tab.name" class="q-mt-lg">
               <ni-auxiliary-indicators :hours-details="hoursDetails" :customers-details="customersDetails" />
             </q-tab-panel>
           </q-tab-panels>

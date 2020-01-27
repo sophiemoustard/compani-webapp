@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="indicators-container">
     <div class="economic-indicators">
       <div class="indicator row">
         <div class="col-4 indicator-title">Heures à travailler</div>
@@ -94,6 +94,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .indicators-container
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   .indicator
     display: flex;
     border-top: 1px solid $light-grey
@@ -113,12 +118,11 @@ export default {
 
   .economic-indicators
     padding: 0 24px
-    margin: 24px 0
+    margin: 0 0 24px
     border-left: 5px solid $primary-dark !important
 
   .quality-indicators
     padding: 0 24px
-    margin-bottom: 24px
     border-left: 5px solid $primary !important
 
   .quality-indicators-item
