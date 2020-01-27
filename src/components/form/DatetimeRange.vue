@@ -9,10 +9,10 @@
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
           @blur="blurHandler" :disable="disable" />
         <ni-time-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
-          @blur="blurHandler" :disable="disable" />
+          @blur="blurHandler" :disable="disable || disableStartHour" />
         <p class="delimiter">-</p>
         <ni-time-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item"
-          @blur="blurHandler" :disable="disable" :min="value.startHour" />
+          @blur="blurHandler" :disable="disable || disableEndHour" :min="value.startHour" />
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
       </div>
@@ -38,6 +38,8 @@ export default {
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     disableEndDate: { type: Boolean, default: false },
+    disableEndHour: { type: Boolean, default: false },
+    disableStartHour: { type: Boolean, default: false },
   },
   validations () {
     return {

@@ -225,6 +225,12 @@ export const planningModalMixin = {
       const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
       return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
+    isDailyAbsence () {
+      return this.newEvent.type === ABSENCE && this.newEvent.absenceNature === DAILY;
+    },
+    isHourlyAbsence () {
+      return this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY;
+    },
   },
   methods: {
     deleteClassFocus () {

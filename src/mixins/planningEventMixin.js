@@ -4,6 +4,8 @@ import {
   ABSENCE,
   STAFFING_VIEW_START_HOUR,
   STAFFING_VIEW_END_HOUR,
+  ILLNESS,
+  WORK_ACCIDENT,
 } from '../data/constants';
 import { formatIdentity } from '../helpers/utils';
 
@@ -54,7 +56,8 @@ export const planningEventMixin = {
       let displayedEndMinutes = eventEndDate.minutes();
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        displayedStartHour = STAFFING_VIEW_START_HOUR;
+        displayedStartHour = [ILLNESS, WORK_ACCIDENT].includes(event.absence) && this.$moment(event.startDate).isSame(day, 'day')
+          ? displayedStartHour : STAFFING_VIEW_START_HOUR;
         displayedEndHour = STAFFING_VIEW_END_HOUR;
         displayedStartMinutes = 0;
         displayedEndMinutes = 0;

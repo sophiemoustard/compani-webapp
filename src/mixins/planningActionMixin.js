@@ -175,7 +175,11 @@ export const planningActionMixin = {
       payload = this.$_.pickBy(payload);
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        payload.startDate = this.$moment(event.dates.startDate).startOf('d').toDate();
+        const isIllnesOrWorkAccident = event.absence && [ILLNESS, WORK_ACCIDENT].includes(event.absence);
+        const startHourSplit = event.dates.startHour.split(':');
+        payload.startDate = isIllnesOrWorkAccident
+          ? this.$moment(event.dates.startDate).set({ hours: startHourSplit[0], minutes: startHourSplit[1] })
+          : this.$moment(event.dates.startDate).startOf('d').toDate();
         payload.endDate = this.$moment(event.dates.endDate).endOf('d').toDate();
       } else {
         payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
