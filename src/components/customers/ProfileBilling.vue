@@ -40,6 +40,8 @@
                       <q-icon name="file_download" />
                     </a>
                   </q-btn>
+                  <q-btn flat round small dense color="grey" icon="delete"
+                    @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -109,7 +111,7 @@ import DateInput from '../form/DateInput';
 import Input from '../form/Input';
 import Select from '../form/Select';
 import Modal from '../Modal';
-
+import { tableMixin } from '../../mixins/tableMixin';
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
 import { formatIdentity } from '../../helpers/utils';
@@ -127,7 +129,7 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
   },
-  mixins: [paymentMixin],
+  mixins: [paymentMixin, tableMixin],
   data () {
     return {
       modalLoading: false,
@@ -289,12 +291,6 @@ export default {
           return doc.netInclTaxes;
       }
     },
-    // Tax certificates
-    taxCertificatesUrl (certificate) {
-      return this.$_.get(certificate, 'driveFile.link')
-        ? certificate.driveFile.link
-        : this.$taxCertificates.getPDFUrl(certificate._id);
-    },
     // Refresh data
     async getTaxCertificates () {
       try {
@@ -412,6 +408,12 @@ export default {
         this.modalLoading = false;
       }
     },
+    // Tax certificates
+    taxCertificatesUrl (certificate) {
+      return this.$_.get(certificate, 'driveFile.link')
+        ? certificate.driveFile.link
+        : this.$taxCertificates.getPDFUrl(certificate._id);
+    },
     formatTaxCertificatePayload () {
       const { file, date, year } = this.taxCertificate;
       const form = new FormData();
@@ -454,6 +456,26 @@ export default {
         NotifyNegative("Erreur lors de l'envoi de l'attestation fiscale");
       } finally {
         this.modalLoading = false;
+      }
+    },
+    validateTaxCertificateDeletion (taxCertificateId, row) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer cette attestation ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteTaxCertificate(taxCertificateId, row))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
+    async deleteTaxCertificate (taxCertificateId, row) {
+      try {
+        const index = this.getRowIndex(this.taxCertificates, row);
+        await this.$taxCertificates.remove(taxCertificateId);
+        this.taxCertificates.splice(index, 1);
+        NotifyPositive('Attestation fiscale supprimée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de l\'attestation fiscale.');
       }
     },
   },
