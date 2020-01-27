@@ -12,4 +12,7 @@ export default {
   async create (data) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/taxcertificates`, data);
   },
+  async remove (id) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/taxcertificates/${id}`);
+  },
 }
