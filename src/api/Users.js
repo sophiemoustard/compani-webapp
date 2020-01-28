@@ -2,6 +2,14 @@ import { alenviAxios } from './ressources/alenviAxios'
 import axios from 'axios'
 
 export default {
+  async refreshToken (data) {
+    const refreshToken = await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
+    return refreshToken.data.data;
+  },
+  async authenticate (data) {
+    const auth = await axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, data);
+    return auth.data.data;
+  },
   async list (params = null) {
     try {
       const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });
