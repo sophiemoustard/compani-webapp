@@ -35,7 +35,7 @@ export const planningEventMixin = {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },
     getEventHours (event) {
-      return `${this.$moment(event.startDate).format('HH:mm')} - ${this.$moment(event.endDate).format('HH:mm')}`
+      return `${this.$moment(event.displayedStartDate).format('HH:mm')} - ${this.$moment(event.displayedEndDate).format('HH:mm')}`
     },
     displayAbsenceType (value) {
       const absence = ABSENCE_TYPES.find(abs => abs.value === value);
@@ -54,20 +54,23 @@ export const planningEventMixin = {
       let displayedEndHour = eventEndDate.hours();
       let displayedStartMinutes = eventStartDate.minutes();
       let displayedEndMinutes = eventEndDate.minutes();
+      let staffingStartHour = displayedStartHour;
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        displayedStartHour = [ILLNESS, WORK_ACCIDENT].includes(event.absence) && this.$moment(event.startDate).isSame(day, 'day')
-          ? displayedStartHour : STAFFING_VIEW_START_HOUR;
+        if ([ILLNESS, WORK_ACCIDENT].includes(event.absence) && !this.$moment(event.startDate).isSame(day, 'day')) {
+          displayedStartHour = eventStartDate.startOf('d').hours();
+          staffingStartHour = STAFFING_VIEW_START_HOUR;
+        }
         displayedEndHour = STAFFING_VIEW_END_HOUR;
         displayedStartMinutes = 0;
         displayedEndMinutes = 0;
       }
 
-      let staffingBeginning = Math.max((displayedStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
+      let staffingBeginning = Math.max((staffingStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
       let staffingEnd = Math.min((displayedEndHour - startDisplay) * 60 + displayedEndMinutes, (endDisplay - startDisplay) * 60 + displayedEndMinutes);
 
-      dayEvent.startDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
-      dayEvent.endDate = this.$moment(day).hour(displayedEndHour).minutes(displayedEndMinutes).toISOString();
+      dayEvent.displayedStartDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
+      dayEvent.displayedEndDate = eventEndDate.toISOString();
       dayEvent.staffingBeginning = staffingBeginning;
       dayEvent.staffingDuration = staffingEnd - staffingBeginning;
 
