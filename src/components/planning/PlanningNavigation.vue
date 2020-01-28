@@ -7,8 +7,9 @@
         <q-menu v-model="datimeModal" self="top middle" anchor="bottom middle">
           <q-date minimal @input="goToWeek" :value="date" />
         </q-menu>
+        <div v-if="$q.platform.is.mobile" class="week-number">Semaine {{ weekNumber }}</div>
       </div>
-    <div class="week-number">Semaine {{ weekNumber }}</div>
+      <div v-if="!$q.platform.is.mobile" class="week-number">Semaine {{ weekNumber }}</div>
     </div>
     <div class="planning-navigation-actions col-6">
       <div>
@@ -100,6 +101,6 @@ export default {
     align-items: center
 
   .week-number
-    font-size: 12px
+    font-size: 14px
     font-style: italic
 </style>
