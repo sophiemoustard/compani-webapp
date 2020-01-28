@@ -39,8 +39,8 @@
             <div class="col-8 auxiliary-label">Heures à travailler</div>
             <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
-          <div class="row unassigned-hours" v-if="hasUnassignedHours(sector)">
-            <div class="col-12">{{ formatHours(getUnassignedHours(sector)) }} en 'à affecter'</div>
+          <div class="row unassigned-hours" v-if="shouldDisplayUnassignedHours(sector)">
+            <div class="col-12">{{ formatHours(getUnassignedHours(sector)) }} à affecter</div>
           </div>
         </div>
         <div class="q-pt-md gauge-wrapper">
@@ -284,8 +284,9 @@ export default {
     getPaidTransportRatio (sectorId) {
       return (this.getPaidTransport(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
     },
-    hasUnassignedHours (sectorId) {
-      return this.unassignedHours.find(el => el.sector === sectorId);
+    shouldDisplayUnassignedHours (sectorId) {
+      return this.unassignedHours.find(el => el.sector === sectorId) &&
+        this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month');
     },
     getUnassignedHours (sectorId) {
       return this.unassignedHours.find(el => el.sector === sectorId).duration;
@@ -421,8 +422,7 @@ export default {
   flex-direction: column
 
 .unassigned-hours
-  margin-top: 0px
   font-style: italic
   font-size: 14px
-  padding-left: 10px
+  padding-left: 5px
 </style>
