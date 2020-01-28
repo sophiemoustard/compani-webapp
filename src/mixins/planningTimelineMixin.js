@@ -26,6 +26,9 @@ export const planningTimelineMixin = {
       this.targetDate = this.startOfWeek;
     },
   },
+  mounted () {
+    this.targetDate = this.startOfWeek;
+  },
   methods: {
     getTimelineDays () {
       const gapDays = this.isThreeDaysView ? 2 : 6;

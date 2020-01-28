@@ -7,6 +7,7 @@
         <q-menu v-model="datimeModal" self="top middle" anchor="bottom middle">
           <q-date minimal @input="goToWeek" :value="date" />
         </q-menu>
+          S{{ weekNumber }}
       </div>
     </div>
     <div class="planning-navigation-actions col-6">
@@ -57,6 +58,9 @@ export default {
     },
     date () {
       return this.$moment(this.targetDate).format('YYYY/MM/DD');
+    },
+    weekNumber () {
+      return this.$moment(this.targetDate).week();
     },
   },
   methods: {
