@@ -7,7 +7,9 @@
         <q-menu v-model="datimeModal" self="top middle" anchor="bottom middle">
           <q-date minimal @input="goToWeek" :value="date" />
         </q-menu>
+        <div v-if="$q.platform.is.mobile" class="week-number">Semaine {{ weekNumber }}</div>
       </div>
+      <div v-if="!$q.platform.is.mobile" class="week-number">Semaine {{ weekNumber }}</div>
     </div>
     <div class="planning-navigation-actions col-6">
       <div>
@@ -58,6 +60,9 @@ export default {
     date () {
       return this.$moment(this.targetDate).format('YYYY/MM/DD');
     },
+    weekNumber () {
+      return this.$moment(this.targetDate).week();
+    },
   },
   methods: {
     goToNextWeek (value) {
@@ -91,4 +96,11 @@ export default {
   .planning-history-button
     display: flex;
     align-items: center;
+
+  .planning-month
+    align-items: center
+
+  .week-number
+    font-size: 14px
+    font-style: italic
 </style>
