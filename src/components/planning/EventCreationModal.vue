@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { ABSENCE, INTERNAL_HOUR, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../../data/constants';
+import { ABSENCE, INTERNAL_HOUR, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, INTERVENTION, NEVER } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -140,15 +140,15 @@ export default {
   watch: {
     selectedAuxiliary (value) {
       if (!this.selectedAuxiliary.hasCompanyContractOnEvent && this.newEvent.type === INTERNAL_HOUR) {
-        // this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
+        this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
       }
     },
     isRepetitionAllowed (value) {
       if (!value) {
-        // this.$emit('update:newEvent', {
-        //   ...this.newEvent,
-        //   repetition: { ...this.newEvent.repetition, frequency: NEVER },
-        // });
+        this.$emit('update:newEvent', {
+          ...this.newEvent,
+          repetition: { ...this.newEvent.repetition, frequency: NEVER },
+        });
       }
     },
   },
@@ -178,7 +178,6 @@ export default {
       this.$emit('update:newEvent', { ...this.newEvent, sector: auxiliary ? auxiliary.sector._id : '' });
     },
     setEventAddressAndSubscription () {
-      console.error('customer', this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {}));
       const payload = {
         ...this.newEvent,
         address: this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {}),
