@@ -63,10 +63,30 @@ export default {
       return startDatetime.isAfter(endDatetime);
     },
   },
+  watch: {
+    'value.startHour' () {
+      this.$emit('input', this.setDatesHours(this.value));
+    },
+    'value.endHour' () {
+      this.$emit('input', this.setDatesHours(this.value));
+    },
+  },
+  mounted () {
+    this.$emit('input', this.setDatesHours(this.value));
+  },
   methods: {
     blurHandler () {
       this.$v.value.$touch();
       this.$emit('blur');
+    },
+    setDatesHours (dates) {
+      const startHourSplit = dates.startHour.split(':').map(time => Number.parseInt(time, 10));
+      const endHourSplit = dates.endHour.split(':').map(time => Number.parseInt(time, 10));
+      return {
+        ...dates,
+        startDate: this.$moment(dates.startDate).set({ hours: startHourSplit[0], minutes: startHourSplit[1] }).toISOString(),
+        endDate: this.$moment(dates.endDate).set({ hours: endHourSplit[0], minutes: endHourSplit[1] }).toISOString(),
+      };
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
@@ -77,7 +97,7 @@ export default {
         dates.endHour = this.$moment.min(startHour.add(2, 'H'), max).format('HH:mm');
       }
 
-      this.$emit('input', dates);
+      this.$emit('input', this.setDatesHours(dates));
     },
   },
 }
