@@ -40,7 +40,7 @@
                       <q-icon name="file_download" />
                     </a>
                   </q-btn>
-                  <q-btn flat round small dense color="grey" icon="delete"
+                  <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
               </template>
