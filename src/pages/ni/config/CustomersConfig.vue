@@ -259,7 +259,7 @@
     </ni-modal>
 
     <!-- Third party payers creation modal -->
-    <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerEditionData">
+    <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerCreation">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">tiers payeur</span>
       </template>
@@ -274,6 +274,9 @@
       <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
         :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
         @blur="$v.newThirdPartyPayer.billingMode.$touch" />
+      <div class="row q-mb-md light-checkbox">
+        <q-checkbox v-model="newThirdPartyPayer.isApa" label="Financement APA" size="12px" dense />
+      </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
           :loading="loading" @click="createNewThirdPartyPayer" :disable="isTppCreationDisabled" />
@@ -281,7 +284,7 @@
     </ni-modal>
 
     <!-- Third party payers edition modal -->
-    <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerUpdateModalData">
+    <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerEdition">
       <template slot="title">
         Editer le <span class="text-weight-bold">tiers payeur</span>
       </template>
@@ -296,6 +299,9 @@
       <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
         caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
         @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
+      <div class="row q-mb-md light-checkbox">
+        <q-checkbox v-model="editedThirdPartyPayer.isApa" label="Financement APA" size="12px" dense />
+      </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
           :loading="loading" @click="updateThirdPartyPayer" :disable="isTppEditionDisabled" />
@@ -629,6 +635,7 @@ export default {
         address: { fullAddress: '' },
         unitTTCRate: '',
         billingMode: '',
+        isApa: true,
       },
       billingModeOptions: [
         { label: 'Indirecte', value: BILLING_INDIRECT },
@@ -1070,10 +1077,10 @@ export default {
       this.selectedService = {};
     },
     // Third party payers
-    openThirdPartyPayerEditionModal (thirdPartyPayerId) {
+    openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
-      const currentThirdPartyPayer = this.thirdPartyPayers.find(thirdPartyPayer => thirdPartyPayer._id === thirdPartyPayerId);
-      const { name, address, email, unitTTCRate, billingMode } = currentThirdPartyPayer;
+      const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const { name, address, email, unitTTCRate, billingMode, isApa } = currentThirdPartyPayer;
       this.editedThirdPartyPayer = {
         _id: currentThirdPartyPayer._id,
         name,
@@ -1081,9 +1088,10 @@ export default {
         email,
         unitTTCRate,
         billingMode,
+        isApa,
       };
     },
-    resetThirdPartyPayerEditionData () {
+    resetThirdPartyPayerCreation () {
       this.$v.newThirdPartyPayer.$reset();
       this.newThirdPartyPayer = {
         name: '',
@@ -1091,13 +1099,14 @@ export default {
         address: {},
         unitTTCRate: '',
         billingMode: '',
+        isApa: true,
       }
     },
     formatThirdPartyPayerPayload (tpp) {
       const payload = this.$_.cloneDeep(tpp);
       if (payload.address && !payload.address.fullAddress) delete payload.address;
 
-      return this.$_.pickBy(payload);
+      return { isApa: false, ...this.$_.pickBy(payload) };
     },
     async createNewThirdPartyPayer () {
       try {
@@ -1115,11 +1124,9 @@ export default {
         this.loading = false;
       }
     },
-    resetThirdPartyPayerUpdateModalData () {
+    resetThirdPartyPayerEdition () {
       this.$v.editedThirdPartyPayer.$reset();
-      this.editedThirdPartyPayer = {
-        address: {},
-      }
+      this.editedThirdPartyPayer = { address: {} }
     },
     async updateThirdPartyPayer () {
       try {
