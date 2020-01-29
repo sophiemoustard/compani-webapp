@@ -312,6 +312,7 @@
 
 <script>
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
+import ThirdPartyPayers from '../../../api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import DateInput from '../../../components/form/DateInput.vue';
 import TimeInput from '../../../components/form/TimeInput.vue';
@@ -814,7 +815,7 @@ export default {
     },
     async refreshThirdPartyPayers () {
       try {
-        this.thirdPartyPayers = await this.$thirdPartyPayers.list();
+        this.thirdPartyPayers = await ThirdPartyPayers.list();
       } catch (e) {
         this.thirdPartyPayers = [];
         console.error(e);
@@ -1113,7 +1114,7 @@ export default {
         if (this.$v.newThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$thirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
+        await ThirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur créé.');
       } catch (e) {
@@ -1136,7 +1137,7 @@ export default {
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;
         delete this.editedThirdPartyPayer._id;
         const payload = this.editedThirdPartyPayer;
-        await this.$thirdPartyPayers.updateById(thirdPartyPayerId, this.formatThirdPartyPayerPayload(payload));
+        await ThirdPartyPayers.updateById(thirdPartyPayerId, this.formatThirdPartyPayerPayload(payload));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur modifié.');
       } catch (e) {
@@ -1150,7 +1151,7 @@ export default {
     async deleteThirdPartyPayer (thirdPartyPayerId, row) {
       try {
         const index = this.getRowIndex(this.thirdPartyPayers, row);
-        await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
+        await ThirdPartyPayers.removeById(thirdPartyPayerId);
         this.thirdPartyPayers.splice(index, 1);
         NotifyPositive('Tiers payeur supprimé.');
       } catch (e) {

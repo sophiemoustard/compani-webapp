@@ -402,6 +402,7 @@
 <script>
 import { Cookies } from 'quasar';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import ThirdPartyPayers from '../../api/ThirdPartyPayers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
 import Input from '../form/Input';
@@ -1069,7 +1070,7 @@ export default {
     // Fundings
     async getThirdPartyPayersOptions () {
       try {
-        const thirdPartyPayers = await this.$thirdPartyPayers.list();
+        const thirdPartyPayers = await ThirdPartyPayers.list();
         this.fundingTppOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
       } catch (e) {
         this.fundingTppOptions = [];

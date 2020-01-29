@@ -23,7 +23,6 @@ module.exports = function (ctx) {
       'services',
       'stats',
       'surcharges',
-      'thirdPartyPayers',
       'twilio',
       'vue-croppa',
       'vMask',

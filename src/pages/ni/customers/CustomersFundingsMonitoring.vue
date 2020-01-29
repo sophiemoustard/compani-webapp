@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import ThirdPartyPayers from '../../../api/ThirdPartyPayers';
 import LargeTable from '../../../components/table/LargeTable';
 import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
@@ -156,7 +157,8 @@ export default {
   methods: {
     async getThirdPartyPayerOptions () {
       try {
-        this.thirdPartyPayerOptions = (await this.$thirdPartyPayers.list()).map(elem => ({ value: elem._id, label: elem.name }));
+        this.thirdPartyPayerOptions = (await ThirdPartyPayers.list())
+          .map(elem => ({ value: elem._id, label: elem.name }));
         this.thirdPartyPayerOptions.push({ value: '', label: 'Tous les financeurs' });
       } catch (e) {
         this.thirdPartyPayerOptions = [{ value: '', label: 'Tous les financeurs' }];
