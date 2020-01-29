@@ -19,7 +19,7 @@
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
             @blur="validations.auxiliary.$touch" />
           <ni-select v-else in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
-            :error="validations.customer.$error" required-field @blur="validations.customer.$touch" />
+            :error="validations.customer.$error" required-field @blur="validations.customer.$touch" @input="setEventAddressAndSubscription" />
           <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
             :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch" />
         </template>
@@ -28,12 +28,12 @@
             :error="validations.absenceNature.$error" required-field @blur="validations.absenceNature.$touch"
             @input="resetAbsenceType" />
           <ni-select in-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
-            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" :disable="isHourlyAbsence"
-            @input="setDateHours" />
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" :disable="isHourlyAbsence(newEvent)"
+            @input="setDateHours(newEvent, 'newEvent')" />
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
-            :disable-end-date="isHourlyAbsence" :error="validations.dates.$error" @blur="validations.dates.$touch"
-            :disable-end-hour="isDailyAbsence" :disable-start-hour="!isIllnessOrWorkAccident" />
-          <ni-file-uploader v-if="isIllnessOrWorkAccident"
+            :disable-end-date="isHourlyAbsence(newEvent)" :error="validations.dates.$error" @blur="validations.dates.$touch"
+            :disable-end-hour="isDailyAbsence(newEvent)" :disable-start-hour="!isIllnessOrWorkAccident(newEvent)" />
+          <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)"
             caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="file"
             :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
             in-modal @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
@@ -73,7 +73,7 @@
 </template>
 
 <script>
-import { ABSENCE, INTERNAL_HOUR, INTERVENTION, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, NEVER, DAILY, WORK_ACCIDENT, ILLNESS } from '../../data/constants';
+import { ABSENCE, INTERNAL_HOUR, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT } from '../../data/constants';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 
 export default {
@@ -136,28 +136,19 @@ export default {
 
       return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
     },
-    isIllnessOrWorkAccident () {
-      return this.newEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence);
-    },
   },
   watch: {
     selectedAuxiliary (value) {
       if (!this.selectedAuxiliary.hasCompanyContractOnEvent && this.newEvent.type === INTERNAL_HOUR) {
-        this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
+        // this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
       }
     },
     isRepetitionAllowed (value) {
       if (!value) {
-        this.$emit('update:newEvent', {
-          ...this.newEvent,
-          repetition: { ...this.newEvent.repetition, frequency: NEVER },
-        });
-      }
-    },
-    selectedCustomer () {
-      this.newEvent.address = this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {});
-      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
-        this.$emit('update:newEvent', { ...this.newEvent, subscription: this.customerSubscriptionsOptions[0].value });
+        // this.$emit('update:newEvent', {
+        //   ...this.newEvent,
+        //   repetition: { ...this.newEvent.repetition, frequency: NEVER },
+        // });
       }
     },
   },
@@ -186,16 +177,16 @@ export default {
       const auxiliary = this.activeAuxiliaries.find(aux => aux._id === auxId);
       this.$emit('update:newEvent', { ...this.newEvent, sector: auxiliary ? auxiliary.sector._id : '' });
     },
-    setDateHours () {
-      if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === DAILY) {
-        if ([WORK_ACCIDENT, ILLNESS].includes(this.newEvent.absence)) {
-          this.$emit('update:newEvent', { ...this.newEvent, dates: { ...this.newEvent.dates, endHour: '20:00' } });
-        } else {
-          this.$emit('update:newEvent', {
-            ...this.newEvent,
-            dates: { ...this.newEvent.dates, startHour: '08:00', endHour: '20:00' } });
-        }
+    setEventAddressAndSubscription () {
+      console.error('customer', this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {}));
+      const payload = {
+        ...this.newEvent,
+        address: this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {}),
+      };
+      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
+        payload.subscription = this.customerSubscriptionsOptions[0].value;
       }
+      this.$emit('update:newEvent', payload);
     },
   },
 }

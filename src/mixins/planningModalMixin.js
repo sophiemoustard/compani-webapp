@@ -225,12 +225,6 @@ export const planningModalMixin = {
       const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
       return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
     },
-    isDailyAbsence () {
-      return this.newEvent.type === ABSENCE && this.newEvent.absenceNature === DAILY;
-    },
-    isHourlyAbsence () {
-      return this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY;
-    },
   },
   methods: {
     deleteClassFocus () {
@@ -300,6 +294,26 @@ export const planningModalMixin = {
     },
     formatAddressOptions (address) {
       return { label: address.fullAddress, value: address };
+    },
+    isDailyAbsence (event) {
+      return event.type === ABSENCE && event.absenceNature === DAILY;
+    },
+    isHourlyAbsence (event) {
+      return event.type === ABSENCE && event.absenceNature === HOURLY;
+    },
+    isIllnessOrWorkAccident (event) {
+      return event.absence && [ILLNESS, WORK_ACCIDENT].includes(event.absence);
+    },
+    setDateHours (event, eventType) {
+      if (event.type === ABSENCE && event.absenceNature === DAILY) {
+        if ([WORK_ACCIDENT, ILLNESS].includes(event.absence)) {
+          this.$emit(`update:${eventType}`, { ...event, dates: { ...event.dates, endHour: '23:59' } });
+        } else {
+          this.$emit(`update:${eventType}`, {
+            ...event,
+            dates: { ...event.dates, startHour: '00:00', endHour: '23:59' } });
+        }
+      }
     },
   },
 };

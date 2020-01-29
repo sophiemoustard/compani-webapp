@@ -43,28 +43,17 @@
         </template>
         <template v-if="editedEvent.type === ABSENCE">
           <ni-select in-modal caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
-            required-field disable />
-          <template v-if="editedEvent.absenceNature === DAILY">
-            <ni-date-input caption="Date de début" v-model="editedEvent.dates.startDate" type="date" required-field
-              :error="validations.dates.startDate.$error" @blur="validations.dates.startDate.$touch" in-modal />
-            <ni-date-input caption="Date de fin" v-model="editedEvent.dates.endDate" type="date" required-field
-              in-modal :error="validations.dates.endDate.$error" @blur="validations.dates.endDate.$touch"
-              :min="editedEvent.dates.startDate" />
-            <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
-              :error="validations.absence.$error" required-field @blur="validations.absence.$touch" />
-            <ni-file-uploader v-if="editedEvent.absence && [ILLNESS, WORK_ACCIDENT].includes(editedEvent.absence)"
-              caption="Justificatif d'absence" :disable="!selectedAuxiliary._id" :entity="editedEvent" name="file"
-              required-field path="attachment" :url="docsUploadUrl" @uploaded="documentUploaded"
-              :additionalValue="additionalValue" in-modal @delete="deleteDocument(editedEvent.attachment.driveId)"
-              alt="justificatif absence" />
-          </template>
-          <template v-if="editedEvent.absenceNature === HOURLY">
-            <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
-              :disable="isDisabled" disable-end-date :error="validations.dates.$error"
-              @blur="validations.dates.$touch" />
-            <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
-              :error="validations.absence.$error" required-field @blur="validations.absence.$touch" disable />
-          </template>
+            :error="validations.absenceNature.$error" required-field disable />
+          <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" :disable="isHourlyAbsence(editedEvent)"
+            @input="setDateHours(editedEvent, 'editedEvent')" />
+          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
+            :disable-end-date="isHourlyAbsence(editedEvent)" :error="validations.dates.$error" @blur="validations.dates.$touch"
+            :disable-end-hour="isDailyAbsence(editedEvent)" :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" />
+          <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)"
+            caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence" name="file"
+            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
+            in-modal @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
@@ -151,15 +140,14 @@ export default {
   },
   methods: {
     toggleCancellationForm (value) {
-      if (!value) this.editedEvent.cancel = {};
+      if (!value) this.$emit('update:editedEvent', { ...this.editedEvent, cancel: {} });
       else {
         this.validations.misc.$touch();
         this.validations.cancel.$touch();
       }
     },
     toggleRepetition () {
-      this.editedEvent.cancel = {};
-      this.editedEvent.isCancelled = false;
+      this.$emit('update:editedEvent', { ...this.editedEvent, cancel: {}, isCancelled: false });
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;

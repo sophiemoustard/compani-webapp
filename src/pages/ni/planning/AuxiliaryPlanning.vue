@@ -14,7 +14,7 @@
       @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="validateEventDeletion"
@@ -254,7 +254,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        address: {},
+        address: { fullAddress: '' },
         attachment: {},
         auxiliary: person ? person._id : '',
         sector: person ? person.sector._id : sectorId,

@@ -161,6 +161,7 @@ export const planningActionMixin = {
           subscription: '',
           internalHour: '',
           absence: '',
+          absenceNature: '',
           address: {},
           attachment: {},
           ...(type === ABSENCE && { absenceNature: DAILY }),
@@ -174,19 +175,8 @@ export const planningActionMixin = {
       let payload = { ...this.$_.omit(event, ['dates', '__v', 'company']) }
       payload = this.$_.pickBy(payload);
 
-      if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        const isIllnesOrWorkAccident = event.absence && [ILLNESS, WORK_ACCIDENT].includes(event.absence);
-        const startHourSplit = event.dates.startHour.split(':');
-        payload.startDate = isIllnesOrWorkAccident
-          ? this.$moment(event.dates.startDate).set({ hours: startHourSplit[0], minutes: startHourSplit[1] })
-          : this.$moment(event.dates.startDate).startOf('d').toDate();
-        payload.endDate = this.$moment(event.dates.endDate).endOf('d').toDate();
-      } else {
-        payload.startDate = this.$moment(event.dates.startDate).hours(event.dates.startHour.split(':')[0])
-          .minutes(event.dates.startHour.split(':')[1]).toISOString();
-        payload.endDate = this.$moment(event.dates.endDate).hours(event.dates.endHour.split(':')[0])
-          .minutes(event.dates.endHour.split(':')[1]).toISOString();
-      }
+      payload.startDate = event.dates.startDate;
+      payload.endDate = event.dates.endDate;
 
       if (event.type === INTERVENTION) {
         const customer = this.customers.find(cus => cus._id === event.customer);
@@ -414,7 +404,15 @@ export const planningActionMixin = {
       if (event.auxiliary) delete payload.sector;
       if (event.address && !event.address.fullAddress) payload.address = {};
 
-      return this.$_.omit(payload, ['customer', 'repetition', 'staffingBeginning', 'staffingDuration', 'type']);
+      return this.$_.omit(payload, [
+        'customer',
+        'repetition',
+        'staffingBeginning',
+        'staffingDuration',
+        'type',
+        'displayedStartDate',
+        'displayedEndDate',
+      ]);
     },
     async updateEvent () {
       try {
