@@ -4,8 +4,9 @@ import User from '../api/Users';
 export default {
   async refreshAlenviCookies () {
     try {
-      if (Cookies.get('refresh_token')) {
-        const newToken = await User.refreshToken({ refreshToken: Cookies.get('refresh_token') });
+      const refreshToken = Cookies.get('refresh_token');
+      if (refreshToken) {
+        const newToken = await User.refreshToken({ refreshToken });
         const expiresInDays = parseInt(newToken.expiresIn / 3600 / 24, 10) >= 1
           ? parseInt(newToken.expiresIn / 3600 / 24, 10)
           : 1;
