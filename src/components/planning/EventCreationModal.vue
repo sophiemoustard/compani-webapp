@@ -19,7 +19,8 @@
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
             @blur="validations.auxiliary.$touch" />
           <ni-select v-else in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
-            :error="validations.customer.$error" required-field @blur="validations.customer.$touch" @input="setEventAddressAndSubscription" />
+            :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
+            @input="setEventAddressAndSubscription" />
           <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
             :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch" />
         </template>
@@ -28,15 +29,16 @@
             :error="validations.absenceNature.$error" required-field @blur="validations.absenceNature.$touch"
             @input="resetAbsenceType" />
           <ni-select in-modal caption="Type d'absence" v-model="newEvent.absence" :options="absenceOptions"
-            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" :disable="isHourlyAbsence(newEvent)"
-            @input="setDateHours(newEvent, 'newEvent')" />
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
+            :disable="isHourlyAbsence(newEvent)" @input="setDateHours(newEvent, 'newEvent')" />
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
-            :disable-end-date="isHourlyAbsence(newEvent)" :error="validations.dates.$error" @blur="validations.dates.$touch"
-            :disable-end-hour="isDailyAbsence(newEvent)" :disable-start-hour="!isIllnessOrWorkAccident(newEvent)" />
-          <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)"
-            caption="Justificatif d'absence" path="attachment" :entity="newEvent" alt="justificatif absence" name="file"
-            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
-            in-modal @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+            :disable-end-date="isHourlyAbsence(newEvent)" :error="validations.dates.$error"
+            @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
+            :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)" />
+          <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
+            :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
+            :additionalValue="additionalValue" required-field in-modal
+            @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" v-model="newEvent.internalHour"
