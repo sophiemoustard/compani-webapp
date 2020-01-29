@@ -3,7 +3,7 @@ import { Cookies } from 'quasar';
 
 import store from '../store/index';
 import alenvi from '../helpers/alenvi';
-import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../data/constants.js';
+import { HELPER, AUXILIARY_ROLES, COACH_ROLES } from '../data/constants.js';
 
 const routes = [
   {
@@ -17,17 +17,9 @@ const routes = [
         }
         if (store.getters['main/user'] && store.getters['main/user'].role.name === HELPER) {
           return next({name: 'customer agenda'});
-        } else if (
-          store.getters['main/user'] &&
-          (store.getters['main/user'].role.name === AUXILIARY ||
-            store.getters['main/user'].role.name === PLANNING_REFERENT)
-        ) {
+        } else if (store.getters['main/user'] && AUXILIARY_ROLES.includes(store.getters['main/user'].role.name)) {
           return next({name: 'auxiliary agenda'});
-        } else if (
-          store.getters['main/user'] &&
-          store.getters['main/user'].role.name !== AUXILIARY &&
-          store.getters['main/user'].role.name !== HELPER
-        ) {
+        } else if (store.getters['main/user'] && COACH_ROLES.includes(store.getters['main/user'].role.name)) {
           return next({ name: 'auxiliaries directory' });
         } else {
           next({ path: '/login' });
