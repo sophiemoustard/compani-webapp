@@ -13,7 +13,7 @@
               <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
                 <q-btn flat round small color="grey" icon="edit"
                   @click.native="openCreditNoteEditionModal(props.row)" />
-                <q-btn flat round small color="grey" icon="delete" :disabled="!props.row.isEditable"
+                <q-btn flat round small color="grey" icon="delete" :disable="!props.row.isEditable"
                   @click="validateCNDeletion(col.value, props.row)" />
               </div>
             </template>
@@ -102,18 +102,18 @@
         v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
       <ni-date-input caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal type="date" required-field
         :error="$v.editedCreditNote.date.$error" @blur="$v.editedCreditNote.date.$touch"
-        :disabled="!editedCreditNote.isEditable" />
+        :disable="!editedCreditNote.isEditable" />
       <!-- Has linked events -->
       <template v-if="hasLinkedEvents">
         <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal type="date"
-          :disable="!editedCreditNote.events" @input="getEvents" required-field :disabled="!editedCreditNote.isEditable"
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
           :error="$v.editedCreditNote.startDate.$error" @blur="$v.editedCreditNote.startDate.$touch" />
         <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal type="date"
-          :disable="!editedCreditNote.events" @input="getEvents" required-field :disabled="!editedCreditNote.isEditable"
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
           :error="$v.editedCreditNote.endDate.$error" @blur="$v.editedCreditNote.endDate.$touch" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-            type="checkbox" required-field inline :disabled="!editedCreditNote.isEditable"/>
+            type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"/>
         </template>
         <div v-if="editedCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
