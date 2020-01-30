@@ -724,6 +724,7 @@ export default {
       },
       billingMode: { required },
       unitTTCRate: { posDecimals },
+      isApa: { required },
     },
     editedThirdPartyPayer: {
       name: { required },
@@ -735,6 +736,7 @@ export default {
       },
       billingMode: { required },
       unitTTCRate: { posDecimals },
+      isApa: { required },
     },
   },
   computed: {
