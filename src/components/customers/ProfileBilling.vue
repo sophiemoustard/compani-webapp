@@ -72,7 +72,7 @@
       </template>
       <ni-date-input caption="Date" v-model="taxCertificate.date" @blur="$v.taxCertificate.date.$touch"
         :error-label="REQUIRED_LABEL" in-modal required-field />
-      <ni-select caption="Année" :value="taxCertificate.year" :options="yearOptions"
+      <ni-select caption="Année" v-model="taxCertificate.year" :options="yearOptions"
         @blur="$v.taxCertificate.year.$touch" :error="$v.taxCertificate.year.$error" in-modal required-field />
       <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="$v.taxCertificate.file.$error"
         @blur="$v.taxCertificate.file.$touch" in-modal required-field last />
