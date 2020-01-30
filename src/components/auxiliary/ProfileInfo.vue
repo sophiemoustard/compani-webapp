@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoaded">
-    <div v-if="!isAuxiliary" class="row gutter-profile q-mb-xl">
+    <div v-if="isCoach" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
@@ -10,6 +10,9 @@
         @blur="updateUser('mentor')" />
       <ni-select v-model="user.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')"
         @blur="updateUser('role._id')" in-form />
+      <ni-select v-model="user.establishment" caption="Établissement" :options="establishmentsOptions"
+        @focus="saveTmp('establishment')" @blur="updateUser('establishment')" :error="$v.user.establishment.$error"
+        :error-label="REQUIRED_LABEL" :disable="disableEstablishmentSelection" in-form />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -153,20 +156,20 @@
             :entity="currentUser" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
             @delete="validateDocumentDeletion(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
             :error="$v.user.administrative.idCardRecto.driveId.$error" :extensions="extensions"
-            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
+            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
             :entity="currentUser" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
             @delete="validateDocumentDeletion(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
-             :extensions="extensions"
-            :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
+            :extensions="extensions"
+            :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div v-if="user.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
-            @delete="validateDocumentDeletion(user.administrative.passport.driveId, 'administrative.passport')" name="passport"
-            :url="docsUploadUrl" @uploaded="refreshUser" :error="$v.user.administrative.passport.driveId.$error"
-            :extensions="extensions"
+            @delete="validateDocumentDeletion(user.administrative.passport.driveId, 'administrative.passport')"
+            name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
+            :error="$v.user.administrative.passport.driveId.$error" :extensions="extensions"
             :additional-value="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
@@ -196,7 +199,7 @@
             :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
             name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
-            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"/>
+            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
@@ -232,8 +235,8 @@
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
             @delete="validateDocumentDeletion(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
-            name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            entity-url="users" :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
+            name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions" entity-url="users"
+            :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
             :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
         </div>
       </div>
@@ -286,7 +289,7 @@ import gdrive from '../../api/GoogleDrive.js';
 import cloudinary from '../../api/Cloudinary.js';
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
-import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL } from '../../data/constants.js';
+import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES, COMPANY_CONTRACT } from '../../data/constants.js';
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input';
 import Select from '../form/Select';
@@ -402,6 +405,7 @@ export default {
             rib: { iban: '', bic: '' },
           },
         },
+        establishment: null,
       },
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
       auxiliaryRolesOptions: [],
@@ -410,6 +414,8 @@ export default {
         { label: 'Passeport', value: 'pp' },
         { label: 'Titre de séjour', value: 'ts' },
       ],
+      establishments: [],
+      REQUIRED_LABEL,
     }
   },
   validations () {
@@ -453,6 +459,7 @@ export default {
             fullAddress: { required, frAddress },
           },
         },
+        establishment: { required },
         administrative: {
           identityDocs: { required },
           emergencyContact: {
@@ -620,14 +627,32 @@ export default {
     isAuxiliary () {
       return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
     },
+    isCoach () {
+      return COACH_ROLES.includes(this.mainUser.role.name);
+    },
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
+    },
+    establishmentsOptions () {
+      const options = this.establishments.map(est => ({ label: est.name, value: est._id }));
+      return [{ label: 'Non affecté', value: null }, ...options];
+    },
+    hasActiveCompanyContract () {
+      return this.user.contracts.some(contract => contract.status === COMPANY_CONTRACT &&
+        this.$moment(contract.startDate).isSameOrBefore(new Date(), 'd') &&
+        (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(new Date(), 'd')));
+    },
+    disableEstablishmentSelection () {
+      return this.hasActiveCompanyContract && !!this.user.establishment;
     },
   },
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
     this.mergeUser(user);
-    if (!this.isAuxiliary) await this.getAuxiliaryRoles();
+    if (!this.isAuxiliary) {
+      await this.getAuxiliaryRoles();
+      await this.getEstablishments();
+    }
     this.$v.user.$touch();
     this.isLoaded = true;
   },
@@ -824,6 +849,14 @@ export default {
         }));
       } catch (e) {
         console.error(e);
+      }
+    },
+    async getEstablishments () {
+      try {
+        this.establishments = await this.$establishments.list();
+      } catch (e) {
+        console.error(e);
+        this.establishments = [];
       }
     },
   },
