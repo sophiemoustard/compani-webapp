@@ -8,7 +8,8 @@
           <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="edit"
@@ -35,7 +36,8 @@
             :visible-columns="visibleColumnsServices">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
@@ -81,7 +83,8 @@
             :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
                   <template v-if="col.name === 'billingMode'">
                     <div class="capitalize">{{ col.value }}</div>
                   </template>
@@ -592,6 +595,7 @@ export default {
           field: 'name',
           align: 'left',
           sortable: true,
+          style: !this.$q.platform.is.mobile && 'width: 250px',
         },
         {
           name: 'address',
@@ -616,17 +620,26 @@ export default {
           name: 'billingMode',
           label: 'Facturation',
           field: 'billingMode',
-          align: 'left',
+          align: 'center',
           format: val => {
             const mode = this.billingModeOptions.find(m => m.value === val);
             return mode ? mode.label : '';
           },
         },
         {
+          name: 'isApa',
+          label: 'APA',
+          field: 'isApa',
+          align: 'center',
+          format: val => val ? 'Oui' : 'Non',
+          style: !this.$q.platform.is.mobile && 'width: 100px',
+        },
+        {
           name: 'actions',
           label: '',
           align: 'center',
           field: '_id',
+          style: !this.$q.platform.is.mobile && 'width: 100px',
         },
       ],
       thirdPartyPayerCreationModal: false,
