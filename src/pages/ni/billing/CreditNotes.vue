@@ -13,7 +13,7 @@
               <div class="row no-wrap table-actions" v-if="props.row.origin === COMPANI">
                 <q-btn flat round small color="grey" icon="edit"
                   @click.native="openCreditNoteEditionModal(props.row)" />
-                <q-btn flat round small color="grey" icon="delete"
+                <q-btn flat round small color="grey" icon="delete" :disable="!props.row.isEditable"
                   @click="validateCNDeletion(col.value, props.row)" />
               </div>
             </template>
@@ -86,7 +86,7 @@
       </template>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
-          :loading="loading" @click="createNewCreditNote" :disable="$v.newCreditNote.$error ||disableCreationButton" />
+          :loading="loading" @click="createNewCreditNote" :disable="$v.newCreditNote.$error || disableCreationButton" />
       </template>
     </ni-modal>
 
@@ -101,18 +101,19 @@
       <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
         v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
       <ni-date-input caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal type="date" required-field
-        :error="$v.editedCreditNote.date.$error" @blur="$v.editedCreditNote.date.$touch" />
+        :error="$v.editedCreditNote.date.$error" @blur="$v.editedCreditNote.date.$touch"
+        :disable="!editedCreditNote.isEditable" />
       <!-- Has linked events -->
       <template v-if="hasLinkedEvents">
         <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal type="date"
-          :disable="!editedCreditNote.events" @input="getEvents" required-field
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
           :error="$v.editedCreditNote.startDate.$error" @blur="$v.editedCreditNote.startDate.$touch" />
         <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal type="date"
-          :disable="!editedCreditNote.events" @input="getEvents" required-field
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
           :error="$v.editedCreditNote.endDate.$error" @blur="$v.editedCreditNote.endDate.$touch" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-            type="checkbox" required-field inline />
+            type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"/>
         </template>
         <div v-if="editedCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
@@ -144,7 +145,7 @@
           v-model="editedCreditNote.inclTaxesTpp" required-field :error="$v.editedCreditNote.inclTaxesTpp.$error"
           @blur="$v.editedCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" type="number" />
       </template>
-      <template slot="footer">
+      <template v-if="editedCreditNote.isEditable" slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
           :loading="loading" @click="updateCreditNote" :disable="$v.editedCreditNote.$error || disableEditionButton" />
       </template>
@@ -409,7 +410,7 @@ export default {
         ((this.newCreditNote.thirdPartyPayer && this.newCreditNote.inclTaxesTpp) || this.newCreditNote.inclTaxesCustomer))));
     },
     disableEditionButton () {
-      return !(this.editedCreditNote.customer && this.editedCreditNote.date &&
+      return !(this.editedCreditNote.customer && this.editedCreditNote.date && this.editedCreditNote.isEditable &&
       ((this.editedCreditNote.events && this.editedCreditNote.events.length > 0) ||
       (this.editedCreditNote.subscription &&
         ((this.editedCreditNote.thirdPartyPayer && this.editedCreditNote.inclTaxesTpp) || this.editedCreditNote.inclTaxesCustomer))));

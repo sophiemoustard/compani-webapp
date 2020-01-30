@@ -7,7 +7,7 @@
       </div>
       <q-field dense borderless :error="error" :error-label="errorLabel" class="col-12">
         <q-option-group :value="value" @input="inputHandler" @blur="blurHandler" :options="options" :readonly="readOnly"
-          :type="type" :inline="inline" dense />
+          :type="type" :inline="inline" dense :disable="disable" />
       </q-field>
     </div>
   </div>
@@ -30,6 +30,7 @@ export default {
     type: { type: String, default: '' },
     inline: { type: Boolean, default: false },
     displayCaption: { type: Boolean, default: true },
+    disable: { type: Boolean, default: true },
   },
   methods: {
     inputHandler (value) {
