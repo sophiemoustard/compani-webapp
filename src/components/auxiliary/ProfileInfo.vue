@@ -459,7 +459,7 @@ export default {
             fullAddress: { required, frAddress },
           },
         },
-        establishment: { required: requiredIf(() => this.hasActiveCompanyContract) },
+        establishment: { required },
         administrative: {
           identityDocs: { required },
           emergencyContact: {
@@ -633,14 +633,12 @@ export default {
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
     },
-    hasActiveCompanyContract () {
-      return this.user.contracts.some(contract => contract.status === COMPANY_CONTRACT &&
-        this.$moment(contract.startDate).isSameOrBefore(new Date(), 'd') &&
-        (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(new Date(), 'd')));
+    hasCompanyContract () {
+      return this.user.contracts.some(contract => contract.status === COMPANY_CONTRACT);
     },
     establishmentsOptions () {
       const options = this.establishments.map(est => ({ label: est.name, value: est._id, inactive: false }));
-      return [{ label: 'Non affecté', value: null, inactive: this.hasActiveCompanyContract }, ...options];
+      return [{ label: 'Non affecté', value: null, inactive: this.hasCompanyContract }, ...options];
     },
   },
   async mounted () {
