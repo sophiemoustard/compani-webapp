@@ -39,6 +39,9 @@
             <div class="col-8 auxiliary-label">Heures à travailler</div>
             <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
           </div>
+          <div class="row unassigned-hours" v-if="shouldDisplayUnassignedHours(sector)">
+            <div class="col-12">{{ formatHours(getUnassignedHours(sector)) }} à affecter</div>
+          </div>
         </div>
         <div class="q-pt-md gauge-wrapper">
           <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)">
@@ -127,6 +130,7 @@ export default {
       internalAndBilledHours: [],
       hoursToWork: [],
       paidTransportStats: [],
+      unassignedHours: [],
       monthModal: false,
       firstInterventionStartDate: '',
       auxiliariesStats: {},
@@ -280,6 +284,13 @@ export default {
     getPaidTransportRatio (sectorId) {
       return (this.getPaidTransport(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
     },
+    shouldDisplayUnassignedHours (sectorId) {
+      return this.unassignedHours.find(el => el.sector === sectorId) &&
+        this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month');
+    },
+    getUnassignedHours (sectorId) {
+      return this.unassignedHours.find(el => el.sector === sectorId).duration;
+    },
     openAuxiliariesDetails (sectorId) {
       if (this.auxiliariesDetailsIsOpened[sectorId]) {
         this.$set(this.auxiliariesDetailsIsOpened, sectorId, false);
@@ -301,6 +312,11 @@ export default {
           this.$pay.getHoursToWork(params),
           this.$events.getPaidTransportStatsBySector(params),
         ]);
+        if (this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month')) {
+          this.unassignedHours = await this.$events.getUnassignedHoursBySector(params);
+        } else {
+          this.unassignedHours = [];
+        }
         for (const sector of this.filteredSectors) {
           if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) {
             this.$set(this.auxiliariesDetailsIsOpened, sector, false);
@@ -349,7 +365,7 @@ export default {
   border-top: 1px solid $light-grey
   border-left: 1px solid $light-grey
   border-right: 1px solid $light-grey
-  &:last-child
+  &:nth-child(2)
     border-bottom: 1px solid $light-grey
 
 .auxiliary-label
@@ -404,4 +420,9 @@ export default {
   border-bottom: 1px solid $light-grey
   display: flex
   flex-direction: column
+
+.unassigned-hours
+  font-style: italic
+  font-size: 14px
+  padding-left: 5px
 </style>
