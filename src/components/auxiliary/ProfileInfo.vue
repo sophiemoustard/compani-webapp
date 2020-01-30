@@ -12,7 +12,7 @@
         @blur="updateUser('role._id')" in-form />
       <ni-select v-model="user.establishment" caption="Établissement" :options="establishmentsOptions"
         @focus="saveTmp('establishment')" @blur="updateUser('establishment')" :error="$v.user.establishment.$error"
-        :error-label="REQUIRED_LABEL" :disable="disableEstablishmentSelection" in-form />
+        :error-label="REQUIRED_LABEL" option-disable="inactive" in-form />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -459,7 +459,7 @@ export default {
             fullAddress: { required, frAddress },
           },
         },
-        establishment: { required },
+        establishment: { required: requiredIf(() => this.hasActiveCompanyContract) },
         administrative: {
           identityDocs: { required },
           emergencyContact: {
@@ -633,17 +633,14 @@ export default {
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
     },
-    establishmentsOptions () {
-      const options = this.establishments.map(est => ({ label: est.name, value: est._id }));
-      return [{ label: 'Non affecté', value: null }, ...options];
-    },
     hasActiveCompanyContract () {
       return this.user.contracts.some(contract => contract.status === COMPANY_CONTRACT &&
         this.$moment(contract.startDate).isSameOrBefore(new Date(), 'd') &&
         (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(new Date(), 'd')));
     },
-    disableEstablishmentSelection () {
-      return this.hasActiveCompanyContract && !!this.user.establishment;
+    establishmentsOptions () {
+      const options = this.establishments.map(est => ({ label: est.name, value: est._id, inactive: false }));
+      return [{ label: 'Non affecté', value: null, inactive: this.hasActiveCompanyContract }, ...options];
     },
   },
   async mounted () {

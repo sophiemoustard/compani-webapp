@@ -7,14 +7,14 @@
     <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
       :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorLabel" use-input
-      :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput">
-        <template v-if="value && !disable" v-slot:append>
-          <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
-        </template>
-        <template v-if="icon" v-slot:append>
-          <q-icon :name="icon" class="select-icon pink-icon cursor-pointer"
-            @click="$refs['selectInput'].showPopup()" />
-        </template>
+      :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
+      :option-disable="optionDisable">
+      <template v-if="value && !disable" v-slot:append>
+        <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
+      </template>
+      <template v-if="icon" v-slot:append>
+        <q-icon :name="icon" class="select-icon pink-icon cursor-pointer" @click="$refs['selectInput'].showPopup()" />
+      </template>
     </q-select>
   </div>
 </template>
@@ -39,6 +39,7 @@ export default {
     multiple: { type: Boolean, default: false },
     noError: { type: Boolean, default: false },
     bgColor: { type: String, default: 'white' },
+    optionDisable: { type: String, default: 'disable' },
   },
   data () {
     return {
