@@ -10,7 +10,7 @@
       <template v-slot:append>
         <q-icon name="event" class="cursor-pointer" @click="focus">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
-            <q-date minimal :value="date" @input="select" :options="dateOptions"/>
+            <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable"/>
           </q-menu>
         </q-icon>
       </template>
