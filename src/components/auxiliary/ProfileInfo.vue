@@ -289,7 +289,7 @@ import gdrive from '../../api/GoogleDrive.js';
 import cloudinary from '../../api/Cloudinary.js';
 import nationalities from '../../data/nationalities.js';
 import countries from '../../data/countries.js';
-import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES, COMPANY_CONTRACT } from '../../data/constants.js';
+import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES } from '../../data/constants.js';
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input';
 import Select from '../form/Select';
@@ -633,12 +633,9 @@ export default {
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
     },
-    hasCompanyContract () {
-      return this.user.contracts.some(contract => contract.status === COMPANY_CONTRACT);
-    },
     establishmentsOptions () {
       const options = this.establishments.map(est => ({ label: est.name, value: est._id, inactive: false }));
-      return [{ label: 'Non affecté', value: null, inactive: this.hasCompanyContract }, ...options];
+      return [{ label: 'Non affecté', value: null, inactive: true }, ...options];
     },
   },
   async mounted () {
