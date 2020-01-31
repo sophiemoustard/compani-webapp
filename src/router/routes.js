@@ -26,9 +26,7 @@ const routes = [
         if (user && user.role.name === HELPER) return next({ name: 'customer agenda' });
         else if (user && AUXILIARY_ROLES.includes(user.role.name)) {
           if (hasActiveContract(user)) return next({ name: 'auxiliary agenda' });
-          else {
-            return next({ name: 'account info', params: { id: user._id } });
-          }
+          else return next({ name: 'account info', params: { id: user._id } });
         } else if (user && COACH_ROLES.includes(user.role.name)) return next({ name: 'auxiliaries directory' });
         else next({ path: '/login' });
       } catch (e) {

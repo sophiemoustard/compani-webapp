@@ -7,26 +7,26 @@
     </div>
     <q-separator v-if="hasActiveContract" />
     <q-expansion-item v-if="hasActiveContract" ref="planning" v-model="activeRoutes.planning.open" label="Planning">
-      <ni-menu-item v-if="hasActiveContract" name="auxiliary agenda" icon="event" label="Le mien" />
-      <ni-menu-item v-if="hasActiveContract" name="auxiliaries planning" icon="face" label="Auxiliaires" />
-      <ni-menu-item v-if="hasActiveContract" name="customers planning" icon="people" label="Bénéficiaires" />
+      <ni-menu-item name="auxiliary agenda" icon="event" label="Le mien" />
+      <ni-menu-item name="auxiliaries planning" icon="face" label="Auxiliaires" />
+      <ni-menu-item name="customers planning" icon="people" label="Bénéficiaires" />
     </q-expansion-item>
     <q-separator v-if="hasActiveContract" />
     <q-expansion-item v-if="hasActiveContract" ref="benef" v-model="activeRoutes.benef.open" label="Bénéficiaires">
-      <ni-menu-item v-if="hasActiveContract" name="profile customers" :params="{ id: user._id }" icon="account_box" label="Fiches" />
-      <ni-menu-item v-if="hasActiveContract" name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
+      <ni-menu-item name="profile customers" :params="{ id: user._id }" icon="account_box" label="Fiches" />
+      <ni-menu-item name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
     </q-expansion-item>
     <q-separator v-if="hasActiveContract" />
     <q-expansion-item v-if="hasActiveContract" ref="administrative" v-model="activeRoutes.administrative.open" label="Administratif">
-      <ni-menu-item v-if="hasActiveContract" name="auxiliary personal info" :params="{ id: user._id }" icon="person" label="Infos personnelles" />
-      <ni-menu-item v-if="hasActiveContract" name="profile salaries" :params="{ id: user._id }" icon="layers" label="Paie" />
-      <ni-menu-item v-if="hasActiveContract" name="profile docs" :params="{ id: user._id }" icon="insert_drive_file" label="Documents" />
-      <ni-menu-item v-if="hasActiveContract" name="profile contracts" icon="description" label="Contrats" />
+      <ni-menu-item name="auxiliary personal info" :params="{ id: user._id }" icon="person" label="Infos personnelles" />
+      <ni-menu-item name="profile salaries" :params="{ id: user._id }" icon="layers" label="Paie" />
+      <ni-menu-item name="profile docs" :params="{ id: user._id }" icon="insert_drive_file" label="Documents" />
+      <ni-menu-item name="profile contracts" icon="description" label="Contrats" />
     </q-expansion-item>
     <q-separator v-if="hasActiveContract" />
     <q-expansion-item v-if="hasActiveContract" ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
-      <ni-menu-item v-if="hasActiveContract" name="teams directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
-      <ni-menu-item v-if="hasActiveContract" name="dashboard" icon="dashboard" label="Tableau de bord" />
+      <ni-menu-item name="teams directory" :params="{ id: user._id }" icon="group" label="Répertoire" />
+      <ni-menu-item name="dashboard" icon="dashboard" label="Tableau de bord" />
     </q-expansion-item>
     <q-separator />
     <ni-side-menu-footer :hasActiveContract="hasActiveContract" :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" isAuxiliary />
@@ -62,7 +62,7 @@ export default {
   },
   computed: {
     hasActiveContract () {
-      return this.user.contracts.some(contract =>
+      return !this.user.contracts.length && this.user.contracts.some(contract =>
         !contract.endDate || this.$moment(contract.endDate).isSameOrAfter(new Date(), 'day'));
     },
   },
