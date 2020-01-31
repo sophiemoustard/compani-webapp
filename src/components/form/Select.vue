@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'col-xs-12 col-md-6': inForm, 'margin-input full-width': inModal, last: last }">
+  <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
@@ -33,7 +33,6 @@ export default {
     value: [String, Number, Object],
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
-    inForm: { type: Boolean, default: false },
     last: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },

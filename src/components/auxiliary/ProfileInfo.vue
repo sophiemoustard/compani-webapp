@@ -12,7 +12,7 @@
         @blur="updateUser('role._id')" in-form />
       <ni-select v-model="user.establishment" caption="Établissement" :options="establishmentsOptions"
         @focus="saveTmp('establishment')" @blur="updateUser('establishment')" :error="$v.user.establishment.$error"
-        :error-label="REQUIRED_LABEL" option-disable="inactive" in-form />
+        :error-label="REQUIRED_LABEL" option-disable="inactive" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -93,7 +93,7 @@
         <ni-input caption="Numéro de téléphone" :error="$v.user.contact.phone.$error" :error-label="phoneNbrError"
           type="tel" v-model.trim="user.contact.phone" @blur="updateUser('contact.phone')"
           @focus="saveTmp('contact.phone')" />
-        <div v-if="!isAuxiliary" class="col-12 col-md-6 row items-center">
+        <div v-if="isCoach" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
               :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="user.local.email"
@@ -644,7 +644,7 @@ export default {
   async mounted () {
     const user = await this.$users.getById(this.currentUser._id);
     this.mergeUser(user);
-    if (!this.isAuxiliary) {
+    if (this.isCoach) {
       await this.getAuxiliaryRoles();
       await this.getEstablishments();
     }
