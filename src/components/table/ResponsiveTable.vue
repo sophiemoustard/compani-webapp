@@ -2,6 +2,13 @@
   <q-table :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" :visible-columns="visibleColumns"
     hide-bottom binary-state-sort @update:pagination="$emit('update:pagination', $event)" flat
     class="table-responsive q-pa-sm" :rows-per-page-options="rowsPerPageOptions">
+    <template v-slot:header="props">
+      <slot name="header" :props="props">
+        <q-tr :props="props">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
+        </q-tr>
+      </slot>
+    </template>
     <template v-slot:body="props">
       <slot name="body" :props="props">
         <q-tr :props="props">

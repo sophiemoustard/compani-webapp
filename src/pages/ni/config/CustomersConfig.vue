@@ -8,7 +8,8 @@
           <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="edit"
@@ -35,7 +36,8 @@
             :visible-columns="visibleColumnsServices">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
@@ -81,7 +83,8 @@
             :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
-                <q-td v-for="col in props.cols" :key="col.name" :props="props" :class="col.name">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
                   <template v-if="col.name === 'billingMode'">
                     <div class="capitalize">{{ col.value }}</div>
                   </template>
@@ -259,7 +262,7 @@
     </ni-modal>
 
     <!-- Third party payers creation modal -->
-    <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerEditionData">
+    <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerCreation">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">tiers payeur</span>
       </template>
@@ -274,6 +277,9 @@
       <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
         :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
         @blur="$v.newThirdPartyPayer.billingMode.$touch" />
+      <div class="row q-mb-md light-checkbox">
+        <q-checkbox v-model="newThirdPartyPayer.isApa" label="Financement APA" size="12px" dense />
+      </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
           :loading="loading" @click="createNewThirdPartyPayer" :disable="isTppCreationDisabled" />
@@ -281,7 +287,7 @@
     </ni-modal>
 
     <!-- Third party payers edition modal -->
-    <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerUpdateModalData">
+    <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerEdition">
       <template slot="title">
         Editer le <span class="text-weight-bold">tiers payeur</span>
       </template>
@@ -296,6 +302,9 @@
       <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
         caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
         @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
+      <div class="row q-mb-md light-checkbox">
+        <q-checkbox v-model="editedThirdPartyPayer.isApa" label="Financement APA" size="12px" dense />
+      </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
           :loading="loading" @click="updateThirdPartyPayer" :disable="isTppEditionDisabled" />
@@ -306,6 +315,7 @@
 
 <script>
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
+import ThirdPartyPayers from '../../../api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import DateInput from '../../../components/form/DateInput.vue';
 import TimeInput from '../../../components/form/TimeInput.vue';
@@ -585,6 +595,7 @@ export default {
           field: 'name',
           align: 'left',
           sortable: true,
+          style: !this.$q.platform.is.mobile && 'width: 250px',
         },
         {
           name: 'address',
@@ -609,17 +620,26 @@ export default {
           name: 'billingMode',
           label: 'Facturation',
           field: 'billingMode',
-          align: 'left',
+          align: 'center',
           format: val => {
             const mode = this.billingModeOptions.find(m => m.value === val);
             return mode ? mode.label : '';
           },
         },
         {
+          name: 'isApa',
+          label: 'APA',
+          field: 'isApa',
+          align: 'center',
+          format: val => val ? 'Oui' : 'Non',
+          style: !this.$q.platform.is.mobile && 'width: 100px',
+        },
+        {
           name: 'actions',
           label: '',
           align: 'center',
           field: '_id',
+          style: !this.$q.platform.is.mobile && 'width: 100px',
         },
       ],
       thirdPartyPayerCreationModal: false,
@@ -629,6 +649,7 @@ export default {
         address: { fullAddress: '' },
         unitTTCRate: '',
         billingMode: '',
+        isApa: true,
       },
       billingModeOptions: [
         { label: 'Indirecte', value: BILLING_INDIRECT },
@@ -703,6 +724,7 @@ export default {
       },
       billingMode: { required },
       unitTTCRate: { posDecimals },
+      isApa: { required },
     },
     editedThirdPartyPayer: {
       name: { required },
@@ -714,6 +736,7 @@ export default {
       },
       billingMode: { required },
       unitTTCRate: { posDecimals },
+      isApa: { required },
     },
   },
   computed: {
@@ -807,7 +830,7 @@ export default {
     },
     async refreshThirdPartyPayers () {
       try {
-        this.thirdPartyPayers = await this.$thirdPartyPayers.list();
+        this.thirdPartyPayers = await ThirdPartyPayers.list();
       } catch (e) {
         this.thirdPartyPayers = [];
         console.error(e);
@@ -1070,10 +1093,10 @@ export default {
       this.selectedService = {};
     },
     // Third party payers
-    openThirdPartyPayerEditionModal (thirdPartyPayerId) {
+    openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
-      const currentThirdPartyPayer = this.thirdPartyPayers.find(thirdPartyPayer => thirdPartyPayer._id === thirdPartyPayerId);
-      const { name, address, email, unitTTCRate, billingMode } = currentThirdPartyPayer;
+      const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
+      const { name, address, email, unitTTCRate, billingMode, isApa } = currentThirdPartyPayer;
       this.editedThirdPartyPayer = {
         _id: currentThirdPartyPayer._id,
         name,
@@ -1081,9 +1104,10 @@ export default {
         email,
         unitTTCRate,
         billingMode,
+        isApa,
       };
     },
-    resetThirdPartyPayerEditionData () {
+    resetThirdPartyPayerCreation () {
       this.$v.newThirdPartyPayer.$reset();
       this.newThirdPartyPayer = {
         name: '',
@@ -1091,20 +1115,21 @@ export default {
         address: {},
         unitTTCRate: '',
         billingMode: '',
+        isApa: true,
       }
     },
     formatThirdPartyPayerPayload (tpp) {
       const payload = this.$_.cloneDeep(tpp);
       if (payload.address && !payload.address.fullAddress) delete payload.address;
 
-      return this.$_.pickBy(payload);
+      return { isApa: false, ...this.$_.pickBy(payload) };
     },
     async createNewThirdPartyPayer () {
       try {
         if (this.$v.newThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$thirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
+        await ThirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur créé.');
       } catch (e) {
@@ -1115,11 +1140,9 @@ export default {
         this.loading = false;
       }
     },
-    resetThirdPartyPayerUpdateModalData () {
+    resetThirdPartyPayerEdition () {
       this.$v.editedThirdPartyPayer.$reset();
-      this.editedThirdPartyPayer = {
-        address: {},
-      }
+      this.editedThirdPartyPayer = { address: {} }
     },
     async updateThirdPartyPayer () {
       try {
@@ -1129,7 +1152,7 @@ export default {
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;
         delete this.editedThirdPartyPayer._id;
         const payload = this.editedThirdPartyPayer;
-        await this.$thirdPartyPayers.updateById(thirdPartyPayerId, this.formatThirdPartyPayerPayload(payload));
+        await ThirdPartyPayers.updateById(thirdPartyPayerId, this.formatThirdPartyPayerPayload(payload));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur modifié.');
       } catch (e) {
@@ -1143,7 +1166,7 @@ export default {
     async deleteThirdPartyPayer (thirdPartyPayerId, row) {
       try {
         const index = this.getRowIndex(this.thirdPartyPayers, row);
-        await this.$thirdPartyPayers.removeById(thirdPartyPayerId);
+        await ThirdPartyPayers.removeById(thirdPartyPayerId);
         this.thirdPartyPayers.splice(index, 1);
         NotifyPositive('Tiers payeur supprimé.');
       } catch (e) {
