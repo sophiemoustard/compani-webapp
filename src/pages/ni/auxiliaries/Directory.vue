@@ -83,7 +83,7 @@ import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
 import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
-import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
   metaInfo: { title: 'Répertoire auxiliaires' },
@@ -293,7 +293,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await this.$users.list({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const users = await this.$users.list({ role: AUXILIARY_ROLES });
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);
           if (user.isActive) {

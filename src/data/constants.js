@@ -121,7 +121,8 @@ export const CUSTOMER = 'customer';
 export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planningReferent';
-export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT];
+export const AUXILIARY_WITHOUT_COMPANY = 'auxiliaryWithoutCompany'
+export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [SUPER_ADMIN, ADMIN, COACH];
 export const ADMIN_ROLES = [SUPER_ADMIN, ADMIN];
 

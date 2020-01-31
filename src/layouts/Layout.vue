@@ -26,7 +26,7 @@ import { mapGetters } from 'vuex'
 import SideMenuCoach from '../components/menu/SideMenuCoach'
 import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
 import SideMenuCustomer from '../components/menu/SideMenuCustomer'
-import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../data/constants.js';
+import { AUXILIARY_ROLES, HELPER } from '../data/constants.js';
 
 export default {
   components: {
@@ -45,7 +45,7 @@ export default {
       user: 'main/user',
     }),
     isAuxiliary () {
-      return this.user.role.name === AUXILIARY || this.user.role.name === PLANNING_REFERENT;
+      return AUXILIARY_ROLES.includes(this.user.role.name);
     },
     menuIcon () {
       return this.isMini ? 'view_headline' : 'chevron_left';

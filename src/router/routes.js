@@ -7,8 +7,9 @@ import { HELPER, AUXILIARY_ROLES, COACH_ROLES } from '../data/constants.js';
 import moment from 'moment';
 
 const hasActiveContract = (user) => {
-  return user.contracts.some(contract =>
-    !contract.endDate || moment(contract.endDate).isSameOrAfter(new Date(), 'day'));
+  return user.contracts.some(contract => {
+    return !contract.endDate || moment(contract.endDate).isSameOrAfter(new Date(), 'day');
+  });
 };
 
 const routes = [
@@ -22,10 +23,12 @@ const routes = [
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         const user = store.getters['main/user'];
-        if (user && user.role.name === HELPER) return next({name: 'customer agenda'});
+        if (user && user.role.name === HELPER) return next({ name: 'customer agenda' });
         else if (user && AUXILIARY_ROLES.includes(user.role.name)) {
-          if (hasActiveContract(user)) return next({name: 'auxiliary agenda'});
-          else return next({name: 'auxiliary personal info'});
+          if (hasActiveContract(user)) return next({ name: 'auxiliary agenda' });
+          else {
+            return next({ name: 'account info', params: { id: user._id } });
+          }
         } else if (user && COACH_ROLES.includes(user.role.name)) return next({ name: 'auxiliaries directory' });
         else next({ path: '/login' });
       } catch (e) {
