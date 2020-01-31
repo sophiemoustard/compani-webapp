@@ -259,10 +259,8 @@ export default {
         auxiliary: person ? person._id : '',
         sector: person ? person.sector._id : sectorId,
         dates: {
-          startDate: selectedDay.toISOString(),
-          startHour: '08:00',
-          endDate: selectedDay.toISOString(),
-          endHour: '10:00',
+          startDate: this.$moment(selectedDay).hours(8).toISOString(),
+          endDate: this.$moment(selectedDay).hours(10).toISOString(),
         },
       };
       this.creationModal = true;

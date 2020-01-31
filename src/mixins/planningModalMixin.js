@@ -96,18 +96,16 @@ export const planningModalMixin = {
           }
 
           return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-            !this.newEvent.absenceNature || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
+            !this.newEvent.absenceNature;
         case INTERVENTION:
           return (this.isCustomerPlanning && !this.newEvent.auxiliary) || !this.newEvent.customer ||
-            !this.newEvent.subscription || !this.newEvent.dates.startDate ||
-            !this.newEvent.dates.endDate || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
+            !this.newEvent.subscription || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate;
         case INTERNAL_HOUR:
           return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
-            !this.newEvent.internalHour || !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
+            !this.newEvent.internalHour;
         case UNAVAILABILITY:
         default:
-          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
-            !this.newEvent.dates.startHour || !this.newEvent.dates.endHour;
+          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate;
       }
     },
     disableEditionButton () {
@@ -121,21 +119,20 @@ export const planningModalMixin = {
           }
 
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.absenceNature || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
+            !this.editedEvent.absenceNature;
         case INTERVENTION:
           const shouldDisableButton = !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.dates.endDate || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
+            !this.editedEvent.dates.endDate;
           if (this.editedEvent.isCancelled) {
             return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason ||
               !this.editedEvent.misc;
           } else return shouldDisableButton;
         case INTERNAL_HOUR:
           return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
-            !this.editedEvent.internalHour || !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
+            !this.editedEvent.internalHour;
         case UNAVAILABILITY:
         default:
-          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
-            !this.editedEvent.dates.startHour || !this.editedEvent.dates.endHour;
+          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate;
       }
     },
     eventTypeOptions () {
@@ -307,11 +304,18 @@ export const planningModalMixin = {
     setDateHours (event, eventType) {
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
         if ([WORK_ACCIDENT, ILLNESS].includes(event.absence)) {
-          this.$emit(`update:${eventType}`, { ...event, dates: { ...event.dates, endHour: '23:59' } });
+          this.$emit(`update:${eventType}`, {
+            ...event,
+            dates: { ...event.dates, endDate: this.$moment(event.dates.endDate).endOf('d').toISOString() },
+          });
         } else {
           this.$emit(`update:${eventType}`, {
             ...event,
-            dates: { ...event.dates, startHour: '00:00', endHour: '23:59' } });
+            dates: {
+              startDate: this.$moment(event.dates.startDate).startOf('d').toISOString(),
+              endDate: this.$moment(event.dates.endDate).endOf('d').toISOString(),
+            },
+          });
         }
       }
     },

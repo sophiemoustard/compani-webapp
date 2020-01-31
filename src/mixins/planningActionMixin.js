@@ -308,11 +308,6 @@ export const planningActionMixin = {
 
       this.editionModal = true;
     },
-    formatHour (date) {
-      return `${this.$moment(date).hours() < 10
-        ? `0${this.$moment(date).hours()}`
-        : this.$moment(date).hours()}:${this.$moment(date).minutes() || '00'}`;
-    },
     formatEditedEvent (event) {
       const {
         createdAt,
@@ -328,7 +323,7 @@ export const planningActionMixin = {
         sector,
         ...eventData
       } = this.$_.cloneDeep(event);
-      const dates = { startDate, endDate, startHour: this.formatHour(startDate), endHour: this.formatHour(endDate) };
+      const dates = { startDate, endDate };
 
       switch (event.type) {
         case INTERVENTION:
