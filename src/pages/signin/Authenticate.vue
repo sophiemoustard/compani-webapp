@@ -65,8 +65,14 @@ export default {
     isAuxiliary () {
       return this.getUser ? AUXILIARY_ROLES.includes(this.getUser.role.name) : false;
     },
+    hasActiveContract () {
+      return this.getUser.contracts.some(contract => {
+        return !contract.endDate || this.$moment(contract.endDate).isSameOrAfter(new Date(), 'day');
+      });
+    },
   },
   methods: {
+
     async submit () {
       try {
         const authenticationPayload = {
@@ -92,7 +98,8 @@ export default {
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliary) {
-          this.$router.replace({ name: 'auxiliary agenda' });
+          if (this.hasActiveContract) this.$router.replace({ name: 'auxiliary agenda' });
+          else this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
         } else {
           this.$router.replace({ name: 'auxiliaries directory' });
         }
