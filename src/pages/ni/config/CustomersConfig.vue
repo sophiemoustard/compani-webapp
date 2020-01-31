@@ -649,7 +649,7 @@ export default {
         address: { fullAddress: '' },
         unitTTCRate: '',
         billingMode: '',
-        isApa: true,
+        isApa: false,
       },
       billingModeOptions: [
         { label: 'Indirecte', value: BILLING_INDIRECT },
@@ -1115,7 +1115,7 @@ export default {
         address: {},
         unitTTCRate: '',
         billingMode: '',
-        isApa: true,
+        isApa: false,
       }
     },
     formatThirdPartyPayerPayload (tpp) {
