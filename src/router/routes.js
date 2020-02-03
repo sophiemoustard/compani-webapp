@@ -3,13 +3,10 @@ import { Cookies } from 'quasar';
 
 import store from '../store/index';
 import alenvi from '../helpers/alenvi';
-import { HELPER, AUXILIARY_ROLES, COACH_ROLES } from '../data/constants.js';
-import moment from 'moment';
+import { HELPER, AUXILIARY_ROLES, COACH_ROLES, AUXILIARY_WITHOUT_COMPANY } from '../data/constants.js';
 
-const hasActiveContract = (user) => {
-  return user.contracts.some(contract => {
-    return !contract.endDate || moment(contract.endDate).isSameOrAfter(new Date(), 'day');
-  });
+const isAuxiliaryWithoutCompany = (user) => {
+  return user.role.name === AUXILIARY_WITHOUT_COMPANY;
 };
 
 const routes = [
@@ -25,8 +22,8 @@ const routes = [
         const user = store.getters['main/user'];
         if (user && user.role.name === HELPER) return next({ name: 'customer agenda' });
         else if (user && AUXILIARY_ROLES.includes(user.role.name)) {
-          if (hasActiveContract(user)) return next({ name: 'auxiliary agenda' });
-          else return next({ name: 'account info', params: { id: user._id } });
+          if (isAuxiliaryWithoutCompany(user)) next({ name: 'account info', params: { id: user._id } });
+          else return next({ name: 'auxiliary agenda' });
         } else if (user && COACH_ROLES.includes(user.role.name)) return next({ name: 'auxiliaries directory' });
         else next({ path: '/login' });
       } catch (e) {

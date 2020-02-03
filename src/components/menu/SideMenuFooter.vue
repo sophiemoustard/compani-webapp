@@ -4,12 +4,12 @@
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
-          <q-icon size="xs" name="mdi-lightbulb-on-outline" class="feedback" v-if="hasActiveContract"
+          <q-icon size="xs" name="mdi-lightbulb-on-outline" class="feedback" v-if="!isAuxiliaryWithoutCompany"
             @click.native="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
         </q-item-section>
-        <q-item-section v-if="isAuxiliary">
-          <q-icon size="xs" class="messenger" name="mdi-facebook-messenger" @click.native="clickHandler"
-            v-if="hasActiveContract"/>
+        <q-item-section v-if="isAuxiliaryWithoutCompany">
+          <q-icon v-if="!isAuxiliaryWithoutCompany" size="xs" class="messenger" name="mdi-facebook-messenger"
+            @click.native="clickHandler" />
         </q-item-section>
         <q-item-section>
           <q-icon size="xs" class="person" name="person" @click.native="goToProfile" />
@@ -27,7 +27,7 @@ export default {
     userId: String,
     label: String,
     isAuxiliary: { type: Boolean, default: false },
-    hasActiveContract: { type: Boolean, default: false },
+    isAuxiliaryWithoutCompany: { type: Boolean, default: true },
   },
   computed: {
     user () {
