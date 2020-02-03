@@ -35,7 +35,8 @@ import Customers from '../../api/Customers';
 import CompaniHeader from '../../components/CompaniHeader';
 import Input from '../../components/form/Input';
 import { NotifyNegative } from '../../components/popup/notify';
-import { HELPER, AUXILIARY_ROLES } from '../../data/constants.js';
+import { HELPER, AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from '../../data/constants.js';
+import get from 'lodash/get';
 
 export default {
   metaInfo: {
@@ -65,6 +66,9 @@ export default {
     isAuxiliary () {
       return this.getUser ? AUXILIARY_ROLES.includes(this.getUser.role.name) : false;
     },
+    isAuxiliaryWithoutCompany () {
+      return get(this, 'getUser.role.name', null) === AUXILIARY_WITHOUT_COMPANY;
+    },
   },
   methods: {
     async submit () {
@@ -92,7 +96,8 @@ export default {
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliary) {
-          this.$router.replace({ name: 'auxiliary agenda' });
+          if (this.isAuxiliaryWithoutCompany) this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
+          else this.$router.replace({ name: 'auxiliary agenda' });
         } else {
           this.$router.replace({ name: 'auxiliaries directory' });
         }
