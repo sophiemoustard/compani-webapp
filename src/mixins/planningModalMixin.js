@@ -302,7 +302,7 @@ export const planningModalMixin = {
       return event.absence && [ILLNESS, WORK_ACCIDENT].includes(event.absence);
     },
     setDateHours (event, eventType) {
-      if (event.type === ABSENCE && event.absenceNature === DAILY) {
+      if (this.isDailyAbsence(event)) {
         if ([WORK_ACCIDENT, ILLNESS].includes(event.absence)) {
           this.$emit(`update:${eventType}`, {
             ...event,

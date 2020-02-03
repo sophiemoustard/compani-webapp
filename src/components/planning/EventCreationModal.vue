@@ -184,7 +184,7 @@ export default {
         ...this.newEvent,
         address: this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {}),
       };
-      if (this.customerSubscriptionsOptions.length === 1 && this.creationModal) {
+      if (this.customerSubscriptionsOptions.length === 1) {
         payload.subscription = this.customerSubscriptionsOptions[0].value;
       }
       this.$emit('update:newEvent', payload);

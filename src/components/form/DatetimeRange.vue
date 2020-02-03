@@ -53,10 +53,7 @@ export default {
     hasError () {
       if (this.error || this.$v.value.$error) return true;
 
-      const startDatetime = this.$moment(this.value.startDate);
-      const endDatetime = this.$moment(this.value.endDate);
-
-      return startDatetime.isAfter(endDatetime);
+      return this.$moment(this.value.startDate).isAfter(this.$moment(this.value.endDate));
     },
     startHour () {
       return this.$moment(this.value.startDate).format('HH:mm');
@@ -76,7 +73,7 @@ export default {
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
-      if (key === 'startDate') dates.endDate = value;
+      if (key === 'startDate' && this.disableEndDate) dates.endDate = value;
       if (key === 'endDate') dates.endDate = this.$moment(dates.endDate).endOf('d').toISOString();
       this.$emit('input', dates);
     },
