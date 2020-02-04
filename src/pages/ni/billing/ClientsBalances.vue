@@ -63,7 +63,7 @@ import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
-import { formatPrice, getLastVersion, formatIdentity, truncate } from '../../../helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPercentage } from '../../../helpers/utils.js';
 
 export default {
   name: 'ClientsBalances',
@@ -97,33 +97,42 @@ export default {
           label: 'Bénéficiaire',
           align: 'left',
           field: row => formatIdentity(row.customer.identity, 'Lf'),
+          format: val => truncate(val),
           classes: 'uppercase text-weight-bold',
+        },
+        {
+          name: 'participationRate',
+          label: 'Taux de participation',
+          align: 'center',
+          field: row => row.thirdPartyPayer ? '' : row.participationRate,
+          format: (value, row) => row.thirdPartyPayer ? '' : roundFrenchPercentage(value),
+          sortable: true,
         },
         {
           name: 'billed',
           label: 'Facturé TTC',
-          align: 'left',
+          align: 'center',
           field: 'billed',
           format: val => formatPrice(val),
         },
         {
           name: 'paid',
           label: 'Payé TTC',
-          align: 'left',
+          align: 'center',
           field: 'paid',
           format: val => formatPrice(val),
         },
         {
           name: 'balance',
           label: 'Solde',
-          align: 'left',
+          align: 'center',
           field: row => row.balance,
           sortable: true,
         },
         {
           name: 'toPay',
           label: 'A Prélever',
-          align: 'left',
+          align: 'center',
           field: 'toPay',
           format: value => formatPrice(value),
           sortable: true,
