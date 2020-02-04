@@ -103,6 +103,10 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import pick from 'lodash/pick';
+import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
 import { minDate } from '../../helpers/vuelidateCustomVal';
 import Select from '../form/Select';
@@ -256,13 +260,13 @@ export default {
   methods: {
     getContractTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompany')
-        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
+        ? get(this.userCompany, 'rhConfig.templates.contractWithCompany')
+        : get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
     },
     getVersionTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
-        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
+        ? get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
+        : get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
     },
     async getCustomersWithCustomerContractSubscriptions () {
       try {
@@ -298,8 +302,8 @@ export default {
     resetContract (val) {
       this.newContract.customer = '';
       this.newContract.grossHourlyRate = val === COMPANY_CONTRACT
-        ? this.$_.get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
+        ? get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.$v.newContract.customer.$reset();
     },
     openCreationModal () {
@@ -336,7 +340,7 @@ export default {
         payload.versions[0].signature = await this.getSignaturePayload(this.newContract, '', template);
       }
 
-      return this.$_.pickBy(payload);
+      return pickBy(payload);
     },
     async createContract () {
       try {
@@ -363,8 +367,8 @@ export default {
     // Version creation
     openVersionCreationModal (contract) {
       this.newVersion.grossHourlyRate = contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
+        ? get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
       this.newVersionModal = true;
@@ -380,14 +384,14 @@ export default {
       this.$v.newVersion.$reset();
     },
     async getVersionCreationPayload () {
-      const payload = this.$_.pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
+      const payload = pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
       if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
         const template = this.getVersionTemplate(versionMix);
         payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 
-      return this.$_.pickBy(payload);
+      return pickBy(payload);
     },
     async createVersion () {
       try {
@@ -467,7 +471,7 @@ export default {
         if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = { ...this.$_.omit(this.endContract, ['contract']) };
+        const payload = { ...omit(this.endContract, ['contract']) };
         payload.endDate = this.$moment(payload.endDate).endOf('day').toISOString();
         await this.$contracts.update(this.endContract.contract._id, payload);
         await this.refreshContracts();
