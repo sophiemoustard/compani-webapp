@@ -106,6 +106,7 @@ export default {
           align: 'center',
           field: 'participationRate',
           format: value => roundFrenchPercentage(value),
+          sortable: true,
         },
         {
           name: 'billed',
