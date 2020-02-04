@@ -8,11 +8,11 @@
       <div class="datetime-container row justify-evenly items-center">
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
           @blur="blurHandler" :disable="disable" />
-        <ni-time-input :value="value.startHour" @input="update($event, 'startHour')" class="time-item"
-          @blur="blurHandler" :disable="disable" />
+        <ni-time-input :value="startHour" @input="updateHours($event, 'startHour')" class="time-item"
+          @blur="blurHandler" :disable="disable || disableStartHour" />
         <p class="delimiter">-</p>
-        <ni-time-input :value="value.endHour" @input="update($event, 'endHour')" class="time-item"
-          @blur="blurHandler" :disable="disable" :min="value.startHour" />
+        <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item"
+          @blur="blurHandler" :disable="disable || disableEndHour" :min="startHour" />
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
       </div>
@@ -24,7 +24,7 @@
 import { required } from 'vuelidate/lib/validators';
 import DateInput from './DateInput';
 import TimeInput from './TimeInput';
-import { minDate, validHour } from '../../helpers/vuelidateCustomVal.js';
+import { minDate } from '../../helpers/vuelidateCustomVal.js';
 
 export default {
   components: {
@@ -38,14 +38,14 @@ export default {
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     disableEndDate: { type: Boolean, default: false },
+    disableEndHour: { type: Boolean, default: false },
+    disableStartHour: { type: Boolean, default: false },
   },
   validations () {
     return {
       value: {
         startDate: { required },
-        startHour: { required, validHour },
         endDate: { required, minDate: minDate(this.value.startDate) },
-        endHour: { required, validHour },
       },
     }
   },
@@ -53,12 +53,13 @@ export default {
     hasError () {
       if (this.error || this.$v.value.$error) return true;
 
-      const startTime = this.value.startHour.split(':')
-      const startDatetime = this.$moment(this.value.startDate).hours(startTime[0]).minutes(startTime[1]);
-      const endTime = this.value.endHour.split(':')
-      const endDatetime = this.$moment(this.value.endDate).hours(endTime[0]).minutes(endTime[1]);
-
-      return startDatetime.isAfter(endDatetime);
+      return this.$moment(this.value.startDate).isAfter(this.$moment(this.value.endDate));
+    },
+    startHour () {
+      return this.$moment(this.value.startDate).format('HH:mm');
+    },
+    endHour () {
+      return this.$moment(this.value.endDate).format('HH:mm');
     },
   },
   methods: {
@@ -66,15 +67,26 @@ export default {
       this.$v.value.$touch();
       this.$emit('blur');
     },
+    setDateHours (date, hour) {
+      const splitHour = hour.split(':');
+      return this.$moment(date).set({ hours: Number.parseInt(splitHour[0]), minutes: Number.parseInt(splitHour[1]) }).toISOString();
+    },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
-      if (key === 'startDate') dates.endDate = value;
-      if (key === 'startHour' && this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.value.endHour, 'HH:mm'))) {
-        const startHour = this.$moment(value, 'HH:mm');
-        const max = this.$moment(startHour).endOf('d');
-        dates.endHour = this.$moment.min(startHour.add(2, 'H'), max).format('HH:mm');
+      if (key === 'startDate' && this.disableEndDate) dates.endDate = value;
+      if (key === 'endDate') dates.endDate = this.$moment(dates.endDate).endOf('d').toISOString();
+      this.$emit('input', dates);
+    },
+    updateHours (value, key) {
+      const dates = { ...this.value };
+      if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
+      if (key === 'startHour') {
+        dates.startDate = this.setDateHours(dates.startDate, value);
+        if (this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.endHour, 'HH:mm'))) {
+          const max = this.$moment(dates.startDate).endOf('d')
+          dates.endDate = this.$moment.min(this.$moment(dates.startDate).add(2, 'H'), max).toISOString();
+        }
       }
-
       this.$emit('input', dates);
     },
   },
