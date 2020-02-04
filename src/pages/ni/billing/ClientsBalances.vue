@@ -104,8 +104,7 @@ export default {
           name: 'participationRate',
           label: 'Taux de participation',
           align: 'center',
-          field: 'participationRate',
-          format: value => roundFrenchPercentage(value),
+          field: row => row.thirdPartyPayer ? '' : roundFrenchPercentage(row.participationRate),
           sortable: true,
         },
         {
