@@ -32,8 +32,8 @@
           <ni-select in-modal caption="Type d'heure interne" v-model="editedEvent.internalHour"
             :options="internalHourOptions" :error="validations.internalHour.$error"
             @blur="validations.internalHour.$touch" />
-          <ni-search-address v-model="editedEvent.address" inModal
-            @blur="validations.address.$touch" :error="validations.address.$error" :error-label="addressError" />
+          <ni-search-address v-model="editedEvent.address" inModal @blur="validations.address.$touch"
+            :error="validations.address.$error" :error-label="addressError" />
         </template>
         <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
           <div class="row q-mb-md light-checkbox">
@@ -45,15 +45,16 @@
           <ni-select in-modal caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
           <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
-            :error="validations.absence.$error" required-field @blur="validations.absence.$touch" :disable="isHourlyAbsence(editedEvent)"
-            @input="setDateHours(editedEvent, 'editedEvent')" />
+            :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
+            :disable="isHourlyAbsence(editedEvent)" @input="setDateHours(editedEvent, 'editedEvent')" />
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
-            :disable-end-date="isHourlyAbsence(editedEvent)" :error="validations.dates.$error" @blur="validations.dates.$touch"
-            :disable-end-hour="isDailyAbsence(editedEvent)" :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" />
-          <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)"
-            caption="Justificatif d'absence" path="attachment" :entity="editedEvent" alt="justificatif absence" name="file"
-            :url="docsUploadUrl" @uploaded="documentUploaded" :additionalValue="additionalValue" required-field
-            in-modal @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+            :disable-end-date="isHourlyAbsence(editedEvent)" :error="validations.dates.$error"
+            @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(editedEvent)"
+            :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" />
+          <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence"
+            path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
+            @uploaded="documentUploaded" :additionalValue="additionalValue" required-field in-modal
+            @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
@@ -73,14 +74,14 @@
           </div>
         </template>
       </div>
-      <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0" class="customer-info">
+      <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0"
+        class="customer-info">
         <div class="row items-center no-wrap">
           <q-select borderless dense v-model="editedEvent.address" @input="deleteClassFocus" emit-value behavior="menu"
             :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
             :display-value="editedEvent.address.fullAddress" ref="addressSelect">
             <template v-slot:append v-if="customerAddressList(editedEvent).length > 1">
-              <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer"
-                @click.stop="toggleAddressSelect" />
+              <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
