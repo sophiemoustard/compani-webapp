@@ -206,11 +206,15 @@ export default {
       return this.getUser.company;
     },
     hasBasicInfo () {
-      if (this.getUser.identity && this.getUser.identity.lastname && this.getUser.identity.birthDate && this.getUser.identity.nationality &&
-        this.getUser.contact && this.getUser.contact.address && this.getUser.contact.address.street && this.getUser.contact.address.city) {
-        return true;
-      }
-      return false;
+      const { contact, identity, establishment } = this.getUser;
+      if (!contact || !identity) return false;
+
+      const completedName = !!identity.lastname && !!identity.firstname;
+      const completedBirthInfo = !!identity.birthDate && !!identity.birthCity && !!identity.birthState;
+      const completedAddress = !!get(contact, 'address.fullAddress');
+
+      return completedName && completedBirthInfo && establishment && identity.socialSecurityNumber &&
+        identity.nationality && completedAddress;
     },
     hasCompanyContract () {
       if (this.contracts.length === 0) return false;
