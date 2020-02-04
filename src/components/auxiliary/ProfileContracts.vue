@@ -8,12 +8,16 @@
       <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <div v-if="!hasBasicInfo" class="missingBasicInfo">
-        <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
+        <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi :</p>
         <ul>
-          <li>Nom de famille</li>
+          <li>Nom et prénom</li>
           <li>Nationalité</li>
-          <li>Adresse complète (sauf complément)</li>
+          <li>Adresse</li>
           <li>Date de naissance</li>
+          <li>Département de naissance</li>
+          <li>Ville de naissance</li>
+          <li>Numéro de sécurité sociale</li>
+          <li>Etablissement</li>
         </ul>
       </div>
     </div>
