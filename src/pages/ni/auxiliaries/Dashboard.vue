@@ -82,11 +82,11 @@
       <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width">
         <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
           @click="openAuxiliariesDetails(sector)" />
-        <div v-show="loadingAuxiliariesDetails[sector]" class="col-md-12 col-xs-12 spinner-container">
+        <div v-show="displayStats[sector].loadingDetails" class="col-md-12 col-xs-12 spinner-container">
           <q-spinner-facebook size="25px" color="primary" />
         </div>
         <q-slide-transition>
-          <div v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails[sector]"
+          <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
             class="sector-card row">
             <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
               class="col-md-6 col-xs-12 auxiliary-card q-mb-lg q-pb-lg">
@@ -139,8 +139,6 @@ export default {
       monthModal: false,
       firstInterventionStartDate: '',
       auxiliariesStats: {},
-      auxiliariesDetailsIsOpened: {},
-      loadingAuxiliariesDetails: {},
       displayStats: {},
     };
   },
@@ -174,13 +172,6 @@ export default {
     elementToRemove (val) {
       this.removeElementFromFilter(val);
     },
-    auxiliariesDetailsIsOpened: {
-      deep: true,
-      immediate: true,
-      async handler (sectors) {
-        await this.getAuxiliariesStats();
-      },
-    },
   },
   async mounted () {
     await this.fillFilter();
@@ -210,7 +201,7 @@ export default {
       await this.refresh(true);
     },
     getIcon (sector) {
-      return this.auxiliariesDetailsIsOpened[sector] ? 'expand_less' : 'expand_more';
+      return this.displayStats[sector].openedDetails ? 'expand_less' : 'expand_more';
     },
     sectorName (sectorId) {
       const sector = this.filters.find(s => s._id === sectorId);
@@ -221,9 +212,9 @@ export default {
         const sectors = [];
         const auxiliariesStats = {}
         for (const sector of this.filteredSectors) {
-          if (this.auxiliariesStats[sector] || !this.auxiliariesDetailsIsOpened[sector]) continue;
+          if (this.auxiliariesStats[sector] || !this.displayStats[sector].openedDetails) continue;
           sectors.push(sector);
-          this.$set(this.loadingAuxiliariesDetails, sector, true);
+          this.$set(this.displayStats[sector], 'loadingDetails', true);
           auxiliariesStats[sector] = [];
         }
         if (!sectors.length) return;
@@ -258,7 +249,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données')
       } finally {
-        this.loadingAuxiliariesDetails = {}
+        this.setDisplayStats({ loadingDetails: false });
       }
     },
     getCustomersAndDurationBySector (sectorId) {
@@ -297,12 +288,13 @@ export default {
     getUnassignedHours (sectorId) {
       return this.unassignedHours.find(el => el.sector === sectorId).duration;
     },
-    openAuxiliariesDetails (sectorId) {
-      if (this.auxiliariesDetailsIsOpened[sectorId]) {
-        this.$set(this.auxiliariesDetailsIsOpened, sectorId, false);
+    async openAuxiliariesDetails (sectorId) {
+      if (this.displayStats[sectorId].openedDetails) {
+        this.$set(this.displayStats[sectorId], 'openedDetails', false);
         return;
       }
-      this.$set(this.auxiliariesDetailsIsOpened, sectorId, true);
+      this.$set(this.displayStats[sectorId], 'openedDetails', true);
+      await this.getAuxiliariesStats();
     },
     hoursRatio (sector) {
       return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;
@@ -311,7 +303,7 @@ export default {
       try {
         if (this.filteredSectors.length === 0) return;
 
-        this.setDisplayStats({ loading: true }, fullRefresh);
+        this.setDisplayStats({ loading: true, openedDetails: false }, fullRefresh);
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
         const [customersAndDuration, internalAndBilledHours, hoursToWork, paidTransportStats] = await Promise.all([
           this.$stats.getCustomersAndDurationBySector(params),
@@ -324,11 +316,7 @@ export default {
         } else {
           this.unassignedHours = [];
         }
-        for (const sector of this.filteredSectors) {
-          if (!this.$_.has(this.auxiliariesDetailsIsOpened, sector)) {
-            this.$set(this.auxiliariesDetailsIsOpened, sector, false);
-          }
-        }
+
         this.internalAndBilledHours = internalAndBilledHours;
         this.customersAndDuration = customersAndDuration;
         this.hoursToWork = hoursToWork;
@@ -355,12 +343,13 @@ export default {
     },
     setDisplayStats (data, fullRefresh) {
       for (const sector of this.filteredSectors) {
-        if (!this.displayStats[sector] || this.displayStats[sector].loading || (fullRefresh && !this.displayStats[sector].loading)) {
+        if (!this.displayStats[sector] || this.displayStats[sector].loading ||
+          (fullRefresh && !this.displayStats[sector].loading) || Object.keys(data).includes('loadingDetails')) {
           this.displayStats = {
             ...this.displayStats,
-            [sector]: data,
-          }
-        };
+            [sector]: { ...this.displayStats[sector], ...data },
+          };
+        }
       }
     },
   },
