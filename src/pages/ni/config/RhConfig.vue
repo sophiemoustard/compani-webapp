@@ -120,7 +120,7 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <a :href="props.row.file.link" target="_blank">
+                      <a :href="props.row.driveFile.link" target="_blank">
                         <q-btn flat round small color="grey" icon="file_download" />
                       </a>
                       <q-btn flat round small color="grey" icon="delete"
@@ -181,16 +181,14 @@
     </ni-modal>
 
     <!-- Administrative document creation modal -->
-    <ni-modal v-model="administrativeDocumentCreationModal" @hide="resetAdministrativeDocumentData">
+    <ni-modal v-model="administrativeDocumentCreationModal" @hide="resetAdministrativeDocumentModal">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">document administratif</span>
       </template>
-      <ni-input in-modal caption="Nom" v-model="newAdministrativeDocument.name"
-        :error="$v.newAdministrativeDocument.name.$error" @blur="$v.newAdministrativeDocument.name.$touch"
-        required-field />
-      <ni-input caption="Document" type="file" v-model="newAdministrativeDocument.file"
-        :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal
-        required-field last />
+      <ni-input in-modal caption="Nom" v-model="newAdministrativeDocument.name" required-field
+        :error="$v.newAdministrativeDocument.name.$error" @blur="$v.newAdministrativeDocument.name.$touch" />
+      <ni-input caption="Document" type="file" v-model="newAdministrativeDocument.file" required-field last
+        :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
           :disable="!$v.newAdministrativeDocument.$anyDirty || $v.newAdministrativeDocument.$invalid" :loading="loading"
@@ -273,7 +271,6 @@ export default {
           label: '',
           align: 'center',
           field: '_id',
-          sortable: true,
         },
       ],
       newInternalHourModal: false,
@@ -293,8 +290,6 @@ export default {
           name: 'actions',
           label: '',
           align: 'center',
-          field: '_id',
-          sortable: false,
         },
       ],
       administrativeDocumentCreationModal: false,
@@ -399,7 +394,7 @@ export default {
       this.newInternalHour = { name: '' };
       this.$v.newInternalHour.$reset();
     },
-    resetAdministrativeDocumentData () {
+    resetAdministrativeDocumentModal () {
       this.newAdministrativeDocument = { name: '', file: null };
       this.$v.newAdministrativeDocument.$reset();
     },
@@ -558,6 +553,7 @@ export default {
         this.administrativeDocuments = await AdministrativeDocument.list();
       } catch (e) {
         console.error(e);
+        this.administrativeDocuments = [];
         NotifyNegative('Erreur lors de la récupération des documents.')
       }
     },
@@ -580,7 +576,7 @@ export default {
         await AdministrativeDocument.create(this.formatAdministrativeDocument());
         this.administrativeDocumentCreationModal = false;
         NotifyPositive('Document sauvegardé');
-        this.getAdministrativeDocuments();
+        await this.getAdministrativeDocuments();
       } catch (e) {
         console.error(e);
         NotifyNegative("Erreur lors de l'envoi du document");
@@ -596,7 +592,7 @@ export default {
         NotifyPositive('Document supprimé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression d\'un document.');
+        NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
     validateAdministrativeDocumentDeletion (administrativeDocument) {
