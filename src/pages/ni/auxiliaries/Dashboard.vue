@@ -427,7 +427,7 @@ export default {
 .auxiliary-card
   display: flex
   flex-direction: column
-  &:not(:last-child)
+  &:not(:nth-last-child(-n+2))
     border-bottom: 1px solid $light-grey
 
 .unassigned-hours
