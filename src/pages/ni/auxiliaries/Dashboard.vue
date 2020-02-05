@@ -351,6 +351,7 @@ export default {
     },
     async removeElementFromFilter (sector) {
       this.filteredSectors = this.filteredSectors.filter(sec => sec !== sector._id);
+      delete this.displayStats[sector._id];
     },
     setDisplayStats (data, fullRefresh) {
       for (const sector of this.filteredSectors) {
