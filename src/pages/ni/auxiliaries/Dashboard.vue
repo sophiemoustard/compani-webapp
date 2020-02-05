@@ -20,73 +20,70 @@
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
       <q-card-section class="full-width">
-        <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
-          <div v-show="displayStats[sector].showStats" class="row justify-between">
-            <div class="col-md-6 col-xs-12">
-              <div class="q-mb-lg stats-header">
-                <div class="text-capitalize">
-                  <div class="sector-name text-weight-bold">{{ sectorName(sector) }}</div>
-                  <div class="month-label">{{ monthLabel }}</div>
-                </div>
-                <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
-                  color="primary" show-value :thickness="0.2" class="text-weight-bold">
-                  {{ roundFrenchPercentage(hoursRatio(sector), 0).replace('&nbsp;', '') }}
-                </q-circular-progress>
+        <div v-show="!displayStats[sector].loading" class="row justify-between">
+          <div class="col-md-6 col-xs-12">
+            <div class="q-mb-lg stats-header">
+              <div class="text-capitalize">
+                <div class="sector-name text-weight-bold">{{ sectorName(sector) }}</div>
+                <div class="month-label">{{ monthLabel }}</div>
               </div>
-              <div class="q-mb-md">
-                <div class="row auxiliary">
-                  <div class="col-8 auxiliary-label">Heures facturées</div>
-                  <div class="col-4 auxiliary-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
-                </div>
-                <div class="row auxiliary">
-                  <div class="col-8 auxiliary-label">Heures à travailler</div>
-                  <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
-                </div>
-                <div class="row unassigned-hours" v-if="shouldDisplayUnassignedHours(sector)">
-                  <div class="col-12">{{ formatHours(getUnassignedHours(sector)) }} à affecter</div>
-                </div>
+              <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
+                color="primary" show-value :thickness="0.2" class="text-weight-bold">
+                {{ roundFrenchPercentage(hoursRatio(sector), 0).replace('&nbsp;', '') }}
+              </q-circular-progress>
+            </div>
+            <div class="q-mb-md">
+              <div class="row auxiliary">
+                <div class="col-8 auxiliary-label">Heures facturées</div>
+                <div class="col-4 auxiliary-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
               </div>
-              <div class="q-pt-md gauge-wrapper">
-                <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20"
-                  :value="getInternalHoursRatio(sector)">
-                  <div slot="title" class="q-mt-sm">
-                    <span class="text-weight-bold">Heures internes</span> - {{ formatHours(getInternalHours(sector)) }}
-                  </div>
-                </ni-gauge>
-                <ni-gauge v-if="getPaidTransport(sector) !== 0" :min="7" :max="16"
-                  :value="getPaidTransportRatio(sector)">
-                  <div slot="title" class="q-mt-sm">
-                    <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
-                  </div>
-                </ni-gauge>
+              <div class="row auxiliary">
+                <div class="col-8 auxiliary-label">Heures à travailler</div>
+                <div class="col-4 auxiliary-value">{{ formatHours(getHoursToWork(sector), 0) }}</div>
+              </div>
+              <div class="row unassigned-hours" v-if="shouldDisplayUnassignedHours(sector)">
+                <div class="col-12">{{ formatHours(getUnassignedHours(sector)) }} à affecter</div>
               </div>
             </div>
-            <div class="col-md-6 col-xs-12 customer">
-              <template v-if="getCustomersAndDurationBySector(sector).customerCount !== 0">
-                <div class="row">
-                  <div class="col-4 customer-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
-                  <div class="col-4 customer-value">
-                    {{ Math.round(getCustomersAndDurationBySector(sector).averageDuration) }}
-                  </div>
-                  <div class="col-4 customer-value">
-                    {{ Math.round(getCustomersAndDurationBySector(sector).auxiliaryTurnOver * 10) / 10 }}
-                  </div>
+            <div class="q-pt-md gauge-wrapper">
+              <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)">
+                <div slot="title" class="q-mt-sm">
+                  <span class="text-weight-bold">Heures internes</span> -
+                  {{ formatHours(getInternalHours(sector)) }}
                 </div>
-                <div class="row">
-                  <div class="col-4 customer-label">Bénéficiaires</div>
-                  <div class="col-4 customer-label">Heures par bénéficiaire</div>
-                  <div class="col-4 customer-label">Auxiliaires par bénéficiaires</div>
+              </ni-gauge>
+              <ni-gauge v-if="getPaidTransport(sector) !== 0" :min="7" :max="16" :value="getPaidTransportRatio(sector)">
+                <div slot="title" class="q-mt-sm">
+                  <span class="text-weight-bold">Transports</span> - {{ formatHours(getPaidTransport(sector)) }}
                 </div>
-              </template>
+              </ni-gauge>
             </div>
           </div>
-        </transition>
+          <div class="col-md-6 col-xs-12 customer">
+            <template v-if="getCustomersAndDurationBySector(sector).customerCount !== 0">
+              <div class="row">
+                <div class="col-4 customer-value">{{ getCustomersAndDurationBySector(sector).customerCount }}</div>
+                <div class="col-4 customer-value">
+                  {{ Math.round(getCustomersAndDurationBySector(sector).averageDuration) }}
+                </div>
+                <div class="col-4 customer-value">
+                  {{ Math.round(getCustomersAndDurationBySector(sector).auxiliaryTurnOver * 10) / 10 }}
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-4 customer-label">Bénéficiaires</div>
+                <div class="col-4 customer-label">Heures par bénéficiaire</div>
+                <div class="col-4 customer-label">Auxiliaires par bénéficiaires</div>
+              </div>
+            </template>
+          </div>
+        </div>
       </q-card-section>
-      <q-card-actions align="right" class="full-width">
+      <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width">
         <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
           @click="openAuxiliariesDetails(sector)" />
         <div v-show="loadingAuxiliariesDetails[sector]" class="col-md-12 col-xs-12 spinner-container">
-          <q-spinner size="25px" color="primary" />
+          <q-spinner-facebook size="25px" color="primary" />
         </div>
         <q-slide-transition>
           <div v-show="auxiliariesDetailsIsOpened[sector] && !loadingAuxiliariesDetails[sector]"
@@ -105,8 +102,8 @@
           </div>
         </q-slide-transition>
       </q-card-actions>
-      <q-inner-loading :showing="displayStats[sector].showCard">
-        <q-spinner-facebook size="50px" color="primary" />
+      <q-inner-loading :showing="displayStats[sector].loading">
+        <q-spinner-facebook size="40px" color="primary" />
       </q-inner-loading>
     </q-card>
   </q-page>
@@ -210,7 +207,7 @@ export default {
       this.selectedMonth = month;
       this.monthModal = false;
       this.auxiliariesStats = {};
-      await this.refresh();
+      await this.refresh(true);
     },
     getIcon (sector) {
       return this.auxiliariesDetailsIsOpened[sector] ? 'expand_less' : 'expand_more';
@@ -310,10 +307,11 @@ export default {
     hoursRatio (sector) {
       return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;
     },
-    async refresh () {
+    async refresh (fullRefresh = false) {
       try {
         if (this.filteredSectors.length === 0) return;
 
+        this.setDisplayStats({ loading: true }, fullRefresh);
         const params = { month: this.selectedMonth, sector: this.filteredSectors };
         const [customersAndDuration, internalAndBilledHours, hoursToWork, paidTransportStats] = await Promise.all([
           this.$stats.getCustomersAndDurationBySector(params),
@@ -336,6 +334,7 @@ export default {
         this.hoursToWork = hoursToWork;
         this.paidTransportStats = paidTransportStats;
         await this.getAuxiliariesStats();
+        this.setDisplayStats({ loading: false }, fullRefresh);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
@@ -348,15 +347,20 @@ export default {
     // Filter
     async addElementToFilter (sector) {
       this.filteredSectors.push(sector._id);
-      this.displayStats = this.setStatsDisplay(sector._id, { showCard: true, showStats: false });
       await this.refresh();
-      this.displayStats = this.setStatsDisplay(sector._id, { showCard: false, showStats: true });
     },
     async removeElementFromFilter (sector) {
       this.filteredSectors = this.filteredSectors.filter(sec => sec !== sector._id);
     },
-    setStatsDisplay (sector, data) {
-      return { ...this.displayStats, [sector]: data };
+    setDisplayStats (data, fullRefresh) {
+      for (const sector of this.filteredSectors) {
+        if (!this.displayStats[sector] || this.displayStats[sector].loading || (fullRefresh && !this.displayStats[sector].loading)) {
+          this.displayStats = {
+            ...this.displayStats,
+            [sector]: data,
+          }
+        };
+      }
     },
   },
 }
@@ -440,6 +444,4 @@ export default {
   font-size: 14px
   padding-left: 5px
 
-// .q-card__section
-//   padding: 0px
 </style>
