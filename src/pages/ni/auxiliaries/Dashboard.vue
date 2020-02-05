@@ -425,9 +425,10 @@ export default {
   justify-content: space-around
 
 .auxiliary-card
-  border-bottom: 1px solid $light-grey
   display: flex
   flex-direction: column
+  &:not(:last-child)
+    border-bottom: 1px solid $light-grey
 
 .unassigned-hours
   font-style: italic
