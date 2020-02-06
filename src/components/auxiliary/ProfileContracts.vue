@@ -1,21 +1,16 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openEndContract="openEndContractModal"
+      <ni-contracts v-if="contracts" :contracts="contracts" :user="auxiliary" @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
         @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
         @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="validateVersionDeletion" />
-      <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
+      <q-btn :disable="disableContractCreation" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
-      <div v-if="!hasBasicInfo" class="missingBasicInfo">
-        <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi:</p>
-        <ul>
-          <li>Nom de famille</li>
-          <li>Nationalité</li>
-          <li>Adresse complète (sauf complément)</li>
-          <li>Date de naissance</li>
-        </ul>
-      </div>
+      <q-banner v-if="disableContractCreation" class="full-width warning" dense>
+        <q-icon size="sm" name="warning" />
+        <div>{{ creationMissingInfo }}</div>
+      </q-banner>
     </div>
 
     <!-- New contract modal -->
@@ -99,27 +94,46 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import pick from 'lodash/pick';
+import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
+import Users from '../../api/Users';
+import Customers from '../../api/Customers';
+import Events from '../../api/Events';
+import Contracts from '../../api/Contracts';
 import { minDate } from '../../helpers/vuelidateCustomVal';
 import Select from '../form/Select';
 import Input from '../form/Input';
 import DateInput from '../form/DateInput';
-import Contracts from '../contracts/Contracts';
+import NiContracts from '../contracts/Contracts';
 import Modal from '../Modal';
 import VersionEditionModal from '../contracts/VersionEditionModal.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
-import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, COACH } from '../../data/constants';
+import {
+  END_CONTRACT_REASONS,
+  OTHER,
+  CONTRACT_STATUS_OPTIONS,
+  CUSTOMER_CONTRACT,
+  COMPANY_CONTRACT,
+  COACH,
+  CONTRACT_CREATION_MANDATORY_INFO,
+} from '../../data/constants';
 import { contractMixin } from '../../mixins/contractMixin.js';
 import { formatIdentity } from '../../helpers/utils';
 
 export default {
   name: 'ProfileContracts',
   mixins: [contractMixin],
+  props: {
+    profileId: { type: String },
+  },
   components: {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
-    'ni-contracts': Contracts,
+    'ni-contracts': NiContracts,
     'ni-modal': Modal,
     'version-edition-modal': VersionEditionModal,
   },
@@ -130,6 +144,9 @@ export default {
       contracts: [],
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
+      auxiliary: {
+        contractCreationMissingInfo: [],
+      },
       customers: [],
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
       // New contract
@@ -191,18 +208,25 @@ export default {
     mainUser () {
       return this.$store.getters['main/user'];
     },
-    getUser () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
     userCompany () {
-      return this.getUser.company;
+      return this.auxiliary.company;
     },
-    hasBasicInfo () {
-      if (this.getUser.identity && this.getUser.identity.lastname && this.getUser.identity.birthDate && this.getUser.identity.nationality &&
-        this.getUser.contact && this.getUser.contact.address && this.getUser.contact.address.street && this.getUser.contact.address.city) {
-        return true;
+    disableContractCreation () {
+      return this.auxiliary.contractCreationMissingInfo.length !== 0;
+    },
+    creationMissingInfo () {
+      const userMissingInfo = this.auxiliary.contractCreationMissingInfo;
+      if (userMissingInfo.length === 1) {
+        const missingInfo = CONTRACT_CREATION_MANDATORY_INFO[userMissingInfo[0]];
+        return `Il manque l'information suivante dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfo}.`;
       }
-      return false;
+
+      const missingInfoList = [];
+      for (const info of userMissingInfo) {
+        missingInfoList.push([CONTRACT_CREATION_MANDATORY_INFO[info]]);
+      }
+
+      return `Il manque les informations suivantes dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfoList.join(', ')}.`;
     },
     hasCompanyContract () {
       if (this.contracts.length === 0) return false;
@@ -246,35 +270,45 @@ export default {
     },
   },
   async mounted () {
+    await this.refreshUser();
     await this.refreshContracts();
     await this.getCustomersWithCustomerContractSubscriptions();
   },
   methods: {
     getContractTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompany')
-        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
+        ? get(this.userCompany, 'rhConfig.templates.contractWithCompany')
+        : get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
     },
     getVersionTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
-        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
+        ? get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
+        : get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
     },
     async getCustomersWithCustomerContractSubscriptions () {
       try {
-        this.customers = await this.$customers.listWithCustomerContractSubscriptions();
+        this.customers = await Customers.listWithCustomerContractSubscriptions();
       } catch (e) {
         this.customers = [];
         console.error(e);
       }
     },
+    async refreshUser () {
+      try {
+        this.auxiliary = await Users.getById(this.profileId);
+      } catch (e) {
+        this.auxiliary = null;
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération de l\'auxiliaire');
+      }
+    },
     async refreshContracts () {
       try {
-        this.contracts = await this.$contracts.list({ user: this.getUser._id });
+        this.contracts = await Contracts.list({ user: this.profileId });
         const promises = [];
         for (const contract of this.contracts) {
           const version = contract.versions[contract.versions.length - 1];
-          promises.push(this.$events.list({ status: contract.status, auxiliary: contract.user._id, startDate: version.startDate }));
+          promises.push(Events.list({ status: contract.status, auxiliary: contract.user._id, startDate: version.startDate }));
         }
 
         const events = await Promise.all(promises);
@@ -294,12 +328,12 @@ export default {
     resetContract (val) {
       this.newContract.customer = '';
       this.newContract.grossHourlyRate = val === COMPANY_CONTRACT
-        ? this.$_.get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
+        ? get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : get(this.auxiliary, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.$v.newContract.customer.$reset();
     },
     openCreationModal () {
-      this.newContract.user = this.getUser._id;
+      this.newContract.user = this.auxiliary._id;
       this.newContractModal = true;
     },
     resetContractCreationModal () {
@@ -332,7 +366,7 @@ export default {
         payload.versions[0].signature = await this.getSignaturePayload(this.newContract, '', template);
       }
 
-      return this.$_.pickBy(payload);
+      return pickBy(payload);
     },
     async createContract () {
       try {
@@ -344,7 +378,7 @@ export default {
 
         this.loading = true;
         const payload = await this.getContractCreationPayload();
-        await this.$contracts.create(payload);
+        await Contracts.create(payload);
         await this.refreshContracts();
 
         this.resetContractCreationModal();
@@ -359,8 +393,8 @@ export default {
     // Version creation
     openVersionCreationModal (contract) {
       this.newVersion.grossHourlyRate = contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : this.$_.get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
+        ? get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : get(this.auxiliary, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
       this.newVersionModal = true;
@@ -376,14 +410,14 @@ export default {
       this.$v.newVersion.$reset();
     },
     async getVersionCreationPayload () {
-      const payload = this.$_.pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
+      const payload = pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
       if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
         const template = this.getVersionTemplate(versionMix);
         payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 
-      return this.$_.pickBy(payload);
+      return pickBy(payload);
     },
     async createVersion () {
       try {
@@ -395,7 +429,7 @@ export default {
 
         this.loading = true;
         const payload = await this.getVersionCreationPayload();
-        await this.$contracts.createVersion(this.newVersion.contractId, payload);
+        await Contracts.createVersion(this.newVersion.contractId, payload);
         await this.refreshContracts();
 
         this.resetVersionCreationModal();
@@ -432,7 +466,7 @@ export default {
     },
     async deleteVersion (contractId, versionId) {
       try {
-        await this.$contracts.deleteVersion(contractId, versionId);
+        await Contracts.deleteVersion(contractId, versionId);
         await this.refreshContracts();
         NotifyPositive('Version supprimée');
       } catch (e) {
@@ -463,9 +497,9 @@ export default {
         if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = { ...this.$_.omit(this.endContract, ['contract']) };
+        const payload = { ...omit(this.endContract, ['contract']) };
         payload.endDate = this.$moment(payload.endDate).endOf('day').toISOString();
-        await this.$contracts.update(this.endContract.contract._id, payload);
+        await Contracts.update(this.endContract.contract._id, payload);
         await this.refreshContracts();
         this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
@@ -484,12 +518,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
-  .missingBasicInfo
-    color: red
-    background: white
-    padding: 10px
-    margin-left: auto
-    margin-right: auto
+  .q-banner
+    background-color: $grey
+    /deep/ .q-banner__content
+      display: flex;
+      align-items: center
+      .q-icon
+        margin-right: 5px
 
 </style>
