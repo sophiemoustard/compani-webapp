@@ -19,7 +19,7 @@
       </div>
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
-      <q-card-section class="full-width">
+      <q-card-section class="full-width" :class="{ 'card-height': displayStats[sector].loading }">
         <div v-if="!displayStats[sector].loading" class="row justify-between">
           <div class="col-md-6 col-xs-12">
             <div class="q-mb-lg stats-header">
@@ -103,7 +103,7 @@
         </q-slide-transition>
       </q-card-actions>
       <q-inner-loading :showing="displayStats[sector].loading">
-        <q-spinner-facebook size="40px" color="primary" />
+        <q-spinner-facebook size="30px" color="primary" />
       </q-inner-loading>
     </q-card>
   </q-page>
@@ -323,11 +323,10 @@ export default {
         this.setDisplayStats(sectors, { loading: false });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la réception des statistiques')
-        this.customersAndDuration = [];
-        this.internalAndBilledHours = [];
-        this.hoursToWork = [];
-        this.paidTransportStats = [];
+        NotifyNegative('Erreur lors de la réception des statistiques');
+        for (const sector of sectors) {
+          delete this.stats[sector];
+        }
       }
     },
     // Filter
@@ -429,5 +428,8 @@ export default {
   font-style: italic
   font-size: 14px
   padding-left: 5px
+
+.card-height
+  height: 100px
 
 </style>
