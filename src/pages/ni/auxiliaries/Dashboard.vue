@@ -20,7 +20,7 @@
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
       <q-card-section class="full-width">
-        <div v-show="!displayStats[sector].loading" class="row justify-between">
+        <div v-if="!displayStats[sector].loading" class="row justify-between">
           <div class="col-md-6 col-xs-12">
             <div class="q-mb-lg stats-header">
               <div class="text-capitalize">
@@ -131,15 +131,12 @@ export default {
       selectedMonth: this.$moment().format('MM-YYYY'),
       terms: [],
       filteredSectors: [],
-      customersAndDuration: [],
-      internalAndBilledHours: [],
-      hoursToWork: [],
-      paidTransportStats: [],
       unassignedHours: [],
       monthModal: false,
       firstInterventionStartDate: '',
       auxiliariesStats: {},
       displayStats: {},
+      stats: {},
     };
   },
   computed: {
@@ -198,7 +195,7 @@ export default {
       this.selectedMonth = month;
       this.monthModal = false;
       this.auxiliariesStats = {};
-      await this.refresh(true);
+      await this.refresh(this.filteredSectors);
     },
     getIcon (sector) {
       return this.displayStats[sector].openedDetails ? 'expand_less' : 'expand_more';
@@ -207,11 +204,11 @@ export default {
       const sector = this.filters.find(s => s._id === sectorId);
       return sector.label;
     },
-    async getAuxiliariesStats () {
+    async getAuxiliariesStats (sectorsIds) {
       try {
         const sectors = [];
         const auxiliariesStats = {}
-        for (const sector of this.filteredSectors) {
+        for (const sector of sectorsIds) {
           if (this.auxiliariesStats[sector] || !this.displayStats[sector].openedDetails) continue;
           sectors.push(sector);
           this.$set(this.displayStats[sector], 'loadingDetails', true);
@@ -249,34 +246,28 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des données')
       } finally {
-        this.setDisplayStats({ loadingDetails: false });
+        this.setDisplayStats(sectorsIds, { loadingDetails: false });
       }
     },
     getCustomersAndDurationBySector (sectorId) {
-      const customersAndDuration = this.customersAndDuration.find(el => el.sector === sectorId);
-      return customersAndDuration || { customerCount: 0, averageDuration: 0, auxiliaryTurnOver: 0 };
+      return this.stats[sectorId].customersAndDuration || { customerCount: 0, averageDuration: 0, auxiliaryTurnOver: 0 };
     },
     getBilledHours (sectorId) {
-      const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
-      return billedHours ? billedHours.interventions : 0;
+      return this.stats[sectorId].internalAndBilledHours ? this.stats[sectorId].internalAndBilledHours.interventions : 0;
     },
     getInternalHours (sectorId) {
-      const billedHours = this.internalAndBilledHours.find(el => el.sector === sectorId);
-      return billedHours ? billedHours.internalHours : 0;
+      return this.stats[sectorId].internalAndBilledHours ? this.stats[sectorId].internalAndBilledHours.internalHours : 0;
     },
     getInternalHoursRatio (sectorId) {
       return (this.getInternalHours(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
     },
     getHoursToWork (sectorId) {
-      const hoursToWork = this.hoursToWork.find(el => el.sector === sectorId);
-      if (!hoursToWork) return 0;
+      if (!this.stats[sectorId].hoursToWork) return 0;
 
-      return hoursToWork.hoursToWork || 0;
+      return this.stats[sectorId].hoursToWork.hoursToWork || 0;
     },
     getPaidTransport (sectorId) {
-      const paidTransportStats = this.paidTransportStats.find(el => el.sector === sectorId);
-
-      return paidTransportStats ? paidTransportStats.duration : 0;
+      return this.stats[sectorId].paidTransportStats ? this.stats[sectorId].paidTransportStats.duration : 0;
     },
     getPaidTransportRatio (sectorId) {
       return (this.getPaidTransport(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
@@ -294,17 +285,17 @@ export default {
         return;
       }
       this.$set(this.displayStats[sectorId], 'openedDetails', true);
-      await this.getAuxiliariesStats();
+      await this.getAuxiliariesStats([sectorId]);
     },
     hoursRatio (sector) {
       return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;
     },
-    async refresh (fullRefresh = false) {
+    async refresh (sectors) {
       try {
-        if (this.filteredSectors.length === 0) return;
+        if (!sectors.length === 0) return;
 
-        this.setDisplayStats({ loading: true, openedDetails: false }, fullRefresh);
-        const params = { month: this.selectedMonth, sector: this.filteredSectors };
+        this.setDisplayStats(sectors, { loading: true, openedDetails: false });
+        const params = { month: this.selectedMonth, sector: sectors };
         const [customersAndDuration, internalAndBilledHours, hoursToWork, paidTransportStats] = await Promise.all([
           this.$stats.getCustomersAndDurationBySector(params),
           this.$stats.getInternalAndBilledHours(params),
@@ -317,12 +308,19 @@ export default {
           this.unassignedHours = [];
         }
 
-        this.internalAndBilledHours = internalAndBilledHours;
-        this.customersAndDuration = customersAndDuration;
-        this.hoursToWork = hoursToWork;
-        this.paidTransportStats = paidTransportStats;
-        await this.getAuxiliariesStats();
-        this.setDisplayStats({ loading: false }, fullRefresh);
+        for (const sector of sectors) {
+          this.stats = {
+            ...this.stats,
+            [sector]: {
+              internalAndBilledHours: internalAndBilledHours.find(ibh => ibh.sector === sector),
+              customersAndDuration: customersAndDuration.find(cd => cd.sector === sector),
+              hoursToWork: hoursToWork.find(hw => hw.sector === sector),
+              paidTransportStats: paidTransportStats.find(pt => pt.sector === sector),
+            },
+          }
+        }
+        await this.getAuxiliariesStats(sectors);
+        this.setDisplayStats(sectors, { loading: false });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réception des statistiques')
@@ -335,21 +333,18 @@ export default {
     // Filter
     async addElementToFilter (sector) {
       this.filteredSectors.push(sector._id);
-      await this.refresh();
+      await this.refresh([sector._id]);
     },
     async removeElementFromFilter (sector) {
       this.filteredSectors = this.filteredSectors.filter(sec => sec !== sector._id);
       delete this.displayStats[sector._id];
     },
-    setDisplayStats (data, fullRefresh) {
-      for (const sector of this.filteredSectors) {
-        if (!this.displayStats[sector] || this.displayStats[sector].loading ||
-          (fullRefresh && !this.displayStats[sector].loading) || Object.keys(data).includes('loadingDetails')) {
-          this.displayStats = {
-            ...this.displayStats,
-            [sector]: { ...this.displayStats[sector], ...data },
-          };
-        }
+    setDisplayStats (sectors, data) {
+      for (const sector of sectors) {
+        this.displayStats = {
+          ...this.displayStats,
+          [sector]: { ...this.displayStats[sector], ...data },
+        };
       }
     },
   },
