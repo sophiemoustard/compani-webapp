@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" @openEndContract="openEndContractModal"
+      <ni-contracts v-if="contracts" :contracts="contracts" :user="auxiliary" @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
         @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
         @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="validateVersionDeletion" />
@@ -99,6 +99,7 @@ import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
+import Users from '../../api/Users';
 import { minDate } from '../../helpers/vuelidateCustomVal';
 import Select from '../form/Select';
 import Input from '../form/Input';
@@ -122,6 +123,9 @@ import { formatIdentity } from '../../helpers/utils';
 export default {
   name: 'ProfileContracts',
   mixins: [contractMixin],
+  props: {
+    profileId: { type: String },
+  },
   components: {
     'ni-select': Select,
     'ni-input': Input,
@@ -137,6 +141,7 @@ export default {
       contracts: [],
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
+      auxiliary: null,
       customers: [],
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
       // New contract
@@ -198,17 +203,14 @@ export default {
     mainUser () {
       return this.$store.getters['main/user'];
     },
-    getUser () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
     userCompany () {
-      return this.getUser.company;
+      return this.auxiliary.company;
     },
     disableContractCreation () {
-      return this.getUser.contractCreationMissingInfo.length !== 0;
+      return this.auxiliary.contractCreationMissingInfo.length !== 0;
     },
     creationMissingInfo () {
-      const userMissingInfo = this.getUser.contractCreationMissingInfo;
+      const userMissingInfo = this.auxiliary.contractCreationMissingInfo;
       if (userMissingInfo.length === 1) {
         const missingInfo = CONTRACT_CREATION_MANDATORY_INFO[userMissingInfo[0]];
         return `Il manque l'information suivante dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfo}.`;
@@ -263,6 +265,7 @@ export default {
     },
   },
   async mounted () {
+    await this.refreshUser();
     await this.refreshContracts();
     await this.getCustomersWithCustomerContractSubscriptions();
   },
@@ -285,9 +288,18 @@ export default {
         console.error(e);
       }
     },
+    async refreshUser () {
+      try {
+        this.auxiliary = await Users.getById(this.profileId);
+      } catch (e) {
+        this.auxiliary = null;
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération de l\'auxiliaire');
+      }
+    },
     async refreshContracts () {
       try {
-        this.contracts = await this.$contracts.list({ user: this.getUser._id });
+        this.contracts = await this.$contracts.list({ user: this.profileId });
         const promises = [];
         for (const contract of this.contracts) {
           const version = contract.versions[contract.versions.length - 1];
@@ -311,12 +323,12 @@ export default {
     resetContract (val) {
       this.newContract.customer = '';
       this.newContract.grossHourlyRate = val === COMPANY_CONTRACT
-        ? get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
+        ? get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : get(this.auxiliary, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.$v.newContract.customer.$reset();
     },
     openCreationModal () {
-      this.newContract.user = this.getUser._id;
+      this.newContract.user = this.auxiliary._id;
       this.newContractModal = true;
     },
     resetContractCreationModal () {
@@ -376,8 +388,8 @@ export default {
     // Version creation
     openVersionCreationModal (contract) {
       this.newVersion.grossHourlyRate = contract.status === COMPANY_CONTRACT
-        ? get(this.getUser, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : get(this.getUser, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
+        ? get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate')
+        : get(this.auxiliary, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
       this.newVersionModal = true;
