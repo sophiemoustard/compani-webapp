@@ -55,6 +55,7 @@ module.exports = function (ctx) {
       lang: 'fr',
       components: [
         'QAjaxBar',
+        'QBanner',
         'QBtn',
         'QBtnToggle',
         'QCard',

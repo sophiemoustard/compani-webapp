@@ -46,6 +46,17 @@ export const END_CONTRACT_REASONS = [
   { label: 'Fin de contrat CDD', value: 'cdd_end' },
   { label: 'Autres', value: OTHER },
 ];
+export const CONTRACT_CREATION_MANDATORY_INFO = {
+  'identity.lastname': 'nom',
+  'identity.firstname': 'prénom',
+  'identity.birthDate': 'date de naissance',
+  'identity.birthCity': 'ville de naissance',
+  'identity.birthState': 'département de naissance',
+  'identity.nationality': 'nationalité',
+  'identity.socialSecurityNumber': 'numéro de sécurité sociale',
+  'contact.address.fullAddress': 'adresse',
+  'establishment': 'établissement',
+}
 
 // EVENTS
 export const INTERVENTION = 'intervention';

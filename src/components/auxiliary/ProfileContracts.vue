@@ -5,21 +5,12 @@
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
         @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
         @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="validateVersionDeletion" />
-      <q-btn :disable="!hasBasicInfo" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
+      <q-btn :disable="disableContractCreation" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
-      <div v-if="!hasBasicInfo" class="missingBasicInfo">
-        <p>/!\ Il manque une ou des information(s) importante(s) pour pouvoir créer un nouveau contrat parmi :</p>
-        <ul>
-          <li>Nom et prénom</li>
-          <li>Nationalité</li>
-          <li>Adresse</li>
-          <li>Date de naissance</li>
-          <li>Département de naissance</li>
-          <li>Ville de naissance</li>
-          <li>Numéro de sécurité sociale</li>
-          <li>Etablissement</li>
-        </ul>
-      </div>
+      <q-banner v-if="disableContractCreation" class="full-width warning" dense>
+        <q-icon name="warning" />
+        <div>{{ creationMissingInfo }}</div>
+      </q-banner>
     </div>
 
     <!-- New contract modal -->
@@ -116,7 +107,15 @@ import Contracts from '../contracts/Contracts';
 import Modal from '../Modal';
 import VersionEditionModal from '../contracts/VersionEditionModal.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
-import { END_CONTRACT_REASONS, OTHER, CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COMPANY_CONTRACT, COACH } from '../../data/constants';
+import {
+  END_CONTRACT_REASONS,
+  OTHER,
+  CONTRACT_STATUS_OPTIONS,
+  CUSTOMER_CONTRACT,
+  COMPANY_CONTRACT,
+  COACH,
+  CONTRACT_CREATION_MANDATORY_INFO,
+} from '../../data/constants';
 import { contractMixin } from '../../mixins/contractMixin.js';
 import { formatIdentity } from '../../helpers/utils';
 
@@ -205,16 +204,22 @@ export default {
     userCompany () {
       return this.getUser.company;
     },
-    hasBasicInfo () {
-      const { contact, identity, establishment } = this.getUser;
-      if (!contact || !identity) return false;
+    disableContractCreation () {
+      return this.getUser.contractCreationMissingInfo.length !== 0;
+    },
+    creationMissingInfo () {
+      const userMissingInfo = this.getUser.contractCreationMissingInfo;
+      if (userMissingInfo.length === 1) {
+        const missingInfo = CONTRACT_CREATION_MANDATORY_INFO[userMissingInfo[0]];
+        return `Il manque l'information suivante dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfo}.`;
+      }
 
-      const completedName = !!identity.lastname && !!identity.firstname;
-      const completedBirthInfo = !!identity.birthDate && !!identity.birthCity && !!identity.birthState;
-      const completedAddress = !!get(contact, 'address.fullAddress');
+      const missingInfoList = [];
+      for (const info of userMissingInfo) {
+        missingInfoList.push([CONTRACT_CREATION_MANDATORY_INFO[info]]);
+      }
 
-      return completedName && completedBirthInfo && establishment && identity.socialSecurityNumber &&
-        identity.nationality && completedAddress;
+      return `Il manque les informations suivantes dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfoList.join(', ')}.`;
     },
     hasCompanyContract () {
       if (this.contracts.length === 0) return false;
@@ -496,12 +501,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
-  .missingBasicInfo
-    color: red
-    background: white
-    padding: 10px
-    margin-left: auto
-    margin-right: auto
+  .q-banner
+    background-color: $grey
+    /deep/ .q-banner__content
+      display: flex;
+      align-items: center
+      .q-icon
+        margin-right: 5px
 
 </style>
