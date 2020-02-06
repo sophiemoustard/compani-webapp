@@ -100,11 +100,14 @@ import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
 import Users from '../../api/Users';
+import Customers from '../../api/Customers';
+import Events from '../../api/Events';
+import Contracts from '../../api/Contracts';
 import { minDate } from '../../helpers/vuelidateCustomVal';
 import Select from '../form/Select';
 import Input from '../form/Input';
 import DateInput from '../form/DateInput';
-import Contracts from '../contracts/Contracts';
+import NiContracts from '../contracts/Contracts';
 import Modal from '../Modal';
 import VersionEditionModal from '../contracts/VersionEditionModal.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
@@ -130,7 +133,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
-    'ni-contracts': Contracts,
+    'ni-contracts': NiContracts,
     'ni-modal': Modal,
     'version-edition-modal': VersionEditionModal,
   },
@@ -141,7 +144,9 @@ export default {
       contracts: [],
       CUSTOMER_CONTRACT,
       COMPANY_CONTRACT,
-      auxiliary: null,
+      auxiliary: {
+        contractCreationMissingInfo: [],
+      },
       customers: [],
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
       // New contract
@@ -282,7 +287,7 @@ export default {
     },
     async getCustomersWithCustomerContractSubscriptions () {
       try {
-        this.customers = await this.$customers.listWithCustomerContractSubscriptions();
+        this.customers = await Customers.listWithCustomerContractSubscriptions();
       } catch (e) {
         this.customers = [];
         console.error(e);
@@ -299,11 +304,11 @@ export default {
     },
     async refreshContracts () {
       try {
-        this.contracts = await this.$contracts.list({ user: this.profileId });
+        this.contracts = await Contracts.list({ user: this.profileId });
         const promises = [];
         for (const contract of this.contracts) {
           const version = contract.versions[contract.versions.length - 1];
-          promises.push(this.$events.list({ status: contract.status, auxiliary: contract.user._id, startDate: version.startDate }));
+          promises.push(Events.list({ status: contract.status, auxiliary: contract.user._id, startDate: version.startDate }));
         }
 
         const events = await Promise.all(promises);
@@ -373,7 +378,7 @@ export default {
 
         this.loading = true;
         const payload = await this.getContractCreationPayload();
-        await this.$contracts.create(payload);
+        await Contracts.create(payload);
         await this.refreshContracts();
 
         this.resetContractCreationModal();
@@ -424,7 +429,7 @@ export default {
 
         this.loading = true;
         const payload = await this.getVersionCreationPayload();
-        await this.$contracts.createVersion(this.newVersion.contractId, payload);
+        await Contracts.createVersion(this.newVersion.contractId, payload);
         await this.refreshContracts();
 
         this.resetVersionCreationModal();
@@ -461,7 +466,7 @@ export default {
     },
     async deleteVersion (contractId, versionId) {
       try {
-        await this.$contracts.deleteVersion(contractId, versionId);
+        await Contracts.deleteVersion(contractId, versionId);
         await this.refreshContracts();
         NotifyPositive('Version supprimée');
       } catch (e) {
@@ -494,7 +499,7 @@ export default {
         this.loading = true;
         const payload = { ...omit(this.endContract, ['contract']) };
         payload.endDate = this.$moment(payload.endDate).endOf('day').toISOString();
-        await this.$contracts.update(this.endContract.contract._id, payload);
+        await Contracts.update(this.endContract.contract._id, payload);
         await this.refreshContracts();
         this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
