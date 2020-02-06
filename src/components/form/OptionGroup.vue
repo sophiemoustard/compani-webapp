@@ -30,7 +30,7 @@ export default {
     type: { type: String, default: '' },
     inline: { type: Boolean, default: false },
     displayCaption: { type: Boolean, default: true },
-    disable: { type: Boolean, default: true },
+    disable: { type: Boolean, default: false },
   },
   methods: {
     inputHandler (value) {
