@@ -8,7 +8,7 @@
       <q-btn :disable="disableContractCreation" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <q-banner v-if="disableContractCreation" class="full-width warning" dense>
-        <q-icon name="warning" />
+        <q-icon size="sm" name="warning" />
         <div>{{ creationMissingInfo }}</div>
       </q-banner>
     </div>
