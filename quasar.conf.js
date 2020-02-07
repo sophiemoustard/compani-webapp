@@ -18,7 +18,6 @@ module.exports = function (ctx) {
       'lodash',
       'moment',
       'resize',
-      'roles',
       'sectors',
       'services',
       'stats',

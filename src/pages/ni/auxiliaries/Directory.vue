@@ -73,6 +73,7 @@
 <script>
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
+import Roles from '../../../api/Roles';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
@@ -361,7 +362,7 @@ export default {
     async createAlenviUser () {
       const folderId = this.$_.get(this.company, 'auxiliariesFolderId', null);
       if (!folderId) throw new Error('No auxiliary folder in company drive');
-      const roles = await this.$roles.showAll({ name: AUXILIARY });
+      const roles = await Roles.list({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
 
       const payload = this.formatPayloadForUserCreation(roles);

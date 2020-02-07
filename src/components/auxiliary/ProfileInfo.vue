@@ -285,11 +285,12 @@ import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import 'vue-croppa/dist/vue-croppa.css'
 
-import gdrive from '../../api/GoogleDrive.js';
-import cloudinary from '../../api/Cloudinary.js';
-import nationalities from '../../data/nationalities.js';
-import countries from '../../data/countries.js';
-import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES } from '../../data/constants.js';
+import Roles from '../../api/Roles';
+import gdrive from '../../api/GoogleDrive';
+import cloudinary from '../../api/Cloudinary';
+import nationalities from '../../data/nationalities';
+import countries from '../../data/countries';
+import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES } from '../../data/constants';
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input';
 import Select from '../form/Select';
@@ -299,9 +300,9 @@ import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput.vue';
 import SearchAddress from '../form/SearchAddress';
 import { frPhoneNumber, iban, frAddress, bic } from '../../helpers/vuelidateCustomVal';
-import { extend, removeDiacritics } from '../../helpers/utils.js';
+import { extend, removeDiacritics } from '../../helpers/utils';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
-import { validationMixin } from '../../mixins/validationMixin.js';
+import { validationMixin } from '../../mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -834,7 +835,7 @@ export default {
     },
     async getAuxiliaryRoles () {
       try {
-        const roles = await this.$roles.showAll({ name: [AUXILIARY, PLANNING_REFERENT] });
+        const roles = await Roles.list({ name: [AUXILIARY, PLANNING_REFERENT] });
         this.auxiliaryRolesOptions = roles.map((role) => ({
           label: role.name === AUXILIARY ? 'Auxiliaire' : 'Référent(e) planning',
           value: role._id,

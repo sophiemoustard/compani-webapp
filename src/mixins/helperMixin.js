@@ -1,6 +1,7 @@
 
 import randomize from 'randomatic';
-import { clear, formatPhone } from '../helpers/utils.js';
+import Roles from '../api/Roles';
+import { clear, formatPhone } from '../helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../components/popup/notify';
 import { HELPER, REQUIRED_LABEL } from '../data/constants';
 
@@ -107,7 +108,7 @@ export const helperMixin = {
     async createAlenviHelper () {
       this.newHelper.local.password = randomize('0', 6);
       this.newHelper.customers = [this.userProfile._id];
-      const roles = await this.$roles.showAll({ name: HELPER });
+      const roles = await Roles.list({ name: HELPER });
       if (roles.length === 0) throw new Error('Role not found');
       this.newHelper.role = roles[0]._id;
       this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
