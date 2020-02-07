@@ -9,8 +9,8 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" class="q-mx-sm" :disable="loading">
-                  <a :href="$_.get(props, 'row.driveFile.link', '')" target="_blank">
+                <q-btn flat round small color="primary" class="q-mx-sm" :disable="!getDriveFileLink(props)">
+                  <a :href="getDriveFileLink(props)" target="_blank">
                     <q-icon name="file_download" color="primary" />
                   </a>
                 </q-btn>
@@ -29,6 +29,7 @@
 <script>
 import LargeTable from '../../../components/table/LargeTable';
 import AdministrativeDocument from '../../../api/AdministrativeDocuments'
+import get from 'lodash/get'
 
 export default {
   metaInfo: {
@@ -47,6 +48,11 @@ export default {
     } finally {
       this.loading = false;
     }
+  },
+  methods: {
+    getDriveFileLink (doc) {
+      return get(doc, 'row.driveFile.link', '');
+    },
   },
   data () {
     return {
