@@ -60,7 +60,7 @@ export default {
         startDate: this.$moment().startOf('M').toISOString(),
         endDate: this.$moment().endOf('M').toISOString(),
       },
-      getUser: {},
+      auxiliary: {},
       contractsList: [],
       versionsList: [],
       datesHasError: false,
@@ -167,7 +167,7 @@ export default {
       this.selectedContract = this.contractsList.find(contract => contract._id === version.contractId);
       this.selectedVersion = version;
       this.versionEditionModal = true;
-      this.getUser = version.user;
+      this.auxiliary = version.user;
     },
     formatContractList () {
       const startDate = this.$moment(this.dates.startDate);
