@@ -54,18 +54,14 @@ export default {
       loading: false,
       columns: [
         {
-          name: 'nom',
+          name: 'name',
           label: 'Nom',
           field: 'name',
           align: 'left',
-          sortable: true,
         },
         {
           name: 'actions',
-          label: 'Visualiser',
-          field: 'link',
           align: 'center',
-          style: 'width: 30px',
         },
       ],
       documents: [],
