@@ -6,10 +6,10 @@
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
       <div class="date-container justify-center items-center row">
-        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
+        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" :min="min"/>
         <p class="delimiter">-</p>
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          :min="value.startDate" />
+          :min="value.startDate" :max="max" />
       </div>
     </q-field>
   </div>
@@ -29,6 +29,8 @@ export default {
     requiredField: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
+    min: { type: String, default: '' },
+    max: { type: String, default: '' },
   },
   methods: {
     update (value, key) {

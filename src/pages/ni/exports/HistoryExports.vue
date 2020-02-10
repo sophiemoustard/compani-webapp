@@ -3,10 +3,11 @@
     <h4>Historique</h4>
     <div class="row q-col-gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />
-      <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :error.sync="dateRangeHasError" />
+      <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :error.sync="dateRangeHasError"
+        :min="min" :max="max" v-on="$listeners" @input="input" />
     </div>
     <q-btn label="Exporter" no-caps unelevated text-color="white" color="primary" icon="import_export"
-      @click="exportCsv" :disable="dateRangeHasError" />
+      @click="exportCsv" :disable="dateRangeHasError || loading" :loading="loading" />
   </q-page>
 </template>
 
@@ -30,11 +31,25 @@ export default {
       type: WORKING_EVENT,
       dateRange: { startDate: this.$moment().startOf('M').toISOString(), endDate: this.$moment().endOf('M').toISOString() },
       dateRangeHasError: false,
+      min: '',
+      max: '',
+      loading: false,
+    }
+  },
+  mounted () {
+    if (this.type === WORKING_EVENT) {
+      this.min = this.$moment().endOf('M').subtract(1, 'year').toISOString();
+      this.max = this.$moment().startOf('M').add(1, 'year').toISOString();
     }
   },
   methods: {
+    input (date) {
+      this.min = this.$moment(date.endDate).subtract(1, 'year').add(1, 'day').toISOString()
+      this.max = this.$moment(date.startDate).add(1, 'year').subtract(1, 'day').toISOString()
+    },
     async exportCsv () {
       try {
+        this.loading = true;
         const type = EXPORT_HISTORY_TYPES.find(type => type.value === this.type);
         if (!type) return NotifyNegative('Impossible de téléchager le document');
 
@@ -45,6 +60,8 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchagement du document');
+      } finally {
+        this.loading = false;
       }
     },
   },
