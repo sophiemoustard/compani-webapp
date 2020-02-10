@@ -76,6 +76,10 @@ export const minDate = (min) => {
   return (value) => moment(min).isSameOrBefore(value);
 };
 
+export const maxDate = (max) => {
+  return (value) => moment(max).isSameOrAfter(value);
+};
+
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
 
 export const validWorkHealthService = value => !value || workHealthServices.map(whs => whs.value).includes(value);

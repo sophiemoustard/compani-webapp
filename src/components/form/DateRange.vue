@@ -25,7 +25,15 @@ export default {
   },
   props: {
     caption: { type: String, default: '' },
-    value: { type: Object, default: function () { return { startDate: this.$moment().startOf('d').toISOString(), endDate: this.$moment().endOf('d').toISOString() } } },
+    value: {
+      type: Object,
+      default: function () {
+        return {
+          startDate: this.$moment().startOf('d').toISOString(),
+          endDate: this.$moment().endOf('d').toISOString(),
+        };
+      },
+    },
     requiredField: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
