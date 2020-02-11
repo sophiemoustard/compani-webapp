@@ -4,7 +4,7 @@
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
-          <q-icon size="xs" name="mdi-lightbulb-on-outline" class="feedback" v-if="!isAuxiliaryWithoutCompany"
+          <q-icon size="xs" name="mdi-lightbulb-on-outline" class="feedback"
             @click.native="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
         </q-item-section>
         <q-item-section v-if="isAuxiliaryWithoutCompany">
@@ -20,18 +20,20 @@
 </template>
 
 <script>
-import { COACH_ROLES, AUXILIARY, PLANNING_REFERENT } from '../../data/constants';
+import { COACH_ROLES, AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY } from '../../data/constants';
 
 export default {
   props: {
     userId: String,
     label: String,
     isAuxiliary: { type: Boolean, default: false },
-    isAuxiliaryWithoutCompany: { type: Boolean, default: true },
   },
   computed: {
     user () {
       return this.$store.getters['main/user'];
+    },
+    isAuxiliaryWithoutCompany () {
+      return this.user.role.name === AUXILIARY_WITHOUT_COMPANY;
     },
     userCanFeedback () {
       return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.user.role.name);
