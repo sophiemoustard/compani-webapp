@@ -11,12 +11,8 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" :disabled="!$_.get(props, 'row.file.link', null)"
-                    class="q-mx-sm" :disable="loading">
-                    <a :href="$_.get(props, 'row.file.link', '')" target="_blank">
-                      <q-icon name="file_download" color="primary" />
-                    </a>
-                  </q-btn>
+                  <q-btn flat round small color="primary" :disable="loading || !getLink(props.row)" class="q-mx-sm"
+                    type="a" :href="getLink(props.row)" target="_blank" icon="file_download" />
                   <q-btn v-if="!isAuxiliary" flat round small color="primary" icon="delete" class="q-mx-sm"
                     :disable="loading"
                     @click="validatePayDocumentDeletion(payDocuments[getRowIndex(payDocuments, props.row)])">
@@ -57,6 +53,8 @@
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import snakeCase from 'lodash/snakeCase';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
@@ -117,9 +115,9 @@ export default {
       mainUser: 'main/user',
     }),
     documentNatureLabels () {
-      const payDocumentNaturesKeyedByValue = this.$_.keyBy(PAY_DOCUMENT_NATURES, 'value');
+      const payDocumentNaturesKeyedByValue = keyBy(PAY_DOCUMENT_NATURES, 'value');
 
-      return this.$_.mapValues(payDocumentNaturesKeyedByValue, 'label');
+      return mapValues(payDocumentNaturesKeyedByValue, 'label');
     },
     userProfile () {
       if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
@@ -137,6 +135,9 @@ export default {
     await this.getDocuments();
   },
   methods: {
+    getLink (doc) {
+      return get(doc, 'file.link') || false;
+    },
     formatDocumentPayload () {
       const { file, nature, date } = this.newDocument;
       const form = new FormData();

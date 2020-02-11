@@ -35,11 +35,8 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary">
-                    <a :href="taxCertificatesUrl(props.row)" target="_blank">
-                      <q-icon name="file_download" />
-                    </a>
-                  </q-btn>
+                  <q-btn flat round small color="primary" type="a" :href="taxCertificatesUrl(props.row)"
+                    target="_blank" icon="file_download" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>

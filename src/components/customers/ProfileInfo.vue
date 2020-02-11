@@ -126,16 +126,13 @@
                   </q-btn>
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
-                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
+                  <div v-if="!props.row.drive || !getMandateLink(props.row)" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
                       field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
-                  <q-btn v-else flat round small color="primary">
-                    <a :href="props.row.drive.link" download target="_blank">
-                      <q-icon name="file_download" />
-                    </a>
-                  </q-btn>
+                  <q-btn v-else flat round small color="primary" type="a" :href="getMandateLink(props.row)"
+                    target="_blank" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
                   <ni-date-input
@@ -208,16 +205,13 @@
                   <q-icon name="file_download" color="primary" @click="downloadQuote(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signedQuote'">
-                  <div v-if="!props.row.drive || !props.row.drive.link" class="row justify-center table-actions">
+                  <div v-if="!props.row.drive || !getQuoteLink(props.row)" class="row justify-center table-actions">
                     <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
                       field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
                       @failed="failMsg" />
                   </div>
-                  <q-btn v-else flat round small color="primary">
-                    <a :href="props.row.drive.link" download target="_blank">
-                      <q-icon name="file_download" />
-                    </a>
-                  </q-btn>
+                  <q-btn v-else flat round small color="primary" type="a" :href="getQuoteLink(props.row)"
+                    target="_blank" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
                   <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
@@ -402,6 +396,8 @@
 <script>
 import { Cookies } from 'quasar';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
+import pickBy from 'lodash/pickBy';
 import ThirdPartyPayers from '../../api/ThirdPartyPayers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify.js';
 import SearchAddress from '../form/SearchAddress';
@@ -620,7 +616,7 @@ export default {
     serviceOptions () {
       if (!this.services) return [];
 
-      const subscribedServices = this.subscriptions.map(subscription => this.$_.get(subscription, 'service._id'));
+      const subscribedServices = this.subscriptions.map(subscription => get(subscription, 'service._id'));
       const availableServices = this.services.filter(service => !subscribedServices.includes(service._id));
 
       return availableServices.map(service => ({
@@ -819,7 +815,7 @@ export default {
       return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
     },
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.customer, path)
+      this.tmpInput = get(this.customer, path)
     },
     saveTmpSignedAt (index) {
       this.tmpInput = this.customer.payment.mandates[index].signedAt;
@@ -922,7 +918,7 @@ export default {
 
         this.loading = true;
         const subscriptionId = this.editedSubscription._id;
-        const payload = this.$_.pickBy(this.editedSubscription);
+        const payload = pickBy(this.editedSubscription);
         delete payload._id;
         delete payload.nature;
         await this.$customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
@@ -957,6 +953,9 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     // Mandates
+    getMandateLink (mandate) {
+      return get(mandate, 'drive.link') || false;
+    },
     async updateSignedAt (mandate) {
       try {
         if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
@@ -974,7 +973,7 @@ export default {
     },
     async downloadMandate (doc) {
       try {
-        const mandateDriveId = this.$_.get(this.company, 'customersConfig.templates.debitMandate.driveId', null);
+        const mandateDriveId = get(this.company, 'customersConfig.templates.debitMandate.driveId', null);
         if (!mandateDriveId) {
           return NotifyWarning('Template manquant');
         }
@@ -1004,9 +1003,12 @@ export default {
       NotifyNegative('Echec de l\'envoi du document');
     },
     // Quotes
+    getQuoteLink (quote) {
+      return get(quote, 'drive.link') || false;
+    },
     async downloadQuote (doc) {
       try {
-        const quoteDriveId = this.$_.get(this.company, 'customersConfig.templates.quote.driveId', null);
+        const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);
         if (!quoteDriveId) {
           return NotifyWarning('Template manquant');
         }
@@ -1088,8 +1090,8 @@ export default {
     },
     fundingSubscriptionsOptions () {
       return this.subscriptions
-        .filter(sub => this.$_.get(sub, 'service.nature') !== FIXED)
-        .map(sub => ({ label: this.$_.get(sub, 'service.name'), value: sub._id }));
+        .filter(sub => get(sub, 'service.nature') !== FIXED)
+        .map(sub => ({ label: get(sub, 'service.name'), value: sub._id }));
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
@@ -1117,7 +1119,7 @@ export default {
       };
     },
     formatCreatedFunding () {
-      const cleanPayload = this.$_.pickBy(this.newFunding);
+      const cleanPayload = pickBy(this.newFunding);
       const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
       if (version.endDate) version.endDate = this.$moment(version.endDate).endOf('d').toDate();
       return {
@@ -1205,7 +1207,7 @@ export default {
           payload.unitTTCRate = unitTTCRate;
           payload.careHours = careHours;
         }
-        const cleanPayload = this.$_.pickBy(payload);
+        const cleanPayload = pickBy(payload);
         await this.$customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
         this.resetEditionFundingData();
         await this.refreshCustomer();

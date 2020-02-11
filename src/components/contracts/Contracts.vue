@@ -37,11 +37,8 @@
                     auto-upload @uploaded="refresh" @fail="failMsg" />
                 </div>
                 <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
-                  <q-btn flat round small color="primary">
-                    <a :href="getContractLink(props.row)" target="_blank">
-                      <q-icon name="file_download" />
-                    </a>
-                  </q-btn>
+                  <q-btn flat round small color="primary" type="a" :href="getContractLink(props.row)" target="_blank"
+                    icon="file_download" />
                 </div>
                 <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                   <p class="no-margin">En attente de signature</p>
@@ -50,11 +47,8 @@
               <template v-else-if="col.name === 'archives'">
                 <div class="row archives justify-center">
                   <div v-for="archive in col.value" :key="archive._id">
-                    <q-btn flat round small color="primary">
-                      <a :href="archive.link" target="_blank">
-                        <q-icon name="file_download" />
-                      </a>
-                    </q-btn>
+                    <q-btn flat round small color="primary" type="a" :href="getArchiveLink(archive)" target="_blank"
+                      icon="file_download" :disable="getArchiveLink(archive)" />
                   </div>
                 </div>
               </template>
@@ -250,6 +244,9 @@ export default {
     },
     refreshWithTimeout () {
       this.$emit('refreshWithTimeout');
+    },
+    getArchiveLink (archive) {
+      return archive.link || false;
     },
     // Documents
     canDownload (version, status, contractIndex) {
