@@ -20,13 +20,13 @@
     </div>
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent" :personKey="personKey"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :personKey="personKey"
       :creationModal="creationModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetCreationForm" @deleteDocument="validateDocumentDeletion"
       @documentUploaded="documentUploaded" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
       @documentUploaded="documentUploaded" @updateEvent="updateEvent" @deleteEvent="validateEventDeletion"
@@ -176,10 +176,8 @@ export default {
         auxiliary: this.selectedAuxiliary._id,
         sector: '',
         dates: {
-          startDate: selectedDay.toISOString(),
-          startHour: '08:00',
-          endDate: selectedDay.toISOString(),
-          endHour: '10:00',
+          startDate: this.$moment(selectedDay).hours(8).toISOString(),
+          endDate: this.$moment(selectedDay).hours(10).toISOString(),
         },
       };
 
