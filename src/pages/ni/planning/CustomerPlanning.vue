@@ -5,12 +5,12 @@
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent" :personKey="personKey"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :personKey="personKey"
       :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
       @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
       :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers" :personKey="personKey"
       @resetForm="resetEditionForm" @updateEvent="updateEvent" @close="closeEditionModal"
       @deleteEventRepetition="validationDeletionEventRepetition" @deleteEvent="validateEventDeletion" />
@@ -172,10 +172,8 @@ export default {
         auxiliary: '',
         sector: '',
         dates: {
-          startDate: selectedDay.toISOString(),
-          startHour: '08:00',
-          endDate: selectedDay.toISOString(),
-          endHour: '10:00',
+          startDate: this.$moment(selectedDay).hours(8).toISOString(),
+          endDate: this.$moment(selectedDay).hours(10).toISOString(),
         },
       };
       this.creationModal = true;

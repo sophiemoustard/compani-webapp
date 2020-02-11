@@ -241,7 +241,7 @@ export default {
           this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled)
         )
-        .map((event) => this.isCustomerPlanning ? event : this.getDisplayedEvent(event, day, STAFFING_VIEW_START_HOUR, STAFFING_VIEW_END_HOUR))
+        .map((event) => this.getDisplayedEvent(event, day, STAFFING_VIEW_START_HOUR, STAFFING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getPersonEvents (person) {
