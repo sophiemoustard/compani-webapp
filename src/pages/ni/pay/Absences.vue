@@ -18,12 +18,9 @@
               </div>
             </template>
             <template v-if="col.name === 'attachment'">
-              <div v-if="props.row.attachment && props.row.attachment.link" class="row no-wrap table-actions">
-                <q-btn flat round small color="primary">
-                  <a :href="props.row.attachment.link" target="_blank">
-                    <q-icon name="file_download" />
-                  </a>
-                </q-btn>
+              <div v-if="getAbsenceLink(props.row)" class="row no-wrap table-actions">
+                <q-btn flat round small color="primary" type="a" :href="getAbsenceLink(props.row)" target="_blank"
+                  icon="file_download" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -41,6 +38,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import DateRange from '../../../components/form/DateRange';
 import TitleHeader from '../../../components/TitleHeader';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '../../../data/constants';
@@ -171,6 +169,9 @@ export default {
     },
   },
   methods: {
+    getAbsenceLink (absence) {
+      return get(absence, 'attachment.link') || false;
+    },
     getAbsenceDuration (absence) {
       if (absence.absenceNature === DAILY) {
         const range = Array.from(this.$moment().range(absence.startDate, absence.endDate).by('days'));

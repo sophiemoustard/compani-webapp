@@ -8,11 +8,7 @@
             :style="col.style" class="text-capitalize">
             <template v-if="col.name === 'document'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary">
-                  <a :href="billSlipUrl(col.value)">
-                    <q-icon name="file_download" />
-                  </a>
-                </q-btn>
+                <q-btn flat round small color="primary" type="a" :href="billSlipUrl(col.value)" icon="file_download" />
               </div>
             </template>
             <template v-else >{{ col.value }}</template>

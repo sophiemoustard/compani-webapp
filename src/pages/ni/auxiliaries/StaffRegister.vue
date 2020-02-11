@@ -11,11 +11,8 @@
             :style="col.style">
             <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
                 <div  class="row justify-center table-actions">
-                  <q-btn flat round small color="primary">
-                    <a :href="col.value" target="_blank">
-                      <q-icon name="file_download" />
-                    </a>
-                  </q-btn>
+                  <q-btn flat round small color="primary" type="a" :href="col.value" target="_blank"
+                    icon="file_download" />
                 </div>
             </template>
             <template v-else>{{ col.value }}</template>
