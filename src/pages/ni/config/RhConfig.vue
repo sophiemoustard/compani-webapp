@@ -120,9 +120,8 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <a :href="props.row.driveFile.link" target="_blank">
-                        <q-btn flat round small color="grey" icon="file_download" />
-                      </a>
+                      <q-btn flat round small color="grey" :href="getAdministrativeDocumentLink(props.row)" type="a"
+                        target="_blank" :disable="!getAdministrativeDocumentLink(props.row)" icon="file_download" />
                       <q-btn flat round small color="grey" icon="delete"
                         @click="validateAdministrativeDocumentDeletion(props.row)" />
                     </div>
@@ -225,6 +224,9 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import cloneDeep from 'lodash/cloneDeep';
+import pickBy from 'lodash/pickBy';
 import { required, maxValue } from 'vuelidate/lib/validators';
 import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
@@ -349,7 +351,7 @@ export default {
     }
   },
   async mounted () {
-    this.company = this.$_.cloneDeep(this.user.company);
+    this.company = cloneDeep(this.user.company);
     if (!this.company.rhConfig.templates) this.company.rhConfig.templates = {};
 
     await this.refreshInternalHours();
@@ -357,10 +359,11 @@ export default {
     await this.getAdministrativeDocuments();
   },
   methods: {
+    get,
     async updateCompanyTransportSubs (params) {
       try {
-        this.$_.get(this.$v.company, params.vuelidatePath).$touch();
-        if (this.$_.get(this.$v.company, params.vuelidatePath).$error) return NotifyWarning('Champ(s) invalide(s)');
+        get(this.$v.company, params.vuelidatePath).$touch();
+        if (get(this.$v.company, params.vuelidatePath).$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const price = this.company.rhConfig.transportSubs[params.index].price
         if (this.tmpInput === price) return;
@@ -382,8 +385,8 @@ export default {
       }
     },
     nbrError (path) {
-      if (!this.$_.get(this.$v.company.rhConfig, path).required) return REQUIRED_LABEL;
-      else if (!this.$_.get(this.$v.company.rhConfig, path).numeric) return 'Nombre non valide';
+      if (!get(this.$v.company.rhConfig, path).required) return REQUIRED_LABEL;
+      else if (!get(this.$v.company.rhConfig, path).numeric) return 'Nombre non valide';
     },
     async refreshCompany () {
       await this.$store.dispatch('main/getUser', this.user._id);
@@ -414,7 +417,7 @@ export default {
 
         this.loading = true;
         if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
-        const payload = this.$_.pickBy(this.newInternalHour);
+        const payload = pickBy(this.newInternalHour);
         await this.$internalHours.create(payload);
         await this.$store.dispatch('main/getUser', this.user._id);
 
@@ -547,6 +550,10 @@ export default {
     sectorNameError (obj) {
       if (!obj.name.required) return REQUIRED_LABEL;
       else if (!obj.name.sector) return 'Nom déjà existant';
+    },
+    // Administrative document
+    getAdministrativeDocumentLink (doc) {
+      return get(doc, 'driveFile.link') || false;
     },
     async getAdministrativeDocuments () {
       try {
