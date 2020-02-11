@@ -4,10 +4,10 @@
     <div class="row q-col-gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />
       <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :min="min" :max="max"
-        :error.sync="dateRangeHasError || $v.dateRange.$error" @input="input" error-label="Date(s) Invalide(s)"/>
+        :error="$v.dateRange.$error" @input="input" error-label="Date(s) invalide(s)" @blur="$v.dateRange.$touch" />
     </div>
     <q-btn label="Exporter" no-caps unelevated text-color="white" color="primary" icon="import_export"
-      @click="exportCsv" :disable="dateRangeHasError || loading" :loading="loading" />
+      @click="exportCsv" :disable="loading || $v.dateRange.$error" :loading="loading" />
   </q-page>
 </template>
 
@@ -31,7 +31,6 @@ export default {
       exportTypeOptions: EXPORT_HISTORY_TYPES,
       type: WORKING_EVENT,
       dateRange: { startDate: this.$moment().startOf('M').toISOString(), endDate: this.$moment().endOf('M').toISOString() },
-      dateRangeHasError: false,
       min: this.$moment().endOf('M').subtract(1, 'year').toISOString(),
       max: this.$moment().startOf('M').add(1, 'year').toISOString(),
       loading: false,
