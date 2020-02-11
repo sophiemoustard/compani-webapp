@@ -9,7 +9,7 @@
             <template v-if="col.name === 'document'">
               <div class="row justify-center table-actions">
                 <q-btn flat round small color="primary">
-                  <a :href="billSlipUrl(col.value)" target="_blank">
+                  <a :href="billSlipUrl(col.value)">
                     <q-icon name="file_download" />
                   </a>
                 </q-btn>
