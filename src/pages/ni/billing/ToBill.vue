@@ -49,6 +49,7 @@
 <script>
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
+import Bills from '../../../api/Bills';
 import DateRange from '../../../components/form/DateRange';
 import ToBillRow from '../../../components/table/ToBillRow';
 import LargeTable from '../../../components/table/LargeTable';
@@ -222,7 +223,7 @@ export default {
           billingPeriod: this.user.company.customersConfig.billingPeriod,
         }
 
-        const draftBills = await this.$bills.getDraftBills(params);
+        const draftBills = await Bills.getDraftBills(params);
         this.draftBills = draftBills.map((draft) => {
           return {
             ...draft,
@@ -250,7 +251,7 @@ export default {
         }));
 
         for (let i = 0, l = bills.length; i < l; i += BATCH_SIZE) {
-          await this.$bills.create({ bills: bills.slice(i, i + BATCH_SIZE) });
+          await Bills.create({ bills: bills.slice(i, i + BATCH_SIZE) });
         }
 
         this.selected = [];
@@ -281,7 +282,7 @@ export default {
         const { startDate, endDate } = bill;
         const index = this.getRowIndex(this.draftBills, row);
 
-        const draftBills = await this.$bills.getDraftBills({
+        const draftBills = await Bills.getDraftBills({
           billingStartDate: startDate,
           startDate: this.$moment(startDate).startOf('d').toISOString(),
           endDate: this.$moment(endDate).endOf('d').toISOString(),

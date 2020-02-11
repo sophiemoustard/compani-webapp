@@ -62,6 +62,7 @@
 </template>
 
 <script>
+import Bills from '../../api/Bills';
 import {
   CREDIT_NOTE,
   BILL,
@@ -187,7 +188,7 @@ export default {
       return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
     },
     billUrl (bill) {
-      return this.$_.get(bill, 'driveFile.link') ? bill.driveFile.link : this.$bills.getPDFUrl(bill._id);
+      return this.$_.get(bill, 'driveFile.link') ? bill.driveFile.link : Bills.getPDFUrl(bill._id);
     },
     creditNoteUrl (creditNote) {
       return this.$_.get(creditNote, 'driveFile.link')

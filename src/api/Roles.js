@@ -1,7 +1,7 @@
 import { alenviAxios } from './ressources/alenviAxios'
 
 export default {
-  async showAll (params) {
+  async list (params) {
     try {
       const roles = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`, { params });
       return roles.data.data.roles;

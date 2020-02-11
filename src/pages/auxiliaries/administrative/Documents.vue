@@ -2,71 +2,76 @@
   <q-page padding class="neutral-background">
     <h4>Documents</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
-    <q-table binary-state-sort :data="documents" :columns="columns" row-key="name"
-      hide-bottom card-class="neutral-background people-list" flat>
-      <q-td slot="body-cell-title" slot-scope="props" :props="props">
-        {{ props.value }}
-      </q-td>
-      <q-td slot="body-cell-link" slot-scope="props" :props="props">
-        <a :href="props.value" target="_blank">
-          <q-icon name="file_download" />
-        </a>
-      </q-td>
-    </q-table>
+    <ni-large-table :data="documents" :columns="columns" :pagination.sync="pagination" row-key="name">
+      <template v-slot:body="{ props }">
+        <q-tr :props="props">
+          <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'actions'">
+              <div class="row justify-center table-actions">
+                <q-btn flat round small color="primary" class="q-mx-sm" :disable="!getDriveFileLink(props)">
+                  <a :href="getDriveFileLink(props)" target="_blank">
+                    <q-icon name="file_download" color="primary" />
+                  </a>
+                </q-btn>
+              </div>
+            </template>
+            <template v-else>
+              {{ col.value }}
+            </template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-large-table>
   </q-page>
 </template>
 
 <script>
+import LargeTable from '../../../components/table/LargeTable';
+import AdministrativeDocument from '../../../api/AdministrativeDocuments'
+import get from 'lodash/get'
+
 export default {
   metaInfo: {
     title: 'Documents',
   },
+  components: {
+    'ni-large-table': LargeTable,
+  },
+  async mounted () {
+    try {
+      this.loading = true;
+      this.documents = await AdministrativeDocument.list();
+    } catch (e) {
+      console.error(e);
+      this.documents = [];
+    } finally {
+      this.loading = false;
+    }
+  },
+  methods: {
+    getDriveFileLink (doc) {
+      return get(doc, 'row.driveFile.link', '');
+    },
+  },
   data () {
     return {
-      documents: [
-        {
-          title: 'Conditions de remboursement de mutuelle',
-          link: 'https://drive.google.com/file/d/0B9x9rvBHVX1TTWlPbHpFZlpUVzQ/view?usp=sharing',
-        },
-        {
-          title: 'Convention collective des services à la personne',
-          link: 'https://drive.google.com/open?id=0B3bqjy-Bj6OHeWx5RVZLYjM5eGM',
-        },
-        {
-          title: 'Evaluation des risques professionnels',
-          link: 'https://drive.google.com/drive/folders/0B9x9rvBHVX1TQ2VVZ3cxb0ZsYVE',
-        },
-      ],
-      pagination: {
-        sortBy: 'title',
-        descending: false,
-        page: 1,
-        rowsPerPage: 10,
-      },
+      pagination: { sortBy: 'title', descending: false, rowsPerPage: 0 },
+      loading: false,
       columns: [
         {
-          name: 'title',
-          label: 'Titre',
-          field: 'title',
+          name: 'name',
+          label: 'Nom',
+          field: 'name',
           align: 'left',
-          sortable: true,
-          style: 'width: 170px',
         },
         {
-          name: 'link',
-          label: 'Visualiser',
-          field: 'link',
-          align: 'left',
-          style: 'width: 30px',
+          name: 'actions',
+          align: 'center',
         },
       ],
+      documents: [],
     }
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-/deep/ .q-table
-  & td
-    font-size: 16px;
-</style>

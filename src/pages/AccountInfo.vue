@@ -3,15 +3,17 @@
     <h4>Mon compte</h4>
     <div class="center-account">
       <ni-input v-model.trim="user.credentials.email" caption="Email" :error="$v.user.credentials.email.$error"
-        error-label="Email invalide." @blur="$v.user.credentials.email.$touch" />
+        error-label="Email invalide." @blur="$v.user.credentials.email.$touch" :disable="isAuxiliaryWithoutCompany" />
       <ni-input v-model.trim="user.credentials.password" :error="$v.user.credentials.password.$error"
         caption="Nouveau mot de passe" error-label="Le mot de passe doit contenir entre 6 et 20 caractères."
-        @blur="$v.user.credentials.password.$touch" type="password" />
+        @blur="$v.user.credentials.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <ni-input v-model.trim="user.credentials.passwordConfirm" :error="$v.user.credentials.passwordConfirm.$error"
         caption="Confirmation mot de passe" error-label="Le mot de passe entré et la confirmation sont différents."
-        @blur="$v.user.credentials.passwordConfirm.$touch" type="password" />
+        @blur="$v.user.credentials.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <div class="row justify-center">
-        <q-btn big @click="updateUser()" color="primary" :disabled="$v.user.$invalid">Modifier</q-btn>
+        <q-btn big @click="updateUser" color="primary" :disable="$v.user.$invalid || isAuxiliaryWithoutCompany">
+          Modifier
+        </q-btn>
       </div>
       <hr style="margin-top: 5%; margin-bottom: 5%">
       <div class="row justify-center">
@@ -25,6 +27,8 @@
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
 import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 import Input from '../components/form/Input';
+import { AUXILIARY_WITHOUT_COMPANY } from '../data/constants';
+import get from 'lodash/get';
 
 export default {
   metaInfo: {
@@ -42,6 +46,7 @@ export default {
           passwordConfirm: '',
         },
         alenvi: {},
+        contracts: [],
       },
     }
   },
@@ -66,6 +71,11 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  computed: {
+    isAuxiliaryWithoutCompany () {
+      return get(this, 'user.alenvi.role.name', null) === AUXILIARY_WITHOUT_COMPANY;
+    },
   },
   methods: {
     async updateUser () {

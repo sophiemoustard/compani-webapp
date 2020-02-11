@@ -6,7 +6,7 @@
     </q-tabs>
     <q-tab-panels v-model="selectedTab" class="no-border neutral-background" flat>
       <q-tab-panel v-for="(tab, index) in tabsContent" :name="tab.name"  :key="index">
-        <component :is="tab.component" />
+        <component :is="tab.component" :profile-id="profileId" />
       </q-tab-panel>
     </q-tab-panels>
   </div>

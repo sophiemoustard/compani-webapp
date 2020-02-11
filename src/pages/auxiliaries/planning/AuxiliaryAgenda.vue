@@ -10,7 +10,7 @@
           </template>
         </div>
         <div class="col-xs-12 col-sm-7">
-          <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :view-mode="viewMode"
+          <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :view-mode="viewMode"
             :type="AGENDA" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
             @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
         </div>

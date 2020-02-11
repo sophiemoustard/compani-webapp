@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Contrats</h4>
-    <ni-contracts v-if="contracts" :contracts="contracts" :user="getUser" :columns="contractVisibleColumns"
+    <ni-contracts v-if="contracts" :contracts="contracts" :user="customer" :columns="contractVisibleColumns"
       @refresh="refreshContracts" :person-key="CUSTOMER" @refreshWithTimeout="refreshContractsWithTimeout" />
   </q-page>
 </template>
@@ -26,18 +26,18 @@ export default {
     }
   },
   computed: {
-    getUser () {
+    customer () {
       const helper = this.$store.getters['main/user'];
       return helper && helper.customers && helper.customers.length > 0 ? helper.customers[0] : {};
     },
   },
   async mounted () {
-    await this.refreshContracts({ customer: this.getUser._id });
+    await this.refreshContracts({ customer: this.customer._id });
   },
   methods: {
     async refreshContracts () {
       try {
-        this.contracts = await this.$contracts.list({ customer: this.getUser._id });
+        this.contracts = await this.$contracts.list({ customer: this.customer._id });
       } catch (e) {
         this.contracts = [];
         console.error(e);

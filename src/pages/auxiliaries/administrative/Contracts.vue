@@ -27,7 +27,7 @@ export default {
     }
   },
   computed: {
-    getUser () {
+    auxiliary () {
       return this.$store.getters['main/user'];
     },
   },
@@ -37,7 +37,7 @@ export default {
   methods: {
     async refreshContracts () {
       try {
-        const contracts = await this.$contracts.list({ user: this.getUser._id });
+        const contracts = await this.$contracts.list({ user: this.auxiliary._id });
         this.contracts = contracts;
       } catch (e) {
         this.contracts = [];

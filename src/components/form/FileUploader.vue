@@ -15,8 +15,8 @@
     </div>
     <q-field borderless v-if="(!document || !document.driveId)" :error="error"
       :error-message="errorLabel">
-      <q-uploader flat :bordered="false" color="white" :label="label" :url="url" :headers="headers"
-        text-color="black" @failed="failMsg" :form-fields="additionalFields" :class="{ borders: inModal }"
+      <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
+        text-color="black" @failed="failMsg" :form-fields="additionalFields"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"/>
     </q-field>
   </div>
@@ -100,11 +100,13 @@ export default {
 
   /deep/ .q-uploader
     width: 100%
+    &--bordered
+      border: 1px solid #d0d0d0
     .q-uploader__list
       display: none
     .q-uploader__header-content
       border-radius: 3px
-      height: 40px
+      height: 38px
       margin: 0
       .q-btn__content
         color: $grey

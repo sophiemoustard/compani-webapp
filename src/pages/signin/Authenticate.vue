@@ -22,7 +22,7 @@
         </router-link>
         <div class="row justify-center">
           <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
-            @click="submit()" />
+            @click="submit" />
         </div>
       </div>
     </div>
@@ -30,17 +30,21 @@
 </template>
 
 <script>
+import Users from '../../api/Users';
+import Customers from '../../api/Customers';
 import CompaniHeader from '../../components/CompaniHeader';
 import Input from '../../components/form/Input';
 import { NotifyNegative } from '../../components/popup/notify';
-import { AUXILIARY, PLANNING_REFERENT, HELPER } from '../../data/constants.js';
+import { HELPER, AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from '../../data/constants.js';
+import get from 'lodash/get';
 
 export default {
   metaInfo: {
     title: 'Connexion',
-    meta: [
-      { name: 'description', content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.' },
-    ],
+    meta: [{
+      name: 'description',
+      content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.',
+    }],
   },
   name: 'Authentication',
   components: {
@@ -60,33 +64,40 @@ export default {
       return this.$store.getters['main/user'];
     },
     isAuxiliary () {
-      return this.getUser ? this.getUser.role.name === AUXILIARY || this.getUser.role.name === PLANNING_REFERENT : false;
+      return this.getUser ? AUXILIARY_ROLES.includes(this.getUser.role.name) : false;
+    },
+    isAuxiliaryWithoutCompany () {
+      return get(this, 'getUser.role.name', null) === AUXILIARY_WITHOUT_COMPANY;
     },
   },
   methods: {
     async submit () {
       try {
-        const user = await this.$axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, {
+        const authenticationPayload = {
           email: this.credentials.email.toLowerCase(),
           password: this.credentials.password,
-        });
-        const expiresInDays = parseInt(user.data.data.expiresIn / 3600 / 24, 10) >= 1 ? parseInt(user.data.data.expiresIn / 3600 / 24, 10) : 1;
-        this.$q.cookies.set('alenvi_token', user.data.data.token, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: process.env.NODE_ENV !== 'development' });
-        this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' });
+        };
+        const auth = await Users.authenticate(authenticationPayload);
+
+        const expiresInDays = parseInt(auth.expiresIn / 3600 / 24, 10) >= 1
+          ? parseInt(auth.expiresIn / 3600 / 24, 10)
+          : 1;
+        const options = { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' };
+        this.$q.cookies.set('alenvi_token', auth.token, options);
+        this.$q.cookies.set('alenvi_token_expires_in', auth.expiresIn, options);
+        this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
+        this.$q.cookies.set('user_id', auth.user._id, options);
         await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
 
-        if (this.$route.query.from) {
-          return this.$router.replace({ path: this.$route.query.from });
-        }
+        if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 
         if (this.getUser.role.name === HELPER) {
-          const customer = await this.$customers.getById(this.getUser.customers[0]._id);
+          const customer = await Customers.getById(this.getUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliary) {
-          this.$router.replace({ name: 'auxiliary agenda' });
+          if (this.isAuxiliaryWithoutCompany) this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
+          else this.$router.replace({ name: 'auxiliary agenda' });
         } else {
           this.$router.replace({ name: 'auxiliaries directory' });
         }

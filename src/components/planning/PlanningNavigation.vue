@@ -8,6 +8,7 @@
           <q-date minimal @input="goToWeek" :value="date" />
         </q-menu>
       </div>
+      <div class="week-number"><span>{{ weekNumber }}</span></div>
     </div>
     <div class="planning-navigation-actions col-6">
       <div>
@@ -58,6 +59,9 @@ export default {
     date () {
       return this.$moment(this.targetDate).format('YYYY/MM/DD');
     },
+    weekNumber () {
+      return this.$moment(this.targetDate).week();
+    },
   },
   methods: {
     goToNextWeek (value) {
@@ -91,4 +95,17 @@ export default {
   .planning-history-button
     display: flex;
     align-items: center;
+
+  .planning-month
+    align-items: center
+
+  .week-number
+    font-size: 12px
+    border: solid 1px
+    display: flex
+    height: 20px
+    width: 20px
+    border-radius: 50%
+    align-content: center
+    justify-content: center
 </style>

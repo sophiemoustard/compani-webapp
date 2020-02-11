@@ -79,7 +79,7 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Documents</p>
+        <p class="text-weight-bold">Modèles contrat</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contractWithCompany"
@@ -108,6 +108,35 @@
               @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`" />
           </div>
         </div>
+      </div>
+      <div class="q-mb-xl">
+        <p class="text-weight-bold">Documents administratifs</p>
+        <q-card>
+          <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
+            :pagination.sync="administrativeDocumentPagination">
+            <template v-slot:body="{ props }">
+              <q-tr :props="props">
+                <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                  :style="col.style">
+                  <template v-if="col.name === 'actions'">
+                    <div class="row no-wrap table-actions">
+                      <a :href="props.row.driveFile.link" target="_blank">
+                        <q-btn flat round small color="grey" icon="file_download" />
+                      </a>
+                      <q-btn flat round small color="grey" icon="delete"
+                        @click="validateAdministrativeDocumentDeletion(props.row)" />
+                    </div>
+                  </template>
+                  <template v-else>{{ col.value }}</template>
+                </q-td>
+              </q-tr>
+            </template>
+          </ni-responsive-table>
+          <q-card-actions align="right">
+            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un document"
+              @click="administrativeDocumentCreationModal = true" />
+          </q-card-actions>
+        </q-card>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Équipes</p>
@@ -151,6 +180,22 @@
       </template>
     </ni-modal>
 
+    <!-- Administrative document creation modal -->
+    <ni-modal v-model="administrativeDocumentCreationModal" @hide="resetAdministrativeDocumentModal">
+      <template slot="title">
+        Ajouter un <span class="text-weight-bold">document administratif</span>
+      </template>
+      <ni-input in-modal caption="Nom" v-model="newAdministrativeDocument.name" required-field
+        :error="$v.newAdministrativeDocument.name.$error" @blur="$v.newAdministrativeDocument.name.$touch" />
+      <ni-input caption="Document" type="file" v-model="newAdministrativeDocument.file" required-field last
+        :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
+          :disable="!$v.newAdministrativeDocument.$anyDirty || $v.newAdministrativeDocument.$invalid" :loading="loading"
+          @click="createNewAdministrativeDocument" />
+      </template>
+    </ni-modal>
+
     <!-- Sector creation modal -->
     <ni-modal v-model="sectorCreationModal" @hide="resetCreationSectorData">
       <template slot="title">
@@ -191,6 +236,7 @@ import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin';
 import { tableMixin } from '../../../mixins/tableMixin';
+import AdministrativeDocument from '../../../api/AdministrativeDocuments'
 
 export default {
   name: 'RhConfig',
@@ -225,13 +271,30 @@ export default {
           label: '',
           align: 'center',
           field: '_id',
-          sortable: true,
         },
       ],
       newInternalHourModal: false,
       newInternalHour: { name: '' },
       loading: false,
       pagination: { rowsPerPage: 0 },
+      administrativeDocuments: [],
+      administrativeDocumentsColumns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'name',
+          sortable: true,
+        },
+        {
+          name: 'actions',
+          label: '',
+          align: 'center',
+        },
+      ],
+      administrativeDocumentCreationModal: false,
+      administrativeDocumentPagination: { rowsPerPage: 0 },
+      newAdministrativeDocument: { name: '', file: null },
       sectors: [],
       sectorsColumns: [
         {
@@ -272,30 +335,17 @@ export default {
     return {
       company: {
         rhConfig: {
-          contractWithCompany: {
-            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) },
-          },
-          contractWithCustomer: {
-            grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) },
-          },
+          contractWithCompany: { grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) } },
+          contractWithCustomer: { grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) } },
           feeAmount: { required, posDecimals, maxValue: maxValue(999) },
           amountPerKm: { required, posDecimals, maxValue: maxValue(999) },
-          transportSubs: {
-            $each: {
-              price: { required, posDecimals, maxValue: maxValue(999) },
-            },
-          },
+          transportSubs: { $each: { price: { required, posDecimals, maxValue: maxValue(999) } } },
         },
       },
-      newInternalHour: {
-        name: { required },
-      },
-      newSector: {
-        name: { required, sector },
-      },
-      editedSector: {
-        name: { required, sector },
-      },
+      newInternalHour: { name: { required } },
+      newAdministrativeDocument: { name: { required }, file: { required } },
+      newSector: { name: { required, sector } },
+      editedSector: { name: { required, sector } },
     }
   },
   async mounted () {
@@ -304,6 +354,7 @@ export default {
 
     await this.refreshInternalHours();
     await this.getSectors();
+    await this.getAdministrativeDocuments();
   },
   methods: {
     async updateCompanyTransportSubs (params) {
@@ -342,6 +393,10 @@ export default {
     resetInternalHourCreationModal () {
       this.newInternalHour = { name: '' };
       this.$v.newInternalHour.$reset();
+    },
+    resetAdministrativeDocumentModal () {
+      this.newAdministrativeDocument = { name: '', file: null };
+      this.$v.newAdministrativeDocument.$reset();
     },
     async refreshInternalHours () {
       try {
@@ -492,6 +547,62 @@ export default {
     sectorNameError (obj) {
       if (!obj.name.required) return REQUIRED_LABEL;
       else if (!obj.name.sector) return 'Nom déjà existant';
+    },
+    async getAdministrativeDocuments () {
+      try {
+        this.administrativeDocuments = await AdministrativeDocument.list();
+      } catch (e) {
+        console.error(e);
+        this.administrativeDocuments = [];
+        NotifyNegative('Erreur lors de la récupération des documents.')
+      }
+    },
+    formatAdministrativeDocument () {
+      const { file, name } = this.newAdministrativeDocument;
+      const form = new FormData();
+
+      form.append('mimeType', file.type || 'application/octet-stream');
+      form.append('name', name);
+      form.append('file', file);
+
+      return form;
+    },
+    async createNewAdministrativeDocument () {
+      this.$v.newAdministrativeDocument.$touch();
+      if (this.$v.newAdministrativeDocument.$error) return NotifyWarning('Champ(s) invalide(s)');
+      this.loading = true;
+
+      try {
+        await AdministrativeDocument.create(this.formatAdministrativeDocument());
+        this.administrativeDocumentCreationModal = false;
+        NotifyPositive('Document sauvegardé');
+        await this.getAdministrativeDocuments();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative("Erreur lors de l'envoi du document");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async deleteAdministrativeDocument (administrativeDocument) {
+      try {
+        const index = this.getRowIndex(this.administrativeDocuments, administrativeDocument);
+        await AdministrativeDocument.remove(administrativeDocument._id);
+        this.administrativeDocuments.splice(index, 1);
+        NotifyPositive('Document supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du document.');
+      }
+    },
+    validateAdministrativeDocumentDeletion (administrativeDocument) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir supprimer ce document ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteAdministrativeDocument(administrativeDocument))
+        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
 }

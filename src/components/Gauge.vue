@@ -16,9 +16,9 @@
             <stop offset="100%" :stop-color="minimum.color"/>
           </linearGradient>
         </defs>
-        <path :d="this.first" fill="none" stroke="url(#linear)" stroke-width="8" opacity="0.6" />
-        <path :d="this.second" fill="none" stroke="url(#linear2)" stroke-width="8" opacity="0.6" />
-        <path :d="this.third" fill="none" stroke="url(#linear3)" stroke-width="8" opacity="0.6" />
+        <path :d="this.first" fill="none" :stroke="getStrokeUrl('linear')" stroke-width="8" opacity="0.6" />
+        <path :d="this.second" fill="none" :stroke="getStrokeUrl('linear2')" stroke-width="8" opacity="0.6" />
+        <path :d="this.third" fill="none" :stroke="getStrokeUrl('linear3')" stroke-width="8" opacity="0.6" />
         <text :x="maximum.x" :y="maximum.y" class="gauge-limit">{{ maximum.value }}%</text>
         <text :x="minimum.x" :y="minimum.y" class="gauge-limit">{{ minimum.value }}%</text>
         <text :x="intermediateMin.x" :y="intermediateMin.y" class="gauge-limit">
@@ -118,6 +118,9 @@ export default {
     setWrapperDimensions () {
       this.$refs.wrapper.style.width = `${2 * this.radius}px`;
       this.$refs.wrapper.style.height = `${this.radius}px`;
+    },
+    getStrokeUrl (id) {
+      return `url(${this.$route.fullPath}#${id})`
     },
     roundFrenchPercentage,
   },

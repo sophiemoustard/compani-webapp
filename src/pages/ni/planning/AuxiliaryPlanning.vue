@@ -8,13 +8,13 @@
       @updateFeeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent="newEvent" :customers="customers"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :customers="customers"
       :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
       :activeAuxiliaries="activeAuxiliaries" @resetForm="resetCreationForm" @createEvent="validateCreationEvent"
       @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
       :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="validateEventDeletion"
@@ -254,15 +254,13 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        address: {},
+        address: { fullAddress: '' },
         attachment: {},
         auxiliary: person ? person._id : '',
         sector: person ? person.sector._id : sectorId,
         dates: {
-          startDate: selectedDay.toISOString(),
-          startHour: '08:00',
-          endDate: selectedDay.toISOString(),
-          endHour: '10:00',
+          startDate: this.$moment(selectedDay).hours(8).toISOString(),
+          endDate: this.$moment(selectedDay).hours(10).toISOString(),
         },
       };
       this.creationModal = true;

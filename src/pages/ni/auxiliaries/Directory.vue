@@ -73,6 +73,7 @@
 <script>
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
+import Roles from '../../../api/Roles';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
@@ -83,7 +84,7 @@ import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
 import Modal from '../../../components/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
-import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT, REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 export default {
   metaInfo: { title: 'Répertoire auxiliaires' },
@@ -293,7 +294,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await this.$users.list({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const users = await this.$users.list({ role: AUXILIARY_ROLES });
         this.userList = users.map((user) => {
           const hiringDate = this.getHiringDate(user);
           if (user.isActive) {
@@ -361,7 +362,7 @@ export default {
     async createAlenviUser () {
       const folderId = this.$_.get(this.company, 'auxiliariesFolderId', null);
       if (!folderId) throw new Error('No auxiliary folder in company drive');
-      const roles = await this.$roles.showAll({ name: AUXILIARY });
+      const roles = await Roles.list({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
 
       const payload = this.formatPayloadForUserCreation(roles);

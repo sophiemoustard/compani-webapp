@@ -46,7 +46,7 @@ export const contractMixin = {
       return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
     userFullName () {
-      return `${this.getUser.identity.firstname} ${this.getUser.identity.lastname}`;
+      return `${this.auxiliary.identity.firstname} ${this.auxiliary.identity.lastname}`;
     },
     esignRedirection () {
       return {
@@ -66,7 +66,7 @@ export const contractMixin = {
       const signers = [{
         id: '1',
         name: this.userFullName,
-        email: this.getUser.local.email,
+        email: this.auxiliary.local.email,
       }];
       signers.push({ id: `${signers.length + 1}`, name: signer.name, email: signer.email });
       return signers;
@@ -80,10 +80,10 @@ export const contractMixin = {
       const signature = {
         ...this.esignRedirection,
         templateId: template.driveId,
-        meta: { status: contract.status, auxiliaryDriveId: this.getUser.administrative.driveFolder.driveId },
+        meta: { status: contract.status, auxiliaryDriveId: this.auxiliary.administrative.driveFolder.driveId },
         fields: generateContractFields(
           contract.status,
-          { user: this.getUser, contract: contract, initialContractStartDate: this.selectedContract.startDate }
+          { user: this.auxiliary, contract: contract, initialContractStartDate: this.selectedContract.startDate }
         ),
       }
 
