@@ -29,7 +29,7 @@
       <ni-menu-item name="dashboard" icon="dashboard" label="Tableau de bord" />
     </q-expansion-item>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" isAuxiliary />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" @myClick="connectToBotMessenger" is-auxiliary />
   </q-list>
 </template>
 
