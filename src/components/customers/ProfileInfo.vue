@@ -131,7 +131,7 @@
                       field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
-                  <q-btn v-else flat round small color="primary" type="a" :href="getMandateLink(props.row)" download
+                  <q-btn v-else flat round small color="primary" type="a" :href="getMandateLink(props.row)"
                     target="_blank" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
@@ -210,7 +210,7 @@
                       field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
                       @failed="failMsg" />
                   </div>
-                  <q-btn v-else flat round small color="primary" type="a" :href="getQuoteLink(props.row)" download
+                  <q-btn v-else flat round small color="primary" type="a" :href="getQuoteLink(props.row)"
                     target="_blank" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
