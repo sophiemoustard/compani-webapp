@@ -5,9 +5,7 @@ import store from '../store/index';
 import alenvi from '../helpers/alenvi';
 import { HELPER, AUXILIARY_ROLES, COACH_ROLES, AUXILIARY_WITHOUT_COMPANY } from '../data/constants.js';
 
-const isAuxiliaryWithoutCompany = (user) => {
-  return user.role.name === AUXILIARY_WITHOUT_COMPANY;
-};
+const isAuxiliaryWithoutCompany = user => user.role.name === AUXILIARY_WITHOUT_COMPANY;
 
 const routes = [
   {
