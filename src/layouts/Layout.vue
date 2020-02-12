@@ -57,10 +57,14 @@ export default {
       return this.$store.state.main.toggleDrawer;
     },
     sidemenusRefs () {
-      if (this.user && !this.isAuxiliary) {
-        return 'defaultMenu';
+      if (this.user && this.isAuxiliary) {
+        return 'auxiliaryMenu';
+      } else if (this.user && this.isCoach) {
+        return 'coachMenu'
+      } else if (this.user && this.user.role.name === HELPER) {
+        return 'helperMenu';
       }
-      return 'auxiliaryMenu';
+      return 'defaultMenu';
     },
   },
   methods: {

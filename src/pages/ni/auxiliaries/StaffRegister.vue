@@ -30,9 +30,7 @@ import LargeTable from '../../../components/table/LargeTable';
 
 export default {
   name: 'StaffRegister',
-  metaInfo: {
-    title: 'Registre unique du personnel',
-  },
+  metaInfo: { title: 'Registre unique du personnel' },
   components: {
     'ni-large-table': LargeTable,
   },

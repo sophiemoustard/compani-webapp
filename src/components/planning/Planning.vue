@@ -90,7 +90,6 @@
 <script>
 import {
   PLANNING,
-  AUXILIARY_ROLES,
   INVOICED_AND_PAID,
   SECTOR,
   STAFFING_VIEW_START_HOUR,
@@ -154,7 +153,7 @@ export default {
     }
   },
   beforeDestroy () {
-    if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+    if (this.isCoach) {
       if (!this.isCustomerPlanning) {
         this.$q.localStorage.set('lastSearchAuxiliaries', JSON.stringify(this.terms));
       } else {

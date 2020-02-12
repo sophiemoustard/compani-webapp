@@ -260,6 +260,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'events:read',
+          parent: 'planning',
         },
       },
       {
@@ -270,6 +271,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'events:read',
+          parent: 'planning',
         },
       },
       // Auxiliary view routes
@@ -280,6 +282,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           permissions: 'events:read',
+          parent: 'planning',
         },
       },
       {

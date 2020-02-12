@@ -62,9 +62,7 @@ import { formatPrice, formatIdentity } from '../../../helpers/utils';
 
 export default {
   name: 'ToBill',
-  metaInfo: {
-    title: 'A facturer',
-  },
+  metaInfo: { title: 'A facturer' },
   mixins: [billingMixin, tableMixin],
   components: {
     'ni-to-bill-row': ToBillRow,

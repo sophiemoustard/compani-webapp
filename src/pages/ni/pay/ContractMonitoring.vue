@@ -44,9 +44,7 @@ import VersionEditionModal from '../../../components/contracts/VersionEditionMod
 
 export default {
   name: 'ContractMonitoring',
-  metaInfo: {
-    title: 'Suivi Contrats/Avenants',
-  },
+  metaInfo: { title: 'Suivi Contrats/Avenants' },
   mixins: [contractMixin],
   components: {
     'ni-date-range': DateRange,
