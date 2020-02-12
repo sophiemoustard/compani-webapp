@@ -5,7 +5,7 @@
       <side-menu-coach :ref="sidemenusRefs" v-if="user && isCoach && !isMini"
         :user="user" />
       <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !isMini" :user="user" />
-      <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !isMini" :user="user" />
+      <side-menu-customer :ref="sidemenusRefs" v-if="user && isHelper && !isMini" :user="user" />
       <div :class="[!isMini ? 'q-mini-drawer-hide' : 'q-mini-drawer-only']" class="absolute" >
         <q-btn :class="[!isMini ? 'chevron-left' : 'chevron-right']" class="chevron" dense round unelevated
           :icon="menuIcon" @click="isMini = !isMini" />
@@ -50,6 +50,9 @@ export default {
     isCoach () {
       return COACH_ROLES.includes(this.user.role.name);
     },
+    isHelper () {
+      return this.user.role.name === HELPER;
+    },
     menuIcon () {
       return this.isMini ? 'view_headline' : 'chevron_left';
     },
@@ -61,7 +64,7 @@ export default {
         return 'auxiliaryMenu';
       } else if (this.user && this.isCoach) {
         return 'coachMenu'
-      } else if (this.user && this.user.role.name === HELPER) {
+      } else if (this.user && this.isHelper) {
         return 'helperMenu';
       }
       return 'defaultMenu';
