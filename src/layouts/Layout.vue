@@ -2,7 +2,7 @@
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer"
       @input="toggleMenu">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && !isAuxiliary && user.role.name !== HELPER && !isMini"
+      <side-menu-coach :ref="sidemenusRefs" v-if="user && isCoach && !isMini"
         :user="user" />
       <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !isMini" :user="user" />
       <side-menu-customer :ref="sidemenusRefs" v-if="user && user.role.name === HELPER && !isMini" :user="user" />
@@ -26,7 +26,7 @@ import { mapGetters } from 'vuex'
 import SideMenuCoach from '../components/menu/SideMenuCoach'
 import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
 import SideMenuCustomer from '../components/menu/SideMenuCustomer'
-import { AUXILIARY_ROLES, HELPER } from '../data/constants.js';
+import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from '../data/constants.js';
 
 export default {
   components: {
@@ -46,6 +46,9 @@ export default {
     }),
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.user.role.name);
+    },
+    isCoach () {
+      return COACH_ROLES.includes(this.user.role.name);
     },
     menuIcon () {
       return this.isMini ? 'view_headline' : 'chevron_left';
