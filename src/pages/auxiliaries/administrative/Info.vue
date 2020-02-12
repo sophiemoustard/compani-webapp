@@ -16,9 +16,7 @@ export default {
   components: {
     ProfileInfo,
   },
-  metaInfo: {
-    title: 'Infos personnelles',
-  },
+  metaInfo: { title: 'Infos personnelles' },
   computed: {
     currentUser () {
       return this.$store.getters['main/user'];

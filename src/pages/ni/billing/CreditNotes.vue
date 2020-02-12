@@ -168,9 +168,7 @@ import { COMPANI } from '../../../data/constants';
 
 export default {
   name: 'CreditNotes',
-  metaInfo: {
-    title: 'Avoirs',
-  },
+  metaInfo: { title: 'Avoirs' },
   components: {
     'ni-date-input': DateInput,
     'ni-input': Input,

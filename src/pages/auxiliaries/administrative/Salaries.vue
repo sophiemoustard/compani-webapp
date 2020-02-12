@@ -16,9 +16,7 @@ export default {
   components: {
     'profile-pay': ProfilePay,
   },
-  metaInfo: {
-    title: 'Documents de paie',
-  },
+  metaInfo: { title: 'Documents de paie' },
   computed: {
     currentUser () {
       return this.$store.getters['main/user'];

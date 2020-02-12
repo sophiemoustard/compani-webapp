@@ -21,7 +21,7 @@
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
+import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER, SECTOR, COACH_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
@@ -112,7 +112,7 @@ export default {
     initFilters () {
       if (this.targetedCustomer) {
         this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedCustomer.identity, 'FL')]);
-      } else if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+      } else if (COACH_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);

@@ -39,9 +39,7 @@ import { NotifyNegative } from '../../../components/popup/notify';
 
 export default {
   name: 'CustomersFundingsMonitoring',
-  metaInfo: {
-    title: 'Suivi des plans d\'aide',
-  },
+  metaInfo: { title: 'Suivi des plans d\'aide' },
   components: {
     'ni-large-table': LargeTable,
     'ni-title-header': TitleHeader,

@@ -5,7 +5,7 @@
         <p class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
-      <div v-if="user.role.name === HELPER" class="message">
+      <div v-if="isHelper" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
@@ -137,12 +137,7 @@ export default {
       tppDocuments: [],
       billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
       balances: [],
-      COACH_ROLES,
-      ADMIN_ROLES,
-      CUSTOMER,
-      THIRD_PARTY_PAYER,
       editedPayment: {},
-      HELPER,
       taxCertificates: [],
       taxCertificatesColumns: [
         {
@@ -194,6 +189,9 @@ export default {
         startDate: this.billingDates.startDate,
         endDate: this.billingDates.endDate,
       };
+    },
+    isHelper () {
+      return HELPER === this.user.role.name;
     },
     isAdmin () {
       return ADMIN_ROLES.includes(this.user.role.name);

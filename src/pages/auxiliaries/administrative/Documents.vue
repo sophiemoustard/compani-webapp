@@ -29,9 +29,7 @@ import AdministrativeDocument from '../../../api/AdministrativeDocuments'
 import get from 'lodash/get'
 
 export default {
-  metaInfo: {
-    title: 'Documents',
-  },
+  metaInfo: { title: 'Documents' },
   components: {
     'ni-large-table': LargeTable,
   },

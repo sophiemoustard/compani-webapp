@@ -25,9 +25,7 @@ export default {
     id: { type: String },
     customerId: { type: String },
   },
-  metaInfo: {
-    title: 'Fiche bénéficiaire',
-  },
+  metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
     customer () {
       return this.$store.getters['rh/getUserProfile'];

@@ -16,9 +16,7 @@ export default {
   components: {
     'ni-contracts': Contracts,
   },
-  metaInfo: {
-    title: 'Contrats',
-  },
+  metaInfo: { title: 'Contrats' },
   data () {
     return {
       AUXILIARY,
