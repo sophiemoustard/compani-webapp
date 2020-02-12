@@ -126,7 +126,7 @@ export const CANCELLATION_REASONS = [
 
 // ROLES
 export const COACH = 'coach';
-export const adminClient = 'adminClient';
+export const ADMIN_CLIENT = 'adminClient';
 export const SUPER_ADMIN = 'superAdmin';
 export const CUSTOMER = 'customer';
 export const AUXILIARY = 'auxiliary';
@@ -134,8 +134,8 @@ export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planningReferent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliaryWithoutCompany'
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
-export const COACH_ROLES = [SUPER_ADMIN, adminClient, COACH];
-export const ADMIN_ROLES = [SUPER_ADMIN, adminClient];
+export const COACH_ROLES = [SUPER_ADMIN, ADMIN_CLIENT, COACH];
+export const ADMIN_ROLES = [SUPER_ADMIN, ADMIN_CLIENT];
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
