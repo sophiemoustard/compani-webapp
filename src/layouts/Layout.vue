@@ -60,13 +60,12 @@ export default {
       return this.$store.state.main.toggleDrawer;
     },
     sidemenusRefs () {
-      if (this.user && this.isAuxiliary) {
-        return 'auxiliaryMenu';
-      } else if (this.user && this.isCoach) {
-        return 'coachMenu'
-      } else if (this.user && this.isHelper) {
-        return 'helperMenu';
-      }
+      if (!this.user) return 'defaultMenu'
+
+      if (this.isAuxiliary) return 'auxiliaryMenu';
+      if (this.isCoach) return 'coachMenu'
+      if (this.isHelper) return 'helperMenu';
+
       return 'defaultMenu';
     },
   },
