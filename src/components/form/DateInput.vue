@@ -28,6 +28,7 @@ export default {
     errorLabel: { type: String, default: REQUIRED_LABEL },
     value: { type: String, default: '' },
     min: { type: String, default: '' },
+    max: { type: String, default: '' },
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
@@ -45,8 +46,11 @@ export default {
   },
   methods: {
     dateOptions (date) {
-      if (this.min) return date >= this.$moment(this.min).format('YYYY/MM/DD');
-      else return true;
+      let isBeforeMax = true;
+      let isAfterMin = true;
+      if (this.min) isAfterMin = date >= this.$moment(this.min).format('YYYY/MM/DD');
+      if (this.max) isBeforeMax = date <= this.$moment(this.max).format('YYYY/MM/DD');
+      return isAfterMin && isBeforeMax;
     },
     select (value) {
       const momentValue = this.$moment(value, 'YYYY/MM/DD', true)

@@ -6,10 +6,11 @@
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
       <div class="date-container justify-center items-center row">
-        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" />
+        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" :min="min"
+          @blur="blur" />
         <p class="delimiter">-</p>
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          :min="value.startDate" />
+          :min="value.startDate" :max="max" @blur="blur" />
       </div>
     </q-field>
   </div>
@@ -25,10 +26,20 @@ export default {
   },
   props: {
     caption: { type: String, default: '' },
-    value: { type: Object, default: function () { return { startDate: this.$moment().startOf('d').toISOString(), endDate: this.$moment().endOf('d').toISOString() } } },
+    value: {
+      type: Object,
+      default: function () {
+        return {
+          startDate: this.$moment().startOf('d').toISOString(),
+          endDate: this.$moment().endOf('d').toISOString(),
+        };
+      },
+    },
     requiredField: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
+    min: { type: String, default: '' },
+    max: { type: String, default: '' },
   },
   methods: {
     update (value, key) {
@@ -40,6 +51,9 @@ export default {
         };
       }
       this.$emit('input', dates);
+    },
+    blur () {
+      this.$emit('blur');
     },
   },
 }
