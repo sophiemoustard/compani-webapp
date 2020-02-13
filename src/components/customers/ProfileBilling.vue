@@ -23,7 +23,7 @@
         :endBalance="getEndBalance(tpp.documents, tpp)" />
       <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
-          @click="openPaymentCreationModal(customer, tpp.documents[0].client)" />
+          @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg">
@@ -54,12 +54,12 @@
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
-      :selectedClientName="selectedClientName" v-model="paymentCreationModal" :validations="$v.newPayment"
+      :selected-client-name="selectedClientName" v-model="paymentCreationModal" :validations="$v.newPayment"
       @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
-      v-model="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
+      v-model="paymentEditionModal" :selectedCustomer="selectedCustomer" :selected-client-name="selectedClientName"
       @updatePayment="updatePayment" @resetForm="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
@@ -324,13 +324,6 @@ export default {
         _id: document.thirdPartyPayer._id,
       };
     },
-    newPaymentList (document) {
-      return {
-        documents: [document],
-        name: document.client.name,
-        _id: document.client._id,
-      };
-    },
     formatDocumentList () {
       this.customerDocuments = [];
       const tppDocuments = {};
@@ -354,10 +347,10 @@ export default {
       }
 
       for (const payment of this.payments) {
-        if (!payment.client) this.customerDocuments.push(payment);
-        else if (payment.client._id && !tppDocuments[payment.client._id]) {
-          tppDocuments[payment.client._id] = this.newPaymentList(payment);
-        } else tppDocuments[payment.client._id].documents.push(payment);
+        if (!payment.thirdPartyPayer) this.customerDocuments.push(payment);
+        else if (payment.thirdPartyPayer._id && !tppDocuments[payment.thirdPartyPayer._id]) {
+          tppDocuments[payment.thirdPartyPayer._id] = this.newDocumentList(payment);
+        } else tppDocuments[payment.thirdPartyPayer._id].documents.push(payment);
       }
 
       this.tppDocuments = Object.values(tppDocuments);
@@ -392,7 +385,9 @@ export default {
 
       this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      this.selectedClientName = payment.client ? payment.client.name : formatIdentity(payment.customer.identity, 'FL');
+      this.selectedClientName = payment.thirdPartyPayer
+        ? payment.thirdPartyPayer.name
+        : formatIdentity(payment.customer.identity, 'FL');
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;

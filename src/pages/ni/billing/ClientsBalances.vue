@@ -45,7 +45,7 @@
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal v-model="paymentCreationModal" :newPayment="newPayment" :validations="$v.newPayment"
-      :selectedClientName="selectedClientName" :loading="creationLoading" @resetForm="resetPaymentCreationModal"
+      :selected-client-name="selectedClientName" :loading="creationLoading" @resetForm="resetPaymentCreationModal"
       @createPayment="createPayment" :selectedCustomer="selectedCustomer" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"

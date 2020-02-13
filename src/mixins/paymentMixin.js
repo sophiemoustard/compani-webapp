@@ -1,3 +1,4 @@
+import omit from 'lodash/omit';
 import { required } from 'vuelidate/lib/validators';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '../data/constants';
 import { formatIdentity } from '../helpers/utils.js';
@@ -50,11 +51,9 @@ export const paymentMixin = {
       this.$v.newPayment.$reset();
     },
     formatPayload (payment) {
-      const payload = { ...payment };
+      const payload = omit(payment, ['client']);
 
-      if (payload.customer === payload.client) {
-        delete payload.client
-      }
+      if (payment.customer !== payment.client) payload.thirdPartyPayer = payment.client;
 
       return payload;
     },
