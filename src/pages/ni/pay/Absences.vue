@@ -30,7 +30,7 @@
     </ni-large-table>
 
     <!-- Absence edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent="editedEvent"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
       :editionModal="editionModal" :personKey="personKey" :activeAuxiliaries="activeAuxiliaries"
       @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded"
       @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="validateEventDeletion" />

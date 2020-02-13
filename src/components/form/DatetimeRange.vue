@@ -69,7 +69,12 @@ export default {
     },
     setDateHours (date, hour) {
       const splitHour = hour.split(':');
-      return this.$moment(date).set({ hours: Number.parseInt(splitHour[0]), minutes: Number.parseInt(splitHour[1]) }).toISOString();
+      return this.$moment(date).set({
+        hours: Number.parseInt(splitHour[0]),
+        minutes: Number.parseInt(splitHour[1]),
+        seconds: 0,
+        milliseconds: 0,
+      }).toISOString();
     },
     update (value, key) {
       const dates = { ...this.value, [key]: value }
