@@ -218,6 +218,7 @@ export const PAY = 'pay';
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
 export const FUNDING = 'funding';
+export const RUP = 'rup';
 export const WORKING_EVENT = 'working_event';
 export const EXPORT_TYPES = [
   { label: 'Services', value: SERVICE },
@@ -227,6 +228,7 @@ export const EXPORT_TYPES = [
   { label: 'Bénéficiaires', value: CUSTOMER },
   { label: 'Aidants', value: HELPER },
   { label: 'Equipes', value: SECTOR },
+  { label: 'Registre unique du personnel', value: RUP },
 ];
 export const EXPORT_HISTORY_TYPES = [
   { label: 'Interventions et heures internes', value: WORKING_EVENT },
