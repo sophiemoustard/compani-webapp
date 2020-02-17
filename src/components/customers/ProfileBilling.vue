@@ -171,6 +171,8 @@ export default {
       },
       taxCertificateModal: false,
       REQUIRED_LABEL,
+      CUSTOMER,
+      THIRD_PARTY_PAYER,
     }
   },
   computed: {
@@ -318,6 +320,13 @@ export default {
     newDocumentList (document) {
       return {
         documents: [document],
+        name: document.thirdPartyPayer.name,
+        _id: document.thirdPartyPayer._id,
+      };
+    },
+    newPaymentList (document) {
+      return {
+        documents: [document],
         name: document.client.name,
         _id: document.client._id,
       };
@@ -328,22 +337,27 @@ export default {
 
       for (const bill of this.bills) {
         bill.type = BILL;
-        if (!bill.client) this.customerDocuments.push(bill);
-        else if (bill.client._id && !tppDocuments[bill.client._id]) tppDocuments[bill.client._id] = this.newDocumentList(bill);
-        else tppDocuments[bill.client._id].documents.push(bill);
+        if (!bill.thirdPartyPayer) this.customerDocuments.push(bill);
+        else if (bill.thirdPartyPayer._id && !tppDocuments[bill.thirdPartyPayer._id]) {
+          tppDocuments[bill.thirdPartyPayer._id] = this.newDocumentList(bill);
+        } else tppDocuments[bill.thirdPartyPayer._id].documents.push(bill);
       }
 
       for (const cd of this.creditNotes) {
         cd.type = CREDIT_NOTE;
         if (cd.inclTaxesCustomer) this.customerDocuments.push(cd);
-        else if (cd.inclTaxesTpp && !tppDocuments[cd.thirdPartyPayer._id]) tppDocuments[cd.client._id] = this.newDocumentList(cd);
-        else if (cd.inclTaxesTpp && tppDocuments[cd.thirdPartyPayer._id]) tppDocuments[cd.thirdPartyPayer._id].documents.push(cd);
+        else if (cd.inclTaxesTpp && !tppDocuments[cd.thirdPartyPayer._id]) {
+          tppDocuments[cd.thirdPartyPayer._id] = this.newDocumentList(cd);
+        } else if (cd.inclTaxesTpp && tppDocuments[cd.thirdPartyPayer._id]) {
+          tppDocuments[cd.thirdPartyPayer._id].documents.push(cd);
+        }
       }
 
       for (const payment of this.payments) {
         if (!payment.client) this.customerDocuments.push(payment);
-        else if (payment.client._id && !tppDocuments[payment.client._id]) tppDocuments[payment.client._id] = this.newDocumentList(payment);
-        else tppDocuments[payment.client._id].documents.push(payment);
+        else if (payment.client._id && !tppDocuments[payment.client._id]) {
+          tppDocuments[payment.client._id] = this.newPaymentList(payment);
+        } else tppDocuments[payment.client._id].documents.push(payment);
       }
 
       this.tppDocuments = Object.values(tppDocuments);
