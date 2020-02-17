@@ -19,16 +19,31 @@
       <div class="row justify-center">
         <q-btn big color="primary" @click="logout">Déconnexion</q-btn>
       </div>
+      <a href="#cgs" @click.prevent="rgpdModal = true">Politique RGPD</a>
     </div>
+
+    <!-- CSG modal -->
+    <q-dialog v-model="rgpdModal" full-height full-width>
+      <q-card class="full-height" style="width: 80vw">
+        <q-card-section class="row justify-between">
+          <h5 class="q-ml-md q-mb-xs">Politique RGPD</h5>
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="rgpdModal = false" />
+        </q-card-section>
+        <q-card-section>
+          <div v-html="rgpd" class="modal-padding"></div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
 import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 import Input from '../components/form/Input';
 import { AUXILIARY_WITHOUT_COMPANY } from '../data/constants';
-import get from 'lodash/get';
+import rgpd from '../statics/rgpd.html';
 
 export default {
   metaInfo: { title: 'Mon compte' },
@@ -46,6 +61,8 @@ export default {
         alenvi: {},
         contracts: [],
       },
+      rgpd,
+      rgpdModal: false,
     }
   },
   validations: {
