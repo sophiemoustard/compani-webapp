@@ -13,15 +13,11 @@
 </template>
 
 <script>
-import { AUXILIARY } from '../../../data/constants.js';
 import { formatIdentity } from '../../../helpers/utils';
 import DirectoryHeader from '../../../components/DirectoryHeader';
 
 export default {
   name: 'AuxiliaryCustomersDirectory',
-  props: {
-    role: { type: String, default: AUXILIARY },
-  },
   metaInfo: { title: 'Bénéficiaires' },
   components: {
     'ni-directory-header': DirectoryHeader,

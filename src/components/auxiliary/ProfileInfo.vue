@@ -288,7 +288,7 @@ import gdrive from '../../api/GoogleDrive';
 import cloudinary from '../../api/Cloudinary';
 import nationalities from '../../data/nationalities';
 import countries from '../../data/countries';
-import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES } from '../../data/constants';
+import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES, AUXILIARY_ROLES } from '../../data/constants';
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input';
 import Select from '../form/Select';
@@ -624,7 +624,7 @@ export default {
       return 'Adresse non valide';
     },
     isAuxiliary () {
-      return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
+      return AUXILIARY_ROLES.includes(this.mainUser.role.name);
     },
     isCoach () {
       return COACH_ROLES.includes(this.mainUser.role.name);

@@ -1,11 +1,9 @@
 <template>
   <q-layout view="hhh Lpr lff">
-    <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer"
-      @input="toggleMenu">
-      <side-menu-coach :ref="sidemenusRefs" v-if="user && isCoach && !isMini"
-        :user="user" />
-      <side-menu-auxiliary :ref="sidemenusRefs" v-if="user && isAuxiliary && !isMini" :user="user" />
-      <side-menu-customer :ref="sidemenusRefs" v-if="user && isHelper && !isMini" :user="user" />
+    <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer" @input="toggleMenu">
+      <side-menu-coach :ref="sidemenusRefs" v-if="isCoach && !isMini" :user="user" />
+      <side-menu-auxiliary :ref="sidemenusRefs" v-if="isAuxiliary && !isMini" :user="user" />
+      <side-menu-customer :ref="sidemenusRefs" v-if="isHelper && !isMini" :user="user" />
       <div :class="[!isMini ? 'q-mini-drawer-hide' : 'q-mini-drawer-only']" class="absolute" >
         <q-btn :class="[!isMini ? 'chevron-left' : 'chevron-right']" class="chevron" dense round unelevated
           :icon="menuIcon" @click="isMini = !isMini" />
@@ -22,7 +20,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-
+import get from 'lodash/get';
 import SideMenuCoach from '../components/menu/SideMenuCoach'
 import SideMenuAuxiliary from '../components/menu/SideMenuAuxiliary'
 import SideMenuCustomer from '../components/menu/SideMenuCustomer'
@@ -44,14 +42,17 @@ export default {
     ...mapGetters({
       user: 'main/user',
     }),
+    userRole () {
+      return get(this.user, 'role.name') || null;
+    },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.user.role.name);
+      return AUXILIARY_ROLES.includes(this.userRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.user.role.name);
+      return COACH_ROLES.includes(this.userRole);
     },
     isHelper () {
-      return this.user.role.name === HELPER;
+      return this.userRole === HELPER;
     },
     menuIcon () {
       return this.isMini ? 'view_headline' : 'chevron_left';
@@ -75,9 +76,7 @@ export default {
     },
   },
   beforeRouteUpdate (to, from, next) {
-    if (this.toggleDrawer && !this.isMini) {
-      this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
-    }
+    if (this.toggleDrawer && !this.isMini) this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
 
     next();
   },

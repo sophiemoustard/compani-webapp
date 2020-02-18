@@ -7,10 +7,9 @@ export const checkPermission = (to, user) => {
       if (user.role && user.role.rights) {
         const rights = user.role.rights.map(right => right.permission);
 
-        const count =
-          typeof to.meta.permissions === 'string'
-            ? rights.includes(to.meta.permissions)
-            : intersection(rights, to.meta.permissions).length;
+        const count = typeof to.meta.permissions === 'string'
+          ? rights.includes(to.meta.permissions)
+          : intersection(rights, to.meta.permissions).length;
 
         return !!count;
       } else {

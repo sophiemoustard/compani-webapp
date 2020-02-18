@@ -30,13 +30,13 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Users from '../../api/Users';
 import Customers from '../../api/Customers';
 import CompaniHeader from '../../components/CompaniHeader';
 import Input from '../../components/form/Input';
 import { NotifyNegative } from '../../components/popup/notify';
 import { HELPER, AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from '../../data/constants.js';
-import get from 'lodash/get';
 
 export default {
   metaInfo: {
@@ -60,14 +60,14 @@ export default {
     }
   },
   computed: {
-    getUser () {
+    mainUser () {
       return this.$store.getters['main/user'];
     },
     isAuxiliary () {
-      return this.getUser ? AUXILIARY_ROLES.includes(this.getUser.role.name) : false;
+      return this.mainUser ? AUXILIARY_ROLES.includes(this.mainUser.role.name) : false;
     },
     isAuxiliaryWithoutCompany () {
-      return get(this, 'getUser.role.name', null) === AUXILIARY_WITHOUT_COMPANY;
+      return get(this, 'mainUser.role.name', null) === AUXILIARY_WITHOUT_COMPANY;
     },
   },
   methods: {
@@ -91,16 +91,14 @@ export default {
 
         if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 
-        if (this.getUser.role.name === HELPER) {
-          const customer = await Customers.getById(this.getUser.customers[0]._id);
+        if (this.mainUser.role.name === HELPER) {
+          const customer = await Customers.getById(this.mainUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
-        } else if (this.isAuxiliary) {
-          if (this.isAuxiliaryWithoutCompany) this.$router.replace({ name: 'account info', params: { id: this.getUser._id } });
-          else this.$router.replace({ name: 'auxiliary agenda' });
-        } else {
-          this.$router.replace({ name: 'auxiliaries directory' });
-        }
+        } else if (this.isAuxiliaryWithoutCompany) {
+          this.$router.replace({ name: 'account info', params: { id: this.mainUser._id } });
+        } else if (this.isAuxiliary) this.$router.replace({ name: 'auxiliary agenda' });
+        else this.$router.replace({ name: 'auxiliaries directory' });
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');
         console.error(e);
