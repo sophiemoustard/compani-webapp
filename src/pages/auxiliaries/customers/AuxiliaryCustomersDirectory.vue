@@ -13,6 +13,7 @@
 </template>
 
 <script>
+import Customers from '../../../api/Customers';
 import { formatIdentity } from '../../../helpers/utils';
 import DirectoryHeader from '../../../components/DirectoryHeader';
 
@@ -69,7 +70,7 @@ export default {
     async getCustomersList () {
       try {
         this.tableLoading = true;
-        const customers = await this.$customers.list();
+        const customers = await Customers.list();
         this.customersList = customers.map(customer => ({
           identity: { ...customer.identity, fullName: formatIdentity(customer.identity, 'FL') },
           customerId: customer._id,
