@@ -105,7 +105,7 @@
     <q-dialog ref="modal" v-model="cgsModal" full-height>
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-between">
-          <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
+          <h5 class="q-ml-md q-mb-xs">Conditions Générales de Service Alenvi</h5>
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
         </q-card-section>
         <q-card-section>

@@ -19,16 +19,50 @@
       <div class="row justify-center">
         <q-btn big color="primary" @click="logout">Déconnexion</q-btn>
       </div>
+      <div class="q-mt-md links">
+        <div class="cursor-pointer q-mb-sm">
+          <a @click.prevent="cguModal = true">Conditions générales d’utilisation</a>
+        </div>
+        <div class="cursor-pointer"><a @click.prevent="rgpdModal = true">Politique RGPD</a></div>
+      </div>
     </div>
+
+    <!-- RGPD modal -->
+    <q-dialog v-model="rgpdModal" full-height full-width>
+      <q-card class="full-height" style="width: 80vw">
+        <q-card-section class="row justify-between">
+          <h5 class="q-ml-md q-mb-xs">Politique RGPD</h5>
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="rgpdModal = false" />
+        </q-card-section>
+        <q-card-section>
+          <div v-html="rgpd" class="modal-padding"></div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
+
+    <!-- CSU modal -->
+    <q-dialog v-model="cguModal" full-height full-width>
+      <q-card class="full-height" style="width: 80vw">
+        <q-card-section class="row justify-between">
+          <h5 class="q-ml-md q-mb-xs">Conditions générales d’utilisation</h5>
+          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cguModal = false" />
+        </q-card-section>
+        <q-card-section>
+          <div v-html="cguCompani" class="modal-padding"></div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
 import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 import Input from '../components/form/Input';
 import { AUXILIARY_WITHOUT_COMPANY } from '../data/constants';
-import get from 'lodash/get';
+import rgpd from '../statics/rgpd.html';
+import cguCompani from '../statics/cguCompani.html';
 
 export default {
   metaInfo: { title: 'Mon compte' },
@@ -46,6 +80,10 @@ export default {
         alenvi: {},
         contracts: [],
       },
+      rgpd,
+      rgpdModal: false,
+      cguModal: false,
+      cguCompani,
     }
   },
   validations: {
@@ -113,4 +151,7 @@ export default {
     max-width: 40%
     @media screen && (max-width: 600px)
       max-width: 100%
+  .links
+    display: flex
+    flex-direction: column
 </style>
