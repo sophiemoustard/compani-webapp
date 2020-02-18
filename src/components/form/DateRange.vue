@@ -43,14 +43,7 @@ export default {
   },
   methods: {
     update (value, key) {
-      let dates = { ...this.value, [key]: value }
-      if (this.$moment(dates.startDate).isAfter(this.$moment(dates.endDate))) {
-        dates = {
-          startDate: dates.startDate,
-          endDate: this.$moment(dates.startDate).endOf('d').toISOString(),
-        };
-      }
-      this.$emit('input', dates);
+      this.$emit('input', { ...this.value, [key]: value });
     },
     blur () {
       this.$emit('blur');
