@@ -43,10 +43,8 @@
                 flat size="1rem" />
               <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
                 @click="uploadImage" round flat size="1rem" />
-              <a :href="pictureDlLink(hasPicture)" target="_blank">
-                <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt"
-                  size="1rem" />
-              </a>
+              <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt"
+                size="1rem" type="a" :href="pictureDlLink(hasPicture)" target="_blank" />
             </div>
           </div>
         </div>

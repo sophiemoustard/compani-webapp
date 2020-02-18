@@ -67,9 +67,7 @@ import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPerce
 
 export default {
   name: 'ClientsBalances',
-  metaInfo: {
-    title: 'Balances clients',
-  },
+  metaInfo: { title: 'Balances clients' },
   components: {
     'ni-large-table': LargeTable,
     'ni-prefixed-cell-content': PrefixedCellContent,

@@ -28,7 +28,7 @@ import EventCreationModal from '../../../components/planning/EventCreationModal'
 import EventEditionModal from '../../../components/planning/EventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
-import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, AUXILIARY_ROLES } from '../../../data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES } from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '../../../components/popup/notify';
 import { formatIdentity } from '../../../helpers/utils';
@@ -136,7 +136,7 @@ export default {
     initFilters () {
       if (this.targetedAuxiliary) {
         this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
-      } else if (!AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+      } else if (COACH_ROLES.includes(this.mainUser.role.name)) {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);

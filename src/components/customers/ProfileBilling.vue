@@ -5,7 +5,7 @@
         <p class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
-      <div v-if="user.role.name === HELPER" class="message">
+      <div v-if="isHelper" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
@@ -35,11 +35,8 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary">
-                    <a :href="taxCertificatesUrl(props.row)" target="_blank">
-                      <q-icon name="file_download" />
-                    </a>
-                  </q-btn>
+                  <q-btn flat round small color="primary" type="a" :href="taxCertificatesUrl(props.row)"
+                    target="_blank" icon="file_download" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
@@ -140,12 +137,7 @@ export default {
       tppDocuments: [],
       billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
       balances: [],
-      COACH_ROLES,
-      ADMIN_ROLES,
-      CUSTOMER,
-      THIRD_PARTY_PAYER,
       editedPayment: {},
-      HELPER,
       taxCertificates: [],
       taxCertificatesColumns: [
         {
@@ -179,6 +171,8 @@ export default {
       },
       taxCertificateModal: false,
       REQUIRED_LABEL,
+      CUSTOMER,
+      THIRD_PARTY_PAYER,
     }
   },
   computed: {
@@ -197,6 +191,9 @@ export default {
         startDate: this.billingDates.startDate,
         endDate: this.billingDates.endDate,
       };
+    },
+    isHelper () {
+      return HELPER === this.user.role.name;
     },
     isAdmin () {
       return ADMIN_ROLES.includes(this.user.role.name);
@@ -323,6 +320,13 @@ export default {
     newDocumentList (document) {
       return {
         documents: [document],
+        name: document.thirdPartyPayer.name,
+        _id: document.thirdPartyPayer._id,
+      };
+    },
+    newPaymentList (document) {
+      return {
+        documents: [document],
         name: document.client.name,
         _id: document.client._id,
       };
@@ -333,22 +337,27 @@ export default {
 
       for (const bill of this.bills) {
         bill.type = BILL;
-        if (!bill.client) this.customerDocuments.push(bill);
-        else if (bill.client._id && !tppDocuments[bill.client._id]) tppDocuments[bill.client._id] = this.newDocumentList(bill);
-        else tppDocuments[bill.client._id].documents.push(bill);
+        if (!bill.thirdPartyPayer) this.customerDocuments.push(bill);
+        else if (bill.thirdPartyPayer._id && !tppDocuments[bill.thirdPartyPayer._id]) {
+          tppDocuments[bill.thirdPartyPayer._id] = this.newDocumentList(bill);
+        } else tppDocuments[bill.thirdPartyPayer._id].documents.push(bill);
       }
 
       for (const cd of this.creditNotes) {
         cd.type = CREDIT_NOTE;
         if (cd.inclTaxesCustomer) this.customerDocuments.push(cd);
-        else if (cd.inclTaxesTpp && !tppDocuments[cd.thirdPartyPayer._id]) tppDocuments[cd.client._id] = this.newDocumentList(cd);
-        else if (cd.inclTaxesTpp && tppDocuments[cd.thirdPartyPayer._id]) tppDocuments[cd.thirdPartyPayer._id].documents.push(cd);
+        else if (cd.inclTaxesTpp && !tppDocuments[cd.thirdPartyPayer._id]) {
+          tppDocuments[cd.thirdPartyPayer._id] = this.newDocumentList(cd);
+        } else if (cd.inclTaxesTpp && tppDocuments[cd.thirdPartyPayer._id]) {
+          tppDocuments[cd.thirdPartyPayer._id].documents.push(cd);
+        }
       }
 
       for (const payment of this.payments) {
         if (!payment.client) this.customerDocuments.push(payment);
-        else if (payment.client._id && !tppDocuments[payment.client._id]) tppDocuments[payment.client._id] = this.newDocumentList(payment);
-        else tppDocuments[payment.client._id].documents.push(payment);
+        else if (payment.client._id && !tppDocuments[payment.client._id]) {
+          tppDocuments[payment.client._id] = this.newPaymentList(payment);
+        } else tppDocuments[payment.client._id].documents.push(payment);
       }
 
       this.tppDocuments = Object.values(tppDocuments);

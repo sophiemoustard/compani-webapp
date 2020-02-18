@@ -62,9 +62,7 @@ import { validationMixin } from '../../../mixins/validationMixin.js';
 
 export default {
   name: 'CustomersDirectory',
-  metaInfo: {
-    title: 'Répertoire bénéficiaires',
-  },
+  metaInfo: { title: 'Répertoire bénéficiaires' },
   mixins: [validationMixin],
   components: {
     'ni-search-address': SearchAddress,

@@ -22,9 +22,7 @@ export default {
   props: {
     role: { type: String, default: AUXILIARY },
   },
-  metaInfo: {
-    title: 'Bénéficiaires',
-  },
+  metaInfo: { title: 'Bénéficiaires' },
   components: {
     'ni-directory-header': DirectoryHeader,
   },

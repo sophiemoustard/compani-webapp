@@ -31,9 +31,7 @@ import { AUXILIARY_WITHOUT_COMPANY } from '../data/constants';
 import get from 'lodash/get';
 
 export default {
-  metaInfo: {
-    title: 'Mon compte',
-  },
+  metaInfo: { title: 'Mon compte' },
   components: {
     'ni-input': Input,
   },

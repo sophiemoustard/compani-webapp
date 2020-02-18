@@ -126,16 +126,16 @@ export const CANCELLATION_REASONS = [
 
 // ROLES
 export const COACH = 'coach';
-export const ADMIN = 'admin';
-export const SUPER_ADMIN = 'superAdmin';
+export const CLIENT_ADMIN = 'client_admin';
+export const SELLER_ADMIN = 'seller_admin';
 export const CUSTOMER = 'customer';
 export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
-export const PLANNING_REFERENT = 'planningReferent';
-export const AUXILIARY_WITHOUT_COMPANY = 'auxiliaryWithoutCompany'
+export const PLANNING_REFERENT = 'planning_referent';
+export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company'
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
-export const COACH_ROLES = [SUPER_ADMIN, ADMIN, COACH];
-export const ADMIN_ROLES = [SUPER_ADMIN, ADMIN];
+export const COACH_ROLES = [SELLER_ADMIN, CLIENT_ADMIN, COACH];
+export const ADMIN_ROLES = [SELLER_ADMIN, CLIENT_ADMIN];
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
@@ -218,6 +218,7 @@ export const PAY = 'pay';
 export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
 export const FUNDING = 'funding';
+export const RUP = 'rup';
 export const WORKING_EVENT = 'working_event';
 export const EXPORT_TYPES = [
   { label: 'Services', value: SERVICE },
@@ -227,6 +228,7 @@ export const EXPORT_TYPES = [
   { label: 'Bénéficiaires', value: CUSTOMER },
   { label: 'Aidants', value: HELPER },
   { label: 'Equipes', value: SECTOR },
+  { label: 'Registre unique du personnel', value: RUP },
 ];
 export const EXPORT_HISTORY_TYPES = [
   { label: 'Interventions et heures internes', value: WORKING_EVENT },

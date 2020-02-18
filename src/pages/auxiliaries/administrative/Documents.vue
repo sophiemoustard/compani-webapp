@@ -9,11 +9,8 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" class="q-mx-sm" :disable="!getDriveFileLink(props)">
-                  <a :href="getDriveFileLink(props)" target="_blank">
-                    <q-icon name="file_download" color="primary" />
-                  </a>
-                </q-btn>
+                <q-btn flat round small color="primary" class="q-mx-sm" :disable="!getDriveFileLink(props)" type="a"
+                  :href="getDriveFileLink(props)" target="_blank" icon="file_download" />
               </div>
             </template>
             <template v-else>
@@ -32,9 +29,7 @@ import AdministrativeDocument from '../../../api/AdministrativeDocuments'
 import get from 'lodash/get'
 
 export default {
-  metaInfo: {
-    title: 'Documents',
-  },
+  metaInfo: { title: 'Documents' },
   components: {
     'ni-large-table': LargeTable,
   },
