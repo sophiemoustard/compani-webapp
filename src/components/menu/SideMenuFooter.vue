@@ -26,7 +26,6 @@ export default {
   props: {
     userId: String,
     label: String,
-    isAuxiliary: { type: Boolean, default: false },
   },
   computed: {
     user () {
