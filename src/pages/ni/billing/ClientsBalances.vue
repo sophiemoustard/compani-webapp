@@ -44,9 +44,9 @@
     </ni-large-table>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal v-model="paymentCreationModal" :newPayment="newPayment" :validations="$v.newPayment"
-      :selectedClientName="selectedClientName" :loading="creationLoading" @resetForm="resetPaymentCreationModal"
-      @createPayment="createPayment" :selectedCustomer="selectedCustomer" />
+    <ni-payment-creation-modal v-model="paymentCreationModal" :new-payment="newPayment" :validations="$v.newPayment"
+      :selected-tpp="selectedTpp" :loading="paymentCreationLoading" @resetForm="resetPaymentCreationModal"
+      @createPayment="createPayment" :selected-customer="selectedCustomer" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
       :disable="selected.length === 0" @click="validatePaymentListCreation" />
@@ -56,13 +56,14 @@
 <script>
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
+import Payments from '../../../api/Payments';
 import LargeTable from '../../../components/table/LargeTable';
 import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
 import TitleHeader from '../../../components/TitleHeader';
 import Select from '../../../components/form/Select';
 import { paymentMixin } from '../../../mixins/paymentMixin.js';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '../../../components/popup/notify';
 import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPercentage } from '../../../helpers/utils.js';
 
 export default {
@@ -166,7 +167,7 @@ export default {
     },
   },
   async mounted () {
-    await this.getBalances();
+    await this.refresh();
   },
   methods: {
     resetSelected () {
@@ -180,7 +181,7 @@ export default {
       else this.selected = this.balances.filter(bl => bl.toPay > 0);
     },
     // Refresh
-    async getBalances () {
+    async refresh () {
       try {
         this.tableLoading = true;
         this.balances = await this.$balances.list();
@@ -190,24 +191,6 @@ export default {
         console.error(e);
       } finally {
         this.tableLoading = false;
-      }
-    },
-    async createPayment () {
-      try {
-        this.creationLoading = true;
-        this.$v.newPayment.$touch();
-        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = this.formatPayload(this.newPayment);
-        await this.$payments.create(payload);
-        NotifyPositive('Règlement créé');
-        await this.getBalances();
-        this.paymentCreationModal = false;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement');
-      } finally {
-        this.creationLoading = false;
       }
     },
     async createPaymentList () {
@@ -223,15 +206,14 @@ export default {
             rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
           }
         });
-        await this.$payments.createList(payload);
+        await Payments.createList(payload);
         NotifyPositive('Règlement(s) créé(s)');
-        await this.getBalances();
+        await this.refresh();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du(des) règlement(s)');
       } finally {
         this.selected = [];
-        this.creationLoading = false;
       }
     },
     validatePaymentListCreation () {

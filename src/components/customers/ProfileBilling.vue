@@ -23,7 +23,7 @@
         :endBalance="getEndBalance(tpp.documents, tpp)" />
       <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
-          @click="openPaymentCreationModal(customer, tpp.documents[0].client)" />
+          @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg">
@@ -53,13 +53,13 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
-      :selectedClientName="selectedClientName" v-model="paymentCreationModal" :validations="$v.newPayment"
+    <ni-payment-creation-modal :new-payment="newPayment" v-model="paymentCreationModal" :validations="$v.newPayment"
+      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
       @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
-    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
-      v-model="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
+    <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
+      :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment="editedPayment"
       @updatePayment="updatePayment" @resetForm="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
@@ -75,7 +75,8 @@
         @blur="$v.taxCertificate.file.$touch" in-modal required-field last />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
-          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading" @click="createTaxCertificate" />
+          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading"
+          @click="createTaxCertificate" />
       </template>
     </ni-modal>
   </div>
@@ -83,6 +84,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import Payments from '../../api/Payments';
 import { validYear } from '../../helpers/vuelidateCustomVal';
 import {
   CREDIT_NOTE,
@@ -131,6 +133,7 @@ export default {
     return {
       modalLoading: false,
       tableLoading: false,
+      paymentEditionLoading: false,
       paymentEditionModal: false,
       customerDocuments: [],
       balancesForCustomer: [],
@@ -324,13 +327,6 @@ export default {
         _id: document.thirdPartyPayer._id,
       };
     },
-    newPaymentList (document) {
-      return {
-        documents: [document],
-        name: document.client.name,
-        _id: document.client._id,
-      };
-    },
     formatDocumentList () {
       this.customerDocuments = [];
       const tppDocuments = {};
@@ -354,33 +350,15 @@ export default {
       }
 
       for (const payment of this.payments) {
-        if (!payment.client) this.customerDocuments.push(payment);
-        else if (payment.client._id && !tppDocuments[payment.client._id]) {
-          tppDocuments[payment.client._id] = this.newPaymentList(payment);
-        } else tppDocuments[payment.client._id].documents.push(payment);
+        if (!payment.thirdPartyPayer) this.customerDocuments.push(payment);
+        else if (payment.thirdPartyPayer._id && !tppDocuments[payment.thirdPartyPayer._id]) {
+          tppDocuments[payment.thirdPartyPayer._id] = this.newDocumentList(payment);
+        } else tppDocuments[payment.thirdPartyPayer._id].documents.push(payment);
       }
 
       this.tppDocuments = Object.values(tppDocuments);
     },
     // Payments
-    async createPayment () {
-      try {
-        this.modalLoading = true;
-        this.$v.newPayment.$touch();
-        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = this.formatPayload(this.newPayment);
-        await this.$payments.create(payload);
-        this.paymentCreationModal = false;
-        NotifyPositive('Règlement créé');
-        await this.refresh();
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
     openEditionModal (payment) {
       this.editedPayment = {
         _id: payment._id,
@@ -390,23 +368,27 @@ export default {
         date: payment.date,
       };
 
-      this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      this.selectedClientName = payment.client ? payment.client.name : formatIdentity(payment.customer.identity, 'FL');
+      if (payment.thirdPartyPayer) {
+        this.selectedTpp = payment.thirdPartyPayer;
+        this.editedPayment.thirdPartyPayer = payment.thirdPartyPayer;
+      }
+
+      this.paymentEditionModal = true;
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;
       this.selectedCustomer = { identity: {} };
-      this.selectedClientName = '';
+      this.selectedTpp = {};
       this.editedPayment = {};
     },
     async updatePayment () {
       try {
-        this.modalLoading = true;
+        this.paymentEditionLoading = true;
         this.$v.editedPayment.$touch();
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.$payments.update(this.editedPayment._id, this.$_.omit(this.editedPayment, '_id'));
+        await Payments.update(this.editedPayment._id, this.$_.omit(this.editedPayment, '_id'));
         this.paymentEditionModal = false;
         NotifyPositive('Règlement créé');
         await this.refresh();
@@ -414,7 +396,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
       } finally {
-        this.modalLoading = false;
+        this.paymentEditionLoading = false;
       }
     },
     // Tax certificates

@@ -30,7 +30,6 @@ module.exports = function (ctx) {
       'events',
       'contracts',
       'balances',
-      'payments',
       'exports',
       'pay',
       'finalPay',
