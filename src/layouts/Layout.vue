@@ -43,7 +43,7 @@ export default {
       user: 'main/user',
     }),
     userRole () {
-      return get(this.user, 'role.name') || null;
+      return get(this.user, 'role.client.name') || null;
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.userRole);

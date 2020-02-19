@@ -4,12 +4,12 @@
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
-          :company-id="mainUser.company._id" in-form />
+          :company-id="mainUser.company._id" />
       </div>
       <ni-input v-model="user.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
         @blur="updateUser('mentor')" />
-      <ni-select v-model="user.role._id" caption="Rôle" :options="auxiliaryRolesOptions" @focus="saveTmp('role._id')"
-        @blur="updateUser('role._id')" in-form />
+      <ni-select v-model="user.role.client._id" caption="Rôle" :options="auxiliaryRolesOptions"
+        @focus="saveTmp('role.client._id')" @blur="updateUser('role.client._id')" />
       <ni-select v-model="user.establishment" caption="Établissement" :options="establishmentsOptions"
         @focus="saveTmp('establishment')" @blur="updateUser('establishment')" :error="$v.user.establishment.$error"
         :error-label="REQUIRED_LABEL" option-disable="inactive" />
@@ -396,7 +396,7 @@ export default {
         contact: {
           address: { fullAddress: '' },
         },
-        role: { _id: '' },
+        role: { client: { _id: '' } },
         administrative: {
           emergencyContact: { name: '', phoneNumber: '' },
           identityDocs: '',
@@ -629,11 +629,14 @@ export default {
       }
       return 'Adresse non valide';
     },
+    mainUserRole () {
+      return this.mainUser.role.client.name;
+    },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.mainUser.role.name);
+      return AUXILIARY_ROLES.includes(this.mainUserRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUser.role.name);
+      return COACH_ROLES.includes(this.mainUserRole);
     },
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
@@ -717,7 +720,7 @@ export default {
       if (path.match(/iban/i)) value = value.split(' ').join('');
 
       const payload = set({}, path, value);
-      if (path === 'role._id') payload.role = value;
+      if (path === 'role.client._id') payload.role = value;
       if (path.match(/birthCountry/i) && value !== 'FR') {
         this.user.identity.birthState = '99';
         payload.identity.birthState = '99';
@@ -733,7 +736,7 @@ export default {
         let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         let data = new FormData();
         data.append('_id', this.currentUser._id);
-        data.append('role', this.currentUser.role.name);
+        data.append('role', this.currentUser.role.client.name);
         data.append('fileName', `photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);

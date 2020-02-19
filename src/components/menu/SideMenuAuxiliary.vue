@@ -67,7 +67,7 @@ export default {
   },
   computed: {
     isAuxiliaryWithCompany () {
-      return [AUXILIARY, PLANNING_REFERENT].includes(get(this, 'user.role.name', null));
+      return [AUXILIARY, PLANNING_REFERENT].includes(get(this, 'user.role.client.name', null));
     },
   },
   methods: {

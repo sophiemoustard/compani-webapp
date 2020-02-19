@@ -184,7 +184,7 @@ export default {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
     initFilters () {
-      if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) {
+      if (AUXILIARY_ROLES.includes(this.mainUser.role.client.name)) {
         const userSector = this.filters.find(filter => filter._id === this.mainUser.sector);
         if (userSector) this.$refs.teamAutocomplete.add(userSector.label);
       }

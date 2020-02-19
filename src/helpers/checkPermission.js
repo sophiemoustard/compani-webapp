@@ -1,15 +1,17 @@
 import intersection from 'lodash/intersection';
+import get from 'lodash/get';
 import redirect from '../router/redirect';
 
 export const checkPermission = (to, user) => {
   try {
     if (to.meta.permissions) {
-      if (user.role && user.role.rights) {
-        const rights = user.role.rights.map(right => right.permission);
+      const rights = get(user, 'role.client.rights') || null;
+      if (rights) {
+        const rightPermissions = rights.map(right => right.permission);
 
         const count = typeof to.meta.permissions === 'string'
-          ? rights.includes(to.meta.permissions)
-          : intersection(rights, to.meta.permissions).length;
+          ? rightPermissions.includes(to.meta.permissions)
+          : intersection(rightPermissions, to.meta.permissions).length;
 
         return !!count;
       } else {

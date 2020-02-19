@@ -93,7 +93,7 @@ export default {
   },
   computed: {
     isAdmin () {
-      return ADMIN_ROLES.includes(this.user.role.name);
+      return ADMIN_ROLES.includes(this.user.role.client.name);
     },
   },
 }

@@ -12,6 +12,6 @@ const findPermission = (right, params) => {
 }
 
 export const can = (params) => {
-  const rights = get(params, 'user.role.rights') || [];
+  const rights = get(params, 'user.role.client.rights') || [];
   return rights.filter(right => right ? params.permissions.some(findPermission(right, params)) : false).length > 0;
 };

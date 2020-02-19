@@ -169,11 +169,14 @@ export default {
     ...mapGetters({
       mainUser: 'main/user',
     }),
+    mainUserRole () {
+      return this.mainUser.role.client.name;
+    },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUser.role.name);
+      return COACH_ROLES.includes(this.mainUserRole);
     },
     isPlanningReferent () {
-      return this.mainUser.role.name === PLANNING_REFERENT;
+      return this.mainUserRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.persons } : this.$_.groupBy(this.persons, 'sector._id');

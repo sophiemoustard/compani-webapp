@@ -63,11 +63,14 @@ export default {
     mainUser () {
       return this.$store.getters['main/user'];
     },
+    userRole () {
+      return get(this, 'mainUser.role.client.name') || null;
+    },
     isAuxiliary () {
-      return this.mainUser ? AUXILIARY_ROLES.includes(this.mainUser.role.name) : false;
+      return this.mainUser ? AUXILIARY_ROLES.includes(this.userRole) : false;
     },
     isAuxiliaryWithoutCompany () {
-      return get(this, 'mainUser.role.name', null) === AUXILIARY_WITHOUT_COMPANY;
+      return this.userRole === AUXILIARY_WITHOUT_COMPANY;
     },
   },
   methods: {
@@ -91,7 +94,7 @@ export default {
 
         if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 
-        if (this.mainUser.role.name === HELPER) {
+        if (this.userRole === HELPER) {
           const customer = await Customers.getById(this.mainUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
