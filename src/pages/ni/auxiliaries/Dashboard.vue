@@ -5,17 +5,15 @@
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
       </div>
       <div class="col-xs-12 col-md-7 row justify-end">
-        <div @click="monthModal = !monthModal" class="month-select">
-          <span>{{ monthLabel }}</span>
-          <q-icon name="arrow_drop_down" />
-          <q-menu v-model="monthModal" anchor="bottom right" self="top right">
+        <q-btn icon-right="arrow_drop_down" :label="monthLabel" flat dense>
+          <q-menu anchor="bottom right" self="top right">
             <q-list dense padding>
               <q-item v-for="(month, index) in monthsOptions" :key="index" clickable @click="selectMonth(month.value)">
                 <q-item-section>{{ month.label }}</q-item-section>
               </q-item>
             </q-list>
           </q-menu>
-        </div>
+        </q-btn>
       </div>
     </div>
     <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
@@ -155,8 +153,11 @@ export default {
     monthsOptions () {
       if (this.firstInterventionStartDate === '') {
         return [
-          { label: 'Mois en cours', value: this.$moment().format('MM-YYYY') },
-          { label: 'Mois prochain', value: this.$moment().add(1, 'month').format('MM-YYYY') },
+          { label: this.$moment().format('MMMM YY'), value: this.$moment().format('MM-YYYY') },
+          {
+            label: this.$moment().add(1, 'month').format('MMMM YY'),
+            value: this.$moment().add(1, 'month').format('MM-YYYY'),
+          },
         ];
       }
       return Array.from(this.$moment().range(this.firstInterventionStartDate, this.$moment().add(1, 'M')).by('month'))
@@ -384,10 +385,6 @@ export default {
   justify-content: flex-end
   display: flex
   padding: 5px
-
-.month-select
-  .q-icon
-    margin-left: 5px
 
 .sector-card
   margin: 0 16px 16px
