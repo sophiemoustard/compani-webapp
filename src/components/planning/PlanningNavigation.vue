@@ -1,7 +1,7 @@
 <template>
   <div class="items-center row justify-around">
     <div class="planning-month col-6">
-      <div class="cursor-pointer" @click.native="datimeModal = !datimeModal">
+      <div class="cursor-pointer" @click="datimeModal = !datimeModal">
         <span class="text-capitalize">{{ timelineTitle }}</span>
         <q-icon name="arrow_drop_down" />
         <q-menu v-model="datimeModal" self="top middle" anchor="bottom middle">
