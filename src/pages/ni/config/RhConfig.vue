@@ -228,6 +228,9 @@ import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import { required, maxValue } from 'vuelidate/lib/validators';
+import Companies from '../../../api/Companies';
+import Sectors from '../../../api/Sectors';
+import InternalHours from '../../../api/InternalHours';
 import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input';
@@ -375,7 +378,7 @@ export default {
             },
           },
         };
-        await this.$companies.updateById(this.company._id, payload);
+        await Companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée');
         this.tmpInput = '';
       } catch (e) {
@@ -403,7 +406,7 @@ export default {
     },
     async refreshInternalHours () {
       try {
-        this.internalHours = await this.$internalHours.list();
+        this.internalHours = await InternalHours.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des heures internes');
@@ -418,7 +421,7 @@ export default {
         this.loading = true;
         if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
         const payload = pickBy(this.newInternalHour);
-        await this.$internalHours.create(payload);
+        await InternalHours.create(payload);
         await this.$store.dispatch('main/getUser', this.user._id);
 
         NotifyPositive('Heure interne créée');
@@ -434,7 +437,7 @@ export default {
     async deleteInternalHour (internalHourId, row) {
       try {
         const index = this.getRowIndex(this.internalHours, row);
-        await this.$internalHours.remove(internalHourId);
+        await InternalHours.remove(internalHourId);
         await this.$store.dispatch('main/getUser', this.user._id);
         this.internalHours.splice(index, 1);
         NotifyPositive('Heure interne supprimée.');
@@ -456,10 +459,10 @@ export default {
       try {
         const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
         if (defaultInternalHour) {
-          await this.$internalHours.update(defaultInternalHour._id, { default: false });
+          await InternalHours.update(defaultInternalHour._id, { default: false });
         }
 
-        await this.$internalHours.update(internalHourId, { default: true });
+        await InternalHours.update(internalHourId, { default: true });
         await this.refreshInternalHours();
         await this.$store.dispatch('main/getUser', this.user._id);
         NotifyPositive('Heures internes mises à jour')
@@ -471,7 +474,7 @@ export default {
     // Sectors
     async getSectors () {
       try {
-        this.sectors = await this.$sectors.list();
+        this.sectors = await Sectors.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des équipes.')
@@ -483,7 +486,7 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$sectors.create(this.newSector);
+        await Sectors.create(this.newSector);
         NotifyPositive('Équipe créée.');
         this.resetCreationSectorData();
         await this.getSectors();
@@ -511,7 +514,7 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
+        await Sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
         NotifyPositive('Équipe modifiée.');
         this.resetEditionSectorData();
         await this.getSectors();
@@ -530,7 +533,7 @@ export default {
     async deleteSector (sectorId, row) {
       try {
         const index = this.getRowIndex(this.sectors, row);
-        await this.$sectors.deleteById(sectorId);
+        await Sectors.deleteById(sectorId);
         this.sectors.splice(index, 1);
         NotifyPositive('Équipe supprimée.');
       } catch (e) {

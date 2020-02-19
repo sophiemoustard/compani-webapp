@@ -1,4 +1,5 @@
-import { validationMixin } from './validationMixin'
+import InternalHours from '../api/InternalHours';
+import { validationMixin } from './validationMixin';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress, validHour } from '../helpers/vuelidateCustomVal.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
@@ -107,7 +108,7 @@ export const planningActionMixin = {
     },
     async setInternalHours () {
       try {
-        this.internalHours = await this.$internalHours.list();
+        this.internalHours = await InternalHours.list();
       } catch (e) {
         console.error(e);
         this.internalHours = [];
