@@ -5,7 +5,7 @@
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
       </div>
       <div class="col-xs-12 col-md-7 row justify-end">
-        <div @click.native="monthModal = !monthModal" class="month-select">
+        <div @click="monthModal = !monthModal" class="month-select">
           <span>{{ monthLabel }}</span>
           <q-icon name="arrow_drop_down" />
           <q-menu v-model="monthModal" anchor="bottom right" self="top right">
@@ -110,8 +110,13 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import omit from 'lodash/omit';
 import { mapActions, mapGetters } from 'vuex';
 import Companies from '../../../api/Companies';
+import Pay from '../../../api/Pay';
+import Events from '../../../api/Events';
+import Stats from '../../../api/Stats';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
 import Gauge from '../../../components/Gauge';
 import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '../../../data/constants';
@@ -174,7 +179,7 @@ export default {
   async mounted () {
     await this.fillFilter();
     const firstIntervention = await Companies.getFirstIntervention();
-    this.firstInterventionStartDate = this.$_.get(firstIntervention, 'startDate', null) || '';
+    this.firstInterventionStartDate = get(firstIntervention, 'startDate', null) || '';
     this.initFilters();
   },
   methods: {
@@ -217,12 +222,12 @@ export default {
         }
         if (!sectors.length) return;
 
-        const paidInterventionStatsByAuxiliary = await this.$stats.getPaidInterventionStats({
+        const paidInterventionStatsByAuxiliary = await Stats.getPaidInterventionStats({
           sector: sectors,
           month: this.selectedMonth,
         });
 
-        const hoursBalanceDetail = await this.$pay.getHoursBalanceDetail({
+        const hoursBalanceDetail = await Pay.getHoursBalanceDetail({
           sector: sectors,
           month: this.selectedMonth,
         });
@@ -236,8 +241,8 @@ export default {
               _id: auxiliaryPaidInterventions._id,
               identity: auxiliaryHoursDetails.identity,
               picture: auxiliaryHoursDetails.picture,
-              paidIntervention: this.$_.omit(auxiliaryPaidInterventions, 'sectors'),
-              hoursBalanceDetail: this.$_.omit(auxiliaryHoursDetails, ['sectors', 'auxiliary']),
+              paidIntervention: omit(auxiliaryPaidInterventions, 'sectors'),
+              hoursBalanceDetail: omit(auxiliaryHoursDetails, ['sectors', 'auxiliary']),
             }
             auxiliariesStats[sector].push(auxiliaryStats);
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
@@ -298,13 +303,13 @@ export default {
         this.setDisplayStats(sectors, { loading: true, openedDetails: false });
         const params = { month: this.selectedMonth, sector: sectors };
         const [customersAndDuration, internalAndBilledHours, hoursToWork, paidTransportStats] = await Promise.all([
-          this.$stats.getCustomersAndDurationBySector(params),
-          this.$stats.getInternalAndBilledHours(params),
-          this.$pay.getHoursToWork(params),
-          this.$events.getPaidTransportStatsBySector(params),
+          Stats.getCustomersAndDurationBySector(params),
+          Stats.getInternalAndBilledHours(params),
+          Pay.getHoursToWork(params),
+          Events.getPaidTransportStatsBySector(params),
         ]);
         if (this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month')) {
-          this.unassignedHours = await this.$events.getUnassignedHoursBySector(params);
+          this.unassignedHours = await Events.getUnassignedHoursBySector(params);
         } else {
           this.unassignedHours = [];
         }
