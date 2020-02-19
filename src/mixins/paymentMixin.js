@@ -1,31 +1,20 @@
-import omit from 'lodash/omit';
+import pickBy from 'lodash/pickBy';
 import { required } from 'vuelidate/lib/validators';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '../data/constants';
-import { formatIdentity } from '../helpers/utils.js';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '../components/popup/notify';
 
 export const paymentMixin = {
   data () {
     return {
-      creationLoading: false,
+      paymentCreationLoading: false,
       paymentCreationModal: false,
       selectedCustomer: { identity: {} },
-      selectedClientName: '',
+      selectedTpp: {},
       PAYMENT,
       DIRECT_DEBIT,
       PAYMENT_OPTIONS,
-      defaultPayment: {
-        nature: PAYMENT,
-        customer: null,
-        client: null,
-        netInclTaxes: 0,
-        type: '',
-        date: this.$moment().toISOString(),
-      },
-      newPayment: null,
+      newPayment: {},
     }
-  },
-  created () {
-    this.newPayment = { ...this.defaultPayment };
   },
   validations: {
     newPayment: {
@@ -37,25 +26,47 @@ export const paymentMixin = {
   methods: {
     openPaymentCreationModal (customer, tpp) {
       this.selectedCustomer = { ...customer };
-      this.selectedClientName = tpp ? tpp.name : formatIdentity(customer.identity, 'FL');
-      this.newPayment.customer = customer._id;
-      this.newPayment.nature = PAYMENT;
-      this.newPayment.client = tpp ? tpp._id : customer._id;
+      this.newPayment = {
+        customer: customer._id,
+        nature: PAYMENT,
+        date: this.$moment().toISOString(),
+        netInclTaxes: 0,
+        type: '',
+      }
+      if (tpp) {
+        this.selectedTpp = { ...tpp };
+        this.newPayment.thirdPartyPayer = tpp._id;
+      }
       this.paymentCreationModal = true;
     },
     resetPaymentCreationModal () {
       this.paymentCreationModal = false;
       this.selectedCustomer = { identity: {} };
-      this.selectedClientName = '';
-      this.newPayment = { ...this.defaultPayment };
+      this.selectedTpp = {};
+      this.newPayment = {
+        nature: PAYMENT,
+        date: this.$moment().toISOString(),
+        netInclTaxes: 0,
+        type: '',
+      };
       this.$v.newPayment.$reset();
     },
-    formatPayload (payment) {
-      const payload = omit(payment, ['client']);
+    async createPayment () {
+      try {
+        this.paymentCreationLoading = true;
+        this.$v.newPayment.$touch();
+        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-      if (payment.customer !== payment.client) payload.thirdPartyPayer = payment.client;
-
-      return payload;
+        await this.$payments.create(pickBy(this.newPayment));
+        NotifyPositive('Règlement créé');
+        await this.refresh();
+        this.paymentCreationModal = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du règlement');
+      } finally {
+        this.paymentCreationLoading = false;
+      }
     },
   },
 };

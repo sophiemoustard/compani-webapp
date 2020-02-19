@@ -53,13 +53,13 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
-      :selected-client-name="selectedClientName" v-model="paymentCreationModal" :validations="$v.newPayment"
+    <ni-payment-creation-modal :new-payment="newPayment" v-model="paymentCreationModal" :validations="$v.newPayment"
+      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
       @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
-    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
-      v-model="paymentEditionModal" :selectedCustomer="selectedCustomer" :selected-client-name="selectedClientName"
+    <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
+      :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment="editedPayment"
       @updatePayment="updatePayment" @resetForm="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
@@ -75,7 +75,8 @@
         @blur="$v.taxCertificate.file.$touch" in-modal required-field last />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
-          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading" @click="createTaxCertificate" />
+          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading"
+          @click="createTaxCertificate" />
       </template>
     </ni-modal>
   </div>
@@ -131,6 +132,7 @@ export default {
     return {
       modalLoading: false,
       tableLoading: false,
+      paymentEditionLoading: false,
       paymentEditionModal: false,
       customerDocuments: [],
       balancesForCustomer: [],
@@ -356,24 +358,6 @@ export default {
       this.tppDocuments = Object.values(tppDocuments);
     },
     // Payments
-    async createPayment () {
-      try {
-        this.modalLoading = true;
-        this.$v.newPayment.$touch();
-        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = this.formatPayload(this.newPayment);
-        await this.$payments.create(payload);
-        this.paymentCreationModal = false;
-        NotifyPositive('Règlement créé');
-        await this.refresh();
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
     openEditionModal (payment) {
       this.editedPayment = {
         _id: payment._id,
@@ -385,19 +369,17 @@ export default {
 
       this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      this.selectedClientName = payment.thirdPartyPayer
-        ? payment.thirdPartyPayer.name
-        : formatIdentity(payment.customer.identity, 'FL');
+      if (payment.client) this.selectedTpp = payment.client;
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;
       this.selectedCustomer = { identity: {} };
-      this.selectedClientName = '';
+      this.selectedTpp = {};
       this.editedPayment = {};
     },
     async updatePayment () {
       try {
-        this.modalLoading = true;
+        this.paymentEditionLoading = true;
         this.$v.editedPayment.$touch();
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -409,7 +391,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
       } finally {
-        this.modalLoading = false;
+        this.paymentEditionLoading = false;
       }
     },
     // Tax certificates
