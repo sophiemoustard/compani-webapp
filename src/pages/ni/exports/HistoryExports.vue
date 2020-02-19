@@ -3,8 +3,8 @@
     <h4>Historique</h4>
     <div class="row q-col-gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />
-      <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :min="min" :max="max"
-        :error="$v.dateRange.$error" @input="input" :error-label="dateRangeErrorLabel" @blur="$v.dateRange.$touch" />
+      <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :error="$v.dateRange.$error"
+        @input="input" :error-label="dateRangeErrorLabel" @blur="$v.dateRange.$touch" />
     </div>
     <q-btn label="Exporter" no-caps unelevated text-color="white" color="primary" icon="import_export"
       @click="exportCsv" :disable="loading || $v.dateRange.$error" :loading="loading" />
