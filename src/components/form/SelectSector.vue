@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import Sectors from '../../api/Sectors';
 import Select from './Select';
 import { REQUIRED_LABEL } from '../../data/constants';
 
@@ -39,7 +40,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        const sectors = await this.$sectors.list();
+        const sectors = await Sectors.list();
         if (this.allowNullOption) sectors.push({ name: 'Toutes les équipes', _id: '' });
         this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {

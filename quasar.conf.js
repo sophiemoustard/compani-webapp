@@ -17,7 +17,6 @@ module.exports = function (ctx) {
       'lodash',
       'moment',
       'resize',
-      'sectors',
       'services',
       'stats',
       'surcharges',
