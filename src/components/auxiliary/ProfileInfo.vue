@@ -278,17 +278,28 @@
 </template>
 
 <script>
+import 'vue-croppa/dist/vue-croppa.css'
 import { mapGetters } from 'vuex';
 import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
-import 'vue-croppa/dist/vue-croppa.css'
-
+import get from 'lodash/get';
+import set from 'lodash/set';
+import isEqual from 'lodash/isEqual';
 import Roles from '../../api/Roles';
+import Establishments from '../../api/Establishments';
+import Users from '../../api/Users';
 import gdrive from '../../api/GoogleDrive';
 import cloudinary from '../../api/Cloudinary';
 import nationalities from '../../data/nationalities';
 import countries from '../../data/countries';
-import { AUXILIARY, PLANNING_REFERENT, TRANSPORT_OPTIONS, REQUIRED_LABEL, COACH_ROLES } from '../../data/constants';
+import {
+  AUXILIARY,
+  PLANNING_REFERENT,
+  TRANSPORT_OPTIONS,
+  REQUIRED_LABEL,
+  COACH_ROLES,
+  AUXILIARY_ROLES,
+} from '../../data/constants';
 import SelectSector from '../form/SelectSector';
 import Input from '../form/Input';
 import Select from '../form/Select';
@@ -525,12 +536,6 @@ export default {
     currentUser () {
       return this.userProfile ? this.userProfile : this.mainUser;
     },
-    currentUserLastname () {
-      return this.$_.get(this.currentUser, 'identity.lastname');
-    },
-    currentUserFirstname () {
-      return this.$_.get(this.currentUser, 'identity.firstname');
-    },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },
@@ -538,7 +543,7 @@ export default {
       return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
     },
     docsUploadUrl () {
-      const driveId = this.$_.get(this.currentUser, 'administrative.driveFolder.driveId');
+      const driveId = get(this.currentUser, 'administrative.driveFolder.driveId');
       if (!driveId) return '';
 
       return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/gdrive/${driveId}/upload`;
@@ -596,7 +601,8 @@ export default {
     emergencyPhoneNbrError () {
       if (!this.$v.user.administrative.emergencyContact.phoneNumber.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.administrative.emergencyContact.phoneNumber.frPhoneNumber || !this.$v.user.administrative.emergencyContact.phoneNumber.maxLength) {
+      } else if (!this.$v.user.administrative.emergencyContact.phoneNumber.frPhoneNumber ||
+        !this.$v.user.administrative.emergencyContact.phoneNumber.maxLength) {
         return 'Numéro de téléphone non valide';
       }
       return '';
@@ -624,7 +630,7 @@ export default {
       return 'Adresse non valide';
     },
     isAuxiliary () {
-      return this.mainUser.role.name === AUXILIARY || this.mainUser.role.name === PLANNING_REFERENT;
+      return AUXILIARY_ROLES.includes(this.mainUser.role.name);
     },
     isCoach () {
       return COACH_ROLES.includes(this.mainUser.role.name);
@@ -638,7 +644,7 @@ export default {
     },
   },
   async mounted () {
-    const user = await this.$users.getById(this.currentUser._id);
+    const user = await Users.getById(this.currentUser._id);
     this.mergeUser(user);
     if (this.isCoach) {
       await this.getAuxiliaryRoles();
@@ -649,7 +655,7 @@ export default {
   },
   watch: {
     currentUser (value) {
-      if (this.emailLock && !this.$_.isEqual(value, this.user)) {
+      if (this.emailLock && !isEqual(value, this.user)) {
         this.mergeUser(value);
       }
     },
@@ -669,7 +675,7 @@ export default {
       this.user = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      if (this.tmpInput === '') this.tmpInput = this.$_.get(this.user, path);
+      if (this.tmpInput === '') this.tmpInput = get(this.user, path);
     },
     async emailErrorHandler (path) {
       try {
@@ -683,13 +689,13 @@ export default {
     },
     async updateUser (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.user, path)) {
+        if (this.tmpInput === get(this.user, path)) {
           this.emailLock = true;
           return;
         }
 
-        if (this.$_.get(this.$v.user, path)) {
-          this.$_.get(this.$v.user, path).$touch();
+        if (get(this.$v.user, path)) {
+          get(this.$v.user, path).$touch();
           const isValid = await this.waitForValidation(this.$v.user, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
@@ -707,16 +713,16 @@ export default {
       }
     },
     async updateAlenviUser (path) {
-      let value = this.$_.get(this.user, path);
+      let value = get(this.user, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
 
-      const payload = this.$_.set({}, path, value);
+      const payload = set({}, path, value);
       if (path === 'role._id') payload.role = value;
       if (path.match(/birthCountry/i) && value !== 'FR') {
         this.user.identity.birthState = '99';
         payload.identity.birthState = '99';
       }
-      await this.$users.updateById(this.currentUser._id, payload);
+      await Users.updateById(this.currentUser._id, payload);
     },
     async uploadImage () {
       try {
@@ -748,10 +754,10 @@ export default {
         let payload;
         if (path === 'certificates') {
           payload = { [`administrative.${path}`]: { driveId } };
-          await this.$users.updateCertificates(this.currentUser._id, payload);
+          await Users.updateCertificates(this.currentUser._id, payload);
         } else {
-          payload = this.$_.set({}, path, { driveId: null, link: null });
-          await this.$users.updateById(this.currentUser._id, payload);
+          payload = set({}, path, { driveId: null, link: null });
+          await Users.updateById(this.currentUser._id, payload);
         }
         await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
         NotifyPositive('Document supprimé');
@@ -776,7 +782,7 @@ export default {
           await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
           this.croppa.remove();
         }
-        await this.$users.updateById(this.currentUser._id, { picture: { link: null, publicId: null } });
+        await Users.updateById(this.currentUser._id, { picture: { link: null, publicId: null } });
         await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
         NotifyPositive('Photo supprimée');
       } catch (e) {
@@ -827,9 +833,10 @@ export default {
       }
     },
     pictureDlLink (link) {
-      return link ? link.replace(/(\/upload)/i,
-        `$1/fl_attachment:photo_${removeDiacritics(this.currentUserFirstname)}_${removeDiacritics(this.currentUserLastname)}`)
-        : '';
+      const lastname = removeDiacritics(get(this.currentUser, 'identity.lastname'));
+      const firstname = removeDiacritics(get(this.currentUser, 'identity.firstname'));
+
+      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${firstname}_${lastname}`) : '';
     },
     async getAuxiliaryRoles () {
       try {
@@ -844,7 +851,7 @@ export default {
     },
     async getEstablishments () {
       try {
-        this.establishments = await this.$establishments.list();
+        this.establishments = await Establishments.list();
       } catch (e) {
         console.error(e);
         this.establishments = [];
