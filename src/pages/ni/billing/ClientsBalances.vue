@@ -56,6 +56,7 @@
 <script>
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
+import Payments from '../../../api/Payments';
 import LargeTable from '../../../components/table/LargeTable';
 import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
@@ -205,7 +206,7 @@ export default {
             rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
           }
         });
-        await this.$payments.createList(payload);
+        await Payments.createList(payload);
         NotifyPositive('Règlement(s) créé(s)');
         await this.refresh();
       } catch (e) {

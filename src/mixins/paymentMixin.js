@@ -1,5 +1,6 @@
 import pickBy from 'lodash/pickBy';
 import { required } from 'vuelidate/lib/validators';
+import Payments from '../api/Payments';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '../data/constants';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../components/popup/notify';
 
@@ -57,7 +58,7 @@ export const paymentMixin = {
         this.$v.newPayment.$touch();
         if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.$payments.create(pickBy(this.newPayment));
+        await Payments.create(pickBy(this.newPayment));
         NotifyPositive('Règlement créé');
         await this.refresh();
         this.paymentCreationModal = false;

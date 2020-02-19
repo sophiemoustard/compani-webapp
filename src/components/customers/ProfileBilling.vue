@@ -84,6 +84,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import Payments from '../../api/Payments';
 import { validYear } from '../../helpers/vuelidateCustomVal';
 import {
   CREDIT_NOTE,
@@ -367,9 +368,13 @@ export default {
         date: payment.date,
       };
 
-      this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      if (payment.client) this.selectedTpp = payment.client;
+      if (payment.thirdPartyPayer) {
+        this.selectedTpp = payment.thirdPartyPayer;
+        this.editedPayment.thirdPartyPayer = payment.thirdPartyPayer;
+      }
+
+      this.paymentEditionModal = true;
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;
@@ -383,7 +388,7 @@ export default {
         this.$v.editedPayment.$touch();
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.$payments.update(this.editedPayment._id, this.$_.omit(this.editedPayment, '_id'));
+        await Payments.update(this.editedPayment._id, this.$_.omit(this.editedPayment, '_id'));
         this.paymentEditionModal = false;
         NotifyPositive('Règlement créé');
         await this.refresh();
