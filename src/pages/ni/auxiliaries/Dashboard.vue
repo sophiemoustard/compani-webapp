@@ -111,6 +111,7 @@
 
 <script>
 import { mapActions, mapGetters } from 'vuex';
+import Companies from '../../../api/Companies';
 import ChipsAutocomplete from '../../../components/planning/ChipsAutocomplete';
 import Gauge from '../../../components/Gauge';
 import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '../../../data/constants';
@@ -172,7 +173,7 @@ export default {
   },
   async mounted () {
     await this.fillFilter();
-    const firstIntervention = await this.$companies.getFirstIntervention();
+    const firstIntervention = await Companies.getFirstIntervention();
     this.firstInterventionStartDate = this.$_.get(firstIntervention, 'startDate', null) || '';
     this.initFilters();
   },

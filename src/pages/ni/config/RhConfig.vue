@@ -228,6 +228,7 @@ import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import { required, maxValue } from 'vuelidate/lib/validators';
+import Companies from '../../../api/Companies';
 import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input';
@@ -375,7 +376,7 @@ export default {
             },
           },
         };
-        await this.$companies.updateById(this.company._id, payload);
+        await Companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée');
         this.tmpInput = '';
       } catch (e) {

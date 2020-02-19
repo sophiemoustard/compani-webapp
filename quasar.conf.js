@@ -11,7 +11,6 @@ module.exports = function (ctx) {
       'bot',
       'can',
       'creditNotes',
-      'companies',
       'customers',
       'googleDrive',
       'email',
