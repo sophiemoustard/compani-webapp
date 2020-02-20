@@ -21,7 +21,10 @@
     </template>
   </ni-modal>
 </template>
+
 <script>
+import omit from 'lodash/omit';
+import Events from '../../api/Events';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
 import Modal from '../Modal';
 import Select from '../form/Select';
@@ -79,7 +82,7 @@ export default {
       try {
         const isValid = await this.waitForFormValidation(this.$v.deletedEvents);
         if (!isValid) return NotifyNegative('Champ(s) invalide(s)');
-        await this.$events.deleteList(this.$_.omit(this.deletedEvents, 'inRange'));
+        await Events.deleteList(omit(this.deletedEvents, 'inRange'));
         this.hide();
         NotifyPositive('Les évènements ont bien étés supprimés');
       } catch (e) {

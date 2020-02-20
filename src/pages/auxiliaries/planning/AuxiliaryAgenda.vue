@@ -35,6 +35,9 @@
 </template>
 
 <script>
+import Users from '../../../api/Users';
+import Customers from '../../../api/Customers';
+import Events from '../../../api/Events';
 import Agenda from '../../../components/planning/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
@@ -130,21 +133,21 @@ export default {
           endDate: this.endOfWeek,
           auxiliary: this.selectedAuxiliary._id,
         }
-        this.events = await this.$events.list(params);
+        this.events = await Events.list(params);
       } catch (e) {
         this.events = [];
       }
     },
     async getAuxiliaries () {
       try {
-        this.auxiliaries = await this.$users.list();
+        this.auxiliaries = await Users.list();
       } catch (e) {
         this.auxiliaries = [];
       }
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.listWithSubscriptions();
+        this.customers = await Customers.listWithSubscriptions();
       } catch (e) {
         this.customers = [];
       }
