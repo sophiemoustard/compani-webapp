@@ -83,11 +83,13 @@
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import snakeCase from 'lodash/snakeCase';
+import { required } from 'vuelidate/lib/validators';
 import Payments from '../../api/Payments';
+import Balances from '../../api/Balances';
+import TaxCertificates from '../../api/TaxCertificates';
 import { validYear } from '../../helpers/vuelidateCustomVal';
 import {
   CREDIT_NOTE,
@@ -300,7 +302,7 @@ export default {
     // Refresh data
     async getTaxCertificates () {
       try {
-        this.taxCertificates = await this.$taxCertificates.list({ customer: this.customer._id });
+        this.taxCertificates = await TaxCertificates.list({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.taxCertificates = [];
@@ -316,7 +318,7 @@ export default {
     },
     async getCustomerBalanceWithDetails () {
       try {
-        const balancesWithDetails = await this.$balances.listWithDetails(this.documentQuery);
+        const balancesWithDetails = await Balances.listWithDetails(this.documentQuery);
         this.balances = balancesWithDetails.balances;
         this.payments = balancesWithDetails.payments;
         this.bills = balancesWithDetails.bills;
@@ -410,7 +412,7 @@ export default {
     taxCertificatesUrl (certificate) {
       return get(certificate, 'driveFile.link')
         ? certificate.driveFile.link
-        : this.$taxCertificates.getPDFUrl(certificate._id);
+        : TaxCertificates.getPDFUrl(certificate._id);
     },
     formatTaxCertificatePayload () {
       const { file, date, year } = this.taxCertificate;
@@ -444,7 +446,7 @@ export default {
       this.modalLoading = true;
 
       try {
-        await this.$taxCertificates.create(this.formatTaxCertificatePayload());
+        await TaxCertificates.create(this.formatTaxCertificatePayload());
 
         this.taxCertificateModal = false;
         NotifyPositive('Attestation fiscale sauvegardée');
@@ -468,7 +470,7 @@ export default {
     async deleteTaxCertificate (taxCertificateId, row) {
       try {
         const index = this.getRowIndex(this.taxCertificates, row);
-        await this.$taxCertificates.remove(taxCertificateId);
+        await TaxCertificates.remove(taxCertificateId);
         this.taxCertificates.splice(index, 1);
         NotifyPositive('Attestation fiscale supprimée.');
       } catch (e) {

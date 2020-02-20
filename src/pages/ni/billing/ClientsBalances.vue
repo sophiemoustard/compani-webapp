@@ -57,6 +57,7 @@
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import Payments from '../../../api/Payments';
+import Balances from '../../../api/Balances';
 import LargeTable from '../../../components/table/LargeTable';
 import PrefixedCellContent from '../../../components/table/PrefixedCellContent';
 import PaymentCreationModal from '../../../components/customers/PaymentCreationModal';
@@ -184,7 +185,7 @@ export default {
     async refresh () {
       try {
         this.tableLoading = true;
-        this.balances = await this.$balances.list();
+        this.balances = await Balances.list();
         this.balances = this.balances.map(balance => ({ ...balance, rowId: this.$_.uniqueId() }))
       } catch (e) {
         this.balances = [];

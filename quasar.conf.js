@@ -24,7 +24,6 @@ module.exports = function (ctx) {
       'users',
       'vuelidate',
       'contracts',
-      'balances',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [
