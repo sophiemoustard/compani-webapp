@@ -138,9 +138,9 @@
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 
-import esign from '../../api/Esign.js';
-import drive from '../../api/GoogleDrive';
-import customers from '../../api/Customers';
+import Esign from '../../api/Esign.js';
+import Drive from '../../api/GoogleDrive';
+import Customers from '../../api/Customers';
 import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
 import Modal from '../../components/Modal';
@@ -286,7 +286,7 @@ export default {
     },
     async refreshCustomer () {
       try {
-        this.customer = await customers.getById(this.helper.customers[0]._id);
+        this.customer = await Customers.getById(this.helper.customers[0]._id);
         this.refreshSubscriptions();
         this.refreshFundings();
 
@@ -311,7 +311,7 @@ export default {
 
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
-        await customers.updateById(this.customer._id, this.$_.set({}, path, value));
+        await Customers.updateById(this.customer._id, this.$_.set({}, path, value));
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
@@ -352,7 +352,7 @@ export default {
               title: this.helper.identity ? this.helper.identity.title : '',
             },
           };
-          await customers.addSubscriptionHistory(this.customer._id, payload);
+          await Customers.addSubscriptionHistory(this.customer._id, payload);
           await this.refreshCustomer();
           NotifyPositive('Abonnement validé');
         }
@@ -366,7 +366,7 @@ export default {
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
-        const signatureRequest = await customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
+        const signatureRequest = await Customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.helper.local.email,
@@ -409,7 +409,7 @@ export default {
         for (const mandate of mandates) {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
-            await customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
+            await Customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
           }
         }
         await this.refreshCustomer();
@@ -419,7 +419,7 @@ export default {
     },
     async hasSignedDoc (docId) {
       try {
-        const document = await esign.getDocument(docId);
+        const document = await Esign.getDocument(docId);
         return document.log.some(el => el.event === 'document_signed');
       } catch (e) {
         console.error(e);
@@ -441,7 +441,7 @@ export default {
         this.showCgs = false;
         const cgsDriveId = get(this.helper, 'company.customersConfig.templates.cgs.driveId');
         if (!cgsDriveId) return;
-        const file = await drive.downloadFileById(cgsDriveId);
+        const file = await Drive.downloadFileById(cgsDriveId);
         this.cgs = file.data;
         this.showCgs = true;
       } catch (e) {
