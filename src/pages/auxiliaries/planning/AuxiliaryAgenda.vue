@@ -48,6 +48,7 @@ import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
 import { formatIdentity } from '../../../helpers/utils';
+import { can } from '../../../helpers/acl/can';
 
 export default {
   name: 'AuxiliaryAgenda',
@@ -154,7 +155,7 @@ export default {
     },
     // Event creation
     openCreationModal (dayIndex) {
-      const can = this.$can({
+      const isAllowed = can({
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
         permissions: [
@@ -162,7 +163,7 @@ export default {
           { name: 'events:own:edit', rule: 'isOwner' },
         ],
       });
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       const selectedDay = this.days[dayIndex];
       if (!this.canCreateEvent(this.selectedAuxiliary, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');

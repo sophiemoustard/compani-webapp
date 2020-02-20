@@ -8,6 +8,7 @@ import Events from '../api/Events';
 import { validationMixin } from './validationMixin';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress, validHour } from '../helpers/vuelidateCustomVal.js';
+import { can } from '../helpers/acl/can.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -375,13 +376,13 @@ export const planningActionMixin = {
     },
     canEditEvent (event) {
       if (!event.auxiliary) { // Unassigned event
-        return this.$can({
+        return can({
           user: this.$store.getters['main/user'],
           permissions: [{ name: 'events:edit' }],
         });
       }
 
-      return this.$can({
+      return can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: event.auxiliary._id,
         permissions: [
