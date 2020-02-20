@@ -8,7 +8,6 @@ module.exports = function (ctx) {
       'axios',
       'activationCode',
       'alenviAxios',
-      'bot',
       'can',
       'creditNotes',
       'customers',
