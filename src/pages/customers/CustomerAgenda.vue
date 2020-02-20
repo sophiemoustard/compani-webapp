@@ -18,6 +18,8 @@
 </template>
 
 <script>
+import Customers from '../../api/Customers';
+import Events from '../../api/Events';
 import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '../../data/constants';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import Agenda from '../../components/planning/Agenda';
@@ -59,7 +61,7 @@ export default {
   methods: {
     async refreshCustomer () {
       try {
-        this.customer = await this.$customers.getById(this.helper.customers[0]._id);
+        this.customer = await Customers.getById(this.helper.customers[0]._id);
       } catch (e) {
         console.error(e);
         this.customer = {};
@@ -80,7 +82,7 @@ export default {
           endDate: this.endOfWeek,
           customer: this.customer._id,
         }
-        this.events = await this.$events.list(params);
+        this.events = await Events.list(params);
       } catch (e) {
         this.events = [];
       }

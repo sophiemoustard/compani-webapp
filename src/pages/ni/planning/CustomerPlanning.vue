@@ -18,10 +18,22 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import Events from '../../../api/Events';
+import Customers from '../../../api/Customers';
 import Planning from '../../../components/planning/Planning.vue';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyNegative } from '../../../components/popup/notify.js';
-import { INTERVENTION, DEFAULT_AVATAR, NEVER, AUXILIARY, PLANNING_REFERENT, CUSTOMER, SECTOR, COACH_ROLES } from '../../../data/constants';
+import {
+  INTERVENTION,
+  DEFAULT_AVATAR,
+  NEVER,
+  AUXILIARY,
+  PLANNING_REFERENT,
+  CUSTOMER,
+  SECTOR,
+  COACH_ROLES,
+} from '../../../data/constants';
 import { mapGetters, mapActions } from 'vuex';
 import { formatIdentity } from '../../../helpers/utils';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
@@ -143,7 +155,7 @@ export default {
     },
     async refresh () {
       try {
-        this.events = await this.$events.list({
+        this.events = await Events.list({
           startDate: this.startOfWeek,
           endDate: this.endOfWeek,
           customer: this.customers.map(cus => cus._id),
@@ -167,7 +179,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
-        address: this.$_.get(person, 'contact.primaryAddress', {}),
+        address: get(person, 'contact.primaryAddress', {}),
         attachment: {},
         auxiliary: '',
         sector: '',
@@ -179,7 +191,7 @@ export default {
       this.creationModal = true;
     },
     async getSectorCustomers (sectors) {
-      return sectors.length === 0 ? [] : this.$customers.listBySector({
+      return sectors.length === 0 ? [] : Customers.listBySector({
         startDate: this.startOfWeek,
         endDate: this.endOfWeek,
         sector: JSON.stringify(sectors),

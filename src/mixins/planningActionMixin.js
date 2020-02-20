@@ -1,7 +1,14 @@
+import omit from 'lodash/omit';
+import get from 'lodash/get';
+import pickBy from 'lodash/pickBy';
+import cloneDeep from 'lodash/cloneDeep';
 import InternalHours from '../api/InternalHours';
+import Gdrive from '../api/GoogleDrive';
+import Events from '../api/Events';
 import { validationMixin } from './validationMixin';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { frAddress, validHour } from '../helpers/vuelidateCustomVal.js';
+import { can } from '../helpers/acl/can.js';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '../components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -173,8 +180,8 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
-      let payload = { ...this.$_.omit(event, ['dates', '__v', 'company']) }
-      payload = this.$_.pickBy(payload);
+      let payload = { ...omit(event, ['dates', '__v', 'company']) }
+      payload = pickBy(payload);
 
       payload.startDate = event.dates.startDate;
       payload.endDate = event.dates.endDate;
@@ -240,7 +247,7 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        await this.$events.create(payload);
+        await Events.create(payload);
 
         await this.refresh();
         this.creationModal = false;
@@ -283,7 +290,7 @@ export const planningActionMixin = {
           })
             .onOk(this.createEvent)
             .onCancel(() => NotifyPositive('Création annulée'));
-        } else if (this.newEvent.auxiliary && this.$_.get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
+        } else if (this.newEvent.auxiliary && get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
           this.$q.dialog({
             title: 'Confirmation',
             message: this.getConfirmationMessage(),
@@ -323,7 +330,7 @@ export const planningActionMixin = {
         internalHour,
         sector,
         ...eventData
-      } = this.$_.cloneDeep(event);
+      } = cloneDeep(event);
       const dates = { startDate, endDate };
 
       switch (event.type) {
@@ -369,13 +376,13 @@ export const planningActionMixin = {
     },
     canEditEvent (event) {
       if (!event.auxiliary) { // Unassigned event
-        return this.$can({
+        return can({
           user: this.$store.getters['main/user'],
           permissions: [{ name: 'events:edit' }],
         });
       }
 
-      return this.$can({
+      return can({
         user: this.$store.getters['main/user'],
         auxiliaryIdEvent: event.auxiliary._id,
         permissions: [
@@ -400,7 +407,7 @@ export const planningActionMixin = {
       if (event.auxiliary) delete payload.sector;
       if (event.address && !event.address.fullAddress) payload.address = {};
 
-      return this.$_.omit(payload, [
+      return omit(payload, [
         'customer',
         'repetition',
         'staffingBeginning',
@@ -424,7 +431,7 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
-        await this.$events.updateById(this.editedEvent._id, payload);
+        await Events.updateById(this.editedEvent._id, payload);
 
         await this.refresh();
         this.editionModal = false;
@@ -479,7 +486,7 @@ export const planningActionMixin = {
           return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
-        await this.$events.updateById(draggedObject._id, payload);
+        await Events.updateById(draggedObject._id, payload);
         await this.refresh();
 
         NotifyPositive('Évènement modifié');
@@ -508,7 +515,7 @@ export const planningActionMixin = {
     },
     async deleteDocument (driveId) {
       try {
-        await this.$gdrive.removeFileById({ id: driveId });
+        await Gdrive.removeFileById({ id: driveId });
         if (this.creationModal) this.newEvent.attachment = {};
         if (this.editionModal) this.editedEvent.attachment = {};
         NotifyPositive('Document supprimé');
@@ -529,7 +536,7 @@ export const planningActionMixin = {
     async deleteEvent () {
       try {
         this.loading = true
-        await this.$events.deleteById(this.editedEvent._id);
+        await Events.deleteById(this.editedEvent._id);
 
         await this.refresh();
         this.editionModal = false;
@@ -545,10 +552,10 @@ export const planningActionMixin = {
       try {
         this.loading = true;
         if (shouldDeleteRepetition) {
-          await this.$events.deleteRepetition(this.editedEvent._id);
+          await Events.deleteRepetition(this.editedEvent._id);
           await this.refresh();
         } else {
-          await this.$events.deleteById(this.editedEvent._id);
+          await Events.deleteById(this.editedEvent._id);
           await this.refresh();
         }
         this.editionModal = false;
