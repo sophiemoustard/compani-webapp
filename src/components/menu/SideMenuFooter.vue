@@ -31,11 +31,14 @@ export default {
     user () {
       return this.$store.getters['main/user'];
     },
+    userRole () {
+      return this.user.role.client.name;
+    },
     isAuxiliaryWithCompany () {
-      return [AUXILIARY, PLANNING_REFERENT].includes(this.user.role.name);
+      return [AUXILIARY, PLANNING_REFERENT].includes(this.userRole);
     },
     userCanFeedback () {
-      return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.user.role.name);
+      return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.userRole);
     },
   },
   methods: {

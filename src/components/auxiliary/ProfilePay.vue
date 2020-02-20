@@ -119,13 +119,16 @@ export default {
 
       return mapValues(payDocumentNaturesKeyedByValue, 'label');
     },
+    mainUserRole () {
+      return this.mainUser.role.client.name;
+    },
     userProfile () {
-      if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
-      if (COACH_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
-      else return {};
+      if (AUXILIARY_ROLES.includes(this.mainUserRole)) return this.mainUser;
+      if (COACH_ROLES.includes(this.mainUserRole)) return this.$store.getters['rh/getUserProfile'];
+      return {};
     },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUser.role.name);
+      return COACH_ROLES.includes(this.mainUserRole);
     },
     driveFolder () {
       return get(this.userProfile, 'administrative.driveFolder.driveId');

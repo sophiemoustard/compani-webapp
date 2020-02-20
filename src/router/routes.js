@@ -18,10 +18,11 @@ const routes = [
         const user = store.getters['main/user'];
         if (!user) return next({ path: '/login' });
 
-        if (user.role.name === HELPER) return next({ name: 'customer agenda' });
-        if (user.role.name === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account info', params: { id: user._id } });
-        if (AUXILIARY_ROLES.includes(user.role.name)) return next({ name: 'auxiliary agenda' });
-        if (COACH_ROLES.includes(user.role.name)) return next({ name: 'auxiliaries directory' });
+        const userClientRole = user.role.client.name;
+        if (userClientRole === HELPER) return next({ name: 'customer agenda' });
+        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account info', params: { id: user._id } });
+        if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliary agenda' });
+        if (COACH_ROLES.includes(userClientRole)) return next({ name: 'auxiliaries directory' });
         return next({ path: '/login' });
       } catch (e) {
         console.error(e);

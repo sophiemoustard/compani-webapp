@@ -185,7 +185,7 @@ export default {
     customerFolder () {
       return this.$_.get(this.customer, 'driveFolder.driveId', null);
     },
-    user () {
+    mainUser () {
       return this.$store.getters['main/user'];
     },
     documentQuery () {
@@ -195,14 +195,17 @@ export default {
         endDate: this.billingDates.endDate,
       };
     },
+    userRole () {
+      return this.mainUser.role.client.name;
+    },
     isHelper () {
-      return HELPER === this.user.role.name;
+      return HELPER === this.userRole;
     },
     isAdmin () {
-      return ADMIN_ROLES.includes(this.user.role.name);
+      return ADMIN_ROLES.includes(this.userRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.user.role.name);
+      return COACH_ROLES.includes(this.userRole);
     },
     taxCertificateFileError () {
       if (!this.$v.taxCertificate.file.required) return REQUIRED_LABEL;

@@ -112,7 +112,7 @@ export default {
     initFilters () {
       if (this.targetedCustomer) {
         this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedCustomer.identity, 'FL')]);
-      } else if (COACH_ROLES.includes(this.mainUser.role.name)) {
+      } else if (COACH_ROLES.includes(this.mainUser.role.client.name)) {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
