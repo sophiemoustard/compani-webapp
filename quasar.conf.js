@@ -26,7 +26,6 @@ module.exports = function (ctx) {
       'contracts',
       'balances',
       'exports',
-      'pay',
       'finalPay',
       'taxCertificates',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
