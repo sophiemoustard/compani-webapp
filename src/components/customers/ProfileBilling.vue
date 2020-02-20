@@ -84,6 +84,9 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
+import omit from 'lodash/omit';
+import snakeCase from 'lodash/snakeCase';
 import Payments from '../../api/Payments';
 import { validYear } from '../../helpers/vuelidateCustomVal';
 import {
@@ -183,7 +186,7 @@ export default {
       return this.$store.getters['rh/getUserProfile'];
     },
     customerFolder () {
-      return this.$_.get(this.customer, 'driveFolder.driveId', null);
+      return get(this.customer, 'driveFolder.driveId', null);
     },
     mainUser () {
       return this.$store.getters['main/user'];
@@ -391,7 +394,8 @@ export default {
         this.$v.editedPayment.$touch();
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Payments.update(this.editedPayment._id, this.$_.omit(this.editedPayment, '_id'));
+        const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer'])
+        await Payments.update(this.editedPayment._id, payload);
         this.paymentEditionModal = false;
         NotifyPositive('Règlement créé');
         await this.refresh();
@@ -404,7 +408,7 @@ export default {
     },
     // Tax certificates
     taxCertificatesUrl (certificate) {
-      return this.$_.get(certificate, 'driveFile.link')
+      return get(certificate, 'driveFile.link')
         ? certificate.driveFile.link
         : this.$taxCertificates.getPDFUrl(certificate._id);
     },
@@ -413,7 +417,7 @@ export default {
       const form = new FormData();
       const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
       const customerName = formatIdentity(this.customer.identity, 'FL');
-      const fileName = this.$_.snakeCase(`attestation_fiscale_${customerName}_${formattedDate}`);
+      const fileName = snakeCase(`attestation_fiscale_${customerName}_${formattedDate}`);
 
       form.append('date', date);
       form.append('year', year);
