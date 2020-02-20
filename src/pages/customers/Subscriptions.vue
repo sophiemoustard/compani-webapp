@@ -92,7 +92,7 @@
     <!-- Mandate signature modal -->
     <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width>
       <q-card class="full-height" style="width: 80vw">
-        <q-card-section class="row justify-end">
+        <q-card-section class="row justify-end no-wrap">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
@@ -104,7 +104,7 @@
     <!-- CSG modal -->
     <q-dialog ref="modal" v-model="cgsModal" @show="openCgsModal" @hide="closeCgsModal" full-height>
       <q-card class="full-height" style="width: 80vw">
-        <q-card-section class="row justify-between">
+        <q-card-section class="row justify-between no-wrap">
           <h5 class="q-ml-md q-mb-xs">Conditions Générales de Service Alenvi</h5>
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
         </q-card-section>
