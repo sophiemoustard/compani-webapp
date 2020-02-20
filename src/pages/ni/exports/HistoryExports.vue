@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import Exports from '../../../api/Exports';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../../components/popup/notify';
 import { downloadFile } from '../../../helpers/downloadFile';
 import Select from '../../../components/form/Select';
@@ -65,7 +66,7 @@ export default {
         const type = EXPORT_HISTORY_TYPES.find(type => type.value === this.type);
         if (!type) return NotifyNegative('Impossible de téléchager le document');
 
-        const csv = await this.$exports.getHistoryCsv({ ...this.dateRange, type: type.value });
+        const csv = await Exports.getHistoryCsv({ ...this.dateRange, type: type.value });
         await downloadFile(csv, `${type.label}.csv`);
 
         NotifyPositive('Document téléchargé');
