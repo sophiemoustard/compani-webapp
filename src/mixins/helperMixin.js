@@ -3,6 +3,7 @@ import randomize from 'randomatic';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
+import get from 'lodash/get';
 import Roles from '../api/Roles';
 import Users from '../api/Users';
 import Email from '../api/Email';
@@ -171,8 +172,10 @@ export const helperMixin = {
     },
     openEditionModalHelper (helperId) {
       const helper = this.helpers.find(helper => helper._id === helperId);
-      this.editedHelper = pick(helper, ['_id', 'contact.phone', 'local.email', 'identity.firstname', 'identity.lastname']);
-      this.editedHelper.contact = { phone: helper.contact.phone || '' };
+      this.editedHelper = {
+        ...pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
+        contact: { phone: get(helper, 'contact.phone') || '' },
+      };
       this.openEditedHelperModal = true;
     },
     async deleteHelper (helperId) {
