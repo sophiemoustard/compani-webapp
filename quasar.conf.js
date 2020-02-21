@@ -1,5 +1,6 @@
 /* eslint-disable func-names */
 require('dotenv').config();
+const path = require('path');
 
 module.exports = function (ctx) {
   return {
@@ -128,6 +129,12 @@ module.exports = function (ctx) {
           test: /\.(html)$/,
           use: { loader: 'html-loader' },
         });
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias,
+          '@components': path.resolve(__dirname, './src/core/components'),
+          '@api': path.resolve(__dirname, './src/core/api'),
+          '@helpers': path.resolve(__dirname, './src/core/helpers'),
+        }
       },
       env: {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),

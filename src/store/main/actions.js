@@ -1,5 +1,5 @@
-import users from '../../api/Users';
-import redirect from '../../router/redirect';
+import users from '@api/Users';
+import redirect from 'src/router/redirect';
 
 export const getUser = async ({ commit }, userId) => {
   try {

@@ -1,12 +1,11 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import VueMeta from 'vue-meta'
-import { Cookies } from 'quasar'
-
-import routes from './routes'
-import alenvi from '../helpers/alenvi'
-import store from '../store/index'
-import { checkPermission } from '../helpers/checkPermission'
+import Vue from 'vue';
+import VueRouter from 'vue-router';
+import VueMeta from 'vue-meta';
+import { Cookies } from 'quasar';
+import routes from 'src/modules/client/router/routes';
+import alenvi from '@helpers/alenvi';
+import store from 'src/store/index';
+import { checkPermission } from '@helpers/checkPermission';
 
 Vue.use(VueRouter)
 Vue.use(VueMeta);
