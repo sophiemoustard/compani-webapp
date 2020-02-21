@@ -95,6 +95,10 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import Customers from '@api/Customers';
+import Stats from '@api/Stats';
+import Users from '@api/Users';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
@@ -199,7 +203,7 @@ export default {
       return AUXILIARY_ROLES.includes(this.mainUser.role.client.name);
     },
     hasSecondaryAddress () {
-      return !!this.$_.get(this.customer, 'contact.secondaryAddress.fullAddress');
+      return !!get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
     auxiliariesOptions () {
       const auxiliariesOptions = [{ label: 'Pas de référent', value: '' }];
@@ -232,7 +236,7 @@ export default {
   },
   methods: {
     getAuxiliaryAvatar (picture) {
-      return picture ? this.$_.get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
+      return picture ? get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
     },
     toggleAuxiliarySelect () {
       return this.$refs['auxiliarySelect'].show();
@@ -240,7 +244,7 @@ export default {
     async getAuxiliaries () {
       try {
         this.loading = true;
-        const activeAuxiliaries = await this.$users.listActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const activeAuxiliaries = await Users.listActive({ role: [AUXILIARY, PLANNING_REFERENT] });
         this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
         this.loading = false;
       } catch (e) {
@@ -250,7 +254,7 @@ export default {
     },
     async getCustomerFollowUp () {
       try {
-        this.customerFollowUp = await this.$stats.getCustomerFollowUp({ customer: this.customer._id });
+        this.customerFollowUp = await Stats.getCustomerFollowUp({ customer: this.customer._id });
       } catch (e) {
         this.customerFollowUp = [];
         NotifyNegative('Erreur lors de la récupération des auxiliaires');
@@ -258,7 +262,7 @@ export default {
     },
     async getCustomerFundingsMonitoring () {
       try {
-        this.fundingsMonitoring = await this.$stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
+        this.fundingsMonitoring = await Stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.fundingsMonitoring = [];
@@ -267,8 +271,8 @@ export default {
     },
     async refreshCustomer () {
       try {
-        if (this.$_.get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
-        const customer = await this.$customers.getById(this.userProfile._id);
+        if (get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
+        const customer = await Customers.getById(this.userProfile._id);
         this.mergeCustomer(customer);
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.isLoaded = true;
@@ -283,13 +287,13 @@ export default {
       this.customer = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      this.tmpInput = path === 'referent' ? this.$_.get(this.customer, 'referent._id', '') : this.$_.get(this.customer, path);
+      this.tmpInput = path === 'referent' ? get(this.customer, 'referent._id', '') : get(this.customer, path);
     },
     getPhoneLink (link) {
       return link ? `tel:+33${link.substring(1)}` : '-';
     },
     getAvatar (value) {
-      const link = this.$_.get(value, 'picture.link', '');
+      const link = get(value, 'picture.link', '');
       return link || DEFAULT_AVATAR;
     },
   },
