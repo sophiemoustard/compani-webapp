@@ -756,7 +756,7 @@ export default {
         await gdrive.removeFileById({ id: driveId });
         let payload;
         if (path === 'certificates') {
-          payload = { [`administrative.${path}`]: { driveId } };
+          payload = { 'certificates': { driveId } };
           await Users.updateCertificates(this.currentUser._id, payload);
         } else {
           payload = set({}, path, { driveId: null, link: null });
