@@ -1,0 +1,127 @@
+<template>
+  <div class="margin-input col-xs-12 col-md-6">
+    <div v-if="displayCaption" class="row justify-between">
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <q-icon v-if="error" name="error_outline" color="secondary" />
+    </div>
+    <div v-if="document && document.driveId" class="row justify-between" style="background: white">
+      <div class="doc-thumbnail">
+        <ni-custom-img :driveId="document.driveId" :alt="alt" />
+      </div>
+      <div class="self-end doc-delete">
+        <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument" />
+        <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
+      </div>
+    </div>
+    <q-field borderless v-if="(!document || !document.driveId)" :error="error"
+      :error-message="errorLabel">
+      <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
+        text-color="black" @failed="failMsg" :form-fields="additionalFields"
+        @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"/>
+    </q-field>
+  </div>
+</template>
+
+<script>
+import { Cookies, openURL } from 'quasar';
+
+import CustomImg from '@components/form/CustomImg';
+import { NotifyNegative } from '@components/popup/notify';
+
+export default {
+  components: {
+    'ni-custom-img': CustomImg,
+  },
+  props: {
+    caption: { type: String, default: '' },
+    error: { type: Boolean, default: false },
+    path: { type: String, default: '' },
+    alt: { type: String, default: '' },
+    name: { type: String, default: 'file' },
+    additionalValue: { type: String, default: '' },
+    entity: { type: Object, default: () => {} },
+    url: { type: String, default: '' },
+    errorLabel: { type: String, default: 'Document requis' },
+    displayCaption: { type: Boolean, default: true },
+    disable: { type: Boolean, default: false },
+    inModal: { type: Boolean, default: false },
+    extensions: { type: String, default: '' },
+    requiredField: { type: Boolean, default: false },
+    multiple: { type: Boolean, default: false },
+    label: { type: String, default: 'Pas de document' },
+  },
+  data () {
+    return {
+      headers: [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }],
+    }
+  },
+  methods: {
+    deleteDocument () {
+      this.$emit('delete');
+    },
+    documentUploaded ({ file, xhr }) {
+      this.$emit('uploaded', { file, xhr });
+    },
+    goToUrl (url) {
+      url = `${url}?usp=sharing`
+      openURL(url);
+    },
+    failMsg () {
+      return NotifyNegative('Echec de l\'envoi du document');
+    },
+  },
+  computed: {
+    additionalFields () {
+      return [{ name: 'fileName', value: this.additionalValue }, { name: 'type', value: this.name }];
+    },
+    document () {
+      return this.$_.get(this.entity, this.path);
+    },
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+  .doc-thumbnail
+    padding: 13px 0px 40px 12px
+
+  .doc-delete
+    padding: 0px 14px 17px 0px
+
+  /deep/ .q-field__control
+    height: 40px
+    min-height: 40px
+
+  /deep/ .q-field__append
+    display: none
+  /deep/ .q-field__bottom
+      color: $secondary
+      padding-top: 3px
+
+  /deep/ .q-uploader
+    width: 100%
+    &--bordered
+      border: 1px solid #d0d0d0
+    .q-uploader__list
+      display: none
+    .q-uploader__header-content
+      border-radius: 3px
+      height: 38px
+      margin: 0
+      .q-btn__content
+        color: $grey
+    .q-btn
+      margin: 0
+      padding: 0
+    .col
+      margin: 0
+    .q-uploader__title
+      font-weight: 400
+      overflow: initial
+    .q-uploader__subtitle
+      display: none
+      height: 0
+    .q-uploader__header:before
+      opacity:0
+
+</style>
