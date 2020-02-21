@@ -7,7 +7,6 @@ module.exports = function (ctx) {
     boot: [
       // 'i18n',
       'axios',
-      'activationCode',
       'alenviAxios',
       'customers',
       'googleDrive',
@@ -16,9 +15,7 @@ module.exports = function (ctx) {
       'moment',
       'resize',
       'services',
-      'stats',
       'surcharges',
-      'twilio',
       'vue-croppa',
       'vMask',
       'users',

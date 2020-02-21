@@ -58,8 +58,12 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
+import ActivationCode from '@api/ActivationCode';
+import Customers from '@api/Customers';
+import Twilio from '@api/Twilio';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
@@ -101,7 +105,7 @@ export default {
       return !this.user.contracts || !this.user.contracts.length;
     },
     companyName () {
-      return this.$_.get(this.currentUser, 'company.tradeName');
+      return get(this.currentUser, 'company.tradeName');
     },
     userActivity () {
       if (this.customer) {
@@ -172,7 +176,7 @@ export default {
     async sendMessage () {
       this.loading = true;
       if (this.typeMessage === 'CA') {
-        await this.$activationCode.create({ code: this.activationCode, user: this.user._id });
+        await ActivationCode.create({ code: this.activationCode, user: this.user._id });
       }
       await this.sendSMS();
       this.loading = false;
@@ -181,7 +185,7 @@ export default {
     async sendSMS () {
       try {
         if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
-        await this.$twilio.sendSMS({
+        await Twilio.sendSMS({
           to: `+33${this.user.contact.phone.substring(1)}`,
           body: this.messageComp,
         });
@@ -194,7 +198,7 @@ export default {
     },
     async deleteCustomer () {
       try {
-        await this.$customers.remove(this.user._id);
+        await Customers.remove(this.user._id);
         NotifyPositive('Bénéficiaire supprimé.');
         this.$router.push({ name: 'customers directory' });
       } catch (e) {
