@@ -13,8 +13,6 @@ module.exports = function (ctx) {
       'lodash',
       'moment',
       'resize',
-      'services',
-      'surcharges',
       'vue-croppa',
       'vMask',
       'users',
