@@ -10,7 +10,6 @@ module.exports = function (ctx) {
       'alenviAxios',
       'customers',
       'googleDrive',
-      'email',
       'lodash',
       'moment',
       'resize',
