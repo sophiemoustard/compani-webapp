@@ -9,7 +9,6 @@ module.exports = function (ctx) {
       'axios',
       'activationCode',
       'alenviAxios',
-      'creditNotes',
       'customers',
       'googleDrive',
       'email',
