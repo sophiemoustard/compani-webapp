@@ -58,7 +58,7 @@ import mapValues from 'lodash/mapValues';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
-import Modal from '../../components/Modal';
+import Modal from '../../components/modal/Modal';
 import LargeTable from '../../components/table/LargeTable';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocuments from '../../api/PayDocuments';

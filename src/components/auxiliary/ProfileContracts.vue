@@ -108,7 +108,7 @@ import Select from '../form/Select';
 import Input from '../form/Input';
 import DateInput from '../form/DateInput';
 import NiContracts from '../contracts/Contracts';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import VersionEditionModal from '../contracts/VersionEditionModal.vue';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../popup/notify';
 import {

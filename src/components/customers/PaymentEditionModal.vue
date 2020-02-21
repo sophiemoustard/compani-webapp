@@ -23,7 +23,7 @@
 import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../data/constants.js';
 import Select from '../form/Select';
 import Input from '../form/Input';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import DateInput from '../form/DateInput';
 import { formatIdentity } from '../../helpers/utils.js';
 

@@ -235,7 +235,7 @@ import { posDecimals, sector } from '../../../helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Input from '../../../components/form/Input';
 import FileUploader from '../../../components/form/FileUploader.vue';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import ResponsiveTable from '../../../components/table/ResponsiveTable';
 import { configMixin } from '../../../mixins/configMixin';
 import { REQUIRED_LABEL } from '../../../data/constants';

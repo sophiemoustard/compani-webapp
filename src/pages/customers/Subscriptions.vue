@@ -102,20 +102,8 @@
     </q-dialog>
 
     <!-- CSG modal -->
-    <q-dialog ref="modal" v-model="cgsModal" @show="openCgsModal" @hide="closeCgsModal" full-height>
-      <q-card class="full-height" style="width: 80vw">
-        <q-card-section class="row justify-between no-wrap">
-          <h5 class="q-ml-md q-mb-xs">Conditions Générales de Service Alenvi</h5>
-          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
-        </q-card-section>
-        <q-card-section>
-          <div v-show="showCgs" v-html="cgs" class="modal-padding"></div>
-        </q-card-section>
-        <q-inner-loading :showing="!showCgs">
-          <q-spinner-facebook size="30px" color="primary" />
-        </q-inner-loading>
-      </q-card>
-    </q-dialog>
+    <ni-html-modal title="Conditions Générales de Service Alenvi" v-model="cgsModal" :html="cgs" @show="openCgsModal"
+      @hide="closeCgsModal" :loading="!showCgs" />
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
@@ -143,7 +131,8 @@ import Drive from '../../api/GoogleDrive';
 import Customers from '../../api/Customers';
 import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
-import Modal from '../../components/Modal';
+import Modal from '../../components/modal/Modal';
+import HtmlModal from '../../components/modal/HtmlModal';
 import ResponsiveTable from '../../components/table/ResponsiveTable';
 import FundingGridTable from '../../components/table/FundingGridTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
@@ -164,6 +153,7 @@ export default {
     'ni-input': Input,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
+    'ni-html-modal': HtmlModal,
     'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
   },
@@ -479,5 +469,4 @@ export default {
   .q-dialog__inner
     &--minimized > div
       max-width: none
-
 </style>

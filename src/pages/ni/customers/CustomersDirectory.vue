@@ -54,7 +54,7 @@ import SearchAddress from '../../../components/form/SearchAddress';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import DirectoryHeader from '../../../components/DirectoryHeader';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../../components/popup/notify.js';
 import { customerProfileValidation } from '../../../helpers/customerProfileValidation.js';
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
