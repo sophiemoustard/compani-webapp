@@ -1,6 +1,12 @@
 
 import randomize from 'randomatic';
+import pickBy from 'lodash/pickBy';
+import pick from 'lodash/pick';
+import omit from 'lodash/omit';
+import get from 'lodash/get';
 import Roles from '../api/Roles';
+import Users from '../api/Users';
+import Email from '../api/Email';
 import { clear, formatPhone } from '../helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../components/popup/notify';
 import { HELPER, REQUIRED_LABEL } from '../data/constants';
@@ -88,7 +94,7 @@ export const helperMixin = {
     // Refresh
     async getUserHelpers () {
       try {
-        this.helpers = await this.$users.list({ customers: this.userProfile._id });
+        this.helpers = await Users.list({ customers: this.userProfile._id });
       } catch (e) {
         this.helpers = [];
         console.error(e);
@@ -105,23 +111,21 @@ export const helperMixin = {
       this.editedHelper = Object.assign({}, clear(this.editedHelper));
       this.openEditedHelperModal = false;
     },
-    async createAlenviHelper () {
-      this.newHelper.local.password = randomize('0', 6);
-      this.newHelper.customers = [this.userProfile._id];
+    async formatHelper () {
       const roles = await Roles.list({ name: HELPER });
       if (roles.length === 0) throw new Error('Role not found');
-      this.newHelper.role = roles[0]._id;
-      this.newHelper.identity = this.$_.pickBy(this.newHelper.identity);
-      const payload = this.$_.pickBy(this.newHelper);
-      await this.$users.create(payload);
-    },
-    async sendWelcomingEmail () {
-      await this.$email.sendWelcome({
-        receiver: {
+
+      const payload = {
+        local: {
           email: this.newHelper.local.email,
-          password: this.newHelper.local.password,
+          password: randomize('0', 6),
         },
-      });
+        customers: [this.userProfile._id],
+        role: roles[0]._id,
+        identity: pickBy(this.newHelper.identity),
+      };
+
+      return pickBy(payload);
     },
     async submitHelper () {
       try {
@@ -129,10 +133,12 @@ export const helperMixin = {
         this.$v.newHelper.$touch();
         if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.createAlenviHelper();
+        const payload = await this.formatHelper();
+        await Users.create(pickBy(payload));
         NotifyPositive('Aidant créé');
 
-        await this.sendWelcomingEmail();
+        const receiver = { email: this.newHelper.local.email, password: this.newHelper.local.password };
+        await Email.sendWelcome({ receiver });
         NotifyPositive('Email envoyé');
 
         await this.getUserHelpers();
@@ -151,9 +157,9 @@ export const helperMixin = {
         this.$v.editedHelper.$touch();
         if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = Object.assign({}, this.$_.omit(this.editedHelper, ['_id']));
+        const payload = Object.assign({}, omit(this.editedHelper, ['_id']));
         delete payload.local;
-        await this.$users.updateById(this.editedHelper._id, payload);
+        await Users.updateById(this.editedHelper._id, payload);
         NotifyPositive('Aidant modifié');
 
         await this.getUserHelpers();
@@ -166,13 +172,15 @@ export const helperMixin = {
     },
     openEditionModalHelper (helperId) {
       const helper = this.helpers.find(helper => helper._id === helperId);
-      this.editedHelper = this.$_.pick(helper, ['_id', 'contact.phone', 'local.email', 'identity.firstname', 'identity.lastname']);
-      this.editedHelper.contact = { phone: helper.contact.phone || '' };
+      this.editedHelper = {
+        ...pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
+        contact: { phone: get(helper, 'contact.phone') || '' },
+      };
       this.openEditedHelperModal = true;
     },
     async deleteHelper (helperId) {
       try {
-        await this.$users.deleteById(helperId);
+        await Users.deleteById(helperId);
         await this.getUserHelpers();
         NotifyPositive('Aidant supprimé');
       } catch (e) {

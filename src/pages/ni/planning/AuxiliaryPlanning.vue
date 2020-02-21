@@ -24,6 +24,10 @@
 
 <script>
 import cloneDeep from 'lodash/cloneDeep';
+import pick from 'lodash/pick';
+import Customers from '../../../api/Customers';
+import Events from '../../../api/Events';
+import EventHistories from '../../../api/EventHistories';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
 import EventEditionModal from '../../../components/planning/EventEditionModal';
 import Planning from '../../../components/planning/Planning.vue';
@@ -136,7 +140,7 @@ export default {
     initFilters () {
       if (this.targetedAuxiliary) {
         this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
-      } else if (COACH_ROLES.includes(this.mainUser.role.name)) {
+      } else if (COACH_ROLES.includes(this.mainUser.role.client.name)) {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
@@ -196,8 +200,8 @@ export default {
           params.sector = this.filteredSectors.map(sector => sector._id);
         }
 
-        this.events = await this.$events.list(params);
-        this.workingStats = await this.$events.workingStats(this.$_.pick(params, ['startDate', 'endDate', 'auxiliary']));
+        this.events = await Events.list(params);
+        this.workingStats = await Events.workingStats(pick(params, ['startDate', 'endDate', 'auxiliary']));
 
         if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
@@ -208,7 +212,7 @@ export default {
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.listWithSubscriptions();
+        this.customers = await Customers.listWithSubscriptions();
       } catch (e) {
         console.error(e);
         this.customers = [];
@@ -224,10 +228,10 @@ export default {
 
         let oldEventHistories;
         if (lastCreatedAt) {
-          oldEventHistories = await this.$eventHistories.list({ ...params, createdAt: lastCreatedAt });
+          oldEventHistories = await EventHistories.list({ ...params, createdAt: lastCreatedAt });
           this.eventHistories.push(...oldEventHistories);
         } else {
-          oldEventHistories = await this.$eventHistories.list(params);
+          oldEventHistories = await EventHistories.list(params);
           this.eventHistories = oldEventHistories;
         }
 

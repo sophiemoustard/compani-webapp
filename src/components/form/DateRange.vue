@@ -6,11 +6,10 @@
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
       <div class="date-container justify-center items-center row">
-        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" :min="min"
-          @blur="blur" />
+        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blur" />
         <p class="delimiter">-</p>
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          :min="value.startDate" :max="max" @blur="blur" />
+          :min="value.startDate" @blur="blur" />
       </div>
     </q-field>
   </div>
@@ -38,19 +37,10 @@ export default {
     requiredField: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorLabel: { type: String, default: REQUIRED_LABEL },
-    min: { type: String, default: '' },
-    max: { type: String, default: '' },
   },
   methods: {
     update (value, key) {
-      let dates = { ...this.value, [key]: value }
-      if (this.$moment(dates.startDate).isAfter(this.$moment(dates.endDate))) {
-        dates = {
-          startDate: dates.startDate,
-          endDate: this.$moment(dates.startDate).endOf('d').toISOString(),
-        };
-      }
-      this.$emit('input', dates);
+      this.$emit('input', { ...this.value, [key]: value });
     },
     blur () {
       this.$emit('blur');

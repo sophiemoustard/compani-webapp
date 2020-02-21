@@ -154,12 +154,19 @@
 </template>
 
 <script>
+import cloneDeep from 'lodash/cloneDeep';
+import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
+import pick from 'lodash/pick';
+import Events from '../../../api/Events';
+import Customers from '../../../api/Customers';
+import CreditNotes from '../../../api/CreditNotes';
 import LargeTable from '../../../components/table/LargeTable';
 import DateInput from '../../../components/form/DateInput';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import OptionGroup from '../../../components/form/OptionGroup';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
 import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';
@@ -431,7 +438,7 @@ export default {
     async refreshCustomersOptions () {
       try {
         this.customersOptions = [];
-        const customers = await this.$customers.listWithBilledEvents();
+        const customers = await Customers.listWithBilledEvents();
         for (let i = 0, l = customers.length; i < l; i++) {
           this.customersOptions.push({
             subscriptions: customers[i].subscriptions,
@@ -448,7 +455,7 @@ export default {
     },
     async refreshCreditNotes () {
       try {
-        this.creditNotes = await this.$creditNotes.list();
+        this.creditNotes = await CreditNotes.list();
       } catch (e) {
         this.creditNotes = [];
         console.error(e);
@@ -461,7 +468,7 @@ export default {
       else if (this.editedCreditNote.customer) customer = this.editedCreditNote.customer;
 
       return events.map(event => {
-        const cnEvent = this.$_.cloneDeep(event);
+        const cnEvent = cloneDeep(event);
         const subscription = customer.subscriptions.find(sub => sub._id === cnEvent.subscription);
         cnEvent.eventId = event._id;
         cnEvent.serviceName = subscription.service.name;
@@ -480,7 +487,7 @@ export default {
             isBilled: true,
           };
           if (this.newCreditNote.thirdPartyPayer) query.thirdPartyPayer = this.newCreditNote.thirdPartyPayer;
-          this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await this.$events.listForCreditNotes(query));
+          this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
         } else if (this.hasLinkedEvents && this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate) {
           const query = {
             startDate: this.editedCreditNote.startDate,
@@ -493,7 +500,7 @@ export default {
             const creditNote = this.creditNotes.find(cd => cd._id === this.editedCreditNote.linkedCreditNote);
             query.thirdPartyPayer = creditNote.thirdPartyPayer._id;
           }
-          this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await this.$events.listForCreditNotes(query));
+          this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
         }
       } catch (e) {
         this.creditNoteEvents = [];
@@ -573,8 +580,8 @@ export default {
       return creditNoteEvents.map(eventId => {
         const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
 
-        const event = this.$_.pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
-        event.bills = this.$_.omit(event.bills, '_id');
+        const event = pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
+        event.bills = omit(event.bills, '_id');
         if (cnEvent.bills.surcharges) event.bills.surcharges = cnEvent.bills.surcharges.map(sur => this.$_.omit(sur, '_id'));
 
         return event;
@@ -608,7 +615,7 @@ export default {
         payload = { ...payload, ...this.formatPayloadWithLinkedEvents(creditNote, selectedCustomer) };
       }
 
-      return this.$_.pickBy(payload, prop => prop != null);
+      return pickBy(payload, prop => prop != null);
     },
     async createNewCreditNote () {
       try {
@@ -616,7 +623,7 @@ export default {
         if (this.$v.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$creditNotes.create(this.formatPayload(this.newCreditNote));
+        await CreditNotes.create(this.formatPayload(this.newCreditNote));
 
         NotifyPositive('Avoir créé');
         await this.refreshCreditNotes();
@@ -664,7 +671,7 @@ export default {
         this.loading = true;
         const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer._id };
         if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
-        await this.$creditNotes.updateById(this.editedCreditNote._id, payload);
+        await CreditNotes.updateById(this.editedCreditNote._id, payload);
 
         NotifyPositive('Avoir édité');
         await this.refreshCreditNotes();
@@ -679,7 +686,7 @@ export default {
     // Deletion
     async deleteCreditNote (id) {
       try {
-        await this.$creditNotes.remove(id);
+        await CreditNotes.remove(id);
         await this.refreshCreditNotes();
         NotifyPositive('Avoir supprimé');
       } catch (e) {

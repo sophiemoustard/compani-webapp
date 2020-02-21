@@ -27,7 +27,7 @@ import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '../../d
 import Select from '../form/Select';
 import Input from '../form/Input';
 import DateInput from '../form/DateInput';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import { formatIdentity } from '../../helpers/utils.js';
 
 export default {
@@ -44,7 +44,7 @@ export default {
     loading: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
     selectedCustomer: { type: Object, default: () => ({}) },
-    selectedClientName: { type: String, default: '' },
+    selectedTpp: { type: Object, default: () => ({}) },
   },
   data () {
     return {
@@ -69,6 +69,9 @@ export default {
     },
     customerFullname () {
       return formatIdentity(this.selectedCustomer.identity, 'FL');
+    },
+    selectedClientName () {
+      return this.newPayment.thirdPartyPayer ? this.selectedTpp.name : this.customerFullname;
     },
   },
   methods: {

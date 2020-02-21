@@ -73,7 +73,11 @@
 <script>
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
+import get from 'lodash/get';
+import cloneDeep from 'lodash/cloneDeep';
+import orderBy from 'lodash/orderBy';
 import Roles from '../../../api/Roles';
+import Users from '../../../api/Users';
 import { frPhoneNumber, frAddress } from '../../../helpers/vuelidateCustomVal';
 import { userProfileValidation } from '../../../helpers/userProfileValidation';
 import { taskValidation } from '../../../helpers/taskValidation';
@@ -82,7 +86,7 @@ import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
@@ -224,7 +228,7 @@ export default {
     },
   },
   created () {
-    this.newUser = this.$_.cloneDeep(this.defaultNewUser);
+    this.newUser = cloneDeep(this.defaultNewUser);
   },
   mounted () {
     this.getUserList();
@@ -281,65 +285,45 @@ export default {
       this.searchStr = value;
     },
     getHiringDate (user) {
-      let hiringDate = null;
-      if (user.contracts && user.contracts.length > 0) {
-        const contracts = user.contracts;
-        if (contracts.length === 1) {
-          hiringDate = contracts[0].startDate;
-        } else {
-          hiringDate = this.$_.orderBy(contracts, ['startDate'], ['asc'])[0].startDate;
-        }
-      }
-      return hiringDate;
+      if (!user.contracts || user.contracts.length === 0) return null;
+      if (user.contracts.length === 1) return user.contracts[0].startDate;
+      return orderBy(user.contracts, ['startDate'], ['asc'])[0].startDate;
+    },
+    formatUser (user) {
+      const hiringDate = this.getHiringDate(user);
+      const formattedUser = {
+        auxiliary: {
+          _id: user._id,
+          name: `${user.identity.firstname} ${user.identity.lastname}`,
+          picture: user.picture ? user.picture.link : null,
+        },
+        startDate: user.createdAt,
+        sector: user.sector ? user.sector.name : 'N/A',
+        isActive: user.isActive,
+        hiringDate,
+      };
+
+      if (!user.isActive) return formattedUser;
+
+      const checkProfileErrors = userProfileValidation(user);
+      this.$store.commit('rh/saveNotification', {
+        type: 'profiles',
+        _id: user._id,
+        exists: !!checkProfileErrors.error,
+      });
+      const checkTasks = taskValidation(user);
+      this.$store.commit('rh/saveNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
+
+      return { ...formattedUser, profileErrors: checkProfileErrors.error, tasksErrors: checkTasks };
     },
     async getUserList () {
       try {
-        const users = await this.$users.list({ role: AUXILIARY_ROLES });
-        this.userList = users.map((user) => {
-          const hiringDate = this.getHiringDate(user);
-          if (user.isActive) {
-            const checkProfileErrors = userProfileValidation(user);
-            this.$store.commit('rh/saveNotification', {
-              type: 'profiles',
-              _id: user._id,
-              exists: !!checkProfileErrors.error,
-            });
-            const checkTasks = taskValidation(user);
-            this.$store.commit('rh/saveNotification', {
-              type: 'tasks',
-              _id: user._id,
-              exists: checkTasks,
-            });
-            return {
-              auxiliary: {
-                _id: user._id,
-                name: `${user.identity.firstname} ${user.identity.lastname}`,
-                picture: user.picture ? user.picture.link : null,
-              },
-              profileErrors: checkProfileErrors.error,
-              tasksErrors: checkTasks,
-              startDate: user.createdAt,
-              sector: user.sector ? user.sector.name : 'N/A',
-              isActive: user.isActive,
-              hiringDate,
-            }
-          }
-          return {
-            auxiliary: {
-              _id: user._id,
-              name: `${user.identity.firstname} ${user.identity.lastname}`,
-              picture: user.picture ? user.picture.link : null,
-            },
-            startDate: user.createdAt,
-            sector: user.sector ? user.sector.name : 'N/A',
-            isActive: user.isActive,
-            hiringDate,
-          }
-        });
-        this.tableLoading = false;
+        const users = await Users.list({ role: AUXILIARY_ROLES });
+        this.userList = users.map(this.formatUser);
       } catch (e) {
-        this.tableLoading = false;
         console.error(e);
+      } finally {
+        this.tableLoading = false;
       }
     },
     goToUserProfile (userId) {
@@ -347,28 +331,29 @@ export default {
     },
     resetForm () {
       this.$v.newUser.$reset();
-      this.newUser = this.$_.cloneDeep(this.defaultNewUser);
+      this.newUser = cloneDeep(this.defaultNewUser);
     },
-    formatPayloadForUserCreation (roles) {
-      const payload = this.$_.cloneDeep(this.newUser);
+    async formatUserCreationPayload () {
+      const roles = await Roles.list({ name: AUXILIARY });
+      if (roles.length === 0) throw new Error('Role not found');
 
-      payload.local.password = randomize('*', 10);
-      payload.role = roles[0]._id;
-
-      if (!payload.contact.address.fullAddress) delete payload.contact.address;
+      const payload = {
+        ...cloneDeep(this.newUser),
+        local: { password: randomize('*', 10), email: this.newUser.local.email },
+        role: roles[0]._id,
+      };
+      if (!get(payload, 'contact.address.fullAddress')) delete payload.contact.address;
 
       return payload;
     },
     async createAlenviUser () {
-      const folderId = this.$_.get(this.company, 'auxiliariesFolderId', null);
+      const folderId = get(this.company, 'auxiliariesFolderId', null);
       if (!folderId) throw new Error('No auxiliary folder in company drive');
-      const roles = await Roles.list({ name: AUXILIARY });
-      if (roles.length === 0) throw new Error('Role not found');
 
-      const payload = this.formatPayloadForUserCreation(roles);
+      const payload = await this.formatUserCreationPayload();
 
-      const newUser = await this.$users.create(payload);
-      await this.$users.createDriveFolder(newUser._id, { parentFolderId: folderId });
+      const newUser = await Users.create(payload);
+      await Users.createDriveFolder(newUser._id, { parentFolderId: folderId });
       return newUser;
     },
     async sendSms (user) {

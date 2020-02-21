@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import FinalPay from '../../../api/FinalPay';
 import { payMixin } from '../../../mixins/payMixin';
 import { editableTdMixin } from '../../../mixins/editableTdMixin';
 import EditableTd from '../../../components/table/EditableTd';
@@ -114,7 +115,7 @@ export default {
   methods: {
     async refreshFinalPay () {
       try {
-        const draftFinalPay = await this.$finalPay.getDraftFinalPay({
+        const draftFinalPay = await FinalPay.getDraftFinalPay({
           startDate: this.$moment().startOf('M').toISOString(),
           endDate: this.$moment().endOf('M').toISOString(),
         });
@@ -159,7 +160,7 @@ export default {
         if (!this.hasSelectedRows) return;
 
         const finalPayList = this.selected.map(row => this.formatPayload(row));
-        await this.$finalPay.createList(finalPayList);
+        await FinalPay.createList(finalPayList);
         NotifyPositive('Soldes tout compte créés');
         await this.refreshFinalPay();
         this.selected = [];

@@ -1,10 +1,10 @@
 <template>
-  <ni-select :in-modal="inModal" :value="value" ref="selectSector" @input="updateSector" :options="sectors"
-    @blur="blurHandler" @focus="focusHandler" filter-placeholder="Rechercher" :error="error" :error-label="errorLabel"
-    :in-form="inForm" />
+  <ni-select :in-modal="inModal" :value="value" @input="updateSector" :options="sectors" :error-label="errorLabel"
+    @blur="blurHandler" @focus="focusHandler" filter-placeholder="Rechercher" :error="error" ref="selectSector" />
 </template>
 
 <script>
+import Sectors from '../../api/Sectors';
 import Select from './Select';
 import { REQUIRED_LABEL } from '../../data/constants';
 
@@ -14,7 +14,6 @@ export default {
     value: { type: String, default: '' },
     myError: { type: String, default: null },
     inModal: { type: Boolean, default: false },
-    inForm: { type: Boolean, default: false },
     companyId: { type: String, default: '' },
     allowNullOption: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
@@ -39,7 +38,7 @@ export default {
   methods: {
     async getSectors () {
       try {
-        const sectors = await this.$sectors.list();
+        const sectors = await Sectors.list();
         if (this.allowNullOption) sectors.push({ name: 'Toutes les équipes', _id: '' });
         this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {

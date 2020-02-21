@@ -57,10 +57,6 @@ export default {
   async updateCertificates (userId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/certificates`, data);
   },
-  async getRoles () {
-    const rolesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`);
-    return rolesRaw.data.data.roles;
-  },
   async forgotPassword (data) {
     const mailInfo = await axios.post(`${process.env.API_HOSTNAME}/users/forgotPassword`, data);
     return mailInfo.data.data.mailInfo;

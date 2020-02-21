@@ -35,6 +35,9 @@
 </template>
 
 <script>
+import Users from '../../../api/Users';
+import Customers from '../../../api/Customers';
+import Events from '../../../api/Events';
 import Agenda from '../../../components/planning/Agenda';
 import PlanningNavigation from '../../../components/planning/PlanningNavigation';
 import EventCreationModal from '../../../components/planning/EventCreationModal';
@@ -45,6 +48,7 @@ import { planningTimelineMixin } from '../../../mixins/planningTimelineMixin';
 import { planningActionMixin } from '../../../mixins/planningActionMixin';
 import { NotifyWarning } from '../../../components/popup/notify';
 import { formatIdentity } from '../../../helpers/utils';
+import { can } from '../../../helpers/acl/can';
 
 export default {
   name: 'AuxiliaryAgenda',
@@ -130,28 +134,28 @@ export default {
           endDate: this.endOfWeek,
           auxiliary: this.selectedAuxiliary._id,
         }
-        this.events = await this.$events.list(params);
+        this.events = await Events.list(params);
       } catch (e) {
         this.events = [];
       }
     },
     async getAuxiliaries () {
       try {
-        this.auxiliaries = await this.$users.list();
+        this.auxiliaries = await Users.list();
       } catch (e) {
         this.auxiliaries = [];
       }
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.listWithSubscriptions();
+        this.customers = await Customers.listWithSubscriptions();
       } catch (e) {
         this.customers = [];
       }
     },
     // Event creation
     openCreationModal (dayIndex) {
-      const can = this.$can({
+      const isAllowed = can({
         user: this.currentUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
         permissions: [
@@ -159,7 +163,7 @@ export default {
           { name: 'events:own:edit', rule: 'isOwner' },
         ],
       });
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       const selectedDay = this.days[dayIndex];
       if (!this.canCreateEvent(this.selectedAuxiliary, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');

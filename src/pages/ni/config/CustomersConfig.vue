@@ -326,7 +326,7 @@ import { tableMixin } from '../../../mixins/tableMixin.js';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import ReponsiveTable from '../../../components/table/ResponsiveTable';
 import { frAddress, posDecimals, positiveNumber } from '../../../helpers/vuelidateCustomVal';
 import {

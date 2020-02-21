@@ -5,8 +5,6 @@ import store from '../store/index';
 import alenvi from '../helpers/alenvi';
 import { HELPER, AUXILIARY_ROLES, COACH_ROLES, AUXILIARY_WITHOUT_COMPANY } from '../data/constants.js';
 
-const isAuxiliaryWithoutCompany = user => user.role.name === AUXILIARY_WITHOUT_COMPANY;
-
 const routes = [
   {
     path: '/',
@@ -18,12 +16,14 @@ const routes = [
           await store.dispatch('main/getUser', Cookies.get('user_id'));
         }
         const user = store.getters['main/user'];
-        if (user && user.role.name === HELPER) return next({ name: 'customer agenda' });
-        else if (user && AUXILIARY_ROLES.includes(user.role.name)) {
-          if (isAuxiliaryWithoutCompany(user)) next({ name: 'account info', params: { id: user._id } });
-          else return next({ name: 'auxiliary agenda' });
-        } else if (user && COACH_ROLES.includes(user.role.name)) return next({ name: 'auxiliaries directory' });
-        else next({ path: '/login' });
+        if (!user) return next({ path: '/login' });
+
+        const userClientRole = user.role.client.name;
+        if (userClientRole === HELPER) return next({ name: 'customer agenda' });
+        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account info', params: { id: user._id } });
+        if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliary agenda' });
+        if (COACH_ROLES.includes(userClientRole)) return next({ name: 'auxiliaries directory' });
+        return next({ path: '/login' });
       } catch (e) {
         console.error(e);
       }
