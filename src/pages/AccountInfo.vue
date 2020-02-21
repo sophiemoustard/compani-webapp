@@ -28,30 +28,10 @@
     </div>
 
     <!-- RGPD modal -->
-    <q-dialog v-model="rgpdModal" full-height full-width>
-      <q-card class="full-height" style="width: 80vw">
-        <q-card-section class="row justify-between">
-          <h5 class="q-ml-md q-mb-xs">Politique RGPD</h5>
-          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="rgpdModal = false" />
-        </q-card-section>
-        <q-card-section>
-          <div v-html="rgpd" class="modal-padding"></div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
 
     <!-- CSU modal -->
-    <q-dialog v-model="cguModal" full-height full-width>
-      <q-card class="full-height" style="width: 80vw">
-        <q-card-section class="row justify-between">
-          <h5 class="q-ml-md q-mb-xs">Conditions générales d’utilisation</h5>
-          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cguModal = false" />
-        </q-card-section>
-        <q-card-section>
-          <div v-html="cguCompani" class="modal-padding"></div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <ni-html-modal title="Conditions générales d’utilisation" v-model="cguModal" :html="cguCompani" />
   </q-page>
 </template>
 
@@ -63,11 +43,13 @@ import Input from '../components/form/Input';
 import { AUXILIARY_WITHOUT_COMPANY } from '../data/constants';
 import rgpd from '../statics/rgpd.html';
 import cguCompani from '../statics/cguCompani.html';
+import HtmlModal from '../components/modal/HtmlModal';
 
 export default {
   metaInfo: { title: 'Mon compte' },
   components: {
     'ni-input': Input,
+    'ni-html-modal': HtmlModal,
   },
   data () {
     return {

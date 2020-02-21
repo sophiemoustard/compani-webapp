@@ -62,7 +62,7 @@ import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
 import Input from './form/Input';
 import Select from './form/Select';
-import Modal from './Modal';
+import Modal from './modal/Modal';
 import { NotifyPositive, NotifyNegative } from './popup/notify';
 import Icon from './Icon';
 import { DEFAULT_AVATAR } from '../data/constants';

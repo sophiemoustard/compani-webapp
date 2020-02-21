@@ -146,7 +146,7 @@ import { validationMixin } from '../../../mixins/validationMixin.js';
 import { tableMixin } from '../../../mixins/tableMixin.js';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import ResponsiveTable from '../../../components/table/ResponsiveTable';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import {

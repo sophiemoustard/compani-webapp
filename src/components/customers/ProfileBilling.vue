@@ -114,7 +114,7 @@ import SimpleTable from '../table/SimpleTable';
 import DateInput from '../form/DateInput';
 import Input from '../form/Input';
 import Select from '../form/Select';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import { tableMixin } from '../../mixins/tableMixin';
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';

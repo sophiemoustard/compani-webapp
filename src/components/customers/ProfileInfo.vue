@@ -408,7 +408,7 @@ import Select from '../form/Select';
 import OptionGroup from '../form/OptionGroup';
 import MultipleFilesUploader from '../form/MultipleFilesUploader.vue';
 import DateInput from '../form/DateInput';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import ReponsiveTable from '../table/ResponsiveTable';
 import FundingGridTable from '../table/FundingGridTable';
 import { downloadDocxFile } from '../../helpers/downloadFile';

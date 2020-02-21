@@ -26,7 +26,7 @@
 import omit from 'lodash/omit';
 import Events from '../../api/Events';
 import { planningModalMixin } from '../../mixins/planningModalMixin';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import Select from '../form/Select';
 import OptionGroup from '../form/OptionGroup';
 import { NotifyNegative, NotifyPositive } from '../popup/notify';

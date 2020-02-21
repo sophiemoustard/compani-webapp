@@ -166,7 +166,7 @@ import DateInput from '../../../components/form/DateInput';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import OptionGroup from '../../../components/form/OptionGroup';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { positiveNumber } from '../../../helpers/vuelidateCustomVal.js';
 import { formatPrice, getLastVersion, formatIdentity } from '../../../helpers/utils.js';

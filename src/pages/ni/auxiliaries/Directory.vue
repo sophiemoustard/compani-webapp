@@ -86,7 +86,7 @@ import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
 import SearchAddress from '../../../components/form/SearchAddress';
 import DirectoryHeader from '../../../components/DirectoryHeader';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '../../../components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '../../../data/constants';
 import { validationMixin } from '../../../mixins/validationMixin.js';
