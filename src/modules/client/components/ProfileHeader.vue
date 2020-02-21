@@ -25,7 +25,7 @@
         <div class="row items-center">
           <q-icon name="restore" class="on-left" size="1rem" />
           <div class="on-left">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-          <ni-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention"
+          <q-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention"
             @click="validateCustomerDeletion" />
         </div>
       </div>
@@ -64,7 +64,6 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import Icon from '@components/Icon';
 import { DEFAULT_AVATAR } from 'src/core/data/constants';
 
 export default {
@@ -72,7 +71,6 @@ export default {
   components: {
     'ni-input': Input,
     'ni-select': Select,
-    'ni-icon': Icon,
     'ni-modal': Modal,
   },
   props: {
