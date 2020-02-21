@@ -89,6 +89,7 @@
 </template>
 
 <script>
+import Pay from '../../../api/Pay';
 import { NotifyPositive, NotifyNegative } from '../../../components/popup/notify';
 import Select from '../../../components/form/Select';
 import SelectSector from '../../../components/form/SelectSector';
@@ -214,7 +215,7 @@ export default {
         this.tableLoading = true;
         this.draftPay = [];
 
-        const draftPay = await this.$pay.getDraftPay(this.dates);
+        const draftPay = await Pay.getDraftPay(this.dates);
         this.draftPay = draftPay.map(dp => ({
           ...dp,
           hoursCounterEdition: false,
@@ -258,7 +259,7 @@ export default {
         if (!this.hasSelectedRows) return;
 
         const pay = this.selected.map(row => this.formatPayload(row));
-        await this.$pay.createList(pay);
+        await Pay.createList(pay);
 
         NotifyPositive('Fiches de paie crées');
         await this.refreshDraftPay();

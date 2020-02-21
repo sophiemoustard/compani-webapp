@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import Exports from '../../../api/Exports';
 import { NotifyNegative, NotifyPositive } from '../../../components/popup/notify';
 import { downloadFile } from '../../../helpers/downloadFile';
 import Select from '../../../components/form/Select';
@@ -33,7 +34,7 @@ export default {
         const type = EXPORT_TYPES.find(t => t.value === this.type);
         if (!type) NotifyNegative('Impossible de téléchager le document');
 
-        const csv = await this.$exports.getCsv({ type: type.value });
+        const csv = await Exports.getCsv({ type: type.value });
         await downloadFile(csv, `${type.label}.csv`);
 
         NotifyPositive('Document téléchargé');
