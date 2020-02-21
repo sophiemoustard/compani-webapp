@@ -1,5 +1,5 @@
 
-import { alenviAxios } from './ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios'
 
 export default {
   async create (formData) {

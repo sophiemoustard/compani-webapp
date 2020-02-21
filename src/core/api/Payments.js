@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { alenviAxios } from './ressources/alenviAxios';
+import { alenviAxios } from '@api/ressources/alenviAxios';
 import { downloadFile } from '@helpers/file';
 
 export default {

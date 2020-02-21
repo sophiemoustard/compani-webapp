@@ -1,4 +1,4 @@
-import { CUSTOMER_CONTRACT, COMPANY_CONTRACT } from './constants';
+import { CUSTOMER_CONTRACT, COMPANY_CONTRACT } from 'src/core/data/constants';
 
 export const translate = {
   [CUSTOMER_CONTRACT]: 'Contrat Mandataire',

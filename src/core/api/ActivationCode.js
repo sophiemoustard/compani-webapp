@@ -1,5 +1,5 @@
-import { alenviAxios } from './ressources/alenviAxios'
-import axios from 'axios'
+import axios from 'axios';
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async create (params) {

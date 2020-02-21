@@ -1,5 +1,5 @@
 import { Cookies } from 'quasar';
-import { alenviAxios } from './ressources/alenviAxios';
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async list (params = null) {
