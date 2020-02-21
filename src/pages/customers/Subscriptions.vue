@@ -126,7 +126,7 @@
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 
-import Esign from '../../api/Esign.js';
+import Esign from '../../api/Esign';
 import Drive from '../../api/GoogleDrive';
 import Customers from '../../api/Customers';
 import Input from '../../components/form/Input';
@@ -159,7 +159,6 @@ export default {
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
     return {
-      // cgs,
       cgs: null,
       cgsModal: false,
       showCgs: false,
