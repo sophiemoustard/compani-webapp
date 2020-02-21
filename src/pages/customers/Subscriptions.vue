@@ -144,7 +144,6 @@ import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import { tableMixin } from '../../mixins/tableMixin.js';
-// import cgs from '../../statics/CGS.html';
 
 export default {
   name: 'Subscriptions',
