@@ -408,7 +408,7 @@ import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
-import { downloadDocxFile } from '@helpers/downloadFile';
+import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import { days } from 'src/core/data/days.js';
 import {

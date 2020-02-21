@@ -1,7 +1,7 @@
 import moment from 'moment';
 import get from 'lodash/get';
 import { formatPrice, formatIdentity, formatHours } from '@helpers/utils';
-import { downloadCsv } from '@helpers/downloadFile';
+import { downloadCsv } from '@helpers/file';
 import { END_CONTRACT_REASONS, SURCHARGES } from 'src/core/data/constants';
 
 export const payMixin = {

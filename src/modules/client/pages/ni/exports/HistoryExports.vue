@@ -14,7 +14,7 @@
 <script>
 import Exports from '@api/Exports';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { downloadFile } from '@helpers/downloadFile';
+import { downloadFile } from '@helpers/file';
 import Select from '@components/form/Select';
 import DateRange from '@components/form/DateRange';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';

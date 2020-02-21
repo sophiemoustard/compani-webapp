@@ -1,6 +1,6 @@
-import moment from 'moment'
-import { alenviAxios } from './ressources/alenviAxios'
-import { downloadFile } from '../helpers/downloadFile'
+import moment from 'moment';
+import { alenviAxios } from './ressources/alenviAxios';
+import { downloadFile } from '@helpers/file';
 
 export default {
   async create (data) {

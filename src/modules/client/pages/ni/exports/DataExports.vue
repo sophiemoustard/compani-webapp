@@ -13,7 +13,7 @@
 import Exports from '@api/Exports';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import Select from '@components/form/Select';
-import { downloadFile } from '@helpers/downloadFile';
+import { downloadFile } from '@helpers/file';
 import { EXPORT_TYPES, SERVICE } from 'src/core/data/constants';
 
 export default {
