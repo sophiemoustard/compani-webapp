@@ -314,7 +314,12 @@
 </template>
 
 <script>
+import capitalize from 'lodash/capitalize';
+import cloneDeep from 'lodash/cloneDeep';
+import pickBy from 'lodash/pickBy';
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
+import Services from '@api/Services';
+import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import DateInput from '@components/form/DateInput.vue';
@@ -552,7 +557,7 @@ export default {
           align: 'left',
           format: (value) => {
             const nature = NATURE_OPTIONS.find(option => option.value === value);
-            return nature ? this.$_.capitalize(nature.label) : '';
+            return nature ? capitalize(nature.label) : '';
           },
           field: 'nature',
         },
@@ -787,7 +792,7 @@ export default {
     async refreshSurcharges () {
       try {
         this.surchargesOptions = [];
-        this.surcharges = await this.$surcharges.list();
+        this.surcharges = await Surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
           if (this.surcharges[i].eveningStartTime) {
             this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
@@ -811,7 +816,7 @@ export default {
     },
     async refreshServices () {
       try {
-        const services = await this.$services.list();
+        const services = await Services.list();
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
           ...service,
@@ -856,7 +861,7 @@ export default {
       this.$v.newSurcharge.$reset();
     },
     getSurchargePayload (surchargeType) {
-      const payload = this.$_.cloneDeep(surchargeType);
+      const payload = cloneDeep(surchargeType);
       if (surchargeType.eveningStartTime) {
         payload.eveningStartTime = this.$moment(surchargeType.eveningStartTime, 'HH:mm').format('HH:mm');
       }
@@ -879,7 +884,7 @@ export default {
         this.loading = true;
 
         const payload = this.getSurchargePayload(this.newSurcharge);
-        await this.$surcharges.create(payload);
+        await Surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
         this.resetCreationSurchargeData();
         await this.refreshSurcharges();
@@ -939,7 +944,7 @@ export default {
         const payload = this.getSurchargePayload(this.editedSurcharge);
         delete payload._id;
         delete payload.company;
-        await this.$surcharges.updateById(surchargeId, payload);
+        await Surcharges.updateById(surchargeId, payload);
         NotifyPositive('Plan de majoration modifié.');
         this.resetEditionSurchargeData();
         await this.refreshSurcharges();
@@ -953,7 +958,7 @@ export default {
     async deleteSurcharge (surchargeId, row) {
       try {
         const index = this.getRowIndex(this.surcharges, row);
-        await this.$surcharges.remove(surchargeId);
+        await Surcharges.remove(surchargeId);
         this.surcharges.splice(index, 1);
         NotifyPositive('Plan de majoration supprimé.');
       } catch (e) {
@@ -1005,7 +1010,7 @@ export default {
 
         this.loading = true;
         const payload = this.formatCreatedService();
-        await this.$services.create(payload);
+        await Services.create(payload);
         NotifyPositive('Service créé.');
         this.resetCreationServiceData();
         await this.refreshServices();
@@ -1050,10 +1055,10 @@ export default {
         if (this.$v.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         const serviceId = this.editedService._id;
-        const payload = this.$_.pickBy(this.editedService);
+        const payload = pickBy(this.editedService);
         delete payload._id;
         delete payload.nature;
-        await this.$services.updateById(serviceId, payload);
+        await Services.updateById(serviceId, payload);
         NotifyPositive('Service modifié');
         this.resetEditionServiceData();
         await this.refreshServices();
@@ -1067,7 +1072,7 @@ export default {
     async deleteService (serviceId, row) {
       try {
         const index = this.getRowIndex(this.services, row);
-        await this.$services.remove(serviceId);
+        await Services.remove(serviceId);
         this.services.splice(index, 1);
         NotifyPositive('Service supprimé.');
       } catch (e) {
@@ -1119,10 +1124,10 @@ export default {
       }
     },
     formatThirdPartyPayerPayload (tpp) {
-      const payload = this.$_.cloneDeep(tpp);
+      const payload = cloneDeep(tpp);
       if (payload.address && !payload.address.fullAddress) delete payload.address;
 
-      return { isApa: false, ...this.$_.pickBy(payload) };
+      return { isApa: false, ...pickBy(payload) };
     },
     async createNewThirdPartyPayer () {
       try {

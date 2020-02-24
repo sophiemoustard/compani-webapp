@@ -137,7 +137,7 @@ export default {
       const month = this.$moment(this.startOfWeek).format('MM-YYYY');
       try {
         this.monthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
-        const monthCustomersDetails = await this.$stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
+        const monthCustomersDetails = await Stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
         this.monthCustomersDetails = monthCustomersDetails[0];
       } catch (e) {
         console.error(e);

@@ -76,7 +76,9 @@ import randomize from 'randomatic';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
+import ActivationCode from '@api/ActivationCode';
 import Roles from '@api/Roles';
+import Twilio from '@api/Twilio';
 import Users from '@api/Users';
 import SelectSector from '@components/form/SelectSector';
 import Input from '@components/form/Input';
@@ -360,8 +362,8 @@ export default {
     async sendSms (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
 
-      const activationCode = await this.$activationCode.create({ user });
-      await this.$twilio.sendSMS({
+      const activationCode = await ActivationCode.create({ user });
+      await Twilio.sendSMS({
         to: `+33${this.newUser.contact.phone.substring(1)}`,
         body: `${this.company.tradeName}. Bienvenue ! :)\nUtilise ce code: ${activationCode.code} pour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration: ' +

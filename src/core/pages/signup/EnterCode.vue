@@ -13,6 +13,8 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import ActivationCode from '@api/ActivationCode';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -30,10 +32,10 @@ export default {
   methods: {
     async submit () {
       try {
-        const code = await this.$activationCode.check(this.code);
+        const code = await ActivationCode.check(this.code);
 
-        const userEmail = this.$_.get(code, 'user.local.email', '');
-        const userId = this.$_.get(code, 'user._id', '');
+        const userEmail = get(code, 'user.local.email', '');
+        const userId = get(code, 'user._id', '');
         this.$q.cookies.set('signup_token', code.token, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_userEmail', userEmail, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });
         this.$q.cookies.set('signup_userId', userId, { path: '/', expires: 1, secure: process.env.NODE_ENV !== 'development' });

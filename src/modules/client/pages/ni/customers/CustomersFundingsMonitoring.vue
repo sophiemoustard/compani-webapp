@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import Stats from '@api/Stats';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import LargeTable from '@components/table/LargeTable';
 import TitleHeader from '@components/TitleHeader';
@@ -63,7 +65,7 @@ export default {
         {
           name: 'tpp',
           label: 'Financeur',
-          field: row => this.$_.get(row, 'tpp.name', ''),
+          field: row => get(row, 'tpp.name', ''),
           format: value => truncate(value),
           align: 'left',
           classes: 'text-weight-bold',
@@ -87,7 +89,7 @@ export default {
         {
           name: 'sector',
           label: 'Equipe',
-          field: row => this.$_.get(row, 'sector.name', ''),
+          field: row => get(row, 'sector.name', ''),
           align: 'left',
         },
         {
@@ -142,7 +144,7 @@ export default {
       let allCustomersFundingsMonitoring = this.allCustomersFundingsMonitoring;
       if (this.selectedSector !== '') {
         allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
-          this.$_.get(elem, 'sector._id', null) === this.selectedSector);
+          get(elem, 'sector._id', null) === this.selectedSector);
       }
       if (this.selectedThirdPartyPayer !== '') {
         allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem => {
@@ -173,7 +175,7 @@ export default {
     try {
       this.tableLoading = true;
       await this.getThirdPartyPayerOptions();
-      this.allCustomersFundingsMonitoring = await this.$stats.getAllCustomersFundingsMonitoring();
+      this.allCustomersFundingsMonitoring = await Stats.getAllCustomersFundingsMonitoring();
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
       this.tableLoading = true;

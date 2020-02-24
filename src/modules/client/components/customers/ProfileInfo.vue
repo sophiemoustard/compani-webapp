@@ -398,6 +398,7 @@ import { Cookies } from 'quasar';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
+import Services from '@api/Services';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
@@ -823,7 +824,7 @@ export default {
     // Refresh data
     async getServices () {
       try {
-        this.services = await this.$services.list();
+        this.services = await Services.list();
       } catch (e) {
         console.error(e);
       }

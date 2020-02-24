@@ -24,6 +24,7 @@
 
 <script>
 import { openURL } from 'quasar';
+import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative } from '@components/popup/notify'
 import LargeTable from '@components/table/LargeTable';
 
@@ -78,7 +79,7 @@ export default {
     async getDirectDebits () {
       try {
         if (!this.user.company || !this.user.company.directDebitsFolderId) return NotifyNegative('Dossier de prélèvement manquant');
-        this.directDebits = await this.$gdrive.getList({ folderId: this.user.company.directDebitsFolderId });
+        this.directDebits = await GoogleDrive.getList({ folderId: this.user.company.directDebitsFolderId });
       } catch (e) {
         this.directDebits = [];
         console.error(e);

@@ -1,4 +1,5 @@
 import Companies from '@api/Companies';
+import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 
 export const configMixin = {
@@ -34,7 +35,7 @@ export const configMixin = {
     // Documents
     async deleteDocument (driveId, type, key) {
       try {
-        await this.$gdrive.removeFileById({ id: driveId });
+        await GoogleDrive.removeFileById({ id: driveId });
         const payload = {
           [key]: {
             templates: { [type]: { driveId: null, link: null } },
