@@ -21,8 +21,8 @@
 </template>
 
 <script>
-import MenuItem from 'src/modules/client/components/menu/MenuItem.vue';
-import SideMenuFooter from 'src/modules/client/components/menu/SideMenuFooter.vue';
+import MenuItem from '@components/menu/MenuItem';
+import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
 
 export default {

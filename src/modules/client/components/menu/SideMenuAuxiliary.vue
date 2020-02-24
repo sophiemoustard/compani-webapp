@@ -39,10 +39,10 @@
 <script>
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
+import SideMenuFooter from '@components/menu/SideMenuFooter';
+import MenuItem from '@components/menu/MenuItem';
 import { AUXILIARY, PLANNING_REFERENT } from 'src/core/data/constants';
-import SideMenuFooter from 'src/modules/client/components/menu/SideMenuFooter.vue';
 import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
-import MenuItem from 'src/modules/client/components/menu/MenuItem.vue';
 
 export default {
   props: ['user'],

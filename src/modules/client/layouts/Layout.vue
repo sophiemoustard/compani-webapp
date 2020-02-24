@@ -21,9 +21,9 @@
 <script>
 import { mapGetters } from 'vuex'
 import get from 'lodash/get';
-import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach'
-import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxiliary'
-import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer'
+import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach';
+import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxiliary';
+import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer';
 import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from 'src/core/data/constants.js';
 
 export default {
