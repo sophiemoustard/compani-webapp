@@ -62,7 +62,7 @@ export default {
     return mailInfo.data.data.mailInfo;
   },
   async checkResetPasswordToken (resetToken) {
-    const check = await axios.get(`${process.env.API_HOSTNAME}/users/checkResetPassword/${resetToken}`);
+    const check = await axios.get(`${process.env.API_HOSTNAME}/users/check-reset-password/${resetToken}`);
     return check.data.data;
   },
   async createDriveFolder (userId, data) {

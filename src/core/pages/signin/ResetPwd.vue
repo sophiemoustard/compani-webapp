@@ -22,7 +22,7 @@
 import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
-import users from '@api/Users'
+import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export default {
@@ -43,7 +43,7 @@ export default {
   async beforeRouteEnter (to, from, next) {
     try {
       if (to.params.token) {
-        const checkToken = await users.checkResetPasswordToken(to.params.token);
+        const checkToken = await Users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
         next({ path: '/403-pwd' });
@@ -85,7 +85,7 @@ export default {
             from: null,
           },
         };
-        await this.$users.updateById(this.userId, userPayload, this.token);
+        await Users.updateById(this.userId, userPayload, this.token);
         let detail = '';
         let action = null;
         switch (this.from) {
