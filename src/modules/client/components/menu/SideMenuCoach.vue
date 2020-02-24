@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { ADMIN_ROLES } from 'src/core/data/constants';
+import { CLIENT_ADMIN } from 'src/core/data/constants';
 import MenuItem from 'src/modules/client/components/menu/MenuItem.vue';
 import SideMenuFooter from 'src/modules/client/components/menu/SideMenuFooter.vue';
 import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
@@ -76,7 +76,7 @@ export default {
   },
   data () {
     return {
-      ADMIN_ROLES,
+      CLIENT_ADMIN,
       activeRoutes: {
         planning: { open: false },
         benef: { open: false },
@@ -93,7 +93,7 @@ export default {
   },
   computed: {
     isAdmin () {
-      return ADMIN_ROLES.includes(this.user.role.client.name);
+      return CLIENT_ADMIN === this.user.role.client.name;
     },
   },
 }

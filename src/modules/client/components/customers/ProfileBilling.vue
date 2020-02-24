@@ -108,7 +108,7 @@ import {
   CESU,
   REFUND,
   COACH_ROLES,
-  ADMIN_ROLES,
+  CLIENT_ADMIN,
   CUSTOMER,
   THIRD_PARTY_PAYER,
   HELPER,
@@ -207,7 +207,7 @@ export default {
       return HELPER === this.userRole;
     },
     isAdmin () {
-      return ADMIN_ROLES.includes(this.userRole);
+      return CLIENT_ADMIN === this.userRole;
     },
     isCoach () {
       return COACH_ROLES.includes(this.userRole);
