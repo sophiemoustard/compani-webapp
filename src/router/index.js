@@ -3,7 +3,6 @@ import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
 import { Cookies } from 'quasar';
 import clientRoutes from 'src/modules/client/router/routes';
-import vendorRoutes from 'src/modules/vendor/router/routes';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
 import { checkPermission } from '@helpers/checkPermission';
@@ -18,7 +17,7 @@ Vue.use(VueMeta);
 
 const Router = new VueRouter({
   scrollBehavior: () => ({ y: 0 }),
-  routes,
+  routes: clientRoutes,
 
   mode: process.env.VUE_ROUTER_MODE,
   base: process.env.VUE_ROUTER_BASE,
