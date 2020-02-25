@@ -120,6 +120,7 @@ export const helperMixin = {
           email: this.newHelper.local.email,
           password: randomize('0', 6),
         },
+        contact: { phone: this.newHelper.contact.phone },
         customers: [this.userProfile._id],
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
