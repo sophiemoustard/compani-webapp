@@ -17,6 +17,7 @@
 
 <script>
 import { email, required } from 'vuelidate/lib/validators'
+import Users from '@api/Users';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -38,7 +39,7 @@ export default {
     async submit () {
       try {
         const payload = { email: this.email.toLowerCase(), from: this.$route.query.from || 'w' };
-        await this.$users.forgotPassword(payload);
+        await Users.forgotPassword(payload);
         NotifyPositive('Un email a été envoyé à l\'adresse indiquée');
       } catch (e) {
         let content = '';
