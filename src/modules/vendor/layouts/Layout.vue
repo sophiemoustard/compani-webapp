@@ -1,10 +1,9 @@
 <template>
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer" @input="toggleMenu">
-      <side-menu-admin :ref="sidemenusRefs" v-if="isCoach && !isMini" />
-      <div :class="[!isMini ? 'q-mini-drawer-hide' : 'q-mini-drawer-only']" class="absolute" >
-        <q-btn :class="[!isMini ? 'chevron-left' : 'chevron-right']" class="chevron" dense round unelevated
-          :icon="menuIcon" @click="isMini = !isMini" />
+      <side-menu-admin ref="adminMenu" v-if="!isMini" />
+      <div :class="chevronContainerClasses" >
+        <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
     </q-drawer>
     <q-page-container>
@@ -17,34 +16,18 @@
 </template>
 
 <script>
-import SideMenuAdmin from 'src/modules/vendor/components/menu/SideMenuAdmin'
+import { layoutMixin } from 'src/core/mixins/layoutMixin';
+import SideMenuAdmin from 'src/modules/vendor/components/menu/SideMenuAdmin';
 
 export default {
   components: {
     'side-menu-admin': SideMenuAdmin,
   },
-  data () {
-    return {
-      isMini: false,
-    }
-  },
+  mixins: [layoutMixin],
   computed: {
-    menuIcon () {
-      return this.isMini ? 'view_headline' : 'chevron_left';
+    sidemenusRefs () {
+      return 'adminMenu';
     },
-    toggleDrawer () {
-      return this.$store.state.main.toggleDrawer;
-    },
-  },
-  methods: {
-    toggleMenu (value) {
-      this.$store.commit('main/setToggleDrawer', value);
-    },
-  },
-  beforeRouteUpdate (to, from, next) {
-    if (this.toggleDrawer && !this.isMini) this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
-
-    next();
   },
 }
 </script>

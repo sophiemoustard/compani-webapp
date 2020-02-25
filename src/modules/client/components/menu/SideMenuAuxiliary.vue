@@ -42,10 +42,9 @@ import get from 'lodash/get';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
 import { AUXILIARY, PLANNING_REFERENT } from 'src/core/data/constants';
-import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
+import { sideMenuMixin } from 'src/core/mixins/sideMenuMixin';
 
 export default {
-  props: ['user'],
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
@@ -67,6 +66,9 @@ export default {
   computed: {
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(get(this, 'user.role.client.name', null));
+    },
+    user () {
+      return this.$store.getters['main/user'];
     },
   },
   methods: {

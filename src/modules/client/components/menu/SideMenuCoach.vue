@@ -63,12 +63,9 @@
 import { CLIENT_ADMIN } from 'src/core/data/constants';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
-import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
+import { sideMenuMixin } from 'src/core/mixins/sideMenuMixin';
 
 export default {
-  props: {
-    user: Object,
-  },
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
@@ -95,11 +92,9 @@ export default {
     isAdmin () {
       return CLIENT_ADMIN === this.user.role.client.name;
     },
+    user () {
+      return this.$store.getters['main/user'];
+    },
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .q-layout-drawer .q-list .router-link-active
-    color: $primary !important
-</style>

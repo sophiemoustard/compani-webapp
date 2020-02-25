@@ -1,5 +1,6 @@
 
 import { Cookies } from 'quasar';
+import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
 import { HELPER, AUXILIARY_ROLES, COACH_ROLES, AUXILIARY_WITHOUT_COMPANY } from 'src/core/data/constants';
@@ -11,11 +12,12 @@ const routes = [
     beforeEnter: async (to, from, next) => {
       try {
         if (to.path !== '/') return next();
-        if (await alenvi.refreshAlenviCookies()) {
-          await store.dispatch('main/getUser', Cookies.get('user_id'));
-        }
+        const refresh = await alenvi.refreshAlenviCookies();
+        if (refresh) await store.dispatch('main/getUser', Cookies.get('user_id'));
+
         const user = store.getters['main/user'];
         if (!user) return next({ path: '/login' });
+        if (!get(user, 'role.client')) return next({ name: '404' });
 
         const userClientRole = user.role.client.name;
         if (userClientRole === HELPER) return next({ name: 'customer agenda' });
@@ -398,44 +400,6 @@ const routes = [
         },
       },
     ],
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('src/core/pages/signin/Authenticate'),
-    beforeEnter: (to, from, next) => {
-      if (Cookies.get('refresh_token')) return next({path: '/'});
-      return next();
-    },
-  },
-  {
-    path: '/enterCode',
-    component: () => import('src/core/pages/signup/EnterCode'),
-    beforeEnter: (to, from, next) => {
-      if (Cookies.get('refresh_token')) return next({path: '/'});
-      return next();
-    },
-  },
-  { path: '/forgotPassword', component: () => import('src/core/pages/signin/ForgotPwd') },
-  { path: '/resetPassword/:token', component: () => import('src/core/pages/signin/ResetPwd') },
-  {
-    path: '/createPassword',
-    component: () => import('src/core/pages/signup/CreatePassword'),
-    beforeEnter: (to, from, next) => {
-      if (Cookies.get('signup_token') && Cookies.get('signup_userId') && Cookies.get('signup_userEmail')) {
-        next();
-      } else {
-        next({ path: '/enterCode' });
-      }
-    },
-  },
-  { path: '/403-pwd', component: () => import('src/core/pages/signin/403') },
-  { path: '/401', component: () => import('src/core/pages/401') },
-  { path: '/docsigned', component: () => import('src/core/pages/DocumentSigned'), props: route => ({ signed: route.query.signed }) },
-  {
-    // Always leave this as last one
-    path: '*',
-    component: () => import('src/core/pages/404'),
   },
 ];
 
