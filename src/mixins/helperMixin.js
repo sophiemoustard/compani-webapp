@@ -137,7 +137,7 @@ export const helperMixin = {
         await Users.create(pickBy(payload));
         NotifyPositive('Aidant créé');
 
-        const receiver = { email: this.newHelper.local.email, password: this.newHelper.local.password };
+        const receiver = { email: this.newHelper.local.email, password: payload.local.password };
         await Email.sendWelcome({ receiver });
         NotifyPositive('Email envoyé');
 
