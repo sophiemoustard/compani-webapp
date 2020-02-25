@@ -43,6 +43,8 @@
 </template>
 
 <script>
+import Pay from '../../api/Pay';
+import Stats from '../../api/Stats';
 import AuxiliaryIndicators from './AuxiliaryIndicators';
 import {
   DEFAULT_AVATAR,
@@ -134,7 +136,7 @@ export default {
     async getMonthDetails () {
       const month = this.$moment(this.startOfWeek).format('MM-YYYY');
       try {
-        this.monthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
+        this.monthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
         const monthCustomersDetails = await this.$stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
         this.monthCustomersDetails = monthCustomersDetails[0];
       } catch (e) {
@@ -145,8 +147,8 @@ export default {
     async getPrevMonthDetails () {
       const month = this.$moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
       try {
-        this.prevMonthHoursDetails = await this.$pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
-        const prevMonthCustomersDetails = await this.$stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
+        this.prevMonthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
+        const prevMonthCustomersDetails = await Stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
         this.prevMonthCustomersDetails = prevMonthCustomersDetails[0];
       } catch (e) {
         console.error(e);

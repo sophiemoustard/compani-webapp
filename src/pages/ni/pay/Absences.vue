@@ -39,6 +39,8 @@
 
 <script>
 import get from 'lodash/get';
+import Users from '../../../api/Users';
+import Events from '../../../api/Events';
 import DateRange from '../../../components/form/DateRange';
 import TitleHeader from '../../../components/TitleHeader';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '../../../data/constants';
@@ -190,8 +192,8 @@ export default {
       try {
         this.tableLoading = true;
         if (this.datesHasError) return;
-        this.absences = await this.$events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
-        this.auxiliaries = await this.$users.listActive();
+        this.absences = await Events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
+        this.auxiliaries = await Users.listActive();
       } catch (e) {
         this.absences = [];
         this.auxiliaries = [];

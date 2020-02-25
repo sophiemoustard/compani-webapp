@@ -88,6 +88,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import {
   PLANNING,
   INVOICED_AND_PAID,
@@ -109,7 +110,7 @@ import DeleteEventsModal from './DeleteEventsModal';
 import { planningTimelineMixin } from '../../mixins/planningTimelineMixin';
 import { planningEventMixin } from '../../mixins/planningEventMixin';
 import PlanningNavigation from './PlanningNavigation.vue';
-import { mapGetters } from 'vuex';
+import { can } from '../../helpers/acl/can';
 
 export default {
   name: 'PlanningManager',
@@ -169,11 +170,14 @@ export default {
     ...mapGetters({
       mainUser: 'main/user',
     }),
+    mainUserRole () {
+      return this.mainUser.role.client.name;
+    },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUser.role.name);
+      return COACH_ROLES.includes(this.mainUserRole);
     },
     isPlanningReferent () {
-      return this.mainUser.role.name === PLANNING_REFERENT;
+      return this.mainUserRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.persons } : this.$_.groupBy(this.persons, 'sector._id');
@@ -278,11 +282,11 @@ export default {
       }
     },
     createEvent (eventInfo) {
-      let can = true;
+      let isAllowed = true;
       if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
-        can = this.$can({ user: this.$store.getters['main/user'], permissions: [{ name: 'events:edit' }] });
+        isAllowed = can({ user: this.$store.getters['main/user'], permissions: [{ name: 'events:edit' }] });
       } else if (this.personKey === 'auxiliary') {
-        can = this.$can({
+        isAllowed = can({
           user: this.$store.getters['main/user'],
           auxiliaryIdEvent: eventInfo.person._id,
           permissions: [
@@ -291,7 +295,7 @@ export default {
           ],
         });
       }
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       this.$emit('createEvent', eventInfo);
     },

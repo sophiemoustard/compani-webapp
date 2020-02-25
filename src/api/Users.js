@@ -57,16 +57,12 @@ export default {
   async updateCertificates (userId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/certificates`, data);
   },
-  async getRoles () {
-    const rolesRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/roles`);
-    return rolesRaw.data.data.roles;
-  },
   async forgotPassword (data) {
-    const mailInfo = await axios.post(`${process.env.API_HOSTNAME}/users/forgotPassword`, data);
+    const mailInfo = await axios.post(`${process.env.API_HOSTNAME}/users/forgot-password`, data);
     return mailInfo.data.data.mailInfo;
   },
   async checkResetPasswordToken (resetToken) {
-    const check = await axios.get(`${process.env.API_HOSTNAME}/users/checkResetPassword/${resetToken}`);
+    const check = await axios.get(`${process.env.API_HOSTNAME}/users/check-reset-password/${resetToken}`);
     return check.data.data;
   },
   async createDriveFolder (userId, data) {

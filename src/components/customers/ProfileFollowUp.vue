@@ -192,11 +192,11 @@ export default {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    currentUser () {
+    mainUser () {
       return this.$store.getters['main/user'];
     },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.currentUser.role.name);
+      return AUXILIARY_ROLES.includes(this.mainUser.role.client.name);
     },
     hasSecondaryAddress () {
       return !!this.$_.get(this.customer, 'contact.secondaryAddress.fullAddress');

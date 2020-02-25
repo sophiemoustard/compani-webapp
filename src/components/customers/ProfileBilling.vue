@@ -23,7 +23,7 @@
         :endBalance="getEndBalance(tpp.documents, tpp)" />
       <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
-          @click="openPaymentCreationModal(customer, tpp.documents[0].client)" />
+          @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg">
@@ -53,13 +53,13 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :newPayment="newPayment" :selectedCustomer="selectedCustomer" :loading="modalLoading"
-      :selectedClientName="selectedClientName" v-model="paymentCreationModal" :validations="$v.newPayment"
+    <ni-payment-creation-modal :new-payment="newPayment" v-model="paymentCreationModal" :validations="$v.newPayment"
+      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
       @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
-    <ni-payment-edition-modal :editedPayment="editedPayment" :validations="$v.editedPayment" :loading="modalLoading"
-      v-model="paymentEditionModal" :selectedCustomer="selectedCustomer" :selectedClientName="selectedClientName"
+    <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
+      :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment="editedPayment"
       @updatePayment="updatePayment" @resetForm="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
@@ -75,14 +75,21 @@
         @blur="$v.taxCertificate.file.$touch" in-modal required-field last />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
-          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading" @click="createTaxCertificate" />
+          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading"
+          @click="createTaxCertificate" />
       </template>
     </ni-modal>
   </div>
 </template>
 
 <script>
+import get from 'lodash/get';
+import omit from 'lodash/omit';
+import snakeCase from 'lodash/snakeCase';
 import { required } from 'vuelidate/lib/validators';
+import Payments from '../../api/Payments';
+import Balances from '../../api/Balances';
+import TaxCertificates from '../../api/TaxCertificates';
 import { validYear } from '../../helpers/vuelidateCustomVal';
 import {
   CREDIT_NOTE,
@@ -107,7 +114,7 @@ import SimpleTable from '../table/SimpleTable';
 import DateInput from '../form/DateInput';
 import Input from '../form/Input';
 import Select from '../form/Select';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import { tableMixin } from '../../mixins/tableMixin';
 import { paymentMixin } from '../../mixins/paymentMixin.js';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../../components/popup/notify';
@@ -131,6 +138,7 @@ export default {
     return {
       modalLoading: false,
       tableLoading: false,
+      paymentEditionLoading: false,
       paymentEditionModal: false,
       customerDocuments: [],
       balancesForCustomer: [],
@@ -180,9 +188,9 @@ export default {
       return this.$store.getters['rh/getUserProfile'];
     },
     customerFolder () {
-      return this.$_.get(this.customer, 'driveFolder.driveId', null);
+      return get(this.customer, 'driveFolder.driveId', null);
     },
-    user () {
+    mainUser () {
       return this.$store.getters['main/user'];
     },
     documentQuery () {
@@ -192,14 +200,17 @@ export default {
         endDate: this.billingDates.endDate,
       };
     },
+    userRole () {
+      return this.mainUser.role.client.name;
+    },
     isHelper () {
-      return HELPER === this.user.role.name;
+      return HELPER === this.userRole;
     },
     isAdmin () {
-      return ADMIN_ROLES.includes(this.user.role.name);
+      return ADMIN_ROLES.includes(this.userRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.user.role.name);
+      return COACH_ROLES.includes(this.userRole);
     },
     taxCertificateFileError () {
       if (!this.$v.taxCertificate.file.required) return REQUIRED_LABEL;
@@ -291,7 +302,7 @@ export default {
     // Refresh data
     async getTaxCertificates () {
       try {
-        this.taxCertificates = await this.$taxCertificates.list({ customer: this.customer._id });
+        this.taxCertificates = await TaxCertificates.list({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.taxCertificates = [];
@@ -307,7 +318,7 @@ export default {
     },
     async getCustomerBalanceWithDetails () {
       try {
-        const balancesWithDetails = await this.$balances.listWithDetails(this.documentQuery);
+        const balancesWithDetails = await Balances.listWithDetails(this.documentQuery);
         this.balances = balancesWithDetails.balances;
         this.payments = balancesWithDetails.payments;
         this.bills = balancesWithDetails.bills;
@@ -322,13 +333,6 @@ export default {
         documents: [document],
         name: document.thirdPartyPayer.name,
         _id: document.thirdPartyPayer._id,
-      };
-    },
-    newPaymentList (document) {
-      return {
-        documents: [document],
-        name: document.client.name,
-        _id: document.client._id,
       };
     },
     formatDocumentList () {
@@ -354,33 +358,15 @@ export default {
       }
 
       for (const payment of this.payments) {
-        if (!payment.client) this.customerDocuments.push(payment);
-        else if (payment.client._id && !tppDocuments[payment.client._id]) {
-          tppDocuments[payment.client._id] = this.newPaymentList(payment);
-        } else tppDocuments[payment.client._id].documents.push(payment);
+        if (!payment.thirdPartyPayer) this.customerDocuments.push(payment);
+        else if (payment.thirdPartyPayer._id && !tppDocuments[payment.thirdPartyPayer._id]) {
+          tppDocuments[payment.thirdPartyPayer._id] = this.newDocumentList(payment);
+        } else tppDocuments[payment.thirdPartyPayer._id].documents.push(payment);
       }
 
       this.tppDocuments = Object.values(tppDocuments);
     },
     // Payments
-    async createPayment () {
-      try {
-        this.modalLoading = true;
-        this.$v.newPayment.$touch();
-        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        const payload = this.formatPayload(this.newPayment);
-        await this.$payments.create(payload);
-        this.paymentCreationModal = false;
-        NotifyPositive('Règlement créé');
-        await this.refresh();
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement');
-      } finally {
-        this.modalLoading = false;
-      }
-    },
     openEditionModal (payment) {
       this.editedPayment = {
         _id: payment._id,
@@ -390,23 +376,28 @@ export default {
         date: payment.date,
       };
 
-      this.paymentEditionModal = true;
       this.selectedCustomer = payment.customer;
-      this.selectedClientName = payment.client ? payment.client.name : formatIdentity(payment.customer.identity, 'FL');
+      if (payment.thirdPartyPayer) {
+        this.selectedTpp = payment.thirdPartyPayer;
+        this.editedPayment.thirdPartyPayer = payment.thirdPartyPayer;
+      }
+
+      this.paymentEditionModal = true;
     },
     resetPaymentEditionModal () {
       this.paymentEditionModal = false;
       this.selectedCustomer = { identity: {} };
-      this.selectedClientName = '';
+      this.selectedTpp = {};
       this.editedPayment = {};
     },
     async updatePayment () {
       try {
-        this.modalLoading = true;
+        this.paymentEditionLoading = true;
         this.$v.editedPayment.$touch();
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await this.$payments.update(this.editedPayment._id, this.$_.omit(this.editedPayment, '_id'));
+        const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer'])
+        await Payments.update(this.editedPayment._id, payload);
         this.paymentEditionModal = false;
         NotifyPositive('Règlement créé');
         await this.refresh();
@@ -414,21 +405,21 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création du règlement');
       } finally {
-        this.modalLoading = false;
+        this.paymentEditionLoading = false;
       }
     },
     // Tax certificates
     taxCertificatesUrl (certificate) {
-      return this.$_.get(certificate, 'driveFile.link')
+      return get(certificate, 'driveFile.link')
         ? certificate.driveFile.link
-        : this.$taxCertificates.getPDFUrl(certificate._id);
+        : TaxCertificates.getPDFUrl(certificate._id);
     },
     formatTaxCertificatePayload () {
       const { file, date, year } = this.taxCertificate;
       const form = new FormData();
       const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
       const customerName = formatIdentity(this.customer.identity, 'FL');
-      const fileName = this.$_.snakeCase(`attestation_fiscale_${customerName}_${formattedDate}`);
+      const fileName = snakeCase(`attestation_fiscale_${customerName}_${formattedDate}`);
 
       form.append('date', date);
       form.append('year', year);
@@ -455,7 +446,7 @@ export default {
       this.modalLoading = true;
 
       try {
-        await this.$taxCertificates.create(this.formatTaxCertificatePayload());
+        await TaxCertificates.create(this.formatTaxCertificatePayload());
 
         this.taxCertificateModal = false;
         NotifyPositive('Attestation fiscale sauvegardée');
@@ -479,7 +470,7 @@ export default {
     async deleteTaxCertificate (taxCertificateId, row) {
       try {
         const index = this.getRowIndex(this.taxCertificates, row);
-        await this.$taxCertificates.remove(taxCertificateId);
+        await TaxCertificates.remove(taxCertificateId);
         this.taxCertificates.splice(index, 1);
         NotifyPositive('Attestation fiscale supprimée.');
       } catch (e) {

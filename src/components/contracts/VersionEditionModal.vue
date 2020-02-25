@@ -21,7 +21,7 @@
 <script>
 import Input from '../form/Input';
 import DateInput from '../form/DateInput';
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 
 export default {
   name: 'VersionEditionModal',

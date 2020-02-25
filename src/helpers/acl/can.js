@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import rules from './rules';
 
 const findPermission = (right, params) => {
@@ -11,8 +12,6 @@ const findPermission = (right, params) => {
 }
 
 export const can = (params) => {
-  if (params.user && params.user.role && params.user.role.rights) {
-    return params.user.role.rights.filter(right => right ? params.permissions.some(findPermission(right, params)) : false).length > 0;
-  }
-  return false;
+  const rights = get(params, 'user.role.client.rights') || [];
+  return rights.filter(right => right ? params.permissions.some(findPermission(right, params)) : false).length > 0;
 };

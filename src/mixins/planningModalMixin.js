@@ -1,4 +1,6 @@
 import { mapGetters } from 'vuex';
+import get from 'lodash/get';
+import Gdrive from '../api/GoogleDrive';
 import SelectSector from '../components/form/SelectSector';
 import DateInput from '../components/form/DateInput.vue';
 import DatetimeRange from '../components/form/DatetimeRange.vue';
@@ -199,7 +201,7 @@ export const planningModalMixin = {
       ];
     },
     customerProfileRedirect () {
-      return COACH_ROLES.includes(this.mainUser.role.name)
+      return COACH_ROLES.includes(this.mainUser.role.client.name)
         ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
         : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
     },
@@ -210,17 +212,22 @@ export const planningModalMixin = {
 
       let subscriptions = this.selectedCustomer.subscriptions;
       if (this.selectedAuxiliary._id) {
-        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) subscriptions = subscriptions.filter(sub => this.$_.get(sub, 'service.type') !== CUSTOMER_CONTRACT);
-        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) subscriptions = subscriptions.filter(sub => this.$_.get(sub, 'service.type') !== COMPANY_CONTRACT);
+        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) {
+          subscriptions = subscriptions.filter(sub => get(sub, 'service.type') !== CUSTOMER_CONTRACT);
+        }
+        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) {
+          subscriptions = subscriptions.filter(sub => get(sub, 'service.type') !== COMPANY_CONTRACT);
+        }
       }
-      return subscriptions.map(sub => ({ label: this.$_.get(sub, 'service.name'), value: sub._id }));
+
+      return subscriptions.map(sub => ({ label: get(sub, 'service.name'), value: sub._id }));
     },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
     },
     docsUploadUrl () {
-      const driveId = this.$_.get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
-      return !driveId ? '' : this.$gdrive.getUploadUrl(driveId);
+      const driveId = get(this.selectedAuxiliary, 'administrative.driveFolder.driveId');
+      return !driveId ? '' : Gdrive.getUploadUrl(driveId);
     },
   },
   methods: {
@@ -252,14 +259,14 @@ export const planningModalMixin = {
     customerAddressList (event) {
       const addresses = [];
 
-      const primaryAddress = this.$_.get(this.selectedCustomer, 'contact.primaryAddress', null);
+      const primaryAddress = get(this.selectedCustomer, 'contact.primaryAddress', null);
       if (event.address.fullAddress && primaryAddress && primaryAddress.fullAddress === event.address.fullAddress) {
         addresses.push(this.formatAddressOptions(event.address));
       } else if (primaryAddress) {
         addresses.push(this.formatAddressOptions(primaryAddress));
       }
 
-      const secondaryAddress = this.$_.get(this.selectedCustomer, 'contact.secondaryAddress', null);
+      const secondaryAddress = get(this.selectedCustomer, 'contact.secondaryAddress', null);
       const isCustomerSecondaryAddressDefined = secondaryAddress && secondaryAddress.fullAddress;
       if (event.address.fullAddress && secondaryAddress && secondaryAddress.fullAddress === event.address.fullAddress) {
         addresses.push(this.formatAddressOptions(event.address));
@@ -281,7 +288,7 @@ export const planningModalMixin = {
     getAvatar (user) {
       if (!user || !user._id) return UNKNOWN_AVATAR;
 
-      return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
+      return get(user, 'picture.link') || DEFAULT_AVATAR;
     },
     formatPersonOptions (person) {
       return {

@@ -19,21 +19,37 @@
       <div class="row justify-center">
         <q-btn big color="primary" @click="logout">Déconnexion</q-btn>
       </div>
+      <div class="q-mt-md links">
+        <div class="cursor-pointer q-mb-sm">
+          <a @click.prevent="cguModal = true">Conditions générales d’utilisation</a>
+        </div>
+        <div class="cursor-pointer"><a @click.prevent="rgpdModal = true">Politique RGPD</a></div>
+      </div>
     </div>
+
+    <!-- RGPD modal -->
+    <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
+
+    <!-- CSU modal -->
+    <ni-html-modal title="Conditions générales d’utilisation" v-model="cguModal" :html="cguCompani" />
   </q-page>
 </template>
 
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
 import { NotifyPositive, NotifyNegative } from '../components/popup/notify';
 import Input from '../components/form/Input';
 import { AUXILIARY_WITHOUT_COMPANY } from '../data/constants';
-import get from 'lodash/get';
+import rgpd from '../statics/rgpd.html';
+import cguCompani from '../statics/cguCompani.html';
+import HtmlModal from '../components/modal/HtmlModal';
 
 export default {
   metaInfo: { title: 'Mon compte' },
   components: {
     'ni-input': Input,
+    'ni-html-modal': HtmlModal,
   },
   data () {
     return {
@@ -46,6 +62,10 @@ export default {
         alenvi: {},
         contracts: [],
       },
+      rgpd,
+      rgpdModal: false,
+      cguModal: false,
+      cguCompani,
     }
   },
   validations: {
@@ -72,7 +92,7 @@ export default {
   },
   computed: {
     isAuxiliaryWithoutCompany () {
-      return get(this, 'user.alenvi.role.name', null) === AUXILIARY_WITHOUT_COMPANY;
+      return get(this, 'user.alenvi.client.name', null) === AUXILIARY_WITHOUT_COMPANY;
     },
   },
   methods: {
@@ -113,4 +133,7 @@ export default {
     max-width: 40%
     @media screen && (max-width: 600px)
       max-width: 100%
+  .links
+    display: flex
+    flex-direction: column
 </style>

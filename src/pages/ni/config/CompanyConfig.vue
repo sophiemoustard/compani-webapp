@@ -140,12 +140,13 @@
 
 <script>
 import { required, requiredIf, maxLength, minLength } from 'vuelidate/lib/validators';
+import Establishments from '../../../api/Establishments';
 import { configMixin } from '../../../mixins/configMixin';
 import { validationMixin } from '../../../mixins/validationMixin.js';
 import { tableMixin } from '../../../mixins/tableMixin.js';
 import Input from '../../../components/form/Input';
 import Select from '../../../components/form/Select';
-import Modal from '../../../components/Modal';
+import Modal from '../../../components/modal/Modal';
 import ResponsiveTable from '../../../components/table/ResponsiveTable';
 import SearchAddress from '../../../components/form/SearchAddress.vue';
 import {
@@ -349,7 +350,7 @@ export default {
     // Establishment
     async getEstablishments () {
       try {
-        this.establishments = await this.$establishments.list();
+        this.establishments = await Establishments.list();
       } catch (e) {
         console.error(e);
         this.establishments = [];
@@ -373,7 +374,7 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$establishments.create(this.newEstablishment);
+        await Establishments.create(this.newEstablishment);
         NotifyPositive('Établissement créé.');
         this.establishmentCreationModal = false;
         await this.getEstablishments();
@@ -408,7 +409,7 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await this.$establishments.update(
+        await Establishments.update(
           this.editedEstablishment._id,
           this.$_.pick(this.editedEstablishment, Object.keys(this.newEstablishment))
         );
@@ -425,7 +426,7 @@ export default {
     },
     async deleteEstablishment (establishmentId) {
       try {
-        await this.$establishments.remove(establishmentId);
+        await Establishments.remove(establishmentId);
         await this.getEstablishments();
         NotifyPositive('Établissement supprimé.');
       } catch (e) {

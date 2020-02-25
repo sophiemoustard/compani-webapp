@@ -92,7 +92,7 @@
     <!-- Mandate signature modal -->
     <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width>
       <q-card class="full-height" style="width: 80vw">
-        <q-card-section class="row justify-end">
+        <q-card-section class="row justify-end no-wrap">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
@@ -102,17 +102,8 @@
     </q-dialog>
 
     <!-- CSG modal -->
-    <q-dialog ref="modal" v-model="cgsModal" full-height>
-      <q-card class="full-height" style="width: 80vw">
-        <q-card-section class="row justify-between">
-          <h5 class="no-margin">Conditions Générales de Service Alenvi</h5>
-          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="cgsModal = false" />
-        </q-card-section>
-        <q-card-section>
-          <div v-html="cgs" class="modal-padding"></div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
+    <ni-html-modal title="Conditions Générales de Service Alenvi" v-model="cgsModal" :html="cgs" @show="openCgsModal"
+      @hide="closeCgsModal" :loading="!showCgs" />
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
@@ -133,11 +124,15 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import get from 'lodash/get';
 
-import esign from '../../api/Esign.js';
+import Esign from '../../api/Esign';
+import Drive from '../../api/GoogleDrive';
+import Customers from '../../api/Customers';
 import Input from '../../components/form/Input';
 import MultipleFilesUploader from '../../components/form/MultipleFilesUploader.vue';
-import Modal from '../../components/Modal';
+import Modal from '../../components/modal/Modal';
+import HtmlModal from '../../components/modal/HtmlModal';
 import ResponsiveTable from '../../components/table/ResponsiveTable';
 import FundingGridTable from '../../components/table/FundingGridTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../../components/popup/notify';
@@ -149,7 +144,6 @@ import { subscriptionMixin } from '../../mixins/subscriptionMixin.js';
 import { financialCertificatesMixin } from '../../mixins/financialCertificatesMixin.js';
 import { fundingMixin } from '../../mixins/fundingMixin.js';
 import { tableMixin } from '../../mixins/tableMixin.js';
-import cgs from '../../statics/CGS.html';
 
 export default {
   name: 'Subscriptions',
@@ -158,14 +152,16 @@ export default {
     'ni-input': Input,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
+    'ni-html-modal': HtmlModal,
     'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
     return {
-      cgs,
+      cgs: null,
       cgsModal: false,
+      showCgs: false,
       agreed: false,
       customer: {
         payment: { mandates: [] },
@@ -278,7 +274,7 @@ export default {
     },
     async refreshCustomer () {
       try {
-        this.customer = await this.$customers.getById(this.helper.customers[0]._id);
+        this.customer = await Customers.getById(this.helper.customers[0]._id);
         this.refreshSubscriptions();
         this.refreshFundings();
 
@@ -290,20 +286,20 @@ export default {
       }
     },
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.customer, path);
+      this.tmpInput = get(this.customer, path);
     },
     // Customer
     async updateCustomer (path) {
       try {
-        let value = this.$_.get(this.customer, path);
+        let value = get(this.customer, path);
         if (this.tmpInput === value) return;
 
-        this.$_.get(this.$v.customer, path).$touch();
-        if (this.$_.get(this.$v.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+        get(this.$v.customer, path).$touch();
+        if (get(this.$v.customer, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
-        await this.$customers.updateById(this.customer._id, this.$_.set({}, path, value));
+        await Customers.updateById(this.customer._id, this.$_.set({}, path, value));
         await this.$store.dispatch('main/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
@@ -344,7 +340,7 @@ export default {
               title: this.helper.identity ? this.helper.identity.title : '',
             },
           };
-          await this.$customers.addSubscriptionHistory(this.customer._id, payload);
+          await Customers.addSubscriptionHistory(this.customer._id, payload);
           await this.refreshCustomer();
           NotifyPositive('Abonnement validé');
         }
@@ -358,7 +354,7 @@ export default {
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
-        const signatureRequest = await this.$customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
+        const signatureRequest = await Customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
           customer: {
             name: this.customer.identity.lastname,
             email: this.helper.local.email,
@@ -401,7 +397,7 @@ export default {
         for (const mandate of mandates) {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
           if (hasSigned) {
-            await this.$customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
+            await Customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
           }
         }
         await this.refreshCustomer();
@@ -411,7 +407,7 @@ export default {
     },
     async hasSignedDoc (docId) {
       try {
-        const document = await esign.getDocument(docId);
+        const document = await Esign.getDocument(docId);
         return document.log.some(el => el.event === 'document_signed');
       } catch (e) {
         console.error(e);
@@ -427,6 +423,21 @@ export default {
     resetFundingData () {
       this.fundingData = [];
       this.fundingModal = false;
+    },
+    async openCgsModal () {
+      try {
+        this.showCgs = false;
+        const cgsDriveId = get(this.helper, 'company.customersConfig.templates.cgs.driveId');
+        if (!cgsDriveId) return;
+        const file = await Drive.downloadFileById(cgsDriveId);
+        this.cgs = file.data;
+        this.showCgs = true;
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    closeCgsModal () {
+      this.cgs = null;
     },
   },
 }
@@ -456,5 +467,4 @@ export default {
   .q-dialog__inner
     &--minimized > div
       max-width: none
-
 </style>

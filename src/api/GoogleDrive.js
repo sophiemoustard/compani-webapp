@@ -25,4 +25,8 @@ export default {
   getUploadUrl (driveId) {
     return `${process.env.API_HOSTNAME}/gdrive/${driveId}/upload`;
   },
+  async downloadFileById (driveId) {
+    const file = await alenviAxios.get(`${process.env.API_HOSTNAME}/gdrive/file/${driveId}/download`);
+    return file;
+  },
 }

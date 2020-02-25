@@ -1,3 +1,4 @@
+import Companies from '../api/Companies';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '../components/popup/notify';
 
 export const configMixin = {
@@ -21,7 +22,7 @@ export const configMixin = {
 
         const value = this.$_.get(this.company, path);
         const payload = this.$_.set({}, path, value);
-        await this.$companies.updateById(this.company._id, payload);
+        await Companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
@@ -39,7 +40,7 @@ export const configMixin = {
             templates: { [type]: { driveId: null, link: null } },
           },
         };
-        await this.$companies.updateById(this.company._id, payload);
+        await Companies.updateById(this.company._id, payload);
         this.refreshCompany();
         NotifyPositive('Document supprimé');
       } catch (e) {

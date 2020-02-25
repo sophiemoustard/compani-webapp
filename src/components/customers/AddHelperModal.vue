@@ -19,7 +19,7 @@
 
 <script>
 
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import Input from '../form/Input';
 import { REQUIRED_LABEL } from '../../data/constants.js';
 

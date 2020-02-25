@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import Modal from '../Modal';
+import Modal from '../modal/Modal';
 import { formatHours } from '../../helpers/utils';
 import { SURCHARGES } from '../../data/constants';
 

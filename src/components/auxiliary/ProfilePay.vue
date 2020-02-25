@@ -58,7 +58,7 @@ import mapValues from 'lodash/mapValues';
 
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '../popup/notify';
 import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '../../data/constants';
-import Modal from '../../components/Modal';
+import Modal from '../../components/modal/Modal';
 import LargeTable from '../../components/table/LargeTable';
 import DocumentUpload from '../../components/documents/DocumentUpload';
 import PayDocuments from '../../api/PayDocuments';
@@ -119,13 +119,16 @@ export default {
 
       return mapValues(payDocumentNaturesKeyedByValue, 'label');
     },
+    mainUserRole () {
+      return this.mainUser.role.client.name;
+    },
     userProfile () {
-      if (AUXILIARY_ROLES.includes(this.mainUser.role.name)) return this.mainUser;
-      if (COACH_ROLES.includes(this.mainUser.role.name)) return this.$store.getters['rh/getUserProfile'];
-      else return {};
+      if (AUXILIARY_ROLES.includes(this.mainUserRole)) return this.mainUser;
+      if (COACH_ROLES.includes(this.mainUserRole)) return this.$store.getters['rh/getUserProfile'];
+      return {};
     },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUser.role.name);
+      return COACH_ROLES.includes(this.mainUserRole);
     },
     driveFolder () {
       return get(this.userProfile, 'administrative.driveFolder.driveId');
