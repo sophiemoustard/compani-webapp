@@ -124,6 +124,8 @@ export const helperMixin = {
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };
+      const phone = get(this, 'newHelper.contact.phone', null);
+      if (phone) payload.contact = { phone };
 
       return pickBy(payload);
     },
