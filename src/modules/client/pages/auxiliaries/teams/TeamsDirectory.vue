@@ -23,7 +23,7 @@
 <script>
 import DirectoryHeader from '@components/DirectoryHeader';
 import { formatPhone, formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from 'src/core/data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
 export default {
   name: 'TeamDirectory',

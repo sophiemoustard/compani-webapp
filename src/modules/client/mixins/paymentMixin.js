@@ -2,7 +2,7 @@ import pickBy from 'lodash/pickBy';
 import { required } from 'vuelidate/lib/validators';
 import Payments from '@api/Payments';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from 'src/core/data/constants';
+import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '@data/constants';
 
 export const paymentMixin = {
   data () {

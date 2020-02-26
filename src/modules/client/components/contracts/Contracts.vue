@@ -94,7 +94,7 @@ import { NotifyNegative } from '@components/popup/notify.js';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from 'src/core/data/constants.js';
+import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from '@data/constants.js';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';

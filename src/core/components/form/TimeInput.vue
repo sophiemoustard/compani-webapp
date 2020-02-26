@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from 'src/core/data/constants';
+import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '@data/constants';
 
 export default {
   name: 'NiTimeInput',

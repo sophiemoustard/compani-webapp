@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { COACH_ROLES, AUXILIARY, PLANNING_REFERENT } from 'src/core/data/constants';
+import { COACH_ROLES, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
 export default {
   props: {

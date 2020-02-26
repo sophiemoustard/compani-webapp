@@ -46,7 +46,7 @@ import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, formatHours } from '@helpers/utils';
-import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from 'src/core/data/constants';
+import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '@data/constants';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 

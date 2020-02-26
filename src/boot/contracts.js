@@ -1,4 +1,4 @@
-import contracts from 'src/core/api/Contracts'
+import contracts from '@api/Contracts'
 
 export default ({ app, router, Vue }) => {
   Vue.prototype.$contracts = contracts;

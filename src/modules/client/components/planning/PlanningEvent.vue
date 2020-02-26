@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY, STAFFING_PERCENTAGE_BY_MINUTES, CUSTOMER } from 'src/core//data/constants';
+import { INTERNAL_HOUR, INTERVENTION, ABSENCE, UNAVAILABILITY, AUXILIARY, STAFFING_PERCENTAGE_BY_MINUTES, CUSTOMER } from '@data/constants';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
 
 export default {

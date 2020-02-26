@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { AUXILIARY } from 'src/core/data/constants';
+import { AUXILIARY } from '@data/constants';
 import Contracts from 'src/modules/client/components/contracts/Contracts';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
 

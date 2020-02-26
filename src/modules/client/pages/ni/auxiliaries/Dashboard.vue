@@ -117,7 +117,7 @@ import Events from '@api/Events';
 import Stats from '@api/Stats';
 import { NotifyNegative } from '@components/popup/notify';
 import { formatHours, roundFrenchPercentage } from '@helpers/utils';
-import { AUXILIARY_ROLES, DEFAULT_AVATAR } from 'src/core/data/constants';
+import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '@data/constants';
 import Gauge from 'src/modules/client/components/Gauge';
 import ChipsAutocomplete from 'src/modules/client/components/planning/ChipsAutocomplete';
 import AuxiliaryIndicators from 'src/modules/client/components/planning/AuxiliaryIndicators';

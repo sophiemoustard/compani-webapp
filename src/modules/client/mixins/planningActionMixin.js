@@ -24,7 +24,7 @@ import {
   OTHER,
   HOURLY,
   WORK_ACCIDENT,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export const planningActionMixin = {

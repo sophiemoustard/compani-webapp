@@ -23,7 +23,7 @@
 <script>
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
-import { sideMenuMixin } from 'src/core/mixins/sideMenuMixin';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
   mixins: [sideMenuMixin],

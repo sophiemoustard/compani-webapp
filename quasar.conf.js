@@ -125,6 +125,8 @@ module.exports = function (ctx) {
           '@components': path.resolve(__dirname, './src/core/components'),
           '@api': path.resolve(__dirname, './src/core/api'),
           '@helpers': path.resolve(__dirname, './src/core/helpers'),
+          '@data': path.resolve(__dirname, './src/core/data'),
+          '@mixins': path.resolve(__dirname, './src/core/mixins'),
         }
       },
       env: {

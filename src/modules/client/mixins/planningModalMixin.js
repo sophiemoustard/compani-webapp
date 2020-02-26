@@ -37,7 +37,7 @@ import {
   CANCELLATION_REASONS,
   OTHER,
   SECTOR,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import PlanningModalHeader from 'src/modules/client/components/planning/PlanningModalHeader';
 
 export const planningModalMixin = {

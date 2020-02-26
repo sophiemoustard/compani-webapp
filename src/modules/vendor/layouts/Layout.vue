@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { layoutMixin } from 'src/core/mixins/layoutMixin';
+import { layoutMixin } from '@mixins/layoutMixin';
 import SideMenuAdmin from 'src/modules/vendor/components/menu/SideMenuAdmin';
 
 export default {

@@ -79,7 +79,7 @@ import {
   CUSTOMER,
   PAYMENT,
   COMPANI,
-} from 'src/core/data/constants';
+} from '@data/constants';
 
 export default {
   name: 'CustomerBillingTable',

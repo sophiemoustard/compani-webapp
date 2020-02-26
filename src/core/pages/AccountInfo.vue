@@ -41,7 +41,7 @@ import get from 'lodash/get';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
-import { AUXILIARY_WITHOUT_COMPANY } from 'src/core/data/constants';
+import { AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
 import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
 

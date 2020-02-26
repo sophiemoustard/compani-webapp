@@ -113,7 +113,7 @@ import {
   THIRD_PARTY_PAYER,
   HELPER,
   REQUIRED_LABEL,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import CustomerBillingTable from 'src/modules/client/components/customers/CustomerBillingTable';
 import PaymentCreationModal from 'src/modules/client/components/customers/PaymentCreationModal';
 import PaymentEditionModal from 'src/modules/client/components/customers/PaymentEditionModal';

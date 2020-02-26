@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { getLastVersion } from '@helpers/utils';
-import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from 'src/core/data/constants';
+import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
 
 export const subscriptionMixin = {
   data () {

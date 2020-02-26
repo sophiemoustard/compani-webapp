@@ -41,8 +41,8 @@ import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
-import { AUXILIARY, PLANNING_REFERENT } from 'src/core/data/constants';
-import { sideMenuMixin } from 'src/core/mixins/sideMenuMixin';
+import { AUXILIARY, PLANNING_REFERENT } from '@data/constants';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
   mixins: [sideMenuMixin],

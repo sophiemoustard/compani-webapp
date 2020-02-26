@@ -39,7 +39,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import { formatHours } from '@helpers/utils';
-import { SURCHARGES } from 'src/core/data/constants';
+import { SURCHARGES } from '@data/constants';
 
 export default {
   name: 'PaySurchargeDetailsModal',

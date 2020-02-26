@@ -16,7 +16,7 @@
 <script>
 import Select from '@components/form/Select';
 import { formatIdentity } from '@helpers/utils';
-import { UNKNOWN_AVATAR, DEFAULT_AVATAR } from 'src/core/data/constants';
+import { UNKNOWN_AVATAR, DEFAULT_AVATAR } from '@data/constants';
 
 export default {
   name: 'PlanningModalHeader',

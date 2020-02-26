@@ -340,7 +340,7 @@ import {
   NATURE_OPTIONS,
   FIXED,
   COMPANY,
-} from 'src/core/data/constants.js';
+} from '@data/constants.js';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';

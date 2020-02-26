@@ -15,7 +15,7 @@
 
 <script>
 import { formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR } from 'src/core/data/constants.js';
+import { DEFAULT_AVATAR } from '@data/constants.js';
 
 export default {
   name: 'ChipCustomerIndicator',

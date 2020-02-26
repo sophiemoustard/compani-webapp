@@ -308,9 +308,9 @@ import {
   REQUIRED_LABEL,
   COACH_ROLES,
   AUXILIARY_ROLES,
-} from 'src/core/data/constants';
-import nationalities from 'src/core/data/nationalities';
-import countries from 'src/core/data/countries';
+} from '@data/constants';
+import nationalities from '@data/nationalities';
+import countries from '@data/countries';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {

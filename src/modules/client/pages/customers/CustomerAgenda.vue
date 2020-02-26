@@ -21,7 +21,7 @@
 import Customers from '@api/Customers';
 import Events from '@api/Events';
 import { formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from 'src/core/data/constants';
+import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '@data/constants';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import Agenda from 'src/modules/client/components/planning/Agenda';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';

@@ -17,7 +17,7 @@
 
 <script>
 import DateInput from '@components/form/DateInput';
-import { REQUIRED_LABEL } from 'src/core/data/constants';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   components: {

@@ -1,6 +1,6 @@
 import moment from 'moment';
-import euSpace from 'src/core/data/euSpace';
-import { COMPANY_CONTRACT } from 'src/core/data/constants';
+import euSpace from '@data/euSpace';
+import { COMPANY_CONTRACT } from '@data/constants';
 
 const isNotFromEU = (userNationality) => !Object.keys(euSpace).includes(userNationality);
 

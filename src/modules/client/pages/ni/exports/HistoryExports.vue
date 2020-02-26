@@ -18,7 +18,7 @@ import { downloadFile } from '@helpers/file';
 import Select from '@components/form/Select';
 import DateRange from '@components/form/DateRange';
 import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
-import { EXPORT_HISTORY_TYPES, WORKING_EVENT } from 'src/core/data/constants';
+import { EXPORT_HISTORY_TYPES, WORKING_EVENT } from '@data/constants';
 
 export default {
   name: 'History',

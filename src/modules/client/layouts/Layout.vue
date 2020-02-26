@@ -19,8 +19,8 @@
 
 <script>
 import get from 'lodash/get';
-import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from 'src/core/data/constants';
-import { layoutMixin } from 'src/core/mixins/layoutMixin';
+import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from '@data/constants';
+import { layoutMixin } from '@mixins/layoutMixin';
 import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach';
 import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxiliary';
 import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer';

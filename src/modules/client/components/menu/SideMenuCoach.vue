@@ -60,10 +60,10 @@
 </template>
 
 <script>
-import { CLIENT_ADMIN } from 'src/core/data/constants';
+import { CLIENT_ADMIN } from '@data/constants';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
-import { sideMenuMixin } from 'src/core/mixins/sideMenuMixin';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
   mixins: [sideMenuMixin],

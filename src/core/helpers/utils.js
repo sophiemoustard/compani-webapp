@@ -1,5 +1,5 @@
 import moment from 'moment';
-import diacriticsMap from 'src/core/data/diacritics';
+import diacriticsMap from '@data/diacritics';
 
 export const extend = (...sources) => {
   const extended = {};

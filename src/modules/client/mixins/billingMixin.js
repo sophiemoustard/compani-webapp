@@ -1,4 +1,4 @@
-import { MONTH } from 'src/core/data/constants';
+import { MONTH } from '@data/constants';
 
 export const billingMixin = {
   methods: {

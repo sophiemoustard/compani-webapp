@@ -2,8 +2,8 @@ const ibantools = require('ibantools');
 const axios = require('axios');
 const moment = require('moment');
 import sectors from '@api/Sectors';
-import { workHealthServices } from 'src/core/data/workHealthServices';
-import { urssafCodes } from 'src/core/data/urssafCodes';
+import { workHealthServices } from '@data/workHealthServices';
+import { urssafCodes } from '@data/urssafCodes';
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;

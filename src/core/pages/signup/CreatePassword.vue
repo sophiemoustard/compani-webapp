@@ -34,7 +34,7 @@ import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
-import { REQUIRED_LABEL } from 'src/core/data/constants';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'CreatePassword',

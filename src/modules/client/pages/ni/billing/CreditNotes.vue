@@ -171,7 +171,7 @@ import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { positiveNumber } from '@helpers/vuelidateCustomVal.js';
 import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils.js';
-import { COMPANI } from 'src/core/data/constants';
+import { COMPANI } from '@data/constants';
 
 export default {
   name: 'CreditNotes',

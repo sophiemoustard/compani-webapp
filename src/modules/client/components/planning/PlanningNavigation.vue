@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { AGENDA, PLANNING, THREE_DAYS_VIEW, WEEK_VIEW } from 'src/core/data/constants';
+import { AGENDA, PLANNING, THREE_DAYS_VIEW, WEEK_VIEW } from '@data/constants';
 
 export default {
   name: 'PlanningNavigation',

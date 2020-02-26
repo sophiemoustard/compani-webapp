@@ -106,7 +106,7 @@ import { NotifyNegative } from '@components/popup/notify.js';
 import SimpleTable from '@components/table/SimpleTable';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { extend, formatIdentity, formatHours } from '@helpers/utils.js';
-import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from 'src/core/data/constants';
+import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin.js';
