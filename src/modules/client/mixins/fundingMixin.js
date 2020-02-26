@@ -1,6 +1,6 @@
 import { getLastVersion } from '@helpers/utils';
-import { days } from 'src/core/data/days';
-import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from 'src/core/data/constants.js';
+import { days } from '@data/days';
+import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants.js';
 
 export const fundingMixin = {
   data () {

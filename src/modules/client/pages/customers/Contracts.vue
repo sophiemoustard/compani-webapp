@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { CUSTOMER } from 'src/core/data/constants';
+import { CUSTOMER } from '@data/constants';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
 import Contracts from 'src/modules/client/components/contracts/Contracts';
 

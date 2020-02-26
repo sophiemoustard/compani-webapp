@@ -9,7 +9,7 @@ import Users from '@api/Users';
 import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { clear, formatPhone } from '@helpers/utils';
-import { HELPER, REQUIRED_LABEL } from 'src/core/data/constants';
+import { HELPER, REQUIRED_LABEL } from '@data/constants';
 
 export const helperMixin = {
   data () {

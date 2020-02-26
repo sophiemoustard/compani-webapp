@@ -108,12 +108,12 @@ import {
   CESU,
   REFUND,
   COACH_ROLES,
-  ADMIN_ROLES,
+  CLIENT_ADMIN,
   CUSTOMER,
   THIRD_PARTY_PAYER,
   HELPER,
   REQUIRED_LABEL,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import CustomerBillingTable from 'src/modules/client/components/customers/CustomerBillingTable';
 import PaymentCreationModal from 'src/modules/client/components/customers/PaymentCreationModal';
 import PaymentEditionModal from 'src/modules/client/components/customers/PaymentEditionModal';
@@ -207,7 +207,7 @@ export default {
       return HELPER === this.userRole;
     },
     isAdmin () {
-      return ADMIN_ROLES.includes(this.userRole);
+      return CLIENT_ADMIN === this.userRole;
     },
     isCoach () {
       return COACH_ROLES.includes(this.userRole);

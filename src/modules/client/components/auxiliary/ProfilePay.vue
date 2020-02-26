@@ -60,7 +60,7 @@ import Modal from '@components/modal/Modal';
 import LargeTable from '@components/table/LargeTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
-import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from 'src/core/data/constants';
+import { PAY_DOCUMENT_NATURES, OTHER, AUXILIARY_ROLES, COACH_ROLES } from '@data/constants';
 import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 

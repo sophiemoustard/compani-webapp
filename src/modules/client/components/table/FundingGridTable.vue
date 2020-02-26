@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { NATURE_OPTIONS, FIXED } from 'src/core/data/constants';
+import { NATURE_OPTIONS, FIXED } from '@data/constants';
 
 export default {
   name: 'GridTable',

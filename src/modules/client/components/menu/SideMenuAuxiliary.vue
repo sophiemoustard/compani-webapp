@@ -39,13 +39,12 @@
 <script>
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
-import { AUXILIARY, PLANNING_REFERENT } from 'src/core/data/constants';
-import SideMenuFooter from 'src/modules/client/components/menu/SideMenuFooter.vue';
-import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
-import MenuItem from 'src/modules/client/components/menu/MenuItem.vue';
+import SideMenuFooter from '@components/menu/SideMenuFooter';
+import MenuItem from '@components/menu/MenuItem';
+import { AUXILIARY, PLANNING_REFERENT } from '@data/constants';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
-  props: ['user'],
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
@@ -67,6 +66,9 @@ export default {
   computed: {
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(get(this, 'user.role.client.name', null));
+    },
+    user () {
+      return this.$store.getters['main/user'];
     },
   },
   methods: {

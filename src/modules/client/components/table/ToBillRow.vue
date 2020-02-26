@@ -48,7 +48,7 @@
 <script>
 import EditableTd from '@components/table/EditableTd';
 import { formatPrice, getLastVersion, formatIdentity, truncate } from '@helpers/utils.js';
-import { FIXED } from 'src/core/data/constants.js';
+import { FIXED } from '@data/constants.js';
 
 export default {
   name: 'ToBillRow',

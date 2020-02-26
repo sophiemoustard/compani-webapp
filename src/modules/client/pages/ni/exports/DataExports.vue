@@ -14,7 +14,7 @@ import Exports from '@api/Exports';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import Select from '@components/form/Select';
 import { downloadFile } from '@helpers/file';
-import { EXPORT_TYPES, SERVICE } from 'src/core/data/constants';
+import { EXPORT_TYPES, SERVICE } from '@data/constants';
 
 export default {
   name: 'DataExports',

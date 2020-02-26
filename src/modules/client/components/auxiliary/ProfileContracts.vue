@@ -119,7 +119,7 @@ import {
   COMPANY_CONTRACT,
   COACH,
   CONTRACT_CREATION_MANDATORY_INFO,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
 import { formatIdentity } from '@helpers/utils';
 

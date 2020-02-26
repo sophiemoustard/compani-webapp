@@ -36,7 +36,7 @@ import Customers from '@api/Customers';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
-import { HELPER, AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from 'src/core/data/constants.js';
+import { HELPER, AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
 
 export default {
   metaInfo: {

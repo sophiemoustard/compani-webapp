@@ -7,7 +7,7 @@ import {
   STAFFING_VIEW_END_HOUR,
   ILLNESS,
   WORK_ACCIDENT,
-} from 'src/core/data/constants';
+} from '@data/constants';
 
 export const planningEventMixin = {
   data () {

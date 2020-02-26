@@ -95,7 +95,7 @@
 
 <script>
 import { formatIdentity } from '@helpers/utils';
-import { INTERVENTION, ABSENCE, OTHER, NEVER } from 'src/core/data/constants';
+import { INTERVENTION, ABSENCE, OTHER, NEVER } from '@data/constants';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
 export default {

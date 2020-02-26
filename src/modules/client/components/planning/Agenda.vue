@@ -59,7 +59,7 @@ import {
   PLANNING_PERCENTAGE_BY_MINUTES,
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
 
 export default {

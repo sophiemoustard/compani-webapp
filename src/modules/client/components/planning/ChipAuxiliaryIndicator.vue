@@ -55,7 +55,7 @@ import {
   COMPANY_CONTRACT,
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import AuxiliaryIndicators from 'src/modules/client/components/planning/AuxiliaryIndicators';
 
 export default {

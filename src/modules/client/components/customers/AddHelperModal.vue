@@ -21,7 +21,7 @@
 
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import { REQUIRED_LABEL } from 'src/core/data/constants.js';
+import { REQUIRED_LABEL } from '@data/constants.js';
 
 export default {
   name: 'AddHelperModal',

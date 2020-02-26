@@ -1,7 +1,7 @@
 import moment from 'moment';
 
-import { COMPANY_CONTRACT, WEEKS_PER_MONTH, CIVILITY_OPTIONS } from 'src/core/data/constants';
-import nationalities from 'src/core/data/nationalities';
+import { COMPANY_CONTRACT, WEEKS_PER_MONTH, CIVILITY_OPTIONS } from '@data/constants';
+import nationalities from '@data/nationalities';
 
 export const generateContractFields = (type, data) => {
   if (type === COMPANY_CONTRACT) {

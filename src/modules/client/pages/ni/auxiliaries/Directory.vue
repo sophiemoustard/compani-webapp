@@ -88,7 +88,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify.js';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
-import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from 'src/core/data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { taskValidation } from 'src/modules/client/helpers/taskValidation';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';

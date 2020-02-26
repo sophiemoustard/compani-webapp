@@ -1,4 +1,4 @@
-import { THREE_DAYS_VIEW } from 'src/core/data/constants';
+import { THREE_DAYS_VIEW } from '@data/constants';
 
 export const planningTimelineMixin = {
   data () {

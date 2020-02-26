@@ -2,7 +2,7 @@ import Sectors from '@api/Sectors'
 import Users from '@api/Users'
 import Customers from '@api/Customers'
 import { formatIdentity } from '@helpers/utils';
-import { AUXILIARY, SECTOR, PERSON, CUSTOMER } from 'src/core/data/constants';
+import { AUXILIARY, SECTOR, PERSON, CUSTOMER } from '@data/constants';
 
 export const fillFilter = async ({ commit }, roleToSearch) => {
   const rawPromises = [];

@@ -68,7 +68,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import { DEFAULT_AVATAR } from 'src/core/data/constants';
+import { DEFAULT_AVATAR } from '@data/constants';
 
 export default {
   name: 'ProfileHeader',

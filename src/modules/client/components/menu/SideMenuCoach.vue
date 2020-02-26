@@ -60,15 +60,12 @@
 </template>
 
 <script>
-import { ADMIN_ROLES } from 'src/core/data/constants';
-import MenuItem from 'src/modules/client/components/menu/MenuItem.vue';
-import SideMenuFooter from 'src/modules/client/components/menu/SideMenuFooter.vue';
-import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
+import { CLIENT_ADMIN } from '@data/constants';
+import SideMenuFooter from '@components/menu/SideMenuFooter';
+import MenuItem from '@components/menu/MenuItem';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
-  props: {
-    user: Object,
-  },
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
@@ -76,7 +73,7 @@ export default {
   },
   data () {
     return {
-      ADMIN_ROLES,
+      CLIENT_ADMIN,
       activeRoutes: {
         planning: { open: false },
         benef: { open: false },
@@ -93,13 +90,11 @@ export default {
   },
   computed: {
     isAdmin () {
-      return ADMIN_ROLES.includes(this.user.role.client.name);
+      return CLIENT_ADMIN === this.user.role.client.name;
+    },
+    user () {
+      return this.$store.getters['main/user'];
     },
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .q-layout-drawer .q-list .router-link-active
-    color: $primary !important
-</style>

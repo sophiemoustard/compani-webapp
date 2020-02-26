@@ -1,12 +1,11 @@
 <template>
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer" @input="toggleMenu">
-      <side-menu-coach :ref="sidemenusRefs" v-if="isCoach && !isMini" :user="user" />
-      <side-menu-auxiliary :ref="sidemenusRefs" v-if="isAuxiliary && !isMini" :user="user" />
-      <side-menu-customer :ref="sidemenusRefs" v-if="isHelper && !isMini" :user="user" />
-      <div :class="[!isMini ? 'q-mini-drawer-hide' : 'q-mini-drawer-only']" class="absolute" >
-        <q-btn :class="[!isMini ? 'chevron-left' : 'chevron-right']" class="chevron" dense round unelevated
-          :icon="menuIcon" @click="isMini = !isMini" />
+      <side-menu-coach ref="coachMenu" v-if="isCoach && !isMini" />
+      <side-menu-auxiliary ref="auxiliaryMenu" v-if="isAuxiliary && !isMini" />
+      <side-menu-customer ref="helperMenu" v-if="isHelper && !isMini" />
+      <div :class="chevronContainerClasses">
+        <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
     </q-drawer>
     <q-page-container>
@@ -19,29 +18,27 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
 import get from 'lodash/get';
-import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach'
-import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxiliary'
-import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer'
-import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from 'src/core/data/constants.js';
+import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from '@data/constants';
+import { layoutMixin } from '@mixins/layoutMixin';
+import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach';
+import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxiliary';
+import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer';
 
 export default {
+  name: 'ClientLayout',
   components: {
     'side-menu-coach': SideMenuCoach,
     'side-menu-auxiliary': SideMenuAuxiliary,
     'side-menu-customer': SideMenuCustomer,
   },
+  mixins: [layoutMixin],
   data () {
     return {
       HELPER,
-      isMini: false,
     }
   },
   computed: {
-    ...mapGetters({
-      user: 'main/user',
-    }),
     userRole () {
       return get(this.user, 'role.client.name') || null;
     },
@@ -54,31 +51,15 @@ export default {
     isHelper () {
       return this.userRole === HELPER;
     },
-    menuIcon () {
-      return this.isMini ? 'view_headline' : 'chevron_left';
-    },
-    toggleDrawer () {
-      return this.$store.state.main.toggleDrawer;
-    },
     sidemenusRefs () {
-      if (!this.user) return 'defaultMenu'
+      if (!this.user) return 'defaultMenu';
 
       if (this.isAuxiliary) return 'auxiliaryMenu';
-      if (this.isCoach) return 'coachMenu'
+      if (this.isCoach) return 'coachMenu';
       if (this.isHelper) return 'helperMenu';
 
       return 'defaultMenu';
     },
-  },
-  methods: {
-    toggleMenu (value) {
-      this.$store.commit('main/setToggleDrawer', value);
-    },
-  },
-  beforeRouteUpdate (to, from, next) {
-    if (this.toggleDrawer && !this.isMini) this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
-
-    next();
   },
 }
 </script>

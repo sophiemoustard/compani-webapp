@@ -33,7 +33,7 @@ import {
   CUSTOMER,
   SECTOR,
   COACH_ROLES,
-} from 'src/core/data/constants';
+} from '@data/constants';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 import Planning from 'src/modules/client/components/planning/Planning.vue';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';

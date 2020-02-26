@@ -56,7 +56,7 @@ import Select from '@components/form/Select';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
-import { REQUIRED_LABEL, CIVILITY_OPTIONS } from 'src/core/data/constants';
+import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 

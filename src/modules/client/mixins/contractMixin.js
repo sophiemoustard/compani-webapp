@@ -1,9 +1,9 @@
 import { required, minValue } from 'vuelidate/lib/validators';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
-import nationalities from 'src/core/data/nationalities.js';
-import { COMPANY_CONTRACT, CUSTOMER_CONTRACT } from 'src/core/data/constants';
-import { translate } from 'src/core/data/translate';
+import nationalities from '@data/nationalities.js';
+import { COMPANY_CONTRACT, CUSTOMER_CONTRACT } from '@data/constants';
+import { translate } from '@data/translate';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields.js';
 
 export const contractMixin = {

@@ -31,7 +31,7 @@ import Events from '@api/Events';
 import EventHistories from '@api/EventHistories';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
-import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES } from 'src/core/data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES } from '@data/constants';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 import Planning from 'src/modules/client/components/planning/Planning.vue';

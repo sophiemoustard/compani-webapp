@@ -159,9 +159,9 @@ import {
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { REQUIRED_LABEL, COMPANY, ASSOCIATION } from 'src/core/data/constants.js';
-import { urssafCodes } from 'src/core/data/urssafCodes';
-import { workHealthServices } from 'src/core/data/workHealthServices';
+import { REQUIRED_LABEL, COMPANY, ASSOCIATION } from '@data/constants.js';
+import { urssafCodes } from '@data/urssafCodes';
+import { workHealthServices } from '@data/workHealthServices';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';

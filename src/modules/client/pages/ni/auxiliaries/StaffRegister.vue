@@ -25,8 +25,8 @@
 
 <script>
 import LargeTable from '@components/table/LargeTable';
-import nationalities from 'src/core/data/nationalities.js';
-import { CIVILITY_OPTIONS } from 'src/core/data/constants';
+import nationalities from '@data/nationalities.js';
+import { CIVILITY_OPTIONS } from '@data/constants';
 
 export default {
   name: 'StaffRegister',

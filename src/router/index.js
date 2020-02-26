@@ -2,7 +2,9 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
 import { Cookies } from 'quasar';
-import routes from 'src/modules/client/router/routes';
+import clientRoutes from 'src/modules/client/router/routes';
+import vendorRoutes from 'src/modules/vendor/router/routes';
+import routes from 'src/router/routes';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
 import { checkPermission } from '@helpers/checkPermission';
@@ -17,7 +19,7 @@ Vue.use(VueMeta);
 
 const Router = new VueRouter({
   scrollBehavior: () => ({ y: 0 }),
-  routes,
+  routes: [...routes, ...vendorRoutes, ...clientRoutes],
 
   mode: process.env.VUE_ROUTER_MODE,
   base: process.env.VUE_ROUTER_BASE,
@@ -26,33 +28,28 @@ const Router = new VueRouter({
 Router.beforeEach(async (to, from, next) => {
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
-      if (await alenvi.refreshAlenviCookies()) {
-        if (store.state.main.refreshState) {
-          await store.dispatch('main/getUser', Cookies.get('user_id'));
-        }
-        if (checkPermission(to, store.getters['main/user'])) {
+      const refresh = await alenvi.refreshAlenviCookies();
+      if (refresh) {
+        if (store.state.main.refreshState) await store.dispatch('main/getUser', Cookies.get('user_id'));
+
+        const permission = checkPermission(to, store.getters['main/user']);
+        if (!permission) next('/401');
+        else {
           store.commit('main/changeRefreshState', false);
           next();
-        } else {
-          next('/401');
         }
-      } else {
-        next({ path: '/login', query: { from: to.fullPath } });
-      }
+      } else next({ path: '/login', query: { from: to.fullPath } });
     } else {
-      if (store.state.main.refreshState) {
-        await store.dispatch('main/getUser', Cookies.get('user_id'));
-      }
-      if (checkPermission(to, store.getters['main/user'])) {
+      if (store.state.main.refreshState) await store.dispatch('main/getUser', Cookies.get('user_id'));
+
+      const permission = checkPermission(to, store.getters['main/user']);
+      if (!permission) next('/401');
+      else {
         store.commit('main/changeRefreshState', false);
         next();
-      } else {
-        next('/401');
       }
     }
-  } else {
-    next();
-  }
+  } else next();
 });
 
 export default Router;

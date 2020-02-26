@@ -21,14 +21,11 @@
 </template>
 
 <script>
-import MenuItem from 'src/modules/client/components/menu/MenuItem.vue';
-import SideMenuFooter from 'src/modules/client/components/menu/SideMenuFooter.vue';
-import { sideMenuMixin } from 'src/modules/client/mixins/sideMenuMixin';
+import MenuItem from '@components/menu/MenuItem';
+import SideMenuFooter from '@components/menu/SideMenuFooter';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
-  props: {
-    user: Object,
-  },
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
@@ -48,15 +45,12 @@ export default {
       return this.user && this.user.customers && this.user.customers.length > 0 && this.user.customers[0].contracts &&
         this.user.customers[0].contracts.length > 0;
     },
+    user () {
+      return this.$store.getters['main/user'];
+    },
   },
   mounted () {
     this.collapsibleOpening();
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-.q-item
-  & .q-item__label
-    font-size: 1rem
-</style>

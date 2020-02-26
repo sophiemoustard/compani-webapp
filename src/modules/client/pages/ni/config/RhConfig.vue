@@ -238,7 +238,7 @@ import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader.vue';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { REQUIRED_LABEL } from 'src/core/data/constants';
+import { REQUIRED_LABEL } from '@data/constants';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';

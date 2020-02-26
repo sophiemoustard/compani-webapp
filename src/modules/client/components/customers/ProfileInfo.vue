@@ -411,7 +411,7 @@ import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
-import { days } from 'src/core/data/days.js';
+import { days } from '@data/days.js';
 import {
   FUNDING_FREQ_OPTIONS,
   NATURE_OPTIONS,
@@ -420,7 +420,7 @@ import {
   REQUIRED_LABEL,
   ONCE,
   CIVILITY_OPTIONS,
-} from 'src/core/data/constants.js';
+} from '@data/constants.js';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import EditHelperModal from 'src/modules/client/components/customers/EditHelperModal.vue';
 import AddHelperModal from 'src/modules/client/components/customers/AddHelperModal.vue';

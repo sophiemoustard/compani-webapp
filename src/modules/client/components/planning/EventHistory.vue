@@ -41,7 +41,7 @@ import {
   EVERY_TWO_WEEKS,
   EVENT_UPDATE,
   CANCELLATION_OPTIONS,
-} from 'src/core/data/constants';
+} from '@data/constants';
 
 export default {
   name: 'EventHistory',
