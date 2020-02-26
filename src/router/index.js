@@ -7,7 +7,7 @@ import vendorRoutes from 'src/modules/vendor/router/routes';
 import routes from 'src/router/routes';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
-import { checkPermission } from '@helpers/checkPermission';
+import { checkRole } from '@helpers/checkRole';
 
 Vue.use(VueRouter)
 Vue.use(VueMeta);
@@ -32,7 +32,7 @@ Router.beforeEach(async (to, from, next) => {
       if (refresh) {
         if (store.state.main.refreshState) await store.dispatch('main/getUser', Cookies.get('user_id'));
 
-        const permission = checkPermission(to, store.getters['main/user']);
+        const permission = checkRole(to, store.getters['main/user']);
         if (!permission) next('/404');
         else {
           store.commit('main/changeRefreshState', false);
@@ -42,7 +42,7 @@ Router.beforeEach(async (to, from, next) => {
     } else {
       if (store.state.main.refreshState) await store.dispatch('main/getUser', Cookies.get('user_id'));
 
-      const permission = checkPermission(to, store.getters['main/user']);
+      const permission = checkRole(to, store.getters['main/user']);
       if (!permission) next('/404');
       else {
         store.commit('main/changeRefreshState', false);
