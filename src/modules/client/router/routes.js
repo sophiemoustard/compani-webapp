@@ -135,7 +135,7 @@ const routes = [
         component: () => import('src/modules/client/pages/ni/pay/ToPay'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
+          roles: [CLIENT_ADMIN],
           parent: 'pay',
         },
       },
@@ -145,7 +145,7 @@ const routes = [
         component: () => import('src/modules/client/pages/ni/pay/ContractEnds'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
+          roles: [CLIENT_ADMIN],
           parent: 'pay',
         },
       },
@@ -213,6 +213,16 @@ const routes = [
         path: 'ni/auxiliaries/staff-register',
         name: 'staff register',
         component: () => import('src/modules/client/pages/ni/auxiliaries/StaffRegister'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: COACH_ROLES,
+          parent: 'teams',
+        },
+      },
+      {
+        path: 'ni/auxiliaries/:id',
+        name: 'personal info',
+        component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryInfo'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -241,24 +251,13 @@ const routes = [
         },
       },
       {
-        path: 'ni/auxiliaries/:id',
-        name: 'personal info',
-        component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryInfo'),
-        props: true,
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
-          parent: 'teams',
-        },
-      },
-      {
         path: 'ni/customers/:id',
         name: 'customers profile',
         props: true,
         component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT],
+          roles: COACH_ROLES,
           parent: 'benef',
         },
       },
@@ -269,7 +268,7 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN, COACH, ...AUXILIARY_ROLES],
+          roles: [CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT],
           parent: 'planning',
         },
       },
@@ -280,7 +279,7 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN, COACH, ...AUXILIARY_ROLES],
+          roles: [CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT],
           parent: 'planning',
         },
       },
@@ -291,7 +290,7 @@ const routes = [
         component: () => import('src/modules/client/pages/auxiliaries/planning/AuxiliaryAgenda'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: AUXILIARY_ROLES,
+          roles: [AUXILIARY, PLANNING_REFERENT],
           parent: 'planning',
         },
       },
@@ -341,7 +340,7 @@ const routes = [
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Documents'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: AUXILIARY_ROLES,
+          roles: [AUXILIARY, PLANNING_REFERENT],
           parent: 'administrative',
         },
       },
@@ -361,7 +360,7 @@ const routes = [
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Info'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: AUXILIARY_ROLES,
+          roles: [AUXILIARY, PLANNING_REFERENT],
           parent: 'administrative',
         },
       },
