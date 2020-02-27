@@ -33,7 +33,6 @@ const routes = [
     },
   },
   { path: '/403-pwd', component: () => import('src/core/pages/signin/403') },
-  { path: '/401', component: () => import('src/core/pages/401') },
   { path: '/docsigned', component: () => import('src/core/pages/DocumentSigned'), props: route => ({ signed: route.query.signed }) },
   {
     // Always leave this as last one
