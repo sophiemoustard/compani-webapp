@@ -41,7 +41,7 @@ import Events from '@api/Events';
 import Select from '@components/form/Select';
 import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
-import { can } from '@helpers/can';
+import { can } from '@helpers/rights';
 import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, THREE_DAYS_VIEW, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '@data/constants';
 import Agenda from 'src/modules/client/components/planning/Agenda';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';

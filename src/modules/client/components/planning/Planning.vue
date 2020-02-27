@@ -90,7 +90,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { can } from '@helpers/can';
+import { can } from '@helpers/rights';
 import {
   PLANNING,
   INVOICED_AND_PAID,

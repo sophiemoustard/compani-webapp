@@ -7,7 +7,7 @@ import vendorRoutes from 'src/modules/vendor/router/routes';
 import routes from 'src/router/routes';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
-import { checkRole } from '@helpers/checkRole';
+import { checkRole } from '@helpers/role';
 
 Vue.use(VueRouter)
 Vue.use(VueMeta);
