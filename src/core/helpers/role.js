@@ -5,9 +5,7 @@ export const checkRole = (to, user) => {
     if (to.meta.roles) {
       const roleClient = get(user, 'role.client.name', null);
       const roleVendor = get(user, 'role.vendor.name', null);
-      if (to.meta.roles.includes(roleClient)) return true;
-      if (to.meta.roles.includes(roleVendor)) return true;
-      return false;
+      return to.meta.roles.includes(roleClient) || to.meta.roles.includes(roleVendor);
     }
     return true;
   } catch (e) {
