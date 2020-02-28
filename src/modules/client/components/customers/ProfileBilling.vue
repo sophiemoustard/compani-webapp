@@ -190,7 +190,7 @@ export default {
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);
     },
-    mainUser () {
+    currentUser () {
       return this.$store.getters['main/user'];
     },
     documentQuery () {
@@ -201,7 +201,7 @@ export default {
       };
     },
     userRole () {
-      return this.mainUser.role.client.name;
+      return this.currentUser.role.client.name;
     },
     isHelper () {
       return HELPER === this.userRole;

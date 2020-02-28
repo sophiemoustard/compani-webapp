@@ -132,11 +132,11 @@ export default {
     await this.refreshContracts();
   },
   computed: {
-    mainUser () {
+    currentUser () {
       return this.$store.getters['main/user'];
     },
     userCompany () {
-      return this.mainUser.company;
+      return this.currentUser.company;
     },
   },
   methods: {

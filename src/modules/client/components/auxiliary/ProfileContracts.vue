@@ -205,7 +205,7 @@ export default {
     }
   },
   computed: {
-    mainUser () {
+    currentUser () {
       return this.$store.getters['main/user'];
     },
     userCompany () {

@@ -95,7 +95,7 @@ export const contractMixin = {
         signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
       } else {
         signature.signers = this.generateContractSigners(
-          { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
+          { name: `${this.currentUser.identity.firstname} ${this.currentUser.identity.lastname}`, email: this.currentUser.local.email }
         );
         signature.title = `${title}${translate[contract.status]} - ${this.userFullName}`;
       }

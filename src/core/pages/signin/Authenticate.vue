@@ -60,14 +60,14 @@ export default {
     }
   },
   computed: {
-    mainUser () {
+    currentUser () {
       return this.$store.getters['main/user'];
     },
     userRole () {
-      return get(this, 'mainUser.role.client.name') || null;
+      return get(this, 'currentUser.role.client.name') || null;
     },
     isAuxiliary () {
-      return this.mainUser ? AUXILIARY_ROLES.includes(this.userRole) : false;
+      return this.currentUser ? AUXILIARY_ROLES.includes(this.userRole) : false;
     },
     isAuxiliaryWithoutCompany () {
       return this.userRole === AUXILIARY_WITHOUT_COMPANY;
@@ -95,11 +95,11 @@ export default {
         if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 
         if (this.userRole === HELPER) {
-          const customer = await Customers.getById(this.mainUser.customers[0]._id);
+          const customer = await Customers.getById(this.currentUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliaryWithoutCompany) {
-          this.$router.replace({ name: 'account info', params: { id: this.mainUser._id } });
+          this.$router.replace({ name: 'account info', params: { id: this.currentUser._id } });
         } else if (this.isAuxiliary) this.$router.replace({ name: 'auxiliary agenda' });
         else this.$router.replace({ name: 'auxiliaries directory' });
       } catch (e) {

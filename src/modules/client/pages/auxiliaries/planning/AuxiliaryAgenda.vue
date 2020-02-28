@@ -141,7 +141,7 @@ export default {
     },
     async getAuxiliaries () {
       try {
-        this.auxiliaries = await Users.list();
+        this.auxiliaries = await Users.list({ company: this.currentUser.company._id });
       } catch (e) {
         this.auxiliaries = [];
       }

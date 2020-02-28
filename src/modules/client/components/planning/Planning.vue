@@ -167,17 +167,15 @@ export default {
     this.getTimelineHours();
   },
   computed: {
-    ...mapGetters({
-      mainUser: 'main/user',
-    }),
-    mainUserRole () {
-      return this.mainUser.role.client.name;
+    ...mapGetters({ currentUser: 'main/user' }),
+    currentUserRole () {
+      return this.currentUser.role.client.name;
     },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUserRole);
+      return COACH_ROLES.includes(this.currentUserRole);
     },
     isPlanningReferent () {
-      return this.mainUserRole === PLANNING_REFERENT;
+      return this.currentUserRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.persons } : this.$_.groupBy(this.persons, 'sector._id');

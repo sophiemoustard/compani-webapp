@@ -321,7 +321,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await Users.list({ role: AUXILIARY_ROLES });
+        const users = await Users.list({ role: AUXILIARY_ROLES, company: this.currentUser.company._id });
         this.userList = users.map(this.formatUser);
       } catch (e) {
         console.error(e);

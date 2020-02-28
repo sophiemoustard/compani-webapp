@@ -169,6 +169,9 @@ export default {
     activeAuxiliaries () {
       return [this.selectedAuxiliary];
     },
+    currentUser () {
+      return this.$store.getters['main/user'];
+    },
   },
   methods: {
     getAbsenceLink (absence) {
@@ -193,7 +196,7 @@ export default {
         this.tableLoading = true;
         if (this.datesHasError) return;
         this.absences = await Events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
-        this.auxiliaries = await Users.listActive();
+        this.auxiliaries = await Users.listActive({ company: this.currentUser.company._id });
       } catch (e) {
         this.absences = [];
         this.auxiliaries = [];

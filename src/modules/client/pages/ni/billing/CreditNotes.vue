@@ -371,9 +371,6 @@ export default {
     }
   },
   computed: {
-    mainUser () {
-      return this.$store.getters['main/user'];
-    },
     subscriptionsOptions () {
       let selectedCustomer;
       if (this.newCreditNote.customer) {

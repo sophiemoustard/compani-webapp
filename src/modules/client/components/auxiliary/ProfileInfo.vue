@@ -4,7 +4,7 @@
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
-          :company-id="mainUser.company._id" />
+          :company-id="currentUser.company._id" />
       </div>
       <ni-input v-model="user.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
         @blur="updateUser('mentor')" />
@@ -151,58 +151,58 @@
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
-            :entity="currentUser" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
+            :entity="user" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
             @delete="validateDocumentDeletion(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
             :error="$v.user.administrative.idCardRecto.driveId.$error" :extensions="extensions"
-            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`cni_recto_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
         <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
-            :entity="currentUser" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
+            :entity="user" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
             @delete="validateDocumentDeletion(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
             :extensions="extensions"
-            :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`cni_verso_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
         <div v-if="user.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="user"
             @delete="validateDocumentDeletion(user.administrative.passport.driveId, 'administrative.passport')"
             name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
             :error="$v.user.administrative.passport.driveId.$error" :extensions="extensions"
-            :additional-value="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`passport_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
         <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
-            alt="titre de séjour (recto)" :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl"
+            alt="titre de séjour (recto)" :entity="user" @uploaded="refreshUser" :url="docsUploadUrl"
             @delete="validateDocumentDeletion(user.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
             :error="$v.user.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
-            :additional-value="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :additional-value="`titre_de_séjour_recto_${user.identity.firstname}_${user.identity.lastname}`"
             :extensions="extensions" />
         </div>
         <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso"
             alt="titre de séjour (verso)" name="residencePermitVerso"
             @delete="validateDocumentDeletion(user.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')"
-            :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :additional-value="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :entity="user" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
+            :additional-value="`titre_de_séjour_verso_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
-            alt="attestation secu" :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
+            alt="attestation secu" :entity="user" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion(user.administrative.healthAttest.driveId, 'administrative.healthAttest')"
             name="healthAttest" @uploaded="refreshUser" :error="$v.user.administrative.healthAttest.driveId.$error"
-            :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`attestation_secu_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
-            :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
+            :entity="user" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
             name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
-            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`facture_telephone_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
             alt="facture téléphone" @delete="validateDocumentDeletion($event, 'certificates')" name="certificates"
-            collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
+            collapsible-label="Ajouter un diplôme" :user-profile="user" :url="docsUploadUrl"
             additional-fields-name="diplomes" @uploaded="refreshUser" :extensions="extensions" />
         </div>
       </div>
@@ -231,11 +231,11 @@
         <div class="col-xs-12 col-md-6" v-if="$_.get(user, 'administrative.mutualFund.has')">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
-            path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
+            path="administrative.mutualFund" alt="justif mutuelle" :entity="user"
             @delete="validateDocumentDeletion(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
             name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions" entity-url="users"
             :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
-            :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`mutuelle_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
       </div>
     </div>
@@ -254,11 +254,11 @@
         </div>
         <div v-if="user.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader :caption="captionTransportUploader" path="administrative.transportInvoice"
-            alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
+            alt="justif transport" :entity="user" name="transportInvoice" @uploaded="refreshUser"
             :error="$v.user.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
             :extensions="extensions"
             @delete="validateDocumentDeletion(user.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`justif_transport_${user.identity.firstname}_${user.identity.lastname}`" />
         </div>
       </div>
     </div>
@@ -269,7 +269,7 @@
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate"
             alt="certificat médical" :entity="user" name="medicalCertificate" @uploaded="refreshUser"
             @delete="validateDocumentDeletion(user.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
-            :additional-value="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            :additional-value="`certificat_medical_${user.identity.firstname}_${user.identity.lastname}`"
             :url="docsUploadUrl" :extensions="extensions" />
         </div>
       </div>
@@ -531,11 +531,8 @@ export default {
     },
     ...mapGetters({
       userProfile: 'rh/getUserProfile',
-      mainUser: 'main/user',
+      currentUser: 'main/user',
     }),
-    currentUser () {
-      return this.userProfile ? this.userProfile : this.mainUser;
-    },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },
@@ -543,13 +540,13 @@ export default {
       return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
     },
     docsUploadUrl () {
-      const driveId = get(this.currentUser, 'administrative.driveFolder.driveId');
+      const driveId = get(this.user, 'administrative.driveFolder.driveId');
       if (!driveId) return '';
 
-      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/gdrive/${driveId}/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.user._id}/gdrive/${driveId}/upload`;
     },
     pictureUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/cloudinary/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.user._id}/cloudinary/upload`;
     },
     hasPicture () {
       return !this.user.picture || (this.user.picture && !this.user.picture.link) ? null : this.user.picture.link;
@@ -629,14 +626,14 @@ export default {
       }
       return 'Adresse non valide';
     },
-    mainUserRole () {
-      return this.mainUser.role.client.name;
+    currentUserRole () {
+      return this.currentUser.role.client.name;
     },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.mainUserRole);
+      return AUXILIARY_ROLES.includes(this.currentUserRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUserRole);
+      return COACH_ROLES.includes(this.currentUserRole);
     },
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
@@ -647,7 +644,7 @@ export default {
     },
   },
   async mounted () {
-    const user = await Users.getById(this.currentUser._id);
+    const user = await Users.getById(this.userProfile._id);
     this.mergeUser(user);
     if (this.isCoach) {
       await this.getAuxiliaryRoles();
@@ -657,7 +654,7 @@ export default {
     this.isLoaded = true;
   },
   watch: {
-    currentUser (value) {
+    userProfile (value) {
       if (this.emailLock && !isEqual(value, this.user)) {
         this.mergeUser(value);
       }
@@ -683,7 +680,7 @@ export default {
     async emailErrorHandler (path) {
       try {
         NotifyNegative('Email déjà existant');
-        this.user.local.email = this.currentUser.local.email;
+        this.user.local.email = this.user.local.email;
         await this.$nextTick();
         this.$refs.userEmail.select();
       } catch (e) {
@@ -725,23 +722,23 @@ export default {
         this.user.identity.birthState = '99';
         payload.identity.birthState = '99';
       }
-      await Users.updateById(this.currentUser._id, payload);
+      await Users.updateById(this.user._id, payload);
     },
     async uploadImage () {
       try {
         if (this.hasPicture && !this.fileChosen) {
-          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
+          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
         }
         this.loadingImage = true;
         let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         let data = new FormData();
-        data.append('_id', this.currentUser._id);
-        data.append('role', this.currentUser.role.client.name);
-        data.append('fileName', `photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`);
+        data.append('_id', this.user._id);
+        data.append('role', this.user.role.client.name);
+        data.append('fileName', `photo_${this.user.identity.firstname}_${this.user.identity.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.user._id });
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
@@ -757,12 +754,12 @@ export default {
         let payload;
         if (path === 'certificates') {
           payload = { 'certificates': { driveId } };
-          await Users.updateCertificates(this.currentUser._id, payload);
+          await Users.updateCertificates(this.user._id, payload);
         } else {
           payload = set({}, path, { driveId: null, link: null });
-          await Users.updateById(this.currentUser._id, payload);
+          await Users.updateById(this.user._id, payload);
         }
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.user._id });
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
@@ -781,12 +778,12 @@ export default {
     },
     async deleteImage () {
       try {
-        if (this.currentUser.picture && this.currentUser.picture.publicId) {
-          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
+        if (this.user.picture && this.user.picture.publicId) {
+          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
           this.croppa.remove();
         }
-        await Users.updateById(this.currentUser._id, { picture: { link: null, publicId: null } });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        await Users.updateById(this.user._id, { picture: { link: null, publicId: null } });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.user._id });
         NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
@@ -804,7 +801,7 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async refreshUser () {
-      await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+      await this.$store.dispatch('rh/getUserProfile', { userId: this.user._id });
       NotifyPositive('Document envoyé');
     },
     groupErrors (group) {
@@ -836,8 +833,8 @@ export default {
       }
     },
     pictureDlLink (link) {
-      const lastname = removeDiacritics(get(this.currentUser, 'identity.lastname'));
-      const firstname = removeDiacritics(get(this.currentUser, 'identity.firstname'));
+      const lastname = removeDiacritics(get(this.user, 'identity.lastname'));
+      const firstname = removeDiacritics(get(this.user, 'identity.firstname'));
 
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${firstname}_${lastname}`) : '';
     },

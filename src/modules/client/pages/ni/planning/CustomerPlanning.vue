@@ -74,7 +74,7 @@ export default {
   },
   async mounted () {
     try {
-      await this.fillFilter(CUSTOMER);
+      await this.fillFilter({ currentUser: this.currentUser, roleToSearch: CUSTOMER });
       await this.getAuxiliaries();
       this.initFilters();
     } catch (e) {
@@ -92,7 +92,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      mainUser: 'main/user',
+      currentUser: 'main/user',
       filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
@@ -124,10 +124,10 @@ export default {
     initFilters () {
       if (this.targetedCustomer) {
         this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedCustomer.identity, 'FL')]);
-      } else if (COACH_ROLES.includes(this.mainUser.role.client.name)) {
+      } else if (COACH_ROLES.includes(this.currentUser.role.client.name)) {
         this.addSavedTerms('Customers');
       } else {
-        const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.mainUser.sector);
+        const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.currentUser.sector);
         if (userSector && this.$refs.planningManager) this.$refs.planningManager.restoreFilter([userSector.label]);
       }
     },

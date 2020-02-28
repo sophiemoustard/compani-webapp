@@ -89,12 +89,15 @@ export const helperMixin = {
         return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
       }
     },
+    currentUser () {
+      return this.$store.getters['main/user'];
+    },
   },
   methods: {
     // Refresh
     async getUserHelpers () {
       try {
-        this.helpers = await Users.list({ customers: this.userProfile._id });
+        this.helpers = await Users.list({ customers: this.userProfile._id, company: this.currentUser.company._id });
       } catch (e) {
         this.helpers = [];
         console.error(e);
