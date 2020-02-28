@@ -8,7 +8,7 @@ import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { frAddress, validHour } from '@helpers/vuelidateCustomVal.js';
-import { can } from '@helpers/can.js';
+import { can } from '@helpers/rights';
 import {
   INTERNAL_HOUR,
   ABSENCE,
