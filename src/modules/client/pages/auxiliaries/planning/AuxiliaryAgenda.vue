@@ -142,10 +142,10 @@ export default {
     },
     async getAuxiliaries () {
       try {
-        const payload = {};
+        const params = {};
         const companyId = get(this, 'currentUser.company._id', null)
-        if (companyId) payload.company = companyId;
-        this.auxiliaries = await Users.list(payload);
+        if (companyId) params.company = companyId;
+        this.auxiliaries = await Users.list(params);
       } catch (e) {
         this.auxiliaries = [];
       }
