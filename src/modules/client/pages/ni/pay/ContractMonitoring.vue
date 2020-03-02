@@ -35,6 +35,8 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import Contracts from '@api/Contracts';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
@@ -80,7 +82,7 @@ export default {
           name: 'team',
           label: 'Equipe',
           align: 'left',
-          field: row => this.$_.get(row, 'user.sector.name', ''),
+          field: row => get(row, 'user.sector.name', ''),
           sortable: true,
         },
         {
@@ -144,7 +146,7 @@ export default {
       try {
         this.contractsLoading = true;
         if (this.datesHasError) return;
-        this.contractsList = await this.$contracts.list({ startDate: this.dates.startDate, endDate: this.dates.endDate });
+        this.contractsList = await Contracts.list({ startDate: this.dates.startDate, endDate: this.dates.endDate });
         this.formatContractList();
         this.contractsLoading = false;
       } catch (e) {

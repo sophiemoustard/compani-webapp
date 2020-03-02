@@ -1,22 +1,23 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Contrats</h4>
-    <ni-contracts v-if="contracts" :contracts="contracts" :user="customer" :columns="contractVisibleColumns"
+    <ni-contracts-card v-if="contracts" :contracts="contracts" :user="customer" :columns="contractVisibleColumns"
       @refresh="refreshContracts" :person-key="CUSTOMER" @refreshWithTimeout="refreshContractsWithTimeout" />
   </q-page>
 </template>
 
 <script>
+import Contracts from '@api/Contracts';
 import { CUSTOMER } from '@data/constants';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
-import Contracts from 'src/modules/client/components/contracts/Contracts';
+import ContractsCard from 'src/modules/client/components/contracts/ContractsCard';
 
 export default {
   name: 'CustomerContracts',
   metaInfo: { title: 'Contracts' },
   mixins: [contractMixin],
   components: {
-    'ni-contracts': Contracts,
+    'ni-contracts-card': ContractsCard,
   },
   data () {
     return {
@@ -37,7 +38,7 @@ export default {
   methods: {
     async refreshContracts () {
       try {
-        this.contracts = await this.$contracts.list({ customer: this.customer._id });
+        this.contracts = await Contracts.list({ customer: this.customer._id });
       } catch (e) {
         this.contracts = [];
         console.error(e);

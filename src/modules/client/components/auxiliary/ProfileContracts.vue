@@ -1,10 +1,11 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts v-if="contracts" :contracts="contracts" :user="auxiliary" @openEndContract="openEndContractModal"
-        @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal" :personKey="COACH"
-        @refresh="refreshContracts" :columns="contractVisibleColumns" display-actions display-uploader
-        @refreshWithTimeout="refreshContractsWithTimeout" @deleteVersion="validateVersionDeletion" />
+      <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractVisibleColumns"
+        :personKey="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
+        @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
+        @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
+        @deleteVersion="validateVersionDeletion" />
       <q-btn :disable="disableContractCreation" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <q-banner v-if="disableContractCreation" class="full-width warning" dense>
@@ -109,7 +110,7 @@ import DateInput from '@components/form/DateInput';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
-import NiContracts from 'src/modules/client/components/contracts/Contracts';
+import ContractsCard from 'src/modules/client/components/contracts/ContractsCard';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal.vue';
 import {
   END_CONTRACT_REASONS,
@@ -133,7 +134,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
-    'ni-contracts': NiContracts,
+    'ni-contracts-card': ContractsCard,
     'ni-modal': Modal,
     'version-edition-modal': VersionEditionModal,
   },
