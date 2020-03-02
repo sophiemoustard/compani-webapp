@@ -64,7 +64,7 @@ export default {
       return this.$store.getters['current/user'];
     },
     userRole () {
-      return get(this, 'currentUser.role.client.name') || null;
+      return get(this.currentUser, 'role.client.name') || null;
     },
     isAuxiliary () {
       return this.currentUser ? AUXILIARY_ROLES.includes(this.userRole) : false;

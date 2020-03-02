@@ -91,7 +91,7 @@ export const contractMixin = {
 
       if (contract.status === CUSTOMER_CONTRACT) {
         const params = { customers: contract.customer };
-        const companyId = get(this, 'userCompany._id', null);
+        const companyId = get(this.userCompany, '_id', null);
         if (companyId) params.company = companyId;
         const helpers = await Users.list(params);
         const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);

@@ -168,7 +168,7 @@ export default {
     },
     async getAuxiliaries () {
       const params = { role: [AUXILIARY, PLANNING_REFERENT] };
-      const companyId = get(this, 'currentUser.company._id');
+      const companyId = get(this.currentUser, 'company._id');
       if (companyId) params.company = companyId;
       this.auxiliaries = await Users.list(params);
     },

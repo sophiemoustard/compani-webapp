@@ -92,7 +92,7 @@ export default {
   },
   computed: {
     isAuxiliaryWithoutCompany () {
-      return get(this, 'user.alenvi.client.name', null) === AUXILIARY_WITHOUT_COMPANY;
+      return get(this.user, 'alenvi.client.name', null) === AUXILIARY_WITHOUT_COMPANY;
     },
   },
   methods: {

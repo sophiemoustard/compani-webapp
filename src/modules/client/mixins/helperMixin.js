@@ -98,7 +98,7 @@ export const helperMixin = {
     async getUserHelpers () {
       try {
         const params = { customers: this.userProfile._id };
-        if (has(this, 'currentUser.company._id')) params.company = this.currentUser.company._id;
+        if (has(this.currentUser, 'company._id')) params.company = this.currentUser.company._id;
         this.helpers = await Users.list(params);
       } catch (e) {
         this.helpers = [];
@@ -129,7 +129,7 @@ export const helperMixin = {
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };
-      const phone = get(this, 'newHelper.contact.phone', null);
+      const phone = get(this.newHelper, 'contact.phone', null);
       if (phone) payload.contact = { phone };
 
       return pickBy(payload);

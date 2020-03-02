@@ -201,7 +201,7 @@ export const planningModalMixin = {
       ];
     },
     customerProfileRedirect () {
-      return COACH_ROLES.includes(get(this, 'currentUser.role.client.name', null))
+      return COACH_ROLES.includes(get(this.currentUser, 'role.client.name', null))
         ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
         : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
     },
