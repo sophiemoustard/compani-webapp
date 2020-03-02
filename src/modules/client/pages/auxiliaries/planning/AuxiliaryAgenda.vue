@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import has from 'lodash/has';
+import get from 'lodash/get';
 import Users from '@api/Users';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
@@ -143,7 +143,8 @@ export default {
     async getAuxiliaries () {
       try {
         const payload = {};
-        if (has(this, 'currentUser.company._id')) payload.company = this.currentUser.company._id;
+        const companyId = get(this, 'currentUser.company._id', null)
+        if (companyId) payload.company = companyId;
         this.auxiliaries = await Users.list(payload);
       } catch (e) {
         this.auxiliaries = [];

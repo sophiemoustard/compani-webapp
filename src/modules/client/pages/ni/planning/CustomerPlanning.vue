@@ -22,6 +22,7 @@ import { mapGetters, mapActions } from 'vuex';
 import get from 'lodash/get';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
+import Users from '@api/Users';
 import { NotifyNegative } from '@components/popup/notify.js';
 import { formatIdentity } from '@helpers/utils';
 import {
@@ -166,7 +167,10 @@ export default {
       }
     },
     async getAuxiliaries () {
-      this.auxiliaries = await this.$users.list({ role: [AUXILIARY, PLANNING_REFERENT] });
+      const payload = { role: [AUXILIARY, PLANNING_REFERENT] };
+      const companyId = get(this, 'currentUser.company._id');
+      if (companyId) payload.company = companyId;
+      this.auxiliaries = await Users.list(payload);
     },
     // Event creation
     openCreationModal (vEvent) {

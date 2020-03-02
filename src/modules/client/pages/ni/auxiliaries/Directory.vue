@@ -241,7 +241,7 @@ export default {
       return this.$store.getters['current/user'];
     },
     company () {
-      return this.$store.getters['main/company'];
+      return this.$store.getters['current/company'];
     },
     activeUserList () {
       if (this.activeUsers) {
