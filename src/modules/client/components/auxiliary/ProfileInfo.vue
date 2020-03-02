@@ -529,10 +529,10 @@ export default {
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
-    ...mapGetters({
-      userProfile: 'rh/getUserProfile',
-      currentUser: 'current/user',
-    }),
+    ...mapGetters({ currentUser: 'current/user' }),
+    userProfile () {
+      return this.$store.getters['rh/getUserProfile'] ? this.$store.getters['rh/getUserProfile'] : this.currentUser;
+    },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },

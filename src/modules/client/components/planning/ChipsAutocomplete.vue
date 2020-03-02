@@ -25,9 +25,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      elementToAdd: 'planning/getElementToAdd',
-    }),
+    ...mapGetters({ elementToAdd: 'planning/getElementToAdd' }),
   },
   methods: {
     addEvent (el) {
