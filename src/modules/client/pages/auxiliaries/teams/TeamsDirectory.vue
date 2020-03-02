@@ -84,10 +84,10 @@ export default {
     },
     async getUserList () {
       try {
-        const payload = { role: [AUXILIARY, PLANNING_REFERENT] };
+        const params = { role: [AUXILIARY, PLANNING_REFERENT] };
         const companyId = get(this, 'currentUser.company._id', null);
-        if (companyId) payload.company = companyId;
-        const users = await Users.listActive(payload);
+        if (companyId) params.company = companyId;
+        const users = await Users.listActive(params);
         this.userList = users.map(user => ({
           auxiliary: {
             name: formatIdentity(user.identity, 'FL'),

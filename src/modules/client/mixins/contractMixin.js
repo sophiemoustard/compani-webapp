@@ -90,10 +90,10 @@ export const contractMixin = {
       }
 
       if (contract.status === CUSTOMER_CONTRACT) {
-        const payload = { customers: contract.customer };
+        const params = { customers: contract.customer };
         const companyId = get(this, 'userCompany._id', null);
-        if (companyId) payload.company = companyId;
-        const helpers = await Users.list(payload);
+        if (companyId) params.company = companyId;
+        const helpers = await Users.list(params);
         const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);
         signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
         signature.title = `${translate[contract.status]} - ${currentCustomer.identity.lastname}`;

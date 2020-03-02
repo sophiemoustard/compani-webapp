@@ -167,10 +167,10 @@ export default {
       }
     },
     async getAuxiliaries () {
-      const payload = { role: [AUXILIARY, PLANNING_REFERENT] };
+      const params = { role: [AUXILIARY, PLANNING_REFERENT] };
       const companyId = get(this, 'currentUser.company._id');
-      if (companyId) payload.company = companyId;
-      this.auxiliaries = await Users.list(payload);
+      if (companyId) params.company = companyId;
+      this.auxiliaries = await Users.list(params);
     },
     // Event creation
     openCreationModal (vEvent) {

@@ -97,9 +97,9 @@ export const helperMixin = {
     // Refresh
     async getUserHelpers () {
       try {
-        const payload = { customers: this.userProfile._id };
-        if (has(this, 'currentUser.company._id')) payload.company = this.currentUser.company._id;
-        this.helpers = await Users.list(payload);
+        const params = { customers: this.userProfile._id };
+        if (has(this, 'currentUser.company._id')) params.company = this.currentUser.company._id;
+        this.helpers = await Users.list(params);
       } catch (e) {
         this.helpers = [];
         console.error(e);
