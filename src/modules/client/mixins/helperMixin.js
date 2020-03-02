@@ -1,4 +1,4 @@
-
+import has from 'lodash/has';
 import randomize from 'randomatic';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
@@ -90,14 +90,16 @@ export const helperMixin = {
       }
     },
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
   methods: {
     // Refresh
     async getUserHelpers () {
       try {
-        this.helpers = await Users.list({ customers: this.userProfile._id, company: this.currentUser.company._id });
+        const payload = { customers: this.userProfile._id };
+        if (has(this, 'currentUser.company._id')) payload.company = this.currentUser.company._id;
+        this.helpers = await Users.list(payload);
       } catch (e) {
         this.helpers = [];
         console.error(e);

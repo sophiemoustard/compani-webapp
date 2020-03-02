@@ -220,7 +220,7 @@ export default {
   },
   computed: {
     helper () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     ibanError () {
       if (!this.$v.customer.payment.iban.required) {
@@ -299,7 +299,7 @@ export default {
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
         await Customers.updateById(this.customer._id, this.$_.set({}, path, value));
-        await this.$store.dispatch('main/getUser', this.helper._id);
+        await this.$store.dispatch('current/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
 

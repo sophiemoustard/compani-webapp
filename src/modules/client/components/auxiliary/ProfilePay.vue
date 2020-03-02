@@ -110,7 +110,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ currentUser: 'main/user' }),
+    ...mapGetters({ currentUser: 'current/user' }),
     documentNatureLabels () {
       const payDocumentNaturesKeyedByValue = keyBy(PAY_DOCUMENT_NATURES, 'value');
 

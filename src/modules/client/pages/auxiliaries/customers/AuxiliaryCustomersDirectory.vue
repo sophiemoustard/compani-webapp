@@ -57,7 +57,7 @@ export default {
   },
   computed: {
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     filteredUsers () {
       return this.customersList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));

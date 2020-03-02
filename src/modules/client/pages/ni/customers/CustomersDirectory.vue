@@ -176,7 +176,7 @@ export default {
   },
   computed: {
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     filteredCustomers () {
       const customers = this.onlyClients ? this.customers.filter(customer => customer.firstIntervention) : this.customers;

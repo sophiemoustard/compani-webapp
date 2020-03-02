@@ -61,7 +61,7 @@ export default {
   },
   computed: {
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     userRole () {
       return get(this, 'currentUser.role.client.name') || null;
@@ -90,7 +90,7 @@ export default {
         this.$q.cookies.set('alenvi_token_expires_in', auth.expiresIn, options);
         this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
         this.$q.cookies.set('user_id', auth.user._id, options);
-        await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
+        await this.$store.dispatch('current/getUser', this.$q.cookies.get('user_id'));
 
         if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 

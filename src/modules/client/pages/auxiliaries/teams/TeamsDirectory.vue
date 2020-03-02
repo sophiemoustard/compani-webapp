@@ -70,7 +70,7 @@ export default {
   },
   computed: {
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     filteredUsers () {
       return this.userList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));

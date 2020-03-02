@@ -145,7 +145,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentUser: 'main/user',
+      currentUser: 'current/user',
       filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',

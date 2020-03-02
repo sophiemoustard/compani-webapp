@@ -39,7 +39,6 @@
 
 <script>
 import get from 'lodash/get';
-import Users from '@api/Users';
 import Events from '@api/Events';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
@@ -67,7 +66,6 @@ export default {
       loading: false,
       tableLoading: false,
       absences: [],
-      auxiliaries: [],
       editedEvent: {},
       editionModal: false,
       selectedAuxiliary: { picture: {}, identity: { lastname: '' } },
@@ -170,7 +168,7 @@ export default {
       return [this.selectedAuxiliary];
     },
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
   methods: {
@@ -196,10 +194,8 @@ export default {
         this.tableLoading = true;
         if (this.datesHasError) return;
         this.absences = await Events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
-        this.auxiliaries = await Users.listActive({ company: this.currentUser.company._id });
       } catch (e) {
         this.absences = [];
-        this.auxiliaries = [];
         console.error(e);
       } finally {
         this.tableLoading = false;

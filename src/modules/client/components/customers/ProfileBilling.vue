@@ -191,7 +191,7 @@ export default {
       return get(this.customer, 'driveFolder.driveId', null);
     },
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     documentQuery () {
       return {

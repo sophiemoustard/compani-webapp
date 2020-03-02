@@ -26,7 +26,7 @@ export default {
   },
   computed: {
     auxiliary () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
   async mounted () {

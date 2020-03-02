@@ -35,6 +35,7 @@
 </template>
 
 <script>
+import has from 'lodash/has';
 import Users from '@api/Users';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
@@ -86,7 +87,7 @@ export default {
       return formatIdentity(this.selectedAuxiliary.identity, 'FL');
     },
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     activeAuxiliaries () {
       return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0], this.days[6]) ||
@@ -141,7 +142,9 @@ export default {
     },
     async getAuxiliaries () {
       try {
-        this.auxiliaries = await Users.list({ company: this.currentUser.company._id });
+        const payload = {};
+        if (has(this, 'currentUser.company._id')) payload.company = this.currentUser.company._id;
+        this.auxiliaries = await Users.list(payload);
       } catch (e) {
         this.auxiliaries = [];
       }

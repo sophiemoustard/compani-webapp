@@ -303,7 +303,7 @@ export default {
   },
   computed: {
     user () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     addressError () {
       return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
@@ -341,7 +341,7 @@ export default {
   },
   methods: {
     async refreshCompany () {
-      await this.$store.dispatch('main/getUser', this.user._id);
+      await this.$store.dispatch('current/getUser', this.user._id);
       this.company = this.user.company;
       this.company.address = this.company.address || { fullAddress: '' };
       this.company.legalRepresentative =

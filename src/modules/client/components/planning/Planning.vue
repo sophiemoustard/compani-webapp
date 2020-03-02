@@ -167,7 +167,7 @@ export default {
     this.getTimelineHours();
   },
   computed: {
-    ...mapGetters({ currentUser: 'main/user' }),
+    ...mapGetters({ currentUser: 'current/user' }),
     currentUserRole () {
       return this.currentUser.role.client.name;
     },
@@ -282,10 +282,10 @@ export default {
     createEvent (eventInfo) {
       let isAllowed = true;
       if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
-        isAllowed = can({ user: this.$store.getters['main/user'], permissions: [{ name: 'events:edit' }] });
+        isAllowed = can({ user: this.$store.getters['current/user'], permissions: [{ name: 'events:edit' }] });
       } else if (this.personKey === 'auxiliary') {
         isAllowed = can({
-          user: this.$store.getters['main/user'],
+          user: this.$store.getters['current/user'],
           auxiliaryIdEvent: eventInfo.person._id,
           permissions: [
             { name: 'events:edit' },

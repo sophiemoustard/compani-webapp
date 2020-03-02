@@ -197,7 +197,7 @@ export default {
       return this.$store.getters['rh/getUserProfile'];
     },
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.currentUser.role.client.name);
