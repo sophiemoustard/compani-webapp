@@ -194,7 +194,7 @@ export default {
       return sectors.length === 0 ? [] : Customers.listBySector({
         startDate: this.startOfWeek,
         endDate: this.endOfWeek,
-        sector: JSON.stringify(sectors),
+        sector: sectors,
       });
     },
     // Filter
