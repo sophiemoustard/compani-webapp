@@ -2,14 +2,14 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
       @updateSearch="updateSearch" :search="searchStr" />
-    <q-table :data="filteredCompanies" :columns="columns" row-key="name" binary-state-sort flat :loading="tableLoading"
-      :pagination.sync="pagination" class="people-list neutral-background" />
+    <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading" />
   </q-page>
 </template>
 
 <script>
 import Companies from '@api/Companies';
 import DirectoryHeader from '@components/DirectoryHeader';
+import TableList from '@components/table/TableList';
 import { NotifyNegative } from '@components/popup/notify';
 
 export default {
@@ -17,6 +17,7 @@ export default {
   name: 'CompaniesDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
+    'ni-table-list': TableList,
   },
   data () {
     return {

@@ -1,14 +1,15 @@
 <template>
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Bénéficiaires" @updateSearch="updateSearch" :search="searchStr" />
-    <q-table :data="filteredUsers" :columns="columns" row-key="name" :rows-per-page-options="[]" binary-state-sort
-      :pagination.sync="pagination" :loading="tableLoading" class="people-list neutral-background" flat>
-      <q-tr slot="body" slot-scope="props" :props="props" @click.native="goToCustomerProfile(props.row.customerId)">
-        <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <template>{{ col.value }}</template>
-        </q-td>
-      </q-tr>
-    </q-table>
+    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
+      <template v-slot:body="{ props }">
+        <q-tr :props="props" @click="goToCustomerProfile(props.row.customerId)">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <template>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-table-list>
   </q-page>
 </template>
 
@@ -16,12 +17,14 @@
 import Customers from '@api/Customers';
 import { formatIdentity } from '@helpers/utils';
 import DirectoryHeader from '@components/DirectoryHeader';
+import TableList from '@components/table/TableList';
 
 export default {
   name: 'AuxiliaryCustomersDirectory',
   metaInfo: { title: 'Bénéficiaires' },
   components: {
     'ni-directory-header': DirectoryHeader,
+    'ni-table-list': TableList,
   },
   data () {
     return {
