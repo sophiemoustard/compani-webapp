@@ -14,7 +14,8 @@
       <ni-input in-modal v-model.trim="newCompany.name" :error="$v.newCompany.name.$error"
         @blur="$v.newCompany.name.$touch" required-field caption="Raison sociale" />
       <ni-input in-modal v-model.trim="newCompany.tradeName" :error="$v.newCompany.tradeName.$error"
-        caption="Nom commercial" @blur="$v.newCompany.tradeName.$touch" required-field />
+        caption="Nom commercial" @blur="$v.newCompany.tradeName.$touch" required-field
+        :error-label="tradeNameError($v.newCompany)" />
       <ni-option-group v-model="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
         required-field />
       <template slot="footer">
@@ -26,8 +27,8 @@
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
 import pickBy from 'lodash/pickBy';
+import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Companies from '@api/Companies';
 import OptionGroup from '@components/form/OptionGroup';
@@ -37,6 +38,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { COMPANY, ASSOCIATION } from '@data/constants';
+import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   metaInfo: { title: 'Répertoire structures' },
@@ -48,6 +50,7 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
   },
+  mixins: [companyMixin],
   data () {
     return {
       companies: [],
@@ -78,11 +81,7 @@ export default {
   },
   validations () {
     return {
-      newCompany: {
-        name: { required },
-        tradeName: { required },
-        type: { required },
-      },
+      newCompany: pick(this.companyValidation, ['type', 'name', 'tradeName']),
     }
   },
   async mounted () {
