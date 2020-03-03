@@ -39,8 +39,5 @@ module.exports = (on, config) => {
 
   config.env = { ...env, NODE_ENV: 'test' };
 
-  console.warn('ctx', ctx());
-  console.warn('config', config);
-
   return config;
 };
