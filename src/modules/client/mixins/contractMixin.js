@@ -1,4 +1,6 @@
+import get from 'lodash/get';
 import { required, minValue } from 'vuelidate/lib/validators';
+import Users from '@api/Users';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import nationalities from '@data/nationalities.js';
@@ -88,14 +90,17 @@ export const contractMixin = {
       }
 
       if (contract.status === CUSTOMER_CONTRACT) {
-        const helpers = await this.$users.list({ customers: contract.customer });
+        const params = { customers: contract.customer };
+        const companyId = get(this.userCompany, '_id', null);
+        if (companyId) params.company = companyId;
+        const helpers = await Users.list(params);
         const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);
         signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
         signature.title = `${translate[contract.status]} - ${currentCustomer.identity.lastname}`;
         signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
       } else {
         signature.signers = this.generateContractSigners(
-          { name: `${this.mainUser.identity.firstname} ${this.mainUser.identity.lastname}`, email: this.mainUser.local.email }
+          { name: `${this.currentUser.identity.firstname} ${this.currentUser.identity.lastname}`, email: this.currentUser.local.email }
         );
         signature.title = `${title}${translate[contract.status]} - ${this.userFullName}`;
       }

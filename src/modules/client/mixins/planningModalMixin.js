@@ -73,7 +73,7 @@ export const planningModalMixin = {
   },
   computed: {
     ...mapGetters({
-      mainUser: 'main/user',
+      currentUser: 'current/user',
       filters: 'planning/getFilters',
     }),
     absenceOptions () {
@@ -201,7 +201,7 @@ export const planningModalMixin = {
       ];
     },
     customerProfileRedirect () {
-      return COACH_ROLES.includes(this.mainUser.role.client.name)
+      return COACH_ROLES.includes(get(this.currentUser, 'role.client.name', null))
         ? { name: 'customers profile', params: { id: this.selectedCustomer._id } }
         : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
     },

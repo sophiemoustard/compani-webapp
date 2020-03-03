@@ -93,7 +93,7 @@ export default {
       return CLIENT_ADMIN === this.user.role.client.name;
     },
     user () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
 }

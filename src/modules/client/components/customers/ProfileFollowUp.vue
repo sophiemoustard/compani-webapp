@@ -196,11 +196,11 @@ export default {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    mainUser () {
-      return this.$store.getters['main/user'];
+    currentUser () {
+      return this.$store.getters['current/user'];
     },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.mainUser.role.client.name);
+      return AUXILIARY_ROLES.includes(this.currentUser.role.client.name);
     },
     hasSecondaryAddress () {
       return !!get(this.customer, 'contact.secondaryAddress.fullAddress');
@@ -244,7 +244,10 @@ export default {
     async getAuxiliaries () {
       try {
         this.loading = true;
-        const activeAuxiliaries = await Users.listActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const activeAuxiliaries = await Users.listActive({
+          role: [AUXILIARY, PLANNING_REFERENT],
+          company: this.currentUser.company._id,
+        });
         this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
         this.loading = false;
       } catch (e) {

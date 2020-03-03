@@ -97,7 +97,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentUser: 'main/user',
+      currentUser: 'current/user',
       user: 'rh/getUserProfile',
     }),
     isPlanningRouterDisable () {

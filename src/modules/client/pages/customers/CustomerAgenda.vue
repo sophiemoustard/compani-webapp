@@ -47,7 +47,7 @@ export default {
   },
   computed: {
     helper () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
   async mounted () {

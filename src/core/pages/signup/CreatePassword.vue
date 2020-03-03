@@ -105,7 +105,7 @@ export default {
         this.$q.cookies.set('alenvi_token_expires_in', user.data.data.expiresIn, { path: '/', expires: expiresInDays, secure: this.secure });
         this.$q.cookies.set('refresh_token', user.data.data.refreshToken, { path: '/', expires: 365, secure: this.secure });
         this.$q.cookies.set('user_id', user.data.data.user._id, { path: '/', expires: expiresInDays, secure: this.secure });
-        await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
+        await this.$store.dispatch('current/getUser', this.$q.cookies.get('user_id'));
 
         if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
         this.$router.replace({ name: 'auxiliary personal info', params: { id: this.$q.cookies.get('user_id') } });

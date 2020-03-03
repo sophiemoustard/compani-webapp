@@ -205,8 +205,8 @@ export default {
     }
   },
   computed: {
-    mainUser () {
-      return this.$store.getters['main/user'];
+    currentUser () {
+      return this.$store.getters['current/user'];
     },
     userCompany () {
       return this.auxiliary.company;

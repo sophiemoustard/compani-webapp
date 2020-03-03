@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     user () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
   mounted () {

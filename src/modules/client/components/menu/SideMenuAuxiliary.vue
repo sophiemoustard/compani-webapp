@@ -65,10 +65,10 @@ export default {
   },
   computed: {
     isAuxiliaryWithCompany () {
-      return [AUXILIARY, PLANNING_REFERENT].includes(get(this, 'user.role.client.name', null));
+      return [AUXILIARY, PLANNING_REFERENT].includes(get(this.user, 'role.client.name', null));
     },
     user () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
   methods: {

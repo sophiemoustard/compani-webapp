@@ -21,6 +21,8 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { formatPhone, formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
@@ -70,7 +72,7 @@ export default {
   },
   computed: {
     currentUser () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     filteredUsers () {
       return this.userList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
@@ -82,7 +84,10 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await this.$users.listActive({ role: [AUXILIARY, PLANNING_REFERENT] });
+        const params = { role: [AUXILIARY, PLANNING_REFERENT] };
+        const companyId = get(this.currentUser, 'company._id', null);
+        if (companyId) params.company = companyId;
+        const users = await Users.listActive(params);
         this.userList = users.map(user => ({
           auxiliary: {
             name: formatIdentity(user.identity, 'FL'),

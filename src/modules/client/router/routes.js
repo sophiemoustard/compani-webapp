@@ -22,9 +22,9 @@ const routes = [
       try {
         if (to.path !== '/') return next();
         const refresh = await alenvi.refreshAlenviCookies();
-        if (refresh) await store.dispatch('main/getUser', Cookies.get('user_id'));
+        if (refresh) await store.dispatch('current/getUser', Cookies.get('user_id'));
 
-        const user = store.getters['main/user'];
+        const user = store.getters['current/user'];
         if (!user) return next({ path: '/login' });
         if (!get(user, 'role.client')) return next({ name: '404' });
 

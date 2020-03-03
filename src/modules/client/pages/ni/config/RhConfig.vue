@@ -327,7 +327,7 @@ export default {
   },
   computed: {
     user () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
@@ -392,7 +392,7 @@ export default {
       else if (!get(this.$v.company.rhConfig, path).numeric) return 'Nombre non valide';
     },
     async refreshCompany () {
-      await this.$store.dispatch('main/getUser', this.user._id);
+      await this.$store.dispatch('current/getUser', this.user._id);
       this.company = this.user.company;
     },
     // Internal hours
@@ -422,7 +422,7 @@ export default {
         if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
         const payload = pickBy(this.newInternalHour);
         await InternalHours.create(payload);
-        await this.$store.dispatch('main/getUser', this.user._id);
+        await this.$store.dispatch('current/getUser', this.user._id);
 
         NotifyPositive('Heure interne créée');
         this.newInternalHourModal = false;
@@ -438,7 +438,7 @@ export default {
       try {
         const index = this.getRowIndex(this.internalHours, row);
         await InternalHours.remove(internalHourId);
-        await this.$store.dispatch('main/getUser', this.user._id);
+        await this.$store.dispatch('current/getUser', this.user._id);
         this.internalHours.splice(index, 1);
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
@@ -464,7 +464,7 @@ export default {
 
         await InternalHours.update(internalHourId, { default: true });
         await this.refreshInternalHours();
-        await this.$store.dispatch('main/getUser', this.user._id);
+        await this.$store.dispatch('current/getUser', this.user._id);
         NotifyPositive('Heures internes mises à jour')
       } catch (e) {
         console.error(e);

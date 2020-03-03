@@ -377,13 +377,13 @@ export const planningActionMixin = {
     canEditEvent (event) {
       if (!event.auxiliary) { // Unassigned event
         return can({
-          user: this.$store.getters['main/user'],
+          user: this.$store.getters['current/user'],
           permissions: [{ name: 'events:edit' }],
         });
       }
 
       return can({
-        user: this.$store.getters['main/user'],
+        user: this.$store.getters['current/user'],
         auxiliaryIdEvent: event.auxiliary._id,
         permissions: [
           { name: 'events:edit' },

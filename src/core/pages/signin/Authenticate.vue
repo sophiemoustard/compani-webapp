@@ -60,14 +60,14 @@ export default {
     }
   },
   computed: {
-    mainUser () {
-      return this.$store.getters['main/user'];
+    currentUser () {
+      return this.$store.getters['current/user'];
     },
     userRole () {
-      return get(this, 'mainUser.role.client.name') || null;
+      return get(this.currentUser, 'role.client.name') || null;
     },
     isAuxiliary () {
-      return this.mainUser ? AUXILIARY_ROLES.includes(this.userRole) : false;
+      return this.currentUser ? AUXILIARY_ROLES.includes(this.userRole) : false;
     },
     isAuxiliaryWithoutCompany () {
       return this.userRole === AUXILIARY_WITHOUT_COMPANY;
@@ -90,16 +90,16 @@ export default {
         this.$q.cookies.set('alenvi_token_expires_in', auth.expiresIn, options);
         this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
         this.$q.cookies.set('user_id', auth.user._id, options);
-        await this.$store.dispatch('main/getUser', this.$q.cookies.get('user_id'));
+        await this.$store.dispatch('current/getUser', this.$q.cookies.get('user_id'));
 
         if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 
         if (this.userRole === HELPER) {
-          const customer = await Customers.getById(this.mainUser.customers[0]._id);
+          const customer = await Customers.getById(this.currentUser.customers[0]._id);
           this.$store.commit('rh/saveUserProfile', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliaryWithoutCompany) {
-          this.$router.replace({ name: 'account info', params: { id: this.mainUser._id } });
+          this.$router.replace({ name: 'account info', params: { id: this.currentUser._id } });
         } else if (this.isAuxiliary) this.$router.replace({ name: 'auxiliary agenda' });
         else this.$router.replace({ name: 'auxiliaries directory' });
       } catch (e) {

@@ -3,15 +3,15 @@
     <div v-if="isCoach" class="row gutter-profile q-mb-xl">
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Équipe</p>
-        <ni-select-sector v-model="user.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
-          :company-id="mainUser.company._id" />
+        <ni-select-sector v-model="mergedUserProfile.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
+          :company-id="currentUser.company._id" />
       </div>
-      <ni-input v-model="user.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
+      <ni-input v-model="mergedUserProfile.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
         @blur="updateUser('mentor')" />
-      <ni-select v-model="user.role.client._id" caption="Rôle" :options="auxiliaryRolesOptions"
+      <ni-select v-model="mergedUserProfile.role.client._id" caption="Rôle" :options="auxiliaryRolesOptions"
         @focus="saveTmp('role.client._id')" @blur="updateUser('role.client._id')" />
-      <ni-select v-model="user.establishment" caption="Établissement" :options="establishmentsOptions"
-        @focus="saveTmp('establishment')" @blur="updateUser('establishment')" :error="$v.user.establishment.$error"
+      <ni-select v-model="mergedUserProfile.establishment" caption="Établissement" :options="establishmentsOptions"
+        @focus="saveTmp('establishment')" @blur="updateUser('establishment')" :error="$v.mergedUserProfile.establishment.$error"
         :error-label="REQUIRED_LABEL" option-disable="inactive" />
     </div>
     <div class="q-mb-xl">
@@ -57,27 +57,27 @@
           groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom" :error="$v.user.identity.firstname.$error" v-model.trim="user.identity.firstname"
+        <ni-input caption="Prénom" :error="$v.mergedUserProfile.identity.firstname.$error" v-model.trim="mergedUserProfile.identity.firstname"
           @blur="updateUser('identity.firstname')" @focus="saveTmp('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.user.identity.lastname.$error" v-model.trim="user.identity.lastname"
+        <ni-input caption="Nom" :error="$v.mergedUserProfile.identity.lastname.$error" v-model.trim="mergedUserProfile.identity.lastname"
           @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')" />
-        <ni-select caption="Nationalité" :error="$v.user.identity.nationality.$error" :options="nationalitiesOptions"
-          v-model="user.identity.nationality" @focus="saveTmp('identity.nationality')" in-form
+        <ni-select caption="Nationalité" :error="$v.mergedUserProfile.identity.nationality.$error" :options="nationalitiesOptions"
+          v-model="mergedUserProfile.identity.nationality" @focus="saveTmp('identity.nationality')" in-form
           @blur="updateUser('identity.nationality')" />
-        <ni-date-input caption="Date de naissance" :error="$v.user.identity.birthDate.$error"
-          v-model="user.identity.birthDate" @focus="saveTmp('identity.birthDate')" content-class="col-xs-12 col-md-6"
+        <ni-date-input caption="Date de naissance" :error="$v.mergedUserProfile.identity.birthDate.$error"
+          v-model="mergedUserProfile.identity.birthDate" @focus="saveTmp('identity.birthDate')" content-class="col-xs-12 col-md-6"
           @input="updateUser('identity.birthDate')" />
-        <ni-select caption="Pays de naissance" :error="$v.user.identity.birthCountry.$error" :options="countriesOptions"
-          v-model="user.identity.birthCountry" @focus="saveTmp('identity.birthCountry')" in-form
+        <ni-select caption="Pays de naissance" :error="$v.mergedUserProfile.identity.birthCountry.$error" :options="countriesOptions"
+          v-model="mergedUserProfile.identity.birthCountry" @focus="saveTmp('identity.birthCountry')" in-form
           @blur="updateUser('identity.birthCountry')" />
-        <ni-input caption="Département de naissance" :error="$v.user.identity.birthState.$error"
-          :error-label="birthStateError" v-model="user.identity.birthState" @blur="updateUser('identity.birthState')"
-          @focus="saveTmp('identity.birthState')" :hidden="this.user.identity.birthCountry !== 'FR'" />
-        <ni-input caption="Ville de naissance" :error="$v.user.identity.birthCity.$error"
-          v-model="user.identity.birthCity" @focus="saveTmp('identity.birthCity')"
+        <ni-input caption="Département de naissance" :error="$v.mergedUserProfile.identity.birthState.$error"
+          :error-label="birthStateError" v-model="mergedUserProfile.identity.birthState" @blur="updateUser('identity.birthState')"
+          @focus="saveTmp('identity.birthState')" :hidden="this.mergedUserProfile.identity.birthCountry !== 'FR'" />
+        <ni-input caption="Ville de naissance" :error="$v.mergedUserProfile.identity.birthCity.$error"
+          v-model="mergedUserProfile.identity.birthCity" @focus="saveTmp('identity.birthCity')"
           @blur="updateUser('identity.birthCity')" />
-        <ni-input caption="Numéro de sécurité sociale" :error="$v.user.identity.socialSecurityNumber.$error"
-          v-model="user.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
+        <ni-input caption="Numéro de sécurité sociale" :error="$v.mergedUserProfile.identity.socialSecurityNumber.$error"
+          v-model="mergedUserProfile.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
           @blur="updateUser('identity.socialSecurityNumber')" :error-label="ssnError" />
       </div>
     </div>
@@ -88,21 +88,21 @@
           {{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.user.contact.phone.$error" :error-label="phoneNbrError"
-          type="tel" v-model.trim="user.contact.phone" @blur="updateUser('contact.phone')"
+        <ni-input caption="Numéro de téléphone" :error="$v.mergedUserProfile.contact.phone.$error" :error-label="phoneNbrError"
+          type="tel" v-model.trim="mergedUserProfile.contact.phone" @blur="updateUser('contact.phone')"
           @focus="saveTmp('contact.phone')" />
         <div v-if="isCoach" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
-            <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.user.local.email.$error"
-              :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="user.local.email"
+            <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
+              :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
               @focus="saveTmp('local.email')" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
             <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
           </div>
         </div>
-        <ni-search-address v-model="user.contact.address" color="white" @focus="saveTmp('contact.address.fullAddress')"
-          @blur="updateUser('contact.address')" :error-label="addressError" :error="$v.user.contact.address.$error" />
+        <ni-search-address v-model="mergedUserProfile.contact.address" color="white" @focus="saveTmp('contact.address.fullAddress')"
+          @blur="updateUser('contact.address')" :error-label="addressError" :error="$v.mergedUserProfile.contact.address.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -112,11 +112,11 @@
           {{ groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom et nom" :error="$v.user.administrative.emergencyContact.name.$error"
-          v-model="user.administrative.emergencyContact.name" @focus="saveTmp('administrative.emergencyContact.name')"
+        <ni-input caption="Prénom et nom" :error="$v.mergedUserProfile.administrative.emergencyContact.name.$error"
+          v-model="mergedUserProfile.administrative.emergencyContact.name" @focus="saveTmp('administrative.emergencyContact.name')"
           @blur="updateUser('administrative.emergencyContact.name')" />
-        <ni-input caption="Numéro de téléphone" :error="$v.user.administrative.emergencyContact.phoneNumber.$error"
-          v-model.trim="user.administrative.emergencyContact.phoneNumber"
+        <ni-input caption="Numéro de téléphone" :error="$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.$error"
+          v-model.trim="mergedUserProfile.administrative.emergencyContact.phoneNumber"
           @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
           @blur="updateUser('administrative.emergencyContact.phoneNumber')" :error-label="emergencyPhoneNbrError" />
       </div>
@@ -128,15 +128,15 @@
         </p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="IBAN" :error="$v.user.administrative.payment.rib.iban.$error" :error-label="ibanError"
-          v-model="user.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upper-case
+        <ni-input caption="IBAN" :error="$v.mergedUserProfile.administrative.payment.rib.iban.$error" :error-label="ibanError"
+          v-model="mergedUserProfile.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upper-case
           @blur="updateUser('administrative.payment.rib.iban')" />
-        <ni-input caption="BIC" :error="$v.user.administrative.payment.rib.bic.$error" :error-label="bicError"
-          upper-case v-model.trim="user.administrative.payment.rib.bic"
+        <ni-input caption="BIC" :error="$v.mergedUserProfile.administrative.payment.rib.bic.$error" :error-label="bicError"
+          upper-case v-model.trim="mergedUserProfile.administrative.payment.rib.bic"
           @focus="saveTmp('administrative.payment.rib.bic')" @blur="updateUser('administrative.payment.rib.bic')" />
       </div>
     </div>
-    <div v-if="user.administrative.driveFolder" class="q-mb-xl">
+    <div v-if="mergedUserProfile.administrative.driveFolder" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
         <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">
@@ -144,65 +144,65 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12">
-          <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.identityDocs" type="radio"
-            :options="identityDocsOptions" :error="$v.user.administrative.identityDocs.$error"
+          <ni-option-group :display-caption="isAuxiliary" v-model="mergedUserProfile.administrative.identityDocs" type="radio"
+            :options="identityDocsOptions" :error="$v.mergedUserProfile.administrative.identityDocs.$error"
             caption="Merci de nous indiquer le type de document d'identité que tu possèdes." required-field
             :error-label="requiredLabel" @input="updateUser('administrative.identityDocs')" />
         </div>
-        <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
+        <div v-if="mergedUserProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
-            :entity="currentUser" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
-            @delete="validateDocumentDeletion(user.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
-            :error="$v.user.administrative.idCardRecto.driveId.$error" :extensions="extensions"
-            :additional-value="`cni_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :entity="mergedUserProfile" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
+            :error="$v.mergedUserProfile.administrative.idCardRecto.driveId.$error" :extensions="extensions"
+            :additional-value="`cni_recto_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
-        <div v-if="user.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
+        <div v-if="mergedUserProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
-            :entity="currentUser" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
-            @delete="validateDocumentDeletion(user.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
+            :entity="mergedUserProfile" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
             :extensions="extensions"
-            :additional-value="`cni_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :additional-value="`cni_verso_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
-        <div v-if="user.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="currentUser"
-            @delete="validateDocumentDeletion(user.administrative.passport.driveId, 'administrative.passport')"
+        <div v-if="mergedUserProfile.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="mergedUserProfile"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.passport.driveId, 'administrative.passport')"
             name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
-            :error="$v.user.administrative.passport.driveId.$error" :extensions="extensions"
-            :additional-value="`passport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :error="$v.mergedUserProfile.administrative.passport.driveId.$error" :extensions="extensions"
+            :additional-value="`passport_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
-        <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
+        <div v-if="mergedUserProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
-            alt="titre de séjour (recto)" :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl"
-            @delete="validateDocumentDeletion(user.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
-            :error="$v.user.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
-            :additional-value="`titre_de_séjour_recto_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            alt="titre de séjour (recto)" :entity="mergedUserProfile" @uploaded="refreshUser" :url="docsUploadUrl"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
+            :error="$v.mergedUserProfile.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
+            :additional-value="`titre_de_séjour_recto_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`"
             :extensions="extensions" />
         </div>
-        <div v-if="user.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
+        <div v-if="mergedUserProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso"
             alt="titre de séjour (verso)" name="residencePermitVerso"
-            @delete="validateDocumentDeletion(user.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')"
-            :entity="currentUser" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :additional-value="`titre_de_séjour_verso_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')"
+            :entity="mergedUserProfile" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
+            :additional-value="`titre_de_séjour_verso_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
-            alt="attestation secu" :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
-            @delete="validateDocumentDeletion(user.administrative.healthAttest.driveId, 'administrative.healthAttest')"
-            name="healthAttest" @uploaded="refreshUser" :error="$v.user.administrative.healthAttest.driveId.$error"
-            :additional-value="`attestation_secu_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            alt="attestation secu" :entity="mergedUserProfile" :url="docsUploadUrl" :extensions="extensions"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.healthAttest.driveId, 'administrative.healthAttest')"
+            name="healthAttest" @uploaded="refreshUser" :error="$v.mergedUserProfile.administrative.healthAttest.driveId.$error"
+            :additional-value="`attestation_secu_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
-            :entity="currentUser" :url="docsUploadUrl" :extensions="extensions"
-            @delete="validateDocumentDeletion(user.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
-            name="phoneInvoice" @uploaded="refreshUser" :error="$v.user.administrative.phoneInvoice.driveId.$error"
-            :additional-value="`facture_telephone_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :entity="mergedUserProfile" :url="docsUploadUrl" :extensions="extensions"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
+            name="phoneInvoice" @uploaded="refreshUser" :error="$v.mergedUserProfile.administrative.phoneInvoice.driveId.$error"
+            :additional-value="`facture_telephone_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
             alt="facture téléphone" @delete="validateDocumentDeletion($event, 'certificates')" name="certificates"
-            collapsible-label="Ajouter un diplôme" :user-profile="currentUser" :url="docsUploadUrl"
+            collapsible-label="Ajouter un diplôme" :user-profile="mergedUserProfile" :url="docsUploadUrl"
             additional-fields-name="diplomes" @uploaded="refreshUser" :extensions="extensions" />
         </div>
       </div>
@@ -217,25 +217,25 @@
         <div class="col-xs-12">
           <div v-if="isAuxiliary" class="row justify-between">
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
-            <q-icon v-if="$v.user.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.mergedUserProfile.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
           </div>
-          <q-field dense :error="$v.user.administrative.mutualFund.has.$error" :error-label="requiredLabel">
+          <q-field dense :error="$v.mergedUserProfile.administrative.mutualFund.has.$error" :error-label="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary"
-              v-model="user.administrative.mutualFund.has" @input="updateUser('administrative.mutualFund.has')"
+              v-model="mergedUserProfile.administrative.mutualFund.has" @input="updateUser('administrative.mutualFund.has')"
               :options="[
                   { label: 'Oui', value: false },
                   { label: 'Non', value: true }
                 ]" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6" v-if="$_.get(user, 'administrative.mutualFund.has')">
+        <div class="col-xs-12 col-md-6" v-if="$_.get(mergedUserProfile, 'administrative.mutualFund.has')">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
-            path="administrative.mutualFund" alt="justif mutuelle" :entity="currentUser"
-            @delete="validateDocumentDeletion(user.administrative.mutualFund.driveId, 'administrative.mutualFund')"
+            path="administrative.mutualFund" alt="justif mutuelle" :entity="mergedUserProfile"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.mutualFund.driveId, 'administrative.mutualFund')"
             name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions" entity-url="users"
-            :error="$v.user.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
-            :additional-value="`mutuelle_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            :error="$v.mergedUserProfile.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
+            :additional-value="`mutuelle_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
       </div>
     </div>
@@ -247,18 +247,18 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12">
-          <ni-option-group :display-caption="isAuxiliary" v-model="user.administrative.transportInvoice.transportType"
+          <ni-option-group :display-caption="isAuxiliary" v-model="mergedUserProfile.administrative.transportInvoice.transportType"
             :options="transportOptions" caption="Par quel moyen comptes-tu te rendre au travail ?" type="radio"
-            :error-label="requiredLabel" :error="$v.user.administrative.transportInvoice.transportType.$error"
+            :error-label="requiredLabel" :error="$v.mergedUserProfile.administrative.transportInvoice.transportType.$error"
             required-field @input="updateUser('administrative.transportInvoice.transportType')" />
         </div>
-        <div v-if="user.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
+        <div v-if="mergedUserProfile.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
           <ni-file-uploader :caption="captionTransportUploader" path="administrative.transportInvoice"
-            alt="justif transport" :entity="currentUser" name="transportInvoice" @uploaded="refreshUser"
-            :error="$v.user.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
+            alt="justif transport" :entity="mergedUserProfile" name="transportInvoice" @uploaded="refreshUser"
+            :error="$v.mergedUserProfile.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
             :extensions="extensions"
-            @delete="validateDocumentDeletion(user.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :additional-value="`justif_transport_${currentUser.identity.firstname}_${currentUser.identity.lastname}`" />
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
+            :additional-value="`justif_transport_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
       </div>
     </div>
@@ -267,9 +267,9 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate"
-            alt="certificat médical" :entity="user" name="medicalCertificate" @uploaded="refreshUser"
-            @delete="validateDocumentDeletion(user.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
-            :additional-value="`certificat_medical_${currentUser.identity.firstname}_${currentUser.identity.lastname}`"
+            alt="certificat médical" :entity="mergedUserProfile" name="medicalCertificate" @uploaded="refreshUser"
+            @delete="validateDocumentDeletion(mergedUserProfile.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
+            :additional-value="`certificat_medical_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`"
             :url="docsUploadUrl" :extensions="extensions" />
         </div>
       </div>
@@ -381,7 +381,7 @@ export default {
         'user.administrative.transportInvoice.transportType',
         'user.administrative.transportInvoice.driveId',
       ],
-      user: {
+      mergedUserProfile: {
         mentorId: '',
         local: { email: '' },
         picture: { link: '' },
@@ -431,7 +431,7 @@ export default {
   validations () {
     return {
       identityType: { required },
-      user: {
+      mergedUserProfile: {
         local: {
           email: { required, email },
         },
@@ -447,7 +447,7 @@ export default {
           birthDate: { required },
           birthCountry: { required },
           birthState: {
-            required: requiredIf(() => this.user.identity.birthCountry === 'FR'),
+            required: requiredIf(() => this.mergedUserProfile.identity.birthCountry === 'FR'),
             numeric,
             minLength: minLength(2),
             maxLength: maxLength(3),
@@ -478,17 +478,17 @@ export default {
           },
           idCardRecto: {
             driveId: {
-              required: requiredIf(() => this.user.administrative.identityDocs === 'cni'),
+              required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'cni'),
             },
           },
           passport: {
             driveId: {
-              required: requiredIf(() => this.user.administrative.identityDocs === 'pp'),
+              required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'pp'),
             },
           },
           residencePermitRecto: {
             driveId: {
-              required: requiredIf(() => this.user.administrative.identityDocs === 'ts'),
+              required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'ts'),
             },
           },
           healthAttest: {
@@ -529,12 +529,9 @@ export default {
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
-    ...mapGetters({
-      userProfile: 'rh/getUserProfile',
-      mainUser: 'main/user',
-    }),
-    currentUser () {
-      return this.userProfile ? this.userProfile : this.mainUser;
+    ...mapGetters({ currentUser: 'current/user' }),
+    userProfile () {
+      return this.$store.getters['rh/getUserProfile'] ? this.$store.getters['rh/getUserProfile'] : this.currentUser;
     },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
@@ -543,100 +540,100 @@ export default {
       return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
     },
     docsUploadUrl () {
-      const driveId = get(this.currentUser, 'administrative.driveFolder.driveId');
+      const driveId = get(this.mergedUserProfile, 'administrative.driveFolder.driveId');
       if (!driveId) return '';
 
-      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/gdrive/${driveId}/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.mergedUserProfile._id}/gdrive/${driveId}/upload`;
     },
     pictureUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.currentUser._id}/cloudinary/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.mergedUserProfile._id}/cloudinary/upload`;
     },
     hasPicture () {
-      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? null : this.user.picture.link;
+      return !this.mergedUserProfile.picture || (this.mergedUserProfile.picture && !this.mergedUserProfile.picture.link) ? null : this.mergedUserProfile.picture.link;
     },
     birthStateError () {
-      if (!this.$v.user.identity.birthState.required) {
+      if (!this.$v.mergedUserProfile.identity.birthState.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.identity.birthState.minLength ||
-      !this.$v.user.identity.birthState.maxLength ||
-      !this.$v.user.identity.birthState.numeric) {
+      } else if (!this.$v.mergedUserProfile.identity.birthState.minLength ||
+      !this.$v.mergedUserProfile.identity.birthState.maxLength ||
+      !this.$v.mergedUserProfile.identity.birthState.numeric) {
         return 'Departement non valide';
       }
       return '';
     },
     ssnError () {
-      if (!this.$v.user.identity.socialSecurityNumber.required) {
+      if (!this.$v.mergedUserProfile.identity.socialSecurityNumber.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.identity.socialSecurityNumber.minLength ||
-      !this.$v.user.identity.socialSecurityNumber.maxLength ||
-      !this.$v.user.identity.socialSecurityNumber.numeric) {
+      } else if (!this.$v.mergedUserProfile.identity.socialSecurityNumber.minLength ||
+      !this.$v.mergedUserProfile.identity.socialSecurityNumber.maxLength ||
+      !this.$v.mergedUserProfile.identity.socialSecurityNumber.numeric) {
         return 'Numéro de sécurité sociale non valide';
       }
       return '';
     },
     phoneNbrError () {
-      if (!this.$v.user.contact.phone.required) {
+      if (!this.$v.mergedUserProfile.contact.phone.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.contact.phone.frPhoneNumber || !this.$v.user.contact.phone.maxLength) {
+      } else if (!this.$v.mergedUserProfile.contact.phone.frPhoneNumber || !this.$v.mergedUserProfile.contact.phone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
       return '';
     },
     emailError () {
-      if (!this.$v.user.local.email.required) {
+      if (!this.$v.mergedUserProfile.local.email.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.local.email.email) {
+      } else if (!this.$v.mergedUserProfile.local.email.email) {
         return 'Email non valide';
       }
       return '';
     },
     zipCodeError () {
-      if (!this.$v.user.contact.zipCode.required) {
+      if (!this.$v.mergedUserProfile.contact.zipCode.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.contact.zipCode.frZipCode || !this.$v.user.contact.zipCode.maxLength) {
+      } else if (!this.$v.mergedUserProfile.contact.zipCode.frZipCode || !this.$v.mergedUserProfile.contact.zipCode.maxLength) {
         return 'Code postal non valide';
       }
       return '';
     },
     emergencyPhoneNbrError () {
-      if (!this.$v.user.administrative.emergencyContact.phoneNumber.required) {
+      if (!this.$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.administrative.emergencyContact.phoneNumber.frPhoneNumber ||
-        !this.$v.user.administrative.emergencyContact.phoneNumber.maxLength) {
+      } else if (!this.$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.frPhoneNumber ||
+        !this.$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.maxLength) {
         return 'Numéro de téléphone non valide';
       }
       return '';
     },
     ibanError () {
-      if (!this.$v.user.administrative.payment.rib.iban.required) {
+      if (!this.$v.mergedUserProfile.administrative.payment.rib.iban.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.administrative.payment.rib.iban.iban) {
+      } else if (!this.$v.mergedUserProfile.administrative.payment.rib.iban.iban) {
         return 'IBAN non valide';
       }
       return '';
     },
     bicError () {
-      if (!this.$v.user.administrative.payment.rib.bic.required) {
+      if (!this.$v.mergedUserProfile.administrative.payment.rib.bic.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.user.administrative.payment.rib.bic.bic) {
+      } else if (!this.$v.mergedUserProfile.administrative.payment.rib.bic.bic) {
         return 'BIC non valide';
       }
       return '';
     },
     addressError () {
-      if (!this.$v.user.contact.address.fullAddress.required) {
+      if (!this.$v.mergedUserProfile.contact.address.fullAddress.required) {
         return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
     },
-    mainUserRole () {
-      return this.mainUser.role.client.name;
+    currentUserRole () {
+      return this.currentUser.role.client.name;
     },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.mainUserRole);
+      return AUXILIARY_ROLES.includes(this.currentUserRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.mainUserRole);
+      return COACH_ROLES.includes(this.currentUserRole);
     },
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
@@ -647,18 +644,18 @@ export default {
     },
   },
   async mounted () {
-    const user = await Users.getById(this.currentUser._id);
-    this.mergeUser(user);
+    const mergedUserProfile = await Users.getById(this.userProfile._id);
+    this.mergeUser(mergedUserProfile);
     if (this.isCoach) {
       await this.getAuxiliaryRoles();
       await this.getEstablishments();
     }
-    this.$v.user.$touch();
+    this.$v.mergedUserProfile.$touch();
     this.isLoaded = true;
   },
   watch: {
-    currentUser (value) {
-      if (this.emailLock && !isEqual(value, this.user)) {
+    userProfile (value) {
+      if (this.emailLock && !isEqual(value, this.mergedUserProfile)) {
         this.mergeUser(value);
       }
     },
@@ -674,16 +671,16 @@ export default {
       }
     },
     mergeUser (value = null) {
-      const args = [this.user, value];
-      this.user = Object.assign({}, extend(true, ...args));
+      const args = [this.mergedUserProfile, value];
+      this.mergedUserProfile = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
-      if (this.tmpInput === '') this.tmpInput = get(this.user, path);
+      if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
     },
     async emailErrorHandler (path) {
       try {
         NotifyNegative('Email déjà existant');
-        this.user.local.email = this.currentUser.local.email;
+        this.mergedUserProfile.local.email = this.mergedUserProfile.local.email;
         await this.$nextTick();
         this.$refs.userEmail.select();
       } catch (e) {
@@ -692,19 +689,19 @@ export default {
     },
     async updateUser (path) {
       try {
-        if (this.tmpInput === get(this.user, path)) {
+        if (this.tmpInput === get(this.mergedUserProfile, path)) {
           this.emailLock = true;
           return;
         }
 
-        if (get(this.$v.user, path)) {
-          get(this.$v.user, path).$touch();
-          const isValid = await this.waitForValidation(this.$v.user, path);
+        if (get(this.$v.mergedUserProfile, path)) {
+          get(this.$v.mergedUserProfile, path).$touch();
+          const isValid = await this.waitForValidation(this.$v.mergedUserProfile, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         await this.updateAlenviUser(path);
 
-        this.$store.commit('rh/saveUserProfile', this.user);
+        this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
         this.emailLock = true;
         NotifyPositive('Modification enregistrée');
       } catch (e) {
@@ -716,32 +713,32 @@ export default {
       }
     },
     async updateAlenviUser (path) {
-      let value = get(this.user, path);
+      let value = get(this.mergedUserProfile, path);
       if (path.match(/iban/i)) value = value.split(' ').join('');
 
       const payload = set({}, path, value);
       if (path === 'role.client._id') payload.role = value;
       if (path.match(/birthCountry/i) && value !== 'FR') {
-        this.user.identity.birthState = '99';
+        this.mergedUserProfile.identity.birthState = '99';
         payload.identity.birthState = '99';
       }
-      await Users.updateById(this.currentUser._id, payload);
+      await Users.updateById(this.mergedUserProfile._id, payload);
     },
     async uploadImage () {
       try {
         if (this.hasPicture && !this.fileChosen) {
-          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
+          await cloudinary.deleteImageById({ id: this.mergedUserProfile.picture.publicId });
         }
         this.loadingImage = true;
         let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         let data = new FormData();
-        data.append('_id', this.currentUser._id);
-        data.append('role', this.currentUser.role.client.name);
-        data.append('fileName', `photo_${this.currentUser.identity.firstname}_${this.currentUser.identity.lastname}`);
+        data.append('_id', this.mergedUserProfile._id);
+        data.append('role', this.mergedUserProfile.role.client.name);
+        data.append('fileName', `photo_${this.mergedUserProfile.identity.firstname}_${this.mergedUserProfile.identity.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
         await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
@@ -757,12 +754,12 @@ export default {
         let payload;
         if (path === 'certificates') {
           payload = { 'certificates': { driveId } };
-          await Users.updateCertificates(this.currentUser._id, payload);
+          await Users.updateCertificates(this.mergedUserProfile._id, payload);
         } else {
           payload = set({}, path, { driveId: null, link: null });
-          await Users.updateById(this.currentUser._id, payload);
+          await Users.updateById(this.mergedUserProfile._id, payload);
         }
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
@@ -781,12 +778,12 @@ export default {
     },
     async deleteImage () {
       try {
-        if (this.currentUser.picture && this.currentUser.picture.publicId) {
-          await cloudinary.deleteImageById({ id: this.currentUser.picture.publicId });
+        if (this.mergedUserProfile.picture && this.mergedUserProfile.picture.publicId) {
+          await cloudinary.deleteImageById({ id: this.mergedUserProfile.picture.publicId });
           this.croppa.remove();
         }
-        await Users.updateById(this.currentUser._id, { picture: { link: null, publicId: null } });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+        await Users.updateById(this.mergedUserProfile._id, { picture: { link: null, publicId: null } });
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
         NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
@@ -804,7 +801,7 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async refreshUser () {
-      await this.$store.dispatch('rh/getUserProfile', { userId: this.currentUser._id });
+      await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
       NotifyPositive('Document envoyé');
     },
     groupErrors (group) {
@@ -836,8 +833,8 @@ export default {
       }
     },
     pictureDlLink (link) {
-      const lastname = removeDiacritics(get(this.currentUser, 'identity.lastname'));
-      const firstname = removeDiacritics(get(this.currentUser, 'identity.firstname'));
+      const lastname = removeDiacritics(get(this.mergedUserProfile, 'identity.lastname'));
+      const firstname = removeDiacritics(get(this.mergedUserProfile, 'identity.firstname'));
 
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${firstname}_${lastname}`) : '';
     },

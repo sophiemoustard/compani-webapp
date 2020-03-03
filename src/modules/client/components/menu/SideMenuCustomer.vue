@@ -46,7 +46,7 @@ export default {
         this.user.customers[0].contracts.length > 0;
     },
     user () {
-      return this.$store.getters['main/user'];
+      return this.$store.getters['current/user'];
     },
   },
   mounted () {
