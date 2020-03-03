@@ -6,7 +6,7 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" />
 
-    <!-- User creation modal -->
+    <!-- Company creation modal -->
     <ni-modal v-model="companyCreationModal" @hide="resetCreationModal">
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">structure</span>
@@ -119,10 +119,11 @@ export default {
         await Companies.create(payload);
 
         this.companyCreationModal = false;
-        NotifyPositive('Structure crée.')
+        NotifyPositive('Structure créée.')
         await this.refreshCompanies();
       } catch (e) {
         console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative('Structure déjà existante.');
         NotifyNegative('Erreur lors de la création de la structure.');
       } finally {
         this.modalLoading = false;
