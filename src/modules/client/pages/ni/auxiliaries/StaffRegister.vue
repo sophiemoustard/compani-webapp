@@ -24,6 +24,8 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import Contracts from '@api/Contracts';
 import LargeTable from '@components/table/LargeTable';
 import nationalities from '@data/nationalities.js';
 import { CIVILITY_OPTIONS } from '@data/constants';
@@ -48,20 +50,20 @@ export default {
         {
           name: 'name',
           label: 'Nom',
-          field: row => this.$_.get(row, 'user.identity.lastname', '').toUpperCase(),
+          field: row => get(row, 'user.identity.lastname', '').toUpperCase(),
           align: 'left',
         },
         {
           name: 'firstname',
           label: 'Prénom',
-          field: row => this.$_.get(row, 'user.identity.firstname', ''),
+          field: row => get(row, 'user.identity.firstname') || '',
           align: 'left',
         },
         {
           name: 'gender',
           label: 'Civilité',
           field: row => {
-            const option = CIVILITY_OPTIONS.find(opt => opt.value === this.$_.get(row, 'user.identity.title'));
+            const option = CIVILITY_OPTIONS.find(opt => opt.value === get(row, 'user.identity.title'));
             return option ? option.label : ''
           },
           align: 'left',
@@ -69,14 +71,14 @@ export default {
         {
           name: 'birthDate',
           label: 'Date de naissance',
-          field: row => this.$_.get(row, 'user.identity.birthDate', ''),
+          field: row => get(row, 'user.identity.birthDate') || '',
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
         },
         {
           name: 'nationality',
           label: 'Nationalité',
-          field: row => nationalities[this.$_.get(row, 'user.identity.nationality', '')],
+          field: row => nationalities[get(row, 'user.identity.nationality')] || '',
           align: 'left',
         },
         {
@@ -108,14 +110,16 @@ export default {
         {
           name: 'idCardOrResidencePermitRecto',
           label: 'Titre de séjour/Identité (R)',
-          field: row => this.$_.has(row, 'user.administrative.idCardRecto.link') ? this.$_.get(row, 'user.administrative.idCardRecto.link', '') : this.$_.get(row, 'user.administrative.residencePermitRecto.link', ''),
+          field: row => get(row, 'user.administrative.idCardRecto.link') ||
+            get(row, 'user.administrative.residencePermitRecto.link') || '',
           align: 'left',
           style: 'width: 105px',
         },
         {
           name: 'idCardOrResidencePermitVerso',
           label: 'Titre de séjour/Identité (V)',
-          field: row => this.$_.has(row, 'user.administrative.idCardVerso.link') ? this.$_.get(row, 'user.administrative.idCardVerso.link', '') : this.$_.get(row, 'user.administrative.residencePermitVerso.link', ''),
+          field: row => get(row, 'user.administrative.idCardVerso.link') ||
+            get(row, 'user.administrative.residencePermitVerso.link') || '',
           align: 'left',
           style: 'width: 105px',
         },
@@ -129,7 +133,7 @@ export default {
     async getStaffRegister () {
       try {
         this.tableLoading = true;
-        this.staffRegister = await this.$contracts.getStaffRegister();
+        this.staffRegister = await Contracts.getStaffRegister();
         this.tableLoading = false;
       } catch (e) {
         console.error(e);

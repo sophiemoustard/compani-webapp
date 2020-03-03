@@ -100,7 +100,7 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
 
 export default {
-  name: 'Contracts',
+  name: 'ContractsCard',
   mixins: [contractMixin, tableMixin],
   components: {
     'ni-responsive-table': ResponsiveTable,

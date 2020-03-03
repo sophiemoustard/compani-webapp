@@ -1,6 +1,9 @@
 import get from 'lodash/get';
+import pick from 'lodash/pick';
+import pickBy from 'lodash/pickBy';
 import { required, minValue } from 'vuelidate/lib/validators';
 import Users from '@api/Users';
+import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import nationalities from '@data/nationalities.js';
@@ -60,7 +63,7 @@ export const contractMixin = {
       if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
       if (!this.$moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;
 
-      return !!this.$_.get(this.selectedVersion, 'signature.eversignId') !== this.editedVersion.shouldBeSigned;
+      return !!get(this.selectedVersion, 'signature.eversignId') !== this.editedVersion.shouldBeSigned;
     },
   },
   methods: {
@@ -109,16 +112,16 @@ export const contractMixin = {
     },
     getContractTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompany')
-        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
+        ? get(this.userCompany, 'rhConfig.templates.contractWithCompany')
+        : get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
     },
     getVersionTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
-        : this.$_.get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
+        ? get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
+        : get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
     },
     async getVersionEditionPayload () {
-      const payload = this.$_.pick(this.editedVersion, ['startDate', 'grossHourlyRate']);
+      const payload = pick(this.editedVersion, ['startDate', 'grossHourlyRate']);
       if (this.editedVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.editedVersion };
         const isContract = this.selectedContract.versions[0]._id === this.editedVersion.versionId;
@@ -126,7 +129,7 @@ export const contractMixin = {
         payload.signature = await this.getSignaturePayload(versionMix, isContract ? '' : 'Avenant au ', template);
       }
 
-      return this.$_.pickBy(payload);
+      return pickBy(payload);
     },
     async saveVersion () {
       this.$v.editedVersion.$touch();
@@ -135,7 +138,7 @@ export const contractMixin = {
       this.loading = true;
       const payload = await this.getVersionEditionPayload();
       const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
-      await this.$contracts.updateVersion(params, payload);
+      await Contracts.updateVersion(params, payload);
       await this.refreshContracts();
 
       this.resetVersionEditionModal();
