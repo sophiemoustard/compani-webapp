@@ -27,9 +27,7 @@
 </template>
 
 <script>
-import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
-import cloneDeep from 'lodash/cloneDeep';
 import Companies from '@api/Companies';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
@@ -115,8 +113,7 @@ export default {
     async createCompany () {
       try {
         this.modalLoading = true;
-        const payload = pickBy(cloneDeep(this.newCompany));
-        await Companies.create(payload);
+        await Companies.create({ ...this.newCompany });
 
         this.companyCreationModal = false;
         NotifyPositive('Structure créée.')
