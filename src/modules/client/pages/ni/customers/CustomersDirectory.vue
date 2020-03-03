@@ -2,24 +2,24 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
       display-toggle @updateSearch="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
-    <q-table :data="filteredCustomers" :columns="columns" row-key="name" binary-state-sort flat :loading="tableLoading"
-      :rows-per-page-options="[15, 25, 35]" :pagination.sync="pagination" class="people-list neutral-background" >
-      <q-tr slot="body" slot-scope="props" :props="props" class="datatable-row"
-        @click.native="goToCustomerProfile(props.row._id)">
-        <q-td v-for="col in props.cols" :key="col.name" :props="props">
-          <q-item v-if="col.name === 'fullName'">
-            <q-item-section>{{ col.value }}</q-item-section>
-          </q-item>
-          <template v-else-if="col.name === 'client'">
-            <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
-          </template>
-          <template v-else-if="col.name === 'info'">
-            <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
-          </template>
-          <template v-else>{{ col.value }}</template>
-        </q-td>
-      </q-tr>
-    </q-table>
+    <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination">
+      <template v-slot:body="{ props }">
+        <q-tr :props="props" @click="goToCustomerProfile(props.row._id)">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <q-item v-if="col.name === 'fullName'">
+              <q-item-section>{{ col.value }}</q-item-section>
+            </q-item>
+            <template v-else-if="col.name === 'client'">
+              <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
+            </template>
+            <template v-else-if="col.name === 'info'">
+              <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
       @click="customerCreationModal = true" />
 
@@ -55,6 +55,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
+import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation.js';
@@ -70,6 +71,7 @@ export default {
     'ni-select': Select,
     'ni-directory-header': DirectoryHeader,
     'ni-modal': Modal,
+    'ni-table-list': TableList,
   },
   data () {
     return {

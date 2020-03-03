@@ -1,5 +1,5 @@
 <template>
-  <q-tr :props="props" :class="{'datatable-row-border-top': index === 0 }">
+  <q-tr :props="props" :class="{'border-top': index === 0 }">
     <q-td v-for="col in props.cols" :key="col.name" :props="props"
       :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
       <template v-if="index === 0 && col.name === 'externalBilling' && bill.thirdPartyPayer">
@@ -100,3 +100,8 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.border-top td
+  border-width: 1px 0 0 0
+</style>

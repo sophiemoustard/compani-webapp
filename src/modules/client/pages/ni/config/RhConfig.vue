@@ -70,11 +70,13 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Abonnements transports en commun</p>
         <div class="row gutter-profile">
-          <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
-            <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
-              type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
-              @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
-              @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })" />
+          <template v-if="company.rhConfig.transportSubs">
+            <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
+              <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
+                type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
+                @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
+                @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })" />
+            </template>
           </template>
         </div>
       </div>
