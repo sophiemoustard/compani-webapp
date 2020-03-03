@@ -1,7 +1,8 @@
 <template>
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation" />
-    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" />
+    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      :visible-columns="visibleColumns" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="courseCreationModal = true" />
 
@@ -50,12 +51,24 @@ export default {
           field: 'name',
           align: 'left',
         },
+        {
+          name: 'createdAt',
+          label: '',
+          field: 'createdAt',
+        },
       ],
+      visibleColumns: ['name'],
       courses: [],
       modalLoading: false,
       courseCreationModal: false,
       newCourse: {
         name: '',
+      },
+      pagination: {
+        sortBy: 'createdAt',
+        descending: true,
+        page: 1,
+        rowsPerPage: 15,
       },
     }
   },
