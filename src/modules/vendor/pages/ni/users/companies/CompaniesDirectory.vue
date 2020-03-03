@@ -27,13 +27,15 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import pickBy from 'lodash/pickBy';
+import cloneDeep from 'lodash/cloneDeep';
 import Companies from '@api/Companies';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { COMPANY, ASSOCIATION } from '@data/constants';
 
 export default {
@@ -108,11 +110,25 @@ export default {
       }
     },
     resetCreationModal () {
-      this.companyCreationModal = false;
       this.newCompany = { name: '', tradeName: '', type: '' };
       this.$v.newCompany.$reset();
     },
-    async createCompany () {},
+    async createCompany () {
+      try {
+        this.modalLoading = true;
+        const payload = pickBy(cloneDeep(this.newCompany));
+        await Companies.create(payload);
+
+        this.companyCreationModal = false;
+        NotifyPositive('Structure crée.')
+        await this.refreshCompanies();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la structure.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
   },
 }
 </script>
