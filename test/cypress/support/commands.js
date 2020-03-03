@@ -86,6 +86,8 @@ Cypress.Commands.add('quasar', { prevSubject: 'element' }, (subject, mode, optio
   }
 })
 
+Cypress.Commands.overwrite('log', (subject, message) => cy.task('log', message));
+
 // Cypress.Commands.add('loadStore', () => {});
 //
 //
