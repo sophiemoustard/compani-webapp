@@ -12,6 +12,9 @@
 // the project's config changing)
 
 // cypress/plugins/index.js
+const ctx = require('../../../quasar.conf');
+
+const { env } = ctx().build;
 
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
@@ -26,4 +29,18 @@ module.exports = (on, config) => {
     }
     return true;
   });
+
+  on('task', {
+    log (message) {
+      console.warn(message);
+      return null;
+    },
+  });
+
+  config.env = { ...env, NODE_ENV: 'test' };
+
+  console.warn('ctx', ctx());
+  console.warn('config', config);
+
+  return config;
 };

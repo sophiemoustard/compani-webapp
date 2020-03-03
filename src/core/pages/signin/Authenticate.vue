@@ -21,7 +21,7 @@
           <small>Mot de passe oublié ?</small>
         </router-link>
         <div class="row justify-center">
-          <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
+          <q-btn data-cy="login" no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
             @click="submit" />
         </div>
       </div>
