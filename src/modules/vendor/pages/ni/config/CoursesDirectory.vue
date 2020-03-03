@@ -1,6 +1,7 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation" />
+    <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation"
+      @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       :visible-columns="visibleColumns" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
@@ -70,6 +71,7 @@ export default {
         page: 1,
         rowsPerPage: 15,
       },
+      searchStr: '',
     }
   },
   validations () {
@@ -88,6 +90,9 @@ export default {
     await this.refreshCourses();
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     async refreshCourses () {
       try {
         this.courses = await Courses.list();
