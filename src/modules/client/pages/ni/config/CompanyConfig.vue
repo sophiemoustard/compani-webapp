@@ -8,7 +8,8 @@
           <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
             @blur="updateCompany('name')" />
           <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
-            @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error" :error-label="tradeNameError" />
+            @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
+              :error-label="tradeNameError($v.company)" />
           <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
@@ -139,7 +140,7 @@
 </template>
 
 <script>
-import { required, requiredIf, maxLength, minLength } from 'vuelidate/lib/validators';
+import { required, maxLength } from 'vuelidate/lib/validators';
 import Establishments from '@api/Establishments';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -148,10 +149,6 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress.vue';
 import {
   frAddress,
-  iban,
-  bic,
-  apeCode,
-  rcs,
   validWorkHealthService,
   validUrssafCode,
   validSiret,
@@ -159,12 +156,13 @@ import {
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { REQUIRED_LABEL, COMPANY, ASSOCIATION } from '@data/constants.js';
+import { REQUIRED_LABEL, COMPANY } from '@data/constants';
 import { urssafCodes } from '@data/urssafCodes';
 import { workHealthServices } from '@data/workHealthServices';
+import { companyMixin } from '@mixins/companyMixin';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
+import { tableMixin } from 'src/modules/client/mixins/tableMixin';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {
   name: 'CompanyConfig',
@@ -176,7 +174,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
   },
-  mixins: [configMixin, validationMixin, tableMixin],
+  mixins: [configMixin, validationMixin, tableMixin, companyMixin],
   data () {
     return {
       company: null,
@@ -264,39 +262,7 @@ export default {
   },
   validations () {
     return {
-      company: {
-        apeCode: { required, apeCode },
-        ics: { required },
-        name: { required },
-        tradeName: { required, maxLength: maxLength(11) },
-        type: { required },
-        rcs: {
-          required: requiredIf(item => item.type === COMPANY),
-          rcs,
-          maxLength: maxLength(9),
-          minLength: minLength(9),
-        },
-        rna: {
-          required: requiredIf(item => item.type === ASSOCIATION),
-          rcs,
-          maxLength: maxLength(9),
-          minLength: minLength(9),
-        },
-        iban: { required, iban },
-        bic: { required, bic },
-        legalRepresentative: {
-          lastname: { required },
-          firstname: { required },
-          position: { required },
-        },
-        address: {
-          zipCode: { required },
-          street: { required },
-          city: { required },
-          fullAddress: { required, frAddress },
-          location: { required },
-        },
-      },
+      company: this.companyValidation,
       newEstablishment: this.establishmentValidation,
       editedEstablishment: this.establishmentValidation,
     };
@@ -304,35 +270,6 @@ export default {
   computed: {
     user () {
       return this.$store.getters['current/user'];
-    },
-    addressError () {
-      return !this.$v.company.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
-    },
-    ibanError () {
-      if (!this.$v.company.iban.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.iban.iban) return 'IBAN non valide';
-
-      return '';
-    },
-    bicError () {
-      if (!this.$v.company.bic.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.bic.bic) return 'BIC non valide';
-
-      return '';
-    },
-    tradeNameError () {
-      if (!this.$v.company.tradeName.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.tradeName.maxLength) return 'Doit contenir 11 caractères (espaces inclus).';
-
-      return '';
-    },
-    rcsError () {
-      if (!this.$v.company.rcs.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.rcs.maxLength || !this.$v.company.rcs.minLength) {
-        return 'Doit contenir 9 caractères (espaces inclus).';
-      }
-
-      return '';
     },
   },
   async mounted () {

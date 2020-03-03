@@ -49,7 +49,7 @@ export default {
   /deep/.q-option-group
     color: black !important
     .q-radio
-      padding-bottom: 10px !important
+      padding: 10px 0 !important
       .q-radio__label
         font-size: 15px
 

@@ -13,4 +13,8 @@ export default {
     const companies = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies`, params);
     return companies.data.data.companies;
   },
+  async create (payload) {
+    const company = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies`, payload);
+    return company.data.data.company;
+  },
 }
