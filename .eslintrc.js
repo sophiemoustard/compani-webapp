@@ -9,15 +9,18 @@ module.exports = {
   },
   extends: [
     'plugin:vue/essential',
+    'plugin:cypress/recommended',
     'standard'
   ],
   plugins: [
-    'vue'
+    'vue',
+    'cypress'
   ],
   globals: {
     'ga': true, // Google Analytics
     'cordova': true,
     '__statics': true,
+    'cypress/globals': true
   },
   rules: {
     'no-param-reassign': 'off',

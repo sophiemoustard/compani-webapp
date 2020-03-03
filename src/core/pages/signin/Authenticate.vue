@@ -15,8 +15,8 @@
             </p>
           </div>
         </div>
-        <ni-input v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
-        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
+        <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
+        <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
         <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }">
           <small>Mot de passe oublié ?</small>
         </router-link>
