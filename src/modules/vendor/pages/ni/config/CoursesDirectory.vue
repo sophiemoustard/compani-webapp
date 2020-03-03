@@ -95,10 +95,13 @@ export default {
     },
     async refreshCourses () {
       try {
+        this.tableLoading = true;
         this.courses = await Courses.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formations');
+      } finally {
+        this.tableLoading = false;
       }
     },
     resetCreationModal () {
