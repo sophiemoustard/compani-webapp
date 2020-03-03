@@ -56,7 +56,7 @@ export default {
         {
           name: 'firstname',
           label: 'Prénom',
-          field: row => get(row, 'user.identity.firstname', ''),
+          field: row => get(row, 'user.identity.firstname') || '',
           align: 'left',
         },
         {
@@ -71,14 +71,14 @@ export default {
         {
           name: 'birthDate',
           label: 'Date de naissance',
-          field: row => get(row, 'user.identity.birthDate', ''),
+          field: row => get(row, 'user.identity.birthDate') || '',
           align: 'left',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
         },
         {
           name: 'nationality',
           label: 'Nationalité',
-          field: row => nationalities[get(row, 'user.identity.nationality', '')],
+          field: row => nationalities[get(row, 'user.identity.nationality')] || '',
           align: 'left',
         },
         {
@@ -110,14 +110,16 @@ export default {
         {
           name: 'idCardOrResidencePermitRecto',
           label: 'Titre de séjour/Identité (R)',
-          field: row => get(row, 'user.administrative.idCardRecto.link') || get(row, 'user.administrative.residencePermitRecto.link', ''),
+          field: row => get(row, 'user.administrative.idCardRecto.link') ||
+            get(row, 'user.administrative.residencePermitRecto.link') || '',
           align: 'left',
           style: 'width: 105px',
         },
         {
           name: 'idCardOrResidencePermitVerso',
           label: 'Titre de séjour/Identité (V)',
-          field: row => get(row, 'user.administrative.idCardVerso.link', '') || get(row, 'user.administrative.residencePermitVerso.link', ''),
+          field: row => get(row, 'user.administrative.idCardVerso.link') ||
+            get(row, 'user.administrative.residencePermitVerso.link') || '',
           align: 'left',
           style: 'width: 105px',
         },
