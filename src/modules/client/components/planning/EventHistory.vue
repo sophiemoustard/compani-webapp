@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import {
   EVENT_CREATION,
@@ -57,12 +58,12 @@ export default {
   },
   computed: {
     auxiliaryName () {
-      return this.$_.has(this.history, 'event.auxiliary.identity')
+      return get(this.history, 'event.auxiliary.identity')
         ? formatIdentity(this.history.event.auxiliary.identity, 'Fl')
         : 'À affecter';
     },
     customerName () {
-      return this.$_.has(this.history, 'event.customer.identity') && formatIdentity(this.history.event.customer.identity, 'fL');
+      return !!get(this.history, 'event.customer.identity') && formatIdentity(this.history.event.customer.identity, 'fL');
     },
     startDate () {
       return this.$moment(this.history.event.startDate).format('DD/MM');
@@ -105,7 +106,7 @@ export default {
       }
     },
     eventType () {
-      if (!this.$_.has(this.history, 'event.type')) return '';
+      if (!get(this.history, 'event.type')) return '';
 
       const { type } = this.history.event;
       if (this.isRepetition && type === INTERVENTION) return 'répétition';
@@ -161,7 +162,7 @@ export default {
   },
   methods: {
     getAvatar (user) {
-      return this.$_.get(user, 'picture.link') || DEFAULT_AVATAR;
+      return get(user, 'picture.link') || DEFAULT_AVATAR;
     },
     toggleDetails () {
       this.displayDetails = !this.displayDetails;

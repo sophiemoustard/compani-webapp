@@ -14,6 +14,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR } from '@data/constants.js';
 
@@ -37,7 +38,7 @@ export default {
   },
   methods: {
     getReferent (person) {
-      return this.$_.get(person, 'referent.identity', {});
+      return get(person, 'referent.identity', {});
     },
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
