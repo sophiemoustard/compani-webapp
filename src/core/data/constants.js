@@ -124,10 +124,9 @@ export const CANCELLATION_REASONS = [
   { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
 ];
 
-// ROLES
-export const COACH = 'coach';
+// ROLES CLIENT
 export const CLIENT_ADMIN = 'client_admin';
-export const VENDOR_ADMIN = 'vendor_admin';
+export const COACH = 'coach';
 export const CUSTOMER = 'customer';
 export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
@@ -135,6 +134,10 @@ export const PLANNING_REFERENT = 'planning_referent';
 export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company'
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
+
+// ROLES VENDOR
+export const VENDOR_ADMIN = 'vendor_admin';
+export const TRAINER = 'trainer';
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
