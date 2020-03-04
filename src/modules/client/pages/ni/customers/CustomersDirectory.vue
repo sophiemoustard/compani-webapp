@@ -218,7 +218,7 @@ export default {
       }
     },
     goToCustomerProfile (customer) {
-      this.$router.push({ name: 'customers profile', params: { id: customer._id } });
+      this.$router.push({ name: 'customers profile', params: { customerId: customer._id } });
     },
     resetForm () {
       this.$v.newCustomer.$reset();

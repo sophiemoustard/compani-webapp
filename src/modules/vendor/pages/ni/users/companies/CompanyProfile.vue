@@ -12,7 +12,7 @@ export default {
   name: 'CompanyProfile',
   metadata: { title: 'Fiche structure' },
   props: {
-    id: { type: String },
+    companyId: { type: String },
   },
   components: {
     'ni-profile-header': ProfileHeader,
@@ -29,7 +29,7 @@ export default {
   methods: {
     async refershCompany () {
       try {
-        this.company = await Company.getById(this.id);
+        this.company = await Company.getById(this.companyId);
       } catch (e) {
         console.error(e);
         this.company = {};

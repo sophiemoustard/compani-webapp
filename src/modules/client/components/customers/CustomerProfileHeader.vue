@@ -3,7 +3,7 @@
     <div class="row col-xs-12 q-mb-md items-center">
       <q-icon class="q-mr-md cursor-pointer" size="1rem" name="arrow_back" color="primary"
         @click="$router.go(-1)" />
-      <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
+      <h4>{{ customer.identity.firstname }} {{ customer.identity.lastname }}</h4>
       <q-btn :disable="isPlanningRouterDisable" flat size="sm" color="primary" icon="date_range"
         @click="goToPlanning" />
     </div>
@@ -15,7 +15,7 @@
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
         <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-        <q-icon name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention"
+        <q-icon name="delete" color="grey" size="1rem" :disable="!!customer.firstIntervention"
           @click="validateCustomerDeletion" />
       </div>
     </div>
@@ -31,19 +31,19 @@ export default {
   name: 'ProfileHeader',
   computed: {
     ...mapGetters({
-      user: 'rh/getUserProfile',
+      customer: 'rh/getUserProfile',
     }),
     isPlanningRouterDisable () {
-      return !this.user.firstIntervention;
+      return !this.customer.firstIntervention;
     },
     userActivity () {
       return {
-        status: this.user.firstIntervention ? 'Client' : 'Prospect',
-        active: !!this.user.firstIntervention,
+        status: this.customer.firstIntervention ? 'Client' : 'Prospect',
+        active: !!this.customer.firstIntervention,
       };
     },
     userStartDate () {
-      if (this.user.createdAt) return this.$moment(this.user.createdAt).format('DD/MM/YY');
+      if (this.customer.createdAt) return this.$moment(this.customer.createdAt).format('DD/MM/YY');
       return 'N/A';
     },
     userRelativeStartDate () {
@@ -53,11 +53,11 @@ export default {
   },
   methods: {
     goToPlanning () {
-      this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.user } });
+      this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.customer } });
     },
     async deleteCustomer () {
       try {
-        await Customers.remove(this.user._id);
+        await Customers.remove(this.customer._id);
         NotifyPositive('Bénéficiaire supprimé.');
         this.$router.push({ name: 'customers directory' });
       } catch (e) {

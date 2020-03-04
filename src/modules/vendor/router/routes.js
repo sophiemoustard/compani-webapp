@@ -35,7 +35,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/users/companies/:id',
+        path: 'ni/users/companies/:companyId',
         name: 'profile company info',
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompanyProfile'),
         props: true,

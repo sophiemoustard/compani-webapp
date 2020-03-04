@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <auxiliary-profile-header :profile-id="id" />
-      <profile-tabs :profile-id="id" :tabsContent="tabsContent" />
+      <auxiliary-profile-header :profile-id="auxiliaryId" />
+      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" />
     </div>
   </q-page>
 </template>
@@ -18,7 +18,7 @@ import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
 export default {
   props: {
-    id: { type: String },
+    auxiliaryId: { type: String },
     defaultTab: { type: String, default: 'info' },
   },
   components: {
@@ -68,7 +68,7 @@ export default {
     }
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { userId: this.id });
+    await this.$store.dispatch('rh/getUserProfile', { userId: this.auxiliaryId });
   },
   watch: {
     async userProfile () {

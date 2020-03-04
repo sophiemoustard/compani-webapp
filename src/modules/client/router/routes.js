@@ -220,7 +220,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/auxiliaries/:id',
+        path: 'ni/auxiliaries/:auxiliaryId',
         name: 'personal info',
         component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryProfile'),
         props: true,
@@ -251,7 +251,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/customers/:id',
+        path: 'ni/customers/:customerId',
         name: 'customers profile',
         props: true,
         component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),
@@ -315,7 +315,7 @@ const routes = [
         },
       },
       {
-        path: 'auxiliaries/customers/:id',
+        path: 'auxiliaries/customers/:customerId',
         name: 'profile customers info',
         props: true,
         component: () => import('src/modules/client/pages/auxiliaries/customers/CustomerInfo'),

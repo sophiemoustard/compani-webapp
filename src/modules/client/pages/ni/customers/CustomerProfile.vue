@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <customer-profile-header :profileId="id" class="header" />
-      <profile-tabs :profileId="id" :tabsContent="tabsContent" />
+      <customer-profile-header :profileId="customerId" class="header" />
+      <profile-tabs :profileId="customerId" :tabsContent="tabsContent" />
     </div>
   </q-page>
 </template>
@@ -16,7 +16,7 @@ import ProfileBilling from 'src/modules/client/components/customers/ProfileBilli
 
 export default {
   props: {
-    id: { type: String },
+    customerId: { type: String },
     defaultTab: { type: String, default: () => 'followUp' },
   },
   components: {
@@ -58,7 +58,7 @@ export default {
     }
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { customerId: this.id });
+    await this.$store.dispatch('rh/getUserProfile', { customerId: this.customerId });
   },
   watch: {
     async userProfile () {

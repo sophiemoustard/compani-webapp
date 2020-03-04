@@ -22,7 +22,7 @@ export default {
     'profile-follow-up': ProfileFollowUp,
   },
   props: {
-    id: { type: String },
+    customerId: { type: String },
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
@@ -31,7 +31,7 @@ export default {
     },
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { customerId: this.id });
+    await this.$store.dispatch('rh/getUserProfile', { customerId: this.customerId });
   },
   filters: {
     formatIdentity,

@@ -104,7 +104,7 @@ export default {
       this.searchStr = value;
     },
     goToCompanyProfile (row) {
-      this.$router.push({ name: 'profile company info', params: { id: row._id } });
+      this.$router.push({ name: 'profile company info', params: { companyId: row._id } });
     },
     async refreshCompanies () {
       try {

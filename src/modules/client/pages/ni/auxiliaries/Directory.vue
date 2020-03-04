@@ -329,7 +329,7 @@ export default {
       }
     },
     goToUserProfile (row) {
-      this.$router.push({ name: 'personal info', params: { id: row.auxiliary._id } });
+      this.$router.push({ name: 'personal info', params: { auxiliaryId: row.auxiliary._id } });
     },
     resetForm () {
       this.$v.newUser.$reset();
