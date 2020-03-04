@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import BillSlip from '@api/BillSlips';
 import LargeTable from '@components/table/LargeTable';
 import TitleHeader from '@components/TitleHeader';
@@ -54,7 +55,7 @@ export default {
           name: 'thirdPartyPayer',
           label: 'Tiers payeur',
           align: 'left',
-          field: row => this.$_.get(row, 'thirdPartyPayer.name') || '',
+          field: row => get(row, 'thirdPartyPayer.name') || '',
         },
         {
           name: 'netInclTaxes',

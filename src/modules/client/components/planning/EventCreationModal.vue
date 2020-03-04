@@ -75,6 +75,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { ABSENCE, INTERNAL_HOUR, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, INTERVENTION, NEVER } from '@data/constants';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
@@ -120,8 +121,8 @@ export default {
 
         const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (this.$_.get(selectedSubscription, 'service.type') === COMPANY_CONTRACT) return this.isCompanyContractValidForRepetition;
-        if (this.$_.get(selectedSubscription, 'service.type') === CUSTOMER_CONTRACT) return this.isCustomerContractValidForRepetition;
+        if (get(selectedSubscription, 'service.type') === COMPANY_CONTRACT) return this.isCompanyContractValidForRepetition;
+        if (get(selectedSubscription, 'service.type') === CUSTOMER_CONTRACT) return this.isCustomerContractValidForRepetition;
       }
 
       return true;
@@ -182,7 +183,7 @@ export default {
     setEventAddressAndSubscription () {
       const payload = {
         ...this.newEvent,
-        address: this.$_.get(this.selectedCustomer, 'contact.primaryAddress', {}),
+        address: get(this.selectedCustomer, 'contact.primaryAddress', {}),
       };
       if (this.customerSubscriptionsOptions.length === 1) {
         payload.subscription = this.customerSubscriptionsOptions[0].value;

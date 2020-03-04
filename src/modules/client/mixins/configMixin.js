@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+import set from 'lodash/set';
 import Companies from '@api/Companies';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -10,19 +12,19 @@ export const configMixin = {
   },
   methods: {
     saveTmp (path) {
-      this.tmpInput = this.$_.get(this.company, path);
+      this.tmpInput = get(this.company, path);
     },
     async updateCompany (path) {
       try {
-        if (this.tmpInput === this.$_.get(this.company, path)) return;
-        if (this.$_.get(this.$v.company, path)) {
-          this.$_.get(this.$v.company, path).$touch();
+        if (this.tmpInput === get(this.company, path)) return;
+        if (get(this.$v.company, path)) {
+          get(this.$v.company, path).$touch();
           const isValid = await this.waitForValidation(this.$v.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const value = this.$_.get(this.company, path);
-        const payload = this.$_.set({}, path, value);
+        const value = get(this.company, path);
+        const payload = set({}, path, value);
         await Companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée');
       } catch (e) {
