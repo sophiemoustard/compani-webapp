@@ -2,19 +2,19 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un formateur"
       @updateSearch="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredTrainer" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"/>
+    <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"/>
   </q-page>
 </template>
 
 <script>
-
 import { mapGetters } from 'vuex';
-import get from 'lodash/get';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative } from '@components/popup/notify';
+import { formatIdentity } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
+
 export default {
   metaInfo: { title: 'Répertoire formateurs' },
   name: 'TrainersDirectory',
@@ -49,7 +49,7 @@ export default {
   },
   computed: {
     ...mapGetters({ currentUser: 'current/user' }),
-    filteredTrainer () {
+    filteredTrainers () {
       return this.trainers.filter(trainer => trainer.name.match(new RegExp(this.searchStr, 'i')));
     },
   },
@@ -59,17 +59,15 @@ export default {
     },
     async refreshTrainers () {
       try {
-        const params = { role: [TRAINER] };
-        const companyId = get(this.currentUser, 'company._id');
-        if (companyId) params.company = companyId;
-        const trainers = await Users.list(params);
-
-        this.trainers = trainers.map(trainer =>
-          ({ ...trainer, name: `${trainer.identity.firstname} ${trainer.identity.lastname}` }))
+        this.tableLoading = true;
+        const trainers = await Users.list({ role: [TRAINER] });
+        this.trainers = trainers.map(trainer => ({ ...trainer, name: formatIdentity(trainer.identity, 'FL') }))
       } catch (e) {
         console.error(e);
         this.trainers = [];
-        NotifyNegative('Erreur lors de la récupération des structures');
+        NotifyNegative('Erreur lors de la récupération des formateurs');
+      } finally {
+        this.tableLoading = false;
       }
     },
   },
