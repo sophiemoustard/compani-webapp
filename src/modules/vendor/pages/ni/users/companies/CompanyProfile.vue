@@ -24,10 +24,10 @@ export default {
     }
   },
   async mounted () {
-    await this.refershCompany();
+    await this.refreshCompany();
   },
   methods: {
-    async refershCompany () {
+    async refreshCompany () {
       try {
         this.company = await Company.getById(this.companyId);
       } catch (e) {
