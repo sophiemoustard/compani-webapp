@@ -31,6 +31,7 @@
 <script>
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 
+import Users from '@api/Users'
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
@@ -89,7 +90,7 @@ export default {
     async submit () {
       try {
         this.user.isConfirmed = true;
-        await this.$users.updateById(this.userId, this.user, this.alenviToken);
+        await Users.updateById(this.userId, this.user, this.alenviToken);
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });

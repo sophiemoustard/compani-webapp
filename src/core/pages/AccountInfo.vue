@@ -38,6 +38,7 @@
 <script>
 import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
+import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
@@ -84,7 +85,7 @@ export default {
   },
   async mounted () {
     try {
-      this.user.alenvi = await this.$users.getById(this.$route.params.id);
+      this.user.alenvi = await Users.getById(this.$route.params.id);
       this.user.credentials.email = this.user.alenvi.local.email;
     } catch (e) {
       console.error(e);
@@ -104,7 +105,7 @@ export default {
         if (this.user.credentials.password) {
           userToSend.local.password = this.user.credentials.password
         };
-        await this.$users.updateById(this.$route.params.id, userToSend);
+        await Users.updateById(this.$route.params.id, userToSend);
         NotifyPositive('Profil mis à jour');
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
