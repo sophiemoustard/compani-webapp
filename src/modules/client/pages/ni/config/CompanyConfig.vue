@@ -140,6 +140,9 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import cloneDeep from 'lodash/cloneDeep';
+import pick from 'lodash/pick';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Establishments from '@api/Establishments';
 import Input from '@components/form/Input';
@@ -200,7 +203,7 @@ export default {
           name: 'address',
           label: 'Adresse',
           align: 'left',
-          field: row => this.$_.get(row, 'address.fullAddress') || '',
+          field: row => get(row, 'address.fullAddress') || '',
         },
         {
           name: 'phone',
@@ -213,14 +216,14 @@ export default {
           label: 'Service de santé du travail',
           align: 'left',
           field: 'workHealthService',
-          format: value => value ? this.$_.get(workHealthServices.find(whs => whs.value === value), 'label', '') : '',
+          format: value => value ? get(workHealthServices.find(whs => whs.value === value), 'label', '') : '',
         },
         {
           name: 'urssafCode',
           label: 'Code URSSAF',
           align: 'left',
           field: 'urssafCode',
-          format: value => value ? this.$_.get(urssafCodes.find(code => code.value === value), 'label', '') : '',
+          format: value => value ? get(urssafCodes.find(code => code.value === value), 'label', '') : '',
         },
         {
           name: 'actions',
@@ -324,9 +327,8 @@ export default {
       }
     },
     openEstablishmentEditionModal (establishmentId) {
-      this.editedEstablishment = this.$_.cloneDeep(
-        this.establishments.find(est => est._id === establishmentId)
-      ) || this.editedEstablishment;
+      this.editedEstablishment = cloneDeep(this.establishments.find(est => est._id === establishmentId)) ||
+        this.editedEstablishment;
       this.establishmentEditionModal = true;
     },
     resetEstablishmentEditionModal () {
@@ -348,7 +350,7 @@ export default {
         this.loading = true;
         await Establishments.update(
           this.editedEstablishment._id,
-          this.$_.pick(this.editedEstablishment, Object.keys(this.newEstablishment))
+          pick(this.editedEstablishment, Object.keys(this.editedEstablishment))
         );
         NotifyPositive('Établissement modifié.');
         this.establishmentEditionModal = false;
@@ -381,53 +383,34 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     establishmentNameError (validationObj) {
-      if (!validationObj.name.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.name.maxLength) {
-        return '32 caractères maximimum';
-      } else if (!validationObj.name.validEstablishmentName) {
-        return 'Caractère(s) invalide(s)';
-      }
+      if (!validationObj.name.required) return REQUIRED_LABEL;
+      else if (!validationObj.name.maxLength) return '32 caractères maximimum';
+      else if (!validationObj.name.validEstablishmentName) return 'Caractère(s) invalide(s)';
       return '';
     },
     establishmentSiretError (validationObj) {
-      if (!validationObj.siret.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.siret.validSiret) {
-        return 'Siret non valide';
-      }
+      if (!validationObj.siret.required) return REQUIRED_LABEL;
+      else if (!validationObj.siret.validSiret) return 'Siret non valide';
       return '';
     },
     establishmentAddressError (validationObj) {
-      if (!validationObj.address.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.address.frAddress) {
-        return 'Adresse invalide';
-      }
+      if (!validationObj.address.required) return REQUIRED_LABEL;
+      else if (!validationObj.address.frAddress) return 'Adresse invalide';
       return '';
     },
     establishmentPhoneError (validationObj) {
-      if (!validationObj.phone.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.phone.frPhoneNumber) {
-        return 'Numéro de téléphone invalide';
-      }
+      if (!validationObj.phone.required) return REQUIRED_LABEL;
+      else if (!validationObj.phone.frPhoneNumber) return 'Numéro de téléphone invalide';
       return '';
     },
     establishmentWhsError (validationObj) {
-      if (!validationObj.workHealthService.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.workHealthService.validWorkHealthService) {
-        return 'Service de santé du travail invalide';
-      }
+      if (!validationObj.workHealthService.required) return REQUIRED_LABEL;
+      else if (!validationObj.workHealthService.validWorkHealthService) return 'Service de santé du travail invalide';
       return '';
     },
     establishmentUrssafCodeError (validationObj) {
-      if (!validationObj.urssafCode.required) {
-        return REQUIRED_LABEL;
-      } else if (!validationObj.urssafCode.validUrssafCode) {
-        return 'Code URSSAF invalide';
-      }
+      if (!validationObj.urssafCode.required) return REQUIRED_LABEL;
+      else if (!validationObj.urssafCode.validUrssafCode) return 'Code URSSAF invalide';
       return '';
     },
   },
