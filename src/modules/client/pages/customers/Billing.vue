@@ -6,7 +6,6 @@
 
 <script>
 import ProfileBilling from 'src/modules/client/components/customers/ProfileBilling.vue';
-
 import Customers from '@api/Customers';
 
 export default {

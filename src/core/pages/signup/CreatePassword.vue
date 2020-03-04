@@ -30,7 +30,6 @@
 
 <script>
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
-
 import Users from '@api/Users'
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';

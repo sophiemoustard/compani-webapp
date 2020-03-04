@@ -50,7 +50,6 @@
 import { required, email } from 'vuelidate/lib/validators';
 import pickBy from 'lodash/pickBy';
 import get from 'lodash/get';
-
 import Customers from '@api/Customers';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
 import SearchAddress from '@components/form/SearchAddress';
