@@ -1,14 +1,14 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header :customer="true" :profileId="id" class="header" />
+      <customer-profile-header :profileId="id" class="header" />
       <profile-tabs :profileId="id" :tabsContent="tabsContent" />
     </div>
   </q-page>
 </template>
 
 <script>
-import ProfileHeader from 'src/modules/client/components/ProfileHeader';
+import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 import ProfileInfo from 'src/modules/client/components/customers/ProfileInfo';
@@ -20,7 +20,7 @@ export default {
     defaultTab: { type: String, default: () => 'followUp' },
   },
   components: {
-    ProfileHeader,
+    CustomerProfileHeader,
     ProfileTabs,
   },
   metaInfo: { title: 'Fiche bénéficiaire' },

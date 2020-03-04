@@ -23,7 +23,6 @@ export default {
   },
   props: {
     id: { type: String },
-    customerId: { type: String },
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
@@ -32,7 +31,7 @@ export default {
     },
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { customerId: this.customerId });
+    await this.$store.dispatch('rh/getUserProfile', { customerId: this.id });
   },
   filters: {
     formatIdentity,

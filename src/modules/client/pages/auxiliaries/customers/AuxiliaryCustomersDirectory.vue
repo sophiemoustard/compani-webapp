@@ -53,9 +53,6 @@ export default {
     await this.getCustomersList();
   },
   computed: {
-    currentUser () {
-      return this.$store.getters['current/user'];
-    },
     filteredUsers () {
       return this.customersList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
     },
@@ -79,10 +76,7 @@ export default {
       }
     },
     goToCustomerProfile (row) {
-      this.$router.push({
-        name: 'profile customers info',
-        params: { id: this.currentUser._id, customerId: row.customerId },
-      });
+      this.$router.push({ name: 'profile customers info', params: { id: row.customerId } });
     },
   },
 }

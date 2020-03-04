@@ -2,30 +2,27 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @updateSearch="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
-    <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
-      <template v-slot:body="{ props }">
-        <q-tr :props="props" @click="goToUserProfile(props.row.auxiliary._id)">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <q-item v-if="col.name === 'name'">
-              <q-item-section avatar>
-                <img class="avatar" :src="getAvatar(col.value.picture)">
-              </q-item-section>
-              <q-item-section>{{ col.value.name }}</q-item-section>
-            </q-item>
-            <template v-else-if="col.name === 'profileErrors'">
-              <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error"
-                color="secondary" size="1rem" />
-            </template>
-            <template v-else-if="col.name === 'tasksErrors'">
-              <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error"
-                color="secondary" size="1rem" />
-            </template>
-            <template v-else-if="col.name === 'active'">
-              <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
+    <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      @goTo="goToUserProfile">
+      <template v-slot:body="{ props, col }">
+        <q-item v-if="col.name === 'name'">
+          <q-item-section avatar>
+            <img class="avatar" :src="getAvatar(col.value.picture)">
+          </q-item-section>
+          <q-item-section>{{ col.value.name }}</q-item-section>
+        </q-item>
+        <template v-else-if="col.name === 'profileErrors'">
+          <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error"
+            color="secondary" size="1rem" />
+        </template>
+        <template v-else-if="col.name === 'tasksErrors'">
+          <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error"
+            color="secondary" size="1rem" />
+        </template>
+        <template v-else-if="col.name === 'active'">
+          <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
+        </template>
+        <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
@@ -331,8 +328,8 @@ export default {
         this.tableLoading = false;
       }
     },
-    goToUserProfile (userId) {
-      this.$router.push({ name: 'personal info', params: { id: userId } });
+    goToUserProfile (row) {
+      this.$router.push({ name: 'personal info', params: { id: row.auxiliary._id } });
     },
     resetForm () {
       this.$v.newUser.$reset();

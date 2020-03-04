@@ -1,41 +1,37 @@
 <template>
-  <div>
+  <div class="header">
     <div class="row col-xs-12 q-mb-md">
-      <div :class="[customer ? 'col-xs-12': 'col-xs-8', 'row', 'items-baseline', 'col-md-10']">
+      <div class="col-xs-8 row items-baseline col-md-10">
         <div class="row items-center">
-          <q-icon v-if="isExternalUser" class="on-left cursor-pointer" size="1rem" name="arrow_back" color="primary"
+          <q-icon v-if="isExternalUser" class="q-mr-md cursor-pointer" size="1rem" name="arrow_back" color="primary"
             @click.native="$router.go(-1)" />
           <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
           <q-btn :disable="isPlanningRouterDisable" flat size="sm" color="primary" icon="date_range"
             @click="goToPlanning" />
         </div>
       </div>
-      <div v-if="!customer" class="row custom-justify-end col-xs-4 col-md-2">
+      <div class="row custom-justify-end col-xs-4 col-md-2">
         <img :src="hasPicture" alt="Img user" class="avatar">
       </div>
     </div>
     <div class="row col-xs-12 profile-info">
-      <div :class="[customer ? 'col-xs-12': 'col-xs-6', 'q-pl-lg', 'col-md-6', 'profile-info-item']">
+      <div class="col-6 q-pl-lg">
         <div class="row items-center">
-          <div class="row items-center justify-center on-left" style="width: 17px; height: 17px">
-            <div :class="[{ activeDot: userActivity.active, inactiveDot: !userActivity.active }]" />
-          </div>
+          <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-inactive']" />
           <div>{{ userActivity.status }}</div>
         </div>
         <div class="row items-center">
-          <q-icon name="restore" class="on-left" size="1rem" />
-          <div class="on-left">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-          <q-icon v-if="customer" name="delete" color="grey" size="1rem" :disable="!!user.firstIntervention"
-            @click="validateCustomerDeletion" />
+          <q-icon name="restore" class="q-mr-md" size="1rem" />
+          <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
         </div>
       </div>
-      <div v-if="!customer" class="q-pl-lg col-xs-6 col-md-6 row profile-info-item">
-        <div class="relative-position" style="width: 37px;">
+      <div class="q-pl-lg col-6 row">
+        <div class="relative-position">
           <q-icon size="36px" name="phone_iphone" color="grey-2" />
           <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
           <q-icon v-if="user.isConfirmed" class="chip-icon" name="check_circle" color="accent" size="16px" />
         </div>
-        <div class="column">
+        <div>
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
           <div class="send-message-link" @click="opened = true">Envoyer un SMS</div>
         </div>
@@ -62,7 +58,6 @@ import get from 'lodash/get';
 import { mapGetters } from 'vuex';
 import randomize from 'randomatic';
 import ActivationCode from '@api/ActivationCode';
-import Customers from '@api/Customers';
 import Twilio from '@api/Twilio';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -101,19 +96,12 @@ export default {
       user: 'rh/getUserProfile',
     }),
     isPlanningRouterDisable () {
-      if (this.customer) return !this.user.firstIntervention;
       return !this.user.contracts || !this.user.contracts.length;
     },
     companyName () {
       return get(this.currentUser, 'company.tradeName');
     },
     userActivity () {
-      if (this.customer) {
-        return {
-          status: this.user.firstIntervention ? 'Client' : 'Prospect',
-          active: !!this.user.firstIntervention,
-        }
-      }
       return {
         status: this.user.isActive ? 'Profil Actif' : 'Profil Inactif',
         active: this.user.isActive,
@@ -165,7 +153,7 @@ export default {
       },
     },
     hasPicture () {
-      return !this.user.picture || (this.user.picture && !this.user.picture.link) ? DEFAULT_AVATAR : this.user.picture.link;
+      return get(this.user, 'picture.link') || DEFAULT_AVATAR;
     },
   },
   methods: {
@@ -196,40 +184,15 @@ export default {
         NotifyNegative('Erreur lors de l\'envoi du SMS');
       }
     },
-    async deleteCustomer () {
-      try {
-        await Customers.remove(this.user._id);
-        NotifyPositive('Bénéficiaire supprimé.');
-        this.$router.push({ name: 'customers directory' });
-      } catch (e) {
-        console.error(e);
-        if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
-      }
-    },
-    validateCustomerDeletion () {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Confirmez-vous la suppression ?',
-        ok: 'OK',
-        cancel: 'Annuler',
-      }).onOk(this.deleteCustomer)
-        .onCancel(() => NotifyPositive('Suppression annulée'));
-    },
   },
 }
 </script>
 
 <style lang="stylus" scoped>
-  h4
-    margin: 0
-
   .avatar
     width: 59px
     height: 59px
     border: 1px solid #979797
-
-  .profile-info
-    font-size: 14px
 
   .send-message-link
     color: $primary
@@ -246,9 +209,8 @@ export default {
     border-radius: 50%
     background: white
 
-  .custom-justify
-    &-end
-      justify-content: flex-end
-      @media (max-width: 767px)
-        justify-content: center
+  .custom-justify-end
+    justify-content: flex-end
+    @media (max-width: 767px)
+      justify-content: center
 </style>

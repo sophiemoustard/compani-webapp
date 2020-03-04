@@ -4,14 +4,14 @@
     :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
     :visible-columns="formattedVisibleColumns">
     <template v-slot:body="props">
-      <slot name="body" :props="props">
-        <q-tr :props="props" @click="$emit('goTo', props.row)">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
-            :class="col.name">
+      <q-tr :props="props" @click="$emit('goTo', props.row)">
+        <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
+          :class="col.name">
+          <slot name="body" :props="props" :col="col">
             {{ col.value }}
-          </q-td>
-        </q-tr>
-      </slot>
+          </slot>
+        </q-td>
+      </q-tr>
     </template>
   </q-table>
 </template>

@@ -1,12 +1,8 @@
 <template>
-  <div class="row col-xs-12 q-mb-md">
-    <div class="'col-xs-12', 'row', 'items-baseline', 'col-md-10'">
-      <div class="row items-center">
-        <q-icon class="on-left cursor-pointer" size="1rem" name="arrow_back" color="primary"
-          @click.native="$router.go(-1)" />
-        <h4>{{ title }}</h4>
-      </div>
-    </div>
+  <div class="row col-xs-12 q-mb-md items-center">
+    <q-icon class="on-left cursor-pointer" size="1rem" name="arrow_back" color="primary"
+      @click.native="$router.go(-1)" />
+    <h4>{{ title }}</h4>
   </div>
 </template>
 

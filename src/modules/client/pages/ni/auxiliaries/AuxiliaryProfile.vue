@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header :profile-id="id" class="header" />
+      <auxiliary-profile-header :profile-id="id" />
       <profile-tabs :profile-id="id" :tabsContent="tabsContent" />
     </div>
   </q-page>
@@ -9,7 +9,7 @@
 
 <script>
 
-import ProfileHeader from 'src/modules/client/components/ProfileHeader';
+import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
 import ProfileTasks from 'src/modules/client/components/auxiliary/ProfileTasks';
@@ -22,8 +22,8 @@ export default {
     defaultTab: { type: String, default: 'info' },
   },
   components: {
-    ProfileHeader,
-    ProfileTabs,
+    'auxiliary-profile-header': AuxiliaryProfileHeader,
+    'profile-tabs': ProfileTabs,
   },
   name: 'AuxiliaryProfile',
   metaInfo: { title: 'Fiche auxiliaire' },

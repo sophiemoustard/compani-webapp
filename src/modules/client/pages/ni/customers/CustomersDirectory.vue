@@ -2,22 +2,19 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
       display-toggle @updateSearch="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
-    <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination">
-      <template v-slot:body="{ props }">
-        <q-tr :props="props" @click="goToCustomerProfile(props.row._id)">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <q-item v-if="col.name === 'fullName'">
-              <q-item-section>{{ col.value }}</q-item-section>
-            </q-item>
-            <template v-else-if="col.name === 'client'">
-              <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
-            </template>
-            <template v-else-if="col.name === 'info'">
-              <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
+    <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
+      @goTo="goToCustomerProfile">
+      <template v-slot:body="{ props, col }">
+        <q-item v-if="col.name === 'fullName'">
+          <q-item-section>{{ col.value }}</q-item-section>
+        </q-item>
+        <template v-else-if="col.name === 'client'">
+          <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
+        </template>
+        <template v-else-if="col.name === 'info'">
+          <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
+        </template>
+        <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
@@ -220,8 +217,8 @@ export default {
         console.error(e);
       }
     },
-    goToCustomerProfile (userId) {
-      this.$router.push({ name: 'customers profile', params: { id: userId } });
+    goToCustomerProfile (customer) {
+      this.$router.push({ name: 'customers profile', params: { id: customer._id } });
     },
     resetForm () {
       this.$v.newCustomer.$reset();

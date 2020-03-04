@@ -315,7 +315,7 @@ const routes = [
         },
       },
       {
-        path: 'auxiliaries/customers/:customerId',
+        path: 'auxiliaries/customers/:id',
         name: 'profile customers info',
         props: true,
         component: () => import('src/modules/client/pages/auxiliaries/customers/CustomerInfo'),
