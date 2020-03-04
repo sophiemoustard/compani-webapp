@@ -1,3 +1,5 @@
+import get from 'lodash/get';
+import capitalize from 'lodash/capitalize';
 import moment from 'moment';
 import { getLastVersion } from '@helpers/utils';
 import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
@@ -13,7 +15,7 @@ export const subscriptionMixin = {
           name: 'service',
           label: 'Service',
           align: 'left',
-          field: row => this.$_.get(row, 'service.name'),
+          field: row => get(row, 'service.name'),
         },
         {
           name: 'nature',
@@ -21,9 +23,9 @@ export const subscriptionMixin = {
           align: 'left',
           format: (value) => {
             const nature = NATURE_OPTIONS.find(option => option.value === value);
-            return nature ? this.$_.capitalize(nature.label) : '';
+            return nature ? capitalize(nature.label) : '';
           },
-          field: row => this.$_.get(row, 'service.nature'),
+          field: row => get(row, 'service.nature'),
         },
         {
           name: 'unitTTCRate',
@@ -35,7 +37,9 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => this.$_.get(row, 'service.nature') === HOURLY ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+          field: row => get(row, 'service.nature') === HOURLY
+            ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h`
+            : row.estimatedWeeklyVolume,
         },
         {
           name: 'weeklyRate',
@@ -68,7 +72,7 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => this.$_.get(this.selectedSubscription, 'service.nature') === HOURLY
+          field: row => get(this.selectedSubscription, 'service.nature') === HOURLY
             ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
         },
         {
@@ -97,7 +101,7 @@ export const subscriptionMixin = {
     },
     computeWeeklyRate (subscription, funding) {
       let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
-      if (this.$_.get(subscription, 'service.surcharge', null)) {
+      if (get(subscription, 'service.surcharge', null)) {
         if (subscription.sundays && subscription.service.surcharge.sunday) {
           weeklyRate += subscription.sundays * subscription.unitTTCRate * subscription.service.surcharge.sunday / 100;
         }

@@ -125,6 +125,7 @@
 <script>
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import Esign from '@api/Esign.js';
 import Drive from '@api/GoogleDrive';
 import Customers from '@api/Customers';
@@ -298,7 +299,7 @@ export default {
 
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
-        await Customers.updateById(this.customer._id, this.$_.set({}, path, value));
+        await Customers.updateById(this.customer._id, set({}, path, value));
         await this.$store.dispatch('current/getUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
