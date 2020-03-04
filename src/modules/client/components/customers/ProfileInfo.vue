@@ -399,6 +399,7 @@ import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
 import Services from '@api/Services';
+import Customers from '@api/Customers';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
@@ -831,7 +832,7 @@ export default {
     },
     async refreshMandates () {
       try {
-        this.customer.payment.mandates = await this.$customers.getMandates(this.customer._id);
+        this.customer.payment.mandates = await Customers.getMandates(this.customer._id);
 
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
@@ -841,7 +842,7 @@ export default {
     },
     async refreshQuotes () {
       try {
-        this.customer.quotes = await this.$customers.getQuotes(this.customer._id);
+        this.customer.quotes = await Customers.getQuotes(this.customer._id);
 
         this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
@@ -850,7 +851,7 @@ export default {
       }
     },
     async refreshCustomer () {
-      this.customer = await this.$customers.getById(this.userProfile._id);
+      this.customer = await Customers.getById(this.userProfile._id);
       await this.refreshSubscriptions();
       await this.refreshFundings();
 
@@ -882,7 +883,7 @@ export default {
 
         this.loading = true;
         const payload = this.formatCreatedSubscription();
-        await this.$customers.addSubscription(this.customer._id, payload);
+        await Customers.addSubscription(this.customer._id, payload);
         await this.refreshCustomer();
         this.subscriptionCreationModal = false;
         NotifyPositive('Souscription ajoutée');
@@ -922,7 +923,7 @@ export default {
         const payload = pickBy(this.editedSubscription);
         delete payload._id;
         delete payload.nature;
-        await this.$customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
+        await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
         this.refreshCustomer();
         this.subscriptionEditionModal = false;
         NotifyPositive('Souscription modifiée');
@@ -936,7 +937,7 @@ export default {
     async deleteSubscriptions (subscriptionId) {
       try {
         const params = { subscriptionId, _id: this.customer._id };
-        await this.$customers.removeSubscription(params);
+        await Customers.removeSubscription(params);
         await this.refreshCustomer();
         NotifyPositive('Souscription supprimée');
       } catch (e) {
@@ -964,7 +965,7 @@ export default {
           _id: this.customer._id,
           mandateId: mandate._id,
         };
-        await this.$customers.updateMandate(params, mandate);
+        await Customers.updateMandate(params, mandate);
         this.refreshMandates();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
@@ -1062,7 +1063,7 @@ export default {
           return sub;
         });
         const payload = { subscriptions };
-        await this.$customers.addQuote(this.customer._id, payload);
+        await Customers.addQuote(this.customer._id, payload);
         await this.refreshQuotes();
         NotifyPositive('Devis généré');
       } catch (e) {
@@ -1138,7 +1139,7 @@ export default {
 
         this.loading = true;
         const payload = this.formatCreatedFunding();
-        await this.$customers.addFunding(this.customer._id, payload);
+        await Customers.addFunding(this.customer._id, payload);
         this.resetCreationFundingData();
         await this.refreshCustomer();
         NotifyPositive('Financement ajoutée');
@@ -1153,7 +1154,7 @@ export default {
     async deleteFunding (fundingId) {
       try {
         const params = { fundingId, _id: this.customer._id };
-        await this.$customers.removeFunding(params);
+        await Customers.removeFunding(params);
         await this.refreshCustomer();
         NotifyPositive('Financement supprimé');
       } catch (e) {
@@ -1209,7 +1210,7 @@ export default {
           payload.careHours = careHours;
         }
         const cleanPayload = pickBy(payload);
-        await this.$customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
+        await Customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
         this.resetEditionFundingData();
         await this.refreshCustomer();
         NotifyPositive('Financement modifié');

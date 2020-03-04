@@ -7,6 +7,8 @@
 <script>
 import ProfileBilling from 'src/modules/client/components/customers/ProfileBilling.vue';
 
+import Customers from '@api/Customers';
+
 export default {
   name: 'Billing',
   metaInfo: { title: 'Facturation' },
@@ -29,7 +31,7 @@ export default {
   methods: {
     async refreshCustomer () {
       try {
-        const customer = await this.$customers.getById(this.helper.customers[0]._id);
+        const customer = await Customers.getById(this.helper.customers[0]._id);
         this.$store.commit('rh/saveUserProfile', customer);
       } catch (e) {
         console.error(e);

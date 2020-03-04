@@ -89,6 +89,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import groupBy from 'lodash/groupBy';
+import Customers from '@api/Customers';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { can } from '@helpers/rights';
 import {
@@ -178,7 +180,7 @@ export default {
       return this.currentUserRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
-      return this.isCustomerPlanning ? { allSectors: this.persons } : this.$_.groupBy(this.persons, 'sector._id');
+      return this.isCustomerPlanning ? { allSectors: this.persons } : groupBy(this.persons, 'sector._id');
     },
   },
   methods: {
@@ -188,7 +190,7 @@ export default {
     },
     async openDeleteEventsModal () {
       try {
-        this.customersWithInterventions = await this.$customers.listWithIntervention();
+        this.customersWithInterventions = await Customers.listWithIntervention();
         this.deleteEventsModal = true;
       } catch (e) {
         this.customersWithInterventions = [];

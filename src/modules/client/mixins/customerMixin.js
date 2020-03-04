@@ -1,3 +1,7 @@
+import get from 'lodash/get';
+import has from 'lodash/has';
+import set from 'lodash/set';
+import Customers from '@api/Customers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
 
 export const customerMixin = {
@@ -13,22 +17,22 @@ export const customerMixin = {
       return {};
     },
     acceptedBy () {
-      if (!this.$_.has(this.lastSubscriptionHistory, 'helper.lastname')) return '';
+      if (!has(this.lastSubscriptionHistory, 'helper.lastname')) return '';
       return `${this.lastSubscriptionHistory.helper.title || ''} ${this.lastSubscriptionHistory.helper.firstname || ''} ${this.lastSubscriptionHistory.helper.lastname}`;
     },
   },
   methods: {
     async updateCustomer (path) {
       try {
-        let value = path === 'referent' ? this.$_.get(this.customer, 'referent._id', '') : this.$_.get(this.customer, path);
+        let value = path === 'referent' ? get(this.customer, 'referent._id', '') : get(this.customer, path);
         if (this.tmpInput === value) return;
-        if (this.$_.get(this.$v.customer, path)) {
+        if (get(this.$v.customer, path)) {
           const isValid = await this.waitForValidation(this.$v.customer, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (path === 'payment.iban') value = value.split(' ').join('');
-        const payload = this.$_.set({}, path, value);
-        await this.$customers.updateById(this.userProfile._id, payload);
+        const payload = set({}, path, value);
+        await Customers.updateById(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée');
         if (path === 'payment.iban' || path === 'referent') this.refreshCustomer();
