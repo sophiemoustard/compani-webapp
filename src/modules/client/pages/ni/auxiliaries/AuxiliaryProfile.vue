@@ -25,8 +25,8 @@ export default {
     ProfileHeader,
     ProfileTabs,
   },
-  name: 'AuxiliaryInfo',
-  metaInfo: { title: 'Infos personnelles' },
+  name: 'AuxiliaryProfile',
+  metaInfo: { title: 'Fiche auxiliaire' },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];

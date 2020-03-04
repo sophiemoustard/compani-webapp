@@ -17,4 +17,8 @@ export default {
     const company = await alenviAxios.post(`${process.env.API_HOSTNAME}/companies`, payload);
     return company.data.data.company;
   },
+  async getById (id) {
+    const company = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies/${id}`);
+    return company.data.data.company;
+  },
 }

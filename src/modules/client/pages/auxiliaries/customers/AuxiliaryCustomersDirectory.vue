@@ -1,14 +1,8 @@
 <template>
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Bénéficiaires" @updateSearch="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
-      <template v-slot:body="{ props }">
-        <q-tr :props="props" @click="goToCustomerProfile(props.row.customerId)">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <template>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </template>
+    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
+      @goTo="goToCustomerProfile">
     </ni-table-list>
   </q-page>
 </template>
@@ -84,8 +78,11 @@ export default {
         console.error(e);
       }
     },
-    goToCustomerProfile (customerId) {
-      this.$router.push({ name: 'profile customers info', params: { id: this.currentUser._id, customerId } });
+    goToCustomerProfile (row) {
+      this.$router.push({
+        name: 'profile customers info',
+        params: { id: this.currentUser._id, customerId: row.customerId },
+      });
     },
   },
 }

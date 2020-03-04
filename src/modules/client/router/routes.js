@@ -222,7 +222,7 @@ const routes = [
       {
         path: 'ni/auxiliaries/:id',
         name: 'personal info',
-        component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryInfo'),
+        component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

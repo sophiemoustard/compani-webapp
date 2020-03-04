@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"
-      :pagination.sync="pagination" :visible-columns="visibleColumns" />
+      :pagination.sync="pagination" :visible-columns="visibleColumns" @goTo="goToCompanyProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" />
 
@@ -102,6 +102,9 @@ export default {
   methods: {
     updateSearch (value) {
       this.searchStr = value;
+    },
+    goToCompanyProfile (row) {
+      this.$router.push({ name: 'profile company info', params: { id: row._id } });
     },
     async refreshCompanies () {
       try {

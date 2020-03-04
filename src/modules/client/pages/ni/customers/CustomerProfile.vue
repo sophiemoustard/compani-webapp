@@ -23,7 +23,7 @@ export default {
     ProfileHeader,
     ProfileTabs,
   },
-  metaInfo: { title: 'Infos personnelles' },
+  metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];

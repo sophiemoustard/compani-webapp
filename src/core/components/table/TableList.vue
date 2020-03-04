@@ -5,7 +5,7 @@
     :visible-columns="formattedVisibleColumns">
     <template v-slot:body="props">
       <slot name="body" :props="props">
-        <q-tr :props="props">
+        <q-tr :props="props" @click="$emit('goTo', props.row)">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
             :class="col.name">
             {{ col.value }}

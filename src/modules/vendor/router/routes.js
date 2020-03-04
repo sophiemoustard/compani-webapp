@@ -1,6 +1,7 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 import store from 'src/store/index';
 
 const routes = [
@@ -29,6 +30,19 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompaniesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
+          role: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'users',
+        },
+      },
+      {
+        path: 'ni/users/companies/:id',
+        name: 'profile company info',
+        component: () => import('src/modules/vendor/pages/ni/users/companies/CompanyProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'users',
         },
       },
       {
@@ -37,6 +51,8 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'users',
         },
       },
       {
@@ -45,6 +61,8 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/config/CoursesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'configuration',
         },
       },
     ],
