@@ -579,7 +579,7 @@ export default {
 
         const event = pick(cnEvent, ['eventId', 'auxiliary', 'startDate', 'endDate', 'bills', 'serviceName']);
         event.bills = omit(event.bills, '_id');
-        if (cnEvent.bills.surcharges) event.bills.surcharges = cnEvent.bills.surcharges.map(sur => this.$_.omit(sur, '_id'));
+        if (cnEvent.bills.surcharges) event.bills.surcharges = cnEvent.bills.surcharges.map(sur => omit(sur, '_id'));
 
         return event;
       });

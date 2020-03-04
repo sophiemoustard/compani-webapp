@@ -56,6 +56,7 @@
 <script>
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
+import uniqueId from 'lodash/uniqueId';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import LargeTable from '@components/table/LargeTable';
@@ -186,7 +187,7 @@ export default {
       try {
         this.tableLoading = true;
         this.balances = await Balances.list();
-        this.balances = this.balances.map(balance => ({ ...balance, rowId: this.$_.uniqueId() }))
+        this.balances = this.balances.map(balance => ({ ...balance, rowId: uniqueId() }))
       } catch (e) {
         this.balances = [];
         console.error(e);

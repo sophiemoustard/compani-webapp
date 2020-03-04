@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import some from 'lodash/some';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
@@ -55,7 +56,7 @@ export default {
       return 'Montant TTC non valide';
     },
     disableEditionButton () {
-      return this.$_.some(this.editedPayment, (el) => !el);
+      return some(this.editedPayment, (el) => !el);
     },
     editionModalNature () {
       if (!this.editedPayment.nature) return '';
