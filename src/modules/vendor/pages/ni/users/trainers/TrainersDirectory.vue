@@ -7,7 +7,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
@@ -48,7 +47,6 @@ export default {
     await this.refreshTrainers();
   },
   computed: {
-    ...mapGetters({ currentUser: 'current/user' }),
     filteredTrainers () {
       return this.trainers.filter(trainer => trainer.name.match(new RegExp(this.searchStr, 'i')));
     },
