@@ -2,7 +2,7 @@
   <q-table :data="data" :columns="columns" :loading="loading" flat :row-key="rowKey" binary-state-sort
     :pagination="pagination" class="table-list neutral-background" :hide-bottom="pagination.rowsPerPage === 0"
     :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
-    :visible-columns="formatVisibleColumns">
+    :visible-columns="formattedVisibleColumns">
     <template v-slot:body="props">
       <slot name="body" :props="props">
         <q-tr :props="props">
@@ -28,7 +28,7 @@ export default {
     rowKey: { type: String, default: 'name' },
   },
   computed: {
-    formatVisibleColumns () {
+    formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
     },
   },
