@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify.js';
 import { displayTask } from 'src/modules/client/helpers/taskValidation.js';
 
@@ -28,7 +29,7 @@ export default {
   },
   async mounted () {
     try {
-      const tasks = await this.$users.getTasks(this.getUser._id);
+      const tasks = await Users.getTasks(this.getUser._id);
       this.tasks = tasks.filter(task => displayTask(task, this.getUser));
     } catch (e) {
       console.error(e);
@@ -37,7 +38,7 @@ export default {
   methods: {
     async handleTask (task) {
       try {
-        await this.$users.updateTask({ userId: this.getUser._id, taskId: task.task._id }, { isDone: task.check.isDone });
+        await Users.updateTask({ userId: this.getUser._id, taskId: task.task._id }, { isDone: task.check.isDone });
         this.$store.dispatch('rh/getUserProfile', { userId: this.getUser._id });
         NotifyPositive('Tâche mise à jour');
       } catch (e) {

@@ -1,3 +1,4 @@
+import Customers from '@api/Customers';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export const financialCertificatesMixin = {
@@ -5,7 +6,7 @@ export const financialCertificatesMixin = {
     async deleteDocument (driveId) {
       try {
         const payload = { driveId };
-        await this.$customers.deleteCertificates(this.customer._id, payload);
+        await Customers.deleteCertificates(this.customer._id, payload);
         await this.refreshCustomer();
         NotifyPositive('Document supprimé');
       } catch (e) {

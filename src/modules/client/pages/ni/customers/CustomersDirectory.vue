@@ -48,7 +48,9 @@
 
 <script>
 import { required, email } from 'vuelidate/lib/validators';
-
+import pickBy from 'lodash/pickBy';
+import get from 'lodash/get';
+import Customers from '@api/Customers';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
@@ -197,7 +199,7 @@ export default {
     },
     async getCustomers () {
       try {
-        this.customers = await this.$customers.list();
+        this.customers = await Customers.list();
         this.tableLoading = false;
       } catch (e) {
         this.customers = [];
@@ -207,10 +209,10 @@ export default {
     },
     async getCustomersFirstIntervention () {
       try {
-        this.firstInterventions = await this.$customers.listWithFirstIntervention();
+        this.firstInterventions = await Customers.listWithFirstIntervention();
         this.customers = this.customers.map(customer => ({
           ...customer,
-          firstIntervention: this.$_.get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
+          firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
           missingInfo: customerProfileValidation(customer).error !== null,
         }));
       } catch (e) {
@@ -238,8 +240,8 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newCustomer);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = this.$_.pickBy(this.newCustomer);
-        await this.$customers.create(payload);
+        const payload = pickBy(this.newCustomer);
+        await Customers.create(payload);
 
         await this.refresh();
         this.customerCreationModal = false;
