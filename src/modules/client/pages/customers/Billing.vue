@@ -23,9 +23,7 @@ export default {
     },
   },
   async mounted () {
-    if (!this.customer) {
-      await this.refreshCustomer();
-    }
+    if (!this.customer) await this.refreshCustomer();
   },
   methods: {
     async refreshCustomer () {

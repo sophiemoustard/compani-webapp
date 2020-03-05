@@ -36,7 +36,6 @@ export default {
   mixins: [planningTimelineMixin],
   data () {
     return {
-      customer: {},
       startOfWeek: '',
       events: [],
       height: 0,
@@ -49,22 +48,25 @@ export default {
     helper () {
       return this.$store.getters['current/user'];
     },
+    customer () {
+      return this.$store.getters['customer/getCustomer'];
+    },
   },
   async mounted () {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
     this.height = window.innerHeight;
     this.startOfWeek = this.$moment().startOf('week').toISOString();
     this.getTimelineDays();
-    await this.refreshCustomer();
+    if (!this.customer) await this.refreshCustomer();
     await this.getEvents();
   },
   methods: {
     async refreshCustomer () {
       try {
-        this.customer = await Customers.getById(this.helper.customers[0]._id);
+        const customer = await Customers.getById(this.helper.customers[0]._id);
+        this.$store.commit('customer/saveCustomer', customer);
       } catch (e) {
         console.error(e);
-        this.customer = {};
       }
     },
     getAvatar () {
