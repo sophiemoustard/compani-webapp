@@ -30,9 +30,9 @@ Router.beforeEach(async (to, from, next) => {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       const refresh = await alenvi.refreshAlenviCookies();
       if (refresh) {
-        if (store.state.main.refreshState) await store.dispatch('current/getUser', Cookies.get('user_id'));
+        if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const permission = checkRole(to, store.getters['current/user']);
+        const permission = checkRole(to, store.getters['main/loggedUser']);
         if (!permission) next('/404');
         else {
           store.commit('main/changeRefreshState', false);
@@ -40,9 +40,9 @@ Router.beforeEach(async (to, from, next) => {
         }
       } else next({ path: '/login', query: { from: to.fullPath } });
     } else {
-      if (store.state.main.refreshState) await store.dispatch('current/getUser', Cookies.get('user_id'));
+      if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-      const permission = checkRole(to, store.getters['current/user']);
+      const permission = checkRole(to, store.getters['main/loggedUser']);
       if (!permission) next('/404');
       else {
         store.commit('main/changeRefreshState', false);

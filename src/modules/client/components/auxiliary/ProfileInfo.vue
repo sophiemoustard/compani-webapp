@@ -4,7 +4,7 @@
       <div class="col-xs-12 col-md-6">
         <p class="input-caption">Équipe</p>
         <ni-select-sector v-model="mergedUserProfile.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
-          :company-id="currentUser.company._id" />
+          :company-id="loggedUser.company._id" />
       </div>
       <ni-input v-model="mergedUserProfile.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
         @blur="updateUser('mentor')" />
@@ -529,9 +529,9 @@ export default {
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
-    ...mapGetters({ currentUser: 'current/user' }),
+    ...mapGetters({ loggedUser: 'main/loggedUser' }),
     userProfile () {
-      return this.$store.getters['rh/getUserProfile'] ? this.$store.getters['rh/getUserProfile'] : this.currentUser;
+      return this.$store.getters['rh/getUserProfile'] ? this.$store.getters['rh/getUserProfile'] : this.loggedUser;
     },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
@@ -626,14 +626,14 @@ export default {
       }
       return 'Adresse non valide';
     },
-    currentUserRole () {
-      return this.currentUser.role.client.name;
+    loggedUserRole () {
+      return this.loggedUser.role.client.name;
     },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.currentUserRole);
+      return AUXILIARY_ROLES.includes(this.loggedUserRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.currentUserRole);
+      return COACH_ROLES.includes(this.loggedUserRole);
     },
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';

@@ -28,9 +28,6 @@ export default {
     userProfile () {
       return this.$store.getters['customer/getCustomer'];
     },
-    currentUser () {
-      return this.$store.getters['current/user'];
-    },
   },
   data () {
     return {

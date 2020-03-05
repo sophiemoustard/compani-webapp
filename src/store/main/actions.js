@@ -1,10 +1,10 @@
 import users from '@api/Users';
 import redirect from 'src/router/redirect';
 
-export const getUser = async ({ commit }, userId) => {
+export const getLoggedUser = async ({ commit }, userId) => {
   try {
     const user = await users.getById(userId);
-    commit('setUser', user);
+    commit('setLoggedUser', user);
   } catch (e) {
     console.error(e);
     if (e.status === 401) {

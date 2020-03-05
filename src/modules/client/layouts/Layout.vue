@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     userRole () {
-      return get(this.user, 'role.client.name') || null;
+      return get(this.loggedUser, 'role.client.name') || null;
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.userRole);
@@ -52,7 +52,7 @@ export default {
       return this.userRole === HELPER;
     },
     sidemenusRefs () {
-      if (!this.user) return 'defaultMenu';
+      if (!this.loggedUser) return 'defaultMenu';
 
       if (this.isAuxiliary) return 'auxiliaryMenu';
       if (this.isCoach) return 'coachMenu';

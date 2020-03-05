@@ -69,8 +69,8 @@ export default {
     this.getUserList();
   },
   computed: {
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     filteredUsers () {
       return this.userList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
@@ -83,7 +83,7 @@ export default {
     async getUserList () {
       try {
         const params = { role: [AUXILIARY, PLANNING_REFERENT] };
-        const companyId = get(this.currentUser, 'company._id', null);
+        const companyId = get(this.loggedUser, 'company._id', null);
         if (companyId) params.company = companyId;
         const users = await Users.listActive(params);
         this.userList = users.map(user => ({

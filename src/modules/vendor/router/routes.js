@@ -12,11 +12,11 @@ const routes = [
       try {
         if (to.path !== '/') return next();
         const refresh = await alenvi.refreshAlenviCookies();
-        if (refresh) await store.dispatch('current/getUser', Cookies.get('user_id'));
+        if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const user = store.getters['current/user'];
-        if (!user) return next({ path: '/login' });
-        if (!get(user, 'role.vendor')) return next({ name: '404' });
+        const loggedUser = store.getters['main/loggedUser'];
+        if (!loggedUser) return next({ path: '/login' });
+        if (!get(loggedUser, 'role.vendor')) return next({ name: '404' });
 
         return next();
       } catch (e) {

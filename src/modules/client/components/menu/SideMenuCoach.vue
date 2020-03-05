@@ -55,7 +55,7 @@
       </q-expansion-item>
     </template>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
   </q-list>
 </template>
 
@@ -90,10 +90,10 @@ export default {
   },
   computed: {
     isAdmin () {
-      return CLIENT_ADMIN === this.user.role.client.name;
+      return CLIENT_ADMIN === this.loggedUser.role.client.name;
     },
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
 }

@@ -196,11 +196,11 @@ export default {
     userProfile () {
       return this.$store.getters['customer/getCustomer'];
     },
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.currentUser.role.client.name);
+      return AUXILIARY_ROLES.includes(this.loggedUser.role.client.name);
     },
     hasSecondaryAddress () {
       return !!get(this.customer, 'contact.secondaryAddress.fullAddress');
@@ -246,7 +246,7 @@ export default {
         this.loading = true;
         const activeAuxiliaries = await Users.listActive({
           role: [AUXILIARY, PLANNING_REFERENT],
-          company: this.currentUser.company._id,
+          company: this.loggedUser.company._id,
         });
         this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
         this.loading = false;

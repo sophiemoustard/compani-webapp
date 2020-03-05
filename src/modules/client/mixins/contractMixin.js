@@ -37,6 +37,9 @@ export const contractMixin = {
     }
   },
   computed: {
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
+    },
     isPreviousPayImpacted () {
       const startOfMonth = this.$moment().startOf('M');
       return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)
@@ -103,7 +106,7 @@ export const contractMixin = {
         signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
       } else {
         signature.signers = this.generateContractSigners(
-          { name: `${this.currentUser.identity.firstname} ${this.currentUser.identity.lastname}`, email: this.currentUser.local.email }
+          { name: `${this.loggedUser.identity.firstname} ${this.loggedUser.identity.lastname}`, email: this.loggedUser.local.email }
         );
         signature.title = `${title}${translate[contract.status]} - ${this.userFullName}`;
       }

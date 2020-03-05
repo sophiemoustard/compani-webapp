@@ -134,11 +134,11 @@ export default {
     await this.refreshContracts();
   },
   computed: {
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     userCompany () {
-      return this.currentUser.company;
+      return this.loggedUser.company;
     },
   },
   methods: {

@@ -22,15 +22,16 @@ const routes = [
       try {
         if (to.path !== '/') return next();
         const refresh = await alenvi.refreshAlenviCookies();
-        if (refresh) await store.dispatch('current/getUser', Cookies.get('user_id'));
+        if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const user = store.getters['current/user'];
-        if (!user) return next({ path: '/login' });
-        if (!get(user, 'role.client')) return next({ name: '404' });
+        const loggedUser = store.getters['main/loggedUser'];
+        console.warn(loggedUser)
+        if (!loggedUser) return next({ path: '/login' });
+        if (!get(loggedUser, 'role.client')) return next({ name: '404' });
 
-        const userClientRole = user.role.client.name;
+        const userClientRole = loggedUser.role.client.name;
         if (userClientRole === HELPER) return next({ name: 'customer agenda' });
-        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account info', params: { id: user._id } });
+        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account info', params: { id: loggedUser._id } });
         if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliary agenda' });
         if (COACH_ROLES.includes(userClientRole)) return next({ name: 'auxiliaries directory' });
         return next({ path: '/login' });

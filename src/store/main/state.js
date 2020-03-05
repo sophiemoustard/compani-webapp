@@ -1,7 +1,7 @@
 import { Platform } from 'quasar';
 
 export default {
-  user: null,
+  loggedUser: null,
   refreshState: true,
   toggleDrawer: !!Platform.is.desktop,
 };

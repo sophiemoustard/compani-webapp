@@ -86,8 +86,8 @@ export default {
       if (!this.selectedAuxiliary.identity) return '';
       return formatIdentity(this.selectedAuxiliary.identity, 'FL');
     },
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     activeAuxiliaries () {
       return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0], this.days[6]) ||
@@ -109,7 +109,7 @@ export default {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
     this.height = window.innerHeight;
     this.startOfWeek = this.$moment().startOf('week').toISOString();
-    this.selectedAuxiliary = this.currentUser;
+    this.selectedAuxiliary = this.loggedUser;
     this.getTimelineDays();
     await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh(), this.setInternalHours()]);
   },
@@ -143,7 +143,7 @@ export default {
     async getAuxiliaries () {
       try {
         const params = {};
-        const companyId = get(this.currentUser, 'company._id', null)
+        const companyId = get(this.loggedUser, 'company._id', null)
         if (companyId) params.company = companyId;
         this.auxiliaries = await Users.list(params);
       } catch (e) {
@@ -160,12 +160,9 @@ export default {
     // Event creation
     openCreationModal (dayIndex) {
       const isAllowed = can({
-        user: this.currentUser,
+        user: this.loggedUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
-        permissions: [
-          { name: 'events:edit' },
-          { name: 'events:own:edit', rule: 'isOwner' },
-        ],
+        permissions: [{ name: 'events:edit' }, { name: 'events:own:edit', rule: 'isOwner' }],
       });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 

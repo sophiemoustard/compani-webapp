@@ -8,7 +8,6 @@
 </template>
 
 <script>
-
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
@@ -30,9 +29,6 @@ export default {
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
-    },
-    currentUser () {
-      return this.$store.getters['current/user'];
     },
   },
   data () {
