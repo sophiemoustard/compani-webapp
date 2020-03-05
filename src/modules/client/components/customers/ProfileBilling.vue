@@ -186,7 +186,7 @@ export default {
   },
   computed: {
     customer () {
-      return this.$store.getters['rh/getUserProfile'];
+      return this.$store.getters['customer/getCustomer'];
     },
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);

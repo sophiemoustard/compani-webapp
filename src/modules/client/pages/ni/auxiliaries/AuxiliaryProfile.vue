@@ -2,7 +2,7 @@
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
       <auxiliary-profile-header :profile-id="auxiliaryId" />
-      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" />
+      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" tyep="auxiliary" />
     </div>
   </q-page>
 </template>
@@ -72,7 +72,7 @@ export default {
   },
   watch: {
     async userProfile () {
-      await this.$store.dispatch('rh/updateNotifications', 'user');
+      await this.$store.dispatch('rh/updateNotifications');
     },
   },
   beforeDestroy () {

@@ -19,7 +19,7 @@ export default {
       return this.$store.getters['current/user'];
     },
     customer () {
-      return this.$store.getters['rh/getUserProfile'];
+      return this.$store.getters['customer/getCustomer'];
     },
   },
   async mounted () {
@@ -31,7 +31,7 @@ export default {
     async refreshCustomer () {
       try {
         const customer = await Customers.getById(this.helper.customers[0]._id);
-        this.$store.commit('rh/saveUserProfile', customer);
+        this.$store.commit('customer/saveCustomer', customer);
       } catch (e) {
         console.error(e);
         this.customer = {};

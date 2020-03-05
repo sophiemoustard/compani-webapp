@@ -31,7 +31,7 @@ export default {
   name: 'ProfileHeader',
   computed: {
     ...mapGetters({
-      customer: 'rh/getUserProfile',
+      customer: 'customer/getCustomer',
     }),
     isPlanningRouterDisable () {
       return !this.customer.firstIntervention;

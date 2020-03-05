@@ -278,7 +278,7 @@ export default {
         this.refreshSubscriptions();
         this.refreshFundings();
 
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$store.commit('customer/saveCustomer', this.customer);
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);

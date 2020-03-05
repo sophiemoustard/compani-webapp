@@ -37,7 +37,7 @@ export const customerMixin = {
         NotifyPositive('Modification enregistrée');
         if (path === 'payment.iban' || path === 'referent') this.refreshCustomer();
 
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$store.commit('customer/saveCustomer', this.customer);
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)

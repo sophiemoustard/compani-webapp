@@ -18,6 +18,7 @@ export default {
   props: {
     tabsContent: { type: Array, default: () => [] },
     profileId: { type: String, default: '' },
+    type: { type: String, default: '' },
   },
   data () {
     return {
@@ -30,12 +31,18 @@ export default {
   },
   computed: {
     notifications () {
-      return this.$store.getters['rh/getNotifications'];
+      switch (this.type) {
+        case 'customer':
+          return this.$store.getters['customer/getNotifications'];
+        case 'auxiliary':
+        default:
+          return this.$store.getters['rh/getNotifications'];
+      }
     },
   },
   methods: {
     alert (tab) {
-      return tab.notification && this.notifications[tab.notification][this.profileId]
+      return tab.notification && this.notifications && this.notifications[tab.notification][this.profileId]
         ? this.notifications[tab.notification][this.profileId]
         : false
     },

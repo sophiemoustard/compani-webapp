@@ -194,7 +194,7 @@ export default {
       return this.getAuxiliaryAvatar(auxiliaryPicture);
     },
     userProfile () {
-      return this.$store.getters['rh/getUserProfile'];
+      return this.$store.getters['customer/getCustomer'];
     },
     currentUser () {
       return this.$store.getters['current/user'];
@@ -274,10 +274,9 @@ export default {
     },
     async refreshCustomer () {
       try {
-        if (get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
         const customer = await Customers.getById(this.userProfile._id);
         this.mergeCustomer(customer);
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$store.commit('customer/saveCustomer', this.customer);
         this.isLoaded = true;
         this.$v.customer.$touch();
       } catch (e) {
@@ -286,6 +285,7 @@ export default {
       }
     },
     mergeCustomer (value = null) {
+      if (get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
       const args = [this.customer, value];
       this.customer = Object.assign({}, extend(true, ...args));
     },

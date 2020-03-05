@@ -96,7 +96,7 @@ export default {
 
         if (this.userRole === HELPER) {
           const customer = await Customers.getById(this.currentUser.customers[0]._id);
-          this.$store.commit('rh/saveUserProfile', customer);
+          this.$store.commit('customer/saveCustomer', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliaryWithoutCompany) {
           this.$router.replace({ name: 'account info', params: { id: this.currentUser._id } });

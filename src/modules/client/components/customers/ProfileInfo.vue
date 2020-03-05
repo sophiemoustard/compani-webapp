@@ -627,7 +627,7 @@ export default {
       }));
     },
     userProfile () {
-      return this.$store.getters['rh/getUserProfile'];
+      return this.$store.getters['customer/getCustomer'];
     },
     primaryAddressError () {
       if (!this.$v.customer.contact.primaryAddress.fullAddress.required) {
@@ -834,7 +834,7 @@ export default {
       try {
         this.customer.payment.mandates = await Customers.getMandates(this.customer._id);
 
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$store.commit('customer/saveCustomer', this.customer);
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
@@ -844,7 +844,7 @@ export default {
       try {
         this.customer.quotes = await Customers.getQuotes(this.customer._id);
 
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$store.commit('customer/saveCustomer', this.customer);
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
@@ -855,7 +855,7 @@ export default {
       await this.refreshSubscriptions();
       await this.refreshFundings();
 
-      this.$store.commit('rh/saveUserProfile', this.customer);
+      this.$store.commit('customer/saveCustomer', this.customer);
       this.$v.customer.$touch();
     },
     // Subscriptions
