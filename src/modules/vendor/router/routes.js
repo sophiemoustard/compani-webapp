@@ -65,6 +65,17 @@ const routes = [
           parent: 'configuration',
         },
       },
+      {
+        path: 'ni/config/courses/:courseId',
+        name: 'profile course info',
+        component: () => import('src/modules/vendor/pages/ni/config/CourseProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'configuration',
+        },
+      },
     ],
   },
 ];
