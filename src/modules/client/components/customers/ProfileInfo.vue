@@ -395,8 +395,9 @@
 
 <script>
 import { Cookies } from 'quasar';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
@@ -422,6 +423,7 @@ import {
   ONCE,
   CIVILITY_OPTIONS,
 } from '@data/constants.js';
+import { userMixin } from '@mixins/userMixin';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import EditHelperModal from 'src/modules/client/components/customers/EditHelperModal.vue';
 import AddHelperModal from 'src/modules/client/components/customers/AddHelperModal.vue';
@@ -456,6 +458,7 @@ export default {
     validationMixin,
     helperMixin,
     tableMixin,
+    userMixin,
   ],
   data () {
     return {
@@ -723,24 +726,8 @@ export default {
         iban: { required, iban },
       },
     },
-    newHelper: {
-      identity: { lastname: { required } },
-      local: {
-        email: { required, email },
-      },
-      contact: {
-        phone: { frPhoneNumber },
-      },
-    },
-    editedHelper: {
-      identity: { lastname: { required } },
-      local: {
-        email: { required, email },
-      },
-      contact: {
-        phone: { frPhoneNumber },
-      },
-    },
+    newHelper: pick(this.userValidation, ['identity.lastname', 'local.email', 'contact.phone']),
+    editedHelper: pick(this.userValidation, ['identity.lastname', 'local.email', 'contact.phone']),
     newSubscription: {
       service: { required },
       unitTTCRate: { required },
