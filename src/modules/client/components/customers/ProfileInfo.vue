@@ -699,80 +699,88 @@ export default {
       return '';
     },
   },
-  validations: {
-    customer: {
-      identity: {
-        lastname: { required },
-        title: { required },
-      },
-      contact: {
-        phone: { frPhoneNumber },
-        primaryAddress: {
-          zipCode: { required },
-          street: { required },
-          city: { required },
-          fullAddress: { required, frAddress },
+  validations () {
+    return {
+      customer: {
+        identity: {
+          lastname: { required },
+          title: { required },
         },
-        secondaryAddress: {
-          zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
-          street: { required: requiredIf(item => item && !!item.fullAddress) },
-          city: { required: requiredIf(item => item && !!item.fullAddress) },
-          fullAddress: { frAddress },
+        contact: {
+          phone: { frPhoneNumber },
+          primaryAddress: {
+            zipCode: { required },
+            street: { required },
+            city: { required },
+            fullAddress: { required, frAddress },
+          },
+          secondaryAddress: {
+            zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
+            street: { required: requiredIf(item => item && !!item.fullAddress) },
+            city: { required: requiredIf(item => item && !!item.fullAddress) },
+            fullAddress: { frAddress },
+          },
+        },
+        payment: {
+          bankAccountOwner: { required },
+          bic: { required, bic },
+          iban: { required, iban },
         },
       },
-      payment: {
-        bankAccountOwner: { required },
-        bic: { required, bic },
-        iban: { required, iban },
+      newHelper: {
+        ...pick(this.userValidation, ['identity.lastname', 'local.email']),
+        contact: { phone: { frPhoneNumber } },
       },
-    },
-    newHelper: pick(this.userValidation, ['identity.lastname', 'local.email', 'contact.phone']),
-    editedHelper: pick(this.userValidation, ['identity.lastname', 'local.email', 'contact.phone']),
-    newSubscription: {
-      service: { required },
-      unitTTCRate: { required },
-      estimatedWeeklyVolume: { required },
-    },
-    editedSubscription: {
-      unitTTCRate: { required },
-      estimatedWeeklyVolume: { required },
-    },
-    newFunding: {
-      thirdPartyPayer: { required },
-      subscription: { required },
-      nature: { required },
-      frequency: { required },
-      amountTTC: { required: requiredIf((item) => {
-        return item.nature === FIXED;
-      }) },
-      unitTTCRate: { required: requiredIf((item) => {
-        return item.nature === HOURLY;
-      }) },
-      careHours: { required: requiredIf((item) => {
-        return item.nature === HOURLY;
-      }) },
-      careDays: { required },
-      startDate: { required },
-      customerParticipationRate: { required: requiredIf((item) => {
-        return item.nature === HOURLY;
-      }) },
-    },
-    editedFunding: {
-      amountTTC: { required: requiredIf((item) => {
-        return item.nature === FIXED;
-      }) },
-      unitTTCRate: { required: requiredIf((item) => {
-        return item.nature === HOURLY;
-      }) },
-      careHours: { required: requiredIf((item) => {
-        return item.nature === HOURLY;
-      }) },
-      careDays: { required },
-      startDate: { required },
-      customerParticipationRate: { required: requiredIf((item) => {
-        return item.nature === HOURLY;
-      }) },
-    },
+      editedHelper: {
+        ...pick(this.userValidation, ['identity.lastname', 'local.email']),
+        contact: { phone: { frPhoneNumber } },
+      },
+      newSubscription: {
+        service: { required },
+        unitTTCRate: { required },
+        estimatedWeeklyVolume: { required },
+      },
+      editedSubscription: {
+        unitTTCRate: { required },
+        estimatedWeeklyVolume: { required },
+      },
+      newFunding: {
+        thirdPartyPayer: { required },
+        subscription: { required },
+        nature: { required },
+        frequency: { required },
+        amountTTC: { required: requiredIf((item) => {
+          return item.nature === FIXED;
+        }) },
+        unitTTCRate: { required: requiredIf((item) => {
+          return item.nature === HOURLY;
+        }) },
+        careHours: { required: requiredIf((item) => {
+          return item.nature === HOURLY;
+        }) },
+        careDays: { required },
+        startDate: { required },
+        customerParticipationRate: { required: requiredIf((item) => {
+          return item.nature === HOURLY;
+        }) },
+      },
+      editedFunding: {
+        amountTTC: { required: requiredIf((item) => {
+          return item.nature === FIXED;
+        }) },
+        unitTTCRate: { required: requiredIf((item) => {
+          return item.nature === HOURLY;
+        }) },
+        careHours: { required: requiredIf((item) => {
+          return item.nature === HOURLY;
+        }) },
+        careDays: { required },
+        startDate: { required },
+        customerParticipationRate: { required: requiredIf((item) => {
+          return item.nature === HOURLY;
+        }) },
+      },
+    };
   },
   async mounted () {
     await this.getUserHelpers();
