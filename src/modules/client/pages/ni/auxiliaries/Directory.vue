@@ -18,6 +18,7 @@
         <template v-else-if="col.name === 'tasksErrors'">
           <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
+          <span v-else />
         </template>
         <template v-else-if="col.name === 'active'">
           <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
