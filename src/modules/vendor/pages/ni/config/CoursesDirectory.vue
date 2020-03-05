@@ -3,8 +3,8 @@
     <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      :visible-columns="visibleColumns" @goTo="goToCousreProfile" />
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
+      :visible-columns="visibleColumns" @goTo="goToCourseProfile" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="courseCreationModal = true" />
 
     <!-- Course creation modal -->
@@ -15,7 +15,7 @@
       <ni-input in-modal v-model.trim="newCourse.name" :error="$v.newCourse.name.$error"
         @blur="$v.newCourse.name.$touch" required-field caption="Nom" />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="modalLoading"
+        <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
           icon-right="add" @click="createCourse" :disable="!this.newCourse.name" />
       </template>
     </ni-modal>
@@ -89,7 +89,7 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
-    goToCousreProfile (row) {
+    goToCourseProfile (row) {
       this.$router.push({ name: 'profile course info', params: { courseId: row._id } });
     },
     async refreshCourses () {
