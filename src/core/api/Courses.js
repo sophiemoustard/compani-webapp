@@ -8,4 +8,12 @@ export default {
   async create (payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses`, payload);
   },
+  async get (courseId) {
+    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
+    return course.data.data.course;
+  },
+  async update (courseId, payload) {
+    const course = await alenviAxios.put(`${process.env.API_HOSTNAME}/courses/${courseId}`, payload);
+    return course.data.data.course;
+  },
 };

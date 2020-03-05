@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      :visible-columns="visibleColumns" />
+      :visible-columns="visibleColumns" @goTo="goToCousreProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="courseCreationModal = true" />
 
@@ -88,6 +88,9 @@ export default {
   methods: {
     updateSearch (value) {
       this.searchStr = value;
+    },
+    goToCousreProfile (row) {
+      this.$router.push({ name: 'profile course info', params: { courseId: row._id } });
     },
     async refreshCourses () {
       try {
