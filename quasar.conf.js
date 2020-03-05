@@ -128,8 +128,9 @@ module.exports = function (ctx) {
       },
       env: {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-        API_HOSTNAME: JSON.stringify(process.env.API_HOSTNAME),
-        CYPRESS_API_HOSTNAME: JSON.stringify(process.env.CYPRESS_API_HOSTNAME),
+        API_HOSTNAME: process.env.NODE_ENV === 'test'
+          ? JSON.stringify(process.env.TEST_API_HOSTNAME)
+          : JSON.stringify(process.env.API_HOSTNAME),
         COMPANI_HOSTNAME: JSON.stringify(process.env.COMPANI_HOSTNAME),
         MESSENGER_LINK: JSON.stringify(process.env.MESSENGER_LINK),
         ENTERCODE_LINK: JSON.stringify(process.env.ENTERCODE_LINK),
