@@ -21,7 +21,7 @@
           <span v-else />
         </template>
         <template v-else-if="col.name === 'active'">
-          <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
+          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }"></div>
         </template>
         <template v-else>{{ col.value }}</template>
       </template>

@@ -141,7 +141,7 @@
                     @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" in-modal />
                 </template>
                 <template v-else-if="col.name === 'signed'">
-                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }]" />
                 </template>
                 <template v-else>{{ col.value}}</template>
               </q-td>
@@ -214,7 +214,7 @@
                     target="_blank" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
-                  <div :class="[{ activeDot: col.value, inactiveDot: !col.value }]" />
+                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }]" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -1230,7 +1230,7 @@ export default {
     td
       word-break: break-all
 
-  .inactiveDot
+  .dot-inactive
     background: $secondary
   .signedAt
     /deep/ .q-field--with-bottom

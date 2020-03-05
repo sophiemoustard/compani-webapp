@@ -3,13 +3,13 @@
     <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
       display-toggle @updateSearch="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
-      @goTo="goToCustomerProfile">
+      @goTo="goToCustomerProfile" :loading="tableLoading">
       <template v-slot:body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>
         </q-item>
         <template v-else-if="col.name === 'client'">
-          <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
+          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }"></div>
         </template>
         <template v-else-if="col.name === 'info'">
           <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
