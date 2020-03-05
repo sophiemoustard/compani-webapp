@@ -1,14 +1,14 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header :customer="true" :profileId="id" class="header" />
-      <profile-tabs :profileId="id" :tabsContent="tabsContent" />
+      <customer-profile-header :profileId="customerId" class="header" />
+      <profile-tabs :profileId="customerId" :tabsContent="tabsContent" />
     </div>
   </q-page>
 </template>
 
 <script>
-import ProfileHeader from 'src/modules/client/components/ProfileHeader';
+import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 import ProfileInfo from 'src/modules/client/components/customers/ProfileInfo';
@@ -16,14 +16,14 @@ import ProfileBilling from 'src/modules/client/components/customers/ProfileBilli
 
 export default {
   props: {
-    id: { type: String },
+    customerId: { type: String },
     defaultTab: { type: String, default: () => 'followUp' },
   },
   components: {
-    ProfileHeader,
+    CustomerProfileHeader,
     ProfileTabs,
   },
-  metaInfo: { title: 'Infos personnelles' },
+  metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
@@ -58,7 +58,7 @@ export default {
     }
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { customerId: this.id });
+    await this.$store.dispatch('rh/getUserProfile', { customerId: this.customerId });
   },
   watch: {
     async userProfile () {

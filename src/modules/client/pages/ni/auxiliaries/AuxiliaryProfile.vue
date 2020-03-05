@@ -1,15 +1,15 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
-      <profile-header :profile-id="id" class="header" />
-      <profile-tabs :profile-id="id" :tabsContent="tabsContent" />
+      <auxiliary-profile-header :profile-id="auxiliaryId" />
+      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" />
     </div>
   </q-page>
 </template>
 
 <script>
 
-import ProfileHeader from 'src/modules/client/components/ProfileHeader';
+import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
 import ProfileTasks from 'src/modules/client/components/auxiliary/ProfileTasks';
@@ -18,15 +18,15 @@ import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
 export default {
   props: {
-    id: { type: String },
+    auxiliaryId: { type: String },
     defaultTab: { type: String, default: 'info' },
   },
   components: {
-    ProfileHeader,
-    ProfileTabs,
+    'auxiliary-profile-header': AuxiliaryProfileHeader,
+    'profile-tabs': ProfileTabs,
   },
-  name: 'AuxiliaryInfo',
-  metaInfo: { title: 'Infos personnelles' },
+  name: 'AuxiliaryProfile',
+  metaInfo: { title: 'Fiche auxiliaire' },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
@@ -68,7 +68,7 @@ export default {
     }
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { userId: this.id });
+    await this.$store.dispatch('rh/getUserProfile', { userId: this.auxiliaryId });
   },
   watch: {
     async userProfile () {

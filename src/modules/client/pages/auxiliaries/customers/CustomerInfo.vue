@@ -22,7 +22,6 @@ export default {
     'profile-follow-up': ProfileFollowUp,
   },
   props: {
-    id: { type: String },
     customerId: { type: String },
   },
   metaInfo: { title: 'Fiche bénéficiaire' },

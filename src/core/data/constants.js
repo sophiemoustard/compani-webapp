@@ -137,6 +137,7 @@ export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 
 // ROLES VENDOR
 export const VENDOR_ADMIN = 'vendor_admin';
+export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
 export const TRAINER = 'trainer';
 
 // PLANNING

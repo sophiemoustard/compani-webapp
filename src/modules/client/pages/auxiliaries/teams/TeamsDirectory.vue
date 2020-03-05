@@ -2,19 +2,15 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire" @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
-      <template v-slot:body="{ props }">
-        <q-tr :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <q-item v-if="col.name === 'name'">
-              <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar" /></q-item-section>
-              <q-item-section>{{ col.value.name }}</q-item-section>
-            </q-item>
-            <template v-else>
-              <a v-if="col.value !== '-'" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
-              <div v-if="col.value === '-'">{{ col.value }}</div>
-            </template>
-          </q-td>
-        </q-tr>
+      <template v-slot:body="{ props, col }">
+        <q-item v-if="col.name === 'name'">
+          <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar" /></q-item-section>
+          <q-item-section>{{ col.value.name }}</q-item-section>
+        </q-item>
+        <template v-else>
+          <a v-if="col.value !== '-'" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
+          <div v-if="col.value === '-'">{{ col.value }}</div>
+        </template>
       </template>
     </ni-table-list>
   </q-page>

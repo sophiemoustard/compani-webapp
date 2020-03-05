@@ -220,9 +220,9 @@ const routes = [
         },
       },
       {
-        path: 'ni/auxiliaries/:id',
+        path: 'ni/auxiliaries/:auxiliaryId',
         name: 'personal info',
-        component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryInfo'),
+        component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -251,7 +251,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/customers/:id',
+        path: 'ni/customers/:customerId',
         name: 'customers profile',
         props: true,
         component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),

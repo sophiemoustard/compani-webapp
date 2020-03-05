@@ -1,18 +1,13 @@
-.activeDot
-  background: $accent
+.dot
   width: 9px
   height: 9px
   border-radius: 50%
   display: inline-block
-  margin: 0 3px
-
-.inactiveDot
-  background: $primary-dark
-  width: 9px
-  height: 9px
-  border-radius: 50%
-  display: inline-block
-  margin: 0 3px
+  margin: 0 20px 0 3px;
+  &-active
+    background: $accent
+  &-inactive
+    background: $primary-dark
 
 .balance-icon
   cursor: default !important
