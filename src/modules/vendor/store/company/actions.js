@@ -1,6 +1,6 @@
 import Company from '@api/Companies';
 
-export async function getCompany ({commit}, params) {
+export async function getCompany ({ commit }, params) {
   try {
     const company = await Company.getById(params.companyId);
     commit('saveCompany', company);
