@@ -1,15 +1,3 @@
-// ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
-//
-// For more comprehensive examples of custom
-// commands please read more here:
-// https://on.cypress.io/custom-commands
-// ***********************************************
-//
-//
-
 // these two commands let you persist local storage between tests
 const LOCAL_STORAGE_MEMORY = {}
 
@@ -44,9 +32,7 @@ Cypress.Commands.add('quasar', { prevSubject: 'element' }, (subject, mode, optio
       .invoke('show')
       .click({ force: true })
       .then(() => {
-        cy.get('.q-popover')
-          .contains(option)
-          .click()
+        cy.get('.q-popover').contains(option).click()
       })
   } else if (mode === 'grid') {
     cy.wrap(subject).within(() => {
@@ -57,9 +43,7 @@ Cypress.Commands.add('quasar', { prevSubject: 'element' }, (subject, mode, optio
       .forEach((x) => {
         cy.wrap(subject)
           .within(() => {
-            cy.get('input')
-              .first()
-              .type(`${option[x]}{enter}`)
+            cy.get('input').first().type(`${option[x]}{enter}`)
           })
       })
   } else {
@@ -70,14 +54,11 @@ Cypress.Commands.add('quasar', { prevSubject: 'element' }, (subject, mode, optio
           case 'date':
           case 'text':
           case 'email':
-            cy.get('input:first')
-              .type(option)
-              .should('have.value', option)
+            cy.get('input:first').type(option).should('have.value', option)
             break;
           case 'radio':
           case 'checkbox':
-            cy.contains(option)
-              .click()
+            cy.contains(option).click()
             break
           default:
             break
@@ -87,17 +68,3 @@ Cypress.Commands.add('quasar', { prevSubject: 'element' }, (subject, mode, optio
 })
 
 Cypress.Commands.overwrite('log', (subject, message) => cy.task('log', message));
-
-// Cypress.Commands.add('loadStore', () => {});
-//
-//
-// -- This is a child command --
-// Cypress.Commands.add("drag", { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add("dismiss", { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This is will overwrite an existing command --
-// Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
