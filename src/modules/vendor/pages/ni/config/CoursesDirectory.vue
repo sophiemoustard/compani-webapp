@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      :visible-columns="visibleColumns" @goTo="goToCourseProfile" />
+      @goTo="goToCourseProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="courseCreationModal = true" />
 
@@ -43,30 +43,12 @@ export default {
   data () {
     return {
       tableLoading: false,
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'name',
-          align: 'left',
-        },
-        {
-          name: 'createdAt',
-          label: '',
-          field: 'createdAt',
-        },
-      ],
-      visibleColumns: ['name'],
+      columns: [{ name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true }],
       courses: [],
       modalLoading: false,
       courseCreationModal: false,
       newCourse: { name: '' },
-      pagination: {
-        sortBy: 'createdAt',
-        descending: true,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
     }
   },
