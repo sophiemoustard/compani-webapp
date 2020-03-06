@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"
-      :pagination.sync="pagination" :visible-columns="visibleColumns" @goTo="goToCompanyProfile" />
+      :pagination.sync="pagination" @goTo="goToCompanyProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" />
 
@@ -55,24 +55,8 @@ export default {
       companies: [],
       tableLoading: false,
       visibleColumns: ['name'],
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
-        {
-          name: 'createdAt',
-          field: 'createdAt',
-        },
-      ],
-      pagination: {
-        sortBy: 'createdAt',
-        descending: true,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      columns: [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }],
+      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
       companyCreationModal: false,
       newCompany: {

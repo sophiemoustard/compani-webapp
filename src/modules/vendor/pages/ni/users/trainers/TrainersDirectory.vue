@@ -57,21 +57,8 @@ export default {
     return {
       trainers: [],
       tableLoading: false,
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'name',
-          align: 'left',
-          sortable: true,
-        },
-      ],
-      pagination: {
-        sortBy: 'name',
-        descending: false,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      columns: [{ name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true }],
+      pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
       searchStr: '',
       trainerCreationModal: false,
       newTrainer: { identity: { lastname: '', firstname: '' }, local: { email: '' }, status: INTERNAL },
