@@ -14,13 +14,15 @@
         <template v-else-if="col.name === 'profileErrors'">
           <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
+            <span v-else />
         </template>
         <template v-else-if="col.name === 'tasksErrors'">
           <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
+          <span v-else />
         </template>
         <template v-else-if="col.name === 'active'">
-          <div :class="{ activeDot: col.value, inactiveDot: !col.value }"></div>
+          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }"></div>
         </template>
         <template v-else>{{ col.value }}</template>
       </template>
@@ -68,7 +70,6 @@
 </template>
 
 <script>
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import randomize from 'randomatic';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
@@ -85,8 +86,8 @@ import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify.js';
-import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
+import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { taskValidation } from 'src/modules/client/helpers/taskValidation';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
@@ -103,7 +104,7 @@ export default {
     'ni-modal': Modal,
     'ni-table-list': TableList,
   },
-  mixins: [validationMixin],
+  mixins: [validationMixin, userMixin],
   data () {
     return {
       tableLoading: true,
@@ -207,28 +208,7 @@ export default {
       REQUIRED_LABEL,
     }
   },
-  validations: {
-    newUser: {
-      identity: {
-        lastname: { required },
-        firstname: { required },
-        title: { required },
-      },
-      contact: {
-        phone: { required, frPhoneNumber },
-        address: {
-          zipCode: { required: requiredIf(item => !!item.fullAddress) },
-          street: { required: requiredIf(item => !!item.fullAddress) },
-          city: { required: requiredIf(item => !!item.fullAddress) },
-          fullAddress: { frAddress },
-        },
-      },
-      local: {
-        email: { required, email },
-      },
-      sector: { required },
-    },
-  },
+  validations () { return { newUser: this.userValidation } },
   created () {
     this.newUser = cloneDeep(this.defaultNewUser);
   },
