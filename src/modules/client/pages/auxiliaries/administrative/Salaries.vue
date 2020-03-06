@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
-    <div v-if="currentUser">
+    <div v-if="loggedUser">
       <h4>Documents de paie</h4>
       <profile-pay/>
     </div>
@@ -18,8 +18,8 @@ export default {
   },
   metaInfo: { title: 'Documents de paie' },
   computed: {
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
 }

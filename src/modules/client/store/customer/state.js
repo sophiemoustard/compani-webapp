@@ -1,7 +1,6 @@
 export default {
-  userProfile: null,
+  customer: null,
   notifications: {
     profiles: {},
-    tasks: {},
   },
 };

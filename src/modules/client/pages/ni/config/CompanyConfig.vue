@@ -271,8 +271,8 @@ export default {
     };
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
   async mounted () {
@@ -281,8 +281,8 @@ export default {
   },
   methods: {
     async refreshCompany () {
-      await this.$store.dispatch('current/getUser', this.user._id);
-      this.company = this.user.company;
+      await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+      this.company = this.loggedUser.company;
       this.company.address = this.company.address || { fullAddress: '' };
       this.company.legalRepresentative =
         this.company.legalRepresentative || { lastname: '', firstname: '', position: '' };

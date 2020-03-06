@@ -30,11 +30,6 @@ export default {
   async mounted () {
     await this.getSectors();
   },
-  computed: {
-    currentUser () {
-      return this.$store.getters['current/user'];
-    },
-  },
   methods: {
     async getSectors () {
       try {

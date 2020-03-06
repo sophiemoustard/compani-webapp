@@ -176,9 +176,6 @@ export default {
     await this.refresh();
   },
   computed: {
-    currentUser () {
-      return this.$store.getters['current/user'];
-    },
     filteredCustomers () {
       const customers = this.onlyClients ? this.customers.filter(customer => customer.firstIntervention) : this.customers;
       return customers.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));

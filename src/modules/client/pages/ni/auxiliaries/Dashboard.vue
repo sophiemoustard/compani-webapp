@@ -145,7 +145,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentUser: 'current/user',
+      loggedUser: 'main/loggedUser',
       filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
@@ -178,7 +178,7 @@ export default {
     },
   },
   async mounted () {
-    await this.fillFilter({ currentUser: this.currentUser });
+    await this.fillFilter({ loggedUser: this.loggedUser });
     const firstIntervention = await Companies.getFirstIntervention();
     this.firstInterventionStartDate = get(firstIntervention, 'startDate', null) || '';
     this.initFilters();
@@ -191,8 +191,8 @@ export default {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
     initFilters () {
-      if (AUXILIARY_ROLES.includes(this.currentUser.role.client.name)) {
-        const userSector = this.filters.find(filter => filter._id === this.currentUser.sector);
+      if (AUXILIARY_ROLES.includes(this.loggedUser.role.client.name)) {
+        const userSector = this.filters.find(filter => filter._id === this.loggedUser.sector);
         if (userSector) this.$refs.teamAutocomplete.add(userSector.label);
       }
     },

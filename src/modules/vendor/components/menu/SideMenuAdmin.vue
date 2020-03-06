@@ -15,7 +15,7 @@
       <ni-menu-item name="courses directory" icon="date_range" label="Formations" />
     </q-expansion-item>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="user._id" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
   </q-list>
 </template>
 
@@ -39,8 +39,8 @@ export default {
     };
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
   mounted () {

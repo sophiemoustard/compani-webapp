@@ -5,7 +5,7 @@
         <div class="row items-center">
           <q-icon v-if="isExternalUser" class="q-mr-md cursor-pointer" size="1rem" name="arrow_back" color="primary"
             @click.native="$router.go(-1)" />
-          <h4>{{ user.identity.firstname }} {{ user.identity.lastname }}</h4>
+          <h4>{{ userProfile.identity.firstname }} {{ userProfile.identity.lastname }}</h4>
           <q-btn :disable="isPlanningRouterDisable" flat size="sm" color="primary" icon="date_range"
             @click="goToPlanning" />
         </div>
@@ -28,8 +28,8 @@
       <div class="q-pl-lg col-6 row">
         <div class="relative-position">
           <q-icon size="36px" name="phone_iphone" color="grey-2" />
-          <q-icon v-if="!user.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
-          <q-icon v-if="user.isConfirmed" class="chip-icon" name="check_circle" color="accent" size="16px" />
+          <q-icon v-if="!userProfile.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
+          <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="accent" size="16px" />
         </div>
         <div>
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
@@ -92,23 +92,23 @@ export default {
   },
   computed: {
     ...mapGetters({
-      currentUser: 'current/user',
-      user: 'rh/getUserProfile',
+      loggedUser: 'main/loggedUser',
+      userProfile: 'rh/getUserProfile',
     }),
     isPlanningRouterDisable () {
-      return !this.user.contracts || !this.user.contracts.length;
+      return !this.userProfile.contracts || !this.userProfile.contracts.length;
     },
     companyName () {
-      return get(this.currentUser, 'company.tradeName');
+      return get(this.loggedUser, 'company.tradeName');
     },
     userActivity () {
       return {
-        status: this.user.isActive ? 'Profil Actif' : 'Profil Inactif',
-        active: this.user.isActive,
+        status: this.userProfile.isActive ? 'Profil Actif' : 'Profil Inactif',
+        active: this.userProfile.isActive,
       }
     },
     userStartDate () {
-      if (this.user.createdAt) return this.$moment(this.user.createdAt).format('DD/MM/YY');
+      if (this.userProfile.createdAt) return this.$moment(this.userProfile.createdAt).format('DD/MM/YY');
       return 'N/A';
     },
     userRelativeStartDate () {
@@ -116,20 +116,11 @@ export default {
       return '';
     },
     isExternalUser () {
-      return this.user._id !== this.currentUser._id;
+      return this.userProfile._id !== this.loggedUser._id;
     },
     isAccountConfirmed () {
-      if (this.user.isConfirmed) {
-        return 'Accès WebApp activé'
-      }
+      if (this.userProfile.isConfirmed) return 'Accès WebApp activé';
       return 'Accès WebApp non activé'
-    },
-    msgSupportOptions () {
-      const options = [{ label: 'SMS', value: 'sms' }];
-      if (this.user.facebook && this.user.facebook.address) {
-        options.push({ label: 'Pigi', value: 'pigi' });
-      }
-      return options
     },
     activationCode () {
       return this.typeMessage === 'CA' ? randomize('0000') : '';
@@ -137,9 +128,9 @@ export default {
     messageComp: {
       get () {
         if (this.typeMessage === 'PM') {
-          return `Bonjour ${this.user.identity.firstname},\nIl manque encore des informations et documents importants pour ` +
+          return `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et documents importants pour ` +
           'compléter ton dossier.\nClique ici pour compléter ton profil: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.user._id}\nSi tu ` +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}\nSi tu ` +
           'rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
         } else if (this.typeMessage === 'CA') {
           return `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
@@ -153,18 +144,18 @@ export default {
       },
     },
     hasPicture () {
-      return get(this.user, 'picture.link') || DEFAULT_AVATAR;
+      return get(this.userProfile, 'picture.link') || DEFAULT_AVATAR;
     },
   },
   methods: {
     goToPlanning () {
-      if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.user } });
-      else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.user } });
+      if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.userProfile } });
+      else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.userProfile } });
     },
     async sendMessage () {
       this.loading = true;
       if (this.typeMessage === 'CA') {
-        await ActivationCode.create({ code: this.activationCode, user: this.user._id });
+        await ActivationCode.create({ code: this.activationCode, userProfile: this.userProfile._id });
       }
       await this.sendSMS();
       this.loading = false;
@@ -174,7 +165,7 @@ export default {
       try {
         if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
         await Twilio.sendSMS({
-          to: `+33${this.user.contact.phone.substring(1)}`,
+          to: `+33${this.userProfile.contact.phone.substring(1)}`,
           body: this.messageComp,
         });
         NotifyPositive('SMS bien envoyé');

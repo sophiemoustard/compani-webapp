@@ -16,7 +16,7 @@
       <ni-menu-item class="customer-menu-size" name="customer contracts" icon="description" label="Contrats" />
       <q-separator />
     </template>
-    <ni-side-menu-footer :label="user.identity.lastname" :userId="user._id" />
+    <ni-side-menu-footer :label="loggedUser.identity.lastname" :userId="loggedUser._id" />
   </q-list>
 </template>
 
@@ -42,11 +42,11 @@ export default {
   },
   computed: {
     hasContracts () {
-      return this.user && this.user.customers && this.user.customers.length > 0 && this.user.customers[0].contracts &&
-        this.user.customers[0].contracts.length > 0;
+      return this.loggedUser && this.loggedUser.customers && this.loggedUser.customers.length > 0 && this.loggedUser.customers[0].contracts &&
+        this.loggedUser.customers[0].contracts.length > 0;
     },
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
   mounted () {

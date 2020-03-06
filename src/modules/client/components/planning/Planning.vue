@@ -169,15 +169,15 @@ export default {
     this.getTimelineHours();
   },
   computed: {
-    ...mapGetters({ currentUser: 'current/user' }),
-    currentUserRole () {
-      return this.currentUser.role.client.name;
+    ...mapGetters({ loggedUser: 'main/loggedUser' }),
+    loggedUserRole () {
+      return this.loggedUser.role.client.name;
     },
     isCoach () {
-      return COACH_ROLES.includes(this.currentUserRole);
+      return COACH_ROLES.includes(this.loggedUserRole);
     },
     isPlanningReferent () {
-      return this.currentUserRole === PLANNING_REFERENT;
+      return this.loggedUserRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.persons } : groupBy(this.persons, 'sector._id');
@@ -284,10 +284,10 @@ export default {
     createEvent (eventInfo) {
       let isAllowed = true;
       if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
-        isAllowed = can({ user: this.$store.getters['current/user'], permissions: [{ name: 'events:edit' }] });
+        isAllowed = can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
       } else if (this.personKey === 'auxiliary') {
         isAllowed = can({
-          user: this.$store.getters['current/user'],
+          user: this.loggedUser,
           auxiliaryIdEvent: eventInfo.person._id,
           permissions: [
             { name: 'events:edit' },

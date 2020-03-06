@@ -28,11 +28,11 @@ export default {
     label: String,
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     userRole () {
-      return this.user.role.client.name;
+      return this.loggedUser.role.client.name;
     },
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(this.userRole);

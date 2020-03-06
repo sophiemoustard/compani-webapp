@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="neutral-background">
-    <div v-if="userProfile">
+    <div v-if="customer">
       <customer-profile-header :profileId="customerId" class="header" />
-      <profile-tabs :profileId="customerId" :tabsContent="tabsContent" />
+      <profile-tabs :profileId="customerId" :tabsContent="tabsContent" type="customer" />
     </div>
   </q-page>
 </template>
@@ -25,11 +25,8 @@ export default {
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
-    userProfile () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
-    currentUser () {
-      return this.$store.getters['current/user'];
+    customer () {
+      return this.$store.getters['customer/getCustomer'];
     },
   },
   data () {
@@ -58,15 +55,15 @@ export default {
     }
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { customerId: this.customerId });
+    await this.$store.dispatch('customer/getCustomer', { customerId: this.customerId });
   },
   watch: {
-    async userProfile () {
-      await this.$store.dispatch('rh/updateNotifications', 'customer');
+    async customer () {
+      await this.$store.dispatch('customer/updateNotifications');
     },
   },
   beforeDestroy () {
-    this.$store.commit('rh/saveUserProfile', null);
+    this.$store.commit('customer/saveCustomer', null);
   },
 }
 </script>

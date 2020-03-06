@@ -89,8 +89,8 @@ export const helperMixin = {
         return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
       }
     },
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
   methods: {
@@ -98,7 +98,7 @@ export const helperMixin = {
     async getUserHelpers () {
       try {
         const params = { customers: this.userProfile._id };
-        if (has(this.currentUser, 'company._id')) params.company = this.currentUser.company._id;
+        if (has(this.loggedUser, 'company._id')) params.company = this.loggedUser.company._id;
         this.helpers = await Users.list(params);
       } catch (e) {
         this.helpers = [];

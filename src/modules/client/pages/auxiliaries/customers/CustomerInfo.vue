@@ -27,17 +27,17 @@ export default {
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
     customer () {
-      return this.$store.getters['rh/getUserProfile'];
+      return this.$store.getters['customer/getCustomer'];
     },
   },
   async mounted () {
-    await this.$store.dispatch('rh/getUserProfile', { customerId: this.customerId });
+    await this.$store.dispatch('customer/getCustomer', { customerId: this.customerId });
   },
   filters: {
     formatIdentity,
   },
   beforeDestroy () {
-    this.$store.commit('rh/saveUserProfile', null);
+    this.$store.commit('customer/saveCustomer', null);
   },
 }
 </script>

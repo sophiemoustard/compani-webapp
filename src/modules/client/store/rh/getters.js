@@ -10,10 +10,6 @@ export function getNotificationsProfiles (state) {
   return state.notifications.profiles;
 }
 
-export function getNotificationsContracts (state) {
-  return state.notifications.contracts;
-}
-
 export function getNotificationsTasks (state) {
   return state.notifications.tasks;
 }

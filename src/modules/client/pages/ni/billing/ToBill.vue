@@ -149,8 +149,8 @@ export default {
     }
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     hasSelectedRows () {
       return this.selected.length > 0;
@@ -218,7 +218,7 @@ export default {
         const params = {
           endDate: this.$moment(this.billingDates.endDate).endOf('d').toISOString(),
           billingStartDate: this.$moment(this.billingDates.startDate).startOf('d').toISOString(),
-          billingPeriod: this.user.company.customersConfig.billingPeriod,
+          billingPeriod: this.loggedUser.company.customersConfig.billingPeriod,
         }
 
         const draftBills = await Bills.getDraftBills(params);
@@ -284,7 +284,7 @@ export default {
           billingStartDate: startDate,
           startDate: this.$moment(startDate).startOf('d').toISOString(),
           endDate: this.$moment(endDate).endOf('d').toISOString(),
-          billingPeriod: this.user.company.customersConfig.billingPeriod,
+          billingPeriod: this.loggedUser.company.customersConfig.billingPeriod,
           customer: customer._id,
         });
         this.draftBills.splice(index, 1, ...draftBills);

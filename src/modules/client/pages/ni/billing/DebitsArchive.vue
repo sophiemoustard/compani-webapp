@@ -65,8 +65,8 @@ export default {
     }
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
   async mounted () {
@@ -78,8 +78,10 @@ export default {
     },
     async getDirectDebits () {
       try {
-        if (!this.user.company || !this.user.company.directDebitsFolderId) return NotifyNegative('Dossier de prélèvement manquant');
-        this.directDebits = await GoogleDrive.getList({ folderId: this.user.company.directDebitsFolderId });
+        if (!this.loggedUser.company || !this.loggedUser.company.directDebitsFolderId) {
+          return NotifyNegative('Dossier de prélèvement manquant');
+        }
+        this.directDebits = await GoogleDrive.getList({ folderId: this.loggedUser.company.directDebitsFolderId });
       } catch (e) {
         this.directDebits = [];
         console.error(e);

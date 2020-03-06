@@ -216,11 +216,11 @@ export default {
     this.getUserList();
   },
   computed: {
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     company () {
-      return this.$store.getters['current/company'];
+      return get(this.loggedUser, 'company');
     },
     activeUserList () {
       if (this.activeUsers) {
@@ -300,7 +300,7 @@ export default {
     },
     async getUserList () {
       try {
-        const users = await Users.list({ role: AUXILIARY_ROLES, company: this.currentUser.company._id });
+        const users = await Users.list({ role: AUXILIARY_ROLES, company: this.loggedUser.company._id });
         this.userList = users.map(this.formatUser);
       } catch (e) {
         console.error(e);

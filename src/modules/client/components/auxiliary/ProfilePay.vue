@@ -110,22 +110,22 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ currentUser: 'current/user' }),
+    ...mapGetters({ loggedUser: 'main/loggedUser' }),
     documentNatureLabels () {
       const payDocumentNaturesKeyedByValue = keyBy(PAY_DOCUMENT_NATURES, 'value');
 
       return mapValues(payDocumentNaturesKeyedByValue, 'label');
     },
-    currentUserRole () {
-      return this.currentUser.role.client.name;
+    loggedUserRole () {
+      return this.loggedUser.role.client.name;
     },
     userProfile () {
-      if (AUXILIARY_ROLES.includes(this.currentUserRole)) return this.currentUser;
-      if (COACH_ROLES.includes(this.currentUserRole)) return this.$store.getters['rh/getUserProfile'];
+      if (AUXILIARY_ROLES.includes(this.loggedUserRole)) return this.loggedUser;
+      if (COACH_ROLES.includes(this.loggedUserRole)) return this.$store.getters['rh/getUserProfile'];
       return {};
     },
     isCoach () {
-      return COACH_ROLES.includes(this.currentUserRole);
+      return COACH_ROLES.includes(this.loggedUserRole);
     },
     driveFolder () {
       return get(this.userProfile, 'administrative.driveFolder.driveId');

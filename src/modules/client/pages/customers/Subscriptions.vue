@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
-    <template v-if="Object.keys(customer).length > 0">
+    <template v-if="customer">
       <div class="q-mb-lg">
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
@@ -163,13 +163,6 @@ export default {
       cgsModal: false,
       showCgs: false,
       agreed: false,
-      customer: {
-        payment: { mandates: [] },
-        subscriptions: [],
-        quotes: [],
-        financialCertificates: [],
-        identity: {},
-      },
       tmpInput: null,
       newESignModal: false,
       embeddedUrl: '',
@@ -221,7 +214,10 @@ export default {
   },
   computed: {
     helper () {
-      return this.$store.getters['current/user'];
+      return this.$store.getters['main/loggedUser'];
+    },
+    customer () {
+      return this.$store.getters['customer/getCustomer'];
     },
     ibanError () {
       if (!this.$v.customer.payment.iban.required) {
@@ -265,7 +261,7 @@ export default {
     },
   },
   async mounted () {
-    await this.refreshCustomer();
+    if (!this.customer) await this.refreshCustomer();
     await this.checkMandates();
   },
   methods: {
@@ -274,15 +270,13 @@ export default {
     },
     async refreshCustomer () {
       try {
-        this.customer = await Customers.getById(this.helper.customers[0]._id);
+        const customer = await Customers.getById(this.helper.customers[0]._id);
+        this.$store.commit('customer/saveCustomer', customer);
         this.refreshSubscriptions();
         this.refreshFundings();
-
-        this.$store.commit('rh/saveUserProfile', this.customer);
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
-        this.customer = {};
       }
     },
     saveTmp (path) {
@@ -300,7 +294,7 @@ export default {
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
         await Customers.updateById(this.customer._id, set({}, path, value));
-        await this.$store.dispatch('current/getUser', this.helper._id);
+        await this.$store.dispatch('main/getLoggedUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
 

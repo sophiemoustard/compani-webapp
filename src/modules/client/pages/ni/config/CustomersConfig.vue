@@ -745,8 +745,8 @@ export default {
     },
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
@@ -828,8 +828,8 @@ export default {
       }
     },
     async refreshCompany () {
-      await this.$store.dispatch('current/getUser', this.user._id);
-      this.company = this.user.company;
+      await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+      this.company = this.loggedUser.company;
       this.documents = this.company.customersConfig.templates || {};
       this.company.address = this.company.address || { fullAddress: '' };
     },

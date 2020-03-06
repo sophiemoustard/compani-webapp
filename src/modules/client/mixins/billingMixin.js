@@ -3,7 +3,7 @@ import { MONTH } from '@data/constants';
 export const billingMixin = {
   methods: {
     setBillingDates () {
-      const billingPeriod = this.user.company.customersConfig.billingPeriod;
+      const billingPeriod = this.loggedUser.company.customersConfig.billingPeriod;
       if (billingPeriod === MONTH) {
         this.billingDates = {
           endDate: this.$moment().subtract(1, 'M').endOf('month').toISOString(),

@@ -5,8 +5,8 @@ export const layoutMixin = {
     };
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     menuIcon () {
       return this.isMini ? 'view_headline' : 'chevron_left';

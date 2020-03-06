@@ -167,8 +167,8 @@ export default {
     activeAuxiliaries () {
       return [this.selectedAuxiliary];
     },
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
   },
   methods: {

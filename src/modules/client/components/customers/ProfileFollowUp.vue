@@ -194,13 +194,13 @@ export default {
       return this.getAuxiliaryAvatar(auxiliaryPicture);
     },
     userProfile () {
-      return this.$store.getters['rh/getUserProfile'];
+      return this.$store.getters['customer/getCustomer'];
     },
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.currentUser.role.client.name);
+      return AUXILIARY_ROLES.includes(this.loggedUser.role.client.name);
     },
     hasSecondaryAddress () {
       return !!get(this.customer, 'contact.secondaryAddress.fullAddress');
@@ -246,7 +246,7 @@ export default {
         this.loading = true;
         const activeAuxiliaries = await Users.listActive({
           role: [AUXILIARY, PLANNING_REFERENT],
-          company: this.currentUser.company._id,
+          company: this.loggedUser.company._id,
         });
         this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
         this.loading = false;
@@ -274,10 +274,9 @@ export default {
     },
     async refreshCustomer () {
       try {
-        if (get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
         const customer = await Customers.getById(this.userProfile._id);
         this.mergeCustomer(customer);
-        this.$store.commit('rh/saveUserProfile', this.customer);
+        this.$store.commit('customer/saveCustomer', this.customer);
         this.isLoaded = true;
         this.$v.customer.$touch();
       } catch (e) {
@@ -286,6 +285,7 @@ export default {
       }
     },
     mergeCustomer (value = null) {
+      if (get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
       const args = [this.customer, value];
       this.customer = Object.assign({}, extend(true, ...args));
     },

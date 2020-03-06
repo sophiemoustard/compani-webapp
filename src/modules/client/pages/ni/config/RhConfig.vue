@@ -328,8 +328,8 @@ export default {
     }
   },
   computed: {
-    user () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
@@ -356,7 +356,7 @@ export default {
     }
   },
   async mounted () {
-    this.company = cloneDeep(this.user.company);
+    this.company = cloneDeep(this.loggedUser.company);
     if (!this.company.rhConfig.templates) this.company.rhConfig.templates = {};
 
     await this.refreshInternalHours();
@@ -394,8 +394,8 @@ export default {
       else if (!get(this.$v.company.rhConfig, path).numeric) return 'Nombre non valide';
     },
     async refreshCompany () {
-      await this.$store.dispatch('current/getUser', this.user._id);
-      this.company = this.user.company;
+      await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+      this.company = this.loggedUser.company;
     },
     // Internal hours
     resetInternalHourCreationModal () {
@@ -424,7 +424,7 @@ export default {
         if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
         const payload = pickBy(this.newInternalHour);
         await InternalHours.create(payload);
-        await this.$store.dispatch('current/getUser', this.user._id);
+        await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
 
         NotifyPositive('Heure interne créée');
         this.newInternalHourModal = false;
@@ -440,7 +440,7 @@ export default {
       try {
         const index = this.getRowIndex(this.internalHours, row);
         await InternalHours.remove(internalHourId);
-        await this.$store.dispatch('current/getUser', this.user._id);
+        await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
         this.internalHours.splice(index, 1);
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
@@ -466,7 +466,7 @@ export default {
 
         await InternalHours.update(internalHourId, { default: true });
         await this.refreshInternalHours();
-        await this.$store.dispatch('current/getUser', this.user._id);
+        await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
         NotifyPositive('Heures internes mises à jour')
       } catch (e) {
         console.error(e);

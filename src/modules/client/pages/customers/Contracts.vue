@@ -28,7 +28,7 @@ export default {
   },
   computed: {
     customer () {
-      const helper = this.$store.getters['current/user'];
+      const helper = this.$store.getters['main/loggedUser'];
       return helper && helper.customers && helper.customers.length > 0 ? helper.customers[0] : {};
     },
   },

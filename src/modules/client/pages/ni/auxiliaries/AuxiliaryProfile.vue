@@ -2,13 +2,12 @@
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
       <auxiliary-profile-header :profile-id="auxiliaryId" />
-      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" />
+      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" type="auxiliary" />
     </div>
   </q-page>
 </template>
 
 <script>
-
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
@@ -30,9 +29,6 @@ export default {
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
-    },
-    currentUser () {
-      return this.$store.getters['current/user'];
     },
   },
   data () {
@@ -72,7 +68,7 @@ export default {
   },
   watch: {
     async userProfile () {
-      await this.$store.dispatch('rh/updateNotifications', 'user');
+      await this.$store.dispatch('rh/updateNotifications');
     },
   },
   beforeDestroy () {

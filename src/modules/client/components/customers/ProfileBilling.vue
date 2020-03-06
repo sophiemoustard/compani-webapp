@@ -186,13 +186,13 @@ export default {
   },
   computed: {
     customer () {
-      return this.$store.getters['rh/getUserProfile'];
+      return this.$store.getters['customer/getCustomer'];
     },
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);
     },
-    currentUser () {
-      return this.$store.getters['current/user'];
+    loggedUser () {
+      return this.$store.getters['main/loggedUser'];
     },
     documentQuery () {
       return {
@@ -202,7 +202,7 @@ export default {
       };
     },
     userRole () {
-      return this.currentUser.role.client.name;
+      return this.loggedUser.role.client.name;
     },
     isHelper () {
       return HELPER === this.userRole;
