@@ -202,7 +202,7 @@ export default {
       });
     },
     goToUserContractPage (user) {
-      this.$router.push({ name: 'personal info', params: { id: user._id, defaultTab: 'contracts' } });
+      this.$router.push({ name: 'personal info', params: { auxiliaryId: user._id, defaultTab: 'contracts' } });
     },
   },
 }
