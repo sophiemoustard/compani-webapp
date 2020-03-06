@@ -30,7 +30,7 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompaniesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          role: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'users',
         },
       },

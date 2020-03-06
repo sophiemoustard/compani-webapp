@@ -220,19 +220,13 @@ export default {
       return this.$store.getters['customer/getCustomer'];
     },
     ibanError () {
-      if (!this.$v.customer.payment.iban.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.customer.payment.iban.iban) {
-        return 'IBAN non valide';
-      }
+      if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
+      else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
       return '';
     },
     bicError () {
-      if (!this.$v.customer.payment.bic.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.customer.payment.bic.bic) {
-        return 'BIC non valide';
-      }
+      if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
+      else if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
       return '';
     },
     agreement () {
