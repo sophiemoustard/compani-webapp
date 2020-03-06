@@ -25,7 +25,6 @@ const routes = [
         if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
         const loggedUser = store.getters['main/loggedUser'];
-        console.warn(loggedUser)
         if (!loggedUser) return next({ path: '/login' });
         if (!get(loggedUser, 'role.client')) return next({ name: '404' });
 
