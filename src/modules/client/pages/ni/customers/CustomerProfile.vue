@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="neutral-background">
     <div v-if="customer">
-      <customer-profile-header :profileId="customerId" class="header" />
-      <profile-tabs :profileId="customerId" :tabsContent="tabsContent" type="customer" />
+      <customer-profile-header :profile-id="customerId" class="header" />
+      <profile-tabs :profile-id="customerId" :tabsContent="tabsContent" type="customer" />
     </div>
   </q-page>
 </template>
