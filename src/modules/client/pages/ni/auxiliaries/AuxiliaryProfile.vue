@@ -2,7 +2,7 @@
   <q-page padding class="neutral-background">
     <div v-if="userProfile">
       <auxiliary-profile-header :profile-id="auxiliaryId" />
-      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" tyep="auxiliary" />
+      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" type="auxiliary" />
     </div>
   </q-page>
 </template>

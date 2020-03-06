@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
-    <div v-if="userProfile">
+    <div v-if="customer">
       <customer-profile-header :profileId="customerId" class="header" />
       <profile-tabs :profileId="customerId" :tabsContent="tabsContent" type="customer" />
     </div>
@@ -25,7 +25,7 @@ export default {
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
-    userProfile () {
+    customer () {
       return this.$store.getters['customer/getCustomer'];
     },
   },
@@ -58,7 +58,7 @@ export default {
     await this.$store.dispatch('customer/getCustomer', { customerId: this.customerId });
   },
   watch: {
-    async userProfile () {
+    async customer () {
       await this.$store.dispatch('customer/updateNotifications');
     },
   },
