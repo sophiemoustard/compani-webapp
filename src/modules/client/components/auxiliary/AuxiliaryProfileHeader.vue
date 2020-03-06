@@ -119,17 +119,8 @@ export default {
       return this.userProfile._id !== this.loggedUser._id;
     },
     isAccountConfirmed () {
-      if (this.userProfile.isConfirmed) {
-        return 'Accès WebApp activé'
-      }
+      if (this.userProfile.isConfirmed) return 'Accès WebApp activé';
       return 'Accès WebApp non activé'
-    },
-    msgSupportOptions () {
-      const options = [{ label: 'SMS', value: 'sms' }];
-      if (this.userProfile.facebook && this.userProfile.facebook.address) {
-        options.push({ label: 'Pigi', value: 'pigi' });
-      }
-      return options
     },
     activationCode () {
       return this.typeMessage === 'CA' ? randomize('0000') : '';
