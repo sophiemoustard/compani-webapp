@@ -27,16 +27,14 @@ export default {
   },
   validations () {
     return {
-      course: {
-        name: { required },
-      },
+      course: { name: { required } },
     }
   },
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
   },
   async mounted () {
-    await this.refreshCourse();
+    if (!this.course) await this.refreshCourse();
   },
   methods: {
     saveTmp (path) {
