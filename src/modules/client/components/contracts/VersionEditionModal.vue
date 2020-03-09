@@ -32,7 +32,7 @@ export default {
     minStartDate: { type: String, default: '' },
     versionTemplate: { type: String, default: '' },
     isVersionUpdated: { type: Boolean, default: false },
-    loading: {type: Boolean, default: false},
+    loading: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,

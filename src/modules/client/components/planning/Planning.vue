@@ -207,7 +207,7 @@ export default {
       return this.filteredSectors.find(s => s._id === sectorId);
     },
     restoreFilter (terms) {
-      for (let term of terms) {
+      for (const term of terms) {
         setTimeout(() => this.$refs.refFilter.add(term), 100);
       }
     },
@@ -216,7 +216,7 @@ export default {
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
     },
     updatePlanningHeaderHeight () {
-      setTimeout(() => { this.planningHeaderHeight = this.$refs['planningHeader'].clientHeight; }, 100);
+      setTimeout(() => { this.planningHeaderHeight = this.$refs.planningHeader.clientHeight; }, 100);
     },
     // Table
     updateTimeline () {

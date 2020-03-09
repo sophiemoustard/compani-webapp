@@ -201,7 +201,7 @@ export const planningActionMixin = {
       return payload;
     },
     getCreationPayload (event) {
-      let payload = this.getPayload(event);
+      const payload = this.getPayload(event);
 
       if (event.address && !event.address.fullAddress) delete payload.address;
       if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
@@ -334,7 +334,7 @@ export const planningActionMixin = {
       const dates = { startDate, endDate };
 
       switch (event.type) {
-        case INTERVENTION:
+        case INTERVENTION: {
           const subscription = event.subscription._id;
           this.editedEvent = {
             isCancelled: false,
@@ -350,6 +350,7 @@ export const planningActionMixin = {
             address,
           };
           break;
+        }
         case INTERNAL_HOUR:
           this.editedEvent = {
             address: address || {},
@@ -361,13 +362,7 @@ export const planningActionMixin = {
           };
           break;
         case ABSENCE:
-          this.editedEvent = {
-            address: {},
-            attachment: {},
-            ...eventData,
-            auxiliary: auxiliary._id,
-            dates,
-          };
+          this.editedEvent = { address: {}, attachment: {}, ...eventData, auxiliary: auxiliary._id, dates };
           break;
         case UNAVAILABILITY:
           this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, dates };
@@ -399,7 +394,7 @@ export const planningActionMixin = {
       this.editionModal = false;
     },
     getEditionPayload (event) {
-      let payload = this.getPayload(event);
+      const payload = this.getPayload(event);
 
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;

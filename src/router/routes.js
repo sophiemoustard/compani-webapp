@@ -7,7 +7,7 @@ const routes = [
     name: 'login',
     component: () => import('src/core/pages/signin/Authenticate'),
     beforeEnter: (to, from, next) => {
-      if (Cookies.get('refresh_token')) return next({path: '/'});
+      if (Cookies.get('refresh_token')) return next({ path: '/' });
       return next();
     },
   },
@@ -15,7 +15,7 @@ const routes = [
     path: '/enterCode',
     component: () => import('src/core/pages/signup/EnterCode'),
     beforeEnter: (to, from, next) => {
-      if (Cookies.get('refresh_token')) return next({path: '/'});
+      if (Cookies.get('refresh_token')) return next({ path: '/' });
       return next();
     },
   },

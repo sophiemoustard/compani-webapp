@@ -317,6 +317,7 @@
 import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
+import pick from 'lodash/pick';
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
@@ -897,21 +898,22 @@ export default {
     },
     openSurchargeEditionModal (id) {
       const selectedSurcharge = this.surcharges.find(surcharge => surcharge._id === id);
-      const { _id, name, saturday, sunday, publicHoliday, twentyFifthOfDecember, firstOfMay,
-        evening, eveningStartTime, eveningEndTime, custom, customStartTime, customEndTime,
-      } = selectedSurcharge;
+      const { eveningStartTime, eveningEndTime, customStartTime, customEndTime } = selectedSurcharge;
+      const pickedFileds = [
+        '_id',
+        'name',
+        'saturday',
+        'sunday',
+        'publicHoliday',
+        'twentyFifthOfDecember',
+        'firstOfMay',
+        'evening',
+        'custom',
+      ];
       this.editedSurcharge = {
-        _id,
-        name,
-        saturday,
-        sunday,
-        publicHoliday,
-        twentyFifthOfDecember,
-        firstOfMay,
-        evening,
+        ...pick(selectedSurcharge, pickedFileds),
         eveningStartTime: eveningStartTime ? this.$moment(eveningStartTime).format('HH:mm') : '',
         eveningEndTime: eveningEndTime ? this.$moment(eveningEndTime).format('HH:mm') : '',
-        custom,
         customStartTime: customStartTime ? this.$moment(customStartTime).format('HH:mm') : '',
         customEndTime: customEndTime ? this.$moment(customEndTime).format('HH:mm') : '',
       };

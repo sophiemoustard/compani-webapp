@@ -749,36 +749,20 @@ export default {
         subscription: { required },
         nature: { required },
         frequency: { required },
-        amountTTC: { required: requiredIf((item) => {
-          return item.nature === FIXED;
-        }) },
-        unitTTCRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
-        careHours: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
+        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY }) },
+        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
       },
       editedFunding: {
-        amountTTC: { required: requiredIf((item) => {
-          return item.nature === FIXED;
-        }) },
-        unitTTCRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
-        careHours: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
+        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
       },
     };
   },
@@ -1011,7 +995,7 @@ export default {
         }
 
         const subscriptions = this.subscriptions.map(subscription => {
-          let estimatedWeeklyRate = this.computeWeeklyRate(subscription);
+          const estimatedWeeklyRate = this.computeWeeklyRate(subscription);
           const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
 
           return {
@@ -1124,7 +1108,7 @@ export default {
         thirdPartyPayer,
         subscription,
         frequency,
-        versions: [{...version}],
+        versions: [{ ...version }],
       };
     },
     async submitFunding () {

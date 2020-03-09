@@ -55,7 +55,7 @@ export default {
   name: 'AuxiliaryAgenda',
   metaInfo: { title: 'Agenda' },
   components: {
-    'agenda': Agenda,
+    agenda: Agenda,
     'planning-navigation': PlanningNavigation,
     'ni-event-creation-modal': EventCreationModal,
     'ni-event-edition-modal': EventEditionModal,

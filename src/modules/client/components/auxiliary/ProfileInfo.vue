@@ -341,7 +341,7 @@ export default {
       isLoaded: false,
       tmpInput: '',
       identityType: '',
-      pictureGroup: [ 'user.picture.link' ],
+      pictureGroup: ['user.picture.link'],
       identityGroup: [
         'user.identity.firstname',
         'user.identity.lastname',
@@ -704,8 +704,8 @@ export default {
           await cloudinary.deleteImageById({ id: this.mergedUserProfile.picture.publicId });
         }
         this.loadingImage = true;
-        let blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
-        let data = new FormData();
+        const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
+        const data = new FormData();
         data.append('_id', this.mergedUserProfile._id);
         data.append('role', this.mergedUserProfile.role.client.name);
         data.append('fileName', `photo_${this.mergedUserProfile.identity.firstname}_${this.mergedUserProfile.identity.lastname}`);
@@ -727,7 +727,7 @@ export default {
         await gdrive.removeFileById({ id: driveId });
         let payload;
         if (path === 'certificates') {
-          payload = { 'certificates': { driveId } };
+          payload = { certificates: { driveId } };
           await Users.updateCertificates(this.mergedUserProfile._id, payload);
         } else {
           payload = set({}, path, { driveId: null, link: null });

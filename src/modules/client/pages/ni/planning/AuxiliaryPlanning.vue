@@ -192,7 +192,7 @@ export default {
     },
     async refresh () {
       try {
-        let params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
+        const params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
 
         if (!this.displayAllSectors) {
           this.updateAuxiliariesList();
