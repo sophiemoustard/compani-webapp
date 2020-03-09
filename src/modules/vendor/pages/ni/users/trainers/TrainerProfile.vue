@@ -1,11 +1,14 @@
 <template>
   <q-page padding class="neutral-background">
-    <ni-profile-header :title="userIdentity" />
-    <profile-tabs :profile-id="trainerId" :tabsContent="tabsContent" />
+    <div v-if="userProfile">
+      <ni-profile-header :title="userIdentity" />
+      <profile-tabs :profile-id="trainerId" :tabsContent="tabsContent" />
+    </div>
   </q-page>
 </template>
 
 <script>
+import get from 'lodash/get';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
@@ -13,7 +16,7 @@ import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'TrainerProfile',
-  metadata: { title: 'Fiche formation' },
+  metaInfo: { title: 'Fiche formateurs' },
   props: {
     trainerId: { type: String },
     defaultTab: { type: String, default: 'info' },
@@ -24,37 +27,26 @@ export default {
   },
   data () {
     return {
-      trainer: {},
       tabsContent: [
         {
           label: 'Infos personnelles',
           name: 'info',
           default: this.defaultTab === 'info',
           component: ProfileInfo,
+          notification: 'profiles',
         },
       ],
     }
   },
   async mounted () {
-    await this.refreshTrainer();
+    await this.$store.dispatch('rh/getUserProfile', { userId: this.trainerId });
   },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
     userIdentity () {
-      if (this.userProfile) return formatIdentity(this.userProfile.identity, 'FL');
-      return '';
-    },
-  },
-  methods: {
-    async refreshTrainer () {
-      try {
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.trainerId });
-      } catch (e) {
-        console.error(e);
-        this.trainer = {};
-      }
+      return formatIdentity(get(this, 'userProfile.identity'), 'FL');
     },
   },
   watch: {
