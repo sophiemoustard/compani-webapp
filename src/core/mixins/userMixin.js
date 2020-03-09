@@ -52,7 +52,6 @@ export const userMixin = {
         NotifyNegative('Erreur lors de la modification');
       } finally {
         this.tmpInput = '';
-        this.emailLock = true;
       }
     },
   },

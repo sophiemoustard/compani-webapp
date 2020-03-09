@@ -91,6 +91,9 @@ export default {
     update (value) {
       this.$emit('input', value);
     },
+    select () {
+      this.$refs[this.name].select();
+    },
   },
   watch: {
     value () {

@@ -95,6 +95,8 @@ export default {
       try {
         NotifyNegative('Email déjà existant');
         this.mergedUserProfile.local.email = this.tmpInput;
+        await this.$nextTick();
+        this.$refs.userEmail.select();
       } catch (e) {
         console.error(e);
       }
