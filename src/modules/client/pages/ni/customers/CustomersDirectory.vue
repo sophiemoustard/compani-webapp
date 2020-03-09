@@ -9,7 +9,7 @@
           <q-item-section>{{ col.value }}</q-item-section>
         </q-item>
         <template v-else-if="col.name === 'client'">
-          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }"></div>
+          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }" />
         </template>
         <template v-else-if="col.name === 'info'">
           <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
