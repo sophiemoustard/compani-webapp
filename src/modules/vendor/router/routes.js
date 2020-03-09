@@ -56,6 +56,17 @@ const routes = [
         },
       },
       {
+        path: 'ni/users/trainers/:trainerId',
+        name: 'profile trainer info',
+        component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'users',
+        },
+      },
+      {
         path: 'ni/config/courses',
         name: 'courses directory',
         component: () => import('src/modules/vendor/pages/ni/config/CoursesDirectory'),

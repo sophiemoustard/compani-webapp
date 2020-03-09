@@ -2,7 +2,8 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un formateur"
       @updateSearch="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"/>
+    <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      @goTo="goToTrainerProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un formateur"
       @click="trainerCreationModal = true" />
 
@@ -86,6 +87,9 @@ export default {
     },
     updateSearch (value) {
       this.searchStr = value;
+    },
+    goToTrainerProfile (row) {
+      this.$router.push({ name: 'profile trainer info', params: { trainerId: row._id } });
     },
     async refreshTrainers () {
       try {
