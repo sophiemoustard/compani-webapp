@@ -53,5 +53,8 @@ export default {
       }
     },
   },
+  beforeDestroy () {
+    this.$store.commit('company/saveCompany', null);
+  },
 }
 </script>
