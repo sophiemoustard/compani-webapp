@@ -4,7 +4,8 @@
       <div v-if="isCoach" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <ni-large-table :data="payDocuments" :columns="columns" :pagination.sync="pagination" row-key="name">
+      <ni-large-table v-if="payDocuments.length !== 0" :data="payDocuments" :columns="columns"
+        :pagination.sync="pagination" row-key="name">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -26,7 +27,7 @@
           </q-tr>
         </template>
       </ni-large-table>
-      <div v-if="payDocuments.length === 0" class="q-px-md q-my-sm">
+      <div v-else class="q-my-sm">
         <span class="no-document">Aucun document</span>
       </div>
       <q-btn v-if="isCoach" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
