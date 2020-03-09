@@ -1,4 +1,4 @@
-import router from './index';
+import router from 'src/router/index';
 
 export default {
   redirectToLogin (params) {

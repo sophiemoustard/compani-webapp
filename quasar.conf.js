@@ -1,29 +1,18 @@
 /* eslint-disable func-names */
 require('dotenv').config();
+const path = require('path');
 
 module.exports = function (ctx) {
   return {
     boot: [
       // 'i18n',
       'axios',
-      'activationCode',
       'alenviAxios',
-      'creditNotes',
-      'customers',
-      'googleDrive',
-      'email',
       'lodash',
       'moment',
-      'resize',
-      'services',
-      'stats',
-      'surcharges',
-      'twilio',
       'vue-croppa',
       'vMask',
-      'users',
       'vuelidate',
-      'contracts',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [
@@ -128,6 +117,14 @@ module.exports = function (ctx) {
           test: /\.(html)$/,
           use: { loader: 'html-loader' },
         });
+        cfg.resolve.alias = {
+          ...cfg.resolve.alias,
+          '@components': path.resolve(__dirname, './src/core/components'),
+          '@api': path.resolve(__dirname, './src/core/api'),
+          '@helpers': path.resolve(__dirname, './src/core/helpers'),
+          '@data': path.resolve(__dirname, './src/core/data'),
+          '@mixins': path.resolve(__dirname, './src/core/mixins'),
+        }
       },
       env: {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),
