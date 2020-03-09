@@ -256,7 +256,12 @@ export default {
   },
   async mounted () {
     if (!this.customer) await this.refreshCustomer();
-    await this.checkMandates();
+    else {
+      this.refreshSubscriptions();
+      this.refreshFundings();
+      await this.checkMandates();
+      this.$v.customer.$touch();
+    }
   },
   methods: {
     documentUploadedForFinancialCertificates () {
@@ -268,6 +273,7 @@ export default {
         this.$store.commit('customer/saveCustomer', customer);
         this.refreshSubscriptions();
         this.refreshFundings();
+        await this.checkMandates();
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
