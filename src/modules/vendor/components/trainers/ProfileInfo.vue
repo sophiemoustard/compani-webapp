@@ -8,7 +8,7 @@
         @blur="updateUser('identity.lastname')" />
       <div class="col-12 col-md-6 row items-center">
         <div class="col-xs-11">
-          <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
+          <ni-input ref="userEmail" name="emailInput" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
             :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
             @focus="saveTmp('local.email')" />
         </div>
@@ -28,20 +28,21 @@ import set from 'lodash/set';
 import { extend } from '@helpers/utils';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative } from '@components/popup/notify';
 import { REQUIRED_LABEL } from '@data/constants';
+import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',
-  mixins: [validationMixin],
+  mixins: [validationMixin, userMixin],
   components: {
     'ni-input': Input,
   },
   data () {
     return {
-      emailInputRef: 'emailInput',
+      tmpInput: '',
       mergedUserProfile: {
         identity: { lastname: '', firstname: '' },
         local: { email: '' },
@@ -55,8 +56,7 @@ export default {
     }
   },
   async mounted () {
-    const user = await Users.getById(this.userProfile._id);
-    this.mergeUser(user);
+    this.mergeUser(this.userProfile);
     this.$v.mergedUserProfile.$touch();
     this.isLoaded = true;
   },
@@ -86,31 +86,6 @@ export default {
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
     },
-    async updateUser (path) {
-      try {
-        if (this.tmpInput === get(this.mergedUserProfile, path)) {
-          this.emailLock = true;
-          return;
-        }
-
-        if (get(this.$v.mergedUserProfile, path)) {
-          get(this.$v.mergedUserProfile, path).$touch();
-          const isValid = await this.waitForValidation(this.$v.mergedUserProfile, path);
-          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
-        }
-
-        await this.updateAlenviUser(path);
-
-        this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification');
-      } finally {
-        this.tmpInput = '';
-        this.emailLock = true;
-      }
-    },
     async updateAlenviUser (path) {
       let value = get(this.mergedUserProfile, path);
       const payload = set({}, path, value);
@@ -119,9 +94,7 @@ export default {
     async emailErrorHandler (path) {
       try {
         NotifyNegative('Email déjà existant');
-        this.mergedUserProfile.local.email = this.mergedUserProfile.local.email;
-        await this.$nextTick();
-        this.$refs.userEmail.select();
+        this.mergedUserProfile.local.email = this.tmpInput;
       } catch (e) {
         console.error(e);
       }
