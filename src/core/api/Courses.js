@@ -8,7 +8,7 @@ export default {
   async create (payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses`, payload);
   },
-  async get (courseId) {
+  async getById (courseId) {
     const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
     return course.data.data.course;
   },

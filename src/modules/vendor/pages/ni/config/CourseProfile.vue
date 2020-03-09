@@ -1,12 +1,13 @@
 <template>
   <q-page padding class="neutral-background">
-    <ni-profile-header :title="course.name" />
+    <ni-profile-header :title="courseName" />
     <profile-tabs :profile-id="courseId" :tabsContent="tabsContent" />
   </q-page>
 </template>
 
 <script>
-import Course from '@api/Courses';
+import get from 'lodash/get';
+import { mapGetters } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileProgram from 'src/modules/vendor/components/courses/ProfileProgram';
@@ -24,7 +25,7 @@ export default {
   },
   data () {
     return {
-      course: {},
+      courseName: '',
       tabsContent: [
         {
           label: 'Programme',
@@ -35,16 +36,24 @@ export default {
       ],
     }
   },
+  computed: {
+    ...mapGetters({ course: 'course/getCourse' }),
+  },
+  watch: {
+    course () {
+      this.courseName = get(this.course, 'name') || '';
+    },
+  },
   async mounted () {
-    await this.refreshCourse();
+    if (!this.course) await this.refreshCourse();
+    else this.courseName = '';
   },
   methods: {
     async refreshCourse () {
       try {
-        this.course = await Course.get(this.courseId);
+        await this.$store.dispatch('course/getCourse', { courseId: this.courseId });
       } catch (e) {
         console.error(e);
-        this.course = {};
       }
     },
   },

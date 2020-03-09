@@ -1,12 +1,15 @@
 <template>
-  <div class="q-mb-xl">
-    <div class="row gutter-profile">
-      <ni-input caption="Nom" v-model.trim="course.name" @focus="saveTmp('name')" @blur="updateCourse('name')" />
+  <div v-if="course">
+    <div class="q-mb-xl">
+      <div class="row gutter-profile">
+        <ni-input caption="Nom" v-model.trim="course.name" @focus="saveTmp('name')" @blur="updateCourse('name')" />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -22,17 +25,15 @@ export default {
   components: {
     'ni-input': Input,
   },
-  data () {
-    return {
-      course: {},
-    };
-  },
   validations () {
     return {
       course: {
         name: { required },
       },
     }
+  },
+  computed: {
+    ...mapGetters({ course: 'course/getCourse' }),
   },
   async mounted () {
     await this.refreshCourse();
@@ -43,10 +44,9 @@ export default {
     },
     async refreshCourse () {
       try {
-        this.course = await Courses.get(this.profileId);
+        await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
       } catch (e) {
         console.error(e);
-        this.course = {};
       }
     },
     async updateCourse (path) {
