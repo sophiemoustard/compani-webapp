@@ -5,7 +5,7 @@
         :name="tab.name" :alert="alert(tab)"/>
     </q-tabs>
     <q-tab-panels v-model="selectedTab" class="no-border neutral-background" flat>
-      <q-tab-panel v-for="(tab, index) in tabsContent" :name="tab.name"  :key="index">
+      <q-tab-panel v-for="(tab, index) in tabsContent" :name="tab.name" :key="index">
         <component :is="tab.component" :profile-id="profileId" />
       </q-tab-panel>
     </q-tab-panels>
@@ -35,8 +35,9 @@ export default {
         case 'customer':
           return this.$store.getters['customer/getNotifications'];
         case 'auxiliary':
-        default:
           return this.$store.getters['rh/getNotifications'];
+        default:
+          return null;
       }
     },
   },
