@@ -57,5 +57,9 @@ export default {
       }
     },
   },
+  beforeDestroy () {
+    this.$store.commit('course/saveCourse', null);
+  },
+
 }
 </script>
