@@ -163,6 +163,7 @@ export default {
         this.$q.localStorage.set('lastSearchCustomers', JSON.stringify(this.terms));
       }
     }
+    clearTimeout(this.timeout);
   },
   async mounted () {
     this.updateTimeline();
@@ -212,11 +213,14 @@ export default {
       }
     },
     getTimelineHours () {
-      const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
+      const range = this.$moment.range(
+        this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0),
+        this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0)
+      );
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
     },
     updatePlanningHeaderHeight () {
-      setTimeout(() => { this.planningHeaderHeight = this.$refs.planningHeader.clientHeight; }, 100);
+      this.timeout = setTimeout(() => { this.planningHeaderHeight = this.$refs.planningHeader.clientHeight; }, 100);
     },
     // Table
     updateTimeline () {

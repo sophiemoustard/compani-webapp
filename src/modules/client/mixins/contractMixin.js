@@ -180,4 +180,7 @@ export const contractMixin = {
       this.timeout = setTimeout(() => this.refreshContracts(), 10000);
     },
   },
+  beforeDestroy () {
+    clearTimeout(this.timeout);
+  },
 };
