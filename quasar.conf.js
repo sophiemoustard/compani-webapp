@@ -11,7 +11,6 @@ module.exports = function (ctx) {
       'lodash',
       'moment',
       'vue-croppa',
-      'vMask',
       'vuelidate',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],

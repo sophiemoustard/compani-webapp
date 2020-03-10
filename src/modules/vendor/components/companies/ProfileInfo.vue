@@ -51,7 +51,7 @@ export default {
     },
     async updateCompany (path) {
       try {
-        let value = get(this.company, path);
+        const value = get(this.company, path);
         if (this.tmpInput === value) return;
         this.$v.company.$touch();
         if (this.$v.company.$error) return NotifyWarning('Champ(s) invalide(s)');

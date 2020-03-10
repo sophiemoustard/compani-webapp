@@ -122,13 +122,14 @@ export const planningModalMixin = {
 
           return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
             !this.editedEvent.absenceNature;
-        case INTERVENTION:
+        case INTERVENTION: {
           const shouldDisableButton = !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
             !this.editedEvent.dates.endDate;
           if (this.editedEvent.isCancelled) {
             return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason ||
               !this.editedEvent.misc;
           } else return shouldDisableButton;
+        }
         case INTERNAL_HOUR:
           return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
             !this.editedEvent.internalHour;
@@ -232,7 +233,7 @@ export const planningModalMixin = {
   },
   methods: {
     deleteClassFocus () {
-      this.$refs['addressSelect'].$el.className = this.$refs['addressSelect'].$el.className.replace('q-if-focused ', '');
+      this.$refs.addressSelect.$el.className = this.$refs.addressSelect.$el.className.replace('q-if-focused ', '');
     },
     hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;

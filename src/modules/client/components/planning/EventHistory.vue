@@ -123,9 +123,10 @@ export default {
           return 'Indispo';
         case INTERNAL_HOUR:
           return internalHour.name;
-        case ABSENCE:
+        case ABSENCE: {
           const absenceName = ABSENCE_TYPES.find(abs => abs.value === absence);
           return absenceName ? absenceName.label : 'Absence';
+        }
         case INTERVENTION:
           return 'Intervention';
         default:
@@ -231,7 +232,7 @@ export default {
       if (this.customerName) post += ` chez ${this.customerName}`;
       if (to && to.identity && from && from.identity) post += `\xa0: ${toAuxiliary} remplace ${fromAuxiliary}`;
       else if (to && to.identity) post += `\xa0: affectée à ${toAuxiliary}`;
-      else post += `\xa0: passée en à affecter.`;
+      else post += '\xa0: passée en à affecter.';
 
       return { pre, post };
     },

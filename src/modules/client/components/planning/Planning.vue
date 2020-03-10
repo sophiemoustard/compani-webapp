@@ -153,6 +153,7 @@ export default {
       deleteEventsModal: false,
       customersWithInterventions: [],
       planningHeaderHeight: 0,
+      timeout: null,
     }
   },
   beforeDestroy () {
@@ -163,6 +164,7 @@ export default {
         this.$q.localStorage.set('lastSearchCustomers', JSON.stringify(this.terms));
       }
     }
+    clearTimeout(this.timeout);
   },
   async mounted () {
     this.updateTimeline();
@@ -207,16 +209,19 @@ export default {
       return this.filteredSectors.find(s => s._id === sectorId);
     },
     restoreFilter (terms) {
-      for (let term of terms) {
+      for (const term of terms) {
         setTimeout(() => this.$refs.refFilter.add(term), 100);
       }
     },
     getTimelineHours () {
-      const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
+      const range = this.$moment.range(
+        this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0),
+        this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0)
+      );
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
     },
     updatePlanningHeaderHeight () {
-      setTimeout(() => { this.planningHeaderHeight = this.$refs['planningHeader'].clientHeight; }, 100);
+      this.timeout = setTimeout(() => { this.planningHeaderHeight = this.$refs.planningHeader.clientHeight; }, 100);
     },
     // Table
     updateTimeline () {

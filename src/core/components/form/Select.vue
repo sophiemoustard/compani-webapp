@@ -63,7 +63,7 @@ export default {
     },
     onInput (val) {
       this.$emit('input', val);
-      this.$refs['selectInput'].blur();
+      this.$refs.selectInput.blur();
     },
     onFilter (val, update) {
       update(() => {

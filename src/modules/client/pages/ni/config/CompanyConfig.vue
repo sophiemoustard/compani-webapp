@@ -155,7 +155,6 @@ import {
   validWorkHealthService,
   validUrssafCode,
   validSiret,
-  validEstablishmentName,
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -254,7 +253,7 @@ export default {
       workHealthServices,
       urssafCodes,
       establishmentValidation: {
-        name: { required, validEstablishmentName, maxLength: maxLength(32) },
+        name: { required, maxLength: maxLength(32) },
         siret: { required, validSiret },
         address: { fullAddress: { required, frAddress } },
         phone: { required, frPhoneNumber },
@@ -385,7 +384,6 @@ export default {
     establishmentNameError (validationObj) {
       if (!validationObj.name.required) return REQUIRED_LABEL;
       else if (!validationObj.name.maxLength) return '32 caractères maximimum';
-      else if (!validationObj.name.validEstablishmentName) return 'Caractère(s) invalide(s)';
       return '';
     },
     establishmentSiretError (validationObj) {

@@ -239,7 +239,7 @@ export default {
       return picture ? get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
     },
     toggleAuxiliarySelect () {
-      return this.$refs['auxiliarySelect'].show();
+      return this.$refs.auxiliarySelect.show();
     },
     async getAuxiliaries () {
       try {

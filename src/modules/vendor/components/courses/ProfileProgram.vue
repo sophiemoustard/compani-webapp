@@ -49,7 +49,7 @@ export default {
     },
     async updateCourse (path) {
       try {
-        let value = get(this.course, path);
+        const value = get(this.course, path);
         if (this.tmpInput === value) return;
         this.$v.course.$touch();
         if (this.$v.course.$error) return NotifyWarning('Champ(s) invalide(s)');

@@ -3,7 +3,7 @@ import router from 'src/router/index';
 export default {
   redirectToLogin (params) {
     if (params && params.to) {
-      return router.replace({path: '/login', query: { from: params.to.fullPath }});
+      return router.replace({ path: '/login', query: { from: params.to.fullPath } });
     }
     router.replace('/login');
   },
