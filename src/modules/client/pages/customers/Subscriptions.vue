@@ -259,9 +259,9 @@ export default {
     else {
       this.refreshSubscriptions();
       this.refreshFundings();
-      await this.checkMandates();
       this.$v.customer.$touch();
     }
+    await this.checkMandates();
   },
   methods: {
     documentUploadedForFinancialCertificates () {
@@ -273,7 +273,6 @@ export default {
         this.$store.commit('customer/saveCustomer', customer);
         this.refreshSubscriptions();
         this.refreshFundings();
-        await this.checkMandates();
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
