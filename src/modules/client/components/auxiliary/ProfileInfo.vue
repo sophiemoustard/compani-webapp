@@ -93,7 +93,7 @@
           @focus="saveTmp('contact.phone')" />
         <div v-if="isCoach" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
-            <ni-input ref="userEmail" :name="emailInputRef" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
+            <ni-input ref="userEmail" name="emailInput" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
               :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
               @focus="saveTmp('local.email')" />
           </div>
@@ -298,7 +298,7 @@ import FileUploader from '@components/form/FileUploader.vue';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
 import DateInput from '@components/form/DateInput.vue';
 import SearchAddress from '@components/form/SearchAddress';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { frPhoneNumber, iban, frAddress, bic } from '@helpers/vuelidateCustomVal';
 import { extend, removeDiacritics } from '@helpers/utils';
 import {
@@ -311,11 +311,12 @@ import {
 } from '@data/constants';
 import nationalities from '@data/nationalities';
 import countries from '@data/countries';
+import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',
-  mixins: [validationMixin],
+  mixins: [validationMixin, userMixin],
   components: {
     'ni-select-sector': SelectSector,
     'ni-input': Input,
@@ -328,7 +329,6 @@ export default {
   },
   data () {
     return {
-      emailInputRef: 'emailInput',
       emailLock: true,
       transportOptions: TRANSPORT_OPTIONS,
       requiredLabel: REQUIRED_LABEL,
@@ -644,8 +644,7 @@ export default {
     },
   },
   async mounted () {
-    const mergedUserProfile = await Users.getById(this.userProfile._id);
-    this.mergeUser(mergedUserProfile);
+    this.mergeUser(this.userProfile);
     if (this.isCoach) {
       await this.getAuxiliaryRoles();
       await this.getEstablishments();
@@ -680,36 +679,11 @@ export default {
     async emailErrorHandler (path) {
       try {
         NotifyNegative('Email déjà existant');
-        this.mergedUserProfile.local.email = this.mergedUserProfile.local.email;
+        this.mergedUserProfile.local.email = this.tmpInput;
         await this.$nextTick();
         this.$refs.userEmail.select();
       } catch (e) {
         console.error(e);
-      }
-    },
-    async updateUser (path) {
-      try {
-        if (this.tmpInput === get(this.mergedUserProfile, path)) {
-          this.emailLock = true;
-          return;
-        }
-
-        if (get(this.$v.mergedUserProfile, path)) {
-          get(this.$v.mergedUserProfile, path).$touch();
-          const isValid = await this.waitForValidation(this.$v.mergedUserProfile, path);
-          if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
-        }
-        await this.updateAlenviUser(path);
-
-        this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
-        this.emailLock = true;
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        if (e.data.statusCode === 409) return this.emailErrorHandler(path);
-        NotifyNegative('Erreur lors de la modification');
-      } finally {
-        this.tmpInput = '';
       }
     },
     async updateAlenviUser (path) {
