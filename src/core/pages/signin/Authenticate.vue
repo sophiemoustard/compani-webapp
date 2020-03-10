@@ -15,13 +15,13 @@
             </p>
           </div>
         </div>
-        <ni-input v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
-        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
+        <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
+        <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
         <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }">
           <small>Mot de passe oublié ?</small>
         </router-link>
         <div class="row justify-center">
-          <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
+          <q-btn data-cy="login" no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
             @click="submit" />
         </div>
       </div>
@@ -85,7 +85,7 @@ export default {
         const expiresInDays = parseInt(auth.expiresIn / 3600 / 24, 10) >= 1
           ? parseInt(auth.expiresIn / 3600 / 24, 10)
           : 1;
-        const options = { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' };
+        const options = { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV === 'production' };
         this.$q.cookies.set('alenvi_token', auth.token, options);
         this.$q.cookies.set('alenvi_token_expires_in', auth.expiresIn, options);
         this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
