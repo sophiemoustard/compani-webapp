@@ -8,7 +8,7 @@
         <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
           :class="col.name">
           <slot name="body" :props="props" :col="col">
-            {{ col.value }}
+            <template v-if="col.value">{{ col.value }}</template>
           </slot>
         </q-td>
       </q-tr>
