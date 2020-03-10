@@ -20,7 +20,7 @@ const routes = [
     },
   },
   { path: '/forgotPassword', component: () => import('src/core/pages/signin/ForgotPwd') },
-  { path: '/resetPassword/:token', component: () => import('src/core/pages/signin/ResetPwd') },
+  { path: '/reset-password/:token', component: () => import('src/core/pages/signin/ResetPassword') },
   {
     path: '/createPassword',
     component: () => import('src/core/pages/signup/CreatePassword'),
