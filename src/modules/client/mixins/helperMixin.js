@@ -97,7 +97,7 @@ export const helperMixin = {
     // Refresh
     async getUserHelpers () {
       try {
-        const params = { customers: this.userProfile._id };
+        const params = { customers: this.customer._id };
         if (has(this.loggedUser, 'company._id')) params.company = this.loggedUser.company._id;
         this.helpers = await Users.list(params);
       } catch (e) {
@@ -125,7 +125,7 @@ export const helperMixin = {
           email: this.newHelper.local.email,
           password: randomize('0', 6),
         },
-        customers: [this.userProfile._id],
+        customers: [this.customer._id],
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };

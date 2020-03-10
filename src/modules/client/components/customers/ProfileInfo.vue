@@ -399,6 +399,7 @@ import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
@@ -438,7 +439,7 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
 export default {
   name: 'ProfileInfo',
   components: {
-    NiSearchAddress: SearchAddress,
+    'ni-search-address': SearchAddress,
     'ni-input': Input,
     'ni-select': Select,
     'ni-date-input': DateInput,
@@ -471,47 +472,14 @@ export default {
       civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
-      customer: {
-        identity: {},
-        contact: {
-          primaryAddress: {},
-          secondaryAddress: {},
-        },
-        payment: {
-          mandates: [],
-        },
-        subscriptions: [],
-        quotes: [],
-        financialCertificates: [],
-      },
       subscriptions: [],
       selectedSubscription: [],
       services: [],
       quoteColumns: [
-        {
-          name: 'quoteNumber',
-          label: 'Numéro du devis',
-          align: 'left',
-          field: 'quoteNumber',
-        },
-        {
-          name: 'emptyQuote',
-          label: 'Devis',
-          align: 'center',
-          field: 'emptyQuote',
-        },
-        {
-          name: 'signedQuote',
-          label: 'Devis signé',
-          align: 'center',
-          field: 'signedQuote',
-        },
-        {
-          name: 'signed',
-          label: 'Signé',
-          align: 'center',
-          field: row => row.drive && row.drive.driveId,
-        },
+        { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
+        { name: 'emptyQuote', label: 'Devis', align: 'center', field: 'emptyQuote' },
+        { name: 'signedQuote', label: 'Devis signé', align: 'center', field: 'signedQuote' },
+        { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
         {
           name: 'createdAt',
           label: '',
@@ -531,36 +499,11 @@ export default {
       visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       mandateColumns: [
-        {
-          name: 'rum',
-          label: 'RUM',
-          align: 'left',
-          field: 'rum',
-        },
-        {
-          name: 'emptyMandate',
-          label: 'Mandat',
-          align: 'center',
-          field: 'emptyMandate',
-        },
-        {
-          name: 'signedMandate',
-          label: 'Mandat signé',
-          align: 'center',
-          field: 'signedMandate',
-        },
-        {
-          name: 'signed',
-          label: 'Signé',
-          align: 'center',
-          field: 'signedAt',
-        },
-        {
-          name: 'signedAt',
-          label: 'Date de signature',
-          align: 'left',
-          field: 'signedAt',
-        },
+        { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
+        { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },
+        { name: 'signedMandate', label: 'Mandat signé', align: 'center', field: 'signedMandate' },
+        { name: 'signed', label: 'Signé', align: 'center', field: 'signedAt' },
+        { name: 'signedAt', label: 'Date de signature', align: 'left', field: 'signedAt' },
         {
           name: 'createdAt',
           label: '',
@@ -629,29 +572,21 @@ export default {
         value: { _id: service._id, nature: service.nature },
       }));
     },
-    userProfile () {
+    customer () {
       return this.$store.getters['customer/getCustomer'];
     },
     primaryAddressError () {
-      if (!this.$v.customer.contact.primaryAddress.fullAddress.required) {
-        return REQUIRED_LABEL;
-      }
+      if (!this.$v.customer.contact.primaryAddress.fullAddress.required) return REQUIRED_LABEL;
       return 'Adresse non valide';
     },
     ibanError () {
-      if (!this.$v.customer.payment.iban.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.customer.payment.iban.iban) {
-        return 'IBAN non valide';
-      }
+      if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
+      else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
       return '';
     },
     bicError () {
-      if (!this.$v.customer.payment.bic.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.customer.payment.bic.bic) {
-        return 'BIC non valide';
-      }
+      if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
+      else if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
       return '';
     },
     acceptedByHelper () {
@@ -661,16 +596,14 @@ export default {
       return '';
     },
     fundingHistoryVisibleColumns () {
-      if (this.selectedFunding.nature === FIXED) {
-        return ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays'];
-      }
-      return ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
+      return this.selectedFunding.nature === FIXED
+        ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
+        : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     },
     fundingDetailsVisibleColumns () {
-      if (this.selectedFunding.nature === FIXED) {
-        return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription'];
-      }
-      return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
+      return this.selectedFunding.nature === FIXED
+        ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
+        : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
     },
     isOneTimeFundingNature () {
       return this.newFunding.nature === FIXED;
@@ -687,16 +620,12 @@ export default {
       return FUNDING_FREQ_OPTIONS;
     },
     daysOptions () {
-      return days.map((day, i) => ({
-        label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
-        value: i,
-      }));
+      return days.map((day, i) => ({ label: day !== 'Jours fériés' ? day.slice(0, 2) : day, value: i }));
     },
     editedFundingMaxStartDate () {
-      if (this.editedFunding && this.editedFunding.endDate) {
-        return this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString();
-      }
-      return '';
+      return this.editedFunding && this.editedFunding.endDate
+        ? this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString()
+        : '';
     },
   },
   validations () {
@@ -773,20 +702,23 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    customerIdentity () {
+      const firstname = get(this.customer, 'identity.firstname');
+      const lastname = get(this.customer, 'identity.last');
+
+      return firstname ? `${firstname}_${lastname}` : lastname
+    },
     mandateFormFields (row) {
       return [
         { name: 'mandateId', value: row._id },
-        {
-          name: 'fileName',
-          value: `mandat_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}`,
-        },
+        { name: 'fileName', value: `mandat_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedMandate' },
       ]
     },
     quoteFormFields (quote) {
       return [
         { name: 'quoteId', value: quote._id },
-        { name: 'fileName', value: `devis_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}` },
+        { name: 'fileName', value: `devis_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedQuote' },
       ]
     },
@@ -807,13 +739,17 @@ export default {
         this.services = await Services.list();
       } catch (e) {
         console.error(e);
+        this.services = [];
       }
     },
     async refreshMandates () {
       try {
-        this.customer.payment.mandates = await Customers.getMandates(this.customer._id);
+        const mandates = await Customers.getMandates(this.customer._id);
 
-        this.$store.commit('customer/saveCustomer', this.customer);
+        this.$store.commit(
+          'customer/saveCustomer',
+          { ...this.customer, payment: { ...this.customer.payment, mandates } }
+        );
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
@@ -821,20 +757,20 @@ export default {
     },
     async refreshQuotes () {
       try {
-        this.customer.quotes = await Customers.getQuotes(this.customer._id);
+        const quotes = await Customers.getQuotes(this.customer._id);
 
-        this.$store.commit('customer/saveCustomer', this.customer);
+        this.$store.commit('customer/saveCustomer', { ...this.customer, quotes });
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
       }
     },
     async refreshCustomer () {
-      this.customer = await Customers.getById(this.userProfile._id);
+      const customer = await Customers.getById(this.customer._id);
       await this.refreshSubscriptions();
       await this.refreshFundings();
 
-      this.$store.commit('customer/saveCustomer', this.customer);
+      this.$store.commit('customer/saveCustomer', customer);
       this.$v.customer.$touch();
     },
     // Subscriptions
@@ -899,10 +835,9 @@ export default {
 
         this.loading = true;
         const subscriptionId = this.editedSubscription._id;
-        const payload = pickBy(this.editedSubscription);
-        delete payload._id;
-        delete payload.nature;
+        const payload = omit(pickBy(this.editedSubscription), ['_id', 'nature']);
         await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
+
         this.refreshCustomer();
         this.subscriptionEditionModal = false;
         NotifyPositive('Souscription modifiée');
@@ -915,8 +850,7 @@ export default {
     },
     async deleteSubscriptions (subscriptionId) {
       try {
-        const params = { subscriptionId, _id: this.customer._id };
-        await Customers.removeSubscription(params);
+        await Customers.removeSubscription({ subscriptionId, _id: this.customer._id });
         await this.refreshCustomer();
         NotifyPositive('Souscription supprimée');
       } catch (e) {
@@ -940,11 +874,9 @@ export default {
     async updateSignedAt (mandate) {
       try {
         if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
-        const params = {
-          _id: this.customer._id,
-          mandateId: mandate._id,
-        };
+        const params = { _id: this.customer._id, mandateId: mandate._id };
         await Customers.updateMandate(params, mandate);
+
         this.refreshMandates();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
@@ -987,27 +919,26 @@ export default {
     getQuoteLink (quote) {
       return get(quote, 'drive.link') || false;
     },
+    formatSubscriptionToDownloadQuote (subscription) {
+      const estimatedWeeklyRate = this.computeWeeklyRate(subscription);
+      const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
+
+      return {
+        serviceName: subscription.service.name,
+        serviceNature: nature ? nature.label : '',
+        unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
+        weeklyVolume: subscription.estimatedWeeklyVolume,
+        weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
+        sundays: subscription.sundays || '',
+        evenings: subscription.evenings || '',
+      }
+    },
     async downloadQuote (doc) {
       try {
         const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);
-        if (!quoteDriveId) {
-          return NotifyWarning('Template manquant');
-        }
+        if (!quoteDriveId) return NotifyWarning('Template manquant');
 
-        const subscriptions = this.subscriptions.map(subscription => {
-          const estimatedWeeklyRate = this.computeWeeklyRate(subscription);
-          const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
-
-          return {
-            serviceName: subscription.service.name,
-            serviceNature: nature ? nature.label : '',
-            unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
-            weeklyVolume: subscription.estimatedWeeklyVolume,
-            weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
-            sundays: subscription.sundays || '',
-            evenings: subscription.evenings || '',
-          }
-        });
+        const subscriptions = this.subscriptions.map(this.formatSubscriptionToDownloadQuote);
 
         const data = {
           quoteNumber: doc.quoteNumber,
@@ -1028,21 +959,23 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du devis.');
       }
     },
+    formatSubscriptionToGenerateQuote (subscription) {
+      const sub = {
+        serviceName: subscription.service.name,
+        unitTTCRate: subscription.unitTTCRate,
+        estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+      }
+      if (subscription.sundays) sub.sundays = subscription.sundays;
+      if (subscription.evenings) sub.evenings = subscription.evenings;
+
+      return sub;
+    },
     async generateQuote () {
       try {
-        const subscriptions = this.subscriptions.map(subscription => {
-          const sub = {
-            serviceName: subscription.service.name,
-            unitTTCRate: subscription.unitTTCRate,
-            estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-          }
-          if (subscription.sundays) sub.sundays = subscription.sundays;
-          if (subscription.evenings) sub.evenings = subscription.evenings;
-
-          return sub;
-        });
+        const subscriptions = this.subscriptions.map(this.formatSubscriptionToGenerateQuote);
         const payload = { subscriptions };
         await Customers.addQuote(this.customer._id, payload);
+
         await this.refreshQuotes();
         NotifyPositive('Devis généré');
       } catch (e) {
@@ -1065,9 +998,7 @@ export default {
       this.fundingCreationModal = true;
     },
     resetFundingFrequency () {
-      if (this.newFunding.nature === FIXED && this.newFunding.frequency !== ONCE) {
-        this.newFunding.frequency = '';
-      }
+      if (this.newFunding.nature === FIXED && this.newFunding.frequency !== ONCE) this.newFunding.frequency = '';
     },
     fundingSubscriptionsOptions () {
       return this.subscriptions
@@ -1103,13 +1034,8 @@ export default {
       const cleanPayload = pickBy(this.newFunding);
       const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
       if (version.endDate) version.endDate = this.$moment(version.endDate).endOf('d').toDate();
-      return {
-        nature,
-        thirdPartyPayer,
-        subscription,
-        frequency,
-        versions: [{ ...version }],
-      };
+
+      return { nature, thirdPartyPayer, subscription, frequency, versions: [{ ...version }] };
     },
     async submitFunding () {
       try {
@@ -1119,6 +1045,7 @@ export default {
         this.loading = true;
         const payload = this.formatCreatedFunding();
         await Customers.addFunding(this.customer._id, payload);
+
         this.resetCreationFundingData();
         await this.refreshCustomer();
         NotifyPositive('Financement ajoutée');
@@ -1169,27 +1096,26 @@ export default {
       this.editedFunding = {};
       this.$v.editedFunding.$reset();
     },
+    formatFundingEditionPayload (funding) {
+      const pickedFields = ['folderNumber', 'careDays', 'customerParticipationRate', 'startDate', 'subscription'];
+      if (funding.nature === FIXED) pickedFields.push('amountTTC');
+      else if (funding.nature === HOURLY) pickedFields.push('unitTTCRate', 'careHours');
+      const payload = {
+        ...pick(funding, pickedFields),
+        endDate: funding.endDate ? this.$moment(funding.endDate).endOf('d') : '',
+      };
+
+      return pickBy(payload);
+    },
     async editFunding () {
       try {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription } = this.editedFunding;
-        const payload = {
-          folderNumber,
-          careDays,
-          customerParticipationRate,
-          startDate,
-          endDate: endDate ? this.$moment(endDate).endOf('d') : '',
-          subscription,
-        };
-        if (this.editedFunding.nature === FIXED) payload.amountTTC = amountTTC;
-        if (this.editedFunding.nature === HOURLY) {
-          payload.unitTTCRate = unitTTCRate;
-          payload.careHours = careHours;
-        }
-        const cleanPayload = pickBy(payload);
-        await Customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
+
+        const payload = this.formatFundingEditionPayload(this.editedFunding);
+        await Customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, payload);
+
         this.resetEditionFundingData();
         await this.refreshCustomer();
         NotifyPositive('Financement modifié');

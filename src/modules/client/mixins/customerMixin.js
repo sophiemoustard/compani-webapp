@@ -32,7 +32,7 @@ export const customerMixin = {
         }
         if (path === 'payment.iban') value = value.split(' ').join('');
         const payload = set({}, path, value);
-        await Customers.updateById(this.userProfile._id, payload);
+        await Customers.updateById(this.customer._id, payload);
 
         NotifyPositive('Modification enregistrée');
         if (path === 'payment.iban' || path === 'referent') this.refreshCustomer();
