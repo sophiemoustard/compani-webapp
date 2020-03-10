@@ -12,7 +12,7 @@
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="configuration" v-model="activeRoutes.configuration.open" label="Configuration">
-      <ni-menu-item name="programs directory" icon="date_range" label="Formations" />
+      <ni-menu-item name="programs directory" icon="view_headline" label="Catalogue" />
     </q-expansion-item>
     <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />

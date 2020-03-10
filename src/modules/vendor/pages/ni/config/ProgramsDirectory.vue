@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation"
+    <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredProgram" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @goTo="goToProgramProfile" />
@@ -32,7 +32,7 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
-  metaInfo: { title: 'Répertoire formation' },
+  metaInfo: { title: 'Catalogue' },
   name: 'ProgramDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
