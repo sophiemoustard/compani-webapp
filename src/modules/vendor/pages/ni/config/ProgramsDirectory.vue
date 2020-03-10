@@ -2,21 +2,21 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Répertoire formations" search-placeholder="Rechercher une formation"
       @updateSearch="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @goTo="goToCourseProfile" />
+    <ni-table-list :data="filteredProgram" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      @goTo="goToProgramProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
-      @click="courseCreationModal = true" />
+      @click="programCreationModal = true" />
 
-    <!-- Course creation modal -->
-    <ni-modal v-model="courseCreationModal" @hide="resetCreationModal">
+    <!-- Program creation modal -->
+    <ni-modal v-model="programCreationModal" @hide="resetCreationModal">
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
-      <ni-input in-modal v-model.trim="newCourse.name" :error="$v.newCourse.name.$error"
-        @blur="$v.newCourse.name.$touch" required-field caption="Nom" />
+      <ni-input in-modal v-model.trim="newProgram.name" :error="$v.newProgram.name.$error"
+        @blur="$v.newProgram.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createCourse" :disable="!this.newCourse.name" />
+          icon-right="add" @click="createProgram" :disable="!this.newProgram.name" />
       </template>
     </ni-modal>
   </q-page>
@@ -24,7 +24,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import Courses from '@api/Courses';
+import Program from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
@@ -33,7 +33,7 @@ import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
   metaInfo: { title: 'Répertoire formation' },
-  name: 'CoursesDirectory',
+  name: 'ProgramDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
@@ -44,40 +44,40 @@ export default {
     return {
       tableLoading: false,
       columns: [{ name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true }],
-      courses: [],
+      programs: [],
       modalLoading: false,
-      courseCreationModal: false,
-      newCourse: { name: '' },
+      programCreationModal: false,
+      newProgram: { name: '' },
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
     }
   },
   validations () {
     return {
-      newCourse: {
+      newProgram: {
         name: { required },
       },
     }
   },
   computed: {
-    filteredCourses () {
-      return this.courses.filter(course => course.name.match(new RegExp(this.searchStr, 'i')));
+    filteredProgram () {
+      return this.programs.filter(program => program.name.match(new RegExp(this.searchStr, 'i')));
     },
   },
   async mounted () {
-    await this.refreshCourses();
+    await this.refreshProgram();
   },
   methods: {
     updateSearch (value) {
       this.searchStr = value;
     },
-    goToCourseProfile (row) {
-      this.$router.push({ name: 'profile course info', params: { courseId: row._id } });
+    goToProgramProfile (row) {
+      this.$router.push({ name: 'profile program info', params: { programId: row._id } });
     },
-    async refreshCourses () {
+    async refreshProgram () {
       try {
         this.tableLoading = true;
-        this.courses = await Courses.list();
+        this.programs = await Program.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formations');
@@ -86,17 +86,17 @@ export default {
       }
     },
     resetCreationModal () {
-      this.$v.newCourse.$reset();
-      this.newCourse = { name: '' };
+      this.$v.newProgram.$reset();
+      this.newProgram = { name: '' };
     },
-    async createCourse () {
+    async createProgram () {
       try {
         this.modalLoading = true;
-        await Courses.create({ ...this.newCourse });
+        await Program.create({ ...this.newProgram });
 
-        this.courseCreationModal = false;
+        this.programCreationModal = false;
         NotifyPositive('Formation créée.')
-        await this.refreshCourses();
+        await this.refreshProgram();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la formation.');

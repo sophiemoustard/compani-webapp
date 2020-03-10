@@ -1,3 +1,3 @@
 export default {
-  course: null,
+  program: null,
 };

@@ -3,7 +3,7 @@ import Vuex from 'vuex';
 import main from 'src/store/main';
 import rh from 'src/modules/client/store/rh';
 import planning from 'src/modules/client/store/planning';
-import course from 'src/modules/vendor/store/course';
+import program from 'src/modules/vendor/store/program';
 import customer from 'src/modules/client/store/customer';
 import company from 'src/modules/vendor/store/company';
 
@@ -15,7 +15,7 @@ const store = new Vuex.Store({
     rh,
     planning,
     customer,
-    course,
+    program,
     company,
   },
 });
