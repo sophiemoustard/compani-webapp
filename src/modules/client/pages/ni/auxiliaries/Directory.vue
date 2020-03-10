@@ -68,7 +68,6 @@
 </template>
 
 <script>
-import randomize from 'randomatic';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
@@ -120,7 +119,7 @@ export default {
           address: { fullAddress: '' },
           phone: '',
         },
-        local: { email: '', password: '' },
+        local: { email: '' },
         sector: null,
         administrative: {
           transportInvoice: { transportType: 'public' },
@@ -319,7 +318,7 @@ export default {
 
       const payload = {
         ...cloneDeep(this.newUser),
-        local: { password: randomize('*', 10), email: this.newUser.local.email },
+        local: { email: this.newUser.local.email },
         role: roles[0]._id,
       };
       if (!get(payload, 'contact.address.fullAddress')) delete payload.contact.address;

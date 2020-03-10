@@ -79,11 +79,7 @@ export default {
       try {
         const userPayload = {
           local: { password: this.password },
-          resetPassword: {
-            token: null,
-            expiresIn: null,
-            from: null,
-          },
+          passwordToken: { token: null, expiresIn: null, from: null },
         };
         await Users.updateById(this.userId, userPayload, this.token);
         let detail = '';

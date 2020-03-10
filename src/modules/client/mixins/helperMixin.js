@@ -1,5 +1,4 @@
 import has from 'lodash/has';
-import randomize from 'randomatic';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -28,29 +27,14 @@ export const helperMixin = {
       },
       helpers: [],
       helperColumns: [
-        {
-          name: 'lastname',
-          label: 'Nom',
-          align: 'left',
-          field: row => row.identity.lastname,
-        },
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          align: 'left',
-          field: row => row.identity.firstname,
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => row.local ? row.local.email : '',
-        },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => row.contact ? row.contact.phone : '',
+          field: row => get(row, 'contact.phone') || '',
           format: (value) => formatPhone(value),
         },
         {
@@ -61,32 +45,25 @@ export const helperMixin = {
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       helperPagination: { rowsPerPage: 0 },
     }
   },
   computed: {
     sortedHelpers () {
-      return [...this.helpers].sort((u1, u2) => {
-        return (u1.identity.lastname || '').localeCompare((u2.identity.lastname || ''));
-      });
+      return [...this.helpers]
+        .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
     },
     emailError () {
-      if (!this.$v.newHelper.local.email.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newHelper.local.email.email) {
-        return 'Email non valide';
-      }
+      if (!this.$v.newHelper.local.email.required) return REQUIRED_LABEL;
+      else if (!this.$v.newHelper.local.email.email) return 'Email non valide';
+      return '';
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
+        const approvalDate = this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY');
+        return `le ${approvalDate} par ${this.acceptedBy}`;
       }
     },
     loggedUser () {
@@ -121,10 +98,7 @@ export const helperMixin = {
       if (roles.length === 0) throw new Error('Role not found');
 
       const payload = {
-        local: {
-          email: this.newHelper.local.email,
-          password: randomize('0', 6),
-        },
+        local: { email: this.newHelper.local.email },
         customers: [this.customer._id],
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
@@ -144,8 +118,7 @@ export const helperMixin = {
         await Users.create(pickBy(payload));
         NotifyPositive('Aidant créé');
 
-        const receiver = { email: this.newHelper.local.email, password: payload.local.password };
-        await Email.sendWelcome({ receiver });
+        await Email.sendWelcome({ email: this.newHelper.local.email });
         NotifyPositive('Email envoyé');
 
         await this.getUserHelpers();
