@@ -153,6 +153,7 @@ export default {
       deleteEventsModal: false,
       customersWithInterventions: [],
       planningHeaderHeight: 0,
+      timeout: null,
     }
   },
   beforeDestroy () {
