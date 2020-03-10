@@ -87,7 +87,7 @@ export default {
       if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
     },
     async updateAlenviUser (path) {
-      let value = get(this.mergedUserProfile, path);
+      const value = get(this.mergedUserProfile, path);
       const payload = set({}, path, value);
       await Users.updateById(this.mergedUserProfile._id, payload);
     },
