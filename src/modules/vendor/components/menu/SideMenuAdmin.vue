@@ -6,6 +6,10 @@
       </q-item-label>
     </div>
     <q-separator />
+    <q-expansion-item ref="operations" v-model="activeRoutes.operations.open" label="Operations">
+      <ni-menu-item name="courses directory" icon="view_headline" label="Formations" />
+    </q-expansion-item>
+    <q-separator />
     <q-expansion-item ref="users" v-model="activeRoutes.users.open" label="Utilisateurs">
       <ni-menu-item name="companies directory" icon="house" label="Structures" />
       <ni-menu-item name="trainers directory" icon="view_headline" label="Formateurs" />
@@ -35,6 +39,7 @@ export default {
       activeRoutes: {
         users: { open: false },
         configuration: { open: false },
+        operations: { open: false },
       },
     };
   },
