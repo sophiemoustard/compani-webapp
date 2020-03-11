@@ -45,12 +45,20 @@ export default {
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${id}`);
   },
-  async updateById (userId, data, token = null) {
+  async updateById (userId, data) {
+    const updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data);
+    return updatedUser;
+  },
+  async updatePassword (userId, data, token = null) {
     let updatedUser;
-    if (token === null) {
-      updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data);
+    if (token) {
+      updatedUser = await axios.put(
+        `${process.env.API_HOSTNAME}/users/${userId}/password`,
+        data,
+        { headers: { 'x-access-token': token } }
+      );
     } else {
-      updatedUser = await axios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data, { headers: { 'x-access-token': token } });
+      updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/password`, data);
     }
     return updatedUser;
   },

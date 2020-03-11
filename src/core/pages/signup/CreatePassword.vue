@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import pick from 'lodash/pick'
 import { required, email, sameAs, minLength } from 'vuelidate/lib/validators';
 import Users from '@api/Users'
 import CompaniHeader from '@components/CompaniHeader';
@@ -89,7 +90,7 @@ export default {
     async submit () {
       try {
         this.user.isConfirmed = true;
-        await Users.updateById(this.userId, this.user, this.alenviToken);
+        await Users.updatePassword(this.userId, pick(this.user, ['local.password']), this.alenviToken);
         this.$q.cookies.remove('signup_token', { path: '/' });
         this.$q.cookies.remove('signup_userId', { path: '/' });
         this.$q.cookies.remove('signup_userEmail', { path: '/' });

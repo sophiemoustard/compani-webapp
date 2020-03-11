@@ -102,10 +102,11 @@ export default {
         const userToSend = {
           local: { email: this.user.credentials.email },
         };
-        if (this.user.credentials.password) {
-          userToSend.local.password = this.user.credentials.password
-        };
+
         await Users.updateById(this.$route.params.id, userToSend);
+        if (this.user.credentials.password) {
+          await Users.updatePassword(this.$route.params.id, { local: { password: this.user.credentials.password } });
+        }
         NotifyPositive('Profil modifié.');
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
