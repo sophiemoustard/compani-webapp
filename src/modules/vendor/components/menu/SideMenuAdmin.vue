@@ -15,6 +15,10 @@
       <ni-menu-item name="programs directory" icon="view_headline" label="Catalogue" />
     </q-expansion-item>
     <q-separator />
+    <q-expansion-item ref="operations" v-model="activeRoutes.operations.open" label="Operations">
+      <ni-menu-item name="courses directory" icon="view_headline" label="Formations" />
+    </q-expansion-item>
+    <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
   </q-list>
 </template>
@@ -35,6 +39,7 @@ export default {
       activeRoutes: {
         users: { open: false },
         configuration: { open: false },
+        operations: { open: false },
       },
     };
   },
