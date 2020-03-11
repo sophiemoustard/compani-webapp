@@ -186,8 +186,7 @@ export default {
   },
   computed: {
     auxiliaryAvatar () {
-      let auxiliaryPicture;
-      if (get(this.customer, 'referent.picture')) auxiliaryPicture = this.customer.referent.picture;
+      const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
       return this.getAuxiliaryAvatar(auxiliaryPicture);
     },
     customer () {

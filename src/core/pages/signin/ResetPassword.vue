@@ -50,7 +50,7 @@ export default {
     } catch (e) {
       if (e.response) console.error(e.response);
       else console.error(e);
-      next({ path: '/error403Pwd' });
+      next({ path: '/login' });
     }
   },
   validations: {
