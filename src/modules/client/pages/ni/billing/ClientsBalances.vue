@@ -176,7 +176,7 @@ export default {
       this.selected = [];
     },
     goToCustomerBillingPage (customerId) {
-      this.$router.push({ name: 'customers profile', params: { id: customerId, defaultTab: 'billing' } });
+      this.$router.push({ name: 'customers profile', params: { customerId: customerId, defaultTab: 'billing' } });
     },
     selectRows (oldValue) {
       if (oldValue) this.selected = [];
