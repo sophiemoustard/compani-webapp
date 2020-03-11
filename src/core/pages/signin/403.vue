@@ -21,7 +21,7 @@ export default {
       window.history.go(-1);
     },
     goToForgot () {
-      this.$router.push({ path: '/forgot-password' });
+      this.$router.push({ name: 'forgotPassword' });
     },
   },
 }
