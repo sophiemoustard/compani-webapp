@@ -16,8 +16,8 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <div class="row no-wrap table-actions">
-                      <!-- <q-icon color="grey" name="edit" @click.native="openUserEditionModal(col.value)" />
-                      <q-icon color="grey" name="delete" @click.native="validateUserDeletion(col.value)" /> -->
+                      <q-icon color="grey" name="edit" @click.native="openUserEditionModal(props.row)" />
+                      <!-- <q-icon color="grey" name="delete" @click.native="validateUserDeletion(col.value)" /> -->
                     </div>
                   </div>
                 </template>
@@ -33,7 +33,7 @@
       </q-card>
     </div>
 
-    <ni-modal v-model="userCreationModal" @hide="resetUserForm" @show="openUserCreationModal">
+    <ni-modal v-model="userCreationModal" @hide="resetUserCreationForm" @show="openUserCreationModal">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">utilisateur</span>
       </template>
@@ -52,6 +52,26 @@
           :loading="loading" @click="createUser" :disable="$v.newUser.$anyError || !$v.newUser.$anyDirty"/>
       </template>
     </ni-modal>
+
+    <ni-modal v-model="userEditionModal" @hide="resetUserEditionForm">
+      <template slot="title">
+        Modifier un <span class="text-weight-bold">utilisateur</span>
+      </template>
+      <ni-input in-modal v-model="selectedUser.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="selectedUser.identity.lastname" :error-label="REQUIRED_LABEL"
+        :error="$v.selectedUser.identity.lastname.$error" caption="Nom" @blur="$v.selectedUser.identity.lastname.$touch"
+        required-field />
+      <ni-input in-modal v-model="selectedUser.local.email" :error="$v.selectedUser.local.email.$error" caption="Email"
+        @blur="$v.selectedUser.local.email.$touch" :error-label="emailError($v.selectedUser)" required-field />
+      <ni-input in-modal v-model.trim="selectedUser.contact.phone" :error="$v.selectedUser.contact.phone.$error"
+        caption="Téléphone" @blur="$v.selectedUser.contact.phone.$touch" :error-label="phoneNbrError($v.selectedUser)" />
+      <ni-select in-modal caption="Role" :options="roleOptions" v-model="selectedUser.role" :error-label="REQUIRED_LABEL"
+        :error="$v.selectedUser.role.$error" @blur="$v.selectedUser.role.$touch" last required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Modifier un utilisateur" icon-right="check" color="primary"
+          :loading="loading" @click="updateUser" :disable="$v.selectedUser.$anyError" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
@@ -60,7 +80,10 @@ import { mapGetters } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
+import cloneDeep from 'lodash/cloneDeep';
 import Companies from '@api/Companies';
 import Users from '@api/Users';
 import Roles from '@api/Roles';
@@ -90,6 +113,7 @@ export default {
       REQUIRED_LABEL,
       loading: false,
       userCreationModal: false,
+      userEditionModal: false,
       users: [],
       usersColumns: [
         {
@@ -144,6 +168,17 @@ export default {
         role: '',
         local: { email: '' },
       },
+      userValidation: {
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
+        contact: { phone: { frPhoneNumber } },
+        role: { required },
+      },
+      selectedUser: {
+        identity: {},
+        local: {},
+        contact: {},
+      },
       roles: [],
     };
   },
@@ -152,12 +187,8 @@ export default {
       company: {
         name: { required },
       },
-      newUser: {
-        identity: { lastname: { required } },
-        local: { email: { required, email } },
-        contact: { phone: { frPhoneNumber } },
-        role: { required },
-      },
+      newUser: this.userValidation,
+      selectedUser: this.userValidation,
     };
   },
   computed: {
@@ -220,7 +251,7 @@ export default {
         NotifyNegative('Erreur lors de la création de l\'utilisateur');
       }
     },
-    resetUserForm () {
+    resetUserCreationForm () {
       this.$v.newUser.$reset();
       this.newUSer = Object.assign({}, clear(this.newUser));
     },
@@ -250,6 +281,30 @@ export default {
       await this.getRoles();
       const coachRole = this.roles.find(role => role.name === COACH);
       if (coachRole) this.newUser.role = coachRole._id;
+    },
+    async openUserEditionModal (user) {
+      await this.getRoles();
+      this.selectedUser = {
+        ...this.selectedUser,
+        ...pick(cloneDeep(user), ['_id', 'identity', 'local', 'contact', 'role']),
+      };
+      this.selectedUser.role = this.selectedUser.role.client._id;
+      this.userEditionModal = true;
+    },
+    resetUserEditionForm () {
+      this.$v.selectedUser.$reset();
+      this.selectedUser = { identity: {}, local: {}, contact: {} };
+    },
+    async updateUser () {
+      try {
+        await Users.updateById(this.selectedUser._id, omit(this.selectedUser, ['_id']));
+        this.userEditionModal = false;
+        await this.getUsers();
+        NotifyPositive('Utilisateur modifié');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition de l\'utilisateur');
+      }
     },
   },
 }
