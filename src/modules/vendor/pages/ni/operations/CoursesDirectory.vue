@@ -2,26 +2,126 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Formations" search-placeholder="Rechercher une formation"
       @updateSearch="updateSearch" :search="searchStr" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
+      @click="courseCreationModal = true" />
+
+    <!-- Course creation modal -->
+    <ni-modal v-model="courseCreationModal" @hide="resetCreationModal">
+      <template slot="title">
+        Créer une nouvelle <span class="text-weight-bold">formation</span>
+      </template>
+      <ni-input in-modal v-model.trim="newCourse.name" :error="$v.newCourse.name.$error"
+        @blur="$v.newCourse.name.$touch" required-field caption="Nom" />
+      <ni-select in-modal v-model.trim="newCourse.program" :error="$v.newCourse.program.$error"
+        @blur="$v.newCourse.program.$touch" required-field caption="Programme" :options="programOptions" />
+      <ni-select in-modal v-model.trim="newCourse.company" :error="$v.newCourse.company.$error"
+        @blur="$v.newCourse.company.$touch" required-field caption="Structure" :options="companyOptions" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
+          icon-right="add" @click="createCourse" :disable="$v.newCourse.$invalid" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
 <script>
+import Courses from '@api/Courses';
+import Companies from '@api/Companies';
+import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
+import Input from '@components/form/Input';
+import Select from '@components/form/Select';
+import Modal from '@components/modal/Modal';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
+    'ni-input': Input,
+    'ni-select': Select,
+    'ni-modal': Modal,
   },
   data () {
     return {
       searchStr: '',
+      modalLoading: false,
+      newCourse: {
+        program: '',
+        company: '',
+        name: '',
+        type: 'intra',
+      },
+      courseCreationModal: false,
+      courses: [],
+      programOptions: [],
+      companyOptions: [],
     }
+  },
+  validations () {
+    return {
+      newCourse: {
+        program: { required: true },
+        company: { required: true },
+        name: { required: true },
+        type: { required: true },
+      },
+    }
+  },
+  async mounted () {
+    await this.refreshCourses();
+    await this.refreshPrograms();
+    await this.refreshCompanies();
   },
   methods: {
     updateSearch (value) {
       this.searchStr = value;
+    },
+    async refreshCourses () {
+      try {
+        this.courses = await Courses.list();
+      } catch (e) {
+        console.error(e);
+        this.courses = [];
+      }
+    },
+    async refreshPrograms () {
+      try {
+        const programs = await Programs.list();
+        this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
+      } catch (e) {
+        console.error(e);
+        this.programOptions = [];
+      }
+    },
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = companies.map(c => ({ label: c.tradeName, value: c._id }));
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
+      }
+    },
+    resetCreationModal () {
+      this.$v.newCourse.$reset();
+      this.newCourse = { program: '', company: '', name: '', type: 'intra' };
+    },
+    async createCourse () {
+      try {
+        this.modalLoading = true;
+        await Courses.create({ ...this.newCourse });
+
+        this.courseCreationModal = false;
+        NotifyPositive('Formation créée.')
+        await this.refreshProgram();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Impossible de créer la formation.');
+      } finally {
+        this.modalLoading = false;
+      }
     },
   },
 }
