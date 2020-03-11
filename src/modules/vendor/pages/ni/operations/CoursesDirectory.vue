@@ -14,8 +14,8 @@
         @blur="$v.newCourse.name.$touch" required-field caption="Nom" />
       <ni-select in-modal v-model.trim="newCourse.program" :error="$v.newCourse.program.$error"
         @blur="$v.newCourse.program.$touch" required-field caption="Programme" :options="programOptions" />
-      <ni-select in-modal v-model.trim="newCourse.company" :error="$v.newCourse.company.$error"
-        @blur="$v.newCourse.company.$touch" required-field caption="Structure" :options="companyOptions" />
+      <ni-select in-modal v-model.trim="newCourse.companies" :error="$v.newCourse.companies.$error"
+        @blur="$v.newCourse.companies.$touch" required-field caption="Structure" :options="companyOptions" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
           icon-right="add" @click="createCourse" :disable="$v.newCourse.$invalid" />
@@ -49,7 +49,7 @@ export default {
       modalLoading: false,
       newCourse: {
         program: '',
-        company: '',
+        companies: '',
         name: '',
         type: 'intra',
       },
@@ -63,7 +63,7 @@ export default {
     return {
       newCourse: {
         program: { required: true },
-        company: { required: true },
+        companies: { required: true },
         name: { required: true },
         type: { required: true },
       },
@@ -106,16 +106,20 @@ export default {
     },
     resetCreationModal () {
       this.$v.newCourse.$reset();
-      this.newCourse = { program: '', company: '', name: '', type: 'intra' };
+      this.newCourse = { program: '', companies: '', name: '', type: 'intra' };
+    },
+    formatCourseCreationPayload (newCourse) {
+      return { ...newCourse, companies: [newCourse.companies] };
     },
     async createCourse () {
       try {
         this.modalLoading = true;
-        await Courses.create({ ...this.newCourse });
+        const payload = this.formatCourseCreationPayload(this.newCourse);
+        await Courses.create(payload);
 
         this.courseCreationModal = false;
         NotifyPositive('Formation créée.')
-        await this.refreshProgram();
+        await this.refreshCourses();
       } catch (e) {
         console.error(e);
         NotifyNegative('Impossible de créer la formation.');
