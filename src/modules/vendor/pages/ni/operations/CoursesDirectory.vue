@@ -10,7 +10,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 
 export default {
   metaInfo: { title: 'Catalogue' },
-  name: 'CourseDirectory',
+  name: 'CoursesDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
   },
