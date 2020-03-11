@@ -67,9 +67,9 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/courses',
-        name: 'courses directory',
-        component: () => import('src/modules/vendor/pages/ni/config/CoursesDirectory'),
+        path: 'ni/config/programs',
+        name: 'programs directory',
+        component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
@@ -77,9 +77,9 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/courses/:courseId',
-        name: 'profile course info',
-        component: () => import('src/modules/vendor/pages/ni/config/CourseProfile'),
+        path: 'ni/config/programs/:programId',
+        name: 'profile program info',
+        component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

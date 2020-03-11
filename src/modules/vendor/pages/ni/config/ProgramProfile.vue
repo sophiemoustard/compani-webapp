@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="neutral-background">
-    <ni-profile-header :title="courseName" />
-    <profile-tabs :profile-id="courseId" :tabsContent="tabsContent" />
+    <ni-profile-header :title="programName" />
+    <profile-tabs :profile-id="programId" :tabsContent="tabsContent" />
   </q-page>
 </template>
 
@@ -10,13 +10,13 @@ import get from 'lodash/get';
 import { mapGetters } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
-import ProfileProgram from 'src/modules/vendor/components/courses/ProfileProgram';
+import ProfileProgram from 'src/modules/vendor/components/programs/ProfileInfo';
 
 export default {
-  name: 'CourseProfile',
-  metadata: { title: 'Fiche formation' },
+  name: 'ProgramProfile',
+  metadata: { title: 'Fiche programme' },
   props: {
-    courseId: { type: String },
+    programId: { type: String },
     defaultTab: { type: String, default: 'program' },
   },
   components: {
@@ -25,7 +25,7 @@ export default {
   },
   data () {
     return {
-      courseName: '',
+      programName: '',
       tabsContent: [
         {
           label: 'Programme',
@@ -37,28 +37,28 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ course: 'course/getCourse' }),
+    ...mapGetters({ program: 'program/getProgram' }),
   },
   watch: {
-    course () {
-      this.courseName = get(this.course, 'name') || '';
+    program () {
+      this.programName = get(this.program, 'name') || '';
     },
   },
   async mounted () {
-    if (!this.course) await this.refreshCourse();
-    else this.courseName = '';
+    if (!this.program) await this.refreshProgram();
+    else this.programName = '';
   },
   methods: {
-    async refreshCourse () {
+    async refreshProgram () {
       try {
-        await this.$store.dispatch('course/getCourse', { courseId: this.courseId });
+        await this.$store.dispatch('program/getProgram', { programId: this.programId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.commit('course/saveCourse', null);
+    this.$store.commit('program/saveProgram', null);
   },
 
 }
