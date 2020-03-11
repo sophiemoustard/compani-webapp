@@ -2,20 +2,20 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme"
       @updateSearch="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredProgram" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @goTo="goToProgramProfile" />
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un programme"
       @click="programCreationModal = true" />
 
     <!-- Program creation modal -->
     <ni-modal v-model="programCreationModal" @hide="resetCreationModal">
       <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">formation</span>
+        Créer un nouveau <span class="text-weight-bold">programme</span>
       </template>
       <ni-input in-modal v-model.trim="newProgram.name" :error="$v.newProgram.name.$error"
         @blur="$v.newProgram.name.$touch" required-field caption="Nom" />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
+        <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="modalLoading"
           icon-right="add" @click="createProgram" :disable="!this.newProgram.name" />
       </template>
     </ni-modal>
@@ -24,7 +24,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import Program from '@api/Programs';
+import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
@@ -60,7 +60,7 @@ export default {
     }
   },
   computed: {
-    filteredProgram () {
+    filteredPrograms () {
       return this.programs.filter(program => program.name.match(new RegExp(this.searchStr, 'i')));
     },
   },
@@ -77,10 +77,10 @@ export default {
     async refreshProgram () {
       try {
         this.tableLoading = true;
-        this.programs = await Program.list();
+        this.programs = await Programs.list();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des formations');
+        NotifyNegative('Erreur lors de la récupération des programmes');
       } finally {
         this.tableLoading = false;
       }
@@ -92,14 +92,14 @@ export default {
     async createProgram () {
       try {
         this.modalLoading = true;
-        await Program.create({ ...this.newProgram });
+        await Programs.create({ ...this.newProgram });
 
         this.programCreationModal = false;
-        NotifyPositive('Formation créée.')
+        NotifyPositive('Programme créé.')
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de la formation.');
+        NotifyNegative('Erreur lors de la création du programme.');
       } finally {
         this.modalLoading = false;
       }

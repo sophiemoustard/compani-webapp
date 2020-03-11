@@ -14,7 +14,7 @@ import ProfileProgram from 'src/modules/vendor/components/programs/ProfileInfo';
 
 export default {
   name: 'ProgramProfile',
-  metadata: { title: 'Fiche formation' },
+  metadata: { title: 'Fiche programme' },
   props: {
     programId: { type: String },
     defaultTab: { type: String, default: 'program' },
