@@ -33,7 +33,7 @@ const routes = [
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account info', params: { id: loggedUser._id } });
         if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliary agenda' });
         if (COACH_ROLES.includes(userClientRole)) return next({ name: 'auxiliaries directory' });
-        return next({ path: '/login' });
+        return next({ name: '404' });
       } catch (e) {
         console.error(e);
       }
