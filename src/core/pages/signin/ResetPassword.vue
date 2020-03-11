@@ -66,7 +66,7 @@ export default {
       try {
         const userPayload = {
           local: { password: this.password },
-          passwordToken: { token: null, expiresIn: null },
+          isResetPassword: true,
         };
         await Users.updatePassword(this.userId, userPayload, this.token);
 
