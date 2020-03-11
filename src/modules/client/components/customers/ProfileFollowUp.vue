@@ -105,7 +105,7 @@ import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative } from '@components/popup/notify.js';
 import SimpleTable from '@components/table/SimpleTable';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { extend, formatIdentity, formatHours } from '@helpers/utils.js';
+import { formatIdentity, formatHours } from '@helpers/utils.js';
 import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
@@ -124,7 +124,6 @@ export default {
     return {
       auxiliaries: [],
       isLoaded: false,
-      customer: { followUp: {}, contact: {} },
       tmpInput: '',
       loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
@@ -187,13 +186,10 @@ export default {
   },
   computed: {
     auxiliaryAvatar () {
-      let auxiliaryPicture;
-      if (this.customer.referent.picture) {
-        auxiliaryPicture = this.customer.referent.picture;
-      }
+      const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
       return this.getAuxiliaryAvatar(auxiliaryPicture);
     },
-    userProfile () {
+    customer () {
       return this.$store.getters['customer/getCustomer'];
     },
     loggedUser () {
@@ -207,16 +203,15 @@ export default {
     },
     auxiliariesOptions () {
       const auxiliariesOptions = [{ label: 'Pas de référent', value: '' }];
+      const referentId = get(this.customer, 'referent._id') || null;
       if (this.auxiliaries.length) {
         auxiliariesOptions.push(...this.auxiliaries.map(aux => ({
           label: formatIdentity(aux.identity, 'FL'),
           value: aux._id,
         })));
-      } else if (this.customer.referent._id) {
-        auxiliariesOptions.push({
-          label: formatIdentity(this.customer.referent.identity, 'FL'),
-          value: this.customer.referent._id,
-        });
+      } else if (referentId) {
+        const identity = get(this.customer, 'referent.identity') || {};
+        auxiliariesOptions.push({ label: formatIdentity(identity, 'FL'), value: referentId });
       }
 
       return auxiliariesOptions;
@@ -274,20 +269,18 @@ export default {
     },
     async refreshCustomer () {
       try {
-        const customer = await Customers.getById(this.userProfile._id);
-        this.mergeCustomer(customer);
-        this.$store.commit('customer/saveCustomer', this.customer);
+        const customer = await Customers.getById(this.customer._id);
+        if (!get(customer, 'referent._id')) customer.referent = { _id: '' };
+        if (!get(customer, 'contact')) customer.contact = {};
+        if (!get(customer, 'followUp')) customer.followUp = {};
+
+        this.$store.commit('customer/saveCustomer', customer);
         this.isLoaded = true;
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des données');
       }
-    },
-    mergeCustomer (value = null) {
-      if (get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
-      const args = [this.customer, value];
-      this.customer = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
       this.tmpInput = path === 'referent' ? get(this.customer, 'referent._id', '') : get(this.customer, path);

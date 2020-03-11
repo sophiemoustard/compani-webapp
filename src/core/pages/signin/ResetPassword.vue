@@ -36,7 +36,6 @@ export default {
       passwordConfirm: '',
       token: null,
       userId: null,
-      userEmail: '',
       timeout: null,
     }
   },
@@ -46,63 +45,33 @@ export default {
         const checkToken = await Users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
-        next({ path: '/403-pwd' });
+        next({ path: '/login' });
       }
     } catch (e) {
-      if (e.response) {
-        console.error(e.response);
-      } else {
-        console.error(e);
-      }
-      next({ path: '/error403Pwd' });
+      if (e.response) console.error(e.response);
+      else console.error(e);
+      next({ path: '/login' });
     }
   },
   validations: {
-    password: {
-      required,
-      minLength: minLength(6),
-      maxLength: maxLength(20),
-    },
-    passwordConfirm: {
-      required,
-      sameAsPassword: sameAs('password'),
-    },
+    password: { required, minLength: minLength(6), maxLength: maxLength(20) },
+    passwordConfirm: { required, sameAsPassword: sameAs('password') },
   },
   methods: {
     setData (checkToken) {
       this.token = checkToken.token;
       this.userId = checkToken.user._id;
-      this.userEmail = checkToken.user.email;
-      this.from = checkToken.user.from;
     },
     async submit () {
       try {
         const userPayload = {
           local: { password: this.password },
-          resetPassword: {
-            token: null,
-            expiresIn: null,
-            from: null,
-          },
+          passwordToken: { token: null, expiresIn: null },
         };
         await Users.updateById(this.userId, userPayload, this.token);
-        let detail = '';
-        let action = null;
-        switch (this.from) {
-          case 'p':
-            detail = 'Mot de passe changé. Redirection vers Pigi...';
-            action = () => {
-              window.location.href = `${process.env.MESSENGER_LINK}`;
-            };
-            break;
-          default:
-            detail = 'Mot de passe changé. Redirection vers la page de connexion...';
-            action = () => {
-              this.$router.replace({ path: '/login' });
-            };
-        }
-        NotifyPositive(detail);
-        this.timeout = setTimeout(action, 2000)
+
+        NotifyPositive('Mot de passe changé. Redirection vers la page de connexion...');
+        this.timeout = setTimeout(() => this.$router.replace({ path: '/login' }), 2000)
       } catch (e) {
         NotifyNegative('Erreur, si le problème persiste, contactez le support technique');
         console.error(e.response);

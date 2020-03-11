@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import randomize from 'randomatic';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import Users from '@api/Users';
@@ -111,7 +110,6 @@ export default {
         const roles = await Roles.list({ name: TRAINER });
         if (roles.length === 0) throw new Error('Role not found');
 
-        this.newTrainer.local.password = randomize('*', 10);
         await Users.create({ ...this.newTrainer, role: roles[0]._id });
 
         this.trainerCreationModal = false;
