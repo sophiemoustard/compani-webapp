@@ -99,11 +99,7 @@ export default {
   methods: {
     async updateUser () {
       try {
-        const userToSend = {
-          local: { email: this.user.credentials.email },
-        };
-
-        await Users.updateById(this.$route.params.id, userToSend);
+        await Users.updateById(this.$route.params.id, { local: { email: this.user.credentials.email } });
         if (this.user.credentials.password) {
           await Users.updatePassword(this.$route.params.id, { local: { password: this.user.credentials.password } });
         }
