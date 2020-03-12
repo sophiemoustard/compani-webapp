@@ -1,5 +1,6 @@
 import get from 'lodash/get';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { REQUIRED_LABEL } from '@data/constants'
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 
@@ -53,6 +54,16 @@ export const userMixin = {
       } finally {
         this.tmpInput = '';
       }
+    },
+    emailError (validationObj) {
+      if (!validationObj.local.email.required) return REQUIRED_LABEL;
+      else if (!validationObj.local.email.email) return 'Email non valide';
+      return '';
+    },
+    phoneNbrError (validationObj) {
+      if (validationObj.contact.phone.required === false) return REQUIRED_LABEL;
+      else if (!this.$_.get(validationObj, 'contact.phone.frPhoneNumber', null)) return 'Numéro de téléphone non valide';
+      return '';
     },
   },
 }
