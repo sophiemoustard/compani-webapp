@@ -243,6 +243,8 @@ export default {
       try {
         this.loading = true;
         this.$v.newUser.$touch();
+        if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         await Users.create(pickBy(this.newUser));
         this.userCreationModal = false;
         await this.getUsers();
@@ -289,6 +291,8 @@ export default {
       try {
         this.loading = true;
         this.$v.selectedUser.$touch();
+        if (this.$v.selectedUser.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         await Users.updateById(this.selectedUser._id, omit(this.selectedUser, ['_id']));
         this.userEditionModal = false;
         await this.getUsers();
