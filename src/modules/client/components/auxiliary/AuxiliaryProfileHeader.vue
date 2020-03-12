@@ -33,7 +33,7 @@
         </div>
         <div>
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
-          <div class="send-message-link" @click="opened = true">Envoyer un SMS</div>
+          <div class="send-message-link" @click="openSmsModal">Envoyer un SMS</div>
         </div>
       </div>
     </div>
@@ -88,6 +88,7 @@ export default {
         { label: 'Envoi code d\'activation', value: 'CA' },
         { label: 'Autres', value: 'Autres' },
       ],
+      messageComp: '',
     }
   },
   computed: {
@@ -125,29 +126,24 @@ export default {
     activationCode () {
       return this.typeMessage === 'CA' ? randomize('0000') : '';
     },
-    messageComp: {
-      get () {
-        if (this.typeMessage === 'PM') {
-          return `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et documents importants pour ` +
-          'compléter ton dossier.\nClique ici pour compléter ton profil: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}\nSi tu ` +
-          'rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
-        } else if (this.typeMessage === 'CA') {
-          return `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
-          'commencer ton enregistrement sur Compani avant ton intégration: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`;
-        }
-        return this.message;
-      },
-      set (value) {
-        this.message = value;
-      },
-    },
     hasPicture () {
       return get(this.userProfile, 'picture.link') || DEFAULT_AVATAR;
     },
   },
   methods: {
+    openSmsModal () {
+      if (this.typeMessage === 'PM') {
+        this.messageComp = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
+        'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ' +
+        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}` +
+        '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
+      } else if (this.typeMessage === 'CA') {
+        this.messageComp = `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
+        'commencer ton enregistrement sur Compani avant ton intégration: ' +
+        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`;
+      }
+      this.opened = true;
+    },
     goToPlanning () {
       if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.userProfile } });
       else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.userProfile } });
@@ -160,6 +156,7 @@ export default {
       await this.sendSMS();
       this.loading = false;
       this.opened = false;
+      this.messageComp = '';
     },
     async sendSMS () {
       try {
