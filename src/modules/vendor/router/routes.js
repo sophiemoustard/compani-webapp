@@ -88,7 +88,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/courses',
+        path: 'ni/operations/courses',
         name: 'courses directory',
         component: () => import('src/modules/vendor/pages/ni/operations/CoursesDirectory'),
         meta: {
