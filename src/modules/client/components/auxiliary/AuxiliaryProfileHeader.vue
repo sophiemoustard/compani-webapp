@@ -43,7 +43,8 @@
       <template slot="title">
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field />
+      <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field
+        @input="updateMessage" />
       <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
@@ -131,7 +132,7 @@ export default {
     },
   },
   methods: {
-    openSmsModal () {
+    updateMessage () {
       if (this.typeMessage === 'PM') {
         this.messageComp = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
         'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ' +
@@ -141,7 +142,10 @@ export default {
         this.messageComp = `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
         'commencer ton enregistrement sur Compani avant ton intégration: ' +
         `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`;
-      }
+      } else this.messageComp = '';
+    },
+    openSmsModal () {
+      this.updateMessage();
       this.opened = true;
     },
     goToPlanning () {
