@@ -254,7 +254,7 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée.');
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('La création de cet évènement n\'est pas autorisée.');
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       } finally {
         this.loading = false;
