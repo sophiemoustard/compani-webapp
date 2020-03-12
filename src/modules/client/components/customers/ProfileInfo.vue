@@ -361,7 +361,7 @@
     <ni-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal"
       @hide="resetEditionFundingData">
       <template slot="title">
-        Modifier le <span class="text-weight-bold">financement</span>
+        Éditer le <span class="text-weight-bold">financement</span>
       </template>
       <ni-date-input v-model="editedFunding.startDate" caption="Date de début de prise en charge"
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="$v.editedFunding.startDate.$touch"
@@ -386,7 +386,7 @@
         type="checkbox" inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error"
         required-field />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="check" color="primary"
+        <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
           :loading="loading" @click="editFunding" />
       </template>
     </ni-modal>
@@ -881,7 +881,7 @@ export default {
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       }
     },
     async downloadMandate (doc) {
@@ -913,7 +913,7 @@ export default {
     },
     // Documents
     failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
+      NotifyNegative('Echec de l\'envoi du document.');
     },
     // Quotes
     getQuoteLink (quote) {
@@ -980,7 +980,7 @@ export default {
         NotifyPositive('Devis généré');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la génération du devis');
+        NotifyNegative('Erreur lors de la génération du devis.');
       }
     },
     // Fundings

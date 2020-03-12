@@ -96,7 +96,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.companies = [];
-        NotifyNegative('Erreur lors de la récupération des structures');
+        NotifyNegative('Erreur lors de la récupération des structures.');
       }
     },
     resetCreationModal () {

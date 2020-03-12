@@ -305,7 +305,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
       }
@@ -340,7 +340,7 @@ export default {
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la validation de votre abonnement');
+        NotifyNegative('Erreur lors de la validation de votre abonnement.');
         this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
       }
     },
@@ -378,7 +378,7 @@ export default {
         console.error(e);
         this.$q.loading.hide();
         this.newESignModal = false;
-        NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
+        NotifyNegative('Erreur lors de la requête de signature en ligne du mandat.');
       } finally {
         this.$q.loading.hide();
       }

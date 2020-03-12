@@ -164,16 +164,16 @@ export default {
     },
     async sendSMS () {
       try {
-        if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+        if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
         await Twilio.sendSMS({
           to: `+33${this.userProfile.contact.phone.substring(1)}`,
           body: this.messageComp,
         });
-        NotifyPositive('SMS bien envoyé');
+        NotifyPositive('SMS bien envoyé.');
       } catch (e) {
         console.error(e);
         this.loading = false;
-        NotifyNegative('Erreur lors de l\'envoi du SMS');
+        NotifyNegative('Erreur lors de l\'envoi du SMS.');
       }
     },
   },

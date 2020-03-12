@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @input="$emit('input', $event)" @hide="resetVersionEditionModal">
     <template slot="title">
-      Modifier le <span class="text-weight-bold">contrat</span>
+      Éditer le <span class="text-weight-bold">contrat</span>
     </template>
     <ni-input in-modal caption="Taux horaire"  type="number" suffix="€" required-field
       v-model="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
@@ -12,7 +12,7 @@
       <q-checkbox dense v-model="editedVersion.shouldBeSigned" label="Signature en ligne" />
     </div>
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Modifier le contrat" icon-right="add" color="primary"
+      <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
         :loading="loading" @click="editVersion" :disable="!isVersionUpdated" />
     </template>
   </ni-modal>

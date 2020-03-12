@@ -79,13 +79,13 @@ export default {
     async getDirectDebits () {
       try {
         if (!this.loggedUser.company || !this.loggedUser.company.directDebitsFolderId) {
-          return NotifyNegative('Dossier de prélèvement manquant');
+          return NotifyNegative('Dossier de prélèvement manquant.');
         }
         this.directDebits = await GoogleDrive.getList({ folderId: this.loggedUser.company.directDebitsFolderId });
       } catch (e) {
         this.directDebits = [];
         console.error(e);
-        NotifyNegative("Erreur lors de la récupération des prélèvements d'archive");
+        NotifyNegative("Erreur lors de la récupération des prélèvements d'archive.");
       }
     },
   },

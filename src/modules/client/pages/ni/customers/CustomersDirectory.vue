@@ -243,7 +243,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
-        NotifyNegative('Erreur lors de la création de la fiche bénéficiaire');
+        NotifyNegative('Erreur lors de la création de la fiche bénéficiaire.');
       } finally {
         this.loading = false;
       }

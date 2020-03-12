@@ -80,7 +80,7 @@ export default {
       this.initFilters();
     } catch (e) {
       console.error(e);
-      NotifyNegative('Erreur lors de la récupération des personnes');
+      NotifyNegative('Erreur lors de la récupération des personnes.');
     }
   },
   watch: {

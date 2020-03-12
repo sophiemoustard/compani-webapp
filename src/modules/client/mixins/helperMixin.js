@@ -125,8 +125,8 @@ export const helperMixin = {
         this.openNewHelperModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
-        NotifyNegative('Erreur lors de la création de l\'aidant');
+        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant.');
+        NotifyNegative('Erreur lors de la création de l\'aidant.');
       } finally {
         this.loading = false;
       }
@@ -145,7 +145,7 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.openEditedHelperModal = false
       } catch (e) {
-        NotifyNegative('Erreur lors de la modification de l\'aidant');
+        NotifyNegative('Erreur lors de la modification de l\'aidant.');
       } finally {
         this.loading = false;
       }
@@ -165,7 +165,7 @@ export const helperMixin = {
         NotifyPositive('Aidant supprimé');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'aidant");
+        NotifyNegative("Erreur lors de la suppression de l'aidant.");
       }
     },
     validateHelperDeletion (helperId) {
@@ -175,7 +175,7 @@ export const helperMixin = {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteHelper(helperId))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 };

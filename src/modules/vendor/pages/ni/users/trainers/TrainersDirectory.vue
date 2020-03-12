@@ -98,7 +98,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.trainers = [];
-        NotifyNegative('Erreur lors de la récupération des formateurs');
+        NotifyNegative('Erreur lors de la récupération des formateurs.');
       } finally {
         this.tableLoading = false;
       }

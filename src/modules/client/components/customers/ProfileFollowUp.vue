@@ -255,7 +255,7 @@ export default {
         this.customerFollowUp = await Stats.getCustomerFollowUp({ customer: this.customer._id });
       } catch (e) {
         this.customerFollowUp = [];
-        NotifyNegative('Erreur lors de la récupération des auxiliaires');
+        NotifyNegative('Erreur lors de la récupération des auxiliaires.');
       }
     },
     async getCustomerFundingsMonitoring () {
@@ -264,7 +264,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.fundingsMonitoring = [];
-        NotifyNegative('Erreur lors de la récupération du suivi des financements');
+        NotifyNegative('Erreur lors de la récupération du suivi des financements.');
       }
     },
     async refreshCustomer () {
@@ -279,7 +279,7 @@ export default {
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du chargement des données');
+        NotifyNegative('Erreur lors du chargement des données.');
       }
     },
     saveTmp (path) {

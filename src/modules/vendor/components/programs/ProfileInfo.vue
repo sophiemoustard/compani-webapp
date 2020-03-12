@@ -56,13 +56,13 @@ export default {
 
         const payload = set({}, path, value);
         await Programs.update(this.profileId, payload);
-        NotifyPositive('Modification enregistrée');
+        NotifyPositive('Modification enregistrée.');
 
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
       }

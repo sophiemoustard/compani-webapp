@@ -213,7 +213,7 @@ export default {
         await this.refresh();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du(des) règlement(s)');
+        NotifyNegative('Erreur lors de la création du(des) règlement(s).');
       } finally {
         this.selected = [];
       }

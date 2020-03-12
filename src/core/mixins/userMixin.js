@@ -46,11 +46,11 @@ export const userMixin = {
 
         this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
         this.emailLock = true;
-        NotifyPositive('Modification enregistrée');
+        NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return this.emailErrorHandler(path);
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
       }

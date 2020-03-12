@@ -12,7 +12,7 @@
         @blur="$v.user.credentials.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <div class="row justify-center">
         <q-btn big @click="updateUser" color="primary" :disable="$v.user.$invalid || isAuxiliaryWithoutCompany">
-          Modifier
+          Éditer
         </q-btn>
       </div>
       <hr style="margin-top: 5%; margin-bottom: 5%">
@@ -106,11 +106,11 @@ export default {
           userToSend.local.password = this.user.credentials.password
         };
         await Users.updateById(this.$route.params.id, userToSend);
-        NotifyPositive('Profil mis à jour');
+        NotifyPositive('Profil modifié.');
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
       } catch (e) {
-        NotifyNegative('Erreur lors de la mise à jour du profil');
+        NotifyNegative('Erreur lors de la modification du profil.');
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
         console.error(e);

@@ -297,7 +297,7 @@ export default {
       } catch (e) {
         this.auxiliary = null;
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération de l\'auxiliaire');
+        NotifyNegative('Erreur lors de la récupération de l\'auxiliaire.');
       }
     },
     async refreshContracts () {
@@ -319,7 +319,7 @@ export default {
       } catch (e) {
         this.contracts = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des contracts');
+        NotifyNegative('Erreur lors de la récupération des contracts.');
       }
     },
     // Contract creation
@@ -383,7 +383,7 @@ export default {
         NotifyPositive('Contrat créé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du contrat');
+        NotifyNegative('Erreur lors de la création du contrat.');
       } finally {
         this.loading = false;
       }
@@ -434,7 +434,7 @@ export default {
         NotifyPositive('Version créée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'avenant');
+        NotifyNegative('Erreur lors de la création de l\'avenant.');
       } finally {
         this.loading = false;
       }
@@ -469,8 +469,8 @@ export default {
         NotifyPositive('Version supprimée');
       } catch (e) {
         console.error(e);
-        if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant');
-        NotifyNegative('Erreur lors de la suppression de l\'avenant');
+        if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant.');
+        NotifyNegative('Erreur lors de la suppression de l\'avenant.');
       }
     },
     // End contract
@@ -503,7 +503,7 @@ export default {
         NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour du contrat');
+        NotifyNegative('Erreur lors de la mise à jour du contrat.');
       } finally {
         this.loading = false;
       }

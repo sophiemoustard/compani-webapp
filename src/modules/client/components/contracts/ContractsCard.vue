@@ -202,7 +202,7 @@ export default {
       }
     },
     failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
+      NotifyNegative('Echec de l\'envoi du document.');
     },
     getFormFields (contract, version) {
       const formFields = [
@@ -296,7 +296,7 @@ export default {
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la requête de signature en ligne du contrat');
+        NotifyNegative('Erreur lors de la requête de signature en ligne du contrat.');
       } finally {
         this.$q.loading.hide();
       }

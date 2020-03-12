@@ -336,7 +336,7 @@ export default {
       return newUser;
     },
     async sendSms (user) {
-      if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+      if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
 
       const activationCode = await ActivationCode.create({ user });
       await Twilio.sendSMS({
@@ -363,8 +363,8 @@ export default {
         this.auxiliaryCreationModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant');
-        NotifyNegative('Erreur lors de la création de la fiche auxiliaire');
+        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant.');
+        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
       } finally {
         this.loading = false;
       }

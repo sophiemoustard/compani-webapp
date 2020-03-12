@@ -224,7 +224,7 @@ export default {
           bonusEdition: false,
         }));
       } catch (e) {
-        NotifyNegative('Impossible de récupérer les payes');
+        NotifyNegative('Impossible de récupérer les payes.');
         this.draftPay = [];
         console.error(e);
       } finally {
@@ -252,7 +252,7 @@ export default {
         ok: 'Oui',
         cancel: 'Non',
       }).onOk(() => this.createList())
-        .onCancel(() => NotifyPositive('Création annulée'));
+        .onCancel(() => NotifyPositive('Création annulée.'));
     },
     async createList () {
       try {
@@ -266,7 +266,7 @@ export default {
         this.selected = [];
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création des fiches de paie');
+        NotifyNegative('Erreur lors de la création des fiches de paie.');
       }
     },
   },

@@ -54,7 +54,7 @@
 
     <ni-modal v-model="userEditionModal" @hide="resetUserEditionForm">
       <template slot="title">
-        Modifier un <span class="text-weight-bold">utilisateur</span>
+        Éditer un <span class="text-weight-bold">utilisateur</span>
       </template>
       <ni-input in-modal v-model="selectedUser.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="selectedUser.identity.lastname" :error="$v.selectedUser.identity.lastname.$error"
@@ -67,7 +67,7 @@
       <ni-select in-modal caption="Role" :options="roleOptions" v-model="selectedUser.role"
         :error="$v.selectedUser.role.$error" @blur="$v.selectedUser.role.$touch" last required-field />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Modifier un utilisateur" icon-right="check" color="primary"
+        <q-btn no-caps class="full-width modal-btn" label="Éditer un utilisateur" icon-right="check" color="primary"
           :loading="loading" @click="updateUser" :disable="$v.selectedUser.$invalid" />
       </template>
     </ni-modal>
@@ -220,13 +220,13 @@ export default {
 
         const payload = set({}, path, value);
         await Companies.updateById(this.company._id, payload);
-        NotifyPositive('Modification enregistrée');
+        NotifyPositive('Modification enregistrée.');
 
         await this.refreshCompany();
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
       }
@@ -249,7 +249,7 @@ export default {
         NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
+        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant.');
         NotifyNegative('Erreur lors de la création de l\'utilisateur.');
       } finally {
         this.loading = false;
@@ -295,7 +295,7 @@ export default {
         NotifyPositive('Utilisateur modifié.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'utilisateur.');
+        NotifyNegative('Erreur lors de la modification de l\'utilisateur.');
       } finally {
         this.loading = false;
       }

@@ -93,7 +93,7 @@ export default {
     },
     async emailErrorHandler (path) {
       try {
-        NotifyNegative('Email déjà existant');
+        NotifyNegative('Email déjà existant.');
         this.mergedUserProfile.local.email = this.tmpInput;
         await this.$nextTick();
         this.$refs.userEmail.select();

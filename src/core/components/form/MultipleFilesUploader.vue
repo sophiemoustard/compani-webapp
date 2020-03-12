@@ -91,7 +91,7 @@ export default {
       this.$emit('uploaded');
     },
     failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
+      NotifyNegative('Echec de l\'envoi du document.');
     },
     goToUrl (url) {
       url = `${url}?usp=sharing`

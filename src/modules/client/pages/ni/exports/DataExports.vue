@@ -32,15 +32,15 @@ export default {
     async exportCsv () {
       try {
         const type = EXPORT_TYPES.find(t => t.value === this.type);
-        if (!type) NotifyNegative('Impossible de téléchager le document');
+        if (!type) NotifyNegative('Impossible de téléchager le document.');
 
         const csv = await Exports.getCsv({ type: type.value });
         await downloadFile(csv, `${type.label}.csv`);
 
-        NotifyPositive('Document téléchargé');
+        NotifyPositive('Document téléchargé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du téléchagement du document');
+        NotifyNegative('Erreur lors du téléchagement du document.');
       }
     },
   },

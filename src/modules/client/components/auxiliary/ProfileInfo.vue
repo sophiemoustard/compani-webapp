@@ -678,7 +678,7 @@ export default {
     },
     async emailErrorHandler (path) {
       try {
-        NotifyNegative('Email déjà existant');
+        NotifyNegative('Email déjà existant.');
         this.mergedUserProfile.local.email = this.tmpInput;
         await this.$nextTick();
         this.$refs.userEmail.select();
@@ -717,7 +717,7 @@ export default {
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.loadingImage = false;
       }
@@ -737,7 +737,7 @@ export default {
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document');
+        NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
     validateDocumentDeletion (driveId, path) {
@@ -748,7 +748,7 @@ export default {
         cancel: 'Annuler',
       })
         .onOk(() => this.deleteDocument(path, driveId))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async deleteImage () {
       try {
@@ -761,7 +761,7 @@ export default {
         NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la photo');
+        NotifyNegative('Erreur lors de la suppression de la photo.');
       }
     },
     validateImageDeletion () {
@@ -772,7 +772,7 @@ export default {
         cancel: 'Annuler',
       })
         .onOk(this.deleteImage)
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async refreshUser () {
       await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
