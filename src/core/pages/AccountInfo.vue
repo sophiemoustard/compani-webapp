@@ -3,7 +3,8 @@
     <h4>Mon compte</h4>
     <div class="center-account">
       <ni-input v-model.trim="user.credentials.email" caption="Email" :error="$v.user.credentials.email.$error"
-        error-label="Email invalide." @blur="$v.user.credentials.email.$touch" :disable="isAuxiliaryWithoutCompany" />
+        error-label="Email invalide." @blur="$v.user.credentials.email.$touch" :disable="isAuxiliaryWithoutCompany"
+        @focus="saveTmp('credentials.email')" />
       <ni-input v-model.trim="user.credentials.password" :error="$v.user.credentials.password.$error"
         caption="Nouveau mot de passe" error-label="Le mot de passe doit contenir entre 6 et 20 caractères."
         @blur="$v.user.credentials.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
@@ -67,6 +68,7 @@ export default {
       rgpdModal: false,
       cguModal: false,
       cguCompani,
+      tmpInput: '',
     }
   },
   validations: {
@@ -97,23 +99,25 @@ export default {
     },
   },
   methods: {
+    saveTmp (path) {
+      if (this.tmpInput === '') this.tmpInput = get(this.user, path);
+    },
     async updateUser () {
       try {
-        const userToSend = {
-          local: { email: this.user.credentials.email },
-        };
+        if (this.user.credentials.email !== this.tmpInput) {
+          await Users.updateById(this.$route.params.id, { local: { email: this.user.credentials.email } });
+        }
         if (this.user.credentials.password) {
-          userToSend.local.password = this.user.credentials.password
-        };
-        await Users.updateById(this.$route.params.id, userToSend);
+          await Users.updatePassword(this.$route.params.id, { local: { password: this.user.credentials.password } });
+        }
         NotifyPositive('Profil modifié.');
-        this.user.credentials.password = '';
-        this.user.credentials.passwordConfirm = '';
       } catch (e) {
         NotifyNegative('Erreur lors de la modification du profil.');
+        console.error(e);
+      } finally {
         this.user.credentials.password = '';
         this.user.credentials.passwordConfirm = '';
-        console.error(e);
+        this.tmpInput = '';
       }
     },
     logout () {
