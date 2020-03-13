@@ -198,7 +198,7 @@ export default {
         this.customersWithInterventions = [];
         this.deleteEventsModal = false;
         console.error(e);
-        NotifyNegative('Error lors de la récupération des bénéficiaires');
+        NotifyNegative('Error lors de la récupération des bénéficiaires.');
       }
     },
     toggleAllSectors () {
@@ -281,7 +281,7 @@ export default {
         this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Problème lors de la modification de l\'évènement');
+        NotifyNegative('Problème lors de la modification de l\'évènement.');
       } finally {
         this.draggedObject = {};
       }
@@ -300,7 +300,7 @@ export default {
           ],
         });
       }
-      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
       this.$emit('createEvent', eventInfo);
     },

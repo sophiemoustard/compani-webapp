@@ -179,7 +179,7 @@ export default {
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
       this.tableLoading = true;
-      NotifyNegative('Erreur lors de la récupération des plans d\'aide');
+      NotifyNegative('Erreur lors de la récupération des plans d\'aide.');
     } finally {
       this.tableLoading = false;
     }

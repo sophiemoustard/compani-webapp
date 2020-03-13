@@ -320,7 +320,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        return NotifyNegative("Erreur lors de la création de l'établissement");
+        return NotifyNegative("Erreur lors de la création de l'établissement.");
       } finally {
         this.loading = false;
       }

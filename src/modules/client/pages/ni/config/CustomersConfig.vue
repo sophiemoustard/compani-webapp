@@ -1066,7 +1066,7 @@ export default {
         await this.refreshServices();
       } catch (e) {
         console.error(e)
-        NotifyNegative('Erreur lors de la modification du service');
+        NotifyNegative('Erreur lors de la modification du service.');
       } finally {
         this.loading = false;
       }
@@ -1089,7 +1089,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteService(serviceId, row))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     showHistory (id) {
       this.selectedService = this.services.find(ser => ser._id === id);
@@ -1188,7 +1188,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     isTppUsedInFundings (tpp) {
       const index = this.getRowIndex(this.thirdPartyPayers, tpp);

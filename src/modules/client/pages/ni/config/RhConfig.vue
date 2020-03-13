@@ -381,11 +381,11 @@ export default {
           },
         };
         await Companies.updateById(this.company._id, payload);
-        NotifyPositive('Modification enregistrée');
+        NotifyPositive('Modification enregistrée.');
         this.tmpInput = '';
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
         this.tmpInput = '';
       }
     },
@@ -411,7 +411,7 @@ export default {
         this.internalHours = await InternalHours.list();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des heures internes');
+        NotifyNegative('Erreur lors de la récupération des heures internes.');
         this.internalHours = [];
       }
     },
@@ -431,7 +431,7 @@ export default {
         await this.refreshInternalHours();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'heure interne');
+        NotifyNegative('Erreur lors de la création de l\'heure interne.');
       } finally {
         this.loading = false;
       }
@@ -494,7 +494,7 @@ export default {
         await this.getSectors();
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la création de l'équipe");
+        NotifyNegative("Erreur lors de la création de l'équipe.");
       } finally {
         this.loading = false;
       }
@@ -522,7 +522,7 @@ export default {
         await this.getSectors();
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la modification de l'équipe");
+        NotifyNegative("Erreur lors de la modification de l'équipe.");
       } finally {
         this.loading = false;
       }
@@ -550,7 +550,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteSector(sectorId, row))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     sectorNameError (obj) {
       if (!obj.name.required) return REQUIRED_LABEL;
@@ -591,7 +591,7 @@ export default {
         await this.getAdministrativeDocuments();
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de l'envoi du document");
+        NotifyNegative("Erreur lors de l'envoi du document.");
       } finally {
         this.loading = false;
       }
@@ -614,7 +614,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteAdministrativeDocument(administrativeDocument))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 }

@@ -447,7 +447,7 @@ export default {
       } catch (e) {
         this.customersOptions = [];
         console.error(e);
-        NotifyNegative('Impossible de récupérer les bénéficiaires');
+        NotifyNegative('Impossible de récupérer les bénéficiaires.');
       }
     },
     async refreshCreditNotes () {
@@ -456,7 +456,7 @@ export default {
       } catch (e) {
         this.creditNotes = [];
         console.error(e);
-        NotifyNegative('Impossible de récupérer les avoirs');
+        NotifyNegative('Impossible de récupérer les avoirs.');
       }
     },
     formatEventsAsCreditNoteEvents (events) {
@@ -502,7 +502,7 @@ export default {
       } catch (e) {
         this.creditNoteEvents = [];
         console.error(e);
-        NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire');
+        NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire.');
       }
     },
     // Compute
@@ -627,7 +627,7 @@ export default {
         this.creditNoteCreationModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'avoir');
+        NotifyNegative('Erreur lors de la création de l\'avoir.');
       } finally {
         this.loading = false;
       }
@@ -670,12 +670,12 @@ export default {
         if (this.editedCreditNote.thirdPartyPayer) payload.thirdPartyPayer = this.editedCreditNote.thirdPartyPayer._id;
         await CreditNotes.updateById(this.editedCreditNote._id, payload);
 
-        NotifyPositive('Avoir édité');
+        NotifyPositive('Avoir modifié.');
         await this.refreshCreditNotes();
         this.creditNoteEditionModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'avoir');
+        NotifyNegative('Erreur lors de la modification de l\'avoir.');
       } finally {
         this.loading = false;
       }
@@ -685,10 +685,10 @@ export default {
       try {
         await CreditNotes.remove(id);
         await this.refreshCreditNotes();
-        NotifyPositive('Avoir supprimé');
+        NotifyPositive('Avoir supprimé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'avoir');
+        NotifyNegative('Erreur lors de la suppression de l\'avoir.');
       }
     },
     validateCNDeletion (id) {
@@ -699,7 +699,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteCreditNote(id))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     formatIdentity,
   },

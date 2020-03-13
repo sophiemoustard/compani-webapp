@@ -26,10 +26,10 @@ export const configMixin = {
         const value = get(this.company, path);
         const payload = set({}, path, value);
         await Companies.updateById(this.company._id, payload);
-        NotifyPositive('Modification enregistrée');
+        NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
       }
@@ -48,7 +48,7 @@ export const configMixin = {
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document');
+        NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
     validateDocumentDeletion (driveId, type, key) {
@@ -58,7 +58,7 @@ export const configMixin = {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(driveId, type, key))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     documentUploaded () {
       NotifyPositive('Document envoyé');

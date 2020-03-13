@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)">
     <template slot="title">
-      Modifier l'<span class="text-weight-bold">aidant</span>
+      Éditer l'<span class="text-weight-bold">aidant</span>
     </template>
     <ni-input in-modal v-model="editedHelper.identity.lastname" :error="validations.identity.lastname.$error"
       caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
@@ -10,7 +10,7 @@
     <ni-input in-modal v-model="editedHelper.contact.phone" last :error="validations.contact.phone.$error"
       caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Modifier l'aidant" icon-right="add" color="primary"
+      <q-btn no-caps class="full-width modal-btn" label="Éditer l'aidant" icon-right="add" color="primary"
         :loading="loading" @click="editHelper" />
     </template>
   </ni-modal>

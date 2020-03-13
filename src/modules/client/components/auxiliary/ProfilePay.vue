@@ -185,7 +185,7 @@ export default {
       } catch (e) {
         this.payDocuments = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des documents');
+        NotifyNegative('Erreur lors de la récupération des documents.');
       }
     },
     async deletePayDocument (payDocument) {
@@ -195,7 +195,7 @@ export default {
         await this.getDocuments();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document');
+        NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
     validatePayDocumentDeletion (payDocument) {
@@ -205,7 +205,7 @@ export default {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deletePayDocument(payDocument))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 }

@@ -111,7 +111,7 @@ export default {
         this.$router.replace({ name: 'auxiliary personal info', params: { id: this.$q.cookies.get('user_id') } });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Echec de la mise à jour de l\'utilisateur');
+        NotifyNegative('Echec de la mise à jour de l\'utilisateur.');
       }
     },
   },

@@ -145,7 +145,7 @@ export const contractMixin = {
       await this.refreshContracts();
 
       this.resetVersionEditionModal();
-      NotifyPositive('Contrat modifié');
+      NotifyPositive('Contrat modifié.');
     },
     async editVersion () {
       try {
@@ -157,7 +157,7 @@ export const contractMixin = {
             ok: true,
             cancel: 'Annuler',
           }).onOk(this.saveVersion)
-            .onCancel(() => NotifyPositive('Edition annulée'));
+            .onCancel(() => NotifyPositive('Modification annulée'));
         } else {
           await this.saveVersion();
         }
@@ -167,7 +167,7 @@ export const contractMixin = {
           this.$v.editedVersion.$reset();
           return NotifyNegative('La date de début du contrat doit etre antérieure aux évènements de l\'auxiliaire.');
         }
-        NotifyNegative('Erreur lors de l\'edition du contrat');
+        NotifyNegative('Erreur lors de la modification du contrat.');
       } finally {
         this.loading = false;
       }

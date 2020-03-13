@@ -73,7 +73,7 @@ export default {
         NotifyPositive('Mot de passe changé. Redirection vers la page de connexion...');
         this.timeout = setTimeout(() => this.$router.replace({ path: '/login' }), 2000)
       } catch (e) {
-        NotifyNegative('Erreur, si le problème persiste, contactez le support technique');
+        NotifyNegative('Erreur, si le problème persiste, contactez le support technique.');
         console.error(e.response);
       }
     },

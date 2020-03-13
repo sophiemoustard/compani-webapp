@@ -234,7 +234,7 @@ export default {
       } catch (e) {
         this.draftBills = [];
         console.error(e);
-        NotifyNegative('Erreur lors du chargement des données à facturer');
+        NotifyNegative('Erreur lors du chargement des données à facturer.');
       } finally {
         this.tableLoading = false;
       }
@@ -254,10 +254,10 @@ export default {
 
         this.selected = [];
         await this.getDraftBills();
-        NotifyPositive('Clients facturés');
+        NotifyPositive('Clients facturés.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la facturation des clients');
+        NotifyNegative('Erreur lors de la facturation des clients.');
       }
     },
     validateBillListCreation () {
@@ -272,7 +272,7 @@ export default {
           items: [{ label: 'Envoyer par email', value: true, color: 'primary' }],
         },
       }).onOk(this.createBillsBatch)
-        .onCancel(() => NotifyPositive('Facturation annulée'));
+        .onCancel(() => NotifyPositive('Facturation annulée.'));
     },
     async refreshBill (row, bill) {
       try {
@@ -288,10 +288,10 @@ export default {
           customer: customer._id,
         });
         this.draftBills.splice(index, 1, ...draftBills);
-        NotifyPositive('Date de début de facturation modifiée');
+        NotifyPositive('Date de début de facturation modifiée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de la date de début de facturation');
+        NotifyNegative('Erreur lors de la modification de la date de début de facturation.');
       }
     },
     tableRowKey (row) {

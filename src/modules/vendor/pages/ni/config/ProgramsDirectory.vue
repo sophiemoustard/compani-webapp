@@ -80,7 +80,7 @@ export default {
         this.programs = await Programs.list();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des programmes');
+        NotifyNegative('Erreur lors de la récupération des programmes.');
       } finally {
         this.tableLoading = false;
       }

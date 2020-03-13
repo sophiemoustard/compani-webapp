@@ -404,7 +404,7 @@ export default {
         await this.refresh();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement');
+        NotifyNegative('Erreur lors de la création du règlement.');
       } finally {
         this.paymentEditionLoading = false;
       }
@@ -441,7 +441,7 @@ export default {
       this.$v.taxCertificate.$reset();
     },
     async createTaxCertificate () {
-      if (!this.customerFolder) return NotifyNegative('Dossier du bénéficiaire manquant');
+      if (!this.customerFolder) return NotifyNegative('Dossier du bénéficiaire manquant.');
       this.$v.taxCertificate.$touch();
       if (this.$v.taxCertificate.$error) return NotifyWarning('Champ(s) invalide(s)');
       this.modalLoading = true;
@@ -450,11 +450,11 @@ export default {
         await TaxCertificates.create(this.formatTaxCertificatePayload());
 
         this.taxCertificateModal = false;
-        NotifyPositive('Attestation fiscale sauvegardée');
+        NotifyPositive('Attestation fiscale sauvegardée.');
         await this.getTaxCertificates();
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de l'envoi de l'attestation fiscale");
+        NotifyNegative("Erreur lors de l'envoi de l'attestation fiscale.");
       } finally {
         this.modalLoading = false;
       }
@@ -466,7 +466,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteTaxCertificate(taxCertificateId, row))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async deleteTaxCertificate (taxCertificateId, row) {
       try {

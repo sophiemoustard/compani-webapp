@@ -144,6 +144,12 @@ export const VENDOR_ADMIN = 'vendor_admin';
 export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
 export const TRAINER = 'trainer';
 
+// ROLE TRANSLATION
+export const ROLES_TRANSLATION = {
+  [CLIENT_ADMIN]: 'Admin Client',
+  [COACH]: 'Coach',
+};
+
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
 export const WEEK_VIEW = 'week';
