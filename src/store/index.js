@@ -6,6 +6,7 @@ import planning from 'src/modules/client/store/planning';
 import program from 'src/modules/vendor/store/program';
 import customer from 'src/modules/client/store/customer';
 import company from 'src/modules/vendor/store/company';
+import course from 'src/modules/vendor/store/course';
 
 Vue.use(Vuex);
 
@@ -17,6 +18,7 @@ const store = new Vuex.Store({
     customer,
     program,
     company,
+    course,
   },
 });
 
