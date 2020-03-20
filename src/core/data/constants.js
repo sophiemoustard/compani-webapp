@@ -67,6 +67,8 @@ export const ILLNESS = 'illness';
 export const UNJUSTIFIED = 'unjustified absence';
 export const PAID_LEAVE = 'leave';
 export const WORK_ACCIDENT = 'work accident';
+export const CESSATION_OF_WORK_CHILD = 'cessation_of_work_child';
+export const CESSATION_OF_WORK_RISK = 'cessation_of_work_risk';
 export const ABSENCE_TYPES = [
   { label: 'Congé', value: PAID_LEAVE },
   { label: 'Congé sans solde', value: 'unpaid leave' },
@@ -74,6 +76,8 @@ export const ABSENCE_TYPES = [
   { label: 'Maladie', value: ILLNESS },
   { label: 'Absence injustifiée', value: UNJUSTIFIED },
   { label: 'Accident du travail', value: WORK_ACCIDENT },
+  { label: 'Arrêt de travail - garde d’enfant', value: CESSATION_OF_WORK_CHILD },
+  { label: 'Arrêt de travail - salarié à risque', value: CESSATION_OF_WORK_RISK },
   { label: 'Autre', value: OTHER },
 ];
 export const EDITION = 'edition';
