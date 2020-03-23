@@ -104,7 +104,7 @@ export default {
     },
     async updateUser () {
       try {
-        if (this.user.credentials.email !== this.tmpInput && this.tmpInput !== '') {
+        if (this.tmpInput !== '' && this.user.credentials.email !== this.tmpInput) {
           await Users.updateById(this.$route.params.id, { local: { email: this.user.credentials.email } });
         }
         if (this.user.credentials.password) {
