@@ -91,8 +91,8 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
-    goToCourseProfile (row) {
-      this.$router.push({ name: 'profile course info', params: { courseId: row._id } });
+    goToCourseProfile (course) {
+      this.$router.push({ name: 'profile course info', params: { courseId: course._id } });
     },
     async refreshCourses () {
       try {

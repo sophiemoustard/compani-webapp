@@ -42,7 +42,7 @@ export default {
     return {
       course: {
         name: { required },
-        trainers: { required },
+        trainer: { required },
       },
     }
   },

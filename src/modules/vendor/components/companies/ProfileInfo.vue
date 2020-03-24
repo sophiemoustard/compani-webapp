@@ -288,7 +288,6 @@ export default {
       this.selectedUser = { identity: {}, local: {}, contact: {} };
     },
     formatUpdatedUserPayload (user) {
-      console.warn(user);
       return pickBy(
         pick(user, ['identity.firstname', 'identity.lastname', 'local.email', 'role', 'contact.phone'])
       );
