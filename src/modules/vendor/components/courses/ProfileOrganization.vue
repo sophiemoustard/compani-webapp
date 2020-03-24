@@ -76,8 +76,8 @@ export default {
       try {
         const value = get(this.course, path);
         if (this.tmpInput === value) return;
-        this.$v.course.$touch();
-        if (this.$v.course.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.course[path].$touch();
+        if (this.$v.course[path].$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = set({}, path, value);
         await Courses.update(this.profileId, payload);
