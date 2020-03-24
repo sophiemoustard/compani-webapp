@@ -6,10 +6,10 @@
         error-label="Email invalide." @blur="$v.user.credentials.email.$touch" :disable="isAuxiliaryWithoutCompany"
         @focus="saveTmp('credentials.email')" />
       <ni-input v-model.trim="user.credentials.password" :error="$v.user.credentials.password.$error"
-        caption="Nouveau mot de passe" error-label="Le mot de passe doit contenir entre 6 et 20 caractères."
+        caption="Nouveau mot de passe" :error-label="passwordError"
         @blur="$v.user.credentials.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <ni-input v-model.trim="user.credentials.passwordConfirm" :error="$v.user.credentials.passwordConfirm.$error"
-        caption="Confirmation mot de passe" error-label="Le mot de passe entré et la confirmation sont différents."
+        caption="Confirmation mot de passe" :error-label="passwordConfirmError($v.user.credentials.passwordConfirm)"
         @blur="$v.user.credentials.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <div class="row justify-center">
         <q-btn big @click="updateUser" color="primary" :disable="$v.user.$invalid || isAuxiliaryWithoutCompany">
@@ -37,18 +37,20 @@
 </template>
 
 <script>
-import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
+import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
 import { AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
+import { passwordMixin } from '@mixins/passwordMixin';
 import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {
   metaInfo: { title: 'Mon compte' },
+  mixins: [passwordMixin],
   components: {
     'ni-input': Input,
     'ni-html-modal': HtmlModal,
@@ -71,19 +73,21 @@ export default {
       tmpInput: '',
     }
   },
-  validations: {
-    user: {
-      credentials: {
-        email: { required, email },
-        password: {
-          minLength: minLength(6),
-          maxLength: maxLength(20),
-        },
-        passwordConfirm: {
-          sameAsPassword: sameAs('password'),
+  validations () {
+    return {
+      user: {
+        credentials: {
+          email: { required, email },
+          password: {
+            ...this.passwordValidation,
+          },
+          passwordConfirm: {
+            required: requiredIf(item => !!item.password),
+            sameAsPassword: sameAs('password'),
+          },
         },
       },
-    },
+    }
   },
   async mounted () {
     try {
