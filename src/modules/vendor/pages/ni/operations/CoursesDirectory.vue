@@ -2,6 +2,9 @@
   <q-page class="neutral-background" padding>
     <ni-directory-header title="Formations" search-placeholder="Rechercher une formation"
       @updateSearch="updateSearch" :search="searchStr" />
+    <div class="q-mt-xl">
+      <course-detail class="q-mb-sm" v-for="(course, index) in filteredCourses" :key="index" :course="course" />
+    </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="courseCreationModal = true" />
 
@@ -33,6 +36,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import CourseDetail from 'src/modules/vendor/components/courses/CourseDetail';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -42,6 +46,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
+    'course-detail': CourseDetail,
   },
   data () {
     return {
@@ -68,6 +73,13 @@ export default {
         type: { required: true },
       },
     }
+  },
+  computed: {
+    filteredCourses () {
+      return this.courses
+        .filter(course => course.name.match(new RegExp(this.searchStr, 'i')))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    },
   },
   async mounted () {
     await this.refreshCourses();
