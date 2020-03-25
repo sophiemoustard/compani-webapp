@@ -15,8 +15,9 @@
         </div>
         <ni-input v-model="user.local.email" caption="Email" @blur="$v.user.local.email.$touch()"
           :error="$v.user.local.email.$error" />
-        <ni-input v-model="user.local.password" caption="Mot de passe" type="password" :error-label="passwordError"
-          @blur="$v.user.local.password.$touch()" :error="$v.user.local.password.$error" />
+        <ni-input v-model="user.local.password" caption="Mot de passe" type="password"
+          :error-label="passwordError($v.user.local.password)" @blur="$v.user.local.password.$touch()"
+          :error="$v.user.local.password.$error" />
         <ni-input v-model="passwordConfirm" caption="Confirmation mot de passe" type="password"
           @blur="$v.passwordConfirm.$touch()" :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError" />
         <div class="row justify-center">

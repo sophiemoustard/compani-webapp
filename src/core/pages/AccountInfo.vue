@@ -6,7 +6,7 @@
         error-label="Email invalide." @blur="$v.user.local.email.$touch" :disable="isAuxiliaryWithoutCompany"
         @focus="saveTmp('local.email')" />
       <ni-input v-model.trim="user.local.password" :error="$v.user.local.password.$error"
-        caption="Nouveau mot de passe" :error-label="passwordError"
+        caption="Nouveau mot de passe" :error-label="passwordError($v.user.local.password)"
         @blur="$v.user.local.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <ni-input v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error"
         caption="Confirmation mot de passe" :error-label="passwordConfirmError"
@@ -79,9 +79,7 @@ export default {
       user: {
         local: {
           email: { required, email },
-          password: {
-            ...this.passwordValidation,
-          },
+          password: { ...this.passwordValidation },
         },
       },
       passwordConfirm: {
@@ -121,7 +119,7 @@ export default {
         console.error(e);
       } finally {
         this.user.local.password = '';
-        this.user.local.passwordConfirm = '';
+        this.passwordConfirm = '';
         this.tmpInput = '';
       }
     },

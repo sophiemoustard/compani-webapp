@@ -173,9 +173,8 @@
         </div>
         <div v-if="mergedUserProfile.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport"
-            :entity="mergedUserProfile"
+            :entity="mergedUserProfile" name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
             @delete="validateDocumentDeletion(mergedUserProfile.administrative.passport.driveId, 'administrative.passport')"
-            name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
             :error="$v.mergedUserProfile.administrative.passport.driveId.$error" :extensions="extensions"
             :additional-value="`passport_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>

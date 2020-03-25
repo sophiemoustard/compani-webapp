@@ -6,10 +6,10 @@
         <p class="q-mb-lg message">Veuillez renseigner un nouveau mot de passe.</p>
         <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
           v-model.trim="password" @blur="$v.password.$touch" type="password"
-          error-label="Le mot de passe doit contenir entre 6 et 20 caractères." required-field />
+          :error-label="passwordError($v.password)" required-field />
         <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
           v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
-          error-label="Le mot de passe entré et la confirmation sont différents." />
+          :error-label="passwordConfirmError" />
         <div class="row justify-center">
           <q-btn @click="submit" color="primary" :disable="$v.$invalid">Envoyer</q-btn>
         </div>
@@ -19,17 +19,19 @@
 </template>
 
 <script>
-import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
+import { sameAs, required, requiredIf } from 'vuelidate/lib/validators'
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { passwordMixin } from '@mixins/passwordMixin';
 
 export default {
   components: {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
+  mixins: [passwordMixin],
   data () {
     return {
       password: '',
@@ -53,9 +55,14 @@ export default {
       next({ path: '/login' });
     }
   },
-  validations: {
-    password: { required, minLength: minLength(6), maxLength: maxLength(20) },
-    passwordConfirm: { required, sameAsPassword: sameAs('password') },
+  validations () {
+    return {
+      password: { required, ...this.passwordValidation },
+      passwordConfirm: {
+        required: requiredIf(item => item.password),
+        sameAsPassword: sameAs('password'),
+      },
+    }
   },
   methods: {
     setData (checkToken) {
