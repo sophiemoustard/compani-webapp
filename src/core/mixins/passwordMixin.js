@@ -15,19 +15,17 @@ export const passwordMixin = {
   computed: {
     passwordError () {
       if (this.$v.user.local.password.required === false) return REQUIRED_LABEL;
-      if (!this.$v.user.credentials.password.minLength || !this.$v.user.credentials.password.minLength) {
+      if (!this.$v.user.local.password.minLength || !this.$v.user.local.password.minLength) {
         return 'Le mot de passe doit contenir au minimum 8 caractères.';
       }
-      if (!this.$v.user.credentials.password.validPassword) {
+      if (!this.$v.user.local.password.validPassword) {
         return 'Le mot de passe doit contenir au moins un chiffre, une majuscule, une minuscule, un caractère spécial(ex: !@#$%^&)'
       }
       return ''
     },
-  },
-  methods: {
-    passwordConfirmError (validationObj) {
-      if (!validationObj.required) return REQUIRED_LABEL;
-      else if (!validationObj.sameAs) return 'Le mot de passe doit être identique';
+    passwordConfirmError () {
+      if (!this.$v.passwordConfirm.required) return REQUIRED_LABEL;
+      else if (!this.$v.passwordConfirm.sameAs) return 'Le mot de passe doit être identique';
       return 'Mot de passe invalide';
     },
   },

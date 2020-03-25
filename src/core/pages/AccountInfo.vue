@@ -2,17 +2,17 @@
   <q-page class="neutral-background" padding>
     <h4>Mon compte</h4>
     <div class="center-account">
-      <ni-input v-model.trim="user.credentials.email" caption="Email" :error="$v.user.credentials.email.$error"
-        error-label="Email invalide." @blur="$v.user.credentials.email.$touch" :disable="isAuxiliaryWithoutCompany"
-        @focus="saveTmp('credentials.email')" />
-      <ni-input v-model.trim="user.credentials.password" :error="$v.user.credentials.password.$error"
+      <ni-input v-model.trim="user.local.email" caption="Email" :error="$v.user.local.email.$error"
+        error-label="Email invalide." @blur="$v.user.local.email.$touch" :disable="isAuxiliaryWithoutCompany"
+        @focus="saveTmp('local.email')" />
+      <ni-input v-model.trim="user.local.password" :error="$v.user.local.password.$error"
         caption="Nouveau mot de passe" :error-label="passwordError"
-        @blur="$v.user.credentials.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
-      <ni-input v-model.trim="user.credentials.passwordConfirm" :error="$v.user.credentials.passwordConfirm.$error"
-        caption="Confirmation mot de passe" :error-label="passwordConfirmError($v.user.credentials.passwordConfirm)"
-        @blur="$v.user.credentials.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
+        @blur="$v.user.local.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
+      <ni-input v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error"
+        caption="Confirmation mot de passe" :error-label="passwordConfirmError"
+        @blur="$v.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <div class="row justify-center">
-        <q-btn big @click="updateUser" color="primary" :disable="$v.user.$invalid || isAuxiliaryWithoutCompany">
+        <q-btn big @click="updateUser" color="primary" :disable="$v.$invalid || isAuxiliaryWithoutCompany">
           Éditer
         </q-btn>
       </div>
@@ -49,6 +49,7 @@ import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {
+  name: 'AccountInfo',
   metaInfo: { title: 'Mon compte' },
   mixins: [passwordMixin],
   components: {
@@ -58,14 +59,14 @@ export default {
   data () {
     return {
       user: {
-        credentials: {
+        local: {
           email: '',
           password: '',
-          passwordConfirm: '',
         },
         alenvi: {},
         contracts: [],
       },
+      passwordConfirm: '',
       rgpd,
       rgpdModal: false,
       cguModal: false,
@@ -76,23 +77,23 @@ export default {
   validations () {
     return {
       user: {
-        credentials: {
+        local: {
           email: { required, email },
           password: {
             ...this.passwordValidation,
           },
-          passwordConfirm: {
-            required: requiredIf(item => !!item.password),
-            sameAsPassword: sameAs('password'),
-          },
         },
+      },
+      passwordConfirm: {
+        required: requiredIf((item) => !!item.user.local.password),
+        sameAsPassword: sameAs((item) => item.user.local.password),
       },
     }
   },
   async mounted () {
     try {
       this.user.alenvi = await Users.getById(this.$route.params.id);
-      this.user.credentials.email = this.user.alenvi.local.email;
+      this.user.local.email = this.user.alenvi.local.email;
     } catch (e) {
       console.error(e);
     }
@@ -108,19 +109,19 @@ export default {
     },
     async updateUser () {
       try {
-        if (this.tmpInput !== '' && this.user.credentials.email !== this.tmpInput) {
-          await Users.updateById(this.$route.params.id, { local: { email: this.user.credentials.email } });
+        if (this.tmpInput !== '' && this.user.local.email !== this.tmpInput) {
+          await Users.updateById(this.$route.params.id, { local: { email: this.user.local.email } });
         }
-        if (this.user.credentials.password) {
-          await Users.updatePassword(this.$route.params.id, { local: { password: this.user.credentials.password } });
+        if (this.user.local.password) {
+          await Users.updatePassword(this.$route.params.id, { local: { password: this.user.local.password } });
         }
         NotifyPositive('Profil modifié.');
       } catch (e) {
         NotifyNegative('Erreur lors de la modification du profil.');
         console.error(e);
       } finally {
-        this.user.credentials.password = '';
-        this.user.credentials.passwordConfirm = '';
+        this.user.local.password = '';
+        this.user.local.passwordConfirm = '';
         this.tmpInput = '';
       }
     },

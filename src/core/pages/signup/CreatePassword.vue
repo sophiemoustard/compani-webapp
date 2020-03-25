@@ -18,10 +18,10 @@
         <ni-input v-model="user.local.password" caption="Mot de passe" type="password" :error-label="passwordError"
           @blur="$v.user.local.password.$touch()" :error="$v.user.local.password.$error" />
         <ni-input v-model="passwordConfirm" caption="Confirmation mot de passe" type="password"
-          @blur="$v.passwordConfirm.$touch()" :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError($v.passwordConfirm)" />
+          @blur="$v.passwordConfirm.$touch()" :error="$v.passwordConfirm.$error" :error-label="passwordConfirmError" />
         <div class="row justify-center">
           <q-btn no-caps class="signup-btn" label="Créer mon compte" icon-right="arrow_forward" color="primary"
-            :loading="loading" @click="submit" />
+            :loading="loading" @click="submit" :disable="$v.$invalid" />
         </div>
       </div>
     </div>
@@ -65,8 +65,8 @@ export default {
         },
       },
       passwordConfirm: {
-        required: requiredIf(() => !!this.user.local.password),
-        sameAsPassword: sameAs(() => this.user.local.password),
+        required: requiredIf((item) => !!item.user.local.password),
+        sameAsPassword: sameAs((item) => item.user.local.password),
       },
     }
   },
