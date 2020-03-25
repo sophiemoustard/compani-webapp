@@ -11,27 +11,8 @@ const routes = [
       return next();
     },
   },
-  {
-    path: '/enterCode',
-    component: () => import('src/core/pages/signup/EnterCode'),
-    beforeEnter: (to, from, next) => {
-      if (Cookies.get('refresh_token')) return next({ path: '/' });
-      return next();
-    },
-  },
   { path: '/forgot-password', component: () => import('src/core/pages/signin/ForgotPassword'), name: 'forgotPassword' },
   { path: '/reset-password/:token', component: () => import('src/core/pages/signin/ResetPassword') },
-  {
-    path: '/createPassword',
-    component: () => import('src/core/pages/signup/CreatePassword'),
-    beforeEnter: (to, from, next) => {
-      if (Cookies.get('signup_token') && Cookies.get('signup_userId') && Cookies.get('signup_userEmail')) {
-        next();
-      } else {
-        next({ path: '/enterCode' });
-      }
-    },
-  },
   { path: '/403-pwd', component: () => import('src/core/pages/signin/403') },
   { path: '/docsigned', component: () => import('src/core/pages/DocumentSigned'), props: route => ({ signed: route.query.signed }) },
   {

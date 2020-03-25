@@ -326,7 +326,7 @@ export default {
         to: `+33${user.contact.phone.substring(1)}`,
         body: `${this.company.tradeName}. Bienvenue ! :)\nPour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)` +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)\n` +
           `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`,
       });
       NotifyPositive('SMS bien envoyé');
