@@ -135,15 +135,12 @@ export default {
         `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}` +
         '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
       } else if (this.typeMessage === 'LA') {
-        let passwordToken;
-        if (!this.userProfile.passwordToken) {
-          passwordToken = await Users.createPasswordToken(this.userProfile._id, { email: this.userProfile.local.email });
-        } else {
-          passwordToken = this.userProfile.passwordToken;
+        if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
+          this.userProfile.passwordToken = await Users.createPasswordToken(this.userProfile._id, { email: this.userProfile.local.email });
         }
         this.messageComp = `${this.companyName}. Bienvenue ! :)\nPour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)\n` +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${this.userProfile.passwordToken.token} :-)\n` +
           `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`;
       } else this.messageComp = '';
     },
