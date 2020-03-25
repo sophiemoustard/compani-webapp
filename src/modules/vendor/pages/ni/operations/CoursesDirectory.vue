@@ -3,7 +3,8 @@
     <ni-directory-header title="Formations" search-placeholder="Rechercher une formation"
       @updateSearch="updateSearch" :search="searchStr" />
     <div class="q-mt-xl">
-      <course-detail class="q-mb-sm" v-for="(course, index) in filteredCourses" :key="index" :course="course" />
+      <course-detail class="q-mb-sm" v-for="(course, index) in filteredCourses" :key="index" :course="course"
+        @click="goToCourseProfile" />
     </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="courseCreationModal = true" />
@@ -89,6 +90,9 @@ export default {
   methods: {
     updateSearch (value) {
       this.searchStr = value;
+    },
+    goToCourseProfile (course) {
+      this.$router.push({ name: 'profile course info', params: { courseId: course._id } });
     },
     async refreshCourses () {
       try {

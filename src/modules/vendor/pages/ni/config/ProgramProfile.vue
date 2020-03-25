@@ -10,7 +10,7 @@ import get from 'lodash/get';
 import { mapGetters } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
-import ProfileProgram from 'src/modules/vendor/components/programs/ProfileInfo';
+import ProfileInfo from 'src/modules/vendor/components/programs/ProfileInfo';
 
 export default {
   name: 'ProgramProfile',
@@ -31,7 +31,7 @@ export default {
           label: 'Programme',
           name: 'program',
           default: this.defaultTab === 'program',
-          component: ProfileProgram,
+          component: ProfileInfo,
         },
       ],
     }

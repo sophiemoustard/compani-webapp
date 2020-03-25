@@ -1,6 +1,8 @@
 <template>
   <q-card flat>
-    <q-card-section class="text-weight-bold text-capitalize">{{ course.name }}</q-card-section>
+    <q-card-section class="text-weight-bold text-capitalize" @click="$emit('click', course)">
+      {{ course.name }}
+    </q-card-section>
   </q-card>
 </template>
 
@@ -17,4 +19,6 @@ export default {
   .q-card__section
     font-size: 13px
     height: 48px
+    &:hover
+      cursor: pointer
 </style>

@@ -81,7 +81,6 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
-import omit from 'lodash/omit';
 import cloneDeep from 'lodash/cloneDeep';
 import Companies from '@api/Companies';
 import Users from '@api/Users';
@@ -275,11 +274,12 @@ export default {
       if (coachRole) this.newUser.role = coachRole._id;
     },
     async openUserEditionModal (user) {
-      await this.getRoles();
+      if (this.roles.length === 0) await this.getRoles();
+
       this.selectedUser = {
         ...this.selectedUser,
         role: user.role.client._id,
-        ...pick(cloneDeep(user), ['_id', 'identity', 'local', 'contact']),
+        ...pick(cloneDeep(user), ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
       };
       this.userEditionModal = true;
     },
@@ -287,13 +287,18 @@ export default {
       this.$v.selectedUser.$reset();
       this.selectedUser = { identity: {}, local: {}, contact: {} };
     },
+    formatUpdatedUserPayload (user) {
+      return pickBy(
+        pick(user, ['identity.firstname', 'identity.lastname', 'local.email', 'role', 'contact.phone'])
+      );
+    },
     async updateUser () {
       try {
         this.loading = true;
         this.$v.selectedUser.$touch();
         if (this.$v.selectedUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Users.updateById(this.selectedUser._id, omit(this.selectedUser, ['_id']));
+        await Users.updateById(this.selectedUser._id, this.formatUpdatedUserPayload(this.selectedUser));
         this.userEditionModal = false;
         await this.getUsers();
         NotifyPositive('Utilisateur modifié.');
