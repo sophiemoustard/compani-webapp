@@ -165,6 +165,7 @@ export default {
         contact: { phone: '' },
         role: '',
         local: { email: '' },
+        company: '',
       },
       userValidations: {
         identity: { lastname: { required } },
@@ -244,7 +245,9 @@ export default {
         this.$v.newUser.$touch();
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Users.create(pickBy(this.newUser));
+        const userPayload = pickBy(this.newUser);
+        userPayload.company = this.company._id;
+        await Users.create(userPayload);
         this.userCreationModal = false;
         await this.getUsers();
         NotifyPositive('Utilisateur enregistré.');
