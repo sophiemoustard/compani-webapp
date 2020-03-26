@@ -165,6 +165,7 @@ export default {
         contact: { phone: '' },
         role: '',
         local: { email: '' },
+        company: '',
       },
       userValidations: {
         identity: { lastname: { required } },
@@ -238,13 +239,16 @@ export default {
         this.users = [];
       }
     },
+    formatUserPayload (user) {
+      return { ...pickBy(user), company: this.company._id };
+    },
     async createUser () {
       try {
         this.loading = true;
         this.$v.newUser.$touch();
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Users.create(pickBy(this.newUser));
+        await Users.create(this.formatUserPayload(this.newUser));
         this.userCreationModal = false;
         await this.getUsers();
         NotifyPositive('Utilisateur enregistré.');
