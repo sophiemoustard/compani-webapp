@@ -49,8 +49,8 @@
       </template>
     </ni-modal>
 
-    <!-- Course slot creation modal -->
-    <ni-modal v-model="courseSlotEditionModal" @hide="resetCourseSlotEditionModal">
+    <!-- Course slot edition modal -->
+    <ni-modal v-model="courseSlotEditionModal" @hide="resetCourseSlotEditionModal" container-class="modal-container-md">
       <template slot="title">
         Editer un <span class="text-weight-bold">créneau</span>
       </template>
@@ -294,10 +294,10 @@ export default {
         message: 'Es-tu sûr(e) de vouloir supprimer ce créneau ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteSubscriptions(slotId))
+      }).onOk(() => this.deleteCourseSlot(slotId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
-    async deleteSubscriptions (slotId) {
+    async deleteCourseSlot (slotId) {
       try {
         await CourseSlots.delete(slotId);
         await this.refreshCourse();
