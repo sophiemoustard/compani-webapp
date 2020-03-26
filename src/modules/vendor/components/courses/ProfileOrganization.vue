@@ -254,6 +254,7 @@ export default {
       this.editedCourseSlot = {
         _id: slot._id,
         dates: pick(slot, ['startDate', 'endDate']),
+        address: {},
       }
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.courseSlotEditionModal = true;
@@ -263,7 +264,7 @@ export default {
       this.$v.editedCourseSlot.$reset();
     },
     formatCourseSlotEditionPayload (courseSlot) {
-      const payload = { ...courseSlot.dates };
+      const payload = { ...courseSlot.dates, address: {} };
       if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
 
       return payload;
