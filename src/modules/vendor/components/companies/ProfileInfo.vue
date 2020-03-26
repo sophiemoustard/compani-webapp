@@ -240,9 +240,7 @@ export default {
       }
     },
     formatUserPayload (user) {
-      const userPayload = pickBy(user);
-      userPayload.company = this.company._id;
-      return userPayload;
+      return { ...pickBy(user), company: this.company._id };
     },
     async createUser () {
       try {
