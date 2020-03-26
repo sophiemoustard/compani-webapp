@@ -19,7 +19,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-icon color="grey" name="edit" @click="openCourseSlotEditionModal(props.row)" />
-                    <q-icon color="grey" name="delete" @click="validateCourseSlotDeletion(props.row)" />
+                    <q-icon color="grey" name="delete" @click="validateCourseSlotDeletion(props.row._id)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -288,7 +288,25 @@ export default {
         this.courseSlotEditionModal = false;
       }
     },
-    validateCourseSlotDeletion (slotId) {},
+    validateCourseSlotDeletion (slotId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce créneau ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteSubscriptions(slotId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteSubscriptions (slotId) {
+      try {
+        await CourseSlots.delete(slotId);
+        await this.refreshCourse();
+        NotifyPositive('Créneau supprimé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du créneau.')
+      }
+    },
   },
 }
 </script>

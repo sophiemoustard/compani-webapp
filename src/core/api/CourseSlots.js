@@ -8,4 +8,7 @@ export default {
     const courseSlot = await alenviAxios.put(`${process.env.API_HOSTNAME}/courseslots/${slotId}`, payload);
     return courseSlot.data.data.courseSlot;
   },
+  async delete (slotId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/courseslots/${slotId}`);
+  },
 };
