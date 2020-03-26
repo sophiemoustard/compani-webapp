@@ -88,13 +88,13 @@
           {{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Numéro de téléphone" :error="$v.mergedUserProfile.contact.phone.$error" :error-label="phoneNbrError"
-          type="tel" v-model.trim="mergedUserProfile.contact.phone" @blur="updateUser('contact.phone')"
-          @focus="saveTmp('contact.phone')" />
+        <ni-input caption="Numéro de téléphone" :error="$v.mergedUserProfile.contact.phone.$error"
+          :error-label="phoneNbrError($v.mergedUserProfile)" type="tel" v-model.trim="mergedUserProfile.contact.phone"
+          @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
         <div v-if="isCoach" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" name="emailInput" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
-              :error-label="emailError" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
+              :error-label="emailError($v.mergedUserProfile)" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
               @focus="saveTmp('local.email')" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
@@ -568,22 +568,6 @@ export default {
       !this.$v.mergedUserProfile.identity.socialSecurityNumber.maxLength ||
       !this.$v.mergedUserProfile.identity.socialSecurityNumber.numeric) {
         return 'Numéro de sécurité sociale non valide';
-      }
-      return '';
-    },
-    phoneNbrError () {
-      if (!this.$v.mergedUserProfile.contact.phone.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.contact.phone.frPhoneNumber || !this.$v.mergedUserProfile.contact.phone.maxLength) {
-        return 'Numéro de téléphone non valide';
-      }
-      return '';
-    },
-    emailError () {
-      if (!this.$v.mergedUserProfile.local.email.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.local.email.email) {
-        return 'Email non valide';
       }
       return '';
     },

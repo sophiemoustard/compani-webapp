@@ -42,7 +42,7 @@
       <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
         caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
       <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError" required-field />
+        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
       <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
         @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
         :error="$v.newUser.contact.address.$error" in-modal />
@@ -71,7 +71,6 @@
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
-import ActivationCode from '@api/ActivationCode';
 import Roles from '@api/Roles';
 import Twilio from '@api/Twilio';
 import Users from '@api/Users';
@@ -242,22 +241,6 @@ export default {
       }
       return '';
     },
-    zipCodeError () {
-      if (!this.$v.newUser.contact.zipCode.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newUser.contact.zipCode.frZipCode || !this.$v.newUser.contact.zipCode.maxLength) {
-        return 'Code postal non valide';
-      }
-      return '';
-    },
-    emailError () {
-      if (!this.$v.newUser.local.email.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newUser.local.email.email) {
-        return 'Email non valide';
-      }
-      return '';
-    },
   },
   methods: {
     updateSearch (value) {
@@ -338,12 +321,13 @@ export default {
     async sendSms (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
 
-      const activationCode = await ActivationCode.create({ user });
+      const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
       await Twilio.sendSMS({
-        to: `+33${this.newUser.contact.phone.substring(1)}`,
-        body: `${this.company.tradeName}. Bienvenue ! :)\nUtilise ce code: ${activationCode.code} pour pouvoir ` +
-          'commencer ton enregistrement sur Compani avant ton intégration: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
+        to: `+33${user.contact.phone.substring(1)}`,
+        body: `${this.company.tradeName}. Bienvenue ! :)\nPour pouvoir ` +
+          'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)\n` +
+          `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`,
       });
       NotifyPositive('SMS bien envoyé');
     },
@@ -356,7 +340,7 @@ export default {
 
         const userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(userCreated._id);
+          await this.sendSms(userCreated);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');

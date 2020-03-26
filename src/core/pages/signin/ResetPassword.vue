@@ -64,7 +64,7 @@ export default {
     },
     async submit () {
       try {
-        await Users.updatePassword(this.userId, { local: { password: this.password } }, this.token);
+        await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true }, this.token);
 
         NotifyPositive('Mot de passe changé. Redirection vers la page de connexion...');
         this.timeout = setTimeout(() => this.$router.replace({ path: '/login' }), 2000)

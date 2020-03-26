@@ -57,8 +57,7 @@
 <script>
 import get from 'lodash/get';
 import { mapGetters } from 'vuex';
-import randomize from 'randomatic';
-import ActivationCode from '@api/ActivationCode';
+import Users from '@api/Users';
 import Twilio from '@api/Twilio';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -86,7 +85,7 @@ export default {
       messageSupport: 'sms',
       typeMessageOptions: [
         { label: 'Pièces manquantes', value: 'PM' },
-        { label: 'Envoi code d\'activation', value: 'CA' },
+        { label: 'Envoi lien d\'activation', value: 'LA' },
         { label: 'Autres', value: 'Autres' },
       ],
       messageComp: '',
@@ -124,24 +123,25 @@ export default {
       if (this.userProfile.isConfirmed) return 'Accès WebApp activé';
       return 'Accès WebApp non activé'
     },
-    activationCode () {
-      return this.typeMessage === 'CA' ? randomize('0000') : '';
-    },
     hasPicture () {
       return get(this.userProfile, 'picture.link') || DEFAULT_AVATAR;
     },
   },
   methods: {
-    updateMessage () {
+    async updateMessage () {
       if (this.typeMessage === 'PM') {
         this.messageComp = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
         'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ' +
         `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}` +
         '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
-      } else if (this.typeMessage === 'CA') {
-        this.messageComp = `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
-        'commencer ton enregistrement sur Compani avant ton intégration: ' +
-        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`;
+      } else if (this.typeMessage === 'LA') {
+        if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
+          this.userProfile.passwordToken = await Users.createPasswordToken(this.userProfile._id, { email: this.userProfile.local.email });
+        }
+        this.messageComp = `${this.companyName}. Bienvenue ! :)\nPour pouvoir ` +
+          'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${this.userProfile.passwordToken.token} :-)\n` +
+          `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`;
       } else this.messageComp = '';
     },
     openSmsModal () {
@@ -154,9 +154,6 @@ export default {
     },
     async sendMessage () {
       this.loading = true;
-      if (this.typeMessage === 'CA') {
-        await ActivationCode.create({ code: this.activationCode, user: this.userProfile._id });
-      }
       await this.sendSMS();
       this.loading = false;
       this.opened = false;
