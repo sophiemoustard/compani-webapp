@@ -239,15 +239,18 @@ export default {
         this.users = [];
       }
     },
+    formatUserPayload (user) {
+      const userPayload = pickBy(user);
+      userPayload.company = this.company._id;
+      return userPayload;
+    },
     async createUser () {
       try {
         this.loading = true;
         this.$v.newUser.$touch();
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const userPayload = pickBy(this.newUser);
-        userPayload.company = this.company._id;
-        await Users.create(userPayload);
+        await Users.create(this.formatUserPayload(this.newUser));
         this.userCreationModal = false;
         await this.getUsers();
         NotifyPositive('Utilisateur enregistré.');
