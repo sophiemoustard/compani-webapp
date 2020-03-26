@@ -133,7 +133,7 @@ export default {
           label: 'Durée',
           align: 'center',
           field: row => this.$moment(row.endDate).diff(row.startDate, 'm') / 60,
-          format: formatHours,
+          format: value => formatHours(value, 2),
         },
         { name: 'address', label: 'Lieu', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
         { name: 'actions', label: '', align: 'center' },
