@@ -78,13 +78,15 @@ export default {
       }).toISOString();
     },
     update (date, key) {
-      const dateObject = pick(this.$moment(date).toObject(), ['year', 'month', 'date']);
+      const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
+      const dateObject = pick(this.$moment(this.value[key]).toObject(), hoursFields);
       const dates = {
         ...this.value,
-        [key]: this.$moment(this.value[key]).set({ ...dateObject }).toISOString(),
+        [key]: this.$moment(date).set({ ...dateObject }).toISOString(),
       }
       if (key === 'startDate' && this.disableEndDate) {
-        dates.endDate = this.$moment(this.value.endDate).set({ ...dateObject }).toISOString();
+        const endDateObject = pick(this.$moment(this.value.endDate).toObject(), hoursFields);
+        dates.endDate = this.$moment(date).set({ ...endDateObject }).toISOString();
       }
       if (key === 'endDate') dates.endDate = this.$moment(dates.endDate).endOf('d').toISOString();
       this.$emit('input', dates);
