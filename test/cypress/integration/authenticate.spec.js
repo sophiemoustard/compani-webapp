@@ -5,7 +5,7 @@ describe('Login page tests', () => {
   });
 
   it('should display an error if credentials are wrong', () => {
-    cy.get('[data-cy=email]').type('admin@alenvi.io');
+    cy.get('[data-cy=email]').type('client-admin@alenvi.io');
     cy.get('[data-cy=password]').type('3236{enter}');
     cy.get('.q-notification__message')
       .should('be.visible')
@@ -13,14 +13,61 @@ describe('Login page tests', () => {
     cy.url().should('include', '/login');
   })
 
-  it('should visits login page and connects admin user', () => {
-    cy.get('[data-cy=email]').type('admin@alenvi.io');
+  const paramsArray = [
+    { person: 'client admin', email: 'client-admin@alenvi.io', password: '123456', url: 'ni/auxiliaries' },
+    { person: 'coach', email: 'coach@alenvi.io', password: '123456', url: 'ni/auxiliaries' },
+    { person: 'auxiliary', email: 'auxiliary@alenvi.io', password: '123456', url: 'auxiliaries/agenda' },
+    {
+      person: 'auxiliary without company',
+      email: 'auxiliary-without-company@alenvi.io',
+      password: '123456',
+      url: 'account',
+    },
+    {
+      person: 'planning referent',
+      email: 'planning-referent@alenvi.io',
+      password: '123456',
+      url: 'auxiliaries/agenda',
+    },
+    { person: 'helper', email: 'helper@alenvi.io', password: '123456', url: 'customers/agenda' },
+  ];
+
+  paramsArray.forEach((params) => {
+    it(`should visits login page and connects ${params.person} user`, () => {
+      cy.get('[data-cy=email]').type(params.email);
+      cy.get('[data-cy=password]').type(params.password);
+      cy.get('[data-cy=login]').click();
+
+      cy.url().should('include', params.url);
+      cy.getCookie('alenvi_token').should('exist');
+      cy.getCookie('alenvi_token_expires_in').should('exist');
+      cy.getCookie('refresh_token').should('exist');
+      cy.getCookie('user_id').should('exist');
+    });
+  })
+
+  it('the url for account info should include the user id', () => {
+    const user = {
+      _id: '1234567ujhgfds2345',
+      role: { client: { name: 'auxiliary_without_company' } },
+      identity: { firstname: 'Auxiliary', lastname: 'Test', title: 'mr' },
+      local: { email: 'auxiliary@alenvi.io', password: '123456' },
+      refreshToken: 'token',
+      company: '987765uyt654321',
+    }
+    cy.server()
+    cy.route('post', '/users/authenticate', {
+      data: { token: 'token', refreshToken: 'refreshToken', expiresIn: 3600 * 24, user },
+    })
+
+    cy.route('get', `/users/${user._id}`, { data: { user } }).as('user')
+
+    cy.get('[data-cy=email]').type('auxiliary-without-company@alenvi.io');
     cy.get('[data-cy=password]').type('123456');
     cy.get('[data-cy=login]').click();
-    cy.url().should('include', '/ni/auxiliaries');
-    cy.getCookie('alenvi_token').should('exist');
-    cy.getCookie('alenvi_token_expires_in').should('exist');
-    cy.getCookie('refresh_token').should('exist');
-    cy.getCookie('user_id').should('exist');
+
+    cy.window().then(win => {
+      cy.wait('@user').url().should('include', `${user._id}/account`)
+    })
   });
 });
