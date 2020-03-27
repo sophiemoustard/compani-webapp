@@ -26,7 +26,7 @@ export const customerMixin = {
       try {
         let value = path === 'referent' ? get(this.customer, 'referent._id', '') : get(this.customer, path);
         if (this.tmpInput === value) return;
-        if (get(this.$v.customer, path)) {
+        if (this.$v && get(this.$v.customer, path)) {
           const isValid = await this.waitForValidation(this.$v.customer, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }

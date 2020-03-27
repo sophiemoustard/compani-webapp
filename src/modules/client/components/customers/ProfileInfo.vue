@@ -21,8 +21,7 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Téléphone" :error="$v.customer.contact.phone.$error"
-          :error-label="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
+        <ni-input caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-model="customer.contact.primaryAddress" :error-label="primaryAddressError"
           :error="$v.customer.contact.primaryAddress.$error" caption="Adresse principale"
@@ -636,7 +635,6 @@ export default {
           title: { required },
         },
         contact: {
-          phone: { frPhoneNumber },
           primaryAddress: {
             zipCode: { required },
             street: { required },
