@@ -1,7 +1,7 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
 import store from 'src/store/index';
 
 const routes = [
@@ -106,6 +106,18 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'configuration',
+        },
+      },
+      {
+        path: ':id/account',
+        name: 'vendor account info',
+        component: () => import('src/core/pages/AccountInfo'),
+        beforeEnter (to, from, next) {
+          return to.params.id === Cookies.get('user_id') ? next() : next('/404');
+        },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER],
         },
       },
     ],
