@@ -11,15 +11,38 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Dates</p>
       <q-card>
-        <ni-responsive-table :data="course.slots" :columns="courseSlotsColumns">
-          <template v-slot:body="{ props }">
+        <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none">
+          <template v-slot:header="{ props }">
             <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
+              <template v-if="col.name === 'date'">Dates ({{ Object.keys(courseSlots).length }})</template>
+              <template v-else-if="col.name === 'hours'">Créneaux ({{ course.slots ? course.slots.length : 0 }})</template>
+              <template v-else-if="col.name === 'duration'">Durée ({{ slotsDurationColumnTitle }})</template>
+              <template v-else>{{ col.label }}</template>
+            </q-th>
+          </q-tr>
+          </template>
+          <template v-slot:body="{ props }">
+            <q-tr v-for="(slot, index) in props.row" :key="slot._id" :props="props"
+              :class="{'border-top': index === 0 }">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template v-if="col.name === 'actions'">
+                <template v-if="col.name === 'date' && index === 0">
+                  {{ $moment(slot.startDate).format('DD/MM/YYYY') }}
+                </template>
+                <template v-else-if="col.name === 'hours'">
+                  {{ $moment(slot.startDate).format('HH:mm') }} - {{ $moment(slot.endDate).format('HH:mm') }}
+                </template>
+                <template v-else-if="col.name === 'duration'">
+                  {{ getSlotDuration(slot) }}
+                </template>
+                <template v-else-if="col.name === 'address'">
+                  {{ get(slot, 'address.fullAddress') || '' }}
+                </template>
+                <template v-else-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="edit" @click="openCourseSlotEditionModal(props.row)" />
-                    <q-icon color="grey" name="delete" @click="validateCourseSlotDeletion(props.row._id)" />
+                    <q-icon color="grey" name="edit" @click="openCourseSlotEditionModal(slot)" />
+                    <q-icon color="grey" name="delete" @click="validateCourseSlotDeletion(slot._id)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -73,6 +96,7 @@ import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
+import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import CourseSlots from '@api/CourseSlots';
 import Users from '@api/Users';
@@ -103,7 +127,7 @@ export default {
   data () {
     return {
       trainerOptions: [],
-      courseSlots: [],
+      courseSlots: {},
       loading: false,
       courseSlotCreationModal: false,
       newCourseSlot: {
@@ -116,27 +140,10 @@ export default {
       editedCourseSlot: {},
       courseSlotEditionModal: false,
       courseSlotsColumns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'startDate',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
-        },
-        {
-          name: 'hours',
-          label: 'Créneaux',
-          align: 'center',
-          field: row => `${this.$moment(row.startDate).format('HH:mm')} - ${this.$moment(row.endDate).format('HH:mm')}`,
-        },
-        {
-          name: 'duration',
-          label: 'Durée',
-          align: 'center',
-          field: row => this.$moment.duration(this.$moment(row.endDate).diff(row.startDate)),
-          format: value => value.minutes() ? `${value.hours()}h${value.minutes()}` : `${value.hours()}h`,
-        },
-        { name: 'address', label: 'Lieu', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
+        { name: 'date', align: 'left' },
+        { name: 'hours', align: 'center' },
+        { name: 'duration', align: 'center' },
+        { name: 'address', label: 'Lieu', align: 'left' },
         { name: 'actions', label: '', align: 'center' },
       ],
       courseSlotValidation: {
@@ -171,18 +178,29 @@ export default {
       }
       return 'Adresse non valide';
     },
+    slotsDurationColumnTitle () {
+      if (!this.course || !this.course.slots) return '0h';
+      const total = this.course.slots.reduce(
+        (acc, slot) => acc.add(this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate))),
+        this.$moment.duration()
+      );
+
+      return total.minutes() ? `${total.hours()}h${total.minutes()}` : `${total.hours()}h`;
+    },
   },
   async mounted () {
     if (!this.course) await this.refreshCourse();
     await this.refreshTrainers();
   },
   methods: {
+    get,
     saveTmp (path) {
       this.tmpInput = get(this.course, path)
     },
     async refreshCourse () {
       try {
         await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
+        this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
       } catch (e) {
         console.error(e);
       }
@@ -216,6 +234,11 @@ export default {
       }
     },
     // Course slot
+    getSlotDuration (slot) {
+      const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
+
+      return duration.minutes() ? `${duration.hours()}h${duration.minutes()}` : `${duration.hours()}h`;
+    },
     resetCourseSlotCreationModal () {
       this.newCourseSlot = {
         dates: {
@@ -241,6 +264,7 @@ export default {
         await CourseSlots.create(this.formatCourseSlotCreationPayload(this.newCourseSlot));
         NotifyPositive('Créneau ajouté.');
 
+        this.courseSlotCreationModal = false;
         await this.refreshCourse();
       } catch (e) {
         console.error(e)
@@ -248,7 +272,6 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
         this.loading = false;
-        this.courseSlotCreationModal = false;
       }
     },
     openCourseSlotEditionModal (slot) {
@@ -280,14 +303,15 @@ export default {
         await CourseSlots.update(this.editedCourseSlot._id, payload);
         NotifyPositive('Créneau modifié.');
 
+        this.courseSlotEditionModal = false;
         await this.refreshCourse();
       } catch (e) {
         console.error(e)
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification du créneau.');
       } finally {
         this.loading = false;
-        this.courseSlotEditionModal = false;
       }
     },
     validateCourseSlotDeletion (slotId) {
@@ -312,3 +336,8 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.border-top td
+  border-width: 1px 0 0 0
+</style>
