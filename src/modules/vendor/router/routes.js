@@ -10,7 +10,8 @@ const routes = [
     components: { default: () => import('src/modules/vendor/layouts/Layout') },
     beforeEnter: async (to, from, next) => {
       try {
-        if (to.path !== '/ad') return next();
+        if (!['/ad', '/ad/'].includes(to.path)) return next();
+
         const refresh = await alenvi.refreshAlenviCookies();
         if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
