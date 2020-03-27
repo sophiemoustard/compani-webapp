@@ -404,7 +404,7 @@ const routes = [
       // All profiles
       {
         path: ':id/account',
-        name: 'account info',
+        name: 'client account info',
         component: () => import('src/core/pages/AccountInfo'),
         beforeEnter (to, from, next) {
           return to.params.id === Cookies.get('user_id') ? next() : next('/404');
