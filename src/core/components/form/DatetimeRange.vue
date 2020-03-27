@@ -21,6 +21,7 @@
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import { required } from 'vuelidate/lib/validators';
 import DateInput from '@components/form/DateInput';
 import TimeInput from '@components/form/TimeInput';
@@ -76,9 +77,17 @@ export default {
         milliseconds: 0,
       }).toISOString();
     },
-    update (value, key) {
-      const dates = { ...this.value, [key]: value }
-      if (key === 'startDate' && this.disableEndDate) dates.endDate = value;
+    update (date, key) {
+      const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
+      const dateObject = pick(this.$moment(this.value[key]).toObject(), hoursFields);
+      const dates = {
+        ...this.value,
+        [key]: this.$moment(date).set({ ...dateObject }).toISOString(),
+      }
+      if (key === 'startDate' && this.disableEndDate) {
+        const endDateObject = pick(this.$moment(this.value.endDate).toObject(), hoursFields);
+        dates.endDate = this.$moment(date).set({ ...endDateObject }).toISOString();
+      }
       if (key === 'endDate') dates.endDate = this.$moment(dates.endDate).endOf('d').toISOString();
       this.$emit('input', dates);
     },
