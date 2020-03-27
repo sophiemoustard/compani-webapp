@@ -8,7 +8,7 @@ import Users from '@api/Users';
 import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { clear, formatPhone } from '@helpers/utils';
-import { HELPER, REQUIRED_LABEL } from '@data/constants';
+import { HELPER } from '@data/constants';
 
 export const helperMixin = {
   data () {
@@ -54,11 +54,6 @@ export const helperMixin = {
     sortedHelpers () {
       return [...this.helpers]
         .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
-    },
-    emailError () {
-      if (!this.$v.newHelper.local.email.required) return REQUIRED_LABEL;
-      else if (!this.$v.newHelper.local.email.email) return 'Email non valide';
-      return '';
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
