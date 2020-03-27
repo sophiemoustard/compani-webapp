@@ -7,8 +7,7 @@
       <div class="row gutter-profile">
         <ni-input caption="Accès / codes" v-model="customer.contact.accessCodes" @focus="saveTmp('contact.accessCodes')"
           @blur="updateCustomer('contact.accessCodes')" />
-        <ni-input v-if="isAuxiliary" caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
-          error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
+        <ni-input v-if="isAuxiliary" caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress"
           color="white" disable />
@@ -104,7 +103,6 @@ import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative } from '@components/popup/notify.js';
 import SimpleTable from '@components/table/SimpleTable';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatHours } from '@helpers/utils.js';
 import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
@@ -176,13 +174,6 @@ export default {
         },
       ],
     };
-  },
-  validations: {
-    customer: {
-      contact: {
-        phone: { frPhoneNumber },
-      },
-    },
   },
   computed: {
     auxiliaryAvatar () {
@@ -276,7 +267,6 @@ export default {
 
         this.$store.commit('customer/saveCustomer', customer);
         this.isLoaded = true;
-        this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des données.');
