@@ -35,7 +35,8 @@
     </div>
 
     <!-- Course slot creation modal -->
-    <ni-modal v-model="courseSlotCreationModal" @hide="resetCourseSlotCreationModal">
+    <ni-modal v-model="courseSlotCreationModal" @hide="resetCourseSlotCreationModal"
+      container-class="modal-container-md">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">créneau</span>
       </template>
