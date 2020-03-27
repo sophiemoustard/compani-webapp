@@ -11,8 +11,8 @@
       <ni-select v-model="mergedUserProfile.role.client._id" caption="Rôle" :options="auxiliaryRolesOptions"
         @focus="saveTmp('role.client._id')" @blur="updateUser('role.client._id')" />
       <ni-select v-model="mergedUserProfile.establishment" caption="Établissement" :options="establishmentsOptions"
-        @focus="saveTmp('establishment')" @blur="updateUser('establishment')" :error="$v.mergedUserProfile.establishment.$error"
-        :error-label="REQUIRED_LABEL" option-disable="inactive" />
+        @focus="saveTmp('establishment')" @blur="updateUser('establishment')"
+        :error="$v.mergedUserProfile.establishment.$error" :error-label="REQUIRED_LABEL" option-disable="inactive" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -43,8 +43,8 @@
                 flat size="1rem" />
               <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
                 @click="uploadImage" round flat size="1rem" />
-              <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt"
-                size="1rem" type="a" :href="pictureDlLink(hasPicture)" target="_blank" />
+              <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem"
+                type="a" :href="pictureDlLink(hasPicture)" target="_blank" />
             </div>
           </div>
         </div>
@@ -57,26 +57,30 @@
           groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Prénom" :error="$v.mergedUserProfile.identity.firstname.$error" v-model.trim="mergedUserProfile.identity.firstname"
-          @blur="updateUser('identity.firstname')" @focus="saveTmp('identity.firstname')" />
-        <ni-input caption="Nom" :error="$v.mergedUserProfile.identity.lastname.$error" v-model.trim="mergedUserProfile.identity.lastname"
-          @blur="updateUser('identity.lastname')" @focus="saveTmp('identity.lastname')" />
-        <ni-select caption="Nationalité" :error="$v.mergedUserProfile.identity.nationality.$error" :options="nationalitiesOptions"
-          v-model="mergedUserProfile.identity.nationality" @focus="saveTmp('identity.nationality')" in-form
-          @blur="updateUser('identity.nationality')" />
+        <ni-input caption="Prénom" :error="$v.mergedUserProfile.identity.firstname.$error"
+          v-model.trim="mergedUserProfile.identity.firstname" @blur="updateUser('identity.firstname')"
+          @focus="saveTmp('identity.firstname')" />
+        <ni-input caption="Nom" :error="$v.mergedUserProfile.identity.lastname.$error"
+          v-model.trim="mergedUserProfile.identity.lastname" @blur="updateUser('identity.lastname')"
+          @focus="saveTmp('identity.lastname')" />
+        <ni-select caption="Nationalité" :error="$v.mergedUserProfile.identity.nationality.$error"
+          :options="nationalitiesOptions" v-model="mergedUserProfile.identity.nationality"
+          @focus="saveTmp('identity.nationality')" in-form @blur="updateUser('identity.nationality')" />
         <ni-date-input caption="Date de naissance" :error="$v.mergedUserProfile.identity.birthDate.$error"
-          v-model="mergedUserProfile.identity.birthDate" @focus="saveTmp('identity.birthDate')" content-class="col-xs-12 col-md-6"
-          @input="updateUser('identity.birthDate')" />
-        <ni-select caption="Pays de naissance" :error="$v.mergedUserProfile.identity.birthCountry.$error" :options="countriesOptions"
-          v-model="mergedUserProfile.identity.birthCountry" @focus="saveTmp('identity.birthCountry')" in-form
-          @blur="updateUser('identity.birthCountry')" />
+          v-model="mergedUserProfile.identity.birthDate" @focus="saveTmp('identity.birthDate')"
+          content-class="col-xs-12 col-md-6" @input="updateUser('identity.birthDate')" />
+        <ni-select caption="Pays de naissance" :error="$v.mergedUserProfile.identity.birthCountry.$error"
+          :options="countriesOptions" v-model="mergedUserProfile.identity.birthCountry"
+          @focus="saveTmp('identity.birthCountry')" in-form @blur="updateUser('identity.birthCountry')" />
         <ni-input caption="Département de naissance" :error="$v.mergedUserProfile.identity.birthState.$error"
-          :error-label="birthStateError" v-model="mergedUserProfile.identity.birthState" @blur="updateUser('identity.birthState')"
-          @focus="saveTmp('identity.birthState')" :hidden="this.mergedUserProfile.identity.birthCountry !== 'FR'" />
+          :error-label="birthStateError" v-model="mergedUserProfile.identity.birthState"
+          @blur="updateUser('identity.birthState')" @focus="saveTmp('identity.birthState')"
+          :hidden="this.mergedUserProfile.identity.birthCountry !== 'FR'" />
         <ni-input caption="Ville de naissance" :error="$v.mergedUserProfile.identity.birthCity.$error"
           v-model="mergedUserProfile.identity.birthCity" @focus="saveTmp('identity.birthCity')"
           @blur="updateUser('identity.birthCity')" />
-        <ni-input caption="Numéro de sécurité sociale" :error="$v.mergedUserProfile.identity.socialSecurityNumber.$error"
+        <ni-input caption="Numéro de sécurité sociale"
+          :error="$v.mergedUserProfile.identity.socialSecurityNumber.$error"
           v-model="mergedUserProfile.identity.socialSecurityNumber" @focus="saveTmp('identity.socialSecurityNumber')"
           @blur="updateUser('identity.socialSecurityNumber')" :error-label="ssnError" />
       </div>
@@ -101,8 +105,9 @@
             <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
           </div>
         </div>
-        <ni-search-address v-model="mergedUserProfile.contact.address" color="white" @focus="saveTmp('contact.address.fullAddress')"
-          @blur="updateUser('contact.address')" :error-label="addressError" :error="$v.mergedUserProfile.contact.address.$error" />
+        <ni-search-address v-model="mergedUserProfile.contact.address" color="white"
+          @focus="saveTmp('contact.address.fullAddress')" @blur="updateUser('contact.address')"
+          :error-label="addressError" :error="$v.mergedUserProfile.contact.address.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -113,9 +118,11 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom et nom" :error="$v.mergedUserProfile.administrative.emergencyContact.name.$error"
-          v-model="mergedUserProfile.administrative.emergencyContact.name" @focus="saveTmp('administrative.emergencyContact.name')"
+          v-model="mergedUserProfile.administrative.emergencyContact.name"
+          @focus="saveTmp('administrative.emergencyContact.name')"
           @blur="updateUser('administrative.emergencyContact.name')" />
-        <ni-input caption="Numéro de téléphone" :error="$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.$error"
+        <ni-input caption="Numéro de téléphone"
+          :error="$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.$error"
           v-model.trim="mergedUserProfile.administrative.emergencyContact.phoneNumber"
           @focus="saveTmp('administrative.emergencyContact.phoneNumber')"
           @blur="updateUser('administrative.emergencyContact.phoneNumber')" :error-label="emergencyPhoneNbrError" />
@@ -128,11 +135,12 @@
         </p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="IBAN" :error="$v.mergedUserProfile.administrative.payment.rib.iban.$error" :error-label="ibanError"
-          v-model="mergedUserProfile.administrative.payment.rib.iban" @focus="saveTmp('administrative.payment.rib.iban')" upper-case
+        <ni-input caption="IBAN" :error="$v.mergedUserProfile.administrative.payment.rib.iban.$error"
+          :error-label="ibanError" v-model="mergedUserProfile.administrative.payment.rib.iban"
+          @focus="saveTmp('administrative.payment.rib.iban')" upper-case
           @blur="updateUser('administrative.payment.rib.iban')" />
-        <ni-input caption="BIC" :error="$v.mergedUserProfile.administrative.payment.rib.bic.$error" :error-label="bicError"
-          upper-case v-model.trim="mergedUserProfile.administrative.payment.rib.bic"
+        <ni-input caption="BIC" :error="$v.mergedUserProfile.administrative.payment.rib.bic.$error"
+          :error-label="bicError" upper-case v-model.trim="mergedUserProfile.administrative.payment.rib.bic"
           @focus="saveTmp('administrative.payment.rib.bic')" @blur="updateUser('administrative.payment.rib.bic')" />
       </div>
     </div>
@@ -144,8 +152,8 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12">
-          <ni-option-group :display-caption="isAuxiliary" v-model="mergedUserProfile.administrative.identityDocs" type="radio"
-            :options="identityDocsOptions" :error="$v.mergedUserProfile.administrative.identityDocs.$error"
+          <ni-option-group :display-caption="isAuxiliary" v-model="mergedUserProfile.administrative.identityDocs"
+            type="radio" :options="identityDocsOptions" :error="$v.mergedUserProfile.administrative.identityDocs.$error"
             caption="Merci de nous indiquer le type de document d'identité que tu possèdes." required-field
             :error-label="requiredLabel" @input="updateUser('administrative.identityDocs')" />
         </div>
@@ -164,9 +172,9 @@
             :additional-value="`cni_verso_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
         <div v-if="mergedUserProfile.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :entity="mergedUserProfile"
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport"
+            :entity="mergedUserProfile" name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
             @delete="validateDocumentDeletion(mergedUserProfile.administrative.passport.driveId, 'administrative.passport')"
-            name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
             :error="$v.mergedUserProfile.administrative.passport.driveId.$error" :extensions="extensions"
             :additional-value="`passport_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
@@ -189,14 +197,16 @@
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
             alt="attestation secu" :entity="mergedUserProfile" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion(mergedUserProfile.administrative.healthAttest.driveId, 'administrative.healthAttest')"
-            name="healthAttest" @uploaded="refreshUser" :error="$v.mergedUserProfile.administrative.healthAttest.driveId.$error"
+            name="healthAttest" @uploaded="refreshUser"
+            :error="$v.mergedUserProfile.administrative.healthAttest.driveId.$error"
             :additional-value="`attestation_secu_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
             :entity="mergedUserProfile" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion(mergedUserProfile.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
-            name="phoneInvoice" @uploaded="refreshUser" :error="$v.mergedUserProfile.administrative.phoneInvoice.driveId.$error"
+            name="phoneInvoice" @uploaded="refreshUser"
+            :error="$v.mergedUserProfile.administrative.phoneInvoice.driveId.$error"
             :additional-value="`facture_telephone_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
         </div>
         <div class="col-xs-12">
@@ -217,12 +227,14 @@
         <div class="col-xs-12">
           <div v-if="isAuxiliary" class="row justify-between">
             <p class="input-caption">Veux-tu adhérer à la mutuelle d'entreprise ?</p>
-            <q-icon v-if="$v.mergedUserProfile.administrative.mutualFund.has.$error" name="error_outline" color="secondary" />
+            <q-icon v-if="$v.mergedUserProfile.administrative.mutualFund.has.$error" name="error_outline"
+              color="secondary" />
           </div>
-          <q-field dense :error="$v.mergedUserProfile.administrative.mutualFund.has.$error" :error-label="requiredLabel">
+          <q-field dense :error="$v.mergedUserProfile.administrative.mutualFund.has.$error"
+            :error-label="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary"
-              v-model="mergedUserProfile.administrative.mutualFund.has" @input="updateUser('administrative.mutualFund.has')"
-              :options="[
+              v-model="mergedUserProfile.administrative.mutualFund.has"
+              @input="updateUser('administrative.mutualFund.has')" :options="[
                   { label: 'Oui', value: false },
                   { label: 'Non', value: true }
                 ]" />
@@ -247,12 +259,14 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12">
-          <ni-option-group :display-caption="isAuxiliary" v-model="mergedUserProfile.administrative.transportInvoice.transportType"
-            :options="transportOptions" caption="Par quel moyen comptes-tu te rendre au travail ?" type="radio"
-            :error-label="requiredLabel" :error="$v.mergedUserProfile.administrative.transportInvoice.transportType.$error"
-            required-field @input="updateUser('administrative.transportInvoice.transportType')" />
+          <ni-option-group :display-caption="isAuxiliary"
+            v-model="mergedUserProfile.administrative.transportInvoice.transportType" :options="transportOptions"
+            caption="Par quel moyen comptes-tu te rendre au travail ?" type="radio" :error-label="requiredLabel"
+            :error="$v.mergedUserProfile.administrative.transportInvoice.transportType.$error" required-field
+            @input="updateUser('administrative.transportInvoice.transportType')" />
         </div>
-        <div v-if="mergedUserProfile.administrative.transportInvoice.transportType === 'public'" class="col-xs-12 col-md-6">
+        <div v-if="mergedUserProfile.administrative.transportInvoice.transportType === 'public'"
+          class="col-xs-12 col-md-6">
           <ni-file-uploader :caption="captionTransportUploader" path="administrative.transportInvoice"
             alt="justif transport" :entity="mergedUserProfile" name="transportInvoice" @uploaded="refreshUser"
             :error="$v.mergedUserProfile.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
