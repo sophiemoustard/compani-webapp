@@ -6,11 +6,11 @@ import store from 'src/store/index';
 
 const routes = [
   {
-    path: '/ad/',
+    path: '/ad',
     components: { default: () => import('src/modules/vendor/layouts/Layout') },
     beforeEnter: async (to, from, next) => {
       try {
-        if (to.path !== '/') return next();
+        if (to.path !== '/ad') return next();
         const refresh = await alenvi.refreshAlenviCookies();
         if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
@@ -18,7 +18,7 @@ const routes = [
         if (!loggedUser) return next({ path: '/login' });
         if (!get(loggedUser, 'role.vendor')) return next({ name: '404' });
 
-        return next();
+        return next({ name: 'courses directory' });
       } catch (e) {
         console.error(e);
       }
