@@ -83,7 +83,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { TRAINER, REQUIRED_LABEL } from '@data/constants';
-import { formatIdentity, formatHours } from '@helpers/utils';
+import { formatIdentity } from '@helpers/utils';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
 
 export default {
@@ -132,8 +132,8 @@ export default {
           name: 'duration',
           label: 'Durée',
           align: 'center',
-          field: row => this.$moment(row.endDate).diff(row.startDate, 'm') / 60,
-          format: value => formatHours(value, 2),
+          field: row => this.$moment.duration(this.$moment(row.endDate).diff(row.startDate)),
+          format: value => value.minutes() ? `${value.hours()}h${value.minutes()}` : `${value.hours()}h`,
         },
         { name: 'address', label: 'Lieu', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
         { name: 'actions', label: '', align: 'center' },
