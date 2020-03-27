@@ -1,6 +1,6 @@
 <template>
   <q-table :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" :visible-columns="visibleColumns"
-    hide-bottom binary-state-sort @update:pagination="$emit('update:pagination', $event)" flat
+    hide-bottom binary-state-sort @update:pagination="$emit('update:pagination', $event)" flat :separator="separator"
     class="table-responsive q-pa-sm" :rows-per-page-options="rowsPerPageOptions">
     <template v-slot:header="props">
       <slot name="header" :props="props">
@@ -32,6 +32,7 @@ export default {
     rowKey: { type: String, default: 'name' },
     rowsPerPageOptions: { type: Array, default: () => [15, 25, 35] },
     visibleColumns: Array,
+    separator: { type: String, default: 'horizontal' },
   },
 }
 </script>
