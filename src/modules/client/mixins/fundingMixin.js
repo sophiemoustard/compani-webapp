@@ -7,6 +7,7 @@ export const fundingMixin = {
     return {
       fundings: [],
       selectedFunding: {},
+      fundingsLoading: false,
       fundingColumns: [
         {
           name: 'startDate',
@@ -112,6 +113,7 @@ export const fundingMixin = {
   methods: {
     refreshFundings () {
       try {
+        this.fundingsLoading = true;
         const { fundings } = this.customer;
         this.fundings = fundings ? fundings.map(fund => {
           const { versions } = fund;
@@ -119,6 +121,8 @@ export const fundingMixin = {
         }) : [];
       } catch (e) {
         console.error(e);
+      } finally {
+        this.fundingsLoading = false;
       }
     },
     careDaysFormat (value) {

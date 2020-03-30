@@ -48,6 +48,7 @@ export const helperMixin = {
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       helperPagination: { rowsPerPage: 0 },
+      helperLoading: false,
     }
   },
   computed: {
@@ -69,12 +70,15 @@ export const helperMixin = {
     // Refresh
     async getUserHelpers () {
       try {
+        this.helperLoading = true;
         const params = { customers: this.customer._id };
         if (has(this.loggedUser, 'company._id')) params.company = this.loggedUser.company._id;
         this.helpers = await Users.list(params);
       } catch (e) {
         this.helpers = [];
         console.error(e);
+      } finally {
+        this.helperLoading = false;
       }
     },
     // Creation

@@ -5,7 +5,8 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
-          <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination">
+          <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination"
+            :loading="surchargesLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -33,7 +34,7 @@
         <p class="text-weight-bold">Services</p>
         <q-card>
           <ni-responsive-table :data="services" :columns="serviceColumns" :pagination.sync="pagination"
-            :visible-columns="visibleColumnsServices">
+            :visible-columns="visibleColumnsServices" :loading="servicesLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -79,7 +80,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card>
-          <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns"
+          <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" :loading="tppLoading"
             :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -389,6 +390,9 @@ export default {
   data () {
     return {
       loading: false,
+      surchargesLoading: false,
+      servicesLoading: false,
+      tppLoading: false,
       company: null,
       documents: null,
       FIXED,
@@ -792,6 +796,7 @@ export default {
     // Refresh data
     async refreshSurcharges () {
       try {
+        this.surchargesLoading = true;
         this.surchargesOptions = [];
         this.surcharges = await Surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
@@ -813,10 +818,13 @@ export default {
         NotifyNegative('Erreur lors du rafraîchissement des plans de majoration.');
         console.error(e);
         this.surcharges = [];
+      } finally {
+        this.surchargesLoading = false;
       }
     },
     async refreshServices () {
       try {
+        this.servicesLoading = true;
         const services = await Services.list();
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
@@ -826,6 +834,8 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors du rafraîchissement des services.');
         this.services = [];
+      } finally {
+        this.servicesLoading = false;
       }
     },
     async refreshCompany () {
@@ -836,10 +846,13 @@ export default {
     },
     async refreshThirdPartyPayers () {
       try {
+        this.tppLoading = true;
         this.thirdPartyPayers = await ThirdPartyPayers.list();
       } catch (e) {
         this.thirdPartyPayers = [];
         console.error(e);
+      } finally {
+        this.tppLoading = false;
       }
     },
     // Surcharges

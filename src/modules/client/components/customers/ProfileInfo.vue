@@ -34,7 +34,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Souscriptions</p>
       <q-card>
-        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns">
+        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -72,7 +72,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
-        <ni-responsive-table :data="sortedHelpers" :columns="helperColumns" :pagination="helperPagination">
+        <ni-responsive-table :data="sortedHelpers" :columns="helperColumns" :pagination="helperPagination"
+          :loading="helperLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -113,7 +114,7 @@
       </div>
       <q-card>
         <ni-responsive-table :columns="mandateColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
-          :visible-columns="visibleMandateColumns" class="mandate-table">
+          :visible-columns="visibleMandateColumns" class="mandate-table" :loading="mandateLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -154,7 +155,8 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns">
+        <ni-responsive-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns"
+          :loading="fundingsLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -195,7 +197,7 @@
       </div>
       <q-card>
         <ni-responsive-table :data="customer.quotes" :columns="quoteColumns" :pagination.sync="pagination"
-          :visible-columns="visibleQuoteColumns">
+          :visible-columns="visibleQuoteColumns" :loading="quotesLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -410,7 +412,7 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
 import Modal from '@components/modal/Modal';
-import ReponsiveTable from '@components/table/ResponsiveTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import { days } from '@data/days.js';
@@ -447,7 +449,7 @@ export default {
     'ni-modal': Modal,
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
-    'ni-responsive-table': ReponsiveTable,
+    'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [
@@ -465,6 +467,8 @@ export default {
       FIXED,
       days,
       loading: false,
+      quotesLoading: false,
+      mandateLoading: false,
       openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
@@ -742,6 +746,7 @@ export default {
     },
     async refreshMandates () {
       try {
+        this.mandateLoading = true;
         const mandates = await Customers.getMandates(this.customer._id);
 
         this.$store.commit(
@@ -751,16 +756,21 @@ export default {
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.mandateLoading = false;
       }
     },
     async refreshQuotes () {
       try {
+        this.quotesLoading = true;
         const quotes = await Customers.getQuotes(this.customer._id);
 
         this.$store.commit('customer/saveCustomer', { ...this.customer, quotes });
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.quotesLoading = false;
       }
     },
     async refreshCustomer () {

@@ -11,7 +11,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
       <q-card>
-        <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none">
+        <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none"
+          :loading="courseSlotsLoading">
           <template v-slot:header="{ props }">
             <q-tr :props="props" :class="{ 'th-border-bottom': Object.values(courseSlots).length === 0 }">
               <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
@@ -194,6 +195,7 @@ export default {
       trainerOptions: [],
       courseSlots: {},
       loading: false,
+      courseSlotsLoading: false,
       courseSlotCreationModal: false,
       newCourseSlot: {
         dates: {
@@ -329,10 +331,13 @@ export default {
     },
     async refreshCourse () {
       try {
+        this.courseSlotsLoading = true;
         await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
         this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
       } catch (e) {
         console.error(e);
+      } finally {
+        this.courseSlotsLoading = false;
       }
     },
     async refreshTrainers () {

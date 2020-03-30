@@ -5,7 +5,7 @@
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
-          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns">
+          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -63,7 +63,7 @@
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
-          <ni-responsive-table :data="customer.payment.mandates" :columns="columnsMandates"
+          <ni-responsive-table :data="customer.payment.mandates" :columns="columnsMandates" :loading="mandatesLoading"
             :pagination.sync="pagination" :visible-columns="visibleColumnsMandates">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -269,6 +269,7 @@ export default {
     },
     async refreshCustomer () {
       try {
+        this.mandatesLoading = true;
         const customer = await Customers.getById(this.helper.customers[0]._id);
         this.$store.commit('customer/saveCustomer', customer);
         this.refreshSubscriptions(this.customer);
@@ -277,6 +278,8 @@ export default {
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.mandatesLoading = false
       }
     },
     saveTmp (path) {
