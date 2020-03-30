@@ -91,7 +91,7 @@ import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { CLIENT_ADMIN, COACH, ROLES_TRANSLATION } from '@data/constants';
-import { formatPhone, clear } from '@helpers/utils';
+import { formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
 
@@ -240,7 +240,7 @@ export default {
       }
     },
     formatUserPayload (user) {
-      return { ...pickBy(user), company: this.company._id };
+      return { ...removeEmptyProps(user), company: this.company._id };
     },
     async createUser () {
       try {
