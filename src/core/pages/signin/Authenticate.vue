@@ -99,7 +99,7 @@ export default {
           this.$store.commit('customer/saveCustomer', customer);
           this.$router.replace({ name: 'customer agenda' });
         } else if (this.isAuxiliaryWithoutCompany) {
-          this.$router.replace({ name: 'account info', params: { id: this.loggedUser._id } });
+          this.$router.replace({ name: 'client account info', params: { id: this.loggedUser._id } });
         } else if (this.isAuxiliary) this.$router.replace({ name: 'auxiliary agenda' });
         else this.$router.replace({ name: 'auxiliaries directory' });
       } catch (e) {
