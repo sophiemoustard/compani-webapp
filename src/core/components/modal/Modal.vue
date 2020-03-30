@@ -1,10 +1,10 @@
-<template>
-  <q-dialog :value="value" @input="$emit('input', $event)" @hide="$emit('hide', $event)" @show="$emit('show', $event)">
-    <div :class="containerClass">
+<template functional>
+  <q-dialog :value="props.value" v-on="listeners">
+    <div :class="props.containerClass">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5 :class="{ 'text-weight-bold': !!title }">{{ title }}
+            <h5 :class="{ 'text-weight-bold': !!props.title }">{{ props.title }}
               <slot name="title" />
             </h5>
           </div>
