@@ -57,6 +57,33 @@
         </q-card-actions>
       </q-card>
     </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Stagiaires</p>
+      <q-card>
+        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination">
+          <template v-slot:body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <div class="row no-wrap table-actions">
+                      <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
+                      <!-- <q-icon color="grey" name="delete" @click.native="validateUserDeletion(col.value)" /> -->
+                    </div>
+                  </div>
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
+        <q-card-actions align="right">
+          <q-btn no-caps flat color="primary" icon="add" label="Ajouter un stagiaire"
+            @click="traineeCreationModal = true" />
+        </q-card-actions>
+      </q-card>
+    </div>
 
     <!-- Course slot creation modal -->
     <ni-modal v-model="courseSlotCreationModal" @hide="resetCourseSlotCreationModal"
@@ -88,16 +115,52 @@
           :loading="loading" @click="updateCourseSlot" />
       </template>
     </ni-modal>
+
+    <ni-modal v-model="traineeCreationModal" @hide="resetTraineeCreationForm">
+      <template slot="title">
+        Ajouter un <span class="text-weight-bold">stagiaire</span>
+      </template>
+      <ni-input in-modal v-model="newTrainee.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" caption="Nom"
+        @blur="$v.newTrainee.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="newTrainee.local.email" :error="$v.newTrainee.local.email.$error" caption="Email"
+        @blur="$v.newTrainee.local.email.$touch" :error-label="emailError($v.newTrainee)" required-field />
+      <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
+        caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error-label="phoneNbrError($v.newTrainee)" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter un stagiaire" icon-right="add" color="primary"
+          :loading="loading" @click="addTrainee" :disable="$v.newTrainee.$invalid" />
+      </template>
+    </ni-modal>
+
+    <ni-modal v-model="traineeEditionModal" @hide="resetTraineeEditionForm">
+      <template slot="title">
+        Éditer un <span class="text-weight-bold">stagiaire</span>
+      </template>
+      <ni-input in-modal v-model="selectedTrainee.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="selectedTrainee.identity.lastname" :error="$v.selectedTrainee.identity.lastname.$error" caption="Nom"
+        @blur="$v.selectedTrainee.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="selectedTrainee.local.email" :error="$v.selectedTrainee.local.email.$error" caption="Email"
+        @blur="$v.selectedTrainee.local.email.$touch" :error-label="emailError($v.selectedTrainee)" required-field />
+      <ni-input in-modal v-model.trim="selectedTrainee.contact.phone" :error="$v.selectedTrainee.contact.phone.$error"
+        caption="Téléphone" @blur="$v.selectedTrainee.contact.phone.$touch" :error-label="phoneNbrError($v.selectedTrainee)" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
+          :loading="loading" @click="updateTrainee" :disable="$v.selectedTrainee.$invalid" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
+import cloneDeep from 'lodash/cloneDeep';
+import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import CourseSlots from '@api/CourseSlots';
 import Users from '@api/Users';
@@ -109,11 +172,13 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { TRAINER, REQUIRED_LABEL } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
-import { frAddress } from '@helpers/vuelidateCustomVal.js';
+import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
+import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
+import { userMixin } from '@mixins/userMixin';
 
 export default {
   name: 'ProfileOrganization',
+  mixins: [userMixin],
   props: {
     profileId: { type: String },
   },
@@ -159,6 +224,64 @@ export default {
           fullAddress: { frAddress },
         },
       },
+      traineesColumns: [
+        {
+          name: 'firstname',
+          label: 'Prénom',
+          align: 'left',
+          field: row => get(row, 'identity.firstname', ''),
+        },
+        {
+          name: 'lastname',
+          label: 'Nom',
+          align: 'left',
+          field: row => get(row, 'identity.lastname', ''),
+        },
+        {
+          name: 'email',
+          label: 'Email',
+          align: 'left',
+          field: row => get(row, 'local.email', ''),
+        },
+        {
+          name: 'phone',
+          label: 'Téléphone',
+          align: 'left',
+          field: row => get(row, 'contact.phone', ''),
+          format: (value) => formatPhone(value),
+        },
+        {
+          name: 'actions',
+          label: '',
+          align: 'left',
+          field: '_id',
+        },
+      ],
+      traineesPagination: {
+        rowsPerPage: 0,
+        sortBy: 'lastname',
+      },
+      newTrainee: {
+        identity: {
+          firstname: '',
+          lastname: '',
+        },
+        contact: { phone: '' },
+        local: { email: '' },
+        company: '',
+      },
+      traineeValidations: {
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
+        contact: { phone: { frPhoneNumber } },
+      },
+      traineeCreationModal: false,
+      traineeEditionModal: false,
+      selectedTrainee: {
+        identity: {},
+        contact: {},
+        local: {},
+      },
     }
   },
   validations () {
@@ -169,6 +292,8 @@ export default {
       },
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
+      newTrainee: this.traineeValidations,
+      selectedTrainee: this.traineeValidations,
     }
   },
   computed: {
@@ -269,7 +394,6 @@ export default {
         await this.refreshCourse();
       } catch (e) {
         console.error(e)
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
         this.loading = false;
@@ -308,7 +432,6 @@ export default {
         await this.refreshCourse();
       } catch (e) {
         console.error(e)
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification du créneau.');
       } finally {
@@ -332,6 +455,60 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du créneau.')
+      }
+    },
+    resetTraineeCreationForm () {
+      this.newTrainee = Object.assign({}, clear(this.newTrainee));
+      this.$v.newTrainee.$reset();
+    },
+    formatTraineeCreationPayload (payload) {
+      return { ...removeEmptyProps(payload), company: this.course.companies[0]._id };
+    },
+    async addTrainee () {
+      try {
+        this.$v.newTrainee.$touch();
+        if (this.$v.newTrainee.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        this.loading = true;
+        const payload = this.formatTraineeCreationPayload(this.newTrainee);
+        await Courses.addTrainee(this.course._id, payload);
+        NotifyPositive('Stagiaire ajouté.');
+
+        this.traineeCreationModal = false;
+        await this.refreshCourse();
+      } catch (e) {
+        console.error(e)
+        NotifyNegative("Erreur lors de l'ajout du stagiaire.");
+      } finally {
+        this.loading = false;
+      }
+    },
+    async openTraineeEditionModal (trainee) {
+      this.selectedTrainee = {
+        ...this.selectedTrainee,
+        ...pick(cloneDeep(trainee), ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
+      };
+      this.traineeEditionModal = true;
+    },
+    resetTraineeEditionForm () {
+      this.$v.selectedTrainee.$reset();
+      this.selectedTrainee = { identity: {}, local: {}, contact: {} };
+    },
+    async updateTrainee () {
+      try {
+        this.loading = true;
+        this.$v.selectedTrainee.$touch();
+        if (this.$v.selectedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Users.updateById(this.selectedTrainee._id, omit(this.selectedTrainee, ['_id']));
+        this.traineeEditionModal = false;
+        await this.refreshCourse();
+        NotifyPositive('Stagiaire modifié.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification du stagiaire');
+      } finally {
+        this.loading = false;
       }
     },
   },
