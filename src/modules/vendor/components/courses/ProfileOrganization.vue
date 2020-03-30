@@ -143,8 +143,7 @@
       <ni-input in-modal v-model="selectedTrainee.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="selectedTrainee.identity.lastname" :error="$v.selectedTrainee.identity.lastname.$error" caption="Nom"
         @blur="$v.selectedTrainee.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="selectedTrainee.local.email" :error="$v.selectedTrainee.local.email.$error" caption="Email"
-        @blur="$v.selectedTrainee.local.email.$touch" :error-label="emailError($v.selectedTrainee)" required-field />
+      <ni-input in-modal v-model="selectedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal v-model.trim="selectedTrainee.contact.phone" :error="$v.selectedTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.selectedTrainee.contact.phone.$touch" :error-label="phoneNbrError($v.selectedTrainee)" />
       <template slot="footer">
@@ -296,7 +295,7 @@ export default {
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
       newTrainee: this.traineeValidations,
-      selectedTrainee: this.traineeValidations,
+      selectedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
     }
   },
   computed: {
@@ -503,7 +502,7 @@ export default {
         this.$v.selectedTrainee.$touch();
         if (this.$v.selectedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Users.updateById(this.selectedTrainee._id, omit(this.selectedTrainee, ['_id']));
+        await Users.updateById(this.selectedTrainee._id, omit(this.selectedTrainee, ['_id', 'local']));
         this.traineeEditionModal = false;
         await this.refreshCourse();
         NotifyPositive('Stagiaire modifié.');
