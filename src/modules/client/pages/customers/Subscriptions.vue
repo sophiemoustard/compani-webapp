@@ -271,8 +271,8 @@ export default {
       try {
         const customer = await Customers.getById(this.helper.customers[0]._id);
         this.$store.commit('customer/saveCustomer', customer);
-        this.refreshSubscriptions();
-        this.refreshFundings();
+        this.refreshSubscriptions(this.customer);
+        this.refreshFundings(this.customer);
         await this.checkMandates();
         this.$v.customer.$touch();
       } catch (e) {
