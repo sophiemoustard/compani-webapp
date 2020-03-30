@@ -1,4 +1,3 @@
-
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
@@ -30,7 +29,7 @@ const routes = [
 
         const userClientRole = loggedUser.role.client.name;
         if (userClientRole === HELPER) return next({ name: 'customer agenda' });
-        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account info', params: { id: loggedUser._id } });
+        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'client account info', params: { id: loggedUser._id } });
         if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliary agenda' });
         if (COACH_ROLES.includes(userClientRole)) return next({ name: 'auxiliaries directory' });
         return next({ name: '404' });
