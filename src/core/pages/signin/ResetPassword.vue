@@ -25,13 +25,14 @@ import Input from '@components/form/Input';
 import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { passwordMixin } from '@mixins/passwordMixin';
+import { loggingMixin } from '@mixins/loggingMixin';
 
 export default {
   components: {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
-  mixins: [passwordMixin],
+  mixins: [passwordMixin, loggingMixin],
   data () {
     return {
       password: '',
@@ -39,6 +40,7 @@ export default {
       token: null,
       userId: null,
       timeout: null,
+      userEmail: '',
     }
   },
   async beforeRouteEnter (to, from, next) {
@@ -68,13 +70,22 @@ export default {
     setData (checkToken) {
       this.token = checkToken.token;
       this.userId = checkToken.user._id;
+      this.userEmail = checkToken.user.email;
+    },
+    async logging () {
+      try {
+        this.loggingUser({ email: this.userEmail, password: this.password });
+      } catch (e) {
+        NotifyNegative('Erreur lors de la connexion. Si le problème persiste, contactez le support technique.');
+        console.error(e);
+      }
     },
     async submit () {
       try {
         await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true }, this.token);
 
-        NotifyPositive('Mot de passe changé. Redirection vers la page de connexion...');
-        this.timeout = setTimeout(() => this.$router.replace({ path: '/login' }), 2000)
+        NotifyPositive('Mot de passe changé. Connexion en cours...');
+        this.timeout = setTimeout(() => this.logging(), 2000)
       } catch (e) {
         NotifyNegative('Erreur, si le problème persiste, contactez le support technique.');
         console.error(e.response);
