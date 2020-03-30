@@ -329,7 +329,7 @@ const routes = [
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Salaries'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
+          roles: AUXILIARY_ROLES,
           parent: 'administrative',
         },
       },
@@ -349,7 +349,7 @@ const routes = [
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Contracts'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
+          roles: AUXILIARY_ROLES,
           parent: 'administrative',
         },
       },
