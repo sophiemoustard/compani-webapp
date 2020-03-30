@@ -60,8 +60,12 @@ export const planningTimelineMixin = {
       this.datimeModal = false;
     },
     updateViewMode (viewMode) {
+      const isCurrentWeek = this.$moment().isBetween(this.$moment(this.startOfWeek), this.$moment(this.endOfWeek));
       this.viewMode = viewMode;
       if (!this.isThreeDaysView) this.startOfWeek = this.$moment(this.startOfWeek).startOf('week').toISOString();
+      else if (isCurrentWeek) {
+        this.startOfWeek = this.$moment().toISOString();
+      }
       this.updateTimeline();
     },
   },
