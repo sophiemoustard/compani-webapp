@@ -19,9 +19,10 @@ export const logInMixin = {
 
       if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 
+      let customer;
       switch (this.userRole) {
         case HELPER:
-          const customer = await Customers.getById(this.loggedUser.customers[0]._id);
+          customer = await Customers.getById(this.loggedUser.customers[0]._id);
           this.$store.commit('customer/saveCustomer', customer);
           this.$router.replace({ name: 'customer agenda' });
           break;
