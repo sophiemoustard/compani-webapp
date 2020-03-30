@@ -13,7 +13,7 @@
       <p v-if="contract.status === COMPANY_CONTRACT" class="card-subtitle">
         Statut : {{ getContractStatus(contract) }}
       </p>
-      <ni-responsive-table :data="contract.versions" :columns="contractColumns" row-key="name"
+      <ni-responsive-table :data="contract.versions" :columns="contractColumns" row-key="name" :loading="loadingContracts"
         :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
@@ -112,6 +112,7 @@ export default {
     displayActions: { type: Boolean, default: () => false },
     displayUploader: { type: Boolean, default: () => false },
     personKey: { type: String, default: () => COACH },
+    loadingContracts: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -120,7 +121,6 @@ export default {
       CUSTOMER,
       esignModal: false,
       embeddedUrl: '',
-      loading: false,
       pagination: { rowsPerPage: 0 },
       contractColumns: [
         {

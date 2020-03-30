@@ -5,7 +5,7 @@
         :personKey="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
         @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
-        @deleteVersion="validateVersionDeletion" />
+        @deleteVersion="validateVersionDeletion" :loading-contracts="loadingContracts" />
       <q-btn :disable="disableContractCreation" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <q-banner v-if="disableContractCreation" class="full-width warning" dense>
@@ -177,6 +177,7 @@ export default {
         contract: {},
       },
       endContractReasons: END_CONTRACT_REASONS,
+      loadingContracts: false,
     }
   },
   validations () {
@@ -302,6 +303,7 @@ export default {
     },
     async refreshContracts () {
       try {
+        this.loadingContracts = true;
         this.contracts = await Contracts.list({ user: this.profileId });
         const promises = [];
         for (const contract of this.contracts) {
@@ -320,6 +322,8 @@ export default {
         this.contracts = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des contracts.');
+      } finally {
+        this.loadingContracts = false;
       }
     },
     // Contract creation

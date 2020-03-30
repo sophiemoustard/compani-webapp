@@ -2,7 +2,8 @@
   <q-page padding class="neutral-background">
     <h4>Contrats</h4>
     <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractVisibleColumns"
-      @refresh="refreshContracts" :person-key="AUXILIARY" @refreshWithTimeout="refreshContractsWithTimeout" />
+      @refresh="refreshContracts" :person-key="AUXILIARY" @refreshWithTimeout="refreshContractsWithTimeout"
+      :loading-contracts="loading" />
   </q-page>
 </template>
 
@@ -23,6 +24,7 @@ export default {
       AUXILIARY,
       contracts: [],
       contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractSigned'],
+      loading: false,
     }
   },
   computed: {
@@ -36,11 +38,14 @@ export default {
   methods: {
     async refreshContracts () {
       try {
+        this.loading = true;
         const contracts = await Contracts.list({ user: this.auxiliary._id });
         this.contracts = contracts;
       } catch (e) {
         this.contracts = [];
         console.error(e);
+      } finally {
+        this.loading = false;
       }
     },
   },

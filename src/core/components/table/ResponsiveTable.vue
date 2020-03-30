@@ -19,6 +19,9 @@
         </q-tr>
       </slot>
     </template>
+    <q-inner-loading :showing="props.loading">
+      <q-spinner-facebook size="30px" color="primary" />
+    </q-inner-loading>
   </q-table>
 </template>
 
@@ -33,6 +36,7 @@ export default {
     rowsPerPageOptions: { type: Array, default: () => [15, 25, 35] },
     visibleColumns: Array,
     separator: { type: String, default: 'horizontal' },
+    loading: { type: Boolean, default: false },
   },
 }
 </script>
