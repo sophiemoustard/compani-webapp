@@ -19,4 +19,7 @@ export default {
   async addTrainee (courseId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees`, payload);
   },
+  async deleteTrainee (courseId, traineeId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees/${traineeId}`);
+  },
 };

@@ -69,7 +69,7 @@
                   <div class="row no-wrap table-actions">
                     <div class="row no-wrap table-actions">
                       <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
-                      <!-- <q-icon color="grey" name="delete" @click.native="validateUserDeletion(col.value)" /> -->
+                      <q-icon color="grey" name="delete" @click.native="validateTraineeDeletion(col.value)" />
                     </div>
                   </div>
                 </template>
@@ -509,6 +509,25 @@ export default {
         NotifyNegative('Erreur lors de la modification du stagiaire');
       } finally {
         this.loading = false;
+      }
+    },
+    validateTraineeDeletion (traineeId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce stagiaire ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteTrainee(traineeId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteTrainee (traineeId) {
+      try {
+        await Courses.deleteTrainee(this.course._id, traineeId);
+        await this.refreshCourse();
+        NotifyPositive('Stagiaire supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du stagiaire.');
       }
     },
   },
