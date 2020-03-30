@@ -148,9 +148,9 @@ export const subscriptionMixin = {
       this.subscriptionHistoryModal = false;
       this.selectedSubscription = [];
     },
-    refreshSubscriptions () {
+    refreshSubscriptions (customer) {
       try {
-        const { subscriptions } = this.customer;
+        const { subscriptions } = customer;
         this.subscriptions = subscriptions ? subscriptions.map(sub => ({
           ...getLastVersion(sub.versions, 'createdAt'),
           ...sub,

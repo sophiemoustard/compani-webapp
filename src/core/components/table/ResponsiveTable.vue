@@ -1,7 +1,7 @@
-<template>
-  <q-table :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" :visible-columns="visibleColumns"
-    hide-bottom binary-state-sort @update:pagination="$emit('update:pagination', $event)" flat :separator="separator"
-    class="table-responsive q-pa-sm" :rows-per-page-options="rowsPerPageOptions">
+<template functional>
+  <q-table :data="props.data" :columns="props.columns" :row-key="props.rowKey" :pagination="props.pagination"
+    :visible-columns="props.visibleColumns" hide-bottom binary-state-sort flat :separator="props.separator"
+    class="table-responsive q-pa-sm" :rows-per-page-options="props.rowsPerPageOptions" v-on="listeners">
     <template v-slot:header="props">
       <slot name="header" :props="props">
         <q-tr :props="props">
