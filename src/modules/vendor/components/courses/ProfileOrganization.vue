@@ -58,9 +58,12 @@
       </q-card>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Stagiaires</p>
+      <p class="text-weight-bold">Participants</p>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination">
+          <template v-slot:top>
+            <div class="table-top">Stagiaires ({{ course.trainees.length }})</div>
+          </template>
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -118,7 +121,7 @@
 
     <ni-modal v-model="traineeCreationModal" @hide="resetTraineeCreationForm">
       <template slot="title">
-        Ajouter un <span class="text-weight-bold">stagiaire</span>
+        Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
       </template>
       <ni-input in-modal v-model="newTrainee.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" caption="Nom"
@@ -128,7 +131,7 @@
       <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error-label="phoneNbrError($v.newTrainee)" />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un stagiaire" icon-right="add" color="primary"
+        <q-btn no-caps class="full-width modal-btn" label="Ajouter à la formation" icon-right="add" color="primary"
           :loading="loading" @click="addTrainee" :disable="$v.newTrainee.$invalid" />
       </template>
     </ni-modal>
@@ -537,6 +540,10 @@ export default {
 <style lang="stylus" scoped>
 .td-border-top td
   border-width: 1px 0 0 0
+
 .th-border-bottom th
   border-width: 0 0 1px 0
+
+.table-top
+  font-size: 15px
 </style>
