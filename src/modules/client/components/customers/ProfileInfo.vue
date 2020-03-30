@@ -765,10 +765,13 @@ export default {
     },
     async refreshCustomer () {
       const customer = await Customers.getById(this.customer._id);
-      await this.refreshSubscriptions();
-      await this.refreshFundings();
+      await this.refreshSubscriptions(customer);
+      await this.refreshFundings(customer);
 
-      this.$store.commit('customer/saveCustomer', customer);
+      this.$store.commit(
+        'customer/saveCustomer',
+        { ...customer, subscriptions: [...this.subscriptions], fundings: [...this.fundings] }
+      );
       this.$v.customer.$touch();
     },
     // Subscriptions

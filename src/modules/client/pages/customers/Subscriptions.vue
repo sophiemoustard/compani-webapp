@@ -257,8 +257,8 @@ export default {
   async mounted () {
     if (!this.customer) await this.refreshCustomer();
     else {
-      this.refreshSubscriptions();
-      this.refreshFundings();
+      this.refreshSubscriptions(this.customer);
+      this.refreshFundings(this.customer);
       await this.checkMandates();
       this.$v.customer.$touch();
     }
