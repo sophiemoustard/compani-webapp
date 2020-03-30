@@ -1,10 +1,10 @@
 import Users from '@api/Users';
 import Customers from '@api/Customers';
-import { HELPER } from '@data/constants';
+import { HELPER, AUXILIARY_WITHOUT_COMPANY, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
-export const loggingMixin = {
+export const logInMixin = {
   methods: {
-    async loggingUser (authenticationPayload) {
+    async logInUser (authenticationPayload) {
       const auth = await Users.authenticate(authenticationPayload);
 
       const expiresInDays = parseInt(auth.expiresIn / 3600 / 24, 10) >= 1
@@ -19,14 +19,22 @@ export const loggingMixin = {
 
       if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
 
-      if (this.userRole === HELPER) {
-        const customer = await Customers.getById(this.loggedUser.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
-        this.$router.replace({ name: 'customer agenda' });
-      } else if (this.isAuxiliaryWithoutCompany) {
-        this.$router.replace({ name: 'client account info', params: { id: this.loggedUser._id } });
-      } else if (this.isAuxiliary) this.$router.replace({ name: 'auxiliary agenda' });
-      else this.$router.replace({ name: 'auxiliaries directory' });
+      switch (this.userRole) {
+        case HELPER:
+          const customer = await Customers.getById(this.loggedUser.customers[0]._id);
+          this.$store.commit('customer/saveCustomer', customer);
+          this.$router.replace({ name: 'customer agenda' });
+          break;
+        case AUXILIARY_WITHOUT_COMPANY:
+          this.$router.replace({ name: 'client account info', params: { id: this.loggedUser._id } });
+          break;
+        case AUXILIARY:
+        case PLANNING_REFERENT:
+          this.$router.replace({ name: 'auxiliary agenda' });
+          break;
+        default:
+          this.$router.replace({ name: 'auxiliaries directory' });
+      }
     },
   },
 }

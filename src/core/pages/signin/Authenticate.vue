@@ -35,7 +35,7 @@ import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
 import { AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
-import { loggingMixin } from '@mixins/loggingMixin';
+import { logInMixin } from '@mixins/logInMixin';
 
 export default {
   metaInfo: {
@@ -50,7 +50,7 @@ export default {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
-  mixins: [loggingMixin],
+  mixins: [logInMixin],
   data () {
     return {
       credentials: {
@@ -76,7 +76,7 @@ export default {
   methods: {
     async submit () {
       try {
-        this.loggingUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
+        this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');
         console.error(e);
