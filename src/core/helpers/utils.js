@@ -1,4 +1,6 @@
 import moment from 'moment';
+import transform from 'lodash/transform';
+import isObject from 'lodash/isObject';
 import diacriticsMap from '@data/diacritics';
 
 export const extend = (...sources) => {
@@ -48,6 +50,12 @@ export const clear = (obj) => {
   }
   return cleared;
 };
+
+export const removeEmptyProps = (obj) =>
+  transform(obj, (acc, value, key) => {
+    if (!value) return;
+    acc[key] = isObject(value) ? removeEmptyProps(value) : value;
+  });
 
 export const getLastVersion = (versions, dateKey) => {
   if (versions.length === 0) return null;
