@@ -76,7 +76,7 @@ export default {
   methods: {
     async submit () {
       try {
-        this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
+        await this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');
         console.error(e);

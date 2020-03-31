@@ -14,7 +14,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "@quasar/extras": "^1.6.0",
+    "@quasar/extras": "^1.5.2",
     "axios": "^0.19.2",
     "connect-history-api-fallback": "^1.5.0",
     "date-holidays": "^1.4.13",
@@ -28,7 +28,7 @@
     "moment-business-days": "^1.0.6",
     "moment-range": "^4.0.1",
     "qs": "^6.9.1",
-    "quasar": "^1.9.12",
+    "quasar": "^1.9.8",
     "randomatic": "^3.0.0",
     "vue-analytics": "^5.22.1",
     "vue-croppa": "^1.3.7",
