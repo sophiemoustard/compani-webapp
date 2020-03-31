@@ -59,10 +59,7 @@ export default {
   data () {
     return {
       user: {
-        local: {
-          email: '',
-          password: '',
-        },
+        local: { email: '', password: '' },
         alenvi: {},
         contracts: [],
       },
@@ -136,7 +133,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
   .center-account
     max-width: 40%
     @media screen && (max-width: 600px)
