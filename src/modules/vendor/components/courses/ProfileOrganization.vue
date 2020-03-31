@@ -58,7 +58,7 @@
       </q-card>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Participants ({{ course.trainees.length }})</p>
+      <p class="text-weight-bold">Participants ({{ traineesNumber }})</p>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination">
           <template v-slot:body="{ props }">
@@ -313,6 +313,9 @@ export default {
       );
 
       return total.minutes() ? `${total.hours()}h${total.minutes()}` : `${total.hours()}h`;
+    },
+    traineesNumber () {
+      return this.course.trainees ? this.course.trainees.length : 0;
     },
   },
   async mounted () {
