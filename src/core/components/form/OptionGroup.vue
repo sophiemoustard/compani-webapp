@@ -1,13 +1,13 @@
-<template functional>
-  <div :class="['row', 'margin-input', { last: props.last }]">
+<template>
+  <div :class="['row', 'margin-input', { last: last }]">
     <div class="col-12">
-      <div v-if="props.displayCaption" class="row justify-between">
-        <p :class="['input-caption', { required: props.requiredField }]">{{ props.caption }}</p>
+      <div v-if="displayCaption" class="row justify-between">
+        <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
-      <q-field dense borderless :error="props.error" :error-label="props.errorLabel" class="col-12">
-        <q-option-group v-on="listeners" :value="props.value" :options="props.options" :readonly="props.readOnly"
-          :type="props.type" :inline="props.inline" dense :disable="props.disable" />
+      <q-field dense borderless :error="error" :error-label="errorLabel" class="col-12">
+        <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
+          :disable="disable" @input="$emit('input', $event)" @blur="$emit('blur')" />
       </q-field>
     </div>
   </div>
