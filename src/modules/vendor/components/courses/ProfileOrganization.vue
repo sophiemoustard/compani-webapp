@@ -13,18 +13,20 @@
       <q-card>
         <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none">
           <template v-slot:header="{ props }">
-            <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-              <template v-if="col.name === 'date'">Dates ({{ Object.keys(courseSlots).length }})</template>
-              <template v-else-if="col.name === 'hours'">Créneaux ({{ course.slots ? course.slots.length : 0 }})</template>
-              <template v-else-if="col.name === 'duration'">Durée ({{ slotsDurationColumnTitle }})</template>
-              <template v-else>{{ col.label }}</template>
-            </q-th>
-          </q-tr>
+            <q-tr :props="props" :class="{ 'th-border-bottom': Object.values(courseSlots).length === 0 }">
+              <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
+                <template v-if="col.name === 'date'">Dates ({{ Object.keys(courseSlots).length }})</template>
+                <template v-else-if="col.name === 'hours'">
+                  Créneaux ({{ course.slots ? course.slots.length : 0 }})
+                </template>
+                <template v-else-if="col.name === 'duration'">Durée ({{ slotsDurationColumnTitle }})</template>
+                <template v-else>{{ col.label }}</template>
+              </q-th>
+            </q-tr>
           </template>
           <template v-slot:body="{ props }">
             <q-tr v-for="(slot, index) in props.row" :key="slot._id" :props="props"
-              :class="{'border-top': index === 0 }">
+              :class="{'td-border-top': index === 0 }">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'date' && index === 0">
@@ -338,6 +340,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.border-top td
+.td-border-top td
   border-width: 1px 0 0 0
+.th-border-bottom th
+  border-width: 0 0 1px 0
 </style>

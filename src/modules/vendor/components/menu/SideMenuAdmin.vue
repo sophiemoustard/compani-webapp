@@ -6,7 +6,7 @@
       </q-item-label>
     </div>
     <q-separator />
-    <q-expansion-item ref="operations" v-model="activeRoutes.operations.open" label="Operations">
+    <q-expansion-item ref="operations" v-model="activeRoutes.operations.open" label="Opérations">
       <ni-menu-item name="courses directory" icon="view_headline" label="Formations" />
     </q-expansion-item>
     <q-separator />
