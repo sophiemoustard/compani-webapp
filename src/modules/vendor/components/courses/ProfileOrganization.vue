@@ -68,7 +68,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
-                    <q-icon color="grey" name="delete" @click.native="validateTraineeDeletion(col.value)" />
+                    <q-icon color="grey" name="close" @click.native="validateTraineeDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
