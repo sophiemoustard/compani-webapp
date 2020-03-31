@@ -1,7 +1,7 @@
 <template>
   <q-table :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination" class="neutral-background"
     :hide-bottom="pagination.rowsPerPage === 0" :visible-columns="visibleColumns" :rows-per-page-options="[]"
-    v-on="$listeners">
+    v-on="$listeners" :loading="loading">
     <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
       <slot name="top-row" :props="props" />
     </template>
@@ -16,7 +16,13 @@
       </slot>
     </template>
     <template v-slot:bottom-row="props">
-      <slot name="bottom-row" :props="props" /></template>
+      <slot name="bottom-row" :props="props" />
+    </template>
+    <template v-slot:loading>
+      <q-inner-loading showing>
+        <q-spinner-facebook size="30px" color="primary" />
+      </q-inner-loading>
+    </template>
   </q-table>
 </template>
 
@@ -29,6 +35,7 @@ export default {
     rowKey: { type: String, default: 'name' },
     visibleColumns: Array,
     pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
+    loading: { type: Boolean, default: false },
   },
 }
 </script>

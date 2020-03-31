@@ -10,7 +10,7 @@
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
         @openEditionModal="openEditionModal" :type="CUSTOMER" :startBalance="getStartBalance()"
-        :endBalance="getEndBalance(customerDocuments)" />
+        :endBalance="getEndBalance(customerDocuments)" :loading="tableLoading" />
       <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
           color="white" icon="add" />
@@ -20,7 +20,7 @@
       <p class="text-weight-bold text-primary">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :displayActions="isCoach"
         @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
-        :endBalance="getEndBalance(tpp.documents, tpp)" />
+        :endBalance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
       <div v-if="isCoach" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
@@ -28,7 +28,7 @@
     </div>
     <div class="q-pa-sm q-mb-lg">
       <p class="text-weight-bold text-primary">Attestations fiscales</p>
-      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns"
+      <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" :loading="tableLoading"
         :pagination.sync="taxCertificatesPagination">
         <template v-slot:body="{ props }">
           <q-tr :props="props">

@@ -19,9 +19,11 @@
         </q-tr>
       </slot>
     </template>
-    <q-inner-loading :showing="props.loading">
-      <q-spinner-facebook size="30px" color="primary" />
-    </q-inner-loading>
+    <template v-slot:loading>
+      <q-inner-loading showing>
+        <q-spinner-facebook size="30px" color="primary" />
+      </q-inner-loading>
+    </template>
   </q-table>
 </template>
 
