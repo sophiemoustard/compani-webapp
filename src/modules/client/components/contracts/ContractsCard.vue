@@ -13,7 +13,7 @@
       <p v-if="contract.status === COMPANY_CONTRACT" class="card-subtitle">
         Statut : {{ getContractStatus(contract) }}
       </p>
-      <ni-responsive-table :data="contract.versions" :columns="contractColumns" row-key="name" :loading="loadingContracts"
+      <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name" :loading="contractsLoading"
         :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
@@ -112,7 +112,7 @@ export default {
     displayActions: { type: Boolean, default: () => false },
     displayUploader: { type: Boolean, default: () => false },
     personKey: { type: String, default: () => COACH },
-    loadingContracts: { type: Boolean, default: false },
+    contractsLoading: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -122,7 +122,7 @@ export default {
       esignModal: false,
       embeddedUrl: '',
       pagination: { rowsPerPage: 0 },
-      contractColumns: [
+      contractsColumns: [
         {
           name: 'weeklyHours',
           label: 'Volume horaire hebdomadaire',

@@ -8,7 +8,7 @@ export const fundingMixin = {
       fundings: [],
       selectedFunding: {},
       fundingsLoading: false,
-      fundingColumns: [
+      fundingsColumns: [
         {
           name: 'startDate',
           label: 'Date de début de prise en charge',

@@ -26,7 +26,7 @@ export const helperMixin = {
         contact: { phone: '' },
       },
       helpers: [],
-      helperColumns: [
+      helpersColumns: [
         { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
         { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
         { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
@@ -47,8 +47,8 @@ export const helperMixin = {
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
-      helperPagination: { rowsPerPage: 0 },
-      helperLoading: false,
+      helpersPagination: { rowsPerPage: 0 },
+      helpersLoading: false,
     }
   },
   computed: {
@@ -70,7 +70,7 @@ export const helperMixin = {
     // Refresh
     async getUserHelpers () {
       try {
-        this.helperLoading = true;
+        this.helpersLoading = true;
         const params = { customers: this.customer._id };
         if (has(this.loggedUser, 'company._id')) params.company = this.loggedUser.company._id;
         this.helpers = await Users.list(params);
@@ -78,7 +78,7 @@ export const helperMixin = {
         this.helpers = [];
         console.error(e);
       } finally {
-        this.helperLoading = false;
+        this.helpersLoading = false;
       }
     },
     // Creation

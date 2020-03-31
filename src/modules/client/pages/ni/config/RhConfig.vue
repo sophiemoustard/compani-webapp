@@ -6,7 +6,7 @@
         <p class="text-weight-bold">Heures internes</p>
         <q-card>
           <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" :pagination.sync="pagination"
-            :loading="internalHourLoading">
+            :loading="internalHoursLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -116,7 +116,7 @@
         <p class="text-weight-bold">Documents administratifs</p>
         <q-card>
           <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
-            :pagination.sync="administrativeDocumentPagination" :loading="adminDocumentsLoading">
+            :pagination.sync="sadministrativeDocumentPagination" :loading="adminDocumentsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -143,7 +143,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Équipes</p>
         <q-card>
-          <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorPagination"
+          <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorsPagination"
             :loading="sectorsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -262,9 +262,6 @@ export default {
       MAX_INTERNAL_HOURS_NUMBER: 9,
       company: null,
       internalHours: [],
-      internalHourLoading: false,
-      adminDocumentsLoading: false,
-      sectorsLoading: false,
       internalHoursColumns: [
         {
           name: 'name',
@@ -285,6 +282,7 @@ export default {
           field: '_id',
         },
       ],
+      internalHoursLoading: false,
       newInternalHourModal: false,
       newInternalHour: { name: '' },
       loading: false,
@@ -304,8 +302,9 @@ export default {
           align: 'center',
         },
       ],
+      adminDocumentsLoading: false,
       administrativeDocumentCreationModal: false,
-      administrativeDocumentPagination: { rowsPerPage: 0 },
+      administrativeDocumentsPagination: { rowsPerPage: 0 },
       newAdministrativeDocument: { name: '', file: null },
       sectors: [],
       sectorsColumns: [
@@ -322,7 +321,8 @@ export default {
           field: row => ({ _id: row._id, auxiliaryCount: row.auxiliaryCount }),
         },
       ],
-      sectorPagination: {
+      sectorsLoading: false,
+      sectorsPagination: {
         rowsPerPage: 0,
         sortBy: 'name',
       },
@@ -413,14 +413,14 @@ export default {
     },
     async refreshInternalHours () {
       try {
-        this.internalHourLoading = true;
+        this.internalHoursLoading = true;
         this.internalHours = await InternalHours.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des heures internes.');
         this.internalHours = [];
       } finally {
-        this.internalHourLoading = false;
+        this.internalHoursLoading = false;
       }
     },
     async createInternalHour () {

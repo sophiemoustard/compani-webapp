@@ -44,8 +44,8 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
-      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" :visible-columns="visibleColumns"
-        :loading="helperLoading">
+      <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
+        :loading="helpersLoading">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -126,11 +126,9 @@ export default {
       isLoaded: false,
       tmpInput: '',
       loading: false,
-      helperLoading: false,
-      fundingsLoading: false,
-      followupLoading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
+      followupLoading: false,
       followUpColumns: [
         {
           name: 'identity',
@@ -152,6 +150,7 @@ export default {
       ],
       followUpPagination: { rowsPerPage: 5 },
       fundingsMonitoring: [],
+      fundingsLoading: false,
       fundingsMonitoringColumns: [
         {
           name: 'thirdPartyPayer',
@@ -259,14 +258,14 @@ export default {
     },
     async getCustomerFundingsMonitoring () {
       try {
-        this.loading = true;
+        this.fundingsLoading = true;
         this.fundingsMonitoring = await Stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.fundingsMonitoring = [];
         NotifyNegative('Erreur lors de la récupération du suivi des financements.');
       } finally {
-        this.loading = false;
+        this.fundingsLoading = false;
       }
     },
     async refreshCustomer () {

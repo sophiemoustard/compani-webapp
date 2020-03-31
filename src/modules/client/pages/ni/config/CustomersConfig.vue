@@ -5,7 +5,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
-          <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination"
+          <ni-responsive-table :data="surcharges" :columns="surchargesColumns" :pagination.sync="pagination"
             :loading="surchargesLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -34,7 +34,7 @@
         <p class="text-weight-bold">Services</p>
         <q-card>
           <ni-responsive-table :data="services" :columns="serviceColumns" :pagination.sync="pagination"
-            :visible-columns="visibleColumnsServices" :loading="servicesLoading">
+            :visible-columns="servicesVisibleColumns" :loading="servicesLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -80,7 +80,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card>
-          <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" :loading="tppLoading"
+          <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" :loading="tppsLoading"
             :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -392,7 +392,7 @@ export default {
       loading: false,
       surchargesLoading: false,
       servicesLoading: false,
-      tppLoading: false,
+      tppsLoading: false,
       company: null,
       documents: null,
       FIXED,
@@ -435,7 +435,7 @@ export default {
         customStartTime: null,
         customEndTime: null,
       },
-      surchargeColumns: [
+      surchargesColumns: [
         {
           name: 'name',
           label: 'Nom',
@@ -541,7 +541,7 @@ export default {
       },
       natureOptions: NATURE_OPTIONS,
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
-      visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges', 'actions'],
+      servicesVisibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
       serviceColumns: [
         {
@@ -846,13 +846,13 @@ export default {
     },
     async refreshThirdPartyPayers () {
       try {
-        this.tppLoading = true;
+        this.tppsLoading = true;
         this.thirdPartyPayers = await ThirdPartyPayers.list();
       } catch (e) {
         this.thirdPartyPayers = [];
         console.error(e);
       } finally {
-        this.tppLoading = false;
+        this.tppsLoading = false;
       }
     },
     // Surcharges

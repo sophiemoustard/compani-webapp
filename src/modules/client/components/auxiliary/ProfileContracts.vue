@@ -1,11 +1,11 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractVisibleColumns"
+      <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
         :personKey="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
         @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
-        @deleteVersion="validateVersionDeletion" :loading-contracts="loadingContracts" />
+        @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
       <q-btn :disable="disableContractCreation" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <q-banner v-if="disableContractCreation" class="full-width warning" dense>
@@ -149,7 +149,7 @@ export default {
         contractCreationMissingInfo: [],
       },
       customers: [],
-      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
+      contractsVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
       // New contract
       newContractModal: false,
       newContract: {
@@ -177,7 +177,7 @@ export default {
         contract: {},
       },
       endContractReasons: END_CONTRACT_REASONS,
-      loadingContracts: false,
+      contractsLoading: false,
     }
   },
   validations () {
@@ -303,7 +303,7 @@ export default {
     },
     async refreshContracts () {
       try {
-        this.loadingContracts = true;
+        this.contractsLoading = true;
         this.contracts = await Contracts.list({ user: this.profileId });
         const promises = [];
         for (const contract of this.contracts) {
@@ -323,7 +323,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des contracts.');
       } finally {
-        this.loadingContracts = false;
+        this.contractsLoading = false;
       }
     },
     // Contract creation

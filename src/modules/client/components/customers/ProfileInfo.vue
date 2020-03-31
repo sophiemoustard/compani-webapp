@@ -72,8 +72,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
-        <ni-responsive-table :data="sortedHelpers" :columns="helperColumns" :pagination="helperPagination"
-          :loading="helperLoading">
+        <ni-responsive-table :data="sortedHelpers" :columns="helpersColumns" :pagination="helpersPagination"
+          :loading="helpersLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -113,8 +113,8 @@
         <p class="text-weight-bold">Mandats de prélèvement</p>
       </div>
       <q-card>
-        <ni-responsive-table :columns="mandateColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
-          :visible-columns="visibleMandateColumns" class="mandate-table" :loading="mandateLoading">
+        <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
+          :visible-columns="mandatesVisibleColumns" class="mandate-table" :loading="mandatesLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -155,7 +155,7 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns"
+        <ni-responsive-table :data="fundings" :columns="fundingsColumns" :visible-columns="fundingsVisibleColumns"
           :loading="fundingsLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
@@ -303,7 +303,7 @@
       <template slot="title">
         Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingColumns"
+      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
         :visible-columns="fundingDetailsVisibleColumns" />
     </ni-modal>
 
@@ -313,8 +313,8 @@
       <template slot="title">
         Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingColumns"
-        :visible-columns="fundingHistoryVisibleColumns" />
+      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingsColumns"
+        :visible-columns="fundingHistoriesVisibleColumns" />
     </ni-modal>
 
     <!-- Funding creation modal -->
@@ -467,8 +467,6 @@ export default {
       FIXED,
       days,
       loading: false,
-      quotesLoading: false,
-      mandateLoading: false,
       openEditedHelperModal: false,
       subscriptionCreationModal: false,
       subscriptionEditionModal: false,
@@ -493,15 +491,16 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
+      quotesLoading: false,
       newSubscription: {
         service: '',
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
       },
       editedSubscription: {},
-      visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
+      mandatesVisibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
-      mandateColumns: [
+      mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
         { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },
         { name: 'signedMandate', label: 'Mandat signé', align: 'center', field: 'signedMandate' },
@@ -517,7 +516,8 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      fundingVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
+      mandatesLoading: false,
+      fundingsVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
       fundingHistoryModal: false,
       paginationFundingHistory: {
         rowsPerPage: 0,
@@ -598,7 +598,7 @@ export default {
       }
       return '';
     },
-    fundingHistoryVisibleColumns () {
+    fundingHistoriesVisibleColumns () {
       return this.selectedFunding.nature === FIXED
         ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
         : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
@@ -746,7 +746,7 @@ export default {
     },
     async refreshMandates () {
       try {
-        this.mandateLoading = true;
+        this.mandatesLoading = true;
         const mandates = await Customers.getMandates(this.customer._id);
 
         this.$store.commit(
@@ -757,7 +757,7 @@ export default {
       } catch (e) {
         console.error(e);
       } finally {
-        this.mandateLoading = false;
+        this.mandatesLoading = false;
       }
     },
     async refreshQuotes () {

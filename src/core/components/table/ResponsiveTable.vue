@@ -1,7 +1,7 @@
 <template>
   <q-table :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" hide-bottom binary-state-sort
     :visible-columns="visibleColumns" flat :separator="separator" :rows-per-page-options="rowsPerPageOptions"
-    class="table-responsive q-pa-sm" v-on="$listeners">
+    class="table-responsive q-pa-sm" v-on="$listeners" :loading="loading">
     <template v-slot:header="props">
       <slot name="header" :props="props">
         <q-tr :props="props">

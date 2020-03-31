@@ -63,8 +63,8 @@
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
-          <ni-responsive-table :data="customer.payment.mandates" :columns="columnsMandates" :loading="mandatesLoading"
-            :pagination.sync="pagination" :visible-columns="visibleColumnsMandates">
+          <ni-responsive-table :data="customer.payment.mandates" :columns="mandatesColumns" :loading="mandatesLoading"
+            :pagination.sync="pagination" :visible-columns="mandatesVisibleColumns">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -117,7 +117,7 @@
 
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
-      <ni-funding-grid-table :data="fundingData" :columns="fundingColumns" />
+      <ni-funding-grid-table :data="fundingData" :columns="fundingsColumns" />
     </ni-modal>
   </q-page>
 </template>
@@ -166,7 +166,7 @@ export default {
       tmpInput: null,
       newESignModal: false,
       embeddedUrl: '',
-      columnsMandates: [
+      mandatesColumns: [
         {
           name: 'rum',
           label: 'RUM',
@@ -192,7 +192,7 @@ export default {
           field: '_id',
         },
       ],
-      visibleColumnsMandates: ['rum', 'sign'],
+      mandatesVisibleColumns: ['rum', 'sign'],
       fundingModal: false,
       fundingData: [],
       pagination: {
