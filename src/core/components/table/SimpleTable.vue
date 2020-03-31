@@ -1,7 +1,7 @@
 <template>
   <q-table :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination" class="neutral-background"
     :hide-bottom="pagination.rowsPerPage === 0" :visible-columns="visibleColumns" :rows-per-page-options="[]"
-    @update:pagination="$emit('update:pagination', $event)">
+    v-on="$listeners">
     <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
       <slot name="top-row" :props="props" />
     </template>

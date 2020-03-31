@@ -7,7 +7,7 @@
       </div>
       <q-field dense borderless :error="error" :error-label="errorLabel" class="col-12">
         <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
-          :disable="disable" @input="$emit('input', $event)" @blur="$emit('blur')" />
+          :disable="disable" v-on="$listeners" />
       </q-field>
     </div>
   </div>

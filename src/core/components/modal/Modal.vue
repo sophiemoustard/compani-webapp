@@ -1,5 +1,5 @@
 <template>
-  <q-dialog :value="value" @input="$emit('input', $event)" @hide="$emit('hide', $event)" @show="$emit('show', $event)">
+  <q-dialog :value="value" v-on="$listeners">
     <div :class="containerClass">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
