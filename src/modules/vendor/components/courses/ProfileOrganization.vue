@@ -9,14 +9,13 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Dates</p>
+      <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
       <q-card>
         <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none">
           <template v-slot:header="{ props }">
             <q-tr :props="props" :class="{ 'th-border-bottom': Object.values(courseSlots).length === 0 }">
               <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-                <template v-if="col.name === 'date'">Dates ({{ Object.keys(courseSlots).length }})</template>
-                <template v-else-if="col.name === 'hours'">
+                <template v-if="col.name === 'hours'">
                   Créneaux ({{ course.slots ? course.slots.length : 0 }})
                 </template>
                 <template v-else-if="col.name === 'duration'">Durée ({{ slotsDurationColumnTitle }})</template>
@@ -26,10 +25,10 @@
           </template>
           <template v-slot:body="{ props }">
             <q-tr v-for="(slot, index) in props.row" :key="slot._id" :props="props"
-              :class="{'td-border-top': index === 0 }">
+              :class="{ 'td-border-top': index === 0 && !$q.platform.is.mobile }">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template v-if="col.name === 'date' && index === 0">
+                <template v-if="col.name === 'date' && (index === 0 || $q.platform.is.mobile)">
                   {{ $moment(slot.startDate).format('DD/MM/YYYY') }}
                 </template>
                 <template v-else-if="col.name === 'hours'">
@@ -142,9 +141,9 @@ export default {
       editedCourseSlot: {},
       courseSlotEditionModal: false,
       courseSlotsColumns: [
-        { name: 'date', align: 'left' },
-        { name: 'hours', align: 'center' },
-        { name: 'duration', align: 'center' },
+        { name: 'date', align: 'left', label: 'Dates' },
+        { name: 'hours', align: 'center', label: 'Créneaux' },
+        { name: 'duration', align: 'center', label: 'Durée' },
         { name: 'address', label: 'Lieu', align: 'left' },
         { name: 'actions', label: '', align: 'center' },
       ],
