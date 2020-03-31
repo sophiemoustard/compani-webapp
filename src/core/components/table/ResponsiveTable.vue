@@ -2,9 +2,6 @@
   <q-table :data="props.data" :columns="props.columns" :row-key="props.rowKey" :pagination="props.pagination"
     :visible-columns="props.visibleColumns" hide-bottom binary-state-sort flat :separator="props.separator"
     class="table-responsive q-pa-sm" :rows-per-page-options="props.rowsPerPageOptions" v-on="listeners">
-    <template v-if="scopedSlots['top']" v-slot:top="props">
-      <slot name="top" :props="props" />
-    </template>
     <template v-slot:header="props">
       <slot name="header" :props="props">
         <q-tr :props="props">

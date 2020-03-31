@@ -58,22 +58,17 @@
       </q-card>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Participants</p>
+      <p class="text-weight-bold">Participants ({{ course.trainees.length }})</p>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination">
-          <template v-slot:top>
-            <div class="table-top">Stagiaires ({{ course.trainees.length }})</div>
-          </template>
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <div class="row no-wrap table-actions">
-                      <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
-                      <q-icon color="grey" name="delete" @click.native="validateTraineeDeletion(col.value)" />
-                    </div>
+                    <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
+                    <q-icon color="grey" name="delete" @click.native="validateTraineeDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -94,8 +89,8 @@
       <template slot="title">
         Ajouter un <span class="text-weight-bold">créneau</span>
       </template>
-      <ni-datetime-range caption="Dates et heures" v-model="newCourseSlot.dates" required-field
-        disable-end-date :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
+      <ni-datetime-range caption="Dates et heures" v-model="newCourseSlot.dates" required-field disable-end-date
+        :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
       <ni-search-address v-model="newCourseSlot.address" :error-label="addressError"
         @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
       <template slot="footer">
@@ -109,8 +104,8 @@
       <template slot="title">
         Editer un <span class="text-weight-bold">créneau</span>
       </template>
-      <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field
-        disable-end-date :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
+      <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
+        :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-label="addressError"
         @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
       <template slot="footer">
@@ -119,13 +114,14 @@
       </template>
     </ni-modal>
 
+    <!-- Trainee creation modal -->
     <ni-modal v-model="traineeCreationModal" @hide="resetTraineeCreationForm">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
       </template>
       <ni-input in-modal v-model="newTrainee.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" caption="Nom"
-        @blur="$v.newTrainee.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error"
+        caption="Nom" @blur="$v.newTrainee.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model="newTrainee.local.email" :error="$v.newTrainee.local.email.$error" caption="Email"
         @blur="$v.newTrainee.local.email.$touch" :error-label="emailError($v.newTrainee)" required-field />
       <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
@@ -136,19 +132,21 @@
       </template>
     </ni-modal>
 
+    <!-- Trainee edition modal -->
     <ni-modal v-model="traineeEditionModal" @hide="resetTraineeEditionForm">
       <template slot="title">
         Éditer un <span class="text-weight-bold">stagiaire</span>
       </template>
-      <ni-input in-modal v-model="selectedTrainee.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="selectedTrainee.identity.lastname" :error="$v.selectedTrainee.identity.lastname.$error" caption="Nom"
-        @blur="$v.selectedTrainee.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="selectedTrainee.local.email" caption="Email" disable />
-      <ni-input in-modal v-model.trim="selectedTrainee.contact.phone" :error="$v.selectedTrainee.contact.phone.$error"
-        caption="Téléphone" @blur="$v.selectedTrainee.contact.phone.$touch" :error-label="phoneNbrError($v.selectedTrainee)" />
+      <ni-input in-modal v-model="editedTrainee.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model="editedTrainee.identity.lastname" :error="$v.editedTrainee.identity.lastname.$error"
+        caption="Nom" @blur="$v.editedTrainee.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
+      <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
+        caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
+        :error-label="phoneNbrError($v.editedTrainee)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
-          :loading="loading" @click="updateTrainee" :disable="$v.selectedTrainee.$invalid" />
+          :loading="loading" @click="updateTrainee" :disable="$v.editedTrainee.$invalid" />
       </template>
     </ni-modal>
   </div>
@@ -161,7 +159,6 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
-import cloneDeep from 'lodash/cloneDeep';
 import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import CourseSlots from '@api/CourseSlots';
@@ -231,25 +228,27 @@ export default {
           name: 'firstname',
           label: 'Prénom',
           align: 'left',
-          field: row => get(row, 'identity.firstname', ''),
+          field: row => get(row, 'identity.firstname', '') || '',
+          classes: 'text-capitalize',
         },
         {
           name: 'lastname',
           label: 'Nom',
           align: 'left',
-          field: row => get(row, 'identity.lastname', ''),
+          field: row => get(row, 'identity.lastname', '') || '',
+          classes: 'text-capitalize',
         },
         {
           name: 'email',
           label: 'Email',
           align: 'left',
-          field: row => get(row, 'local.email', ''),
+          field: row => get(row, 'local.email', '') || '',
         },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => get(row, 'contact.phone', ''),
+          field: row => get(row, 'contact.phone', '') || '',
           format: (value) => formatPhone(value),
         },
         {
@@ -263,6 +262,7 @@ export default {
         rowsPerPage: 0,
         sortBy: 'lastname',
       },
+      traineeCreationModal: false,
       newTrainee: {
         identity: {
           firstname: '',
@@ -277,9 +277,8 @@ export default {
         local: { email: { required, email } },
         contact: { phone: { frPhoneNumber } },
       },
-      traineeCreationModal: false,
       traineeEditionModal: false,
-      selectedTrainee: {
+      editedTrainee: {
         identity: {},
         contact: {},
         local: {},
@@ -295,7 +294,7 @@ export default {
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
       newTrainee: this.traineeValidations,
-      selectedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
+      editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
     }
   },
   computed: {
@@ -486,23 +485,23 @@ export default {
       }
     },
     async openTraineeEditionModal (trainee) {
-      this.selectedTrainee = {
-        ...this.selectedTrainee,
-        ...pick(cloneDeep(trainee), ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
+      this.editedTrainee = {
+        ...this.editedTrainee,
+        ...pick(trainee, ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
       };
       this.traineeEditionModal = true;
     },
     resetTraineeEditionForm () {
-      this.$v.selectedTrainee.$reset();
-      this.selectedTrainee = { identity: {}, local: {}, contact: {} };
+      this.$v.editedTrainee.$reset();
+      this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },
     async updateTrainee () {
       try {
         this.loading = true;
-        this.$v.selectedTrainee.$touch();
-        if (this.$v.selectedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.editedTrainee.$touch();
+        if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Users.updateById(this.selectedTrainee._id, omit(this.selectedTrainee, ['_id', 'local']));
+        await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
         this.traineeEditionModal = false;
         await this.refreshCourse();
         NotifyPositive('Stagiaire modifié.');
@@ -516,7 +515,7 @@ export default {
     validateTraineeDeletion (traineeId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce stagiaire ?',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce stagiaire de la formation ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteTrainee(traineeId))
