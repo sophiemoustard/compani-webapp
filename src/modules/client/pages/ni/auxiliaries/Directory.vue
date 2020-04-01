@@ -83,6 +83,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { taskValidation } from 'src/modules/client/helpers/taskValidation';
@@ -256,7 +257,7 @@ export default {
       const formattedUser = {
         auxiliary: {
           _id: user._id,
-          name: `${user.identity.firstname} ${user.identity.lastname}`,
+          name: formatIdentity(user.identity, 'FL'),
           picture: user.picture ? user.picture.link : null,
         },
         startDate: user.createdAt,
