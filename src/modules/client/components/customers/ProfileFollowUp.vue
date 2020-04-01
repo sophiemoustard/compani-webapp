@@ -44,7 +44,8 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
-      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" :visible-columns="visibleColumns">
+      <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
+        :loading="helpersLoading">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -63,13 +64,14 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" />
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
+        :loading="followUpLoading">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -126,6 +128,7 @@ export default {
       loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
+      followUpLoading: false,
       followUpColumns: [
         {
           name: 'identity',
@@ -147,6 +150,7 @@ export default {
       ],
       followUpPagination: { rowsPerPage: 5 },
       fundingsMonitoring: [],
+      fundingsLoading: false,
       fundingsMonitoringColumns: [
         {
           name: 'thirdPartyPayer',
@@ -243,19 +247,25 @@ export default {
     },
     async getCustomerFollowUp () {
       try {
+        this.followUpLoading = true;
         this.customerFollowUp = await Stats.getCustomerFollowUp({ customer: this.customer._id });
       } catch (e) {
         this.customerFollowUp = [];
         NotifyNegative('Erreur lors de la récupération des auxiliaires.');
+      } finally {
+        this.followUpLoading = false;
       }
     },
     async getCustomerFundingsMonitoring () {
       try {
+        this.fundingsLoading = true;
         this.fundingsMonitoring = await Stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.fundingsMonitoring = [];
         NotifyNegative('Erreur lors de la récupération du suivi des financements.');
+      } finally {
+        this.fundingsLoading = false;
       }
     },
     async refreshCustomer () {

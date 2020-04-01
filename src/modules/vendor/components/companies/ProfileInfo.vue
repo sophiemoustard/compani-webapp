@@ -8,7 +8,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Utilisateurs</p>
       <q-card>
-        <ni-responsive-table :data="users" :columns="usersColumns" :pagination.sync="usersPagination">
+        <ni-responsive-table :data="users" :columns="usersColumns" :pagination.sync="usersPagination"
+          :loading="usersLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -28,7 +29,7 @@
         </ni-responsive-table>
         <q-card-actions align="right">
           <q-btn no-caps flat color="primary" icon="add" label="Ajouter un utilisateur"
-            @click="userCreationModal = true" />
+            @click="userCreationModal = true" :disable="usersLoading" />
         </q-card-actions>
       </q-card>
     </div>
@@ -110,6 +111,7 @@ export default {
   data () {
     return {
       loading: false,
+      usersLoading: false,
       userCreationModal: false,
       userEditionModal: false,
       users: [],
@@ -233,10 +235,13 @@ export default {
     },
     async getUsers () {
       try {
+        this.usersLoading = true;
         this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
       } catch (e) {
         console.error(e);
         this.users = [];
+      } finally {
+        this.usersLoading = false;
       }
     },
     formatUserPayload (user) {

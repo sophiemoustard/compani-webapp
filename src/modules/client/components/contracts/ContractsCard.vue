@@ -13,7 +13,7 @@
       <p v-if="contract.status === COMPANY_CONTRACT" class="card-subtitle">
         Statut : {{ getContractStatus(contract) }}
       </p>
-      <ni-responsive-table :data="contract.versions" :columns="contractColumns" row-key="name"
+      <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name" :loading="contractsLoading"
         :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
@@ -67,9 +67,9 @@
       <q-card-actions align="right">
         <template v-if="displayActions && !contract.endDate">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
-            @click="openVersionCreation(contract)" />
+            @click="openVersionCreation(contract)" :disable="contractsLoading" />
           <q-btn flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
-            @click="openEndContract(contract)" />
+            @click="openEndContract(contract)" :disable="contractsLoading" />
         </template>
       </q-card-actions>
     </q-card>
@@ -112,6 +112,7 @@ export default {
     displayActions: { type: Boolean, default: () => false },
     displayUploader: { type: Boolean, default: () => false },
     personKey: { type: String, default: () => COACH },
+    contractsLoading: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -120,9 +121,8 @@ export default {
       CUSTOMER,
       esignModal: false,
       embeddedUrl: '',
-      loading: false,
       pagination: { rowsPerPage: 0 },
-      contractColumns: [
+      contractsColumns: [
         {
           name: 'weeklyHours',
           label: 'Volume horaire hebdomadaire',

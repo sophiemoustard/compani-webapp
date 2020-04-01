@@ -74,7 +74,7 @@ export default {
     },
     async logIn () {
       try {
-        this.logInUser({ email: this.userEmail, password: this.password });
+        await this.logInUser({ email: this.userEmail, password: this.password });
       } catch (e) {
         NotifyNegative('Erreur lors de la connexion. Si le problème persiste, contactez le support technique.');
         console.error(e);

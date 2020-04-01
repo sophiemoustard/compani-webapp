@@ -31,7 +31,7 @@
         <span class="no-document">Aucun document</span>
       </div>
       <q-btn v-if="isCoach" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
-        label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
+        label="Ajouter un document" @click="documentUpload = true" :disable="payDocumentsLoading" />
 
       <!-- Document upload modal -->
       <ni-modal v-model="documentUpload">

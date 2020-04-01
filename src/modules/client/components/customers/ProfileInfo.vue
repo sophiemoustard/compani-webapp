@@ -34,7 +34,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Souscriptions</p>
       <q-card>
-        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns">
+        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -53,7 +53,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add"
+          <q-btn :disable="serviceOptions.length === 0 || subscriptionsLoading" flat no-caps color="primary" icon="add"
             label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
         </q-card-actions>
       </q-card>
@@ -72,7 +72,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
-        <ni-responsive-table :data="sortedHelpers" :columns="helperColumns" :pagination="helperPagination">
+        <ni-responsive-table :data="sortedHelpers" :columns="helpersColumns" :pagination="helpersPagination"
+          :loading="helpersLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -89,7 +90,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true" />
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true"
+            :disable="helpersLoading" />
         </q-card-actions>
       </q-card>
     </div>
@@ -112,8 +114,8 @@
         <p class="text-weight-bold">Mandats de prélèvement</p>
       </div>
       <q-card>
-        <ni-responsive-table :columns="mandateColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
-          :visible-columns="visibleMandateColumns" class="mandate-table">
+        <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
+          :visible-columns="mandatesVisibleColumns" class="mandate-table" :loading="mandatesLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -154,7 +156,8 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns">
+        <ni-responsive-table :data="fundings" :columns="fundingsColumns" :visible-columns="fundingsVisibleColumns"
+          :loading="fundingsLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -173,7 +176,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add"
+          <q-btn :disable="fundingSubscriptionsOptions().length === 0 || fundingsLoading" flat no-caps color="primary" icon="add"
             label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
@@ -194,8 +197,8 @@
         <p class="text-weight-bold">Devis</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="customer.quotes" :columns="quoteColumns" :pagination.sync="pagination"
-          :visible-columns="visibleQuoteColumns">
+        <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" :pagination.sync="pagination"
+          :visible-columns="quotesVisibleColumns" :loading="quotesLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -221,7 +224,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add"
+          <q-btn :disable="this.subscriptions.length === 0 || quotesLoading" flat no-caps color="primary" icon="add"
             label="Générer un devis" @click="generateQuote" />
         </q-card-actions>
       </q-card>
@@ -301,7 +304,7 @@
       <template slot="title">
         Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingColumns"
+      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
         :visible-columns="fundingDetailsVisibleColumns" />
     </ni-modal>
 
@@ -311,8 +314,8 @@
       <template slot="title">
         Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingColumns"
-        :visible-columns="fundingHistoryVisibleColumns" />
+      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingsColumns"
+        :visible-columns="fundingHistoriesVisibleColumns" />
     </ni-modal>
 
     <!-- Funding creation modal -->
@@ -410,7 +413,7 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
 import Modal from '@components/modal/Modal';
-import ReponsiveTable from '@components/table/ResponsiveTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import { days } from '@data/days.js';
@@ -447,7 +450,7 @@ export default {
     'ni-modal': Modal,
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
-    'ni-responsive-table': ReponsiveTable,
+    'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [
@@ -474,7 +477,8 @@ export default {
       subscriptions: [],
       selectedSubscription: [],
       services: [],
-      quoteColumns: [
+      quotesVisibleColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
+      quotesColumns: [
         { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
         { name: 'emptyQuote', label: 'Devis', align: 'center', field: 'emptyQuote' },
         { name: 'signedQuote', label: 'Devis signé', align: 'center', field: 'signedQuote' },
@@ -489,15 +493,15 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
+      quotesLoading: false,
       newSubscription: {
         service: '',
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
       },
       editedSubscription: {},
-      visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
-      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
-      mandateColumns: [
+      mandatesVisibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
+      mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
         { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },
         { name: 'signedMandate', label: 'Mandat signé', align: 'center', field: 'signedMandate' },
@@ -513,7 +517,8 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      fundingVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
+      mandatesLoading: false,
+      fundingsVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
       fundingHistoryModal: false,
       paginationFundingHistory: {
         rowsPerPage: 0,
@@ -594,7 +599,7 @@ export default {
       }
       return '';
     },
-    fundingHistoryVisibleColumns () {
+    fundingHistoriesVisibleColumns () {
       return this.selectedFunding.nature === FIXED
         ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
         : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
@@ -742,6 +747,7 @@ export default {
     },
     async refreshMandates () {
       try {
+        this.mandatesLoading = true;
         const mandates = await Customers.getMandates(this.customer._id);
 
         this.$store.commit(
@@ -751,16 +757,21 @@ export default {
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.mandatesLoading = false;
       }
     },
     async refreshQuotes () {
       try {
+        this.quotesLoading = true;
         const quotes = await Customers.getQuotes(this.customer._id);
 
         this.$store.commit('customer/saveCustomer', { ...this.customer, quotes });
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.quotesLoading = false;
       }
     },
     async refreshCustomer () {

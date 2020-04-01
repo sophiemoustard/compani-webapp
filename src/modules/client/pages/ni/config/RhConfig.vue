@@ -5,7 +5,8 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Heures internes</p>
         <q-card>
-          <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" :pagination.sync="pagination">
+          <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" :pagination.sync="pagination"
+            :loading="internalHoursLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -25,7 +26,8 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
-              @click="newInternalHourModal = true" :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
+              @click="newInternalHourModal = true"
+              :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER || internalHoursLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -115,7 +117,7 @@
         <p class="text-weight-bold">Documents administratifs</p>
         <q-card>
           <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
-            :pagination.sync="administrativeDocumentPagination">
+            :pagination.sync="administrativeDocumentsPagination" :loading="administrativeDocumentsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -135,14 +137,15 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un document"
-              @click="administrativeDocumentCreationModal = true" />
+              @click="administrativeDocumentCreationModal = true" :disable="administrativeDocumentsLoading" />
           </q-card-actions>
         </q-card>
       </div>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Équipes</p>
         <q-card>
-          <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorPagination">
+          <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorsPagination"
+            :loading="sectorsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -162,7 +165,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une équipe"
-              @click="sectorCreationModal = true" />
+              @click="sectorCreationModal = true" :disable="sectorsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -280,6 +283,7 @@ export default {
           field: '_id',
         },
       ],
+      internalHoursLoading: false,
       newInternalHourModal: false,
       newInternalHour: { name: '' },
       loading: false,
@@ -299,8 +303,9 @@ export default {
           align: 'center',
         },
       ],
+      administrativeDocumentsLoading: false,
       administrativeDocumentCreationModal: false,
-      administrativeDocumentPagination: { rowsPerPage: 0 },
+      administrativeDocumentsPagination: { rowsPerPage: 0 },
       newAdministrativeDocument: { name: '', file: null },
       sectors: [],
       sectorsColumns: [
@@ -317,7 +322,8 @@ export default {
           field: row => ({ _id: row._id, auxiliaryCount: row.auxiliaryCount }),
         },
       ],
-      sectorPagination: {
+      sectorsLoading: false,
+      sectorsPagination: {
         rowsPerPage: 0,
         sortBy: 'name',
       },
@@ -408,11 +414,14 @@ export default {
     },
     async refreshInternalHours () {
       try {
+        this.internalHoursLoading = true;
         this.internalHours = await InternalHours.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des heures internes.');
         this.internalHours = [];
+      } finally {
+        this.internalHoursLoading = false;
       }
     },
     async createInternalHour () {
@@ -476,10 +485,13 @@ export default {
     // Sectors
     async getSectors () {
       try {
+        this.sectorsLoading = true;
         this.sectors = await Sectors.list();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des équipes.')
+      } finally {
+        this.sectorsLoading = false;
       }
     },
     async createNewSector () {
@@ -562,11 +574,14 @@ export default {
     },
     async getAdministrativeDocuments () {
       try {
+        this.administrativeDocumentsLoading = true;
         this.administrativeDocuments = await AdministrativeDocument.list();
       } catch (e) {
         console.error(e);
         this.administrativeDocuments = [];
         NotifyNegative('Erreur lors de la récupération des documents.')
+      } finally {
+        this.administrativeDocumentsLoading = false;
       }
     },
     formatAdministrativeDocument () {

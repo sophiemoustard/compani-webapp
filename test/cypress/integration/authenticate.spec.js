@@ -14,22 +14,22 @@ describe('Login page tests', () => {
   })
 
   const paramsArray = [
-    { person: 'client admin', email: 'client-admin@alenvi.io', password: '123456', url: 'ni/auxiliaries' },
-    { person: 'coach', email: 'coach@alenvi.io', password: '123456', url: 'ni/auxiliaries' },
-    { person: 'auxiliary', email: 'auxiliary@alenvi.io', password: '123456', url: 'auxiliaries/agenda' },
+    { person: 'client admin', email: 'client-admin@alenvi.io', password: '123456!eR', url: 'ni/auxiliaries' },
+    { person: 'coach', email: 'coach@alenvi.io', password: '123456!eR', url: 'ni/auxiliaries' },
+    { person: 'auxiliary', email: 'auxiliary@alenvi.io', password: '123456!eR', url: 'auxiliaries/agenda' },
     {
       person: 'auxiliary without company',
       email: 'auxiliary-without-company@alenvi.io',
-      password: '123456',
+      password: '123456!eR',
       url: 'account',
     },
     {
       person: 'planning referent',
       email: 'planning-referent@alenvi.io',
-      password: '123456',
+      password: '123456!eR',
       url: 'auxiliaries/agenda',
     },
-    { person: 'helper', email: 'helper@alenvi.io', password: '123456', url: 'customers/agenda' },
+    { person: 'helper', email: 'helper@alenvi.io', password: '123456!eR', url: 'customers/agenda' },
   ];
 
   paramsArray.forEach((params) => {

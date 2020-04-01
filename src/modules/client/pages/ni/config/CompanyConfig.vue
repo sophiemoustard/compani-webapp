@@ -48,7 +48,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Établissements</p>
         <q-card>
-          <ni-responsive-table :data="establishments" :columns="establishmentsColumns"
+          <ni-responsive-table :data="establishments" :columns="establishmentsColumns" :loading="establishmentsLoading"
             :pagination.sync="establishmentsPagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -69,7 +69,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un établissement"
-              @click="establishmentCreationModal = true" />
+              @click="establishmentCreationModal = true" :disable="establishmentsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -183,6 +183,7 @@ export default {
       documents: null,
       COMPANY,
       loading: false,
+      establishmentsLoading: false,
       // Establishment
       establishments: [],
       establishmentsColumns: [
@@ -289,11 +290,14 @@ export default {
     // Establishment
     async getEstablishments () {
       try {
+        this.establishmentsLoading = true;
         this.establishments = await Establishments.list();
       } catch (e) {
         console.error(e);
         this.establishments = [];
         NotifyNegative('Erreur lors de la récupération des établissements.')
+      } finally {
+        this.establishmentsLoading = false;
       }
     },
     resetEstablishmentCreationModal () {
