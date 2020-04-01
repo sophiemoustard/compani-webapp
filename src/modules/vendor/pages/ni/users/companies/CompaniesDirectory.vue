@@ -5,7 +5,7 @@
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"
       :pagination.sync="pagination" @goTo="goToCompanyProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
-      @click="companyCreationModal = true" :disabled="tableLoading" />
+      @click="companyCreationModal = true" :disable="tableLoading" />
 
     <!-- Company creation modal -->
     <ni-modal v-model="companyCreationModal" @hide="resetCreationModal">

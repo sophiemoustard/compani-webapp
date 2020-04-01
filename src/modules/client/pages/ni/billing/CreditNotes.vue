@@ -23,7 +23,7 @@
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
-      @click="creditNoteCreationModal = true" :disabled="tableLoading" />
+      @click="creditNoteCreationModal = true" :disable="tableLoading" />
 
     <!-- Credit note creation modal -->
     <ni-modal v-model="creditNoteCreationModal" @hide="resetCreationCreditNoteData"

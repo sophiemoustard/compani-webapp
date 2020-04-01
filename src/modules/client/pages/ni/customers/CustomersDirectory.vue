@@ -18,7 +18,7 @@
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
-      @click="customerCreationModal = true" :disabled="tableLoading" />
+      @click="customerCreationModal = true" :disable="tableLoading" />
 
     <!-- Customer creation modal -->
     <ni-modal v-model="customerCreationModal" @hide="resetForm">

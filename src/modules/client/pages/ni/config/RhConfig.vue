@@ -24,9 +24,10 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right" :disabled="internalHoursLoading">
+          <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
-              @click="newInternalHourModal = true" :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
+              @click="newInternalHourModal = true"
+              :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER || internalHoursLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -116,7 +117,7 @@
         <p class="text-weight-bold">Documents administratifs</p>
         <q-card>
           <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
-            :pagination.sync="administrativeDocumentPagination" :loading="adminDocumentsLoading">
+            :pagination.sync="administrativeDocumentsPagination" :loading="administrativeDocumentsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -134,9 +135,9 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right" :disabled="adminDocumentsLoading">
+          <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un document"
-              @click="administrativeDocumentCreationModal = true" />
+              @click="administrativeDocumentCreationModal = true" :disable="administrativeDocumentsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -162,9 +163,9 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right" :disabled="sectorsLoading">
+          <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une équipe"
-              @click="sectorCreationModal = true" />
+              @click="sectorCreationModal = true" :disable="sectorsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -302,7 +303,7 @@ export default {
           align: 'center',
         },
       ],
-      adminDocumentsLoading: false,
+      administrativeDocumentsLoading: false,
       administrativeDocumentCreationModal: false,
       administrativeDocumentsPagination: { rowsPerPage: 0 },
       newAdministrativeDocument: { name: '', file: null },
@@ -573,14 +574,14 @@ export default {
     },
     async getAdministrativeDocuments () {
       try {
-        this.adminDocumentsLoading = true;
+        this.administrativeDocumentsLoading = true;
         this.administrativeDocuments = await AdministrativeDocument.list();
       } catch (e) {
         console.error(e);
         this.administrativeDocuments = [];
         NotifyNegative('Erreur lors de la récupération des documents.')
       } finally {
-        this.adminDocumentsLoading = false;
+        this.administrativeDocumentsLoading = false;
       }
     },
     formatAdministrativeDocument () {

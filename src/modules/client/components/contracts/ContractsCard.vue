@@ -64,12 +64,12 @@
           </q-tr>
         </template>
       </ni-responsive-table>
-      <q-card-actions align="right" :disabled="contractsLoading">
+      <q-card-actions align="right">
         <template v-if="displayActions && !contract.endDate">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
-            @click="openVersionCreation(contract)" />
+            @click="openVersionCreation(contract)" :disable="contractsLoading" />
           <q-btn flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
-            @click="openEndContract(contract)" />
+            @click="openEndContract(contract)" :disable="contractsLoading" />
         </template>
       </q-card-actions>
     </q-card>

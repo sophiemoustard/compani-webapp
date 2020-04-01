@@ -67,9 +67,9 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right" :disabled="establishmentsLoading">
+          <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un établissement"
-              @click="establishmentCreationModal = true" />
+              @click="establishmentCreationModal = true" :disable="establishmentsLoading" />
           </q-card-actions>
         </q-card>
       </div>

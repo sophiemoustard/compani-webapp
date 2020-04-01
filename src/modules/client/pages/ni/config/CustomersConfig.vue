@@ -24,9 +24,9 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right" :disabled="surchargesLoading">
+          <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration"
-              @click="surchargeCreationModal = true" />
+              @click="surchargeCreationModal = true" :disable="surchargesLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -54,9 +54,9 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right" :disabled="servicesLoading">
+          <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service"
-              @click="serviceCreationModal = true" />
+              @click="serviceCreationModal = true" :disable="servicesLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -102,9 +102,9 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right" :disabled="tppsLoading">
+          <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur"
-              @click="thirdPartyPayerCreationModal = true" />
+              @click="thirdPartyPayerCreationModal = true" :disable="tppsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -390,9 +390,6 @@ export default {
   data () {
     return {
       loading: false,
-      surchargesLoading: false,
-      servicesLoading: false,
-      tppsLoading: false,
       company: null,
       documents: null,
       FIXED,
@@ -515,6 +512,7 @@ export default {
           field: '_id',
         },
       ],
+      surchargesLoading: false,
       // Services
       services: [],
       serviceCreationModal: false,
@@ -597,6 +595,7 @@ export default {
           field: '_id',
         },
       ],
+      servicesLoading: false,
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
         {
@@ -652,6 +651,7 @@ export default {
           style: !this.$q.platform.is.mobile && 'width: 100px',
         },
       ],
+      tppsLoading: false,
       thirdPartyPayerCreationModal: false,
       newThirdPartyPayer: {
         name: '',

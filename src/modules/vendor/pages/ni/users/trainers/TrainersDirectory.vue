@@ -5,7 +5,7 @@
     <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @goTo="goToTrainerProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un formateur"
-      @click="trainerCreationModal = true" :disabled="tableLoading" />
+      @click="trainerCreationModal = true" :disable="tableLoading" />
 
     <!-- Trainer creation modal -->
     <ni-modal v-model="trainerCreationModal" @hide="resetCreationModal">

@@ -71,7 +71,7 @@
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
       <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
-        :loading="followupLoading">
+        :loading="followUpLoading">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -128,7 +128,7 @@ export default {
       loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
-      followupLoading: false,
+      followUpLoading: false,
       followUpColumns: [
         {
           name: 'identity',
@@ -247,13 +247,13 @@ export default {
     },
     async getCustomerFollowUp () {
       try {
-        this.followupLoading = true;
+        this.followUpLoading = true;
         this.customerFollowUp = await Stats.getCustomerFollowUp({ customer: this.customer._id });
       } catch (e) {
         this.customerFollowUp = [];
         NotifyNegative('Erreur lors de la récupération des auxiliaires.');
       } finally {
-        this.followupLoading = false;
+        this.followUpLoading = false;
       }
     },
     async getCustomerFundingsMonitoring () {

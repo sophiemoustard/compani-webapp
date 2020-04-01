@@ -52,9 +52,9 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right" :disabled="courseSlotsLoading">
+        <q-card-actions align="right">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un créneau"
-            @click="courseSlotCreationModal = true" />
+            @click="courseSlotCreationModal = true" :disable="courseSlotsLoading" />
         </q-card-actions>
       </q-card>
     </div>

@@ -52,8 +52,8 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right" :disabled="subscriptionsLoading">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add"
+        <q-card-actions align="right">
+          <q-btn :disable="serviceOptions.length === 0 || subscriptionsLoading" flat no-caps color="primary" icon="add"
             label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
         </q-card-actions>
       </q-card>
@@ -89,8 +89,9 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right" :disabled="helpersLoading">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true" />
+        <q-card-actions align="right">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true"
+            :disable="helpersLoading" />
         </q-card-actions>
       </q-card>
     </div>
@@ -174,8 +175,8 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right" :disabled="fundingsLoading">
-          <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add"
+        <q-card-actions align="right">
+          <q-btn :disable="fundingSubscriptionsOptions().length === 0 || fundingsLoading" flat no-caps color="primary" icon="add"
             label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
@@ -196,8 +197,8 @@
         <p class="text-weight-bold">Devis</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="customer.quotes" :columns="quoteColumns" :pagination.sync="pagination"
-          :visible-columns="visibleQuoteColumns" :loading="quotesLoading">
+        <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" :pagination.sync="pagination"
+          :visible-columns="quotesVisibleColumns" :loading="quotesLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -222,8 +223,8 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right" :disabled="quotesLoading">
-          <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add"
+        <q-card-actions align="right">
+          <q-btn :disable="this.subscriptions.length === 0 || quotesLoading" flat no-caps color="primary" icon="add"
             label="Générer un devis" @click="generateQuote" />
         </q-card-actions>
       </q-card>
@@ -476,7 +477,8 @@ export default {
       subscriptions: [],
       selectedSubscription: [],
       services: [],
-      quoteColumns: [
+      quotesVisibleColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
+      quotesColumns: [
         { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
         { name: 'emptyQuote', label: 'Devis', align: 'center', field: 'emptyQuote' },
         { name: 'signedQuote', label: 'Devis signé', align: 'center', field: 'signedQuote' },
@@ -499,7 +501,6 @@ export default {
       },
       editedSubscription: {},
       mandatesVisibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
-      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
         { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },

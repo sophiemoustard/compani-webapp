@@ -5,7 +5,7 @@
     <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @goTo="goToProgramProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un programme"
-      @click="programCreationModal = true" :disabled="tableLoading" />
+      @click="programCreationModal = true" :disable="tableLoading" />
 
     <!-- Program creation modal -->
     <ni-modal v-model="programCreationModal" @hide="resetCreationModal">
