@@ -24,7 +24,7 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right">
+          <q-card-actions align="right" :disabled="internalHoursLoading">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
               @click="newInternalHourModal = true" :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER" />
           </q-card-actions>
@@ -116,7 +116,7 @@
         <p class="text-weight-bold">Documents administratifs</p>
         <q-card>
           <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
-            :pagination.sync="sadministrativeDocumentPagination" :loading="adminDocumentsLoading">
+            :pagination.sync="administrativeDocumentPagination" :loading="adminDocumentsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -134,7 +134,7 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right">
+          <q-card-actions align="right" :disabled="adminDocumentsLoading">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un document"
               @click="administrativeDocumentCreationModal = true" />
           </q-card-actions>
@@ -162,7 +162,7 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right">
+          <q-card-actions align="right" :disabled="sectorsLoading">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une équipe"
               @click="sectorCreationModal = true" />
           </q-card-actions>

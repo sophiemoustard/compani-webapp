@@ -24,7 +24,7 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right">
+          <q-card-actions align="right" :disabled="surchargesLoading">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration"
               @click="surchargeCreationModal = true" />
           </q-card-actions>
@@ -54,7 +54,7 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right">
+          <q-card-actions align="right" :disabled="servicesLoading">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service"
               @click="serviceCreationModal = true" />
           </q-card-actions>
@@ -102,7 +102,7 @@
               </q-tr>
             </template>
           </ni-responsive-table>
-          <q-card-actions align="right">
+          <q-card-actions align="right" :disabled="tppsLoading">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur"
               @click="thirdPartyPayerCreationModal = true" />
           </q-card-actions>

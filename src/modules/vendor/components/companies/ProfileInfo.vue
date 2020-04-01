@@ -27,7 +27,7 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right">
+        <q-card-actions align="right" :disabled="usersLoading">
           <q-btn no-caps flat color="primary" icon="add" label="Ajouter un utilisateur"
             @click="userCreationModal = true" />
         </q-card-actions>

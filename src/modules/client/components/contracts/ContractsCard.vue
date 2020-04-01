@@ -64,7 +64,7 @@
           </q-tr>
         </template>
       </ni-responsive-table>
-      <q-card-actions align="right">
+      <q-card-actions align="right" :disabled="contractsLoading">
         <template v-if="displayActions && !contract.endDate">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" />

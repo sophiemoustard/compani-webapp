@@ -52,7 +52,7 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right">
+        <q-card-actions align="right" :disabled="subscriptionsLoading">
           <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add"
             label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
         </q-card-actions>
@@ -89,7 +89,7 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right">
+        <q-card-actions align="right" :disabled="helpersLoading">
           <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true" />
         </q-card-actions>
       </q-card>
@@ -174,7 +174,7 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right">
+        <q-card-actions align="right" :disabled="fundingsLoading">
           <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add"
             label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
@@ -222,7 +222,7 @@
             </q-tr>
           </template>
         </ni-responsive-table>
-        <q-card-actions align="right">
+        <q-card-actions align="right" :disabled="quotesLoading">
           <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add"
             label="Générer un devis" @click="generateQuote" />
         </q-card-actions>
