@@ -1,8 +1,8 @@
-<template functional>
-  <q-table :data="props.data" :columns="props.columns" :row-key="props.rowKey" flat :pagination="props.pagination"
-    :hide-bottom="props.pagination.rowsPerPage === 0" :visible-columns="props.visibleColumns" class="neutral-background"
-    :rows-per-page-options="[]" v-on="listeners">
-    <template v-if="scopedSlots['top-row']" v-slot:top-row="props">
+<template>
+  <q-table :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination" class="neutral-background"
+    :hide-bottom="pagination.rowsPerPage === 0" :visible-columns="visibleColumns" :rows-per-page-options="[]"
+    v-on="$listeners">
+    <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
       <slot name="top-row" :props="props" />
     </template>
     <template v-slot:body="props">
