@@ -26,7 +26,7 @@
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
-      @click="auxiliaryCreationModal = true" />
+      @click="auxiliaryCreationModal = true" :disabled="tableLoading" />
 
     <!-- User creation modal -->
     <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm">
