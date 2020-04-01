@@ -91,7 +91,7 @@ export default {
             name: formatIdentity(user.identity, 'FL'),
             picture: user.picture ? user.picture.link : null,
           },
-          phone: user.contact.phone,
+          phone: get(user, 'contact.phone') || '',
         }));
         this.tableLoading = false;
       } catch (e) {
