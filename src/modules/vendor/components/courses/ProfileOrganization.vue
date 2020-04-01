@@ -403,6 +403,7 @@ export default {
         await this.refreshCourse();
       } catch (e) {
         console.error(e)
+        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
         this.loading = false;
