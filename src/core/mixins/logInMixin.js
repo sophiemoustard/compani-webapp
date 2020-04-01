@@ -1,6 +1,4 @@
 import Users from '@api/Users';
-import Customers from '@api/Customers';
-import { HELPER, AUXILIARY_WITHOUT_COMPANY, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
 export const logInMixin = {
   methods: {
@@ -18,24 +16,7 @@ export const logInMixin = {
       await this.$store.dispatch('main/getLoggedUser', this.$q.cookies.get('user_id'));
 
       if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
-
-      let customer;
-      switch (this.userRole) {
-        case HELPER:
-          customer = await Customers.getById(this.loggedUser.customers[0]._id);
-          this.$store.commit('customer/saveCustomer', customer);
-          this.$router.replace({ name: 'customer agenda' });
-          break;
-        case AUXILIARY_WITHOUT_COMPANY:
-          this.$router.replace({ name: 'client account info', params: { id: this.loggedUser._id } });
-          break;
-        case AUXILIARY:
-        case PLANNING_REFERENT:
-          this.$router.replace({ name: 'auxiliary agenda' });
-          break;
-        default:
-          this.$router.replace({ name: 'auxiliaries directory' });
-      }
+      return this.$router.replace('/');
     },
   },
 }
