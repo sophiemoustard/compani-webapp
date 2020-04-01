@@ -13,6 +13,12 @@
         </q-td>
       </q-tr>
     </template>
+    <template v-slot:no-data="props">
+      <div v-show="!loading" class="full-width row q-gutter-sm">
+        <q-icon :name="props.icon" size="2em" />
+        <span>Pas de données disponibles</span>
+      </div>
+    </template>
     <template v-slot:loading>
       <q-inner-loading showing class="neutral-background">
         <q-spinner-facebook size="30px" color="primary" />
