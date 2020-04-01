@@ -37,7 +37,7 @@ export default {
       courseName: '',
       tabsContent: [
         {
-          label: 'Organisation de la session',
+          label: 'Organisation de la formation',
           name: 'course',
           default: this.defaultTab === 'course',
           component: ProfileOrganization,
@@ -60,7 +60,7 @@ export default {
     headerInfo () {
       return [
         { icon: 'bookmark_border', label: `${this.courseType}` },
-        { icon: 'home', label: `${this.companyName}` },
+        { icon: 'apartment', label: `${this.companyName}` },
         { icon: 'library_books', label: `${this.programName}` },
       ];
     },

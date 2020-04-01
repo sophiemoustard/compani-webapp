@@ -11,8 +11,8 @@
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="users" v-model="activeRoutes.users.open" label="Utilisateurs">
-      <ni-menu-item name="companies directory" icon="house" label="Structures" />
-      <ni-menu-item name="trainers directory" icon="view_headline" label="Formateurs" />
+      <ni-menu-item name="companies directory" icon="apartment" label="Structures" />
+      <ni-menu-item name="trainers directory" icon="mdi-teach" label="Formateurs" />
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="configuration" v-model="activeRoutes.configuration.open" label="Configuration">
