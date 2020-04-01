@@ -4,8 +4,8 @@
       <div v-if="isCoach" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <ni-large-table v-if="payDocuments.length !== 0" :data="payDocuments" :columns="columns"
-        :pagination.sync="pagination" row-key="name">
+      <ni-large-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
+        :pagination.sync="pagination" row-key="name" :loading="payDocumentsLoading">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -81,6 +81,7 @@ export default {
       newDocument: null,
       formValid: false,
       payDocuments: [],
+      payDocumentsLoading: false,
       columns: [
         {
           name: 'nature',
@@ -181,11 +182,14 @@ export default {
     },
     async getDocuments () {
       try {
+        this.payDocumentsLoading = true;
         this.payDocuments = await PayDocuments.list({ user: this.userProfile._id });
       } catch (e) {
         this.payDocuments = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des documents.');
+      } finally {
+        this.payDocumentsLoading = false;
       }
     },
     async deletePayDocument (payDocument) {

@@ -16,6 +16,11 @@
     <template v-slot:bottom="props">
       <ni-pagination :props="props" :pagination.sync="pagination" :data="data"/>
     </template>
+    <template v-slot:loading>
+      <q-inner-loading showing class="neutral-background">
+        <q-spinner-facebook size="30px" color="primary" />
+      </q-inner-loading>
+    </template>
   </q-table>
 </template>
 
@@ -40,3 +45,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+/deep/ .q-inner-loading {
+  opacity: 0.6;
+}
+</style>
