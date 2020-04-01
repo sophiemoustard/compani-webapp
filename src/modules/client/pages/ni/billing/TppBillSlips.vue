@@ -1,7 +1,7 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
     <ni-title-header title="Bordereaux tiers payeurs" />
-    <ni-large-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination">
+    <ni-large-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination" :loading="loading">
       <template v-slot:body="{ props }" >
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -37,6 +37,7 @@ export default {
   data () {
     return {
       billSlipList: [],
+      loading: false,
       columns: [
         {
           name: 'number',
@@ -84,12 +85,15 @@ export default {
   methods: {
     async refreshBillSlips () {
       try {
+        this.loading = true;
         this.billSlipList = await BillSlip.list();
         NotifyPositive('Bordereaux récupérés avec succès.');
       } catch (e) {
         this.billSlipList = [];
         NotifyNegative('Erreur lors de la récuperation des bordereaux.')
         console.error(e);
+      } finally {
+        this.loading = false;
       }
     },
     billSlipUrl (id) {
