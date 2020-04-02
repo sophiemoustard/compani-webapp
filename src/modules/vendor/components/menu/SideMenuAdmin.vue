@@ -6,13 +6,17 @@
       </q-item-label>
     </div>
     <q-separator />
+    <q-expansion-item ref="operations" v-model="activeRoutes.operations.open" label="Opérations">
+      <ni-menu-item name="courses directory" icon="view_headline" label="Formations" />
+    </q-expansion-item>
+    <q-separator />
     <q-expansion-item ref="users" v-model="activeRoutes.users.open" label="Utilisateurs">
-      <ni-menu-item name="companies directory" icon="house" label="Structures" />
-      <ni-menu-item name="trainers directory" icon="view_headline" label="Formateurs" />
+      <ni-menu-item name="companies directory" icon="apartment" label="Structures" />
+      <ni-menu-item name="trainers directory" icon="mdi-teach" label="Formateurs" />
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="configuration" v-model="activeRoutes.configuration.open" label="Configuration">
-      <ni-menu-item name="courses directory" icon="date_range" label="Formations" />
+      <ni-menu-item name="programs directory" icon="view_headline" label="Catalogue" />
     </q-expansion-item>
     <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
@@ -35,6 +39,7 @@ export default {
       activeRoutes: {
         users: { open: false },
         configuration: { open: false },
+        operations: { open: false },
       },
     };
   },

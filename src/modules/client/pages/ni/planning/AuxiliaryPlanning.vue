@@ -82,7 +82,7 @@ export default {
       await this.setInternalHours();
     } catch (e) {
       console.error(e);
-      NotifyNegative('Erreur lors de la récupération des personnes');
+      NotifyNegative('Erreur lors de la récupération des personnes.');
     }
   },
   watch: {
@@ -192,7 +192,7 @@ export default {
     },
     async refresh () {
       try {
-        let params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
+        const params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
 
         if (!this.displayAllSectors) {
           this.updateAuxiliariesList();

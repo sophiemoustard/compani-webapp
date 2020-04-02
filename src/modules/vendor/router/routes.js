@@ -1,16 +1,17 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
 import store from 'src/store/index';
 
 const routes = [
   {
-    path: '/ad/',
+    path: '/ad',
     components: { default: () => import('src/modules/vendor/layouts/Layout') },
     beforeEnter: async (to, from, next) => {
       try {
-        if (to.path !== '/') return next();
+        if (!['/ad', '/ad/'].includes(to.path)) return next();
+
         const refresh = await alenvi.refreshAlenviCookies();
         if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
@@ -18,7 +19,7 @@ const routes = [
         if (!loggedUser) return next({ path: '/login' });
         if (!get(loggedUser, 'role.vendor')) return next({ name: '404' });
 
-        return next();
+        return next({ name: 'courses directory' });
       } catch (e) {
         console.error(e);
       }
@@ -67,9 +68,9 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/courses',
-        name: 'courses directory',
-        component: () => import('src/modules/vendor/pages/ni/config/CoursesDirectory'),
+        path: 'ni/config/programs',
+        name: 'programs directory',
+        component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
@@ -77,14 +78,47 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/courses/:courseId',
-        name: 'profile course info',
-        component: () => import('src/modules/vendor/pages/ni/config/CourseProfile'),
+        path: 'ni/config/programs/:programId',
+        name: 'profile program info',
+        component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'configuration',
+        },
+      },
+      {
+        path: 'ni/operations/courses',
+        name: 'courses directory',
+        component: () => import('src/modules/vendor/pages/ni/operations/CoursesDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'operations',
+        },
+      },
+      {
+        path: 'ni/config/operations/:courseId',
+        name: 'profile course info',
+        component: () => import('src/modules/vendor/pages/ni/operations/CourseProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          parent: 'configuration',
+        },
+      },
+      {
+        path: ':id/account',
+        name: 'vendor account info',
+        component: () => import('src/core/pages/AccountInfo'),
+        beforeEnter (to, from, next) {
+          return to.params.id === Cookies.get('user_id') ? next() : next('/404');
+        },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER],
         },
       },
     ],

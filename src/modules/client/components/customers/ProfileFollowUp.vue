@@ -7,8 +7,7 @@
       <div class="row gutter-profile">
         <ni-input caption="Accès / codes" v-model="customer.contact.accessCodes" @focus="saveTmp('contact.accessCodes')"
           @blur="updateCustomer('contact.accessCodes')" />
-        <ni-input v-if="isAuxiliary" caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
-          error-label="Numéro de téléphone non valide" v-model.trim="customer.contact.phone"
+        <ni-input v-if="isAuxiliary" caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress"
           color="white" disable />
@@ -45,7 +44,8 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
-      <ni-simple-table :data="sortedHelpers" :columns="helperColumns" :visible-columns="visibleColumns">
+      <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
+        :loading="helpersLoading">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -64,13 +64,14 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" />
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
+        :loading="followUpLoading">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -104,8 +105,7 @@ import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative } from '@components/popup/notify.js';
 import SimpleTable from '@components/table/SimpleTable';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { extend, formatIdentity, formatHours } from '@helpers/utils.js';
+import { formatIdentity, formatHours } from '@helpers/utils.js';
 import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
@@ -124,11 +124,11 @@ export default {
     return {
       auxiliaries: [],
       isLoaded: false,
-      customer: { followUp: {}, contact: {} },
       tmpInput: '',
       loading: false,
       visibleColumns: ['lastname', 'firstname', 'email', 'phone'],
       customerFollowUp: [],
+      followUpLoading: false,
       followUpColumns: [
         {
           name: 'identity',
@@ -150,6 +150,7 @@ export default {
       ],
       followUpPagination: { rowsPerPage: 5 },
       fundingsMonitoring: [],
+      fundingsLoading: false,
       fundingsMonitoringColumns: [
         {
           name: 'thirdPartyPayer',
@@ -178,22 +179,12 @@ export default {
       ],
     };
   },
-  validations: {
-    customer: {
-      contact: {
-        phone: { frPhoneNumber },
-      },
-    },
-  },
   computed: {
     auxiliaryAvatar () {
-      let auxiliaryPicture;
-      if (this.customer.referent.picture) {
-        auxiliaryPicture = this.customer.referent.picture;
-      }
+      const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
       return this.getAuxiliaryAvatar(auxiliaryPicture);
     },
-    userProfile () {
+    customer () {
       return this.$store.getters['customer/getCustomer'];
     },
     loggedUser () {
@@ -207,16 +198,15 @@ export default {
     },
     auxiliariesOptions () {
       const auxiliariesOptions = [{ label: 'Pas de référent', value: '' }];
+      const referentId = get(this.customer, 'referent._id') || null;
       if (this.auxiliaries.length) {
         auxiliariesOptions.push(...this.auxiliaries.map(aux => ({
           label: formatIdentity(aux.identity, 'FL'),
           value: aux._id,
         })));
-      } else if (this.customer.referent._id) {
-        auxiliariesOptions.push({
-          label: formatIdentity(this.customer.referent.identity, 'FL'),
-          value: this.customer.referent._id,
-        });
+      } else if (referentId) {
+        const identity = get(this.customer, 'referent.identity') || {};
+        auxiliariesOptions.push({ label: formatIdentity(identity, 'FL'), value: referentId });
       }
 
       return auxiliariesOptions;
@@ -239,7 +229,7 @@ export default {
       return picture ? get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
     },
     toggleAuxiliarySelect () {
-      return this.$refs['auxiliarySelect'].show();
+      return this.$refs.auxiliarySelect.show();
     },
     async getAuxiliaries () {
       try {
@@ -257,37 +247,40 @@ export default {
     },
     async getCustomerFollowUp () {
       try {
+        this.followUpLoading = true;
         this.customerFollowUp = await Stats.getCustomerFollowUp({ customer: this.customer._id });
       } catch (e) {
         this.customerFollowUp = [];
-        NotifyNegative('Erreur lors de la récupération des auxiliaires');
+        NotifyNegative('Erreur lors de la récupération des auxiliaires.');
+      } finally {
+        this.followUpLoading = false;
       }
     },
     async getCustomerFundingsMonitoring () {
       try {
+        this.fundingsLoading = true;
         this.fundingsMonitoring = await Stats.getCustomerFundingsMonitoring({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.fundingsMonitoring = [];
-        NotifyNegative('Erreur lors de la récupération du suivi des financements');
+        NotifyNegative('Erreur lors de la récupération du suivi des financements.');
+      } finally {
+        this.fundingsLoading = false;
       }
     },
     async refreshCustomer () {
       try {
-        const customer = await Customers.getById(this.userProfile._id);
-        this.mergeCustomer(customer);
-        this.$store.commit('customer/saveCustomer', this.customer);
+        const customer = await Customers.getById(this.customer._id);
+        if (!get(customer, 'referent._id')) customer.referent = { _id: '' };
+        if (!get(customer, 'contact')) customer.contact = {};
+        if (!get(customer, 'followUp')) customer.followUp = {};
+
+        this.$store.commit('customer/saveCustomer', customer);
         this.isLoaded = true;
-        this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du chargement des données');
+        NotifyNegative('Erreur lors du chargement des données.');
       }
-    },
-    mergeCustomer (value = null) {
-      if (get(this.customer, 'referent._id', '') === '') this.customer.referent = { _id: '' };
-      const args = [this.customer, value];
-      this.customer = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
       this.tmpInput = path === 'referent' ? get(this.customer, 'referent._id', '') : get(this.customer, path);

@@ -166,7 +166,7 @@ export default {
         this.selected = [];
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création des soldes tout compte');
+        NotifyNegative('Erreur lors de la création des soldes tout compte.');
       }
     },
   },

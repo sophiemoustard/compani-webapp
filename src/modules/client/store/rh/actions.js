@@ -2,7 +2,7 @@ import Users from '@api/Users';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { taskValidation } from 'src/modules/client/helpers/taskValidation';
 
-export async function getUserProfile ({commit}, params) {
+export const getUserProfile = async ({ commit }, params) => {
   try {
     const user = await Users.getById(params.userId);
     commit('saveUserProfile', user);
@@ -11,7 +11,7 @@ export async function getUserProfile ({commit}, params) {
   }
 }
 
-export async function updateNotifications ({commit, state}, type) {
+export const updateNotifications = async ({ commit, state }, type) => {
   const user = state.userProfile;
   const validation = userProfileValidation(user);
   commit('saveNotification', { type: 'profiles', _id: user._id, exists: !!validation.error });

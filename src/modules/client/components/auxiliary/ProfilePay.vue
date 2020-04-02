@@ -4,7 +4,8 @@
       <div v-if="isCoach" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <ni-large-table :data="payDocuments" :columns="columns" :pagination.sync="pagination" row-key="name">
+      <ni-large-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
+        :pagination.sync="pagination" row-key="name" :loading="payDocumentsLoading">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -26,11 +27,11 @@
           </q-tr>
         </template>
       </ni-large-table>
-      <div v-if="payDocuments.length === 0" class="q-px-md q-my-sm">
+      <div v-else class="q-my-sm">
         <span class="no-document">Aucun document</span>
       </div>
       <q-btn v-if="isCoach" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
-        label="Ajouter un document" @click="documentUpload = true" :disable="loading" />
+        label="Ajouter un document" @click="documentUpload = true" :disable="payDocumentsLoading" />
 
       <!-- Document upload modal -->
       <ni-modal v-model="documentUpload">
@@ -80,6 +81,7 @@ export default {
       newDocument: null,
       formValid: false,
       payDocuments: [],
+      payDocumentsLoading: false,
       columns: [
         {
           name: 'nature',
@@ -180,11 +182,14 @@ export default {
     },
     async getDocuments () {
       try {
+        this.payDocumentsLoading = true;
         this.payDocuments = await PayDocuments.list({ user: this.userProfile._id });
       } catch (e) {
         this.payDocuments = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des documents');
+        NotifyNegative('Erreur lors de la récupération des documents.');
+      } finally {
+        this.payDocumentsLoading = false;
       }
     },
     async deletePayDocument (payDocument) {
@@ -194,7 +199,7 @@ export default {
         await this.getDocuments();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document');
+        NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
     validatePayDocumentDeletion (payDocument) {
@@ -204,7 +209,7 @@ export default {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deletePayDocument(payDocument))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 }

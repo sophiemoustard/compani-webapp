@@ -49,8 +49,10 @@ export default {
       window.open(url, '_blank');
     },
     goToProfile () {
-      if (this.$router.currentRoute.name !== 'account info') {
-        return this.$router.push({ name: 'account info', params: { id: this.userId } });
+      if (!/account info/.test(this.$router.currentRoute.name)) {
+        return /\/ad\//.test(this.$router.currentRoute.path)
+          ? this.$router.push({ name: 'vendor account info', params: { id: this.userId } })
+          : this.$router.push({ name: 'client account info', params: { id: this.userId } });
       }
     },
   },

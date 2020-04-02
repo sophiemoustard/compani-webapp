@@ -1,4 +1,6 @@
 import moment from 'moment';
+import transform from 'lodash/transform';
+import isObject from 'lodash/isObject';
 import diacriticsMap from '@data/diacritics';
 
 export const extend = (...sources) => {
@@ -15,7 +17,7 @@ export const extend = (...sources) => {
   // Merge the object into the extended object
   const merge = (obj) => {
     for (const prop in obj) {
-      if (obj.hasOwnProperty(prop)) {
+      if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
           // If we're doing a deep merge and the property is an object
           extended[prop] = extend(true, extended[prop], obj[prop]);
@@ -38,7 +40,7 @@ export const clear = (obj) => {
   const cleared = {};
 
   for (const prop in obj) {
-    if (obj.hasOwnProperty(prop)) {
+    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
       if (Object.prototype.toString.call(obj[prop]) === '[object Object]') {
         cleared[prop] = clear(obj[prop]);
       } else {
@@ -49,9 +51,15 @@ export const clear = (obj) => {
   return cleared;
 };
 
+export const removeEmptyProps = (obj) =>
+  transform(obj, (acc, value, key) => {
+    if (!value) return;
+    acc[key] = isObject(value) ? removeEmptyProps(value) : value;
+  });
+
 export const getLastVersion = (versions, dateKey) => {
   if (versions.length === 0) return null;
-  if (versions.length === 1) return {...versions[0]};
+  if (versions.length === 1) return { ...versions[0] };
 
   return [...versions].sort((a, b) => new Date(b[dateKey]) - new Date(a[dateKey]))[0];
 };

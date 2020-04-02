@@ -5,7 +5,7 @@
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
-          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns">
+          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -63,8 +63,8 @@
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
-          <ni-responsive-table :data="customer.payment.mandates" :columns="columnsMandates"
-            :pagination.sync="pagination" :visible-columns="visibleColumnsMandates">
+          <ni-responsive-table :data="customer.payment.mandates" :columns="mandatesColumns" :loading="mandatesLoading"
+            :pagination.sync="pagination" :visible-columns="mandatesVisibleColumns">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -117,7 +117,7 @@
 
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
-      <ni-funding-grid-table :data="fundingData" :columns="fundingColumns" />
+      <ni-funding-grid-table :data="fundingData" :columns="fundingsColumns" />
     </ni-modal>
   </q-page>
 </template>
@@ -166,7 +166,7 @@ export default {
       tmpInput: null,
       newESignModal: false,
       embeddedUrl: '',
-      columnsMandates: [
+      mandatesColumns: [
         {
           name: 'rum',
           label: 'RUM',
@@ -192,7 +192,7 @@ export default {
           field: '_id',
         },
       ],
-      visibleColumnsMandates: ['rum', 'sign'],
+      mandatesVisibleColumns: ['rum', 'sign'],
       fundingModal: false,
       fundingData: [],
       pagination: {
@@ -251,14 +251,16 @@ export default {
       return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban
     },
     docsUploadUrl () {
-      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload` : '';
+      return this.customer.driveFolder
+        ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`
+        : '';
     },
   },
   async mounted () {
     if (!this.customer) await this.refreshCustomer();
     else {
-      this.refreshSubscriptions();
-      this.refreshFundings();
+      this.refreshSubscriptions(this.customer);
+      this.refreshFundings(this.customer);
       this.$v.customer.$touch();
     }
     await this.checkMandates();
@@ -269,13 +271,17 @@ export default {
     },
     async refreshCustomer () {
       try {
+        this.mandatesLoading = true;
         const customer = await Customers.getById(this.helper.customers[0]._id);
         this.$store.commit('customer/saveCustomer', customer);
-        this.refreshSubscriptions();
-        this.refreshFundings();
+
+        this.refreshSubscriptions(this.customer);
+        this.refreshFundings(this.customer);
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.mandatesLoading = false
       }
     },
     saveTmp (path) {
@@ -304,7 +310,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
       }
@@ -339,7 +345,7 @@ export default {
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la validation de votre abonnement');
+        NotifyNegative('Erreur lors de la validation de votre abonnement.');
         this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
       }
     },
@@ -377,7 +383,7 @@ export default {
         console.error(e);
         this.$q.loading.hide();
         this.newESignModal = false;
-        NotifyNegative('Erreur lors de la requête de signature en ligne du mandat');
+        NotifyNegative('Erreur lors de la requête de signature en ligne du mandat.');
       } finally {
         this.$q.loading.hide();
       }

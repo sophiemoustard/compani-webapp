@@ -67,7 +67,7 @@ export default {
       openURL(url);
     },
     failMsg () {
-      return NotifyNegative('Echec de l\'envoi du document');
+      return NotifyNegative('Echec de l\'envoi du document.');
     },
   },
   computed: {

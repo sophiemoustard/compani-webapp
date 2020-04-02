@@ -6,8 +6,8 @@
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
       <q-field dense borderless :error="error" :error-label="errorLabel" class="col-12">
-        <q-option-group :value="value" @input="inputHandler" @blur="blurHandler" :options="options" :readonly="readOnly"
-          :type="type" :inline="inline" dense :disable="disable" />
+        <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
+          :disable="disable" v-on="$listeners" />
       </q-field>
     </div>
   </div>
@@ -31,14 +31,6 @@ export default {
     inline: { type: Boolean, default: false },
     displayCaption: { type: Boolean, default: true },
     disable: { type: Boolean, default: false },
-  },
-  methods: {
-    inputHandler (value) {
-      this.$emit('input', value);
-    },
-    blurHandler () {
-      this.$emit('blur');
-    },
   },
 }
 </script>

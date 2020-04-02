@@ -1,5 +1,5 @@
 <template>
-  <ni-simple-table :data="documents" :columns="columns">
+  <ni-simple-table :data="documents" :columns="columns" :loading="loading">
     <template v-slot:top-row="{ props }" >
       <q-tr :props="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
@@ -90,6 +90,7 @@ export default {
     type: { type: String, default: CUSTOMER },
     startBalance: { type: Number, default: 0 },
     endBalance: { type: Number, default: 0 },
+    loading: { type: Boolean, default: false },
   },
   components: {
     'ni-simple-table': SimpleTable,

@@ -86,8 +86,6 @@ export const validWorkHealthService = value => !value || workHealthServices.map(
 
 export const validUrssafCode = value => !value || urssafCodes.map(code => code.value).includes(value);
 
-export const validEstablishmentName = value => !value || !/[^a-zA-Z0-9éèêëâàäöôûüîïç°2!#$%&'()*+,\-./:;<=>?@\s]/.test(value);
-
 export const validSiret = value => !value || /^\d{14}$/.test(value);
 
 export const rcs = value => !value || /^[0-9]*[1-9][0-9]*$/.test(value);

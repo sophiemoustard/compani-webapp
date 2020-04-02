@@ -48,7 +48,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Établissements</p>
         <q-card>
-          <ni-responsive-table :data="establishments" :columns="establishmentsColumns"
+          <ni-responsive-table :data="establishments" :columns="establishmentsColumns" :loading="establishmentsLoading"
             :pagination.sync="establishmentsPagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -69,7 +69,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un établissement"
-              @click="establishmentCreationModal = true" />
+              @click="establishmentCreationModal = true" :disable="establishmentsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -155,7 +155,6 @@ import {
   validWorkHealthService,
   validUrssafCode,
   validSiret,
-  validEstablishmentName,
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -184,6 +183,7 @@ export default {
       documents: null,
       COMPANY,
       loading: false,
+      establishmentsLoading: false,
       // Establishment
       establishments: [],
       establishmentsColumns: [
@@ -254,7 +254,7 @@ export default {
       workHealthServices,
       urssafCodes,
       establishmentValidation: {
-        name: { required, validEstablishmentName, maxLength: maxLength(32) },
+        name: { required, maxLength: maxLength(32) },
         siret: { required, validSiret },
         address: { fullAddress: { required, frAddress } },
         phone: { required, frPhoneNumber },
@@ -290,11 +290,14 @@ export default {
     // Establishment
     async getEstablishments () {
       try {
+        this.establishmentsLoading = true;
         this.establishments = await Establishments.list();
       } catch (e) {
         console.error(e);
         this.establishments = [];
         NotifyNegative('Erreur lors de la récupération des établissements.')
+      } finally {
+        this.establishmentsLoading = false;
       }
     },
     resetEstablishmentCreationModal () {
@@ -321,7 +324,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        return NotifyNegative("Erreur lors de la création de l'établissement");
+        return NotifyNegative("Erreur lors de la création de l'établissement.");
       } finally {
         this.loading = false;
       }
@@ -385,7 +388,6 @@ export default {
     establishmentNameError (validationObj) {
       if (!validationObj.name.required) return REQUIRED_LABEL;
       else if (!validationObj.name.maxLength) return '32 caractères maximimum';
-      else if (!validationObj.name.validEstablishmentName) return 'Caractère(s) invalide(s)';
       return '';
     },
     establishmentSiretError (validationObj) {

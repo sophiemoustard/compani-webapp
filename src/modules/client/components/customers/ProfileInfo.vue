@@ -21,8 +21,7 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
-          :error-label="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
+        <ni-input caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-model="customer.contact.primaryAddress" :error-label="primaryAddressError"
           :error="$v.customer.contact.primaryAddress.$error" caption="Adresse principale"
@@ -35,7 +34,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Souscriptions</p>
       <q-card>
-        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns">
+        <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -54,7 +53,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="serviceOptions.length === 0" flat no-caps color="primary" icon="add"
+          <q-btn :disable="serviceOptions.length === 0 || subscriptionsLoading" flat no-caps color="primary" icon="add"
             label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
         </q-card-actions>
       </q-card>
@@ -73,7 +72,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
-        <ni-responsive-table :data="sortedHelpers" :columns="helperColumns" :pagination="helperPagination">
+        <ni-responsive-table :data="sortedHelpers" :columns="helpersColumns" :pagination="helpersPagination"
+          :loading="helpersLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -90,7 +90,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true" />
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true"
+            :disable="helpersLoading" />
         </q-card-actions>
       </q-card>
     </div>
@@ -113,8 +114,8 @@
         <p class="text-weight-bold">Mandats de prélèvement</p>
       </div>
       <q-card>
-        <ni-responsive-table :columns="mandateColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
-          :visible-columns="visibleMandateColumns" class="mandate-table">
+        <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
+          :visible-columns="mandatesVisibleColumns" class="mandate-table" :loading="mandatesLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -155,7 +156,8 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="fundings" :columns="fundingColumns" :visible-columns="fundingVisibleColumns">
+        <ni-responsive-table :data="fundings" :columns="fundingsColumns" :visible-columns="fundingsVisibleColumns"
+          :loading="fundingsLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -174,7 +176,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="fundingSubscriptionsOptions().length === 0" flat no-caps color="primary" icon="add"
+          <q-btn :disable="fundingSubscriptionsOptions().length === 0 || fundingsLoading" flat no-caps color="primary" icon="add"
             label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
@@ -195,8 +197,8 @@
         <p class="text-weight-bold">Devis</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="customer.quotes" :columns="quoteColumns" :pagination.sync="pagination"
-          :visible-columns="visibleQuoteColumns">
+        <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" :pagination.sync="pagination"
+          :visible-columns="quotesVisibleColumns" :loading="quotesLoading">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -222,7 +224,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disabled="this.subscriptions.length === 0" flat no-caps color="primary" icon="add"
+          <q-btn :disable="this.subscriptions.length === 0 || quotesLoading" flat no-caps color="primary" icon="add"
             label="Générer un devis" @click="generateQuote" />
         </q-card-actions>
       </q-card>
@@ -302,7 +304,7 @@
       <template slot="title">
         Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingColumns"
+      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
         :visible-columns="fundingDetailsVisibleColumns" />
     </ni-modal>
 
@@ -312,8 +314,8 @@
       <template slot="title">
         Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
       </template>
-      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingColumns"
-        :visible-columns="fundingHistoryVisibleColumns" />
+      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingsColumns"
+        :visible-columns="fundingHistoriesVisibleColumns" />
     </ni-modal>
 
     <!-- Funding creation modal -->
@@ -361,7 +363,7 @@
     <ni-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal"
       @hide="resetEditionFundingData">
       <template slot="title">
-        Modifier le <span class="text-weight-bold">financement</span>
+        Éditer le <span class="text-weight-bold">financement</span>
       </template>
       <ni-date-input v-model="editedFunding.startDate" caption="Date de début de prise en charge"
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="$v.editedFunding.startDate.$touch"
@@ -386,7 +388,7 @@
         type="checkbox" inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error"
         required-field />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Modifier le financement" icon-right="check" color="primary"
+        <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
           :loading="loading" @click="editFunding" />
       </template>
     </ni-modal>
@@ -399,6 +401,7 @@ import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
@@ -410,7 +413,7 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
 import Modal from '@components/modal/Modal';
-import ReponsiveTable from '@components/table/ResponsiveTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import { days } from '@data/days.js';
@@ -438,7 +441,7 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
 export default {
   name: 'ProfileInfo',
   components: {
-    NiSearchAddress: SearchAddress,
+    'ni-search-address': SearchAddress,
     'ni-input': Input,
     'ni-select': Select,
     'ni-date-input': DateInput,
@@ -447,7 +450,7 @@ export default {
     'ni-modal': Modal,
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
-    'ni-responsive-table': ReponsiveTable,
+    'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [
@@ -471,47 +474,15 @@ export default {
       civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
-      customer: {
-        identity: {},
-        contact: {
-          primaryAddress: {},
-          secondaryAddress: {},
-        },
-        payment: {
-          mandates: [],
-        },
-        subscriptions: [],
-        quotes: [],
-        financialCertificates: [],
-      },
       subscriptions: [],
       selectedSubscription: [],
       services: [],
-      quoteColumns: [
-        {
-          name: 'quoteNumber',
-          label: 'Numéro du devis',
-          align: 'left',
-          field: 'quoteNumber',
-        },
-        {
-          name: 'emptyQuote',
-          label: 'Devis',
-          align: 'center',
-          field: 'emptyQuote',
-        },
-        {
-          name: 'signedQuote',
-          label: 'Devis signé',
-          align: 'center',
-          field: 'signedQuote',
-        },
-        {
-          name: 'signed',
-          label: 'Signé',
-          align: 'center',
-          field: row => row.drive && row.drive.driveId,
-        },
+      quotesVisibleColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
+      quotesColumns: [
+        { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
+        { name: 'emptyQuote', label: 'Devis', align: 'center', field: 'emptyQuote' },
+        { name: 'signedQuote', label: 'Devis signé', align: 'center', field: 'signedQuote' },
+        { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
         {
           name: 'createdAt',
           label: '',
@@ -522,45 +493,20 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
+      quotesLoading: false,
       newSubscription: {
         service: '',
         unitTTCRate: '',
         estimatedWeeklyVolume: '',
       },
       editedSubscription: {},
-      visibleMandateColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
-      visibleQuoteColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
-      mandateColumns: [
-        {
-          name: 'rum',
-          label: 'RUM',
-          align: 'left',
-          field: 'rum',
-        },
-        {
-          name: 'emptyMandate',
-          label: 'Mandat',
-          align: 'center',
-          field: 'emptyMandate',
-        },
-        {
-          name: 'signedMandate',
-          label: 'Mandat signé',
-          align: 'center',
-          field: 'signedMandate',
-        },
-        {
-          name: 'signed',
-          label: 'Signé',
-          align: 'center',
-          field: 'signedAt',
-        },
-        {
-          name: 'signedAt',
-          label: 'Date de signature',
-          align: 'left',
-          field: 'signedAt',
-        },
+      mandatesVisibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
+      mandatesColumns: [
+        { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
+        { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },
+        { name: 'signedMandate', label: 'Mandat signé', align: 'center', field: 'signedMandate' },
+        { name: 'signed', label: 'Signé', align: 'center', field: 'signedAt' },
+        { name: 'signedAt', label: 'Date de signature', align: 'left', field: 'signedAt' },
         {
           name: 'createdAt',
           label: '',
@@ -571,7 +517,8 @@ export default {
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
-      fundingVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
+      mandatesLoading: false,
+      fundingsVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
       fundingHistoryModal: false,
       paginationFundingHistory: {
         rowsPerPage: 0,
@@ -629,29 +576,21 @@ export default {
         value: { _id: service._id, nature: service.nature },
       }));
     },
-    userProfile () {
+    customer () {
       return this.$store.getters['customer/getCustomer'];
     },
     primaryAddressError () {
-      if (!this.$v.customer.contact.primaryAddress.fullAddress.required) {
-        return REQUIRED_LABEL;
-      }
+      if (!this.$v.customer.contact.primaryAddress.fullAddress.required) return REQUIRED_LABEL;
       return 'Adresse non valide';
     },
     ibanError () {
-      if (!this.$v.customer.payment.iban.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.customer.payment.iban.iban) {
-        return 'IBAN non valide';
-      }
+      if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
+      else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
       return '';
     },
     bicError () {
-      if (!this.$v.customer.payment.bic.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.customer.payment.bic.bic) {
-        return 'BIC non valide';
-      }
+      if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
+      else if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
       return '';
     },
     acceptedByHelper () {
@@ -660,17 +599,15 @@ export default {
       }
       return '';
     },
-    fundingHistoryVisibleColumns () {
-      if (this.selectedFunding.nature === FIXED) {
-        return ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays'];
-      }
-      return ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
+    fundingHistoriesVisibleColumns () {
+      return this.selectedFunding.nature === FIXED
+        ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
+        : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
     },
     fundingDetailsVisibleColumns () {
-      if (this.selectedFunding.nature === FIXED) {
-        return ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription'];
-      }
-      return ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
+      return this.selectedFunding.nature === FIXED
+        ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
+        : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
     },
     isOneTimeFundingNature () {
       return this.newFunding.nature === FIXED;
@@ -687,16 +624,12 @@ export default {
       return FUNDING_FREQ_OPTIONS;
     },
     daysOptions () {
-      return days.map((day, i) => ({
-        label: day !== 'Jours fériés' ? day.slice(0, 2) : day,
-        value: i,
-      }));
+      return days.map((day, i) => ({ label: day !== 'Jours fériés' ? day.slice(0, 2) : day, value: i }));
     },
     editedFundingMaxStartDate () {
-      if (this.editedFunding && this.editedFunding.endDate) {
-        return this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString();
-      }
-      return '';
+      return this.editedFunding && this.editedFunding.endDate
+        ? this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString()
+        : '';
     },
   },
   validations () {
@@ -707,7 +640,6 @@ export default {
           title: { required },
         },
         contact: {
-          phone: { frPhoneNumber },
           primaryAddress: {
             zipCode: { required },
             street: { required },
@@ -749,36 +681,20 @@ export default {
         subscription: { required },
         nature: { required },
         frequency: { required },
-        amountTTC: { required: requiredIf((item) => {
-          return item.nature === FIXED;
-        }) },
-        unitTTCRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
-        careHours: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
+        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY }) },
+        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
       },
       editedFunding: {
-        amountTTC: { required: requiredIf((item) => {
-          return item.nature === FIXED;
-        }) },
-        unitTTCRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
-        careHours: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
+        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => {
-          return item.nature === HOURLY;
-        }) },
+        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
       },
     };
   },
@@ -789,20 +705,23 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    customerIdentity () {
+      const firstname = get(this.customer, 'identity.firstname');
+      const lastname = get(this.customer, 'identity.last');
+
+      return firstname ? `${firstname}_${lastname}` : lastname
+    },
     mandateFormFields (row) {
       return [
         { name: 'mandateId', value: row._id },
-        {
-          name: 'fileName',
-          value: `mandat_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}`,
-        },
+        { name: 'fileName', value: `mandat_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedMandate' },
       ]
     },
     quoteFormFields (quote) {
       return [
         { name: 'quoteId', value: quote._id },
-        { name: 'fileName', value: `devis_signe_${this.customer.identity.firstname}_${this.customer.identity.lastname}` },
+        { name: 'fileName', value: `devis_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedQuote' },
       ]
     },
@@ -823,34 +742,47 @@ export default {
         this.services = await Services.list();
       } catch (e) {
         console.error(e);
+        this.services = [];
       }
     },
     async refreshMandates () {
       try {
-        this.customer.payment.mandates = await Customers.getMandates(this.customer._id);
+        this.mandatesLoading = true;
+        const mandates = await Customers.getMandates(this.customer._id);
 
-        this.$store.commit('customer/saveCustomer', this.customer);
+        this.$store.commit(
+          'customer/saveCustomer',
+          { ...this.customer, payment: { ...this.customer.payment, mandates } }
+        );
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.mandatesLoading = false;
       }
     },
     async refreshQuotes () {
       try {
-        this.customer.quotes = await Customers.getQuotes(this.customer._id);
+        this.quotesLoading = true;
+        const quotes = await Customers.getQuotes(this.customer._id);
 
-        this.$store.commit('customer/saveCustomer', this.customer);
+        this.$store.commit('customer/saveCustomer', { ...this.customer, quotes });
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
+      } finally {
+        this.quotesLoading = false;
       }
     },
     async refreshCustomer () {
-      this.customer = await Customers.getById(this.userProfile._id);
-      await this.refreshSubscriptions();
-      await this.refreshFundings();
+      const customer = await Customers.getById(this.customer._id);
+      await this.refreshSubscriptions(customer);
+      await this.refreshFundings(customer);
 
-      this.$store.commit('customer/saveCustomer', this.customer);
+      this.$store.commit(
+        'customer/saveCustomer',
+        { ...customer, subscriptions: [...this.subscriptions], fundings: [...this.fundings] }
+      );
       this.$v.customer.$touch();
     },
     // Subscriptions
@@ -915,10 +847,9 @@ export default {
 
         this.loading = true;
         const subscriptionId = this.editedSubscription._id;
-        const payload = pickBy(this.editedSubscription);
-        delete payload._id;
-        delete payload.nature;
+        const payload = omit(pickBy(this.editedSubscription), ['_id', 'nature']);
         await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
+
         this.refreshCustomer();
         this.subscriptionEditionModal = false;
         NotifyPositive('Souscription modifiée');
@@ -931,8 +862,7 @@ export default {
     },
     async deleteSubscriptions (subscriptionId) {
       try {
-        const params = { subscriptionId, _id: this.customer._id };
-        await Customers.removeSubscription(params);
+        await Customers.removeSubscription({ subscriptionId, _id: this.customer._id });
         await this.refreshCustomer();
         NotifyPositive('Souscription supprimée');
       } catch (e) {
@@ -956,16 +886,14 @@ export default {
     async updateSignedAt (mandate) {
       try {
         if (!mandate.signedAt || this.tmpInput === mandate.signedAt) return;
-        const params = {
-          _id: this.customer._id,
-          mandateId: mandate._id,
-        };
+        const params = { _id: this.customer._id, mandateId: mandate._id };
         await Customers.updateMandate(params, mandate);
+
         this.refreshMandates();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       }
     },
     async downloadMandate (doc) {
@@ -997,33 +925,32 @@ export default {
     },
     // Documents
     failMsg () {
-      NotifyNegative('Echec de l\'envoi du document');
+      NotifyNegative('Echec de l\'envoi du document.');
     },
     // Quotes
     getQuoteLink (quote) {
       return get(quote, 'drive.link') || false;
     },
+    formatSubscriptionToDownloadQuote (subscription) {
+      const estimatedWeeklyRate = this.computeWeeklyRate(subscription);
+      const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
+
+      return {
+        serviceName: subscription.service.name,
+        serviceNature: nature ? nature.label : '',
+        unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
+        weeklyVolume: subscription.estimatedWeeklyVolume,
+        weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
+        sundays: subscription.sundays || '',
+        evenings: subscription.evenings || '',
+      }
+    },
     async downloadQuote (doc) {
       try {
         const quoteDriveId = get(this.company, 'customersConfig.templates.quote.driveId', null);
-        if (!quoteDriveId) {
-          return NotifyWarning('Template manquant');
-        }
+        if (!quoteDriveId) return NotifyWarning('Template manquant');
 
-        const subscriptions = this.subscriptions.map(subscription => {
-          let estimatedWeeklyRate = this.computeWeeklyRate(subscription);
-          const nature = NATURE_OPTIONS.find(nat => nat.value === subscription.service.nature);
-
-          return {
-            serviceName: subscription.service.name,
-            serviceNature: nature ? nature.label : '',
-            unitTTCRate: subscription.unitTTCRate ? `${this.formatNumber(subscription.unitTTCRate)}€` : '',
-            weeklyVolume: subscription.estimatedWeeklyVolume,
-            weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
-            sundays: subscription.sundays || '',
-            evenings: subscription.evenings || '',
-          }
-        });
+        const subscriptions = this.subscriptions.map(this.formatSubscriptionToDownloadQuote);
 
         const data = {
           quoteNumber: doc.quoteNumber,
@@ -1044,26 +971,28 @@ export default {
         NotifyNegative('Erreur lors du téléchargement du devis.');
       }
     },
+    formatSubscriptionToGenerateQuote (subscription) {
+      const sub = {
+        serviceName: subscription.service.name,
+        unitTTCRate: subscription.unitTTCRate,
+        estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
+      }
+      if (subscription.sundays) sub.sundays = subscription.sundays;
+      if (subscription.evenings) sub.evenings = subscription.evenings;
+
+      return sub;
+    },
     async generateQuote () {
       try {
-        const subscriptions = this.subscriptions.map(subscription => {
-          const sub = {
-            serviceName: subscription.service.name,
-            unitTTCRate: subscription.unitTTCRate,
-            estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-          }
-          if (subscription.sundays) sub.sundays = subscription.sundays;
-          if (subscription.evenings) sub.evenings = subscription.evenings;
-
-          return sub;
-        });
+        const subscriptions = this.subscriptions.map(this.formatSubscriptionToGenerateQuote);
         const payload = { subscriptions };
         await Customers.addQuote(this.customer._id, payload);
+
         await this.refreshQuotes();
         NotifyPositive('Devis généré');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la génération du devis');
+        NotifyNegative('Erreur lors de la génération du devis.');
       }
     },
     // Fundings
@@ -1081,9 +1010,7 @@ export default {
       this.fundingCreationModal = true;
     },
     resetFundingFrequency () {
-      if (this.newFunding.nature === FIXED && this.newFunding.frequency !== ONCE) {
-        this.newFunding.frequency = '';
-      }
+      if (this.newFunding.nature === FIXED && this.newFunding.frequency !== ONCE) this.newFunding.frequency = '';
     },
     fundingSubscriptionsOptions () {
       return this.subscriptions
@@ -1119,13 +1046,8 @@ export default {
       const cleanPayload = pickBy(this.newFunding);
       const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
       if (version.endDate) version.endDate = this.$moment(version.endDate).endOf('d').toDate();
-      return {
-        nature,
-        thirdPartyPayer,
-        subscription,
-        frequency,
-        versions: [{...version}],
-      };
+
+      return { nature, thirdPartyPayer, subscription, frequency, versions: [{ ...version }] };
     },
     async submitFunding () {
       try {
@@ -1135,6 +1057,7 @@ export default {
         this.loading = true;
         const payload = this.formatCreatedFunding();
         await Customers.addFunding(this.customer._id, payload);
+
         this.resetCreationFundingData();
         await this.refreshCustomer();
         NotifyPositive('Financement ajoutée');
@@ -1185,27 +1108,26 @@ export default {
       this.editedFunding = {};
       this.$v.editedFunding.$reset();
     },
+    formatFundingEditionPayload (funding) {
+      const pickedFields = ['folderNumber', 'careDays', 'customerParticipationRate', 'startDate', 'subscription'];
+      if (funding.nature === FIXED) pickedFields.push('amountTTC');
+      else if (funding.nature === HOURLY) pickedFields.push('unitTTCRate', 'careHours');
+      const payload = {
+        ...pick(funding, pickedFields),
+        endDate: funding.endDate ? this.$moment(funding.endDate).endOf('d') : '',
+      };
+
+      return pickBy(payload);
+    },
     async editFunding () {
       try {
         this.$v.editedFunding.$touch();
         if (this.$v.editedFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
-        const { folderNumber, endDate, amountTTC, unitTTCRate, careHours, careDays, customerParticipationRate, startDate, subscription } = this.editedFunding;
-        const payload = {
-          folderNumber,
-          careDays,
-          customerParticipationRate,
-          startDate,
-          endDate: endDate ? this.$moment(endDate).endOf('d') : '',
-          subscription,
-        };
-        if (this.editedFunding.nature === FIXED) payload.amountTTC = amountTTC;
-        if (this.editedFunding.nature === HOURLY) {
-          payload.unitTTCRate = unitTTCRate;
-          payload.careHours = careHours;
-        }
-        const cleanPayload = pickBy(payload);
-        await Customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, cleanPayload);
+
+        const payload = this.formatFundingEditionPayload(this.editedFunding);
+        await Customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, payload);
+
         this.resetEditionFundingData();
         await this.refreshCustomer();
         NotifyPositive('Financement modifié');

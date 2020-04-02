@@ -1,7 +1,7 @@
 <template>
-  <q-table :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" :visible-columns="visibleColumns"
-    hide-bottom binary-state-sort @update:pagination="$emit('update:pagination', $event)" flat
-    class="table-responsive q-pa-sm" :rows-per-page-options="rowsPerPageOptions">
+  <q-table :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" hide-bottom binary-state-sort
+    :visible-columns="visibleColumns" flat :separator="separator" :rows-per-page-options="rowsPerPageOptions"
+    class="table-responsive q-pa-sm" v-on="$listeners" :loading="loading">
     <template v-slot:header="props">
       <slot name="header" :props="props">
         <q-tr :props="props">
@@ -19,6 +19,11 @@
         </q-tr>
       </slot>
     </template>
+    <template v-slot:loading>
+      <q-inner-loading showing>
+        <q-spinner-facebook size="30px" color="primary" />
+      </q-inner-loading>
+    </template>
   </q-table>
 </template>
 
@@ -32,6 +37,8 @@ export default {
     rowKey: { type: String, default: 'name' },
     rowsPerPageOptions: { type: Array, default: () => [15, 25, 35] },
     visibleColumns: Array,
+    separator: { type: String, default: 'horizontal' },
+    loading: { type: Boolean, default: false },
   },
 }
 </script>

@@ -64,7 +64,7 @@ export const paymentMixin = {
         this.paymentCreationModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du règlement');
+        NotifyNegative('Erreur lors de la création du règlement.');
       } finally {
         this.paymentCreationLoading = false;
       }

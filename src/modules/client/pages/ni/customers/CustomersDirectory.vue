@@ -18,7 +18,7 @@
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
-      @click="customerCreationModal = true" />
+      @click="customerCreationModal = true" :disable="tableLoading" />
 
     <!-- Customer creation modal -->
     <ni-modal v-model="customerCreationModal" @hide="resetForm">
@@ -243,7 +243,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e && e.message === 'Invalid fields') return NotifyWarning('Champ(s) invalide(s)');
-        NotifyNegative('Erreur lors de la création de la fiche bénéficiaire');
+        NotifyNegative('Erreur lors de la création de la fiche bénéficiaire.');
       } finally {
         this.loading = false;
       }

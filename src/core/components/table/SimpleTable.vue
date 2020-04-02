@@ -1,7 +1,7 @@
 <template>
-  <q-table :data="data" :columns="columns" :row-key="rowKey" flat :hide-bottom="pagination.rowsPerPage === 0"
-    :pagination="pagination" :visible-columns="visibleColumns" class="neutral-background" :rows-per-page-options="[]"
-    @update:pagination="$emit('update:pagination', $event)">
+  <q-table :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination" class="neutral-background"
+    :hide-bottom="pagination.rowsPerPage === 0" :visible-columns="visibleColumns" :rows-per-page-options="[]"
+    v-on="$listeners" :loading="loading">
     <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
       <slot name="top-row" :props="props" />
     </template>
@@ -16,7 +16,13 @@
       </slot>
     </template>
     <template v-slot:bottom-row="props">
-      <slot name="bottom-row" :props="props" /></template>
+      <slot name="bottom-row" :props="props" />
+    </template>
+    <template v-slot:loading>
+      <q-inner-loading showing class="neutral-background">
+        <q-spinner-facebook size="30px" color="primary" />
+      </q-inner-loading>
+    </template>
   </q-table>
 </template>
 
@@ -27,9 +33,15 @@ export default {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
     rowKey: { type: String, default: 'name' },
-    hideBottom: { type: Boolean, default: true },
     visibleColumns: Array,
     pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
+    loading: { type: Boolean, default: false },
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+/deep/ .q-inner-loading {
+  opacity: 0.6;
+}
+</style>

@@ -2,17 +2,18 @@
   <q-page class="neutral-background" padding>
     <h4>Mon compte</h4>
     <div class="center-account">
-      <ni-input v-model.trim="user.credentials.email" caption="Email" :error="$v.user.credentials.email.$error"
-        error-label="Email invalide." @blur="$v.user.credentials.email.$touch" :disable="isAuxiliaryWithoutCompany" />
-      <ni-input v-model.trim="user.credentials.password" :error="$v.user.credentials.password.$error"
-        caption="Nouveau mot de passe" error-label="Le mot de passe doit contenir entre 6 et 20 caractères."
-        @blur="$v.user.credentials.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
-      <ni-input v-model.trim="user.credentials.passwordConfirm" :error="$v.user.credentials.passwordConfirm.$error"
-        caption="Confirmation mot de passe" error-label="Le mot de passe entré et la confirmation sont différents."
-        @blur="$v.user.credentials.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
+      <ni-input v-model.trim="user.local.email" caption="Email" :error="$v.user.local.email.$error"
+        error-label="Email invalide." @blur="$v.user.local.email.$touch" :disable="isAuxiliaryWithoutCompany"
+        @focus="saveTmp('local.email')" />
+      <ni-input v-model.trim="user.local.password" :error="$v.user.local.password.$error"
+        caption="Nouveau mot de passe" :error-label="passwordError($v.user.local.password)"
+        @blur="$v.user.local.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
+      <ni-input v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error"
+        caption="Confirmation mot de passe" :error-label="passwordConfirmError"
+        @blur="$v.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <div class="row justify-center">
-        <q-btn big @click="updateUser" color="primary" :disable="$v.user.$invalid || isAuxiliaryWithoutCompany">
-          Modifier
+        <q-btn big @click="updateUser" color="primary" :disable="$v.$invalid || isAuxiliaryWithoutCompany">
+          Éditer
         </q-btn>
       </div>
       <hr style="margin-top: 5%; margin-bottom: 5%">
@@ -36,18 +37,21 @@
 </template>
 
 <script>
-import { required, email, sameAs, minLength, maxLength } from 'vuelidate/lib/validators';
+import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
 import { AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
+import { passwordMixin } from '@mixins/passwordMixin';
 import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {
+  name: 'AccountInfo',
   metaInfo: { title: 'Mon compte' },
+  mixins: [passwordMixin],
   components: {
     'ni-input': Input,
     'ni-html-modal': HtmlModal,
@@ -55,38 +59,36 @@ export default {
   data () {
     return {
       user: {
-        credentials: {
-          email: '',
-          password: '',
-          passwordConfirm: '',
-        },
+        local: { email: '', password: '' },
         alenvi: {},
         contracts: [],
       },
+      passwordConfirm: '',
       rgpd,
       rgpdModal: false,
       cguModal: false,
       cguCompani,
+      tmpInput: '',
     }
   },
-  validations: {
-    user: {
-      credentials: {
-        email: { required, email },
-        password: {
-          minLength: minLength(6),
-          maxLength: maxLength(20),
-        },
-        passwordConfirm: {
-          sameAsPassword: sameAs('password'),
+  validations () {
+    return {
+      user: {
+        local: {
+          email: { required, email },
+          password: { ...this.passwordValidation },
         },
       },
-    },
+      passwordConfirm: {
+        required: requiredIf((item) => !!item.user.local.password),
+        sameAsPassword: sameAs((item) => item.user.local.password),
+      },
+    }
   },
   async mounted () {
     try {
       this.user.alenvi = await Users.getById(this.$route.params.id);
-      this.user.credentials.email = this.user.alenvi.local.email;
+      this.user.local.email = this.user.alenvi.local.email;
     } catch (e) {
       console.error(e);
     }
@@ -97,23 +99,25 @@ export default {
     },
   },
   methods: {
+    saveTmp (path) {
+      if (this.tmpInput === '') this.tmpInput = get(this.user, path);
+    },
     async updateUser () {
       try {
-        const userToSend = {
-          local: { email: this.user.credentials.email },
-        };
-        if (this.user.credentials.password) {
-          userToSend.local.password = this.user.credentials.password
-        };
-        await Users.updateById(this.$route.params.id, userToSend);
-        NotifyPositive('Profil mis à jour');
-        this.user.credentials.password = '';
-        this.user.credentials.passwordConfirm = '';
+        if (this.tmpInput !== '' && this.user.local.email !== this.tmpInput) {
+          await Users.updateById(this.$route.params.id, { local: { email: this.user.local.email } });
+        }
+        if (this.user.local.password) {
+          await Users.updatePassword(this.$route.params.id, { local: { password: this.user.local.password } });
+        }
+        NotifyPositive('Profil modifié.');
       } catch (e) {
-        NotifyNegative('Erreur lors de la mise à jour du profil');
-        this.user.credentials.password = '';
-        this.user.credentials.passwordConfirm = '';
+        NotifyNegative('Erreur lors de la modification du profil.');
         console.error(e);
+      } finally {
+        this.user.local.password = '';
+        this.passwordConfirm = '';
+        this.tmpInput = '';
       }
     },
     logout () {
@@ -129,7 +133,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
   .center-account
     max-width: 40%
     @media screen && (max-width: 600px)

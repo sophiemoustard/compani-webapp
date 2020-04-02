@@ -43,7 +43,7 @@ export default {
         NotifyPositive('Tâche mise à jour');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour de la tâche');
+        NotifyNegative('Erreur lors de la mise à jour de la tâche.');
       }
     },
   },

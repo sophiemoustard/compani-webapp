@@ -5,7 +5,8 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
-          <ni-responsive-table :data="surcharges" :columns="surchargeColumns" :pagination.sync="pagination">
+          <ni-responsive-table :data="surcharges" :columns="surchargesColumns" :pagination.sync="pagination"
+            :loading="surchargesLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -25,7 +26,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration"
-              @click="surchargeCreationModal = true" />
+              @click="surchargeCreationModal = true" :disable="surchargesLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -33,7 +34,7 @@
         <p class="text-weight-bold">Services</p>
         <q-card>
           <ni-responsive-table :data="services" :columns="serviceColumns" :pagination.sync="pagination"
-            :visible-columns="visibleColumnsServices">
+            :visible-columns="servicesVisibleColumns" :loading="servicesLoading">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -55,7 +56,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service"
-              @click="serviceCreationModal = true" />
+              @click="serviceCreationModal = true" :disable="servicesLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -79,7 +80,7 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Tiers payeurs</p>
         <q-card>
-          <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns"
+          <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" :loading="tppsLoading"
             :pagination.sync="pagination">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
@@ -103,7 +104,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur"
-              @click="thirdPartyPayerCreationModal = true" />
+              @click="thirdPartyPayerCreationModal = true" :disable="tppsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -317,6 +318,7 @@
 import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
+import pick from 'lodash/pick';
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
@@ -430,7 +432,7 @@ export default {
         customStartTime: null,
         customEndTime: null,
       },
-      surchargeColumns: [
+      surchargesColumns: [
         {
           name: 'name',
           label: 'Nom',
@@ -510,6 +512,7 @@ export default {
           field: '_id',
         },
       ],
+      surchargesLoading: false,
       // Services
       services: [],
       serviceCreationModal: false,
@@ -536,7 +539,7 @@ export default {
       },
       natureOptions: NATURE_OPTIONS,
       serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
-      visibleColumnsServices: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges', 'actions'],
+      servicesVisibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
       serviceColumns: [
         {
@@ -592,6 +595,7 @@ export default {
           field: '_id',
         },
       ],
+      servicesLoading: false,
       thirdPartyPayers: [],
       thirdPartyPayersColumns: [
         {
@@ -647,6 +651,7 @@ export default {
           style: !this.$q.platform.is.mobile && 'width: 100px',
         },
       ],
+      tppsLoading: false,
       thirdPartyPayerCreationModal: false,
       newThirdPartyPayer: {
         name: '',
@@ -791,6 +796,7 @@ export default {
     // Refresh data
     async refreshSurcharges () {
       try {
+        this.surchargesLoading = true;
         this.surchargesOptions = [];
         this.surcharges = await Surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
@@ -812,10 +818,13 @@ export default {
         NotifyNegative('Erreur lors du rafraîchissement des plans de majoration.');
         console.error(e);
         this.surcharges = [];
+      } finally {
+        this.surchargesLoading = false;
       }
     },
     async refreshServices () {
       try {
+        this.servicesLoading = true;
         const services = await Services.list();
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
@@ -825,6 +834,8 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors du rafraîchissement des services.');
         this.services = [];
+      } finally {
+        this.servicesLoading = false;
       }
     },
     async refreshCompany () {
@@ -835,10 +846,13 @@ export default {
     },
     async refreshThirdPartyPayers () {
       try {
+        this.tppsLoading = true;
         this.thirdPartyPayers = await ThirdPartyPayers.list();
       } catch (e) {
         this.thirdPartyPayers = [];
         console.error(e);
+      } finally {
+        this.tppsLoading = false;
       }
     },
     // Surcharges
@@ -897,21 +911,22 @@ export default {
     },
     openSurchargeEditionModal (id) {
       const selectedSurcharge = this.surcharges.find(surcharge => surcharge._id === id);
-      const { _id, name, saturday, sunday, publicHoliday, twentyFifthOfDecember, firstOfMay,
-        evening, eveningStartTime, eveningEndTime, custom, customStartTime, customEndTime,
-      } = selectedSurcharge;
+      const { eveningStartTime, eveningEndTime, customStartTime, customEndTime } = selectedSurcharge;
+      const pickedFileds = [
+        '_id',
+        'name',
+        'saturday',
+        'sunday',
+        'publicHoliday',
+        'twentyFifthOfDecember',
+        'firstOfMay',
+        'evening',
+        'custom',
+      ];
       this.editedSurcharge = {
-        _id,
-        name,
-        saturday,
-        sunday,
-        publicHoliday,
-        twentyFifthOfDecember,
-        firstOfMay,
-        evening,
+        ...pick(selectedSurcharge, pickedFileds),
         eveningStartTime: eveningStartTime ? this.$moment(eveningStartTime).format('HH:mm') : '',
         eveningEndTime: eveningEndTime ? this.$moment(eveningEndTime).format('HH:mm') : '',
-        custom,
         customStartTime: customStartTime ? this.$moment(customStartTime).format('HH:mm') : '',
         customEndTime: customEndTime ? this.$moment(customEndTime).format('HH:mm') : '',
       };
@@ -1064,7 +1079,7 @@ export default {
         await this.refreshServices();
       } catch (e) {
         console.error(e)
-        NotifyNegative('Erreur lors de la modification du service');
+        NotifyNegative('Erreur lors de la modification du service.');
       } finally {
         this.loading = false;
       }
@@ -1087,7 +1102,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteService(serviceId, row))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     showHistory (id) {
       this.selectedService = this.services.find(ser => ser._id === id);
@@ -1186,7 +1201,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteThirdPartyPayer(thirdPartyPayerId, row))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     isTppUsedInFundings (tpp) {
       const index = this.getRowIndex(this.thirdPartyPayers, tpp);

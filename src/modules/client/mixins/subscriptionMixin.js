@@ -93,6 +93,7 @@ export const subscriptionMixin = {
         sortBy: 'startDate',
         descending: true,
       },
+      subscriptionsLoading: false,
     };
   },
   methods: {
@@ -148,15 +149,18 @@ export const subscriptionMixin = {
       this.subscriptionHistoryModal = false;
       this.selectedSubscription = [];
     },
-    refreshSubscriptions () {
+    refreshSubscriptions (customer) {
       try {
-        const { subscriptions } = this.customer;
+        this.subscriptionsLoading = true;
+        const { subscriptions } = customer;
         this.subscriptions = subscriptions ? subscriptions.map(sub => ({
           ...getLastVersion(sub.versions, 'createdAt'),
           ...sub,
         })) : [];
       } catch (e) {
         console.error(e);
+      } finally {
+        this.subscriptionsLoading = false;
       }
     },
   },

@@ -21,13 +21,13 @@ export const NATURE_OPTIONS = [
 ];
 
 export const SURCHARGES = {
-  'saturday': 'Samedi',
-  'sunday': 'Dimanche',
-  'publicHoliday': 'Jours fériés',
-  'twentyFifthOfDecember': '25 décembre',
-  'firstOfMay': '1er mai',
-  'evening': 'Soirée',
-  'custom': 'Personnalisée',
+  saturday: 'Samedi',
+  sunday: 'Dimanche',
+  publicHoliday: 'Jours fériés',
+  twentyFifthOfDecember: '25 décembre',
+  firstOfMay: '1er mai',
+  evening: 'Soirée',
+  custom: 'Personnalisée',
 };
 
 // CONTRACTS
@@ -55,7 +55,7 @@ export const CONTRACT_CREATION_MANDATORY_INFO = {
   'identity.nationality': 'nationalité',
   'identity.socialSecurityNumber': 'numéro de sécurité sociale',
   'contact.address.fullAddress': 'adresse',
-  'establishment': 'établissement',
+  establishment: 'établissement',
 }
 
 // EVENTS
@@ -89,10 +89,10 @@ export const ABSENCE_NATURES = [
   { label: 'Horaire', value: HOURLY },
 ];
 export const EVENT_TYPES = [
-  {label: 'Intervention', value: INTERVENTION},
-  {label: 'Interne', value: INTERNAL_HOUR},
-  {label: 'Absence', value: ABSENCE},
-  {label: 'Indispo', value: UNAVAILABILITY},
+  { label: 'Intervention', value: INTERVENTION },
+  { label: 'Interne', value: INTERNAL_HOUR },
+  { label: 'Absence', value: ABSENCE },
+  { label: 'Indispo', value: UNAVAILABILITY },
 ];
 
 // THIRD PARTY PAYERS
@@ -147,6 +147,12 @@ export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 export const VENDOR_ADMIN = 'vendor_admin';
 export const TRAINING_ORGANISATION_MANAGER = 'training_organisation_manager';
 export const TRAINER = 'trainer';
+
+// ROLE TRANSLATION
+export const ROLES_TRANSLATION = {
+  [CLIENT_ADMIN]: 'Admin Client',
+  [COACH]: 'Coach',
+};
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';

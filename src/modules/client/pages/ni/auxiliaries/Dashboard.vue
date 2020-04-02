@@ -251,7 +251,7 @@ export default {
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des données')
+        NotifyNegative('Erreur lors de la récupération des données.')
       } finally {
         this.setDisplayStats(sectorsIds, { loadingDetails: false });
       }
@@ -330,7 +330,7 @@ export default {
         this.setDisplayStats(sectors, { loading: false });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la réception des statistiques');
+        NotifyNegative('Erreur lors de la réception des statistiques.');
         for (const sector of sectors) {
           delete this.stats[sector];
         }

@@ -15,13 +15,13 @@
             </p>
           </div>
         </div>
-        <ni-input v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
-        <ni-input v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
-        <router-link class="row justify-end" :to="{ path: '/forgotPassword', query: { from: 'w' } }">
+        <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
+        <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
+        <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
           <small>Mot de passe oublié ?</small>
         </router-link>
         <div class="row justify-center">
-          <q-btn no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
+          <q-btn data-cy="login" no-caps class="signup-btn" label="Me connecter" icon-right="ion-log-in" color="primary"
             @click="submit" />
         </div>
       </div>
@@ -31,12 +31,11 @@
 
 <script>
 import get from 'lodash/get';
-import Users from '@api/Users';
-import Customers from '@api/Customers';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
-import { HELPER, AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
+import { AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
+import { logInMixin } from '@mixins/logInMixin';
 
 export default {
   metaInfo: {
@@ -51,6 +50,7 @@ export default {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
+  mixins: [logInMixin],
   data () {
     return {
       credentials: {
@@ -76,32 +76,7 @@ export default {
   methods: {
     async submit () {
       try {
-        const authenticationPayload = {
-          email: this.credentials.email.toLowerCase(),
-          password: this.credentials.password,
-        };
-        const auth = await Users.authenticate(authenticationPayload);
-
-        const expiresInDays = parseInt(auth.expiresIn / 3600 / 24, 10) >= 1
-          ? parseInt(auth.expiresIn / 3600 / 24, 10)
-          : 1;
-        const options = { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV !== 'development' };
-        this.$q.cookies.set('alenvi_token', auth.token, options);
-        this.$q.cookies.set('alenvi_token_expires_in', auth.expiresIn, options);
-        this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
-        this.$q.cookies.set('user_id', auth.user._id, options);
-        await this.$store.dispatch('main/getLoggedUser', this.$q.cookies.get('user_id'));
-
-        if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
-
-        if (this.userRole === HELPER) {
-          const customer = await Customers.getById(this.loggedUser.customers[0]._id);
-          this.$store.commit('customer/saveCustomer', customer);
-          this.$router.replace({ name: 'customer agenda' });
-        } else if (this.isAuxiliaryWithoutCompany) {
-          this.$router.replace({ name: 'account info', params: { id: this.loggedUser._id } });
-        } else if (this.isAuxiliary) this.$router.replace({ name: 'auxiliary agenda' });
-        else this.$router.replace({ name: 'auxiliaries directory' });
+        await this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
       } catch (e) {
         NotifyNegative('Impossible de se connecter.');
         console.error(e);

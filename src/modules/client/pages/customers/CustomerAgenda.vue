@@ -30,7 +30,7 @@ export default {
   name: 'CustomerAgenda',
   metaInfo: { title: 'Agenda' },
   components: {
-    'agenda': Agenda,
+    agenda: Agenda,
     'planning-navigation': PlanningNavigation,
   },
   mixins: [planningTimelineMixin],

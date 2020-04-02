@@ -57,8 +57,7 @@
 <script>
 import get from 'lodash/get';
 import { mapGetters } from 'vuex';
-import randomize from 'randomatic';
-import ActivationCode from '@api/ActivationCode';
+import Users from '@api/Users';
 import Twilio from '@api/Twilio';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -86,7 +85,7 @@ export default {
       messageSupport: 'sms',
       typeMessageOptions: [
         { label: 'Pièces manquantes', value: 'PM' },
-        { label: 'Envoi code d\'activation', value: 'CA' },
+        { label: 'Envoi lien d\'activation', value: 'LA' },
         { label: 'Autres', value: 'Autres' },
       ],
       messageComp: '',
@@ -110,38 +109,41 @@ export default {
       }
     },
     userStartDate () {
-      if (this.userProfile.createdAt) return this.$moment(this.userProfile.createdAt).format('DD/MM/YY');
-      return 'N/A';
+      return this.userProfile.createdAt ? this.$moment(this.userProfile.createdAt).format('DD/MM/YY') : 'N/A';
     },
     userRelativeStartDate () {
-      if (this.userStartDate !== 'N/A') return this.$moment(this.userStartDate, 'DD/MM/YY').toNow(true);
-      return '';
+      return this.userStartDate !== 'N/A' ? this.$moment(this.userStartDate, 'DD/MM/YY').toNow(true) : '';
     },
     isExternalUser () {
       return this.userProfile._id !== this.loggedUser._id;
     },
     isAccountConfirmed () {
-      if (this.userProfile.isConfirmed) return 'Accès WebApp activé';
-      return 'Accès WebApp non activé'
-    },
-    activationCode () {
-      return this.typeMessage === 'CA' ? randomize('0000') : '';
+      return this.userProfile.isConfirmed ? 'Accès WebApp activé' : 'Accès WebApp non activé'
     },
     hasPicture () {
       return get(this.userProfile, 'picture.link') || DEFAULT_AVATAR;
     },
   },
   methods: {
-    updateMessage () {
+    async updateMessage () {
+      const baseUrl = `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}`;
+
       if (this.typeMessage === 'PM') {
         this.messageComp = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
         'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ' +
-        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}` +
-        '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
-      } else if (this.typeMessage === 'CA') {
-        this.messageComp = `${this.companyName}. Bienvenue ! :)\nUtilise ce code: ${this.activationCode} pour pouvoir ` +
-        'commencer ton enregistrement sur Compani avant ton intégration: ' +
-        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`;
+        `${baseUrl}/ni/${this.userProfile._id}\n` +
+        'Si tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
+      } else if (this.typeMessage === 'LA') {
+        const { passwordToken, local } = this.userProfile;
+
+        if (!passwordToken || this.$moment().isAfter(passwordToken.expiresIn)) {
+          this.userProfile.passwordToken = await Users.createPasswordToken(this.userProfile._id, { email: local.email });
+        }
+
+        this.messageComp = `${this.companyName}. Bienvenue ! :)\nPour pouvoir commencer ton enregistrement sur ` +
+          'Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
+          `${baseUrl}/reset-password/${passwordToken.token} :-)\n` +
+          `Par la suite pour te connecter suis ce lien: ${baseUrl}.`;
       } else this.messageComp = '';
     },
     openSmsModal () {
@@ -149,31 +151,33 @@ export default {
       this.opened = true;
     },
     goToPlanning () {
-      if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.userProfile } });
-      else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.userProfile } });
+      if (this.customer) {
+        this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.userProfile } });
+      } else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.userProfile } });
     },
     async sendMessage () {
       this.loading = true;
-      if (this.typeMessage === 'CA') {
-        await ActivationCode.create({ code: this.activationCode, user: this.userProfile._id });
-      }
       await this.sendSMS();
+
       this.loading = false;
       this.opened = false;
       this.messageComp = '';
     },
     async sendSMS () {
       try {
-        if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+        if (!this.companyName) {
+          return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
+        }
+
         await Twilio.sendSMS({
           to: `+33${this.userProfile.contact.phone.substring(1)}`,
           body: this.messageComp,
         });
-        NotifyPositive('SMS bien envoyé');
+        NotifyPositive('SMS bien envoyé.');
       } catch (e) {
         console.error(e);
         this.loading = false;
-        NotifyNegative('Erreur lors de l\'envoi du SMS');
+        NotifyNegative('Erreur lors de l\'envoi du SMS.');
       }
     },
   },

@@ -153,6 +153,7 @@ export default {
       deleteEventsModal: false,
       customersWithInterventions: [],
       planningHeaderHeight: 0,
+      timeout: null,
     }
   },
   beforeDestroy () {
@@ -163,6 +164,7 @@ export default {
         this.$q.localStorage.set('lastSearchCustomers', JSON.stringify(this.terms));
       }
     }
+    clearTimeout(this.timeout);
   },
   async mounted () {
     this.updateTimeline();
@@ -196,7 +198,7 @@ export default {
         this.customersWithInterventions = [];
         this.deleteEventsModal = false;
         console.error(e);
-        NotifyNegative('Error lors de la récupération des bénéficiaires');
+        NotifyNegative('Error lors de la récupération des bénéficiaires.');
       }
     },
     toggleAllSectors () {
@@ -207,16 +209,19 @@ export default {
       return this.filteredSectors.find(s => s._id === sectorId);
     },
     restoreFilter (terms) {
-      for (let term of terms) {
+      for (const term of terms) {
         setTimeout(() => this.$refs.refFilter.add(term), 100);
       }
     },
     getTimelineHours () {
-      const range = this.$moment.range(this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0), this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0));
+      const range = this.$moment.range(
+        this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0),
+        this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0)
+      );
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
     },
     updatePlanningHeaderHeight () {
-      setTimeout(() => { this.planningHeaderHeight = this.$refs['planningHeader'].clientHeight; }, 100);
+      this.timeout = setTimeout(() => { this.planningHeaderHeight = this.$refs.planningHeader.clientHeight; }, 100);
     },
     // Table
     updateTimeline () {
@@ -276,7 +281,7 @@ export default {
         this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Problème lors de la modification de l\'évènement');
+        NotifyNegative('Problème lors de la modification de l\'évènement.');
       } finally {
         this.draggedObject = {};
       }
@@ -295,7 +300,7 @@ export default {
           ],
         });
       }
-      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
       this.$emit('createEvent', eventInfo);
     },

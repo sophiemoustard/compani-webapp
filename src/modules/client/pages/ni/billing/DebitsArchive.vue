@@ -4,7 +4,7 @@
       <h4>Archive Prélèvements</h4>
     </div>
     <div class="q-pa-sm">
-      <ni-large-table :data="directDebits" :columns="columns" :pagination.sync="pagination">
+      <ni-large-table :data="directDebits" :columns="columns" :pagination.sync="pagination" :loading="loading">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -37,6 +37,7 @@ export default {
   data () {
     return {
       directDebits: [],
+      loading: false,
       columns: [
         {
           name: 'name',
@@ -78,14 +79,17 @@ export default {
     },
     async getDirectDebits () {
       try {
+        this.loading = true;
         if (!this.loggedUser.company || !this.loggedUser.company.directDebitsFolderId) {
-          return NotifyNegative('Dossier de prélèvement manquant');
+          return NotifyNegative('Dossier de prélèvement manquant.');
         }
         this.directDebits = await GoogleDrive.getList({ folderId: this.loggedUser.company.directDebitsFolderId });
       } catch (e) {
         this.directDebits = [];
         console.error(e);
-        NotifyNegative("Erreur lors de la récupération des prélèvements d'archive");
+        NotifyNegative("Erreur lors de la récupération des prélèvements d'archive.");
+      } finally {
+        this.loading = false;
       }
     },
   },

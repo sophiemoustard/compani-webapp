@@ -1,12 +1,12 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractVisibleColumns"
+      <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
         :personKey="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
         @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
-        @deleteVersion="validateVersionDeletion" />
-      <q-btn :disable="disableContractCreation" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
+        @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
+      <q-btn :disable="disableContractCreation || contractsLoading" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
       <q-banner v-if="disableContractCreation" class="full-width warning" dense>
         <q-icon size="sm" name="warning" />
@@ -149,7 +149,7 @@ export default {
         contractCreationMissingInfo: [],
       },
       customers: [],
-      contractVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
+      contractsVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
       // New contract
       newContractModal: false,
       newContract: {
@@ -177,6 +177,7 @@ export default {
         contract: {},
       },
       endContractReasons: END_CONTRACT_REASONS,
+      contractsLoading: false,
     }
   },
   validations () {
@@ -297,11 +298,12 @@ export default {
       } catch (e) {
         this.auxiliary = null;
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération de l\'auxiliaire');
+        NotifyNegative('Erreur lors de la récupération de l\'auxiliaire.');
       }
     },
     async refreshContracts () {
       try {
+        this.contractsLoading = true;
         this.contracts = await Contracts.list({ user: this.profileId });
         const promises = [];
         for (const contract of this.contracts) {
@@ -319,7 +321,9 @@ export default {
       } catch (e) {
         this.contracts = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des contracts');
+        NotifyNegative('Erreur lors de la récupération des contracts.');
+      } finally {
+        this.contractsLoading = false;
       }
     },
     // Contract creation
@@ -383,7 +387,7 @@ export default {
         NotifyPositive('Contrat créé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du contrat');
+        NotifyNegative('Erreur lors de la création du contrat.');
       } finally {
         this.loading = false;
       }
@@ -434,7 +438,7 @@ export default {
         NotifyPositive('Version créée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'avenant');
+        NotifyNegative('Erreur lors de la création de l\'avenant.');
       } finally {
         this.loading = false;
       }
@@ -469,8 +473,8 @@ export default {
         NotifyPositive('Version supprimée');
       } catch (e) {
         console.error(e);
-        if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant');
-        NotifyNegative('Erreur lors de la suppression de l\'avenant');
+        if (e.status === 403) return NotifyNegative('Impossible de supprimer cet avenant.');
+        NotifyNegative('Erreur lors de la suppression de l\'avenant.');
       }
     },
     // End contract
@@ -503,7 +507,7 @@ export default {
         NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour du contrat');
+        NotifyNegative('Erreur lors de la mise à jour du contrat.');
       } finally {
         this.loading = false;
       }

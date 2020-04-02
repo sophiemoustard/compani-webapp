@@ -38,7 +38,7 @@ export default {
   methods: {
     async submit () {
       try {
-        const payload = { email: this.email.toLowerCase(), from: this.$route.query.from || 'w' };
+        const payload = { email: this.email.toLowerCase() };
         await Users.forgotPassword(payload);
         NotifyPositive('Un email a été envoyé à l\'adresse indiquée');
       } catch (e) {
@@ -56,9 +56,6 @@ export default {
         console.error(e.response);
       }
     },
-  },
-  beforeDestroy () {
-    clearTimeout(this.timeout);
   },
 }
 </script>

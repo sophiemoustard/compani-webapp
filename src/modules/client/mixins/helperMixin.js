@@ -1,5 +1,4 @@
 import has from 'lodash/has';
-import randomize from 'randomatic';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -9,7 +8,7 @@ import Users from '@api/Users';
 import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { clear, formatPhone } from '@helpers/utils';
-import { HELPER, REQUIRED_LABEL } from '@data/constants';
+import { HELPER } from '@data/constants';
 
 export const helperMixin = {
   data () {
@@ -27,30 +26,15 @@ export const helperMixin = {
         contact: { phone: '' },
       },
       helpers: [],
-      helperColumns: [
-        {
-          name: 'lastname',
-          label: 'Nom',
-          align: 'left',
-          field: row => row.identity.lastname,
-        },
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          align: 'left',
-          field: row => row.identity.firstname,
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => row.local ? row.local.email : '',
-        },
+      helpersColumns: [
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => row.contact ? row.contact.phone : '',
+          field: row => get(row, 'contact.phone') || '',
           format: (value) => formatPhone(value),
         },
         {
@@ -61,32 +45,21 @@ export const helperMixin = {
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
-      helperPagination: { rowsPerPage: 0 },
+      helpersPagination: { rowsPerPage: 0 },
+      helpersLoading: false,
     }
   },
   computed: {
     sortedHelpers () {
-      return [...this.helpers].sort((u1, u2) => {
-        return (u1.identity.lastname || '').localeCompare((u2.identity.lastname || ''));
-      });
-    },
-    emailError () {
-      if (!this.$v.newHelper.local.email.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newHelper.local.email.email) {
-        return 'Email non valide';
-      }
+      return [...this.helpers]
+        .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
+        const approvalDate = this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY');
+        return `le ${approvalDate} par ${this.acceptedBy}`;
       }
     },
     loggedUser () {
@@ -97,12 +70,15 @@ export const helperMixin = {
     // Refresh
     async getUserHelpers () {
       try {
-        const params = { customers: this.userProfile._id };
+        this.helpersLoading = true;
+        const params = { customers: this.customer._id };
         if (has(this.loggedUser, 'company._id')) params.company = this.loggedUser.company._id;
         this.helpers = await Users.list(params);
       } catch (e) {
         this.helpers = [];
         console.error(e);
+      } finally {
+        this.helpersLoading = false;
       }
     },
     // Creation
@@ -121,11 +97,8 @@ export const helperMixin = {
       if (roles.length === 0) throw new Error('Role not found');
 
       const payload = {
-        local: {
-          email: this.newHelper.local.email,
-          password: randomize('0', 6),
-        },
-        customers: [this.userProfile._id],
+        local: { email: this.newHelper.local.email },
+        customers: [this.customer._id],
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };
@@ -144,16 +117,15 @@ export const helperMixin = {
         await Users.create(pickBy(payload));
         NotifyPositive('Aidant créé');
 
-        const receiver = { email: this.newHelper.local.email, password: payload.local.password };
-        await Email.sendWelcome({ receiver });
+        await Email.sendWelcome({ email: this.newHelper.local.email });
         NotifyPositive('Email envoyé');
 
         await this.getUserHelpers();
         this.openNewHelperModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant');
-        NotifyNegative('Erreur lors de la création de l\'aidant');
+        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant.');
+        NotifyNegative('Erreur lors de la création de l\'aidant.');
       } finally {
         this.loading = false;
       }
@@ -172,7 +144,7 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.openEditedHelperModal = false
       } catch (e) {
-        NotifyNegative('Erreur lors de la modification de l\'aidant');
+        NotifyNegative('Erreur lors de la modification de l\'aidant.');
       } finally {
         this.loading = false;
       }
@@ -192,7 +164,7 @@ export const helperMixin = {
         NotifyPositive('Aidant supprimé');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'aidant");
+        NotifyNegative("Erreur lors de la suppression de l'aidant.");
       }
     },
     validateHelperDeletion (helperId) {
@@ -202,7 +174,7 @@ export const helperMixin = {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteHelper(helperId))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 };

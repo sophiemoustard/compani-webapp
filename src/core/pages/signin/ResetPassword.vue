@@ -6,10 +6,10 @@
         <p class="q-mb-lg message">Veuillez renseigner un nouveau mot de passe.</p>
         <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
           v-model.trim="password" @blur="$v.password.$touch" type="password"
-          error-label="Le mot de passe doit contenir entre 6 et 20 caractères." required-field />
+          :error-label="passwordError($v.password)" required-field />
         <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
           v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
-          error-label="Le mot de passe entré et la confirmation sont différents." />
+          :error-label="passwordConfirmError" />
         <div class="row justify-center">
           <q-btn @click="submit" color="primary" :disable="$v.$invalid">Envoyer</q-btn>
         </div>
@@ -19,25 +19,28 @@
 </template>
 
 <script>
-import { sameAs, minLength, maxLength, required } from 'vuelidate/lib/validators'
+import { sameAs, required, requiredIf } from 'vuelidate/lib/validators'
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { passwordMixin } from '@mixins/passwordMixin';
+import { logInMixin } from '@mixins/logInMixin';
 
 export default {
   components: {
     'compani-header': CompaniHeader,
     'ni-input': Input,
   },
+  mixins: [passwordMixin, logInMixin],
   data () {
     return {
       password: '',
       passwordConfirm: '',
       token: null,
       userId: null,
-      userEmail: '',
       timeout: null,
+      userEmail: '',
     }
   },
   async beforeRouteEnter (to, from, next) {
@@ -46,65 +49,45 @@ export default {
         const checkToken = await Users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
-        next({ path: '/403-pwd' });
+        next({ path: '/login' });
       }
     } catch (e) {
-      if (e.response) {
-        console.error(e.response);
-      } else {
-        console.error(e);
-      }
-      next({ path: '/error403Pwd' });
+      if (e.response) console.error(e.response);
+      else console.error(e);
+      next({ path: '/login' });
     }
   },
-  validations: {
-    password: {
-      required,
-      minLength: minLength(6),
-      maxLength: maxLength(20),
-    },
-    passwordConfirm: {
-      required,
-      sameAsPassword: sameAs('password'),
-    },
+  validations () {
+    return {
+      password: { required, ...this.passwordValidation },
+      passwordConfirm: {
+        required: requiredIf(item => item.password),
+        sameAsPassword: sameAs('password'),
+      },
+    }
   },
   methods: {
     setData (checkToken) {
       this.token = checkToken.token;
       this.userId = checkToken.user._id;
       this.userEmail = checkToken.user.email;
-      this.from = checkToken.user.from;
+    },
+    async logIn () {
+      try {
+        await this.logInUser({ email: this.userEmail, password: this.password });
+      } catch (e) {
+        NotifyNegative('Erreur lors de la connexion. Si le problème persiste, contactez le support technique.');
+        console.error(e);
+      }
     },
     async submit () {
       try {
-        const userPayload = {
-          local: { password: this.password },
-          resetPassword: {
-            token: null,
-            expiresIn: null,
-            from: null,
-          },
-        };
-        await Users.updateById(this.userId, userPayload, this.token);
-        let detail = '';
-        let action = null;
-        switch (this.from) {
-          case 'p':
-            detail = 'Mot de passe changé. Redirection vers Pigi...';
-            action = () => {
-              window.location.href = `${process.env.MESSENGER_LINK}`;
-            };
-            break;
-          default:
-            detail = 'Mot de passe changé. Redirection vers la page de connexion...';
-            action = () => {
-              this.$router.replace({ path: '/login' });
-            };
-        }
-        NotifyPositive(detail);
-        this.timeout = setTimeout(action, 2000)
+        await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true }, this.token);
+
+        NotifyPositive('Mot de passe changé. Connexion en cours...');
+        this.timeout = setTimeout(() => this.logIn(), 2000)
       } catch (e) {
-        NotifyNegative('Erreur, si le problème persiste, contactez le support technique');
+        NotifyNegative('Erreur, si le problème persiste, contactez le support technique.');
         console.error(e.response);
       }
     },

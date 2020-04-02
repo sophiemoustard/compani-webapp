@@ -6,7 +6,7 @@ import { AUXILIARY, SECTOR, PERSON, CUSTOMER } from '@data/constants';
 
 export const fillFilter = async ({ commit }, { loggedUser, roleToSearch }) => {
   const rawPromises = [];
-  let elems = [];
+  const elems = [];
   rawPromises.push(Sectors.list());
 
   if (roleToSearch === AUXILIARY) rawPromises.push(Users.listWithSectorHistories({ company: loggedUser.company._id }));

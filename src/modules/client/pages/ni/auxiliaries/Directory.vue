@@ -26,7 +26,7 @@
       </template>
     </ni-table-list>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
-      @click="auxiliaryCreationModal = true" />
+      @click="auxiliaryCreationModal = true" :disable="tableLoading" />
 
     <!-- User creation modal -->
     <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm">
@@ -42,7 +42,7 @@
       <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
         caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
       <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError" required-field />
+        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
       <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
         @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
         :error="$v.newUser.contact.address.$error" in-modal />
@@ -68,11 +68,9 @@
 </template>
 
 <script>
-import randomize from 'randomatic';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
-import ActivationCode from '@api/ActivationCode';
 import Roles from '@api/Roles';
 import Twilio from '@api/Twilio';
 import Users from '@api/Users';
@@ -85,6 +83,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { taskValidation } from 'src/modules/client/helpers/taskValidation';
@@ -120,7 +119,7 @@ export default {
           address: { fullAddress: '' },
           phone: '',
         },
-        local: { email: '', password: '' },
+        local: { email: '' },
         sector: null,
         administrative: {
           transportInvoice: { transportType: 'public' },
@@ -243,22 +242,6 @@ export default {
       }
       return '';
     },
-    zipCodeError () {
-      if (!this.$v.newUser.contact.zipCode.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newUser.contact.zipCode.frZipCode || !this.$v.newUser.contact.zipCode.maxLength) {
-        return 'Code postal non valide';
-      }
-      return '';
-    },
-    emailError () {
-      if (!this.$v.newUser.local.email.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.newUser.local.email.email) {
-        return 'Email non valide';
-      }
-      return '';
-    },
   },
   methods: {
     updateSearch (value) {
@@ -274,7 +257,7 @@ export default {
       const formattedUser = {
         auxiliary: {
           _id: user._id,
-          name: `${user.identity.firstname} ${user.identity.lastname}`,
+          name: formatIdentity(user.identity, 'FL'),
           picture: user.picture ? user.picture.link : null,
         },
         startDate: user.createdAt,
@@ -319,7 +302,7 @@ export default {
 
       const payload = {
         ...cloneDeep(this.newUser),
-        local: { password: randomize('*', 10), email: this.newUser.local.email },
+        local: { email: this.newUser.local.email },
         role: roles[0]._id,
       };
       if (!get(payload, 'contact.address.fullAddress')) delete payload.contact.address;
@@ -337,14 +320,15 @@ export default {
       return newUser;
     },
     async sendSms (user) {
-      if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration');
+      if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
 
-      const activationCode = await ActivationCode.create({ user });
+      const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
       await Twilio.sendSMS({
-        to: `+33${this.newUser.contact.phone.substring(1)}`,
-        body: `${this.company.tradeName}. Bienvenue ! :)\nUtilise ce code: ${activationCode.code} pour pouvoir ` +
-          'commencer ton enregistrement sur Compani avant ton intégration: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/enterCode :-)`,
+        to: `+33${user.contact.phone.substring(1)}`,
+        body: `${this.company.tradeName}. Bienvenue ! :)\nPour pouvoir ` +
+          'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
+          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)\n` +
+          `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`,
       });
       NotifyPositive('SMS bien envoyé');
     },
@@ -357,15 +341,15 @@ export default {
 
         const userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(userCreated._id);
+          await this.sendSms(userCreated);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
         this.auxiliaryCreationModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant');
-        NotifyNegative('Erreur lors de la création de la fiche auxiliaire');
+        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant.');
+        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
       } finally {
         this.loading = false;
       }

@@ -201,7 +201,7 @@ export const planningActionMixin = {
       return payload;
     },
     getCreationPayload (event) {
-      let payload = this.getPayload(event);
+      const payload = this.getPayload(event);
 
       if (event.address && !event.address.fullAddress) delete payload.address;
       if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
@@ -254,8 +254,8 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
-        NotifyNegative('Erreur lors de la création de l\'évènement');
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('La création de cet évènement n\'est pas autorisée.');
+        NotifyNegative('Erreur lors de la création de l\'évènement.');
       } finally {
         this.loading = false;
       }
@@ -289,7 +289,7 @@ export const planningActionMixin = {
             cancel: 'Annuler',
           })
             .onOk(this.createEvent)
-            .onCancel(() => NotifyPositive('Création annulée'));
+            .onCancel(() => NotifyPositive('Création annulée.'));
         } else if (this.newEvent.auxiliary && get(this.newEvent, 'repetition.frequency', '') !== NEVER) {
           this.$q.dialog({
             title: 'Confirmation',
@@ -298,20 +298,20 @@ export const planningActionMixin = {
             cancel: 'Annuler',
           })
             .onOk(this.createEvent)
-            .onCancel(() => NotifyPositive('Création annulée'));
+            .onCancel(() => NotifyPositive('Création annulée.'));
         } else {
           await this.createEvent();
         }
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('La creation de cet evenement n\'est pas autorisée');
-        NotifyNegative('Erreur lors de la création de l\'évènement');
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('La création de cet évènement n\'est pas autorisée.');
+        NotifyNegative('Erreur lors de la création de l\'évènement.');
       }
     },
     // Event edition
     openEditionModal (event) {
       const can = this.canEditEvent(event);
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
       this.formatEditedEvent(event);
 
       this.editionModal = true;
@@ -334,7 +334,7 @@ export const planningActionMixin = {
       const dates = { startDate, endDate };
 
       switch (event.type) {
-        case INTERVENTION:
+        case INTERVENTION: {
           const subscription = event.subscription._id;
           this.editedEvent = {
             isCancelled: false,
@@ -350,6 +350,7 @@ export const planningActionMixin = {
             address,
           };
           break;
+        }
         case INTERNAL_HOUR:
           this.editedEvent = {
             address: address || {},
@@ -361,13 +362,7 @@ export const planningActionMixin = {
           };
           break;
         case ABSENCE:
-          this.editedEvent = {
-            address: {},
-            attachment: {},
-            ...eventData,
-            auxiliary: auxiliary._id,
-            dates,
-          };
+          this.editedEvent = { address: {}, attachment: {}, ...eventData, auxiliary: auxiliary._id, dates };
           break;
         case UNAVAILABILITY:
           this.editedEvent = { shouldUpdateRepetition: false, ...eventData, auxiliary: auxiliary._id, dates };
@@ -399,7 +394,7 @@ export const planningActionMixin = {
       this.editionModal = false;
     },
     getEditionPayload (event) {
-      let payload = this.getPayload(event);
+      const payload = this.getPayload(event);
 
       if (event.cancel && Object.keys(event.cancel).length === 0) delete payload.cancel;
       if (event.attachment && Object.keys(event.attachment).length === 0) delete payload.attachment;
@@ -435,14 +430,14 @@ export const planningActionMixin = {
 
         await this.refresh();
         this.editionModal = false;
-        NotifyPositive('Évènement modifié');
+        NotifyPositive('Évènement modifié.');
       } catch (e) {
         console.error(e)
         if (e.data && e.data.statusCode === 422) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Cette modification n\'est pas autorisée');
+          return NotifyNegative('Cette modification n\'est pas autorisée.');
         }
-        NotifyNegative('Erreur lors de l\'édition de l\'évènement');
+        NotifyNegative('Erreur lors de la modification de l\'évènement.');
       } finally {
         this.loading = false;
       }
@@ -489,9 +484,9 @@ export const planningActionMixin = {
         await Events.updateById(draggedObject._id, payload);
         await this.refresh();
 
-        NotifyPositive('Évènement modifié');
+        NotifyPositive('Évènement modifié.');
       } catch (e) {
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée');
+        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée.');
       }
     },
     // Event files
@@ -511,16 +506,16 @@ export const planningActionMixin = {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(driveId))
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async deleteDocument (driveId) {
       try {
         await Gdrive.removeFileById({ id: driveId });
         if (this.creationModal) this.newEvent.attachment = {};
         if (this.editionModal) this.editedEvent.attachment = {};
-        NotifyPositive('Document supprimé');
+        NotifyPositive('Document supprimé.');
       } catch (e) {
-        return NotifyPositive('Suppression annulée');
+        return NotifyPositive('Suppression annulée.');
       }
     },
     // Event deletion
@@ -531,7 +526,7 @@ export const planningActionMixin = {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteEvent)
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async deleteEvent () {
       try {
@@ -562,8 +557,8 @@ export const planningActionMixin = {
         NotifyPositive('Évènement supprimé.');
       } catch (e) {
         console.error(e);
-        if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements');
-        else NotifyNegative('Erreur lors de la suppression de l\'évènement');
+        if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements.');
+        else NotifyNegative('Erreur lors de la suppression de l\'évènement.');
       } finally {
         this.loading = false;
       }
@@ -584,7 +579,7 @@ export const planningActionMixin = {
             ],
           },
         }).onOk(this.deleteEventRepetition)
-          .onCancel(() => NotifyPositive('Suppression annulée'));
+          .onCancel(() => NotifyPositive('Suppression annulée.'));
       } catch (e) {
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {

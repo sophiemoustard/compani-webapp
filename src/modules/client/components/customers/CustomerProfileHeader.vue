@@ -62,7 +62,7 @@ export default {
         this.$router.push({ name: 'customers directory' });
       } catch (e) {
         console.error(e);
-        if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire');
+        if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire.');
       }
     },
     validateCustomerDeletion () {

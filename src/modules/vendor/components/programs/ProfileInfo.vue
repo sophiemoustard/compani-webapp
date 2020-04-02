@@ -1,8 +1,8 @@
 <template>
-  <div v-if="course">
+  <div v-if="program">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Nom" v-model.trim="course.name" @focus="saveTmp('name')" @blur="updateCourse('name')" />
+        <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')" />
       </div>
     </div>
   </div>
@@ -13,12 +13,12 @@ import { mapGetters } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import Courses from '@api/Courses';
+import Programs from '@api/Programs';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
 export default {
-  name: 'ProfileProgram',
+  name: 'ProfileInfo',
   props: {
     profileId: { type: String },
   },
@@ -27,42 +27,42 @@ export default {
   },
   validations () {
     return {
-      course: { name: { required } },
+      program: { name: { required } },
     }
   },
   computed: {
-    ...mapGetters({ course: 'course/getCourse' }),
+    ...mapGetters({ program: 'program/getProgram' }),
   },
   async mounted () {
-    if (!this.course) await this.refreshCourse();
+    if (!this.program) await this.refreshProgram();
   },
   methods: {
     saveTmp (path) {
-      this.tmpInput = get(this.course, path)
+      this.tmpInput = get(this.program, path)
     },
-    async refreshCourse () {
+    async refreshProgram () {
       try {
-        await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
+        await this.$store.dispatch('program/getProgram', { programId: this.profileId });
       } catch (e) {
         console.error(e);
       }
     },
-    async updateCourse (path) {
+    async updateProgram (path) {
       try {
-        let value = get(this.course, path);
+        const value = get(this.program, path);
         if (this.tmpInput === value) return;
-        this.$v.course.$touch();
-        if (this.$v.course.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.program.$touch();
+        if (this.$v.program.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = set({}, path, value);
-        await Courses.update(this.profileId, payload);
-        NotifyPositive('Modification enregistrée');
+        await Programs.update(this.profileId, payload);
+        NotifyPositive('Modification enregistrée.');
 
-        await this.refreshCourse();
+        await this.refreshProgram();
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification');
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
       }

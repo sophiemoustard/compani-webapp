@@ -5,7 +5,7 @@
     <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @goTo="goToTrainerProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un formateur"
-      @click="trainerCreationModal = true" />
+      @click="trainerCreationModal = true" :disable="tableLoading" />
 
     <!-- Trainer creation modal -->
     <ni-modal v-model="trainerCreationModal" @hide="resetCreationModal">
@@ -28,7 +28,6 @@
 </template>
 
 <script>
-import randomize from 'randomatic';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import Users from '@api/Users';
@@ -99,7 +98,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.trainers = [];
-        NotifyNegative('Erreur lors de la récupération des formateurs');
+        NotifyNegative('Erreur lors de la récupération des formateurs.');
       } finally {
         this.tableLoading = false;
       }
@@ -111,7 +110,6 @@ export default {
         const roles = await Roles.list({ name: TRAINER });
         if (roles.length === 0) throw new Error('Role not found');
 
-        this.newTrainer.local.password = randomize('*', 10);
         await Users.create({ ...this.newTrainer, role: roles[0]._id });
 
         this.trainerCreationModal = false;
