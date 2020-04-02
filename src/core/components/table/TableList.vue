@@ -48,6 +48,6 @@ export default {
 
 <style lang="stylus" scoped>
 /deep/ .q-inner-loading {
-  opacity: 0.6;
+  transition: none;
 }
 </style>

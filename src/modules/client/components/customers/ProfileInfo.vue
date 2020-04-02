@@ -699,10 +699,22 @@ export default {
     };
   },
   async mounted () {
+    this.quotesLoading = true;
+    this.mandatesLoading = true;
+    this.subscriptionsLoading = true;
+    this.helpersLoading = true;
+    this.fundingsLoading = true;
+
     await this.getUserHelpers();
     await this.refreshCustomer();
     await this.getServices();
+
     this.isLoaded = true;
+    this.quotesLoading = false;
+    this.mandatesLoading = false;
+    this.subscriptionsLoading = false;
+    this.helpersLoading = false;
+    this.fundingsLoading = false;
   },
   methods: {
     customerIdentity () {

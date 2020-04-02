@@ -782,10 +782,18 @@ export default {
     },
   },
   async mounted () {
+    this.surchargesLoading = true;
+    this.tppsLoading = true;
+    this.servicesLoading = true;
+
     await this.refreshCompany();
     await this.refreshSurcharges();
     await this.refreshServices();
     await this.refreshThirdPartyPayers();
+
+    this.surchargesLoading = false;
+    this.tppsLoading = false;
+    this.servicesLoading = false;
   },
   methods: {
     getServiceLastVersion (service) {

@@ -200,7 +200,9 @@ export default {
   },
   async mounted () {
     if (!this.company) await this.refreshCompany();
+    this.usersLoading = true;
     await this.getUsers();
+    this.usersLoading = false;
   },
   methods: {
     saveTmp (path) {

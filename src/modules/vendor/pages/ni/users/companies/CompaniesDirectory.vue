@@ -92,11 +92,14 @@ export default {
     },
     async refreshCompanies () {
       try {
+        this.tableLoading = true;
         this.companies = await Companies.list();
       } catch (e) {
         console.error(e);
         this.companies = [];
         NotifyNegative('Erreur lors de la récupération des structures.');
+      } finally {
+        this.tableLoading = false;
       }
     },
     resetCreationModal () {

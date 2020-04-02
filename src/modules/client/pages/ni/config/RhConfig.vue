@@ -365,9 +365,17 @@ export default {
     this.company = cloneDeep(this.loggedUser.company);
     if (!this.company.rhConfig.templates) this.company.rhConfig.templates = {};
 
+    this.internalHoursLoading = true;
+    this.administrativeDocumentsLoading = true;
+    this.sectorsLoading = true;
+
     await this.refreshInternalHours();
     await this.getSectors();
     await this.getAdministrativeDocuments();
+
+    this.internalHoursLoading = false;
+    this.administrativeDocumentsLoading = false;
+    this.sectorsLoading = false;
   },
   methods: {
     get,

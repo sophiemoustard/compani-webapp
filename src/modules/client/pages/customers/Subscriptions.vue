@@ -255,6 +255,8 @@ export default {
     },
   },
   async mounted () {
+    this.mandatesLoading = true;
+    this.subscriptionsLoading = true;
     if (!this.customer) await this.refreshCustomer();
     else {
       this.refreshSubscriptions(this.customer);
@@ -262,6 +264,8 @@ export default {
       await this.checkMandates();
       this.$v.customer.$touch();
     }
+    this.mandatesLoading = false;
+    this.subscriptionsLoading = false;
   },
   methods: {
     documentUploadedForFinancialCertificates () {

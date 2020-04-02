@@ -33,7 +33,7 @@ export default {
   },
   data () {
     return {
-      tableLoading: true,
+      tableLoading: false,
       userList: [],
       searchStr: '',
       activeUsers: true,
@@ -82,6 +82,7 @@ export default {
     },
     async getUserList () {
       try {
+        this.tableLoading = true;
         const params = { role: [AUXILIARY, PLANNING_REFERENT] };
         const companyId = get(this.loggedUser, 'company._id', null);
         if (companyId) params.company = companyId;
@@ -93,10 +94,10 @@ export default {
           },
           phone: get(user, 'contact.phone') || '',
         }));
-        this.tableLoading = false;
       } catch (e) {
-        this.tableLoading = false;
         console.error(e);
+      } finally {
+        this.tableLoading = false;
       }
     },
     getAvatar (link) {
