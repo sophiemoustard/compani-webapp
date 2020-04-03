@@ -45,7 +45,6 @@ export default {
 
 <style lang="stylus" scoped>
 /deep/ .q-inner-loading {
-  transition: none;
   background: white;
 }
 </style>

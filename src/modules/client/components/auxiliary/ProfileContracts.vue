@@ -269,11 +269,11 @@ export default {
     },
   },
   async mounted () {
-    this.contractsLoading = true;
-    await this.refreshUser();
-    await this.refreshContracts();
-    await this.getCustomersWithCustomerContractSubscriptions();
-    this.contractsLoading = false;
+    await Promise.all([
+      this.refreshUser(),
+      this.refreshContracts(),
+      this.getCustomersWithCustomerContractSubscriptions(),
+    ]);
   },
   methods: {
     getContractTemplate (contract) {

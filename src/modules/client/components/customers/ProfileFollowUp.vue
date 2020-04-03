@@ -218,17 +218,10 @@ export default {
     },
   },
   async mounted () {
-    this.followUpLoading = true;
-    this.fundingsLoading = true;
-    this.helpersLoading = true;
-    await this.refreshCustomer();
-    const promises = [this.getUserHelpers(), this.getAuxiliaries()];
+    const promises = [this.refreshCustomer(), this.getUserHelpers(), this.getAuxiliaries()];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
     if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
     await Promise.all(promises);
-    this.followUpLoading = false;
-    this.fundingsLoading = false;
-    this.helpersLoading = false;
   },
   methods: {
     getAuxiliaryAvatar (picture) {

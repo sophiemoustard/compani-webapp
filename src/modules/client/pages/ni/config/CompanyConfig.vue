@@ -276,10 +276,7 @@ export default {
     },
   },
   async mounted () {
-    this.establishmentsLoading = true;
-    await this.refreshCompany();
-    await this.getEstablishments();
-    this.establishmentsLoading = false;
+    await Promise.all([this.refreshCompany(), this.getEstablishments()]);
   },
   methods: {
     async refreshCompany () {
