@@ -5,14 +5,17 @@
         <p class="text-weight-bold">Pratique</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Accès / codes" v-model="customer.contact.accessCodes" @focus="saveTmp('contact.accessCodes')"
-          @blur="updateCustomer('contact.accessCodes')" />
-        <ni-input v-if="isAuxiliary" caption="Téléphone" v-model.trim="customer.contact.phone"
-          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress"
           color="white" disable />
         <ni-search-address v-if="isAuxiliary && hasSecondaryAddress" caption='Adresse secondaire'
           v-model="customer.contact.secondaryAddress" color="white" disable />
+        <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes" @focus="saveTmp('contact.accessCodes')"
+          @blur="updateCustomer('contact.accessCodes')" />
+        <ni-input v-if="isAuxiliary" type="tel" :error="$v.customer.contact.phone.$error"
+          error-label="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
+          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
+        <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
+          @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" type="textarea" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -105,6 +108,7 @@ import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative } from '@components/popup/notify.js';
 import SimpleTable from '@components/table/SimpleTable';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatHours } from '@helpers/utils.js';
 import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
@@ -178,6 +182,13 @@ export default {
         },
       ],
     };
+  },
+  validations: {
+    customer: {
+      contact: {
+        phone: { frPhoneNumber },
+      },
+    },
   },
   computed: {
     auxiliaryAvatar () {
@@ -276,6 +287,7 @@ export default {
         if (!get(customer, 'followUp')) customer.followUp = {};
 
         this.$store.commit('customer/saveCustomer', customer);
+        this.$v.customer.$touch();
         this.isLoaded = true;
       } catch (e) {
         console.error(e);

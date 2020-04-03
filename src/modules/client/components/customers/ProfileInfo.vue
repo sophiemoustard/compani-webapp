@@ -21,14 +21,17 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Téléphone" v-model.trim="customer.contact.phone"
-          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-search-address v-model="customer.contact.primaryAddress" :error-label="primaryAddressError"
           :error="$v.customer.contact.primaryAddress.$error" caption="Adresse principale"
           @focus="saveTmp('contact.primaryAddress.fullAddress')" @blur="updateCustomer('contact.primaryAddress')" />
         <ni-search-address v-model="customer.contact.secondaryAddress" caption="Adresse secondaire"
           error-label="Adresse non valide" :error="$v.customer.contact.secondaryAddress.$error"
           @focus="saveTmp('contact.secondaryAddress.fullAddress')" @blur="updateCustomer('contact.secondaryAddress')" />
+        <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
+          :error-label="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
+          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
+        <ni-input caption="Compléments" v-model="customer.contact.others"
+          @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" type="textarea" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -640,6 +643,7 @@ export default {
           title: { required },
         },
         contact: {
+          phone: { frPhoneNumber },
           primaryAddress: {
             zipCode: { required },
             street: { required },
