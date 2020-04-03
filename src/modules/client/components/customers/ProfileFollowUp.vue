@@ -218,8 +218,7 @@ export default {
     },
   },
   async mounted () {
-    await this.refreshCustomer();
-    const promises = [this.getUserHelpers(), this.getAuxiliaries()];
+    const promises = [this.refreshCustomer(), this.getUserHelpers(), this.getAuxiliaries()];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
     if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
     await Promise.all(promises);

@@ -782,10 +782,12 @@ export default {
     },
   },
   async mounted () {
-    await this.refreshCompany();
-    await this.refreshSurcharges();
-    await this.refreshServices();
-    await this.refreshThirdPartyPayers();
+    await Promise.all([
+      this.refreshCompany(),
+      this.refreshSurcharges(),
+      this.refreshServices(),
+      this.refreshThirdPartyPayers(),
+    ]);
   },
   methods: {
     getServiceLastVersion (service) {

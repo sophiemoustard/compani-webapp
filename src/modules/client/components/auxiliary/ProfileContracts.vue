@@ -269,9 +269,11 @@ export default {
     },
   },
   async mounted () {
-    await this.refreshUser();
-    await this.refreshContracts();
-    await this.getCustomersWithCustomerContractSubscriptions();
+    await Promise.all([
+      this.refreshUser(),
+      this.refreshContracts(),
+      this.getCustomersWithCustomerContractSubscriptions(),
+    ]);
   },
   methods: {
     getContractTemplate (contract) {

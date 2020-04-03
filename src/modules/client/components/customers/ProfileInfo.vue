@@ -699,9 +699,7 @@ export default {
     };
   },
   async mounted () {
-    await this.getUserHelpers();
-    await this.refreshCustomer();
-    await this.getServices();
+    await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices()]);
     this.isLoaded = true;
   },
   methods: {

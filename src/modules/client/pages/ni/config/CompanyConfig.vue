@@ -276,8 +276,7 @@ export default {
     },
   },
   async mounted () {
-    await this.refreshCompany();
-    await this.getEstablishments();
+    await Promise.all([this.refreshCompany(), this.getEstablishments()]);
   },
   methods: {
     async refreshCompany () {

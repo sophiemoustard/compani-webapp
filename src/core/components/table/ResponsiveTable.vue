@@ -1,30 +1,30 @@
 <template>
-  <q-table :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" hide-bottom binary-state-sort
-    :visible-columns="visibleColumns" flat :separator="separator" :rows-per-page-options="rowsPerPageOptions"
-    class="table-responsive q-pa-sm" v-on="$listeners" :loading="loading">
-    <template v-slot:header="props">
-      <slot name="header" :props="props">
-        <q-tr :props="props">
-          <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
-        </q-tr>
-      </slot>
-    </template>
-    <template v-slot:body="props">
-      <slot name="body" :props="props">
-        <q-tr :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-            :style="col.style">
-            {{ col.value }}
-          </q-td>
-        </q-tr>
-      </slot>
-    </template>
-    <template v-slot:loading>
-      <q-inner-loading showing>
-        <q-spinner-facebook size="30px" color="primary" />
-      </q-inner-loading>
-    </template>
-  </q-table>
+  <div class="relative-position table-spinner-container">
+    <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" hide-bottom binary-state-sort
+      :visible-columns="visibleColumns" flat :separator="separator" :rows-per-page-options="rowsPerPageOptions"
+      class="table-responsive q-pa-sm" v-on="$listeners" :loading="loading">
+      <template v-slot:header="props">
+        <slot name="header" :props="props">
+          <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
+          </q-tr>
+        </slot>
+      </template>
+      <template v-slot:body="props">
+        <slot name="body" :props="props">
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+              :style="col.style">
+              {{ col.value }}
+            </q-td>
+          </q-tr>
+        </slot>
+      </template>
+    </q-table>
+    <q-inner-loading :showing="loading">
+      <q-spinner-facebook size="30px" color="primary" />
+    </q-inner-loading>
+  </div>
 </template>
 
 <script>

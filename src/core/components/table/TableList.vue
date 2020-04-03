@@ -1,30 +1,30 @@
 <template>
-  <q-table :data="data" :columns="columns" :loading="loading" flat :row-key="rowKey" binary-state-sort
-    :pagination="pagination" class="table-list neutral-background" :hide-bottom="pagination.rowsPerPage === 0"
-    :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
-    :visible-columns="formattedVisibleColumns">
-    <template v-slot:body="props">
-      <q-tr :props="props" @click="$emit('goTo', props.row)">
-        <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
-          :class="col.name">
-          <slot name="body" :props="props" :col="col">
-            <template v-if="col.value">{{ col.value }}</template>
-          </slot>
-        </q-td>
-      </q-tr>
-    </template>
-    <template v-slot:no-data="props">
-      <div v-show="!loading" class="full-width row q-gutter-sm">
-        <q-icon :name="props.icon" size="2em" />
-        <span>Pas de données disponibles</span>
-      </div>
-    </template>
-    <template v-slot:loading>
-      <q-inner-loading showing class="neutral-background">
-        <q-spinner-facebook size="30px" color="primary" />
-      </q-inner-loading>
-    </template>
-  </q-table>
+  <div class="relative-position table-spinner-container">
+    <q-table v-if="!loading" :data="data" :columns="columns" flat :row-key="rowKey" binary-state-sort
+      :pagination="pagination" class="table-list neutral-background" :hide-bottom="pagination.rowsPerPage === 0"
+      :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
+      :visible-columns="formattedVisibleColumns">
+      <template v-slot:body="props">
+        <q-tr :props="props" @click="$emit('goTo', props.row)">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
+            :class="col.name">
+            <slot name="body" :props="props" :col="col">
+              <template v-if="col.value">{{ col.value }}</template>
+            </slot>
+          </q-td>
+        </q-tr>
+      </template>
+      <template v-slot:no-data="props">
+        <div v-show="!loading" class="full-width row q-gutter-sm">
+          <q-icon :name="props.icon" size="2em" />
+          <span>Pas de données disponibles</span>
+        </div>
+      </template>
+    </q-table>
+    <q-inner-loading :showing="loading">
+      <q-spinner-facebook size="30px" color="primary" />
+    </q-inner-loading>
+  </div>
 </template>
 
 <script>
@@ -45,9 +45,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-/deep/ .q-inner-loading {
-  opacity: 0.6;
-}
-</style>
