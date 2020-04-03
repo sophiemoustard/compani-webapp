@@ -5,3 +5,15 @@ branches:
   - dev
 before_install:
   - npm i -g cypress
+addons:
+  apt:
+    packages:
+      - libgconf-2-4
+cache:
+  npm: true
+  directories:
+    - ~/.cache
+install:
+  - npm ci
+script:
+  - npm run test:e2e:ci
