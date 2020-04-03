@@ -19,7 +19,7 @@ Vue.use(VueMeta);
 
 const Router = new VueRouter({
   scrollBehavior: () => ({ y: 0 }),
-  routes: [...routes, ...vendorRoutes, ...clientRoutes],
+  routes: [...clientRoutes, ...vendorRoutes, ...routes], // routes needs to be at the end of array cf. /src/router/routes.js
 
   mode: process.env.VUE_ROUTER_MODE,
   base: process.env.VUE_ROUTER_BASE,
