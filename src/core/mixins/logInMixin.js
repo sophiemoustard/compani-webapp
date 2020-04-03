@@ -16,7 +16,7 @@ export const logInMixin = {
       await this.$store.dispatch('main/getLoggedUser', this.$q.cookies.get('user_id'));
 
       if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
-      return this.$router.push('/').catch(e => {});
+      return this.$router.replace('/').catch(e => {});
     },
   },
 }
