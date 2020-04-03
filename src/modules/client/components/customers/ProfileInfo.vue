@@ -30,8 +30,8 @@
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
           :error-label="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
-        <ni-input caption="Compléments" v-model="customer.contact.others"
-          @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" type="textarea" />
+        <ni-input caption="Compléments" v-model="customer.contact.others" @blur="updateCustomer('contact.others')"
+          @focus="saveTmp('contact.others')" />
       </div>
     </div>
     <div class="q-mb-xl">
