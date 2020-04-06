@@ -14,12 +14,13 @@
         </q-item-section>
         <q-item-section class="course-link">Page info formation</q-item-section>
       </q-item>
-      <q-item>
-        <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="link" flat dense />
-        </q-item-section>
-        <q-item-section color="primary">Obtenir un lien de partage</q-item-section>
-      </q-item>
+      <div class="course-link-share">
+        <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
+        <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
+          color="primary">
+          Obtenir un lien de partage
+        </div>
+      </div>
     </div>
     <q-item>
       <q-item-section side>
@@ -69,8 +70,24 @@ export default {
 <style lang="stylus" scoped>
 .course-link
   @media screen and (min-width: 1025px)
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    display: flex
+    flex-direction: row
+    align-items: center
     justify-content: left
+  &-share
+    display: flex
+    flex-direction: row
+    align-items: center
+    @media screen and (max-width: 1024px)
+      padding: 0 0 10px 55px
+    &-label
+      cursor: pointer
+      color: $primary
+      text-decoration underline
+      font-size: 14px
+      @media screen and (max-width: 767px)
+        font-size: 12px
+      &-disabled
+        opacity: 0.7 !important;
+        cursor: not-allowed !important
 </style>
