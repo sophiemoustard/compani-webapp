@@ -322,6 +322,7 @@ export default {
   },
   async mounted () {
     if (!this.course) await this.refreshCourse();
+    else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
     await this.refreshTrainers();
   },
   methods: {
