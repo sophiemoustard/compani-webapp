@@ -22,6 +22,9 @@
             @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
           <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
             v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
+          <ni-input caption="Support facturation" :error="$v.company.billingAssistance.$error"
+            :error-label="billingAssistanceError" v-model.trim="company.billingAssistance"
+            @focus="saveTmp('billingAssistance')" @blur="updateCompany('billingAssistance')" />
         </div>
       </div>
       <div class="q-mb-xl">
