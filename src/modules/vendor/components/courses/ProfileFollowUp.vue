@@ -7,20 +7,20 @@
         {{ followUpMissinInfo.join(', ') }}.
       </div>
     </q-banner>
-    <q-item>
-      <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="info" flat dense />
-      </q-item-section>
-      <q-item-section class="course-link">
-        <div>Page info formation</div>
-        <q-item class="row q-ml-md">
-          <q-item-section side>
-            <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="link" flat dense />
-          </q-item-section>
-          <q-item-section color="primary">Obtenir un lien de partage</q-item-section>
-        </q-item>
-      </q-item-section>
-    </q-item>
+    <div class="course-link">
+      <q-item>
+        <q-item-section side>
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="info" flat dense />
+        </q-item-section>
+        <q-item-section class="course-link">Page info formation</q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="link" flat dense />
+        </q-item-section>
+        <q-item-section color="primary">Obtenir un lien de partage</q-item-section>
+      </q-item>
+    </div>
     <q-item>
       <q-item-section side>
         <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="mdi-cellphone-message" flat dense />
@@ -68,9 +68,10 @@ export default {
 
 <style lang="stylus" scoped>
 .course-link
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: left
+  @media screen and (min-width: 1025px)
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left
 
 </style>
