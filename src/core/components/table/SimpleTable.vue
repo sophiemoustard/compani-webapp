@@ -2,7 +2,7 @@
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination" class="neutral-background"
       :hide-bottom="pagination.rowsPerPage === 0" :visible-columns="visibleColumns" :rows-per-page-options="[]"
-      v-on="$listeners" :loading="loading">
+      v-on="$listeners">
       <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
         <slot name="top-row" :props="props" />
       </template>
@@ -20,6 +20,7 @@
         <slot name="bottom-row" :props="props" />
       </template>
     </q-table>
+    <div v-else class="loading-container" />
     <q-inner-loading :showing="loading">
       <q-spinner-facebook size="30px" color="primary" />
     </q-inner-loading>

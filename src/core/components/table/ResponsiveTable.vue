@@ -1,8 +1,8 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" hide-bottom binary-state-sort
-      :visible-columns="visibleColumns" flat :separator="separator" :rows-per-page-options="rowsPerPageOptions"
-      class="table-responsive q-pa-sm" v-on="$listeners" :loading="loading">
+    <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination" hide-bottom
+      binary-state-sort :visible-columns="visibleColumns" flat :separator="separator"
+      :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm" v-on="$listeners">
       <template v-slot:header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
@@ -21,6 +21,7 @@
         </slot>
       </template>
     </q-table>
+    <div v-else class="loading-container" />
     <q-inner-loading :showing="loading">
       <q-spinner-facebook size="30px" color="primary" />
     </q-inner-loading>
