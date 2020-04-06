@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="card-container">
     <q-card v-for="(contract, contractIndex) in sortedContracts" :key="contractIndex" class="contract-card">
       <q-card-section class="card-title" :style="{ color: cardTitle(contract.endDate).color }">
         {{ cardTitle(contract.endDate).msg }}
@@ -330,6 +330,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .card-container
+    width: 100%
+
   .contract-card
     background: white
     width: 100%
