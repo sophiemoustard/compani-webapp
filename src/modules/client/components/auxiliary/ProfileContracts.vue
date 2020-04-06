@@ -269,9 +269,18 @@ export default {
     },
   },
   async mounted () {
-    await this.refreshUser();
-    await this.refreshContracts();
-    await this.getCustomersWithCustomerContractSubscriptions();
+    try {
+      this.contractsLoading = true;
+      await this.refreshUser();
+      await Promise.all([
+        this.refreshContracts(),
+        this.getCustomersWithCustomerContractSubscriptions(),
+      ]);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      this.contractsLoading = false;
+    }
   },
   methods: {
     getContractTemplate (contract) {

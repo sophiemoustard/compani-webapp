@@ -104,7 +104,7 @@ export default {
   mixins: [validationMixin, userMixin],
   data () {
     return {
-      tableLoading: true,
+      tableLoading: false,
       loading: false,
       auxiliaryCreationModal: false,
       sendWelcomeMsg: true,
@@ -281,6 +281,7 @@ export default {
     },
     async getUserList () {
       try {
+        this.tableLoading = true;
         const users = await Users.list({ role: AUXILIARY_ROLES, company: this.loggedUser.company._id });
         this.userList = users.map(this.formatUser);
       } catch (e) {

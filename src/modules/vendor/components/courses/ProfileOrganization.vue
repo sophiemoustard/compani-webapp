@@ -487,8 +487,9 @@ export default {
         this.traineeCreationModal = false;
         await this.refreshCourse();
       } catch (e) {
-        console.error(e)
-        NotifyNegative("Erreur lors de l'ajout du stagiaire.");
+        console.error(e);
+        if (e.status === 409) return NotifyNegative('Ce stagiaire n\'est pas relié à la structure de la formation');
+        NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
         this.loading = false;
       }
@@ -516,7 +517,7 @@ export default {
         NotifyPositive('Stagiaire modifié.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification du stagiaire');
+        NotifyNegative('Erreur lors de la modification du stagiaire.');
       } finally {
         this.loading = false;
       }
@@ -524,7 +525,7 @@ export default {
     validateTraineeDeletion (traineeId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce stagiaire de la formation ?',
+        message: 'Es-tu sûr(e) de vouloir retirer ce stagiaire de la formation ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteTrainee(traineeId))

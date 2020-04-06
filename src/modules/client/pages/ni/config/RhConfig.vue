@@ -365,9 +365,11 @@ export default {
     this.company = cloneDeep(this.loggedUser.company);
     if (!this.company.rhConfig.templates) this.company.rhConfig.templates = {};
 
-    await this.refreshInternalHours();
-    await this.getSectors();
-    await this.getAdministrativeDocuments();
+    await Promise.all([
+      this.refreshInternalHours(),
+      this.getSectors(),
+      this.getAdministrativeDocuments(),
+    ]);
   },
   methods: {
     get,

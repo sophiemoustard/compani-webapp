@@ -75,7 +75,7 @@ export default {
   data () {
     return {
       userCreated: null,
-      tableLoading: true,
+      tableLoading: false,
       loading: false,
       customerCreationModal: false,
       sendWelcomeMsg: true,
@@ -193,12 +193,13 @@ export default {
     },
     async getCustomers () {
       try {
+        this.tableLoading = true;
         this.customers = await Customers.list();
-        this.tableLoading = false;
       } catch (e) {
         this.customers = [];
-        this.tableLoading = false;
         console.error(e);
+      } finally {
+        this.tableLoading = false;
       }
     },
     async getCustomersFirstIntervention () {
