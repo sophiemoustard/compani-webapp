@@ -20,6 +20,7 @@
         <slot name="bottom-row" :props="props" />
       </template>
     </q-table>
+    <div v-else class="loading-container" />
     <q-inner-loading :showing="loading">
       <q-spinner-facebook size="30px" color="primary" />
     </q-inner-loading>

@@ -43,8 +43,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-.loading-container
-  height: 30px;
-</style>
