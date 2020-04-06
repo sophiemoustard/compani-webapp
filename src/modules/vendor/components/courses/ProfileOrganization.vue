@@ -2,7 +2,7 @@
   <div v-if="course">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Nom de la session" v-model.trim="course.name" @focus="saveTmp('name')"
+        <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" />
         <ni-select caption="Formateur" v-model.trim="course.trainer" @focus="saveTmp('trainer')"
           @blur="updateCourse('trainer')" :options="trainerOptions" />
@@ -322,6 +322,7 @@ export default {
   },
   async mounted () {
     if (!this.course) await this.refreshCourse();
+    else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
     await this.refreshTrainers();
   },
   methods: {
