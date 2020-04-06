@@ -527,14 +527,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  .q-banner
-    background-color: $grey
-    /deep/ .q-banner__content
-      display: flex;
-      align-items: center
-      .q-icon
-        margin-right: 5px
-
-</style>
