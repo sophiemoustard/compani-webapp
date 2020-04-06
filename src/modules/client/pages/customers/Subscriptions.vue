@@ -166,6 +166,7 @@ export default {
       tmpInput: null,
       newESignModal: false,
       embeddedUrl: '',
+      mandatesLoading: true,
       mandatesColumns: [
         {
           name: 'rum',
@@ -248,10 +249,12 @@ export default {
       }
     },
     isValidPayment () {
-      return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban
+      return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban;
     },
     docsUploadUrl () {
-      return this.customer.driveFolder ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload` : '';
+      return this.customer.driveFolder
+        ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`
+        : '';
     },
   },
   async mounted () {
@@ -272,9 +275,10 @@ export default {
         this.mandatesLoading = true;
         const customer = await Customers.getById(this.helper.customers[0]._id);
         this.$store.commit('customer/saveCustomer', customer);
+
         this.refreshSubscriptions(this.customer);
         this.refreshFundings(this.customer);
-        await this.checkMandates();
+
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
@@ -391,12 +395,12 @@ export default {
         if (this.customer.payment.mandates.length === 0) return;
         const mandates = this.customer.payment.mandates.filter(mandate => !mandate.drive && mandate.everSignId);
         if (mandates.length === 0) return;
+
         for (const mandate of mandates) {
           const hasSigned = await this.hasSignedDoc(mandate.everSignId);
-          if (hasSigned) {
-            await Customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
-          }
+          if (hasSigned) await Customers.saveSignedDoc({ _id: this.customer._id, mandateId: mandate._id });
         }
+
         await this.refreshCustomer();
       } catch (e) {
         console.error(e);
