@@ -1,10 +1,10 @@
 <template>
   <div>
-    <q-banner v-if="disabledFollowUp" class="full-width warning" dense>
+    <q-banner v-if="disabledFollowUp" class="full-width warning q-mb-md" dense>
       <q-icon size="sm" name="warning" />
       <div>
         Il manque la ou les information(s) suivante(s) pour assurer le suivi de la formation :
-        {{ followUpMissinInfo.join(', ') }}.
+        {{ followUpMissingInfo.join(', ') }}.
       </div>
     </q-banner>
     <div class="course-link">
@@ -52,12 +52,12 @@ export default {
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
     disabledFollowUp () {
-      return this.followUpMissinInfo.length > 0;
+      return this.followUpMissingInfo.length > 0;
     },
-    followUpMissinInfo () {
+    followUpMissingInfo () {
       const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('le formatteur');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaure(s)');
+      if (!this.course.trainer) missingInfo.push('le formateur');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
 
       return missingInfo;
@@ -73,5 +73,4 @@ export default {
     flex-direction: row;
     align-items: center;
     justify-content: left
-
 </style>
