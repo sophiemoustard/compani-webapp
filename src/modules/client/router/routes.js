@@ -1,6 +1,5 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
-import has from 'lodash/has';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
 import {
@@ -380,7 +379,7 @@ const routes = [
         component: () => import('src/modules/client/pages/customers/Contact'),
         beforeEnter (to, from, next) {
           const loggedUser = store.getters['main/loggedUser'];
-          return has(loggedUser, 'company.billingAssistance') && loggedUser.company.billingAssistance !== ''
+          return get(loggedUser, 'company.billingAssistance')
             ? next()
             : next('/404');
         },

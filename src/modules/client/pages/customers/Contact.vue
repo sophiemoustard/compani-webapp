@@ -17,12 +17,9 @@ export default {
   name: 'Contact',
   metaInfo: { title: 'Contact' },
   async mounted () {
-    if (!this.customer) await this.refreshCustomer();
+    await this.refreshCustomer();
   },
   computed: {
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
     helper () {
       return this.$store.getters['main/loggedUser'];
     },
