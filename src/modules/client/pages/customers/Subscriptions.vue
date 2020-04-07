@@ -2,7 +2,7 @@
   <q-page padding class="neutral-background">
     <template v-if="customer">
       <div class="q-mb-lg">
-        <p class="title">Souscriptions</p>
+        <h4>Abonnement</h4>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
           <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
