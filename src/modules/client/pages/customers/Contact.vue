@@ -11,30 +11,15 @@
 </template>
 
 <script>
-import Customers from '@api/Customers';
-
 export default {
   name: 'Contact',
   metaInfo: { title: 'Contact' },
-  async mounted () {
-    await this.refreshCustomer();
-  },
   computed: {
     helper () {
       return this.$store.getters['main/loggedUser'];
     },
     company () {
       return this.helper.company;
-    },
-  },
-  methods: {
-    async refreshCustomer () {
-      try {
-        const customer = await Customers.getById(this.helper.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
-      } catch (e) {
-        console.error(e);
-      }
     },
   },
 }
