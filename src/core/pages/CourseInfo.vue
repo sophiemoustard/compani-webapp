@@ -1,13 +1,13 @@
 <template>
   <div>
-    <div class="row col-12 course-info-header">
+    <div class="row col-12 course-info-header items-center justify-center">
       <div>Votre formation Compani</div>
     </div>
-    <div class="row q-pa-sm q-mb-lg course-info-title-container">
-      <span class="col-xs-4 col-md-2 course-info-img-container">
+    <div class="row q-pa-sm q-mb-lg course-info-title-container items-center justify-center">
+      <div class="col-xs-4 col-md-2 row items-center justify-center">
         <img class="course-info-img"
           src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/aux-pouce.png">
-      </span>
+      </div>
       <div class="col-xs-8 col-md-10 course-info-title" >
         <h5>{{ course.name }}</h5>
       </div>
@@ -39,16 +39,10 @@ export default {
     background-color: $primary;
     padding: 16px;
     font-size: 20px;
-    align-items: center;
-    justify-content: center;
     color: white;
     font-weight: bold;
   &-title
     border-bottom: 2px solid $grey-3
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
     text-align: center;
     &-container
       margin-top: 20px;
@@ -56,10 +50,6 @@ export default {
     height: auto;
     width: 100px;
     padding-right: 20px;
-    &-container
-      display: flex;
-      justify-content: center;
-      align-items: center;
 
 h5
   color: $primary;
@@ -70,5 +60,5 @@ h5
     padding: 0px 125px;
 
   h5
-    margin: 0px !important;
+    margin-bottom: 20px !important;
 </style>
