@@ -1,4 +1,5 @@
 import { alenviAxios } from '@api/ressources/alenviAxios';
+import axios from 'axios'
 
 export default {
   async list (params) {
@@ -9,7 +10,7 @@ export default {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses`, payload);
   },
   async getById (courseId) {
-    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
+    const course = await axios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
     return course.data.data.course;
   },
   async update (courseId, payload) {
