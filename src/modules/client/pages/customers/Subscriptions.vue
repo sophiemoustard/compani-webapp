@@ -166,7 +166,7 @@ export default {
       tmpInput: null,
       newESignModal: false,
       embeddedUrl: '',
-      mandatesLoading: true,
+      mandatesLoading: false,
       mandatesColumns: [
         {
           name: 'rum',
