@@ -10,7 +10,8 @@ const instance = axios.create({
 
 instance.interceptors.request.use(async function (config) {
   // Ignore routes that don't need automatic token
-  if (config.url.match(/users\/authenticate/i)) {
+  if (config.url.match(/users\/authenticate/i) ||
+    (config.url.match(/courses\/[0-9a-z]{24}/i) && config.method === 'get')) {
     return config;
   }
   if (!Cookies.get('alenvi_token')) {
