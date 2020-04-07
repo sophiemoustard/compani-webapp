@@ -15,7 +15,7 @@ const routes = [
   { path: '/reset-password/:token', component: () => import('src/core/pages/signin/ResetPassword') },
   { path: '/403-pwd', component: () => import('src/core/pages/signin/403') },
   { path: '/docsigned', component: () => import('src/core/pages/DocumentSigned'), props: route => ({ signed: route.query.signed }) },
-  { path: '/courses/:courseId/info', component: () => import('src/core/pages/CourseInfo') },
+  { path: '/trainees/courses/:courseId', component: () => import('src/core/pages/CourseInfo') },
   {
     // Always leave this as last one
     path: '*',
