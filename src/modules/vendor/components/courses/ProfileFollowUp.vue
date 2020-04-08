@@ -44,13 +44,13 @@
     </q-item>
 
     <!-- Modal envoi message -->
-    <ni-modal v-model="opened">
+    <ni-modal v-model="smsModal">
       <template slot="title">
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field
+      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="messageType" required-field
         @input="updateMessage" />
-      <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
+      <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click.native="sendMessage" />
@@ -61,9 +61,7 @@
 
 <script>
 import { mapGetters } from 'vuex'
-import has from 'lodash/has';
 import Courses from '@api/Courses';
-import Twilio from '@api/Twilio';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
@@ -81,13 +79,13 @@ export default {
   },
   data () {
     return {
-      opened: false,
-      typeMessage: 'Convocation',
-      typeMessageOptions: [
-        { label: 'SMS de convocation', value: 'Convocation' },
-        { label: 'SMS de rappel', value: 'Reminder' },
+      smsModal: false,
+      messageType: 'convocation',
+      messageTypeOptions: [
+        { label: 'SMS de convocation', value: 'convocation' },
+        { label: 'SMS de rappel', value: 'reminder' },
       ],
-      messageComp: '',
+      message: '',
       loading: false,
     };
   },
@@ -113,50 +111,55 @@ export default {
   methods: {
     openSmsModal () {
       this.updateMessage();
-      this.opened = true;
+      this.smsModal = true;
     },
     updateMessage () {
       const courseLink = `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/trainees/courses/${this.course._id}`;
-      if (this.typeMessage === 'Convocation') {
-        const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
-        const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
-        const hour = this.$moment(slots[0].startDate).format('HH:mm');
-
-        this.messageComp = `Bonjour,\nVous êtes inscrits à la formation ${this.course.name}.\nLa première session à ` +
-        `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
-        `formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
-      } else if (this.typeMessage === 'Reminder') {
-        const slots = this.course.slots
-          .filter(slot => this.$moment().isBefore(slot.startDate))
-          .sort((a, b) => a.startDate - b.startDate);
-        const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
-        const hour = this.$moment(slots[0].startDate).format('HH:mm');
-
-        this.messageComp = `Bonjour,\nRAPPEL : vous êtes inscrits à la formation ${this.course.name}.\nVotre ` +
-        `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
-        `le début de la formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne ` +
-        'formation,\nCompani'
+      if (this.messageType === 'convocation') {
+        this.setConvocationMessage(courseLink);
+      } else if (this.messageType === 'reminder') {
+        this.setReminderMessage(courseLink);
       };
     },
+    setConvocationMessage (courseLink) {
+      const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
+      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const hour = this.$moment(slots[0].startDate).format('HH:mm');
+      this.message = `Bonjour,\nVous êtes inscrits à la formation ${this.course.name}.\nLa première session à ` +
+        `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
+        `formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+    },
+    setReminderMessage (courseLink) {
+      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
+        .sort((a, b) => a.startDate - b.startDate);
+      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const hour = this.$moment(slots[0].startDate).format('HH:mm');
+
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrits à la formation ${this.course.name}.\nVotre ` +
+      `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
+      `le début de la formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne ` +
+      'formation,\nCompani'
+    },
     async sendMessage () {
-      this.loading = true;
-      const traineesWithPhoneNumber = this.course.trainees.filter(trainee => has(trainee, 'contact.phone'));
-      for (const trainee of traineesWithPhoneNumber) {
-        try {
-          await Twilio.sendCompaniSMS({
-            to: `+33${trainee.contact.phone.substring(1)}`,
-            body: this.messageComp,
-          });
-          NotifyPositive('SMS bien envoyé.');
-        } catch (e) {
-          console.error(e);
-          NotifyNegative(`Erreur lors de l'envoi du SMS à : ${trainee.identity.firstname} ${trainee.identity.lastname}`);
+      try {
+        this.loading = true;
+        const smsNotSent = await Courses.sendSMS(this.course._id, { body: this.message });
+        if (smsNotSent.length === 0) {
+          NotifyPositive('SMS bien envoyé(s).');
+          return;
         }
+        for (const trainee of smsNotSent) {
+          NotifyNegative(`Erreur lors de l'envoi du SMS à : ${trainee.firstname || ''} ${trainee.lastname}`);
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'envoi des SMS');
+      } finally {
+        this.smsModal = false;
+        this.loading = false;
+        this.message = '';
+        this.messageType = 'convocation';
       }
-      this.opened = false;
-      this.loading = false;
-      this.messageComp = '';
-      this.typeMessage = 'Convocation';
     },
     downloadAttendanceSheet () {
       return Courses.downloadAttendanceSheet(this.course._id);
