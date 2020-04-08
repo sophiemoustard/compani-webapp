@@ -1,7 +1,7 @@
 <template>
   <div>
     <p class="text-weight-bold">Identité</p>
-    <div class="row gutter-profile q-mb-xl">
+    <div class="row gutter-profile q-mb-lg">
       <ni-input v-model.trim="mergedUserProfile.identity.firstname" caption="Prénom"
         @focus="saveTmp('identity.firstname')" @blur="updateUser('identity.firstname')" />
       <ni-input v-model.trim="mergedUserProfile.identity.lastname" caption="Nom" @focus="saveTmp('identity.lastname')"
@@ -16,11 +16,10 @@
           <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
         </div>
       </div>
-      <div class="col-md-6"></div>
-      <div class="col-md-6">
-        <ni-input caption="Biographie du formateur" v-model="mergedUserProfile.biography" type="textarea"
-          @blur="updateUser('biography')" @focus="saveTmp('biography')" />
-      </div>
+    </div>
+    <div class="row gutter-profile q-mb-xl">
+      <ni-input caption="Biographie du formateur" v-model="mergedUserProfile.biography" type="textarea"
+        @blur="updateUser('biography')" @focus="saveTmp('biography')" />
     </div>
   </div>
 </template>
