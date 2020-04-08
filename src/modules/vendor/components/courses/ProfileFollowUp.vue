@@ -30,7 +30,8 @@
     </q-item>
     <q-item>
       <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense />
+        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
+          type="a" :href="downloadAttendanceSheet()" />
       </q-item-section>
       <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
     </q-item>
@@ -44,7 +45,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import Courses from '@api/Courses';
+
 export default {
   name: 'ProfileFollowUp',
   props: {
@@ -62,6 +65,11 @@ export default {
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
 
       return missingInfo;
+    },
+  },
+  methods: {
+    downloadAttendanceSheet () {
+      return Courses.downloadAttendanceSheet(this.course._id);
     },
   },
 }
