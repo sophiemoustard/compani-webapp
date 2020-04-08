@@ -8,6 +8,9 @@
     <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date_range" label="Planning" />
     <q-separator />
+    <ni-menu-item v-if="hasBillingAssistance" class="customer-menu-size" name="customer contact" icon="contact_support"
+      label="Contact" />
+    <q-separator v-if="hasBillingAssistance" />
     <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
     <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
@@ -21,6 +24,7 @@
 </template>
 
 <script>
+const get = require('lodash/get');
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
@@ -47,6 +51,9 @@ export default {
     },
     loggedUser () {
       return this.$store.getters['main/loggedUser'];
+    },
+    hasBillingAssistance () {
+      return get(this.loggedUser, 'company.billingAssistance');
     },
   },
   mounted () {

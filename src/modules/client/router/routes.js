@@ -374,6 +374,21 @@ const routes = [
         },
       },
       {
+        path: 'customers/contact',
+        name: 'customer contact',
+        component: () => import('src/modules/client/pages/customers/Contact'),
+        beforeEnter (to, from, next) {
+          const loggedUser = store.getters['main/loggedUser'];
+          return get(loggedUser, 'company.billingAssistance')
+            ? next()
+            : next('/404');
+        },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [HELPER],
+        },
+      },
+      {
         path: 'customers/documents',
         name: 'customer documents',
         component: () => import('src/modules/client/pages/customers/Billing'),

@@ -1,4 +1,4 @@
-import { required, requiredIf, maxLength, minLength } from 'vuelidate/lib/validators';
+import { required, requiredIf, maxLength, minLength, email } from 'vuelidate/lib/validators';
 import {
   frAddress,
   iban,
@@ -31,6 +31,7 @@ export const companyMixin = {
         },
         iban: { required, iban },
         bic: { required, bic },
+        billingAssistance: { email },
         legalRepresentative: {
           lastname: { required },
           firstname: { required },
@@ -68,6 +69,10 @@ export const companyMixin = {
         return 'Doit contenir 9 caractères (espaces inclus).';
       }
 
+      return '';
+    },
+    billingAssistanceError () {
+      if (!this.$v.company.billingAssistance.email) return 'Email non valide';
       return '';
     },
   },
