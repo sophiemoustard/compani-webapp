@@ -24,7 +24,8 @@
     </div>
     <q-item>
       <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="mdi-cellphone-message" flat dense />
+        <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
+          dense @click="openSmsModal" />
       </q-item-section>
       <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
     </q-item>
@@ -41,17 +42,54 @@
       </q-item-section>
       <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
     </q-item>
+
+    <!-- Modal envoi message -->
+    <ni-modal v-model="opened">
+      <template slot="title">
+        Envoyer un <span class="text-weight-bold">message</span>
+      </template>
+      <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field
+        @input="updateMessage" />
+      <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
+          :loading="loading" @click.native="sendMessage" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex'
+import has from 'lodash/has';
 import Courses from '@api/Courses';
+import Twilio from '@api/Twilio';
+import Input from '@components/form/Input';
+import Select from '@components/form/Select';
+import Modal from '@components/modal/Modal';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'ProfileFollowUp',
+  components: {
+    'ni-input': Input,
+    'ni-select': Select,
+    'ni-modal': Modal,
+  },
   props: {
     profileId: { type: String },
+  },
+  data () {
+    return {
+      opened: false,
+      typeMessage: 'Convocation',
+      typeMessageOptions: [
+        { label: 'SMS de convocation', value: 'Convocation' },
+        { label: 'SMS de rappel', value: 'Reminder' },
+      ],
+      messageComp: '',
+      loading: false,
+    };
   },
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
@@ -66,8 +104,60 @@ export default {
 
       return missingInfo;
     },
+    isFinished () {
+      const slots = this.course.slots
+        .filter(slot => this.$moment().isBefore(slot.startDate))
+      return !slots.length;
+    },
   },
   methods: {
+    openSmsModal () {
+      this.updateMessage();
+      this.opened = true;
+    },
+    updateMessage () {
+      const courseLink = `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/trainees/courses/${this.course._id}`;
+      if (this.typeMessage === 'Convocation') {
+        const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
+        const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+        const hour = this.$moment(slots[0].startDate).format('HH:mm');
+
+        this.messageComp = `Bonjour,\nVous êtes inscrits à la formation ${this.course.name}.\nLa première session à ` +
+        `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
+        `formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+      } else if (this.typeMessage === 'Reminder') {
+        const slots = this.course.slots
+          .filter(slot => this.$moment().isBefore(slot.startDate))
+          .sort((a, b) => a.startDate - b.startDate);
+        const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+        const hour = this.$moment(slots[0].startDate).format('HH:mm');
+
+        this.messageComp = `Bonjour,\nRAPPEL : vous êtes inscrits à la formation ${this.course.name}.\nVotre ` +
+        `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
+        `le début de la formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne ` +
+        'formation,\nCompani'
+      };
+    },
+    async sendMessage () {
+      this.loading = true;
+      const traineesWithPhoneNumber = this.course.trainees.filter(trainee => has(trainee, 'contact.phone'));
+      for (const trainee of traineesWithPhoneNumber) {
+        try {
+          await Twilio.sendCompaniSMS({
+            to: `+33${trainee.contact.phone.substring(1)}`,
+            body: this.messageComp,
+          });
+          NotifyPositive('SMS bien envoyé.');
+        } catch (e) {
+          console.error(e);
+          NotifyNegative(`Erreur lors de l'envoi du SMS à : ${trainee.identity.firstname} ${trainee.identity.lastname}`);
+        }
+      }
+      this.opened = false;
+      this.loading = false;
+      this.messageComp = '';
+      this.typeMessage = 'Convocation';
+    },
     downloadAttendanceSheet () {
       return Courses.downloadAttendanceSheet(this.course._id);
     },
