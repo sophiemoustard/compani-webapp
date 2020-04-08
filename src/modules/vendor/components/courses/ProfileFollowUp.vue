@@ -31,7 +31,7 @@
     <q-item>
       <q-item-section side>
         <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-          type="a" :href="downloadAttendanceSheet()" />
+          type="a" :href="downloadAttendanceSheet()" target="_blank" />
       </q-item-section>
       <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
     </q-item>
