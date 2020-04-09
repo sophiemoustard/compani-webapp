@@ -53,7 +53,7 @@
       <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
-          :loading="loading" @click.native="sendMessage" />
+          :loading="loading" @click="sendMessage" />
       </template>
     </ni-modal>
   </div>
@@ -125,6 +125,7 @@ export default {
       const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
+
       this.message = `Bonjour,\nVous êtes inscrits à la formation ${this.course.name}.\nLa première session à ` +
         `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
         `formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
@@ -143,14 +144,8 @@ export default {
     async sendMessage () {
       try {
         this.loading = true;
-        const smsNotSent = await Courses.sendSMS(this.course._id, { body: this.message });
-        if (smsNotSent.length === 0) {
-          NotifyPositive('SMS bien envoyé(s).');
-          return;
-        }
-        for (const trainee of smsNotSent) {
-          NotifyNegative(`Erreur lors de l'envoi du SMS à : ${trainee.firstname || ''} ${trainee.lastname}`);
-        }
+        await Courses.sendSMS(this.course._id, { body: this.message });
+        return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'envoi des SMS');
