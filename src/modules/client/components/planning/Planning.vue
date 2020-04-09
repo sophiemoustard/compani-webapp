@@ -61,7 +61,7 @@
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
               <td valign="top">
                 <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)"
-                  :staffing-view="staffingView"  />
+                  :staffing-view="staffingView" :startOfWeek="startOfWeek" />
                 <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
                   :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
               </td>

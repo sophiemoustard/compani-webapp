@@ -24,6 +24,7 @@ export default {
     events: { type: Array, default: () => [] },
     person: { type: Object, default: () => ({}) },
     staffingView: { type: Boolean, default: false },
+    startOfWeek: { type: String, default: '' },
   },
   computed: {
     indicators () {
@@ -38,7 +39,12 @@ export default {
   },
   methods: {
     getReferent (person) {
-      return get(person, 'referent.identity', {});
+      const referentHistory = person.referentHistories
+        .filter(rh => this.$moment(this.startOfWeek).isSameOrAfter(rh.startDate) &&
+          (!rh.endDate || this.$moment(this.startOfWeek).isBefore(rh.endDate)))
+        .sort((a, b) => a.startDate - b.startDate);
+
+      return get(referentHistory[0], 'auxiliary.identity', {});
     },
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
