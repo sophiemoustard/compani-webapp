@@ -1,14 +1,19 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Contact</h4>
-    <div class="referent-container" v-if="customer && customer.referent">
+    <div class="referent-container" v-if="referent">
       Pour toutes les questions concernant l’organisation des interventions et le planning, nous vous invitons à
       contacter votre auxiliaire référent.
-      <div class="items-center">
+      <div class="items-center row">
         <img :src="referentAvatar" class="avatar q-mr-sm" />
-        {{ referentIdentity }}
+        <div class="referent-info">
+          {{ referentIdentity }}
+          <span>
+            Numéro de téléphone :
+            <a v-if="referentPhoneNumber" class="text-primary" :href="referentPhoneLink">{{referentPhoneNumber}}</a>
+          </span>
+        </div>
       </div>
-      <a v-if="referentPhoneNumber" class="text-primary" :href="referentPhoneLink">{{referentPhoneNumber}}</a>
     </div>
     <div v-if="company && company.billingAssistance">
       Pour toutes les questions concernant la facturation ou l’utilisation de votre espace Compani,
@@ -31,7 +36,7 @@ export default {
   computed: {
     referentAvatar () {
       const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
-      return this.getReferentAvatar(auxiliaryPicture);
+      return auxiliaryPicture ? get(auxiliaryPicture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
     },
     helper () {
       return this.$store.getters['main/loggedUser'];
@@ -43,14 +48,13 @@ export default {
       return this.$store.getters['customer/getCustomer'];
     },
     referent () {
-      return this.customer.referent;
+      return get(this.customer, 'referent');
     },
     referentIdentity () {
-      return formatIdentity(this.customer.referent.identity, 'FL')
+      return formatIdentity(this.referent.identity, 'FL')
     },
     referentPhoneNumber () {
-      const phoneNumber = get(this.referent, 'contact.phone');
-      return phoneNumber ? `Numéro de téléphone: ${phoneNumber}` : '';
+      return get(this.referent, 'contact.phone') || '';
     },
     referentPhoneLink () {
       const phoneNumber = get(this.referent, 'contact.phone');
@@ -67,9 +71,6 @@ export default {
         this.$store.commit('customer/saveCustomer', customer);
       }
     },
-    getReferentAvatar (picture) {
-      return picture ? get(picture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
-    },
   },
 }
 </script>
@@ -81,4 +82,9 @@ export default {
 .referent-container div
   margin-bottom: 10px;
   margin-top: 10px;
+
+.referent-info
+  padding-left: 10px;
+  display: flex
+  flex-direction: column;
 </style>

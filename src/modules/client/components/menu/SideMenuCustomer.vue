@@ -8,9 +8,9 @@
     <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date_range" label="Planning" />
     <q-separator />
-    <ni-menu-item v-if="hasBillingAssistance || customer.referent" class="customer-menu-size" name="customer contact" icon="contact_support"
-      label="Contact" />
-    <q-separator v-if="hasBillingAssistance || customer.referent" />
+    <ni-menu-item v-if="hasBillingAssistance || (customer && customer.referent)" class="customer-menu-size"
+      name="customer contact" icon="contact_support" label="Contact" />
+    <q-separator v-if="hasBillingAssistance || (customer && customer.referent)" />
     <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
     <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
