@@ -5,7 +5,7 @@
     </p>
     <p class="text-faded">Désolé, il n'y a rien ici...</p>
     <q-btn v-if="canGoBack" color="primary" @click="goBack">Retour</q-btn>
-    <q-btn color="primary" @click="$router.replace('/')">Accueil</q-btn>
+    <q-btn color="primary" @click="goTo">Accueil</q-btn>
   </div>
 </template>
 
@@ -20,6 +20,11 @@ export default {
   methods: {
     goBack () {
       window.history.go(-1);
+    },
+    goTo () {
+      return /\/ad\//.test(this.$router.currentRoute.path)
+        ? this.$router.replace('/ad').catch(e => {})
+        : this.$router.replace('/').catch(e => {});
     },
   },
 }
