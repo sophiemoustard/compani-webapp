@@ -10,11 +10,12 @@
     <div class="course-link">
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="info" flat dense />
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="info" flat dense type="a"
+            target="_blank" :href="courseInfoLink" />
         </q-item-section>
         <q-item-section class="course-link">Page info formation</q-item-section>
       </q-item>
-      <div class="course-link-share">
+      <div class="course-link-share" @click="copyToClipboard">
         <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
         <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
           color="primary">
@@ -103,12 +104,24 @@ export default {
       return missingInfo;
     },
     isFinished () {
-      const slots = this.course.slots
-        .filter(slot => this.$moment().isBefore(slot.startDate))
+      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
       return !slots.length;
+    },
+    courseInfoLink () {
+      return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
+        `trainees/courses/${this.course._id}`;
     },
   },
   methods: {
+    copyToClipboard () {
+      const el = document.createElement('textarea');
+      el.value = this.courseInfoLink;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      NotifyPositive('Lien copié !');
+    },
     openSmsModal () {
       this.updateMessage();
       this.smsModal = true;
