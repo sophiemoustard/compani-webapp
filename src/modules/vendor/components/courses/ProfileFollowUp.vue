@@ -10,11 +10,12 @@
     <div class="course-link">
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="info" flat dense />
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="info" flat dense type="a"
+            target="_blank" :href="courseLink" />
         </q-item-section>
         <q-item-section class="course-link">Page info formation</q-item-section>
       </q-item>
-      <div class="course-link-share">
+      <div class="course-link-share" @click="copyToClipboard">
         <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
         <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
           color="primary">
@@ -103,34 +104,43 @@ export default {
       return missingInfo;
     },
     isFinished () {
-      const slots = this.course.slots
-        .filter(slot => this.$moment().isBefore(slot.startDate))
+      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
       return !slots.length;
+    },
+    courseLink () {
+      return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
+        `trainees/courses/${this.course._id}`;
     },
   },
   methods: {
+    copyToClipboard () {
+      const el = document.createElement('textarea');
+      el.value = this.courseLink;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      NotifyPositive('Lien copié !');
+    },
     openSmsModal () {
       this.updateMessage();
       this.smsModal = true;
     },
     updateMessage () {
-      const courseLink = `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/trainees/courses/${this.course._id}`;
-      if (this.messageType === 'convocation') {
-        this.setConvocationMessage(courseLink);
-      } else if (this.messageType === 'reminder') {
-        this.setReminderMessage(courseLink);
-      };
+      if (this.messageType === 'convocation') this.setConvocationMessage();
+      else if (this.messageType === 'reminder') this.setReminderMessage();
     },
-    setConvocationMessage (courseLink) {
+    setConvocationMessage () {
       const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
       this.message = `Bonjour,\nVous êtes inscrits à la formation ${this.course.name}.\nLa première session à ` +
         `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
-        `formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+        `formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne formation,` +
+        '\nCompani';
     },
-    setReminderMessage (courseLink) {
+    setReminderMessage () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
         .sort((a, b) => a.startDate - b.startDate);
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
@@ -138,7 +148,7 @@ export default {
 
       this.message = `Bonjour,\nRAPPEL : vous êtes inscrits à la formation ${this.course.name}.\nVotre ` +
       `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
-      `le début de la formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne ` +
+      `le début de la formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne ` +
       'formation,\nCompani'
     },
     async sendMessage () {
