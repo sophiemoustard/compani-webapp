@@ -3,28 +3,29 @@
     <div class="row col-12 q-pa-md course-header items-center justify-center text-weight-bold">
       <div>Votre formation Compani</div>
     </div>
-    <div class="course-title-container items-center justify-center">
+    <div class="course-title-container items-center">
       <img class="course-img"
         src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/aux-pouce.png">
       <div class="course-title" >
+        <div class="text-weight-bold">Vous êtes convoqué(e) à la formation</div>
         <h5>{{ course.name }}</h5>
       </div>
     </div>
-    <div class="row justify-center">
+    <div class="row course-stepper">
       <div>
         <p class="text-weight-bold q-pl-xl">Dates de la formation</p>
         <q-stepper value="date" vertical flat>
           <q-step v-for="(daySlot, index) in Object.values(courseSlots)" name="date" :color="getSlotColor(daySlot)"
-            :class="{ 'opacity': isDone(daySlot) || !isNext(daySlot) }" :key="index"
+            :class="{ 'opacity': isDone(daySlot) || !isNext(daySlot), 'next-slot': isNext(daySlot) }" :key="index"
             :title="formatSlotTitle(daySlot, index)" :active-icon="isDone(daySlot) ? 'check' : 'none'">
             <div v-for="hourSlot in daySlot" :key="hourSlot._id" class="hour-slot">
               <q-item>
                 <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
                 <q-item-section>{{ formatSlotHour(hourSlot) }}</q-item-section>
               </q-item>
-              <q-item v-if="hourSlot.address && hourSlot.address.fullAddress">
+              <q-item>
                 <q-item-section side><q-icon name="location_on" flat dense size="xs" /></q-item-section>
-                <q-item-section>{{ hourSlot.address.fullAddress }}</q-item-section>
+                <q-item-section>{{ getSlotAddress(hourSlot) }}</q-item-section>
               </q-item>
             </div>
           </q-step>
@@ -36,10 +37,11 @@
 
 <script>
 import groupBy from 'lodash/groupBy';
+import get from 'lodash/get';
 import Courses from '@api/Courses';
 
 export default {
-  metaInfo: { title: 'Course info' },
+  metaInfo: { title: 'Formation' },
   name: 'CourseInfo',
   data () {
     return {
@@ -79,6 +81,9 @@ export default {
     formatSlotHour (slot) {
       return `${this.$moment(slot.startDate).format('HH:mm')} - ${this.$moment(slot.endDate).format('HH:mm')}`;
     },
+    getSlotAddress (slot) {
+      return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
+    },
   },
 };
 
@@ -87,29 +92,46 @@ export default {
 <style lang="stylus" scoped>
 .course
   &-header
-    background-color: $primary;
-    font-size: 20px;
-    color: white;
+    background-color: $primary
+    font-size: 20px
+    color: white
   &-title
     border-bottom: 2px solid $grey-3
-    text-align: center;
     &-container
-      margin: 20px 8px 30px;
+      margin: 20px 8px 30px
       display:flex
       flex-direction: row
+      @media screen and (min-width: 768px)
+        justify-content: center
+  &-stepper
+    @media screen and (min-width: 768px)
+      justify-content: center
   &-img
-    height: auto;
-    width: 80px;
-    padding-right: 20px;
+    height: auto
+    width: 80px
+    padding-right: 20px
 
 /deep/.q-stepper
   &__title
     font-size: 16px
     font-weight: bold
   &__tab
-    padding: 5px 24px;
+    padding: 5px 24px
     .q-stepper__dot:after
       display: block !important
+  &__dot
+    height: 20px
+    width: 20px
+    min-width: 20px
+
+.next-slot
+  /deep/.q-stepper
+    &__title
+      font-size:18px
+    &__dot
+      height: 24px
+      width: 24px
+      box-shadow: 1px 1px 2px grey
 
 .hour-slot
   padding: 8px 0
@@ -124,13 +146,13 @@ export default {
   opacity: 0.6
 
 h5
-  color: $primary;
-  font-weight: bold;
+  color: $primary
+  font-weight: bold
 
 @media screen and (min-width: 768px)
   .course-info-title-container
-    padding: 0px 125px;
+    padding: 0px 125px
 
   h5
-    margin-bottom: 20px !important;
+    margin-bottom: 20px !important
 </style>
