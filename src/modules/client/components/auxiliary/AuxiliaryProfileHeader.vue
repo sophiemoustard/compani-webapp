@@ -39,13 +39,13 @@
     </div>
 
     <!-- Modal envoi message -->
-    <ni-modal v-model="opened">
+    <ni-modal v-model="smsModal">
       <template slot="title">
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="typeMessageOptions" v-model="typeMessage" required-field
+      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="messageType" required-field
         @input="updateMessage" />
-      <ni-input in-modal caption="Message" v-model="messageComp" type="textarea" :rows="7" required-field />
+      <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click.native="sendMessage" />
@@ -79,16 +79,15 @@ export default {
   data () {
     return {
       loading: false,
-      opened: false,
+      smsModal: false,
       message: '',
-      typeMessage: 'PM',
+      messageType: 'PM',
       messageSupport: 'sms',
-      typeMessageOptions: [
+      messageTypeOptions: [
         { label: 'Pièces manquantes', value: 'PM' },
         { label: 'Envoi lien d\'activation', value: 'LA' },
         { label: 'Autres', value: 'Autres' },
       ],
-      messageComp: '',
     }
   },
   computed: {
@@ -129,24 +128,24 @@ export default {
   },
   methods: {
     async updateMessage () {
-      if (this.typeMessage === 'PM') {
-        this.messageComp = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
+      if (this.messageType === 'PM') {
+        this.message = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
         'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ' +
         `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}` +
         '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
-      } else if (this.typeMessage === 'LA') {
+      } else if (this.messageType === 'LA') {
         if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
           this.userProfile.passwordToken = await Users.createPasswordToken(this.userProfile._id, { email: this.userProfile.local.email });
         }
-        this.messageComp = `${this.companyName}. Bienvenue ! :)\nPour pouvoir ` +
+        this.message = `${this.companyName}. Bienvenue ! :)\nPour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${this.userProfile.passwordToken.token} :-)\n` +
           `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`;
-      } else this.messageComp = '';
+      } else this.message = '';
     },
     openSmsModal () {
       this.updateMessage();
-      this.opened = true;
+      this.smsModal = true;
     },
     goToPlanning () {
       if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.userProfile } });
@@ -156,15 +155,15 @@ export default {
       this.loading = true;
       await this.sendSMS();
       this.loading = false;
-      this.opened = false;
-      this.messageComp = '';
+      this.smsModal = false;
+      this.message = '';
     },
     async sendSMS () {
       try {
         if (!this.companyName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
         await Twilio.sendSMS({
           to: `+33${this.userProfile.contact.phone.substring(1)}`,
-          body: this.messageComp,
+          body: this.message,
         });
         NotifyPositive('SMS bien envoyé.');
       } catch (e) {

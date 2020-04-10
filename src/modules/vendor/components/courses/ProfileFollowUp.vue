@@ -24,7 +24,8 @@
     </div>
     <q-item>
       <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="mdi-cellphone-message" flat dense />
+        <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
+          dense @click="openSmsModal" />
       </q-item-section>
       <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
     </q-item>
@@ -41,17 +42,52 @@
       </q-item-section>
       <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
     </q-item>
+
+    <!-- Modal envoi message -->
+    <ni-modal v-model="smsModal">
+      <template slot="title">
+        Envoyer un <span class="text-weight-bold">message</span>
+      </template>
+      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="messageType" required-field
+        @input="updateMessage" />
+      <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
+          :loading="loading" @click="sendMessage" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters } from 'vuex'
 import Courses from '@api/Courses';
+import Input from '@components/form/Input';
+import Select from '@components/form/Select';
+import Modal from '@components/modal/Modal';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'ProfileFollowUp',
+  components: {
+    'ni-input': Input,
+    'ni-select': Select,
+    'ni-modal': Modal,
+  },
   props: {
     profileId: { type: String },
+  },
+  data () {
+    return {
+      smsModal: false,
+      messageType: 'convocation',
+      messageTypeOptions: [
+        { label: 'SMS de convocation', value: 'convocation' },
+        { label: 'SMS de rappel', value: 'reminder' },
+      ],
+      message: '',
+      loading: false,
+    };
   },
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
@@ -66,8 +102,60 @@ export default {
 
       return missingInfo;
     },
+    isFinished () {
+      const slots = this.course.slots
+        .filter(slot => this.$moment().isBefore(slot.startDate))
+      return !slots.length;
+    },
   },
   methods: {
+    openSmsModal () {
+      this.updateMessage();
+      this.smsModal = true;
+    },
+    updateMessage () {
+      const courseLink = `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/trainees/courses/${this.course._id}`;
+      if (this.messageType === 'convocation') {
+        this.setConvocationMessage(courseLink);
+      } else if (this.messageType === 'reminder') {
+        this.setReminderMessage(courseLink);
+      };
+    },
+    setConvocationMessage (courseLink) {
+      const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
+      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const hour = this.$moment(slots[0].startDate).format('HH:mm');
+
+      this.message = `Bonjour,\nVous êtes inscrits à la formation ${this.course.name}.\nLa première session à ` +
+        `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
+        `formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+    },
+    setReminderMessage (courseLink) {
+      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
+        .sort((a, b) => a.startDate - b.startDate);
+      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const hour = this.$moment(slots[0].startDate).format('HH:mm');
+
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrits à la formation ${this.course.name}.\nVotre ` +
+      `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
+      `le début de la formation.\nToutes les informations sur : ${courseLink}\nNous vous souhaitons une bonne ` +
+      'formation,\nCompani'
+    },
+    async sendMessage () {
+      try {
+        this.loading = true;
+        await Courses.sendSMS(this.course._id, { body: this.message });
+        return NotifyPositive('SMS bien envoyé(s).');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'envoi des SMS');
+      } finally {
+        this.smsModal = false;
+        this.loading = false;
+        this.message = '';
+        this.messageType = 'convocation';
+      }
+    },
     downloadAttendanceSheet () {
       return Courses.downloadAttendanceSheet(this.course._id);
     },

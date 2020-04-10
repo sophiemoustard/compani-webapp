@@ -18,6 +18,9 @@ export default {
     const course = await alenviAxios.put(`${process.env.API_HOSTNAME}/courses/${courseId}`, payload);
     return course.data.data.course;
   },
+  async sendSMS (courseId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/sms`, payload);
+  },
   async addTrainee (courseId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees`, payload);
   },
