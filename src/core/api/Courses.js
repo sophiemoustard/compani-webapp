@@ -30,4 +30,7 @@ export default {
   downloadAttendanceSheet (courseId) {
     return `${process.env.API_HOSTNAME}/courses/${courseId}/attendancesheets?x-access-token=${Cookies.get('alenvi_token')}`;
   },
+  downloadCompletionCertificates (courseId) {
+    return `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates?x-access-token=${Cookies.get('alenvi_token')}`;
+  },
 };
