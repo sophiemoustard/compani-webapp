@@ -314,7 +314,9 @@ export default {
         this.$moment.duration()
       );
 
-      return total.minutes() ? `${total.hours()}h${total.minutes()}` : `${total.hours()}h`;
+      const paddedMinutes = this.padMinutes(total.minutes());
+
+      return paddedMinutes ? `${total.hours()}h${paddedMinutes}` : `${total.hours()}h`;
     },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
@@ -329,6 +331,9 @@ export default {
     get,
     saveTmp (path) {
       this.tmpInput = get(this.course, path)
+    },
+    padMinutes (minutes) {
+      return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
     },
     async refreshCourse () {
       try {
@@ -373,7 +378,9 @@ export default {
     getSlotDuration (slot) {
       const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
 
-      return duration.minutes() ? `${duration.hours()}h${duration.minutes()}` : `${duration.hours()}h`;
+      const paddedMinutes = this.padMinutes(duration.minutes());
+
+      return paddedMinutes ? `${duration.hours()}h${paddedMinutes}` : `${duration.hours()}h`;
     },
     resetCourseSlotCreationModal () {
       this.newCourseSlot = {
