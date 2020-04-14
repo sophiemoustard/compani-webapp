@@ -9,6 +9,12 @@
       </div>
     </div>
     <div class="q-mb-xl">
+      <p class="text-weight-bold">Référent structure</p>
+      <div class="row gutter-profile">
+          <ni-input caption="Nom référent structure" />
+      </div>
+    </div>
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
       <q-card>
         <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none"
