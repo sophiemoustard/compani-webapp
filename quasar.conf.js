@@ -12,6 +12,7 @@ module.exports = function (ctx) {
       'moment',
       'vue-croppa',
       'vuelidate',
+      'vueclipboard',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [

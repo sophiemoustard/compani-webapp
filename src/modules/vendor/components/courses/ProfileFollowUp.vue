@@ -15,7 +15,7 @@
         </q-item-section>
         <q-item-section class="course-link">Page info formation</q-item-section>
       </q-item>
-      <div class="course-link-share" @click="copyToClipboard">
+      <div class="course-link-share" v-clipboard:copy="courseLink" v-clipboard:success="handleCopySuccess">
         <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
         <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
           color="primary">
@@ -113,14 +113,8 @@ export default {
     },
   },
   methods: {
-    copyToClipboard () {
-      const el = document.createElement('textarea');
-      el.value = this.courseLink;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
-      NotifyPositive('Lien copié !');
+    handleCopySuccess () {
+      return NotifyPositive('Lien copié !');
     },
     openSmsModal () {
       this.updateMessage();
