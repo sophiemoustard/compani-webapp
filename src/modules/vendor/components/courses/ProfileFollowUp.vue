@@ -39,7 +39,8 @@
     </q-item>
     <q-item>
       <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense />
+        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
+          type="a" :href="downloadCompletionCertificates()" target="_blank" />
       </q-item-section>
       <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
     </q-item>
@@ -162,6 +163,9 @@ export default {
     },
     downloadAttendanceSheet () {
       return Courses.downloadAttendanceSheet(this.course._id);
+    },
+    downloadCompletionCertificates () {
+      return Courses.downloadCompletionCertificates(this.course._id);
     },
   },
 }
