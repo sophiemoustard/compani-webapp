@@ -10,8 +10,9 @@
     <div class="course-link">
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="info" flat dense type="a"
+          <q-btn v-if="!disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
             target="_blank" :href="courseLink" />
+          <q-btn v-else color="primary" size="sm" icon="info" flat dense :disable="true" />
         </q-item-section>
         <q-item-section class="course-link">Page info formation</q-item-section>
       </q-item>
@@ -109,12 +110,14 @@ export default {
       return !slots.length;
     },
     courseLink () {
+      if (this.disabledFollowUp) return '';
       return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
         `trainees/courses/${this.course._id}`;
     },
   },
   methods: {
     handleCopySuccess () {
+      if (this.disabledFollowUp) return;
       return NotifyPositive('Lien copié !');
     },
     openSmsModal () {
