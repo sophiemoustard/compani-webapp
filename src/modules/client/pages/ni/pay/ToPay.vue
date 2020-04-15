@@ -27,7 +27,7 @@
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
           <th>
-            <q-checkbox v-model="props.selected" indeterminate-value="some" />
+            <q-checkbox v-model="props.selected" indeterminate-value="some" dense />
           </th>
         </q-tr>
       </template>
@@ -75,7 +75,7 @@
             <template v-else>{{ col.value }}</template>
           </q-td>
           <q-td>
-            <q-checkbox v-model="props.selected" />
+            <q-checkbox v-model="props.selected" dense/>
           </q-td>
         </q-tr>
       </template>
