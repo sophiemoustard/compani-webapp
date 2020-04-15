@@ -11,7 +11,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Référent structure</p>
       <div class="row gutter-profile">
-          <ni-input caption="Nom référent structure" />
+          <ni-input caption="Nom référent structure" v-model.trim="course.referent" @focus="saveTmp('referent')"
+          @blur="updateCourse('referent')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -298,6 +299,7 @@ export default {
       course: {
         name: { required },
         trainer: { required },
+        referent: { required },
       },
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
