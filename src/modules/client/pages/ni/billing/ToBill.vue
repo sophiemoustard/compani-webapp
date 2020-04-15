@@ -86,7 +86,7 @@ export default {
         {
           name: 'externalBilling',
           label: 'Factu. externe',
-          align: 'left',
+          align: 'center',
         },
         {
           name: 'customer',
