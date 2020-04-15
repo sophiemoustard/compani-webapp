@@ -139,8 +139,6 @@ export default {
     padding: 2px 10px
     min-height: 0px
     font-size: 14px
-  @media screen and (min-width: 768px)
-    display: flex
 
 .opacity
   opacity: 0.6
