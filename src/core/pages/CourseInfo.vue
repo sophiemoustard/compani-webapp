@@ -39,6 +39,11 @@
         <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
       </div>
     </div>
+    <a @click.prevent="rulesModal = true" class="rules cursor-pointer">Règlement intérieur</a>
+
+    <!-- Modal reglement interieur -->
+    <ni-html-modal title="Règlement intérieur" v-model="rulesModal" :html="rules" />
+
   </div>
 </template>
 
@@ -47,13 +52,20 @@ import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import { formatIdentity } from '@helpers/utils';
+import HtmlModal from '@components/modal/HtmlModal';
+import rules from 'src/statics/rules.html';
 
 export default {
   metaInfo: { title: 'Formation' },
   name: 'CourseInfo',
+  components: {
+    'ni-html-modal': HtmlModal,
+  },
   data () {
     return {
       course: {},
+      rulesModal: false,
+      rules,
     };
   },
   computed: {
@@ -168,6 +180,12 @@ export default {
 
 .opacity
   opacity: 0.6
+
+.rules
+  display: flex
+  justify-content: center;
+  color: $primary;
+  margin-bottom: 20px;
 
 h5
   color: $primary
