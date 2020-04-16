@@ -10,13 +10,12 @@
     <div class="course-link">
       <q-item>
         <q-item-section side>
-          <q-btn v-if="!disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
-            target="_blank" :href="courseLink" />
-          <q-btn v-else color="primary" size="sm" icon="info" flat dense :disable="true" />
+          <q-btn :disable="disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
+            target="_blank" :href="!disabledFollowUp && courseLink" />
         </q-item-section>
         <q-item-section class="course-link">Page info formation</q-item-section>
       </q-item>
-      <div class="course-link-share" v-clipboard:copy="courseLink" v-clipboard:success="handleCopySuccess">
+      <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink" v-clipboard:success="handleCopySuccess">
         <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
         <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
           color="primary">
@@ -34,14 +33,14 @@
     <q-item>
       <q-item-section side>
         <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-          type="a" :href="downloadAttendanceSheet()" target="_blank" />
+          type="a" :href="!disabledFollowUp && downloadAttendanceSheet()" target="_blank" />
       </q-item-section>
       <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
     </q-item>
     <q-item>
       <q-item-section side>
         <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-          type="a" :href="downloadCompletionCertificates()" target="_blank" />
+          type="a" :href="!disabledFollowUp && downloadCompletionCertificates()" target="_blank" />
       </q-item-section>
       <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
     </q-item>
@@ -110,14 +109,12 @@ export default {
       return !slots.length;
     },
     courseLink () {
-      if (this.disabledFollowUp) return '';
       return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
         `trainees/courses/${this.course._id}`;
     },
   },
   methods: {
     handleCopySuccess () {
-      if (this.disabledFollowUp) return;
       return NotifyPositive('Lien copié !');
     },
     openSmsModal () {
