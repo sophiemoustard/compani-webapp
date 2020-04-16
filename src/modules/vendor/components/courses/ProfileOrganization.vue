@@ -11,8 +11,12 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Référent structure</p>
       <div class="row gutter-profile">
-          <ni-input caption="Nom référent structure" v-model.trim="course.referent" @focus="saveTmp('referent')"
-          @blur="updateCourse('referent')" />
+        <ni-input caption="Nom référent structure" v-model.trim="course.referent.name" @focus="saveTmp('referent.name')"
+          @blur="updateCourse('referent.name')" />
+        <ni-input caption="Téléphone référent structure" v-model.trim="course.referent.phone" @focus="saveTmp('referent.phone')"
+            @blur="updateCourse('referent.phone')" />
+        <ni-input caption="Email référent structure" v-model.trim="course.referent.email" @focus="saveTmp('referent.email')"
+            @blur="updateCourse('referent.email')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -299,7 +303,11 @@ export default {
       course: {
         name: { required },
         trainer: { required },
-        referent: { required },
+        referent: {
+          name: { required },
+          phone: { required, frPhoneNumber },
+          email: { email },
+        },
       },
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
@@ -361,8 +369,8 @@ export default {
       try {
         const value = get(this.course, path);
         if (this.tmpInput === value) return;
-        this.$v.course[path].$touch();
-        if (this.$v.course[path].$error) return NotifyWarning('Champ(s) invalide(s).');
+        get(this.$v.course, path).$touch();
+        if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
 
         const payload = set({}, path, value);
         await Courses.update(this.profileId, payload);
