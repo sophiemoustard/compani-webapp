@@ -38,7 +38,7 @@
       <div>
         <div class="text-weight-bold">Intervenant(e)</div>
         <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
-        <div class="biography">"{{ course.trainer.biography }}"</div>
+        <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
       </div>
     </div>
   </div>
