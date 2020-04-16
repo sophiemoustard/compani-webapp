@@ -1,9 +1,9 @@
 <template>
-  <div>
+  <div class="q-mb-xl">
     <div class="row col-12 q-pa-md course-header items-center justify-center text-weight-bold">
       <div>Votre formation Compani</div>
     </div>
-    <div class="course-title-container items-center">
+    <div class="course-title-container course-container items-center">
       <img class="course-img"
         src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/aux-pouce.png">
       <div class="course-title" >
@@ -11,25 +11,32 @@
         <h5>{{ course.name }}</h5>
       </div>
     </div>
-    <div class="row course-stepper">
+    <div class="course-container">
+      <p class="text-weight-bold q-pl-xl">Dates de la formation</p>
+      <q-stepper value="date" vertical flat>
+        <q-step v-for="(daySlot, index) in Object.values(courseSlots)" name="date" :color="getSlotColor(daySlot)"
+          :class="{ 'opacity': isDone(daySlot) || !isNext(daySlot), 'next-slot': isNext(daySlot) }" :key="index"
+          :title="formatSlotTitle(daySlot, index)" :active-icon="isDone(daySlot) ? 'check' : 'none'">
+          <div v-for="hourSlot in daySlot" :key="hourSlot._id" class="hour-slot">
+            <q-item>
+              <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
+              <q-item-section>{{ formatSlotHour(hourSlot) }}</q-item-section>
+            </q-item>
+            <q-item>
+              <q-item-section side><q-icon name="location_on" flat dense size="xs" /></q-item-section>
+              <q-item-section>{{ getSlotAddress(hourSlot) }}</q-item-section>
+            </q-item>
+          </div>
+        </q-step>
+      </q-stepper>
+    </div>
+    <div class="course-container course-trainer">
+      <img class="course-img"
+        src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
       <div>
-        <p class="text-weight-bold q-pl-xl">Dates de la formation</p>
-        <q-stepper value="date" vertical flat>
-          <q-step v-for="(daySlot, index) in Object.values(courseSlots)" name="date" :color="getSlotColor(daySlot)"
-            :class="{ 'opacity': isDone(daySlot) || !isNext(daySlot), 'next-slot': isNext(daySlot) }" :key="index"
-            :title="formatSlotTitle(daySlot, index)" :active-icon="isDone(daySlot) ? 'check' : 'none'">
-            <div v-for="hourSlot in daySlot" :key="hourSlot._id" class="hour-slot">
-              <q-item>
-                <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
-                <q-item-section>{{ formatSlotHour(hourSlot) }}</q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section side><q-icon name="location_on" flat dense size="xs" /></q-item-section>
-                <q-item-section>{{ getSlotAddress(hourSlot) }}</q-item-section>
-              </q-item>
-            </div>
-          </q-step>
-        </q-stepper>
+        <div class="text-weight-bold">Intervenant(e)</div>
+        <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
+        <div class="biography">"{{ course.trainer.biography }}"</div>
       </div>
     </div>
   </div>
@@ -39,6 +46,7 @@
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
+import { formatIdentity } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Formation' },
@@ -85,12 +93,19 @@ export default {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
     },
   },
+  filters: {
+    formatIdentity,
+  },
 };
 
 </script>
 
 <style lang="stylus" scoped>
 .course
+  &-container
+    margin: 20px 8px 30px
+    @media screen and (min-width: 768px)
+      justify-content: center
   &-header
     background-color: $primary
     font-size: 20px
@@ -98,18 +113,17 @@ export default {
   &-title
     border-bottom: 2px solid $grey-3
     &-container
-      margin: 20px 8px 30px
       display:flex
       flex-direction: row
-      @media screen and (min-width: 768px)
-        justify-content: center
-  &-stepper
-    @media screen and (min-width: 768px)
-      justify-content: center
   &-img
     height: auto
     width: 80px
     padding-right: 20px
+  &-trainer
+    display:flex
+    flex-direction: row
+.biography
+  font-style: italic
 
 /deep/.q-stepper
   &__title
