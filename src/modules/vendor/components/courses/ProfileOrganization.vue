@@ -15,7 +15,7 @@
           @blur="updateCourse('referent.name')" :error="$v.course.referent.name.$error"/>
         <ni-input caption="Téléphone référent structure" @blur="updateCourse('referent.phone')"
             @focus="saveTmp('referent.phone')" v-model.trim="course.referent.phone"
-            :error="$v.course.referent.phone.$error" :error-label="phoneNbrError($v.course.referent.phone)" />
+            :error="$v.course.referent.phone.$error" :error-label="phoneNbrErrorReferent" />
         <ni-input caption="Email référent structure" v-model.trim="course.referent.email"
             @focus="saveTmp('referent.email')" @blur="updateCourse('referent.email')"
             :error="$v.course.referent.email.$error" :error-label="emailErrorReferent" />
@@ -137,10 +137,10 @@
       <ni-input in-modal v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error"
         caption="Nom" @blur="$v.newTrainee.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model="newTrainee.local.email" :error="$v.newTrainee.local.email.$error" caption="Email"
-        @blur="$v.newTrainee.local.email.$touch" :error-label="emailError($v.newTrainee.local.email)" required-field />
+        @blur="$v.newTrainee.local.email.$touch" :error-label="emailError($v.newTrainee)" required-field />
       <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch"
-        :error-label="phoneNbrError($v.newTrainee.contact.phone)" />
+        :error-label="phoneNbrError($v.newTrainee)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter à la formation" icon-right="add" color="primary"
           :loading="loading" @click="addTrainee" :disable="$v.newTrainee.$invalid" />
@@ -158,7 +158,7 @@
       <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
-        :error-label="phoneNbrError($v.editedTrainee.contact.phone)" />
+        :error-label="phoneNbrError($v.editedTrainee)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
           :loading="loading" @click="updateTrainee" :disable="$v.editedTrainee.$invalid" />
@@ -340,6 +340,11 @@ export default {
     },
     emailErrorReferent () {
       if (!this.$v.course.referent.email.email) return 'Email non valide';
+      return '';
+    },
+    phoneNbrErrorReferent () {
+      if (this.$v.course.referent.phone.required === false) return REQUIRED_LABEL;
+      else if (!this.$v.course.referent.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
       return '';
     },
   },
