@@ -56,13 +56,13 @@ export const userMixin = {
       }
     },
     emailError (validationObj) {
-      if (!validationObj.local.email.required) return REQUIRED_LABEL;
-      else if (!validationObj.local.email.email) return 'Email non valide';
+      if (get(validationObj, 'local.email.required', null) === false) return REQUIRED_LABEL;
+      else if (!get(validationObj, 'local.email.email', null)) return 'Email non valide';
       return '';
     },
     phoneNbrError (validationObj) {
-      if (validationObj.contact.phone.required === false) return REQUIRED_LABEL;
-      else if (!this.$_.get(validationObj, 'contact.phone.frPhoneNumber', null)) return 'Numéro de téléphone non valide';
+      if (get(validationObj, 'contact.phone.required', null) === false) return REQUIRED_LABEL;
+      else if (!get(validationObj, 'contact.phone.frPhoneNumber', null)) return 'Numéro de téléphone non valide';
       return '';
     },
   },
