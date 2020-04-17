@@ -62,7 +62,8 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters } from 'vuex';
+import get from 'lodash/get';
 import Courses from '@api/Courses';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -101,6 +102,8 @@ export default {
       if (!this.course.trainer) missingInfo.push('le formateur');
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
+      if (!get(this.course, 'referent.name')) missingInfo.push('le nom du référent structure');
+      if (!get(this.course, 'referent.phone')) missingInfo.push('le numéro du référent structure');
 
       return missingInfo;
     },
