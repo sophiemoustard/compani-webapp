@@ -5,11 +5,11 @@
       <ni-input v-model.trim="mergedUserProfile.identity.firstname" caption="Prénom"
         @focus="saveTmp('identity.firstname')" @blur="updateUser('identity.firstname')" />
       <ni-input v-model.trim="mergedUserProfile.identity.lastname" caption="Nom" @focus="saveTmp('identity.lastname')"
-        @blur="updateUser('identity.lastname')" />
+        @blur="updateUser('identity.lastname')" :error="$v.mergedUserProfile.identity.lastname.$error" />
       <div class="col-12 col-md-6 row items-center">
         <div class="col-xs-11">
-          <ni-input ref="userEmail" name="emailInput" caption="Adresse email"
-            :error="$v.mergedUserProfile.local.email.$error" :error-label="emailError($v.mergedUserProfile)" type="email" lower-case
+          <ni-input ref="userEmail" name="emailInput" caption="Adresse email" type="email" lower-case
+            :error="$v.mergedUserProfile.local.email.$error" :error-label="emailError($v.mergedUserProfile)"
             :disable="emailLock" v-model.trim="mergedUserProfile.local.email" @focus="saveTmp('local.email')" />
         </div>
         <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
@@ -55,7 +55,10 @@ export default {
   },
   validations () {
     return {
-      mergedUserProfile: { identity: { lastname: { required } }, local: { email: { required, email } } },
+      mergedUserProfile: {
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
+      },
     }
   },
   async mounted () {

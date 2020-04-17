@@ -2,7 +2,8 @@
   <div v-if="company">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Nom" v-model.trim="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')" />
+        <ni-input caption="Nom" v-model.trim="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')"
+          :error="$v.company.name.$error" />
       </div>
     </div>
     <div class="q-mb-xl">

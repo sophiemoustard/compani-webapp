@@ -3,9 +3,9 @@
     <div class="q-mb-xl">
       <div class="row gutter-profile">
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
-          @blur="updateCourse('name')" />
+          @blur="updateCourse('name')" :error="$v.course.name.$error" />
         <ni-select caption="Formateur" v-model.trim="course.trainer" @focus="saveTmp('trainer')"
-          @blur="updateCourse('trainer')" :options="trainerOptions" />
+          @blur="updateCourse('trainer')" :options="trainerOptions" :error="$v.course.trainer.$error" />
       </div>
     </div>
     <div class="q-mb-xl">
