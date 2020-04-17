@@ -15,7 +15,7 @@
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
         <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-        <q-icon :class="deletionDisabled ? 'cursor-not-allowed' : 'cursor-pointer'" name="delete" color="grey" size="1rem"
+        <q-btn round flat :disable="deletionDisabled" icon="delete" color="grey" size="0px"
           @click="validateCustomerDeletion" />
       </div>
     </div>
