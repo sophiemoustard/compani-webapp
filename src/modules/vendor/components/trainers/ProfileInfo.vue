@@ -26,10 +26,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { extend } from '@helpers/utils';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
@@ -46,10 +44,6 @@ export default {
   data () {
     return {
       tmpInput: '',
-      mergedUserProfile: {
-        identity: { lastname: '', firstname: '' },
-        local: { email: '' },
-      },
       emailLock: true,
     };
   },
@@ -61,18 +55,15 @@ export default {
       },
     }
   },
+  computed: {
+    ...mapGetters({ mergedUserProfile: 'rh/getUserProfile' }),
+    lockIcon () {
+      return this.emailLock ? 'lock' : 'lock_open';
+    },
+  },
   async mounted () {
-    this.mergeUser(this.userProfile);
     this.$v.mergedUserProfile.$touch();
     this.isLoaded = true;
-  },
-
-  watch: {
-    userProfile (value) {
-      if (this.emailLock && !isEqual(value, this.mergedUserProfile)) {
-        this.mergeUser(value);
-      }
-    },
   },
   methods: {
     async toggleEmailLock (toLock) {
@@ -83,11 +74,6 @@ export default {
       } else {
         await this.updateUser('local.email');
       }
-    },
-
-    mergeUser (value = null) {
-      const args = [this.mergedUserProfile, value];
-      this.mergedUserProfile = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
@@ -108,12 +94,6 @@ export default {
       }
     },
 
-  },
-  computed: {
-    ...mapGetters({ userProfile: 'rh/getUserProfile' }),
-    lockIcon () {
-      return this.emailLock ? 'lock' : 'lock_open';
-    },
   },
 };
 </script>
