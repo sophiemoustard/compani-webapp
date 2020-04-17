@@ -5,11 +5,11 @@
       <ni-input v-model.trim="mergedUserProfile.identity.firstname" caption="Prénom"
         @focus="saveTmp('identity.firstname')" @blur="updateUser('identity.firstname')" />
       <ni-input v-model.trim="mergedUserProfile.identity.lastname" caption="Nom" @focus="saveTmp('identity.lastname')"
-        @blur="updateUser('identity.lastname')" />
+        @blur="updateUser('identity.lastname')" :error="$v.mergedUserProfile.identity.lastname.$error" />
       <div class="col-12 col-md-6 row items-center">
         <div class="col-xs-11">
-          <ni-input ref="userEmail" name="emailInput" caption="Adresse email"
-            :error="$v.mergedUserProfile.local.email.$error" :error-label="emailError($v.mergedUserProfile)" type="email" lower-case
+          <ni-input ref="userEmail" name="emailInput" caption="Adresse email" type="email" lower-case
+            :error="$v.mergedUserProfile.local.email.$error" :error-label="emailError($v.mergedUserProfile)"
             :disable="emailLock" v-model.trim="mergedUserProfile.local.email" @focus="saveTmp('local.email')" />
         </div>
         <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
@@ -26,10 +26,8 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import isEqual from 'lodash/isEqual';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { extend } from '@helpers/utils';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
@@ -46,30 +44,26 @@ export default {
   data () {
     return {
       tmpInput: '',
-      mergedUserProfile: {
-        identity: { lastname: '', firstname: '' },
-        local: { email: '' },
-      },
       emailLock: true,
     };
   },
   validations () {
     return {
-      mergedUserProfile: { identity: { lastname: { required } }, local: { email: { required, email } } },
+      mergedUserProfile: {
+        identity: { lastname: { required } },
+        local: { email: { required, email } },
+      },
     }
   },
+  computed: {
+    ...mapGetters({ mergedUserProfile: 'rh/getUserProfile' }),
+    lockIcon () {
+      return this.emailLock ? 'lock' : 'lock_open';
+    },
+  },
   async mounted () {
-    this.mergeUser(this.userProfile);
     this.$v.mergedUserProfile.$touch();
     this.isLoaded = true;
-  },
-
-  watch: {
-    userProfile (value) {
-      if (this.emailLock && !isEqual(value, this.mergedUserProfile)) {
-        this.mergeUser(value);
-      }
-    },
   },
   methods: {
     async toggleEmailLock (toLock) {
@@ -80,11 +74,6 @@ export default {
       } else {
         await this.updateUser('local.email');
       }
-    },
-
-    mergeUser (value = null) {
-      const args = [this.mergedUserProfile, value];
-      this.mergedUserProfile = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
@@ -105,12 +94,6 @@ export default {
       }
     },
 
-  },
-  computed: {
-    ...mapGetters({ userProfile: 'rh/getUserProfile' }),
-    lockIcon () {
-      return this.emailLock ? 'lock' : 'lock_open';
-    },
   },
 };
 </script>

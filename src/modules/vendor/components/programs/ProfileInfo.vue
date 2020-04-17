@@ -2,7 +2,8 @@
   <div v-if="program">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')" />
+        <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
+          :error="$v.program.name.$error" />
       </div>
     </div>
   </div>
