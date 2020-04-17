@@ -12,11 +12,13 @@
       <p class="text-weight-bold">Référent structure</p>
       <div class="row gutter-profile">
         <ni-input caption="Nom référent structure" v-model.trim="course.referent.name" @focus="saveTmp('referent.name')"
-          @blur="updateCourse('referent.name')" />
-        <ni-input caption="Téléphone référent structure" v-model.trim="course.referent.phone" @focus="saveTmp('referent.phone')"
-            @blur="updateCourse('referent.phone')" />
-        <ni-input caption="Email référent structure" v-model.trim="course.referent.email" @focus="saveTmp('referent.email')"
-            @blur="updateCourse('referent.email')" />
+          @blur="updateCourse('referent.name')" :error="$v.course.referent.name.$error"/>
+        <ni-input caption="Téléphone référent structure" @blur="updateCourse('referent.phone')"
+            @focus="saveTmp('referent.phone')" v-model.trim="course.referent.phone"
+            :error="$v.course.referent.phone.$error" :error-label="phoneNbrError($v.course.referent.phone)" />
+        <ni-input caption="Email référent structure" v-model.trim="course.referent.email"
+            @focus="saveTmp('referent.email')" @blur="updateCourse('referent.email')"
+            :error="$v.course.referent.email.$error" :error-label="emailErrorReferent" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -135,9 +137,10 @@
       <ni-input in-modal v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error"
         caption="Nom" @blur="$v.newTrainee.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model="newTrainee.local.email" :error="$v.newTrainee.local.email.$error" caption="Email"
-        @blur="$v.newTrainee.local.email.$touch" :error-label="emailError($v.newTrainee)" required-field />
+        @blur="$v.newTrainee.local.email.$touch" :error-label="emailError($v.newTrainee.local.email)" required-field />
       <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
-        caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error-label="phoneNbrError($v.newTrainee)" />
+        caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch"
+        :error-label="phoneNbrError($v.newTrainee.contact.phone)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter à la formation" icon-right="add" color="primary"
           :loading="loading" @click="addTrainee" :disable="$v.newTrainee.$invalid" />
@@ -155,7 +158,7 @@
       <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
-        :error-label="phoneNbrError($v.editedTrainee)" />
+        :error-label="phoneNbrError($v.editedTrainee.contact.phone)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
           :loading="loading" @click="updateTrainee" :disable="$v.editedTrainee.$invalid" />
@@ -334,6 +337,10 @@ export default {
     },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
+    },
+    emailErrorReferent () {
+      if (!this.$v.course.referent.email.email) return 'Email non valide';
+      return '';
     },
   },
   async mounted () {

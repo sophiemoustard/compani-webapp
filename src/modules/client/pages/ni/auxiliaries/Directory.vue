@@ -42,7 +42,7 @@
       <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
         caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
       <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
+        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser.local.email)" required-field />
       <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
         @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
         :error="$v.newUser.contact.address.$error" in-modal />

@@ -93,12 +93,12 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Numéro de téléphone" :error="$v.mergedUserProfile.contact.phone.$error"
-          :error-label="phoneNbrError($v.mergedUserProfile)" type="tel" v-model.trim="mergedUserProfile.contact.phone"
+          :error-label="phoneNbrError($v.mergedUserProfile.contact.phone)" type="tel" v-model.trim="mergedUserProfile.contact.phone"
           @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
         <div v-if="isCoach" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
             <ni-input ref="userEmail" name="emailInput" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
-              :error-label="emailError($v.mergedUserProfile)" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
+              :error-label="emailError($v.mergedUserProfile.local.email)" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
               @focus="saveTmp('local.email')" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">

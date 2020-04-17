@@ -9,7 +9,7 @@
       <div class="col-12 col-md-6 row items-center">
         <div class="col-xs-11">
           <ni-input ref="userEmail" name="emailInput" caption="Adresse email"
-            :error="$v.mergedUserProfile.local.email.$error" :error-label="emailError($v.mergedUserProfile)" type="email" lower-case
+            :error="$v.mergedUserProfile.local.email.$error" :error-label="emailError($v.mergedUserProfile.local.email)" type="email" lower-case
             :disable="emailLock" v-model.trim="mergedUserProfile.local.email" @focus="saveTmp('local.email')" />
         </div>
         <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
