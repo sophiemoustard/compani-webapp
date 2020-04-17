@@ -15,7 +15,7 @@
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
         <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-        <q-icon name="delete" color="grey" size="1rem" :disable="!!customer.firstIntervention"
+        <q-icon :class="deletionDisabled ? 'cursor-not-allowed' : 'cursor-pointer'" name="delete" color="grey" size="1rem"
           @click="validateCustomerDeletion" />
       </div>
     </div>
@@ -30,9 +30,10 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 export default {
   name: 'ProfileHeader',
   computed: {
-    ...mapGetters({
-      customer: 'customer/getCustomer',
-    }),
+    ...mapGetters({ customer: 'customer/getCustomer' }),
+    deletionDisabled () {
+      return !!this.customer.firstIntervention || this.customer.contracts.length;
+    },
     isPlanningRouterDisable () {
       return !this.customer.firstIntervention;
     },
@@ -62,10 +63,12 @@ export default {
         this.$router.push({ name: 'customers directory' });
       } catch (e) {
         console.error(e);
+        if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer ce bénéficiaire.');
         if (e.msg) NotifyNegative('Erreur lors de la suppression du bénéficiaire.');
       }
     },
     validateCustomerDeletion () {
+      if (this.deletionDisabled) return;
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
