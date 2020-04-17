@@ -30,7 +30,7 @@
         </q-step>
       </q-stepper>
     </div>
-    <div v-if="course.trainer" class="course-container course-trainer q-mx-sm q-my-lg">
+    <div v-if="course.trainer" class="course-container course-bottom-info q-mx-sm q-my-lg">
       <img class="course-img course-img-explanation"
         src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
       <div>
@@ -39,8 +39,21 @@
         <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
       </div>
     </div>
-    <div class="q-mx-sm q-my-lg course-container cursor-pointer">
-      <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
+    <div v-if="course.referent" class="course-container course-bottom-info q-mx-sm q-my-lg">
+      <img class="course-img"
+        src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
+      <div>
+        <div class="text-weight-bold">Une question ?</div>
+        <div class="">Votre contact</div>
+        <div class="text-weight-bold" >{{ course.referent.name }}</div>
+        <div class="text-weight-bold" >{{ formatPhone(course.referent.phone) }}</div>
+        <div v-if="course.referent.email">{{ course.referent.email }}</div>
+      </div>
+    </div>
+    <div class="q-mt-md links">
+      <div class="q-mx-sm q-my-lg course-container cursor-pointer">
+        <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
+      </div>
     </div>
 
     <!-- Modal reglement interieur -->
@@ -52,7 +65,7 @@
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatPhone } from '@helpers/utils';
 import HtmlModal from '@components/modal/HtmlModal';
 import rules from 'src/statics/rules.html';
 
@@ -105,6 +118,9 @@ export default {
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
     },
+    formatPhone (value) {
+      return formatPhone(value);
+    },
   },
   filters: {
     formatIdentity,
@@ -144,7 +160,7 @@ export default {
   &-stepper
     display: flex
     flex-direction: column
-  &-trainer
+  &-bottom-info
     display: flex
     flex-direction: row
 .biography
