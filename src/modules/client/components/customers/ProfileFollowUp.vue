@@ -100,7 +100,6 @@
 
 <script>
 import get from 'lodash/get';
-import Customers from '@api/Customers';
 import Stats from '@api/Stats';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
@@ -280,12 +279,7 @@ export default {
     },
     async refreshCustomer () {
       try {
-        const customer = await Customers.getById(this.customer._id);
-        if (!get(customer, 'referent._id')) customer.referent = { _id: '' };
-        if (!get(customer, 'contact')) customer.contact = {};
-        if (!get(customer, 'followUp')) customer.followUp = {};
-
-        this.$store.commit('customer/saveCustomer', customer);
+        await this.$store.dispatch('customer/getCustomer', { customerId: this.customer._id });
         this.$v.customer.$touch();
         this.isLoaded = true;
       } catch (e) {
