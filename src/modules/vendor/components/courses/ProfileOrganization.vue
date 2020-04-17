@@ -4,7 +4,7 @@
       <div class="row gutter-profile">
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" :error="$v.course.name.$error" />
-        <ni-select caption="Formateur" v-model.trim="course.trainer" @focus="saveTmp('trainer')"
+        <ni-select caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
           @blur="updateCourse('trainer')" :options="trainerOptions" :error="$v.course.trainer.$error" />
       </div>
     </div>
@@ -360,7 +360,7 @@ export default {
   methods: {
     get,
     saveTmp (path) {
-      this.tmpInput = get(this.course, path)
+      this.tmpInput = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
     },
     padMinutes (minutes) {
       return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
@@ -386,7 +386,7 @@ export default {
     },
     async updateCourse (path) {
       try {
-        const value = get(this.course, path);
+        const value = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
         if (this.tmpInput === value) return;
         get(this.$v.course, path).$touch();
         if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
