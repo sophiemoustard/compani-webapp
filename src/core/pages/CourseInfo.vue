@@ -30,7 +30,7 @@
         </q-step>
       </q-stepper>
     </div>
-    <div class="course-container course-trainer q-mx-sm q-my-lg">
+    <div v-if="course.trainer" class="course-container course-trainer q-mx-sm q-my-lg">
       <img class="course-img"
         src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
       <div>
