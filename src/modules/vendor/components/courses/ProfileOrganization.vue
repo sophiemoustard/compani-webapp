@@ -309,14 +309,16 @@ export default {
     },
     slotsDurationColumnTitle () {
       if (!this.course || !this.course.slots) return '0h';
+
       const total = this.course.slots.reduce(
         (acc, slot) => acc.add(this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate))),
         this.$moment.duration()
       );
 
       const paddedMinutes = this.padMinutes(total.minutes());
+      const hours = total.days() * 24 + total.hours();
 
-      return paddedMinutes ? `${total.hours()}h${paddedMinutes}` : `${total.hours()}h`;
+      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
