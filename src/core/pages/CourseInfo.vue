@@ -39,8 +39,11 @@
         <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
       </div>
     </div>
-    <a @click.prevent="rulesModal = true" class="rules cursor-pointer">Règlement intérieur</a>
-
+    <div class="q-mt-md links">
+      <div class="cursor-pointer q-mb-sm">
+        <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
+      </div>
+    </div>
     <!-- Modal reglement interieur -->
     <ni-html-modal title="Règlement intérieur" v-model="rulesModal" :html="rules" />
 
@@ -181,15 +184,14 @@ export default {
 .opacity
   opacity: 0.6
 
-.rules
-  display: flex
-  justify-content: center;
-  color: $primary;
-  margin-bottom: 20px;
-
-h5
+.course-title > h5
   color: $primary
   font-weight: bold
+
+.links
+  display: flex
+  flex-direction: column
+  align-items: center
 
 @media screen and (min-width: 768px)
   .course-info-title-container
