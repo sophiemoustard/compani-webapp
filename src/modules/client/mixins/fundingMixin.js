@@ -111,14 +111,12 @@ export const fundingMixin = {
     }
   },
   methods: {
-    refreshFundings () {
+    refreshFundings ({ fundings }) {
       try {
         this.fundingsLoading = true;
-        const { fundings } = this.customer;
-        this.fundings = fundings ? fundings.map(fund => {
-          const { versions } = fund;
-          return { ...getLastVersion(versions, 'createdAt'), ...fund };
-        }) : [];
+        this.fundings = fundings
+          ? fundings.map(fund => ({ ...getLastVersion(fund.versions, 'createdAt'), ...fund }))
+          : [];
       } catch (e) {
         console.error(e);
       } finally {
