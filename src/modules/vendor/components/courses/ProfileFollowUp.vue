@@ -91,7 +91,11 @@ export default {
       message: '',
       loading: false,
       courseLoading: false,
+      smsSent: [],
     };
+  },
+  mounted () {
+    this.refreshSms();
   },
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
@@ -121,6 +125,9 @@ export default {
     await this.refreshCourse();
   },
   methods: {
+    async refreshSms () {
+      this.smsSent = await Courses.getSMS(this.course._id);
+    },
     handleCopySuccess () {
       return NotifyPositive('Lien copié !');
     },
@@ -166,7 +173,7 @@ export default {
     async sendMessage () {
       try {
         this.loading = true;
-        await Courses.sendSMS(this.course._id, { body: this.message });
+        await Courses.sendSMS(this.course._id, { body: this.message, type: this.messageType });
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
         console.error(e);
