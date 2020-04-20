@@ -1,5 +1,5 @@
 <template functional>
-  <div class="title-padding row items-start">
+  <div class="row items-start">
     <div class="col-xs-12 col-md-4 row">
       <h4>{{ props.title }}</h4>
       <slot name="title" />

@@ -1,9 +1,8 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-directory-header title="Formations" search-placeholder="Rechercher une formation"
-      @updateSearch="updateSearch" :search="searchStr" />
+    <ni-title-header title="Formations" class="title-padding" />
     <div class="q-mt-xl">
-      <course-detail class="q-mb-sm" v-for="(course, index) in filteredCourses" :key="index" :course="course"
+      <course-detail class="q-mb-sm" v-for="(course, index) in sortedCourses" :key="index" :course="course"
         @click="goToCourseProfile" />
     </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
@@ -32,7 +31,7 @@
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
-import DirectoryHeader from '@components/DirectoryHeader';
+import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
@@ -43,7 +42,7 @@ export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
   components: {
-    'ni-directory-header': DirectoryHeader,
+    'ni-title-header': TitleHeader,
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
@@ -51,7 +50,6 @@ export default {
   },
   data () {
     return {
-      searchStr: '',
       modalLoading: false,
       newCourse: {
         program: '',
@@ -76,10 +74,8 @@ export default {
     }
   },
   computed: {
-    filteredCourses () {
-      return this.courses
-        .filter(course => course.name.match(new RegExp(this.searchStr, 'i')))
-        .sort((a, b) => a.name.localeCompare(b.name));
+    sortedCourses () {
+      return [...this.courses].sort((a, b) => a.name.localeCompare(b.name));
     },
   },
   async mounted () {
@@ -88,9 +84,6 @@ export default {
     await this.refreshCompanies();
   },
   methods: {
-    updateSearch (value) {
-      this.searchStr = value;
-    },
     goToCourseProfile (course) {
       this.$router.push({ name: 'profile course info', params: { courseId: course._id } });
     },

@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="Bordereaux tiers payeurs" />
+    <ni-title-header title="Bordereaux tiers payeurs" class="title-padding" />
     <ni-large-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination" :loading="loading">
       <template v-slot:body="{ props }" >
         <q-tr :props="props">
