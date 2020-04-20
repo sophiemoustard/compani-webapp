@@ -51,8 +51,10 @@
       <div class="col-xs-8 col-md-9">
         <div class="text-weight-bold">Votre contact pour la formation</div>
         <div>{{ course.referent.name }}</div>
-        <div>{{ formatPhone(course.referent.phone) }}</div>
-        <div v-if="course.referent.email">{{ course.referent.email }}</div>
+        <div><a :href="referentPhoneLink">{{ formatPhone(course.referent.phone) }}</a></div>
+        <div><a v-if="course.referent.email" :href="'mailto:' + course.referent.email" >
+          {{ course.referent.email }}
+        </a></div>
       </div>
     </div>
     </div>
@@ -88,6 +90,10 @@ export default {
   computed: {
     courseSlots () {
       return this.course.slots ? groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')) : {};
+    },
+    referentPhoneLink () {
+      const phoneNumber = get(this.course, 'referent.phone');
+      return phoneNumber ? `tel:+33${phoneNumber.substring(1)}` : '';
     },
   },
   async mounted () {
