@@ -30,24 +30,31 @@
         </q-step>
       </q-stepper>
     </div>
-    <div v-if="course.trainer" class="course-container course-bottom-info q-mx-sm q-my-lg">
-      <img class="course-img course-img-explanation"
-        src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
-      <div>
+
+    <div>
+      <div v-if="course.trainer" class="course-container course-bottom-info q-mx-sm q-my-lg row">
+      <div class="col-xs-4 col-md-3 course-img-container">
+        <img class="course-img course-img-explanation"
+          src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
+      </div>
+      <div class="col-xs-8 col-md-9">
         <div class="text-weight-bold">Intervenant(e)</div>
         <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
         <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
       </div>
     </div>
-    <div v-if="course.referent" class="course-container course-bottom-info q-mx-sm q-my-lg">
-      <img class="course-img"
-        src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
-      <div>
+    <div v-if="course.referent" class="course-container course-bottom-info q-mx-sm q-my-lg row">
+      <div class="col-xs-4 col-md-3 course-img-container">
+        <img class="course-img course-img-referent-size"
+          src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
+      </div>
+      <div class="col-xs-8 col-md-9">
         <div class="text-weight-bold">Votre contact pour la formation</div>
         <div>{{ course.referent.name }}</div>
         <div>{{ formatPhone(course.referent.phone) }}</div>
         <div v-if="course.referent.email">{{ course.referent.email }}</div>
       </div>
+    </div>
     </div>
     <div class="q-mx-sm q-my-lg course-container cursor-pointer">
       <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
@@ -114,9 +121,7 @@ export default {
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
     },
-    formatPhone (value) {
-      return formatPhone(value);
-    },
+    formatPhone,
   },
   filters: {
     formatIdentity,
@@ -151,8 +156,13 @@ export default {
     margin-right: 10px
     &-explanation
       width: 110px
+    &-referent-size
+      width: 84px
     &-thumb
       width: 80px
+    &-container
+      display: flex
+      justify-content: center
   &-stepper
     display: flex
     flex-direction: column
