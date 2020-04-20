@@ -105,7 +105,9 @@ export default {
     async refreshPrograms () {
       try {
         const programs = await Programs.list();
-        this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
+        this.programOptions = programs
+          .map(p => ({ label: p.name, value: p._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         this.programOptions = [];
@@ -114,7 +116,9 @@ export default {
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = companies.map(c => ({ label: c.tradeName, value: c._id }));
+        this.companyOptions = companies
+          .map(c => ({ label: c.tradeName, value: c._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         this.companyOptions = [];
