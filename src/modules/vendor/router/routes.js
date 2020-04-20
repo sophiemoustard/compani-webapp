@@ -17,9 +17,9 @@ const routes = [
 
         const loggedUser = store.getters['main/loggedUser'];
         if (!loggedUser) return next({ path: '/login' });
-        if (!get(loggedUser, 'role.vendor')) return next({ name: '404' });
 
-        return next({ name: 'courses directory' });
+        if (!get(loggedUser, 'role.vendor.name')) return next({ name: '404' });
+        return next({ name: 'admin courses directory' });
       } catch (e) {
         console.error(e);
       }
@@ -94,7 +94,7 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER],
           parent: 'management',
         },
       },
