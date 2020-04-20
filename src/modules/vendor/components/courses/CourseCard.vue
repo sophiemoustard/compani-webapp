@@ -18,7 +18,9 @@ export default {
 <style lang="stylus" scoped>
   .q-card__section
     font-size: 13px
-    height: 48px
+    height: fit-content
     &:hover
       cursor: pointer
+    &--vert
+      padding: 10px
 </style>

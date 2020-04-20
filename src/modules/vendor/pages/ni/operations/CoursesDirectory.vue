@@ -1,9 +1,8 @@
 <template>
   <q-page class="neutral-background" padding>
-    <ni-title-header title="Formations" class="title-padding" />
-    <div class="q-mt-xl">
-      <course-detail class="q-mb-sm" v-for="(course, index) in sortedCourses" :key="index" :course="course"
-        @click="goToCourseProfile" />
+    <ni-title-header title="Formations" class="q-mb-xl" />
+    <div class="trello">
+      <course-container v-for="col in trello" :title="col.title" :courses="col.courses" :key="col.title" />
     </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="courseCreationModal = true" />
@@ -36,7 +35,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import CourseDetail from 'src/modules/vendor/components/courses/CourseDetail';
+import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -46,7 +45,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
-    'course-detail': CourseDetail,
+    'course-container': CourseContainer,
   },
   data () {
     return {
@@ -74,8 +73,12 @@ export default {
     }
   },
   computed: {
-    sortedCourses () {
-      return [...this.courses].sort((a, b) => a.name.localeCompare(b.name));
+    trello () {
+      return [
+        { title: 'À venir', courses: this.courses },
+        { title: 'En cours', courses: this.courses },
+        { title: 'Terminée(s)', courses: this.courses },
+      ]
     },
   },
   async mounted () {
@@ -84,9 +87,6 @@ export default {
     await this.refreshCompanies();
   },
   methods: {
-    goToCourseProfile (course) {
-      this.$router.push({ name: 'profile course info', params: { courseId: course._id } });
-    },
     async refreshCourses () {
       try {
         this.courses = await Courses.list();
@@ -139,3 +139,12 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.trello
+  overflow: overlay;
+  display: flex
+  flex-direction: row
+  @media screen and (min-width: 768px)
+    justify-content: space-between
+</style>

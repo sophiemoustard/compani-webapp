@@ -1,7 +1,7 @@
-<template functional>
+<template>
   <div class="row items-start">
     <div class="col-xs-12 col-md-4 row">
-      <h4>{{ props.title }}</h4>
+      <h4>{{ title }}</h4>
       <slot name="title" />
     </div>
     <div class="col-xs-12 col-md-8 row justify-end">
