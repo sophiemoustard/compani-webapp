@@ -1,10 +1,10 @@
 <template>
-  <div class="q-mb-xl course">
+  <div class="course">
     <div class="row col-12 q-pa-md course-header items-center justify-center text-weight-bold">
       <div>Votre formation Compani</div>
     </div>
     <div class="course-container course-title q-mx-sm q-my-lg">
-      <img class="course-img"
+      <img class="course-img course-img-thumb"
         src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/aux-pouce.png">
       <div class="course-title-text">
         <div class="text-weight-bold">Vous êtes convoqué(e) à la formation</div>
@@ -31,7 +31,7 @@
       </q-stepper>
     </div>
     <div v-if="course.trainer" class="course-container course-trainer q-mx-sm q-my-lg">
-      <img class="course-img"
+      <img class="course-img course-img-explanation"
         src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
       <div>
         <div class="text-weight-bold">Intervenant(e)</div>
@@ -39,14 +39,12 @@
         <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
       </div>
     </div>
-    <div class="q-mt-md links">
-      <div class="cursor-pointer q-mb-sm">
-        <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
-      </div>
+    <div class="q-mx-sm q-my-lg course-container cursor-pointer">
+      <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
     </div>
+
     <!-- Modal reglement interieur -->
     <ni-html-modal title="Règlement intérieur" v-model="rulesModal" :html="rules" />
-
   </div>
 </template>
 
@@ -137,10 +135,12 @@ export default {
     &-text
       border-bottom: 2px solid $grey-3
   &-img
-    height: auto
-    width: 80px
     height: 110px
     margin-right: 10px
+    &-explanation
+      width: 110px
+    &-thumb
+      width: 80px
   &-stepper
     display: flex
     flex-direction: column
@@ -184,19 +184,14 @@ export default {
 .opacity
   opacity: 0.6
 
-.course-title > h5
+.course-title-text > h5
   color: $primary
   font-weight: bold
-
-.links
-  display: flex
-  flex-direction: column
-  align-items: center
 
 @media screen and (min-width: 768px)
   .course-info-title-container
     padding: 0px 125px
 
-  h5
+  .course-title-text > h5
     margin-bottom: 20px !important
 </style>
