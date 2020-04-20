@@ -30,13 +30,29 @@
         </q-step>
       </q-stepper>
     </div>
-    <div v-if="course.trainer" class="course-container course-trainer q-mx-sm q-my-lg">
-      <img class="course-img course-img-explanation"
-        src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
-      <div>
+    <div v-if="course.trainer" class="course-container course-bottom-info q-mx-sm q-my-lg row">
+      <div class="col-xs-4 col-md-3 course-img-container">
+          <img class="course-img course-img-explanation"
+           src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
+      </div>
+      <div class="col-xs-8 col-md-9">
         <div class="text-weight-bold">Intervenant(e)</div>
         <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
         <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
+      </div>
+    </div>
+    <div v-if="course.referent" class="course-container course-bottom-info q-mx-sm q-my-lg row">
+      <div class="col-xs-4 col-md-3 course-img-container">
+        <img class="course-img course-img-referent"
+          src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
+      </div>
+      <div class="col-xs-8 col-md-9">
+        <div class="text-weight-bold">Votre contact pour la formation</div>
+        <div>{{ course.referent.name }}</div>
+        <div><a :href="referentPhoneLink">{{ formatPhone(course.referent.phone) }}</a></div>
+        <div>
+          <a v-if="course.referent.email" :href="'mailto:' + course.referent.email" >{{ course.referent.email }}</a>
+        </div>
       </div>
     </div>
     <div class="q-mx-sm q-my-lg course-container cursor-pointer">
@@ -52,7 +68,7 @@
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatPhone } from '@helpers/utils';
 import HtmlModal from '@components/modal/HtmlModal';
 import rules from 'src/statics/rules.html';
 
@@ -72,6 +88,10 @@ export default {
   computed: {
     courseSlots () {
       return this.course.slots ? groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')) : {};
+    },
+    referentPhoneLink () {
+      const phoneNumber = get(this.course, 'referent.phone');
+      return phoneNumber ? `tel:+33${phoneNumber.substring(1)}` : '';
     },
   },
   async mounted () {
@@ -105,6 +125,7 @@ export default {
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
     },
+    formatPhone,
   },
   filters: {
     formatIdentity,
@@ -139,12 +160,17 @@ export default {
     margin-right: 10px
     &-explanation
       width: 110px
+    &-referent
+      width: 84px
     &-thumb
       width: 80px
+    &-container
+      display: flex
+      justify-content: center
   &-stepper
     display: flex
     flex-direction: column
-  &-trainer
+  &-bottom-info
     display: flex
     flex-direction: row
 .biography
