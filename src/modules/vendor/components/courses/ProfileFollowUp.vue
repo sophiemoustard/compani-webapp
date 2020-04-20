@@ -90,6 +90,7 @@ export default {
       ],
       message: '',
       loading: false,
+      courseLoading: false,
     };
   },
   computed: {
@@ -116,6 +117,9 @@ export default {
         `trainees/courses/${this.course._id}`;
     },
   },
+  async mounted () {
+    await this.refreshCourse();
+  },
   methods: {
     handleCopySuccess () {
       return NotifyPositive('Lien copié !');
@@ -123,6 +127,16 @@ export default {
     openSmsModal () {
       this.updateMessage();
       this.smsModal = true;
+    },
+    async refreshCourse () {
+      try {
+        this.courseLoading = true;
+        await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
+      } catch (e) {
+        console.error(e);
+      } finally {
+        this.courseLoading = false;
+      }
     },
     updateMessage () {
       if (this.messageType === 'convocation') this.setConvocationMessage();
