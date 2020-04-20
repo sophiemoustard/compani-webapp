@@ -49,12 +49,9 @@
         <div v-if="course.referent.email">{{ course.referent.email }}</div>
       </div>
     </div>
-    <div class="q-mt-md links">
-      <div class="q-mx-sm q-my-lg course-container cursor-pointer">
-        <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
-      </div>
+    <div class="q-mx-sm q-my-lg course-container cursor-pointer">
+      <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
     </div>
-
     <!-- Modal reglement interieur -->
     <ni-html-modal title="Règlement intérieur" v-model="rulesModal" :html="rules" />
   </div>
