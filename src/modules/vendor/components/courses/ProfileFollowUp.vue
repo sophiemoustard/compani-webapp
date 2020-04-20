@@ -44,6 +44,23 @@
       </q-item-section>
       <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
     </q-item>
+    <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination"
+      :loading="smsLoading" class="sms-table">
+      <template v-slot:body="{ props }">
+        <q-tr :props="props">
+          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+            :style="col.style">
+            <template v-if="col.name === 'actions'">
+              <div class="row no-wrap table-actions">
+                <q-btn flat round small color="grey" icon="remove_red_eye"
+                  @click.native="openSmsInfoModal(col.value._id)" />
+              </div>
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
+        </q-tr>
+      </template>
+    </ni-responsive-table>
 
     <!-- Modal envoi message -->
     <ni-modal v-model="smsModal">
@@ -68,6 +85,7 @@ import Courses from '@api/Courses';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export default {
@@ -76,6 +94,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
+    'ni-responsive-table': ResponsiveTable,
   },
   props: {
     profileId: { type: String },
@@ -92,10 +111,34 @@ export default {
       loading: false,
       courseLoading: false,
       smsSent: [],
+      smsSentColumns: [
+        {
+          name: 'type',
+          label: 'Type',
+          align: 'left',
+          field: 'type',
+        },
+        {
+          name: 'date',
+          label: 'Date d\'envoi',
+          align: 'left',
+          field: 'date',
+          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+        },
+        {
+          name: 'actions',
+          label: '',
+          align: 'center',
+          field: '_id',
+        },
+      ],
+      pagination: { rowsPerPage: 0 },
+      smsLoading: false,
     };
   },
-  mounted () {
-    this.refreshSms();
+  async mounted () {
+    await this.refreshCourse();
+    await this.refreshSms();
   },
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
@@ -121,12 +164,18 @@ export default {
         `trainees/courses/${this.course._id}`;
     },
   },
-  async mounted () {
-    await this.refreshCourse();
-  },
   methods: {
     async refreshSms () {
-      this.smsSent = await Courses.getSMS(this.course._id);
+      try {
+        this.smsLoading = true;
+        this.smsSent = await Courses.getSMS(this.course._id);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du chargement des sms');
+        this.smsSent = [];
+      } finally {
+        this.smsLoading = false;
+      }
     },
     handleCopySuccess () {
       return NotifyPositive('Lien copié !');
@@ -144,6 +193,9 @@ export default {
       } finally {
         this.courseLoading = false;
       }
+    },
+    openSmsInfoModal () {
+      return '';
     },
     updateMessage () {
       if (this.messageType === 'convocation') this.setConvocationMessage();
@@ -218,4 +270,7 @@ export default {
       &-disabled
         opacity: 0.7 !important;
         cursor: not-allowed !important
+
+.sms-table
+  margin-top: 20px;
 </style>
