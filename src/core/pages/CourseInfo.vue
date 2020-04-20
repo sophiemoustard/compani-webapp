@@ -41,12 +41,11 @@
     </div>
     <div v-if="course.referent" class="course-container course-bottom-info q-mx-sm q-my-lg">
       <img class="course-img"
-        src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
+        src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
       <div>
-        <div class="text-weight-bold">Une question ?</div>
-        <div class="">Votre contact</div>
-        <div class="text-weight-bold" >{{ course.referent.name }}</div>
-        <div class="text-weight-bold" >{{ formatPhone(course.referent.phone) }}</div>
+        <div class="text-weight-bold">Votre contact pour la formation</div>
+        <div>{{ course.referent.name }}</div>
+        <div>{{ formatPhone(course.referent.phone) }}</div>
         <div v-if="course.referent.email">{{ course.referent.email }}</div>
       </div>
     </div>
