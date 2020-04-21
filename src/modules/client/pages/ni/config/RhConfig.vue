@@ -264,24 +264,9 @@ export default {
       company: null,
       internalHours: [],
       internalHoursColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
-        {
-          name: 'default',
-          label: 'Type par défaut',
-          align: 'left',
-          field: 'default',
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
+        { name: 'default', label: 'Type par défaut', align: 'left', field: 'default' },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       internalHoursLoading: false,
       newInternalHourModal: false,
@@ -290,18 +275,8 @@ export default {
       pagination: { rowsPerPage: 0 },
       administrativeDocuments: [],
       administrativeDocumentsColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-          sortable: true,
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true },
+        { name: 'actions', label: '', align: 'center' },
       ],
       administrativeDocumentsLoading: false,
       administrativeDocumentCreationModal: false,
@@ -309,12 +284,7 @@ export default {
       newAdministrativeDocument: { name: '', file: null },
       sectors: [],
       sectorsColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
           name: 'actions',
           label: '',
@@ -323,10 +293,7 @@ export default {
         },
       ],
       sectorsLoading: false,
-      sectorsPagination: {
-        rowsPerPage: 0,
-        sortBy: 'name',
-      },
+      sectorsPagination: { rowsPerPage: 0, sortBy: 'name' },
       sectorCreationModal: false,
       newSector: { name: '' },
       sectorEditionModal: false,
@@ -334,9 +301,6 @@ export default {
     }
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
@@ -362,7 +326,7 @@ export default {
     }
   },
   async mounted () {
-    this.company = cloneDeep(this.loggedUser.company);
+    this.company = cloneDeep(this.loggedCompany);
     if (!this.company.rhConfig.templates) this.company.rhConfig.templates = {};
 
     await Promise.all([
@@ -403,7 +367,7 @@ export default {
     },
     async refreshCompany () {
       await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
-      this.company = this.loggedUser.company;
+      this.company = this.loggedCompany;
     },
     // Internal hours
     resetInternalHourCreationModal () {
@@ -435,7 +399,7 @@ export default {
         if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
         const payload = pickBy(this.newInternalHour);
         await InternalHours.create(payload);
-        await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+        await this.refreshCompany();
 
         NotifyPositive('Heure interne créée');
         this.newInternalHourModal = false;
@@ -451,7 +415,8 @@ export default {
       try {
         const index = this.getRowIndex(this.internalHours, row);
         await InternalHours.remove(internalHourId);
-        await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+        await this.refreshCompany();
+
         this.internalHours.splice(index, 1);
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
@@ -471,13 +436,12 @@ export default {
     async updateDefaultInternalHour (internalHourId) {
       try {
         const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
-        if (defaultInternalHour) {
-          await InternalHours.update(defaultInternalHour._id, { default: false });
-        }
+        if (defaultInternalHour) await InternalHours.update(defaultInternalHour._id, { default: false });
 
         await InternalHours.update(internalHourId, { default: true });
         await this.refreshInternalHours();
-        await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+        await this.refreshCompany();
+
         NotifyPositive('Heures internes mises à jour')
       } catch (e) {
         console.error(e);

@@ -73,15 +73,13 @@ export const planningModalMixin = {
   },
   computed: {
     ...mapGetters({
-      loggedUser: 'main/loggedUser',
       filters: 'planning/getFilters',
+      clientRole: 'main/clientRole',
     }),
     absenceOptions () {
-      if (this.newEvent && this.newEvent.absenceNature === HOURLY) {
-        return ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED);
-      }
-
-      return ABSENCE_TYPES;
+      return this.newEvent && this.newEvent.absenceNature === HOURLY
+        ? ABSENCE_TYPES.filter(type => type.value === UNJUSTIFIED)
+        : ABSENCE_TYPES;
     },
     isCustomerPlanning () {
       return this.personKey === CUSTOMER;
@@ -180,10 +178,7 @@ export const planningModalMixin = {
       return customers.map(cus => this.formatPersonOptions(cus));
     },
     internalHourOptions () {
-      return this.internalHours.map(hour => ({
-        label: hour.name,
-        value: hour._id,
-      }));
+      return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
     },
     repetitionOptions () {
       const oneWeekRepetitionLabel = this.creationModal
@@ -202,7 +197,7 @@ export const planningModalMixin = {
       ];
     },
     customerProfileRedirect () {
-      return COACH_ROLES.includes(get(this.loggedUser, 'role.client.name', null))
+      return COACH_ROLES.includes(this.clientRole)
         ? { name: 'customers profile', params: { customerId: this.selectedCustomer._id } }
         : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
     },

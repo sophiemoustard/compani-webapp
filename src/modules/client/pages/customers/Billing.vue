@@ -17,7 +17,7 @@ export default {
   },
   computed: {
     helper () {
-      return this.$store.getters['main/loggedUser'];
+      return this.$store.state.main.loggedUser;
     },
     customer () {
       return this.$store.getters['customer/getCustomer'];

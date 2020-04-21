@@ -85,6 +85,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import snakeCase from 'lodash/snakeCase';
@@ -186,14 +187,16 @@ export default {
     }
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({
+      company: 'main/company',
+      clientRole: 'main/clientRole',
+    }),
     customer () {
       return this.$store.getters['customer/getCustomer'];
     },
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
     },
     documentQuery () {
       return {
@@ -202,20 +205,14 @@ export default {
         endDate: this.billingDates.endDate,
       };
     },
-    userRole () {
-      return this.loggedUser.role.client.name;
-    },
-    company () {
-      return this.loggedUser.company;
-    },
     isHelper () {
-      return HELPER === this.userRole;
+      return HELPER === this.clientRole;
     },
     isAdmin () {
-      return CLIENT_ADMIN === this.userRole;
+      return CLIENT_ADMIN === this.clientRole;
     },
     isCoach () {
-      return COACH_ROLES.includes(this.userRole);
+      return COACH_ROLES.includes(this.clientRole);
     },
     taxCertificateFileError () {
       if (!this.$v.taxCertificate.file.required) return REQUIRED_LABEL;

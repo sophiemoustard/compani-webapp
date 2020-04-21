@@ -138,20 +138,9 @@ export default {
           align: 'left',
           sortable: true,
         },
-        {
-          name: 'attachment',
-          label: 'Justificatif',
-        },
-        {
-          name: 'misc',
-          label: 'Notes',
-          field: 'misc',
-          align: 'left',
-        },
-        {
-          name: 'actions',
-          label: '',
-        },
+        { name: 'attachment', label: 'Justificatif' },
+        { name: 'misc', label: 'Notes', field: 'misc', align: 'left' },
+        { name: 'actions', label: '' },
       ],
       dates: {
         startDate: this.$moment().startOf('M').toISOString(),
@@ -166,9 +155,6 @@ export default {
   computed: {
     activeAuxiliaries () {
       return [this.selectedAuxiliary];
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
     },
   },
   methods: {

@@ -75,7 +75,7 @@ export default {
   },
   async mounted () {
     try {
-      await this.fillFilter({ loggedUser: this.loggedUser, roleToSearch: CUSTOMER });
+      await this.fillFilter({ company: this.company, roleToSearch: CUSTOMER });
       await this.getAuxiliaries();
       this.initFilters();
     } catch (e) {
@@ -93,7 +93,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      loggedUser: 'main/loggedUser',
+      company: 'main/company',
+      clientRole: 'main/clientRole',
       filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
@@ -125,7 +126,7 @@ export default {
     initFilters () {
       if (this.targetedCustomer) {
         this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedCustomer.identity, 'FL')]);
-      } else if (COACH_ROLES.includes(this.loggedUser.role.client.name)) {
+      } else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Customers');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.loggedUser.sector);
@@ -168,7 +169,7 @@ export default {
     },
     async getAuxiliaries () {
       const params = { role: [AUXILIARY, PLANNING_REFERENT] };
-      const companyId = get(this.loggedUser, 'company._id');
+      const companyId = get(this.company, '_id');
       if (companyId) params.company = companyId;
       this.auxiliaries = await Users.list(params);
     },

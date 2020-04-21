@@ -319,6 +319,7 @@ import capitalize from 'lodash/capitalize';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
+import get from 'lodash/get';
 import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
@@ -433,12 +434,7 @@ export default {
         customEndTime: null,
       },
       surchargesColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
           name: 'saturday',
           label: 'Samedi',
@@ -505,12 +501,7 @@ export default {
           align: 'center',
           field: row => row.customEndTime ? this.$moment(row.customEndTime).format('HH:mm') : '',
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       surchargesLoading: false,
       // Services
@@ -548,12 +539,7 @@ export default {
           align: 'left',
           field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
         },
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
           name: 'nature',
           label: 'Nature',
@@ -568,7 +554,8 @@ export default {
           name: 'defaultUnitAmount',
           label: 'Prix unitaire TTC par défaut',
           align: 'center',
-          field: row => `${row.defaultUnitAmount}€`,
+          field: 'defaultUnitAmount',
+          format: value => `${value}€`,
         },
         {
           name: 'vat',
@@ -588,12 +575,7 @@ export default {
           align: 'center',
           field: row => row.exemptFromCharges ? 'Oui' : 'Non',
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       servicesLoading: false,
       thirdPartyPayers: [],
@@ -606,18 +588,8 @@ export default {
           sortable: true,
           style: !this.$q.platform.is.mobile && 'width: 250px',
         },
-        {
-          name: 'address',
-          label: 'Adresse',
-          align: 'left',
-          field: row => row.address ? row.address.fullAddress : '',
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          field: 'email',
-          align: 'left',
-        },
+        { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
+        { name: 'email', label: 'Email', field: 'email', align: 'left' },
         {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC par défaut',
@@ -750,9 +722,6 @@ export default {
     },
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
@@ -842,7 +811,7 @@ export default {
     },
     async refreshCompany () {
       await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
-      this.company = this.loggedUser.company;
+      this.company = this.loggedCompany;
       this.documents = this.company.customersConfig.templates || {};
       this.company.address = this.company.address || { fullAddress: '' };
     },

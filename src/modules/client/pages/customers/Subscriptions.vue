@@ -169,18 +169,8 @@ export default {
       embeddedUrl: '',
       mandatesLoading: false,
       mandatesColumns: [
-        {
-          name: 'rum',
-          label: 'RUM',
-          align: 'left',
-          field: 'rum',
-        },
-        {
-          name: 'sign',
-          label: 'Signature',
-          align: 'left',
-          field: 'signedAt',
-        },
+        { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
+        { name: 'sign', label: 'Signature', align: 'left', field: 'signedAt' },
         {
           name: 'createdAt',
           align: 'left',
@@ -189,10 +179,7 @@ export default {
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
-        {
-          name: '_id',
-          field: '_id',
-        },
+        { name: '_id', field: '_id' },
       ],
       mandatesVisibleColumns: ['rum', 'sign'],
       fundingModal: false,
@@ -216,7 +203,7 @@ export default {
   },
   computed: {
     helper () {
-      return this.$store.getters['main/loggedUser'];
+      return this.$store.state.main.loggedUser;
     },
     customer () {
       return this.$store.getters['customer/getCustomer'];

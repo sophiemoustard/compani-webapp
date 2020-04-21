@@ -39,7 +39,7 @@ export default {
       return auxiliaryPicture ? get(auxiliaryPicture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
     },
     helper () {
-      return this.$store.getters['main/loggedUser'];
+      return this.$store.state.main.loggedUser;
     },
     company () {
       return this.helper.company;

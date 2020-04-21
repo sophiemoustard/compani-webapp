@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -69,9 +70,9 @@ export default {
     this.getUserList();
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
+    ...mapGetters({
+      company: 'main/company',
+    }),
     filteredUsers () {
       return this.userList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
     },
@@ -84,14 +85,11 @@ export default {
       try {
         this.tableLoading = true;
         const params = { role: [AUXILIARY, PLANNING_REFERENT] };
-        const companyId = get(this.loggedUser, 'company._id', null);
+        const companyId = get(this.company, '_id') || null;
         if (companyId) params.company = companyId;
         const users = await Users.listActive(params);
         this.userList = users.map(user => ({
-          auxiliary: {
-            name: formatIdentity(user.identity, 'FL'),
-            picture: user.picture ? user.picture.link : null,
-          },
+          auxiliary: { name: formatIdentity(user.identity, 'FL'), picture: get(user, 'picture.link') || null },
           phone: get(user, 'contact.phone') || '',
         }));
       } catch (e) {

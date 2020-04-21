@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import get from 'lodash/get';
 import snakeCase from 'lodash/snakeCase';
 import keyBy from 'lodash/keyBy';
@@ -112,22 +112,20 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ loggedUser: 'main/loggedUser' }),
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({ clientRole: 'main/clientRole' }),
     documentNatureLabels () {
       const payDocumentNaturesKeyedByValue = keyBy(PAY_DOCUMENT_NATURES, 'value');
 
       return mapValues(payDocumentNaturesKeyedByValue, 'label');
     },
-    loggedUserRole () {
-      return this.loggedUser.role.client.name;
-    },
     userProfile () {
-      if (AUXILIARY_ROLES.includes(this.loggedUserRole)) return this.loggedUser;
-      if (COACH_ROLES.includes(this.loggedUserRole)) return this.$store.getters['rh/getUserProfile'];
+      if (AUXILIARY_ROLES.includes(this.clientRole)) return this.loggedUser;
+      if (COACH_ROLES.includes(this.clientRole)) return this.$store.getters['rh/getUserProfile'];
       return {};
     },
     isCoach () {
-      return COACH_ROLES.includes(this.loggedUserRole);
+      return COACH_ROLES.includes(this.clientRole);
     },
     driveFolder () {
       return get(this.userProfile, 'administrative.driveFolder.driveId');

@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hhh Lpr lff">
-    <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer" @input="toggleMenu">
+    <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
       <side-menu-admin ref="adminMenu" v-if="!isMini" />
       <div :class="chevronContainerClasses" >
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />

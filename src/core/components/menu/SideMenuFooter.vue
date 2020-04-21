@@ -20,6 +20,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { COACH_ROLES, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
 export default {
@@ -28,17 +29,14 @@ export default {
     label: String,
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
-    userRole () {
-      return this.loggedUser.role.client.name;
-    },
+    ...mapGetters({
+      clientRole: 'main/clientRole',
+    }),
     isAuxiliaryWithCompany () {
-      return [AUXILIARY, PLANNING_REFERENT].includes(this.userRole);
+      return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
     },
     userCanFeedback () {
-      return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.userRole);
+      return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
     },
   },
   methods: {

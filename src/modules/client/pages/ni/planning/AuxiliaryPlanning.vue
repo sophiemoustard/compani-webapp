@@ -77,7 +77,10 @@ export default {
   },
   async mounted () {
     try {
-      await Promise.all([this.fillFilter({ loggedUser: this.loggedUser, roleToSearch: AUXILIARY }), this.getCustomers()]);
+      await Promise.all([
+        this.fillFilter({ company: this.company, roleToSearch: AUXILIARY }),
+        this.getCustomers(),
+      ]);
       this.initFilters();
       await this.setInternalHours();
     } catch (e) {
@@ -95,7 +98,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      loggedUser: 'main/loggedUser',
+      clientRole: 'main/clientRole',
+      company: 'main/company',
       filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
@@ -140,7 +144,7 @@ export default {
     initFilters () {
       if (this.targetedAuxiliary) {
         this.$refs.planningManager.restoreFilter([formatIdentity(this.targetedAuxiliary.identity, 'FL')]);
-      } else if (COACH_ROLES.includes(this.loggedUser.role.client.name)) {
+      } else if (COACH_ROLES.includes(this.clientRole)) {
         this.addSavedTerms('Auxiliaries');
       } else {
         const userSector = this.filters.find(filter => filter.type === SECTOR && filter._id === this.loggedUser.sector);

@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background" :style="{ height: height }">
-    <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
+    <div :class="[{ 'planning': !drawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-sm-5 person-name row" v-if="customer && customer.identity">
           <img :src="getAvatar()" class="avatar">
@@ -46,7 +46,7 @@ export default {
   },
   computed: {
     helper () {
-      return this.$store.getters['main/loggedUser'];
+      return this.$store.state.main.loggedUser;
     },
     customer () {
       return this.$store.getters['customer/getCustomer'];

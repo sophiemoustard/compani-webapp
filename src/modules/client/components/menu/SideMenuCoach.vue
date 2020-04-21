@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { CLIENT_ADMIN } from '@data/constants';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
@@ -89,11 +90,11 @@ export default {
     this.collapsibleOpening();
   },
   computed: {
+    ...mapGetters({
+      clientRole: 'main/clientRole',
+    }),
     isAdmin () {
-      return CLIENT_ADMIN === this.loggedUser.role.client.name;
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
+      return CLIENT_ADMIN === this.clientRole;
     },
   },
 }

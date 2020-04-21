@@ -1,6 +1,6 @@
 <template>
   <q-layout view="hhh Lpr lff">
-    <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="toggleDrawer" @input="toggleMenu">
+    <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
       <side-menu-coach ref="coachMenu" v-if="isCoach && !isMini" />
       <side-menu-auxiliary ref="auxiliaryMenu" v-if="isAuxiliary && !isMini" />
       <side-menu-customer ref="helperMenu" v-if="isHelper && !isMini" />
@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import get from 'lodash/get';
+import { mapGetters, mapState } from 'vuex';
 import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from '@data/constants';
 import { layoutMixin } from '@mixins/layoutMixin';
 import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach';
@@ -39,17 +39,16 @@ export default {
     }
   },
   computed: {
-    userRole () {
-      return get(this.loggedUser, 'role.client.name') || null;
-    },
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({ clientRole: 'main/clientRole' }),
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.userRole);
+      return AUXILIARY_ROLES.includes(this.clientRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.userRole);
+      return COACH_ROLES.includes(this.clientRole);
     },
     isHelper () {
-      return this.userRole === HELPER;
+      return this.clientRole === HELPER;
     },
     sidemenusRefs () {
       if (!this.loggedUser) return 'defaultMenu';

@@ -1,3 +1,5 @@
+import { mapState } from 'vuex';
+
 export const sideMenuMixin = {
   data () {
     return {
@@ -5,6 +7,7 @@ export const sideMenuMixin = {
     }
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
     userFirstnameUpper () {
       return this.loggedUser.identity.firstname.toUpperCase();
     },

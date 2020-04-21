@@ -1,3 +1,4 @@
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -15,7 +16,6 @@ export const contractMixin = {
   data () {
     return {
       timeout: null,
-      // Edited version
       versionEditionModal: false,
       editedVersion: {},
       loading: false,
@@ -37,9 +37,8 @@ export const contractMixin = {
     }
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({ company: 'main/company' }),
     isPreviousPayImpacted () {
       const startOfMonth = this.$moment().startOf('M');
       return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)
@@ -97,7 +96,7 @@ export const contractMixin = {
 
       if (contract.status === CUSTOMER_CONTRACT) {
         const params = { customers: contract.customer };
-        const companyId = get(this.userCompany, '_id', null);
+        const companyId = get(this.company, '_id', null);
         if (companyId) params.company = companyId;
         const helpers = await Users.list(params);
         const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);
@@ -105,9 +104,10 @@ export const contractMixin = {
         signature.title = `${translate[contract.status]} - ${currentCustomer.identity.lastname}`;
         signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
       } else {
-        signature.signers = this.generateContractSigners(
-          { name: `${this.loggedUser.identity.firstname} ${this.loggedUser.identity.lastname}`, email: this.loggedUser.local.email }
-        );
+        signature.signers = this.generateContractSigners({
+          name: `${this.loggedUser.identity.firstname} ${this.loggedUser.identity.lastname}`,
+          email: this.loggedUser.local.email,
+        });
         signature.title = `${title}${translate[contract.status]} - ${this.userFullName}`;
       }
 
@@ -115,13 +115,13 @@ export const contractMixin = {
     },
     getContractTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? get(this.userCompany, 'rhConfig.templates.contractWithCompany')
-        : get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
+        ? get(this.company, 'rhConfig.templates.contractWithCompany')
+        : get(this.company, 'rhConfig.templates.contractWithCustomer');
     },
     getVersionTemplate (contract) {
       return contract.status === COMPANY_CONTRACT
-        ? get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
-        : get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
+        ? get(this.company, 'rhConfig.templates.contractWithCompanyVersion')
+        : get(this.company, 'rhConfig.templates.contractWithCustomerVersion');
     },
     async getVersionEditionPayload () {
       const payload = pick(this.editedVersion, ['startDate', 'grossHourlyRate']);

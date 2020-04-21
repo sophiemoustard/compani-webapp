@@ -1,7 +1,12 @@
-import get from 'lodash/get';
+import { mapGetters } from 'vuex';
 import Users from '@api/Users';
 
 export const logInMixin = {
+  computed: {
+    ...mapGetters({
+      clientRole: 'main/clientRole',
+    }),
+  },
   methods: {
     async logInUser (authenticationPayload) {
       const auth = await Users.authenticate(authenticationPayload);
@@ -16,9 +21,8 @@ export const logInMixin = {
       this.$q.cookies.set('user_id', auth.user._id, options);
       await this.$store.dispatch('main/getLoggedUser', this.$q.cookies.get('user_id'));
 
-      const loggedUser = this.$store.getters['main/loggedUser'];
       if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
-      if (!get(loggedUser, 'role.client.name')) return this.$router.replace('/ad').catch(e => {});
+      if (!this.clientRole) return this.$router.replace('/ad').catch(e => {});
       return this.$router.replace('/').catch(e => {});
     },
   },

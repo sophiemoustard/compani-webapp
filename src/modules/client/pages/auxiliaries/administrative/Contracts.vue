@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="neutral-background">
     <h4>Contrats</h4>
-    <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
+    <ni-contracts-card v-if="contracts" :contracts="contracts" :user="loggedUser" :columns="contractsVisibleColumns"
       @refresh="refreshContracts" :person-key="AUXILIARY" @refreshWithTimeout="refreshContractsWithTimeout"
       :loading-contracts="loading" />
   </q-page>
@@ -27,11 +27,6 @@ export default {
       loading: false,
     }
   },
-  computed: {
-    auxiliary () {
-      return this.$store.getters['main/loggedUser'];
-    },
-  },
   async mounted () {
     await this.refreshContracts();
   },
@@ -39,7 +34,7 @@ export default {
     async refreshContracts () {
       try {
         this.loading = true;
-        const contracts = await Contracts.list({ user: this.auxiliary._id });
+        const contracts = await Contracts.list({ user: this.loggedUser._id });
         this.contracts = contracts;
       } catch (e) {
         this.contracts = [];

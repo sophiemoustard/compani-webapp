@@ -1,3 +1,4 @@
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Companies from '@api/Companies';
@@ -9,6 +10,10 @@ export const configMixin = {
     return {
       tmpInput: '',
     };
+  },
+  computed: {
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({ loggedCompany: 'main/company' }),
   },
   methods: {
     saveTmp (path) {

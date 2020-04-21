@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative } from '@components/popup/notify'
@@ -39,24 +40,14 @@ export default {
       directDebits: [],
       loading: false,
       columns: [
-        {
-          name: 'name',
-          label: 'Nom du fichier',
-          align: 'left',
-          field: 'name',
-        },
+        { name: 'name', label: 'Nom du fichier', align: 'left', field: 'name' },
         {
           name: 'createdTime',
           label: 'Date de création',
           align: 'left',
           field: row => row.createdTime ? this.$moment(row.createdTime).format('DD/MM/YYYY') : '',
         },
-        {
-          name: 'download',
-          label: '',
-          align: 'left',
-          field: 'webViewLink',
-        },
+        { name: 'download', label: '', align: 'left', field: 'webViewLink' },
       ],
       pagination: {
         rowsPerPage: 0,
@@ -66,9 +57,7 @@ export default {
     }
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
+    ...mapGetters({ company: 'main/company' }),
   },
   async mounted () {
     await this.getDirectDebits();
@@ -80,10 +69,10 @@ export default {
     async getDirectDebits () {
       try {
         this.loading = true;
-        if (!this.loggedUser.company || !this.loggedUser.company.directDebitsFolderId) {
+        if (!this.company || !this.company.directDebitsFolderId) {
           return NotifyNegative('Dossier de prélèvement manquant.');
         }
-        this.directDebits = await GoogleDrive.getList({ folderId: this.loggedUser.company.directDebitsFolderId });
+        this.directDebits = await GoogleDrive.getList({ folderId: this.company.directDebitsFolderId });
       } catch (e) {
         this.directDebits = [];
         console.error(e);

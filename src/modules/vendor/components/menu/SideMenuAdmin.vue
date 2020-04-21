@@ -43,11 +43,6 @@ export default {
       },
     };
   },
-  computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
-  },
   mounted () {
     this.collapsibleOpening();
   },

@@ -293,7 +293,7 @@
 
 <script>
 import 'vue-croppa/dist/vue-croppa.css'
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
@@ -538,12 +538,15 @@ export default {
     }
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({
+      clientRole: 'main/clientRole',
+    }),
     captionTransportUploader () {
       const coachText = 'Justificatif d\'abonnement';
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
-    ...mapGetters({ loggedUser: 'main/loggedUser' }),
     userProfile () {
       return this.$store.getters['rh/getUserProfile'] ? this.$store.getters['rh/getUserProfile'] : this.loggedUser;
     },
@@ -624,14 +627,11 @@ export default {
       }
       return 'Adresse non valide';
     },
-    loggedUserRole () {
-      return this.loggedUser.role.client.name;
-    },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.loggedUserRole);
+      return AUXILIARY_ROLES.includes(this.clientRole);
     },
     isCoach () {
-      return COACH_ROLES.includes(this.loggedUserRole);
+      return COACH_ROLES.includes(this.clientRole);
     },
     lockIcon () {
       return this.emailLock ? 'lock' : 'lock_open';
