@@ -20,13 +20,14 @@ import { mapGetters } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileOrganization from 'src/modules/vendor/components/courses/ProfileOrganization';
+import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
 
 export default {
   name: 'CourseProfile',
   metadata: { title: 'Fiche formation' },
   props: {
     courseId: { type: String },
-    defaultTab: { type: String, default: 'course' },
+    defaultTab: { type: String, default: 'organization' },
   },
   components: {
     'ni-profile-header': ProfileHeader,
@@ -38,9 +39,15 @@ export default {
       tabsContent: [
         {
           label: 'Organisation de la formation',
-          name: 'course',
-          default: this.defaultTab === 'course',
+          name: 'organization',
+          default: this.defaultTab === 'organization',
           component: ProfileOrganization,
+        },
+        {
+          label: 'Suivi de la formation',
+          name: 'followUp',
+          default: this.defaultTab === 'course',
+          component: ProfileFollowUp,
         },
       ],
     }

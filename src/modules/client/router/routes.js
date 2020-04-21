@@ -1,5 +1,6 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
+import Customers from '@api/Customers';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
 import {
@@ -368,6 +369,22 @@ const routes = [
         path: 'customers/agenda',
         name: 'customer agenda',
         component: () => import('src/modules/client/pages/customers/CustomerAgenda'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [HELPER],
+        },
+      },
+      {
+        path: 'customers/contact',
+        name: 'customer contact',
+        component: () => import('src/modules/client/pages/customers/Contact'),
+        async beforeEnter (to, from, next) {
+          const loggedUser = store.getters['main/loggedUser'];
+          const customer = await Customers.getById(loggedUser.customers[0]._id);
+          return get(loggedUser, 'company.billingAssistance') || customer.referent
+            ? next()
+            : next('/404');
+        },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [HELPER],

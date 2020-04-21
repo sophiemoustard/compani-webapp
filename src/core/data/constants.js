@@ -236,6 +236,7 @@ export const SERVICE = 'service';
 export const SUBSCRIPTION = 'subscription';
 export const FUNDING = 'funding';
 export const RUP = 'rup';
+export const REFERENT = 'referent';
 export const WORKING_EVENT = 'working_event';
 export const EXPORT_TYPES = [
   { label: 'Services', value: SERVICE },
@@ -246,6 +247,7 @@ export const EXPORT_TYPES = [
   { label: 'Aidants', value: HELPER },
   { label: 'Equipes', value: SECTOR },
   { label: 'Registre unique du personnel', value: RUP },
+  { label: 'Référents bénéficiaire', value: REFERENT },
 ];
 export const EXPORT_HISTORY_TYPES = [
   { label: 'Interventions et heures internes', value: WORKING_EVENT },

@@ -8,6 +8,9 @@
     <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date_range" label="Planning" />
     <q-separator />
+    <ni-menu-item v-if="hasBillingAssistance || (customer && customer.referent)" class="customer-menu-size"
+      name="customer contact" icon="contact_support" label="Contact" />
+    <q-separator v-if="hasBillingAssistance || (customer && customer.referent)" />
     <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
     <q-separator />
     <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
@@ -21,6 +24,8 @@
 </template>
 
 <script>
+const get = require('lodash/get');
+import Customers from '@api/Customers';
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
@@ -48,9 +53,24 @@ export default {
     loggedUser () {
       return this.$store.getters['main/loggedUser'];
     },
+    hasBillingAssistance () {
+      return get(this.loggedUser, 'company.billingAssistance');
+    },
+    customer () {
+      return this.$store.getters['customer/getCustomer'];
+    },
   },
-  mounted () {
+  async mounted () {
     this.collapsibleOpening();
+    if (!this.customer) await this.refreshCustomer();
+  },
+  methods: {
+    async refreshCustomer () {
+      if (this.loggedUser && this.loggedUser.customers) {
+        const customer = await Customers.getById(this.loggedUser.customers[0]._id);
+        this.$store.commit('customer/saveCustomer', customer);
+      }
+    },
   },
 }
 </script>

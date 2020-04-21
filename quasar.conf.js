@@ -12,6 +12,7 @@ module.exports = function (ctx) {
       'moment',
       'vue-croppa',
       'vuelidate',
+      'vueclipboard',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [
@@ -65,6 +66,8 @@ module.exports = function (ctx) {
         'QSpinner',
         'QSpinnerDots',
         'QSpinnerFacebook',
+        'QStepper',
+        'QStep',
         'QTabs',
         'QTab',
         'QTabPanels',

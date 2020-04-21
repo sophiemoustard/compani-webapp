@@ -14,11 +14,6 @@ export const downloadDocxFile = async (params, data, fileName) => {
   downloadFile(file, fileName);
 };
 
-export const generatePdfUrl = (pdf) => {
-  const blob = new Blob([pdf.data], { type: 'application/pdf' })
-  return window.URL.createObjectURL(blob);
-};
-
 export const downloadCsv = (data, fileName) => {
   let csvContent = '\ufeff'; // UTF16LE BOM for Microsoft Excel
   data.forEach((rowArray) => {

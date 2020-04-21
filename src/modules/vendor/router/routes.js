@@ -99,7 +99,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/operations/:courseId',
+        path: 'ni/operations/courses/:courseId',
         name: 'profile course info',
         component: () => import('src/modules/vendor/pages/ni/operations/CourseProfile'),
         props: true,

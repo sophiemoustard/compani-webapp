@@ -1,5 +1,6 @@
 <template>
   <q-page padding class="neutral-background">
+    <h4>Facturation</h4>
     <ni-profile-billing v-if="customer" />
   </q-page>
 </template>

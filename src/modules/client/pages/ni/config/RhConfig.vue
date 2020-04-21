@@ -12,7 +12,7 @@
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
                   <template v-if="col.name === 'default'">
-                    <q-checkbox :disable="col.value" :value="col.value"
+                    <q-checkbox :disable="col.value" :value="col.value" dense
                       @input="updateDefaultInternalHour(props.row._id)" />
                   </template>
                   <template v-else-if="col.name === 'actions'">

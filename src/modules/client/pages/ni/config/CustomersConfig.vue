@@ -219,7 +219,7 @@
       <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge"
         :options="surchargesOptions" clearable />
       <div class="row q-mb-md">
-        <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" />
+        <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" dense />
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
@@ -245,7 +245,7 @@
       <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration"
         v-model="editedService.surcharge" :options="surchargesOptions" clearable />
       <div class="row q-mb-md">
-        <q-checkbox label="Exonération de charges" v-model="editedService.exemptFromCharges" />
+        <q-checkbox label="Exonération de charges" v-model="editedService.exemptFromCharges" dense />
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
@@ -279,7 +279,7 @@
         :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
         @blur="$v.newThirdPartyPayer.billingMode.$touch" />
       <div class="row q-mb-md light-checkbox">
-        <q-checkbox v-model="newThirdPartyPayer.isApa" label="Financement APA" size="12px" dense />
+        <q-checkbox v-model="newThirdPartyPayer.isApa" label="Financement APA" dense />
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
@@ -304,7 +304,7 @@
         caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
         @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
       <div class="row q-mb-md light-checkbox">
-        <q-checkbox v-model="editedThirdPartyPayer.isApa" label="Financement APA" size="12px" dense />
+        <q-checkbox v-model="editedThirdPartyPayer.isApa" label="Financement APA" dense />
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"

@@ -5,8 +5,9 @@
         <p class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
-      <div v-if="isHelper" class="message">
-        Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à support@alenvi.io.
+      <div v-if="isHelper && company.billingAssistance" class="message">
+        Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à
+        <a :href="'mailto:' + company.billingAssistance"> {{ company.billingAssistance }}</a>.
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
         @openEditionModal="openEditionModal" :type="CUSTOMER" :startBalance="getStartBalance()"
@@ -203,6 +204,9 @@ export default {
     },
     userRole () {
       return this.loggedUser.role.client.name;
+    },
+    company () {
+      return this.loggedUser.company;
     },
     isHelper () {
       return HELPER === this.userRole;

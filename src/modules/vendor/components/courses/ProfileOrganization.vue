@@ -2,10 +2,23 @@
   <div v-if="course">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Nom de la session" v-model.trim="course.name" @focus="saveTmp('name')"
-          @blur="updateCourse('name')" />
-        <ni-select caption="Formateur" v-model.trim="course.trainer" @focus="saveTmp('trainer')"
-          @blur="updateCourse('trainer')" :options="trainerOptions" />
+        <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
+          @blur="updateCourse('name')" :error="$v.course.name.$error" />
+        <ni-select caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
+          @blur="updateCourse('trainer')" :options="trainerOptions" :error="$v.course.trainer.$error" />
+      </div>
+    </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Référent structure</p>
+      <div class="row gutter-profile">
+        <ni-input caption="Nom référent structure" v-model.trim="course.referent.name" @focus="saveTmp('referent.name')"
+          @blur="updateCourse('referent.name')" :error="$v.course.referent.name.$error"/>
+        <ni-input caption="Téléphone référent structure" @blur="updateCourse('referent.phone')"
+            @focus="saveTmp('referent.phone')" v-model.trim="course.referent.phone"
+            :error="$v.course.referent.phone.$error" :error-label="phoneNbrErrorReferent" />
+        <ni-input caption="Email référent structure" v-model.trim="course.referent.email"
+            @focus="saveTmp('referent.email')" @blur="updateCourse('referent.email')"
+            :error="$v.course.referent.email.$error" :error-label="emailErrorReferent" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -126,7 +139,8 @@
       <ni-input in-modal v-model="newTrainee.local.email" :error="$v.newTrainee.local.email.$error" caption="Email"
         @blur="$v.newTrainee.local.email.$touch" :error-label="emailError($v.newTrainee)" required-field />
       <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
-        caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error-label="phoneNbrError($v.newTrainee)" />
+        caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch"
+        :error-label="phoneNbrError($v.newTrainee)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter à la formation" icon-right="add" color="primary"
           :loading="loading" @click="addTrainee" :disable="$v.newTrainee.$invalid" />
@@ -292,6 +306,11 @@ export default {
       course: {
         name: { required },
         trainer: { required },
+        referent: {
+          name: { required },
+          phone: { required, frPhoneNumber },
+          email: { email },
+        },
       },
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
@@ -309,25 +328,42 @@ export default {
     },
     slotsDurationColumnTitle () {
       if (!this.course || !this.course.slots) return '0h';
+
       const total = this.course.slots.reduce(
         (acc, slot) => acc.add(this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate))),
         this.$moment.duration()
       );
 
-      return total.minutes() ? `${total.hours()}h${total.minutes()}` : `${total.hours()}h`;
+      const paddedMinutes = this.padMinutes(total.minutes());
+      const hours = total.days() * 24 + total.hours();
+
+      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
     },
+    emailErrorReferent () {
+      if (!this.$v.course.referent.email.email) return 'Email non valide';
+      return '';
+    },
+    phoneNbrErrorReferent () {
+      if (this.$v.course.referent.phone.required === false) return REQUIRED_LABEL;
+      else if (!this.$v.course.referent.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
+      return '';
+    },
   },
   async mounted () {
     if (!this.course) await this.refreshCourse();
+    else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
     await this.refreshTrainers();
   },
   methods: {
     get,
     saveTmp (path) {
-      this.tmpInput = get(this.course, path)
+      this.tmpInput = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
+    },
+    padMinutes (minutes) {
+      return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
     },
     async refreshCourse () {
       try {
@@ -350,10 +386,10 @@ export default {
     },
     async updateCourse (path) {
       try {
-        const value = get(this.course, path);
+        const value = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
         if (this.tmpInput === value) return;
-        this.$v.course[path].$touch();
-        if (this.$v.course[path].$error) return NotifyWarning('Champ(s) invalide(s).');
+        get(this.$v.course, path).$touch();
+        if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
 
         const payload = set({}, path, value);
         await Courses.update(this.profileId, payload);
@@ -372,7 +408,9 @@ export default {
     getSlotDuration (slot) {
       const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
 
-      return duration.minutes() ? `${duration.hours()}h${duration.minutes()}` : `${duration.hours()}h`;
+      const paddedMinutes = this.padMinutes(duration.minutes());
+
+      return paddedMinutes ? `${duration.hours()}h${paddedMinutes}` : `${duration.hours()}h`;
     },
     resetCourseSlotCreationModal () {
       this.newCourseSlot = {

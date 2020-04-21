@@ -38,7 +38,7 @@
         <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
-              @input="toggleRepetition" size="12px" dense />
+              @input="toggleRepetition" dense />
           </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
@@ -62,7 +62,7 @@
         <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
             <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm"
-              size="12px" dense />
+              dense />
           </div>
           <div class="row justify-between">
             <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" required-field
