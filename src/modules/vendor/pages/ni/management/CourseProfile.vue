@@ -56,6 +56,9 @@ export default {
   },
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
+    courseType () {
+      return get(this.course, 'type') || '';
+    },
     headerInfo () {
       return [
         { icon: 'bookmark_border', label: `${this.courseType}` },
