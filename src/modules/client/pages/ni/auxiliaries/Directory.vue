@@ -269,7 +269,7 @@ export default {
       try {
         this.tableLoading = true;
         const users = await Users.list({ role: AUXILIARY_ROLES, company: this.company._id });
-        this.userList = users.map(this.formatUser);
+        this.userList = Object.freeze(users.map(this.formatUser));
       } catch (e) {
         console.error(e);
       } finally {
