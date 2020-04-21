@@ -320,7 +320,7 @@ export default {
       await Users.createDriveFolder(newUser._id, { parentFolderId: folderId });
       return newUser;
     },
-    async sendSms (user) {
+    async sendSMS (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
 
       const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
@@ -342,7 +342,7 @@ export default {
 
         const userCreated = await this.createAlenviUser();
         if (this.sendWelcomeMsg) {
-          await this.sendSms(userCreated);
+          await this.sendSMS(userCreated);
         }
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');

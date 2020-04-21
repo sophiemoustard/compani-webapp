@@ -7,61 +7,66 @@
         {{ followUpMissingInfo.join(', ') }}.
       </div>
     </q-banner>
-    <div class="course-link">
-      <q-item>
-        <q-item-section side>
-          <q-btn :disable="disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
-            target="_blank" :href="!disabledFollowUp && courseLink" />
-        </q-item-section>
-        <q-item-section class="course-link">Page info formation</q-item-section>
-      </q-item>
-      <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink" v-clipboard:success="handleCopySuccess">
-        <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
-        <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
-          color="primary">
-          Obtenir un lien de partage
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Actions utiles</p>
+      <div class="course-link">
+        <q-item>
+          <q-item-section side>
+            <q-btn :disable="disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
+              target="_blank" :href="!disabledFollowUp && courseLink" />
+          </q-item-section>
+          <q-item-section class="course-link">Page info formation</q-item-section>
+        </q-item>
+        <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink" v-clipboard:success="handleCopySuccess">
+          <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
+          <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
+            color="primary">
+            Obtenir un lien de partage
+          </div>
         </div>
       </div>
+      <q-item>
+        <q-item-section side>
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
+            dense @click="openSmsModal" />
+        </q-item-section>
+        <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
+            type="a" :href="!disabledFollowUp && downloadAttendanceSheet()" target="_blank" />
+        </q-item-section>
+        <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
+      </q-item>
+      <q-item>
+        <q-item-section side>
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
+            type="a" :href="!disabledFollowUp && downloadCompletionCertificates()" target="_blank" />
+        </q-item-section>
+        <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
+      </q-item>
     </div>
-    <q-item>
-      <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
-          dense @click="openSmsModal" />
-      </q-item-section>
-      <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-          type="a" :href="!disabledFollowUp && downloadAttendanceSheet()" target="_blank" />
-      </q-item-section>
-      <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
-    </q-item>
-    <q-item>
-      <q-item-section side>
-        <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-          type="a" :href="!disabledFollowUp && downloadCompletionCertificates()" target="_blank" />
-      </q-item-section>
-      <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
-    </q-item>
-    <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination"
-      :loading="smsLoading" class="sms-table">
-      <template v-slot:body="{ props }">
-        <q-tr :props="props">
-          <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-            :style="col.style">
-            <template v-if="col.name === 'actions'">
-              <div class="row no-wrap table-actions">
-                <q-btn flat round small color="grey" icon="remove_red_eye"
-                  @click.native="openSmsInfoModal(col.value._id)" />
-              </div>
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </q-tr>
-      </template>
-    </ni-responsive-table>
-
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Historique d'envoi</p>
+      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination"
+        :loading="smsLoading">
+        <template v-slot:body="{ props }">
+          <q-tr :props="props">
+            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+              :style="col.style">
+              <template v-if="col.name === 'actions'">
+                <div class="row no-wrap table-actions">
+                  <q-btn flat round small color="grey" icon="remove_red_eye"
+                    @click.native="openSmsHistoriesModal(col.value)" />
+                </div>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </q-tr>
+        </template>
+      </ni-responsive-table>
+    </div>
     <!-- Modal envoi message -->
     <ni-modal v-model="smsModal">
       <template slot="title">
@@ -75,6 +80,15 @@
           :loading="loading" @click="sendMessage" />
       </template>
     </ni-modal>
+
+    <!-- Modal visualisation message -->
+    <ni-modal v-model="smsHistoriesModal" @hide="resetSmsHistoryModal">
+      <template slot="title">
+        Message envoyé le <span class="text-weight-bold">{{$moment(smsHistory.date).format('DD/MM/YYYY')}}</span>
+      </template>
+      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="smsHistory.type" disable />
+      <ni-input in-modal caption="Message" v-model="smsHistory.message" type="textarea" :rows="7" disable />
+    </ni-modal>
   </div>
 </template>
 
@@ -87,6 +101,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { CONVOCATION, REMINDER } from '@data/constants';
 
 export default {
   name: 'ProfileFollowUp',
@@ -104,8 +119,12 @@ export default {
       smsModal: false,
       messageType: 'convocation',
       messageTypeOptions: [
-        { label: 'SMS de convocation', value: 'convocation' },
-        { label: 'SMS de rappel', value: 'reminder' },
+        { label: 'SMS de convocation', value: CONVOCATION },
+        { label: 'SMS de rappel', value: REMINDER },
+      ],
+      messateTypes: [
+        { label: 'Convocation', value: CONVOCATION },
+        { label: 'Rappel', value: REMINDER },
       ],
       message: '',
       loading: false,
@@ -117,6 +136,7 @@ export default {
           label: 'Type',
           align: 'left',
           field: 'type',
+          format: (value) => this.getType(value),
         },
         {
           name: 'date',
@@ -134,6 +154,8 @@ export default {
       ],
       pagination: { rowsPerPage: 0 },
       smsLoading: false,
+      smsHistoriesModal: false,
+      smsHistory: {},
     };
   },
   async mounted () {
@@ -165,10 +187,16 @@ export default {
     },
   },
   methods: {
+    getType (value) {
+      const type = this.messateTypes.find(type => type.value === value);
+      if (type) return type.label;
+      else return '';
+    },
     async refreshSms () {
       try {
         this.smsLoading = true;
-        this.smsSent = await Courses.getSMS(this.course._id);
+        const smsSent = await Courses.getSMS(this.course._id);
+        this.smsSent = smsSent.sort((a, b) => new Date(b.date) - new Date(a.date))
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
@@ -196,6 +224,13 @@ export default {
     },
     openSmsInfoModal () {
       return '';
+    },
+    openSmsHistoriesModal (smsId) {
+      this.smsHistoriesModal = true;
+      this.smsHistory = this.smsSent.find(sms => sms._id === smsId);
+    },
+    resetSmsHistoryModal () {
+      this.smsHistory = {};
     },
     updateMessage () {
       if (this.messageType === 'convocation') this.setConvocationMessage();
@@ -270,7 +305,4 @@ export default {
       &-disabled
         opacity: 0.7 !important;
         cursor: not-allowed !important
-
-.sms-table
-  margin-top: 20px;
 </style>
