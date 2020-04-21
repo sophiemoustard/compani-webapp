@@ -81,10 +81,19 @@ export default {
     },
     trello () {
       return [
-        { title: 'À venir', courses: this.courses },
-        { title: 'En cours', courses: this.courses },
-        { title: 'Terminée(s)', courses: this.courses },
+        { title: 'À venir', courses: this.courseListForthComing },
+        { title: 'En cours', courses: this.courseListInProgress },
+        { title: 'Terminée(s)', courses: this.courseListCompleted },
       ]
+    },
+    courseListForthComing () {
+      return this.courses.filter((course) => this.isForthComing(course));
+    },
+    courseListInProgress () {
+      return this.courses.filter((course) => this.isInProgress(course));
+    },
+    courseListCompleted () {
+      return this.courses.filter((course) => this.isCompleted(course));
     },
   },
   async created () {
@@ -144,6 +153,19 @@ export default {
       } finally {
         this.modalLoading = false;
       }
+    },
+    isForthComing (course) {
+      if (course.trainees.length > 0) return true;
+      return false;
+    },
+    isInProgress (course) {
+      // eslint-disable-next-line no-console
+      console.log(course);
+      if (course.slots) return true;
+      return false;
+    },
+    isCompleted (course) {
+      return true;
     },
   },
 }
