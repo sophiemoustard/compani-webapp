@@ -261,6 +261,7 @@ export default {
       try {
         this.loading = true;
         await Courses.sendSMS(this.course._id, { body: this.message, type: this.messageType });
+        await this.refreshSms();
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
         console.error(e);
