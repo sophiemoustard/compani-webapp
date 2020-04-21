@@ -128,7 +128,7 @@ export default {
       if (this.messageType === 'PM') {
         this.message = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
         'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ' +
-        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/ni/${this.userProfile._id}` +
+        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/auxiliaries/info` +
         '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
       } else if (this.messageType === 'LA') {
         if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
