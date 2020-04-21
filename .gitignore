@@ -23,3 +23,5 @@ yarn-error.log*
 
 # Our hidden files
 .env
+.env.swo
+.env.swp
