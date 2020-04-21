@@ -1,7 +1,8 @@
 <template>
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
-      <side-menu-admin ref="adminMenu" v-if="!isMini" />
+      <side-menu-admin ref="adminMenu" v-if="!isMini && isAdmin" />
+      <side-menu-trainer ref="trainerAdmin" v-if="!isMini && isTrainer" />
       <div :class="chevronContainerClasses" >
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
@@ -16,17 +17,33 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { layoutMixin } from '@mixins/layoutMixin';
+import { TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 import SideMenuAdmin from 'src/modules/vendor/components/menu/SideMenuAdmin';
+import SideMenuTrainer from 'src/modules/vendor/components/menu/SideMenuTrainer';
 
 export default {
   components: {
     'side-menu-admin': SideMenuAdmin,
+    'side-menu-trainer': SideMenuTrainer,
   },
   mixins: [layoutMixin],
   computed: {
+    ...mapGetters({ vendorRole: 'main/vendorRole' }),
+    isAdmin () {
+      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
+    },
+    isTrainer () {
+      return this.vendorRole === TRAINER;
+    },
     sidemenusRefs () {
-      return 'adminMenu';
+      if (!this.loggedUser) return 'defaultMenu';
+
+      if (this.isAdmin) return 'adminMenu';
+      if (this.isTrainer) return 'trainerMenu';
+
+      return 'defaultMenu';
     },
   },
 }

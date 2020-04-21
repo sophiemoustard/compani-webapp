@@ -7,7 +7,7 @@ export const layoutMixin = {
     };
   },
   computed: {
-    ...mapState('main', ['drawer']),
+    ...mapState('main', ['loggedUser', 'drawer']),
     menuIcon () {
       return this.isMini ? 'view_headline' : 'chevron_left';
     },

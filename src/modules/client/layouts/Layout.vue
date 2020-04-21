@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapGetters } from 'vuex';
 import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from '@data/constants';
 import { layoutMixin } from '@mixins/layoutMixin';
 import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach';
@@ -39,7 +39,6 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['loggedUser']),
     ...mapGetters({ clientRole: 'main/clientRole' }),
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.clientRole);
