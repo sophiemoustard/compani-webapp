@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="Balances Clients" class="title-padding">
+    <ni-title-header title="Balances Clients" padding>
       <template slot="content">
         <div class="col-xs-12 col-md-6 on-left">
           <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" separator />

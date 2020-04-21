@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="À facturer" class="title-padding">
+    <ni-title-header title="À facturer" padding>
       <template slot="content">
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-5 on-left selects">
           <ni-select :options="toBillOptions" v-model="toBillOption" separator />

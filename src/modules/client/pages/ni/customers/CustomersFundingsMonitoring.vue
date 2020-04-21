@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="Suivi des plans d'aide" class="title-padding">
+    <ni-title-header title="Suivi des plans d'aide" padding>
       <template slot="content">
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div class="col-xs-12 col-sm-6 col-md-4">

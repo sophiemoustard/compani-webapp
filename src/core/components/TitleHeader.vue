@@ -1,7 +1,7 @@
-<template>
-  <div class="row items-start">
+<template functional>
+  <div class="row items-start" :class="[data.class, data.staticClass, props.padding && 'title-padding']">
     <div class="col-xs-12 col-md-4 row">
-      <h4>{{ title }}</h4>
+      <h4>{{ props.title }}</h4>
       <slot name="title" />
     </div>
     <div class="col-xs-12 col-md-8 row justify-end">
@@ -14,6 +14,7 @@
 export default {
   props: {
     title: { type: String, default: '' },
+    padding: { type: Boolean, default: false },
   },
 }
 </script>
