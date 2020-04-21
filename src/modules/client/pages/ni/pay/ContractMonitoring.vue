@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="Suivi Contrats/Avenants">
+    <ni-title-header title="Suivi Contrats/Avenants" padding>
       <template slot="content">
         <div class="col-xs-12 col-md-6">
           <ni-date-range v-model="dates" @input="refreshContracts" borderless :error.sync="datesHasError" />
