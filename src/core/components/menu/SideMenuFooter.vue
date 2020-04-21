@@ -21,22 +21,31 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import { COACH_ROLES, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
+import {
+  COACH_ROLES,
+  AUXILIARY,
+  PLANNING_REFERENT,
+  VENDOR_ADMIN,
+  TRAINING_ORGANISATION_MANAGER,
+  TRAINER,
+} from '@data/constants';
 
 export default {
   props: {
-    userId: String,
-    label: String,
+    userId: { type: String, required: true },
+    label: { type: String, default: '' },
   },
   computed: {
     ...mapGetters({
       clientRole: 'main/clientRole',
+      vendorRole: 'main/vendorRole',
     }),
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
     },
     userCanFeedback () {
-      return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
+      return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.clientRole) ||
+        [TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },
   },
   methods: {

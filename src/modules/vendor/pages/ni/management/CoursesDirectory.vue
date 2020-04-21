@@ -4,8 +4,8 @@
     <div class="trello">
       <course-container v-for="col in trello" :title="col.title" :courses="col.courses" :key="col.title" />
     </div>
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
-      @click="courseCreationModal = true" />
+    <q-btn v-if="isAdmin" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
+      label="Ajouter une formation" @click="courseCreationModal = true" />
 
     <!-- Course creation modal -->
     <ni-modal v-model="courseCreationModal" @hide="resetCreationModal">
@@ -27,6 +27,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -35,6 +36,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 
 export default {
@@ -73,6 +75,10 @@ export default {
     }
   },
   computed: {
+    ...mapGetters({ vendorRole: 'main/vendorRole' }),
+    isAdmin () {
+      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
+    },
     trello () {
       return [
         { title: 'À venir', courses: this.courses },
@@ -81,10 +87,9 @@ export default {
       ]
     },
   },
-  async mounted () {
+  async created () {
     await this.refreshCourses();
-    await this.refreshPrograms();
-    await this.refreshCompanies();
+    if (this.isAdmin) await Promise.all([this.refreshPrograms(), this.refreshCompanies()]);
   },
   methods: {
     async refreshCourses () {

@@ -2,7 +2,7 @@
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
       <side-menu-admin ref="adminMenu" v-if="!isMini && isAdmin" />
-      <side-menu-trainer ref="trainerAdmin" v-if="!isMini && isTrainer" />
+      <side-menu-trainer ref="trainerMenu" v-if="!isMini && isTrainer" />
       <div :class="chevronContainerClasses" >
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
