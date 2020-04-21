@@ -1156,6 +1156,11 @@ export default {
 
   .dot-inactive
     background: $secondary
+
+  @media screen and (min-width: 768px)
+    .dot
+      margin: 0px
+
   .signedAt
     /deep/ .q-field--with-bottom
       padding: 0
