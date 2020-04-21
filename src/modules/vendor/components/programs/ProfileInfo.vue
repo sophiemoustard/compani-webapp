@@ -5,6 +5,10 @@
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
           :error="$v.program.name.$error" />
       </div>
+      <div class="row gutter-profile">
+        <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
+          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')"/>
+      </div>
     </div>
   </div>
 </template>
