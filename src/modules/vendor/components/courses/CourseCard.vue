@@ -32,7 +32,7 @@ export default {
   },
   computed: {
     trainerName () {
-      return formatIdentity(get(this.course, 'trainer.identity') || '', 'FL');
+      return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
     },
     traineesCount () {
       return get(this.course, 'trainees.length') || 0;
