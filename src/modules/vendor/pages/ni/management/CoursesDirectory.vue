@@ -27,11 +27,8 @@
 </template>
 
 <script>
-<<<<<<< HEAD:src/modules/vendor/pages/ni/management/CoursesDirectory.vue
 import { mapGetters } from 'vuex';
-=======
 import groupBy from 'lodash/groupBy';
->>>>>>> COM-1134 add sorting methods:src/modules/vendor/pages/ni/operations/CoursesDirectory.vue
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -86,13 +83,13 @@ export default {
     },
     trello () {
       return [
-        { title: 'À venir', courses: this.courseListForthComing },
+        { title: 'À venir', courses: this.courseListForthcoming },
         { title: 'En cours', courses: this.courseListInProgress },
         { title: 'Terminée(s)', courses: this.courseListCompleted },
       ]
     },
-    courseListForthComing () {
-      return this.coursesWithGroupedSlot.filter((course) => this.isForthComing(course));
+    courseListForthcoming () {
+      return this.coursesWithGroupedSlot.filter((course) => this.isForthcoming(course));
     },
     courseListInProgress () {
       return this.coursesWithGroupedSlot.filter((course) => this.isInProgress(course));
@@ -163,25 +160,31 @@ export default {
         this.modalLoading = false;
       }
     },
-    hasHappened (sessionSameDaySlots) {
-      if (this.$moment().isBefore(sessionSameDaySlots[sessionSameDaySlots.length - 1].endDate)) return false;
-      return true;
+    happened (sameDaySlots) {
+      return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
-    isForthComing (courseWithGroupedSlot) {
-      if (!courseWithGroupedSlot.slots || courseWithGroupedSlot.slots.length < 1 ||
-       !courseWithGroupedSlot.slots.some((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots))) return true;
-      return false;
+    isForthcoming (courseWithGroupedSlots) {
+      const noSlot = !courseWithGroupedSlots.slots.length;
+      const noSlotsHappened = !courseWithGroupedSlots.slots.some((sameDaySlots) =>
+        this.happened(sameDaySlots));
+
+      return noSlot || noSlotsHappened;
     },
-    isInProgress (courseWithGroupedSlot) {
-      if (courseWithGroupedSlot.slots && courseWithGroupedSlot.slots.length > 0 &&
-        courseWithGroupedSlot.slots.some((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots)) &&
-        !courseWithGroupedSlot.slots.every((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots))) return true;
-      return false;
+    isInProgress (courseWithGroupedSlots) {
+      const atLeastOneSlot = courseWithGroupedSlots.slots.length;
+      const atLeastOneSlothappened = courseWithGroupedSlots.slots.some((sameDaySlots) =>
+        this.happened(sameDaySlots));
+      const notEverySlotsHappened = courseWithGroupedSlots.slots.some((sameDaySlots) =>
+        !this.happened(sameDaySlots));
+
+      return atLeastOneSlot && atLeastOneSlothappened && notEverySlotsHappened;
     },
-    isCompleted (courseWithGroupedSlot) {
-      if (courseWithGroupedSlot.slots && courseWithGroupedSlot.slots.length > 0 &&
-        courseWithGroupedSlot.slots.every((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots))) return true;
-      return false;
+    isCompleted (courseWithGroupedSlots) {
+      const atLeastOneSlot = courseWithGroupedSlots.slots.length;
+      const everySlotsHappened = courseWithGroupedSlots.slots.every((sameDaySlots) =>
+        this.happened(sameDaySlots));
+
+      return atLeastOneSlot && everySlotsHappened;
     },
   },
 }
@@ -189,7 +192,7 @@ export default {
 
 <style lang="stylus" scoped>
 .trello
-  overflow: overlay;
+  overflow: auto;
   display: flex
   flex-direction: row
   @media screen and (min-width: 768px)
