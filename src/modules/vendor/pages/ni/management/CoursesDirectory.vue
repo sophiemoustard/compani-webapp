@@ -27,7 +27,11 @@
 </template>
 
 <script>
+<<<<<<< HEAD:src/modules/vendor/pages/ni/management/CoursesDirectory.vue
 import { mapGetters } from 'vuex';
+=======
+import groupBy from 'lodash/groupBy';
+>>>>>>> COM-1134 add sorting methods:src/modules/vendor/pages/ni/operations/CoursesDirectory.vue
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -60,6 +64,7 @@ export default {
       },
       courseCreationModal: false,
       courses: [],
+      coursesWithGroupedSlot: [],
       programOptions: [],
       companyOptions: [],
     }
@@ -87,13 +92,13 @@ export default {
       ]
     },
     courseListForthComing () {
-      return this.courses.filter((course) => this.isForthComing(course));
+      return this.coursesWithGroupedSlot.filter((course) => this.isForthComing(course));
     },
     courseListInProgress () {
-      return this.courses.filter((course) => this.isInProgress(course));
+      return this.coursesWithGroupedSlot.filter((course) => this.isInProgress(course));
     },
     courseListCompleted () {
-      return this.courses.filter((course) => this.isCompleted(course));
+      return this.coursesWithGroupedSlot.filter((course) => this.isCompleted(course));
     },
   },
   async created () {
@@ -104,6 +109,10 @@ export default {
     async refreshCourses () {
       try {
         this.courses = await Courses.list();
+        this.coursesWithGroupedSlot = await this.courses.map(course => ({
+          ...course,
+          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
+        }));
       } catch (e) {
         console.error(e);
         this.courses = [];
@@ -154,18 +163,25 @@ export default {
         this.modalLoading = false;
       }
     },
-    isForthComing (course) {
-      if (course.trainees.length > 0) return true;
-      return false;
-    },
-    isInProgress (course) {
-      // eslint-disable-next-line no-console
-      console.log(course);
-      if (course.slots) return true;
-      return false;
-    },
-    isCompleted (course) {
+    hasHappened (sessionSameDaySlots) {
+      if (this.$moment().isBefore(sessionSameDaySlots[sessionSameDaySlots.length - 1].endDate)) return false;
       return true;
+    },
+    isForthComing (courseWithGroupedSlot) {
+      if (!courseWithGroupedSlot.slots || courseWithGroupedSlot.slots.length < 1 ||
+       !courseWithGroupedSlot.slots.some((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots))) return true;
+      return false;
+    },
+    isInProgress (courseWithGroupedSlot) {
+      if (courseWithGroupedSlot.slots && courseWithGroupedSlot.slots.length > 0 &&
+        courseWithGroupedSlot.slots.some((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots)) &&
+        !courseWithGroupedSlot.slots.every((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots))) return true;
+      return false;
+    },
+    isCompleted (courseWithGroupedSlot) {
+      if (courseWithGroupedSlot.slots && courseWithGroupedSlot.slots.length > 0 &&
+        courseWithGroupedSlot.slots.every((sessionSameDaySlots) => this.hasHappened(sessionSameDaySlots))) return true;
+      return false;
     },
   },
 }
