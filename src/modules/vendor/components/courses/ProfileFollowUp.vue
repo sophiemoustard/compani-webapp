@@ -17,7 +17,8 @@
           </q-item-section>
           <q-item-section class="course-link">Page info formation</q-item-section>
         </q-item>
-        <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink" v-clipboard:success="handleCopySuccess">
+        <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink"
+          v-clipboard:success="handleCopySuccess">
           <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
           <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
             color="primary">
@@ -67,6 +68,7 @@
         </template>
       </ni-responsive-table>
     </div>
+
     <!-- Modal envoi message -->
     <ni-modal v-model="smsModal">
       <template slot="title">
@@ -119,10 +121,6 @@ export default {
       smsModal: false,
       messageType: 'convocation',
       messageTypeOptions: [
-        { label: 'SMS de convocation', value: CONVOCATION },
-        { label: 'SMS de rappel', value: REMINDER },
-      ],
-      messateTypes: [
         { label: 'Convocation', value: CONVOCATION },
         { label: 'Rappel', value: REMINDER },
       ],
@@ -131,13 +129,7 @@ export default {
       courseLoading: false,
       smsSent: [],
       smsSentColumns: [
-        {
-          name: 'type',
-          label: 'Type',
-          align: 'left',
-          field: 'type',
-          format: (value) => this.getType(value),
-        },
+        { name: 'type', label: 'Type', align: 'left', field: 'type', format: this.getType },
         {
           name: 'date',
           label: 'Date d\'envoi',
@@ -145,12 +137,7 @@ export default {
           field: 'date',
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       pagination: { rowsPerPage: 0 },
       smsLoading: false,
@@ -158,9 +145,8 @@ export default {
       smsHistory: {},
     };
   },
-  async mounted () {
-    await this.refreshCourse();
-    await this.refreshSms();
+  async created () {
+    await Promise.all([this.refreshCourse(), this.refreshSms()]);
   },
   computed: {
     ...mapGetters({ course: 'course/getCourse' }),
@@ -188,9 +174,8 @@ export default {
   },
   methods: {
     getType (value) {
-      const type = this.messateTypes.find(type => type.value === value);
-      if (type) return type.label;
-      else return '';
+      const type = this.messageTypeOptions.find(type => type.value === value);
+      return type ? type.label : '';
     },
     async refreshSms () {
       try {
@@ -221,9 +206,6 @@ export default {
       } finally {
         this.courseLoading = false;
       }
-    },
-    openSmsInfoModal () {
-      return '';
     },
     openSmsHistoriesModal (smsId) {
       this.smsHistoriesModal = true;

@@ -341,10 +341,9 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const userCreated = await this.createAlenviUser();
-        if (this.sendWelcomeMsg) {
-          await this.sendSMS(userCreated);
-        }
+        if (this.sendWelcomeMsg) await this.sendSMS(userCreated);
         await this.getUserList();
+
         NotifyPositive('Fiche auxiliaire créée');
         this.auxiliaryCreationModal = false;
       } catch (e) {
