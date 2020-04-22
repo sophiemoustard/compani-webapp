@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background">
+  <q-page class="neutral-background q-pb-xl">
     <div class="title-padding row items-start">
       <div class="col-xs-12 col-md-5 row q-mb-md">
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
@@ -299,7 +299,7 @@ export default {
     },
     async refresh (sectors) {
       try {
-        if (!sectors.length === 0) return;
+        if (sectors.length === 0) return;
 
         this.setDisplayStats(sectors, { loading: true, openedDetails: false });
         const params = { month: this.selectedMonth, sector: sectors };

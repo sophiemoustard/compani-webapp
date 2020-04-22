@@ -90,9 +90,7 @@ export default {
     this.collapsibleOpening();
   },
   computed: {
-    ...mapGetters({
-      clientRole: 'main/clientRole',
-    }),
+    ...mapGetters({ clientRole: 'main/clientRole' }),
     isAdmin () {
       return CLIENT_ADMIN === this.clientRole;
     },

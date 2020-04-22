@@ -3,9 +3,7 @@ import Users from '@api/Users';
 
 export const logInMixin = {
   computed: {
-    ...mapGetters({
-      clientRole: 'main/clientRole',
-    }),
+    ...mapGetters({ clientRole: 'main/clientRole' }),
   },
   methods: {
     async logInUser (authenticationPayload) {

@@ -30,9 +30,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      company: 'company/getCompany',
-    }),
+    ...mapGetters({ company: 'company/getCompany' }),
   },
   async mounted () {
     if (!this.company) await this.refreshCompany();

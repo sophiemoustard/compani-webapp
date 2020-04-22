@@ -205,10 +205,8 @@ export default {
     }
   },
   validations () { return { newUser: this.userValidation } },
-  created () {
+  async created () {
     this.newUser = cloneDeep(this.defaultNewUser);
-  },
-  async mounted () {
     await this.getUserList();
   },
   computed: {

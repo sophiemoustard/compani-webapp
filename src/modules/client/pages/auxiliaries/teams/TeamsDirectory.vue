@@ -70,9 +70,7 @@ export default {
     this.getUserList();
   },
   computed: {
-    ...mapGetters({
-      company: 'main/company',
-    }),
+    ...mapGetters({ company: 'main/company' }),
     filteredUsers () {
       return this.userList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
     },

@@ -124,6 +124,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -202,12 +203,8 @@ export default {
     },
   },
   computed: {
-    helper () {
-      return this.$store.state.main.loggedUser;
-    },
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
+    ...mapState({ helper: state => state.main.loggedUser }),
+    ...mapGetters({ customer: 'customer/getCustomer' }),
     ibanError () {
       if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
       else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
@@ -245,7 +242,7 @@ export default {
         : '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.customer) await this.refreshCustomer();
     else {
       this.refreshSubscriptions(this.customer);

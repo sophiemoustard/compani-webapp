@@ -92,9 +92,7 @@ export default {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({
-      userProfile: 'rh/getUserProfile',
-    }),
+    ...mapGetters({ userProfile: 'rh/getUserProfile' }),
     isPlanningRouterDisable () {
       return !this.userProfile.contracts || !this.userProfile.contracts.length;
     },

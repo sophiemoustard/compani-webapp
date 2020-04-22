@@ -66,9 +66,7 @@ export default {
     this.collapsibleOpening();
   },
   computed: {
-    ...mapGetters({
-      clientRole: 'main/clientRole',
-    }),
+    ...mapGetters({ clientRole: 'main/clientRole' }),
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
     },
