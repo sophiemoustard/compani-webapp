@@ -9,10 +9,10 @@
         </q-item>
       </div>
       <q-item class="infos-course-container text-weight-bold">
-        <q-item-section><q-icon size="xs" name="people"/> ({{ traineesNbr }}) </q-item-section>
+        <q-item-section><q-icon size="xs" name="people"/> ({{ traineesCount }}) </q-item-section>
       </q-item>
       <q-item class="infos-course-container text-weight-bold">
-        <q-item-section><q-icon size="xs" name="date_range"/> ({{ courseSlots }}) </q-item-section>
+        <q-item-section><q-icon size="xs" name="date_range"/> ({{ courseSlotsCount }}) </q-item-section>
       </q-item>
     </q-card-section>
   </q-card>
@@ -32,12 +32,12 @@ export default {
   },
   computed: {
     trainerName () {
-      return formatIdentity(get(this.course, 'trainer.identity', ''), 'FL');
+      return formatIdentity(get(this.course, 'trainer.identity') || '', 'FL');
     },
-    traineesNbr () {
+    traineesCount () {
       return get(this.course, 'trainees.length') || 0;
     },
-    courseSlots () {
+    courseSlotsCount () {
       const courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
       return Object.keys(courseSlots).length || 0;
     },
