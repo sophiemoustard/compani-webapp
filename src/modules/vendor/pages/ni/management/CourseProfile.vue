@@ -21,10 +21,12 @@ import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileOrganization from 'src/modules/vendor/components/courses/ProfileOrganization';
 import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
 export default {
   name: 'CourseProfile',
   metadata: { title: 'Fiche formation' },
+  mixins: [courseMixin],
   props: {
     courseId: { type: String },
     defaultTab: { type: String, default: 'organization' },
@@ -56,13 +58,6 @@ export default {
     ...mapGetters({ course: 'course/getCourse' }),
     courseType () {
       return get(this.course, 'type') || '';
-    },
-    companyName () {
-      if (!get(this.course, 'companies') || !this.course.companies.length) return '';
-      return this.course.companies[0].tradeName || '';
-    },
-    programName () {
-      return get(this.course, 'program.name') || '';
     },
     headerInfo () {
       return [
