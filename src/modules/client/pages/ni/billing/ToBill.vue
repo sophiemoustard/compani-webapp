@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import Bills from '@api/Bills';
@@ -55,15 +56,15 @@ import LargeTable from '@components/table/LargeTable';
 import Select from '@components/form/Select';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { MONTH } from '@data/constants';
 import { formatPrice, formatIdentity } from '@helpers/utils';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
-import { billingMixin } from 'src/modules/client/mixins/billingMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ToBill',
   metaInfo: { title: 'A facturer' },
-  mixins: [billingMixin, tableMixin],
+  mixins: [tableMixin],
   components: {
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
@@ -83,62 +84,22 @@ export default {
       draftBills: [],
       selected: [],
       columns: [
-        {
-          name: 'externalBilling',
-          label: 'Factu. externe',
-          align: 'center',
-        },
+        { name: 'externalBilling', label: 'Factu. externe', align: 'center' },
         {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
           field: row => formatIdentity(row.customer.identity, 'Lf'),
         },
-        {
-          name: 'client',
-          label: 'Client',
-          align: 'left',
-        },
-        {
-          name: 'startDate',
-          label: 'Début F.',
-          align: 'left',
-        },
-        {
-          name: 'endDate',
-          label: 'Fin F.',
-          align: 'left',
-        },
-        {
-          name: 'service',
-          label: 'Service',
-          align: 'left',
-        },
-        {
-          name: 'hours',
-          label: 'Décompte',
-          align: 'center',
-        },
-        {
-          name: 'unitExclTaxes',
-          label: 'PU HT',
-          align: 'center',
-        },
-        {
-          name: 'discount',
-          label: 'Remise TTC',
-          align: 'center',
-        },
-        {
-          name: 'exclTaxes',
-          label: 'HT',
-          align: 'center',
-        },
-        {
-          name: 'inclTaxes',
-          label: 'TTC',
-          align: 'center',
-        },
+        { name: 'client', label: 'Client', align: 'left' },
+        { name: 'startDate', label: 'Début F.', align: 'left' },
+        { name: 'endDate', label: 'Fin F.', align: 'left' },
+        { name: 'service', label: 'Service', align: 'left' },
+        { name: 'hours', label: 'Décompte', align: 'center' },
+        { name: 'unitExclTaxes', label: 'PU HT', align: 'center' },
+        { name: 'discount', label: 'Remise TTC', align: 'center' },
+        { name: 'exclTaxes', label: 'HT', align: 'center' },
+        { name: 'inclTaxes', label: 'TTC', align: 'center' },
       ],
       toBillOptions: [
         { label: 'Tous', value: 0 },
@@ -149,9 +110,7 @@ export default {
     }
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
+    ...mapGetters({ company: 'main/company' }),
     hasSelectedRows () {
       return this.selected.length > 0;
     },
@@ -210,6 +169,22 @@ export default {
     addEditDiscountToBills (bills) {
       return bills.map(bill => ({ ...bill, discountEdition: false }));
     },
+    setBillingDates () {
+      const billingPeriod = get(this.company, 'customersConfig.billingPeriod');
+      if (billingPeriod === MONTH) {
+        this.billingDates = {
+          endDate: this.$moment().subtract(1, 'M').endOf('month').toISOString(),
+          startDate: this.$moment().subtract(1, 'M').startOf('month').toISOString(),
+        };
+      } else {
+        this.billingDates = {
+          endDate: this.$moment().date() > 15 ? this.$moment().date(15).endOf('d').toISOString()
+            : this.$moment().subtract(1, 'M').endOf('month').toISOString(),
+          startDate: this.$moment().date() > 15 ? this.$moment().startOf('month').toISOString()
+            : this.$moment().subtract(1, 'M').date(16).startOf('d').toISOString(),
+        }
+      }
+    },
     async getDraftBills () {
       if (this.billingDatesHasError) return;
 
@@ -218,7 +193,7 @@ export default {
         const params = {
           endDate: this.$moment(this.billingDates.endDate).endOf('d').toISOString(),
           billingStartDate: this.$moment(this.billingDates.startDate).startOf('d').toISOString(),
-          billingPeriod: this.loggedUser.company.customersConfig.billingPeriod,
+          billingPeriod: get(this.company, 'customersConfig.billingPeriod'),
         }
 
         const draftBills = await Bills.getDraftBills(params);
@@ -284,7 +259,7 @@ export default {
           billingStartDate: startDate,
           startDate: this.$moment(startDate).startOf('d').toISOString(),
           endDate: this.$moment(endDate).endOf('d').toISOString(),
-          billingPeriod: this.loggedUser.company.customersConfig.billingPeriod,
+          billingPeriod: get(this.company, 'customersConfig.billingPeriod'),
           customer: customer._id,
         });
         this.draftBills.splice(index, 1, ...draftBills);

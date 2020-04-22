@@ -40,7 +40,7 @@
 
 <script>
 import { Cookies } from 'quasar';
-import get from 'lodash/get';
+import { mapGetters } from 'vuex';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
 import { AUXILIARY, PLANNING_REFERENT } from '@data/constants';
@@ -66,11 +66,9 @@ export default {
     this.collapsibleOpening();
   },
   computed: {
+    ...mapGetters({ clientRole: 'main/clientRole' }),
     isAuxiliaryWithCompany () {
-      return [AUXILIARY, PLANNING_REFERENT].includes(get(this.loggedUser, 'role.client.name', null));
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
+      return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
     },
   },
   methods: {

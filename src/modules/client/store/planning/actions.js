@@ -4,23 +4,18 @@ import Customers from '@api/Customers'
 import { formatIdentity } from '@helpers/utils';
 import { AUXILIARY, SECTOR, PERSON, CUSTOMER } from '@data/constants';
 
-export const fillFilter = async ({ commit }, { loggedUser, roleToSearch }) => {
+export const fillFilter = async ({ commit }, { company, roleToSearch }) => {
   const rawPromises = [];
   const elems = [];
   rawPromises.push(Sectors.list());
 
-  if (roleToSearch === AUXILIARY) rawPromises.push(Users.listWithSectorHistories({ company: loggedUser.company._id }));
+  if (roleToSearch === AUXILIARY) rawPromises.push(Users.listWithSectorHistories({ company: company._id }));
   else if (roleToSearch === CUSTOMER) rawPromises.push(Customers.listWithSubscriptions());
 
   const filterPromises = await Promise.all(rawPromises);
   const sectors = filterPromises[0];
   for (let i = 0, l = sectors.length; i < l; i++) {
-    elems.push({
-      label: sectors[i].name,
-      value: sectors[i].name,
-      _id: sectors[i]._id,
-      type: SECTOR,
-    });
+    elems.push({ label: sectors[i].name, value: sectors[i].name, _id: sectors[i]._id, type: SECTOR });
   }
 
   if (roleToSearch) {

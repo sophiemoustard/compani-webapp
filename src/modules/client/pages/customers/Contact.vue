@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import { formatIdentity } from '@helpers/utils.js';
@@ -34,18 +35,14 @@ export default {
   name: 'Contact',
   metaInfo: { title: 'Contact' },
   computed: {
+    ...mapState({ helper: state => state.main.loggedUser }),
+    ...mapGetters({
+      company: 'main/company',
+      customer: 'customer/getCustomer',
+    }),
     referentAvatar () {
       const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
       return auxiliaryPicture ? get(auxiliaryPicture, 'link') || DEFAULT_AVATAR : UNKNOWN_AVATAR;
-    },
-    helper () {
-      return this.$store.getters['main/loggedUser'];
-    },
-    company () {
-      return this.helper.company;
-    },
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
     },
     referent () {
       return get(this.customer, 'referent');
@@ -61,7 +58,7 @@ export default {
       return phoneNumber ? `tel:+33${phoneNumber.substring(1)}` : '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.customer) await this.refreshCustomer();
   },
   methods: {

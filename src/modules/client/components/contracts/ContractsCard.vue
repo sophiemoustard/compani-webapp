@@ -123,12 +123,7 @@ export default {
       embeddedUrl: '',
       pagination: { rowsPerPage: 0 },
       contractsColumns: [
-        {
-          name: 'weeklyHours',
-          label: 'Volume horaire hebdomadaire',
-          align: 'center',
-          field: 'weeklyHours',
-        },
+        { name: 'weeklyHours', label: 'Volume horaire hebdomadaire', align: 'center', field: 'weeklyHours' },
         {
           name: 'startDate',
           label: 'Date d\'effet',
@@ -143,35 +138,16 @@ export default {
           field: 'endDate',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
         },
-        {
-          name: 'grossHourlyRate',
-          label: 'Taux horaire',
-          align: 'center',
-          field: 'grossHourlyRate',
-        },
-        {
-          name: 'contractEmpty',
-          label: 'Word',
-          align: 'center',
-          field: 'contractEmpty',
-        },
+        { name: 'grossHourlyRate', label: 'Taux horaire', align: 'center', field: 'grossHourlyRate' },
+        { name: 'contractEmpty', label: 'Word', align: 'center', field: 'contractEmpty' },
         {
           name: 'contractSigned',
           label: 'Contrat / Avenant',
           align: 'center',
           field: (val) => val.signature ? val.signature.eversignId : '',
         },
-        {
-          name: 'archives',
-          label: 'Archives',
-          align: 'center',
-          field: 'auxiliaryArchives',
-        },
-        {
-          name: 'actions',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'archives', label: 'Archives', align: 'center', field: 'auxiliaryArchives' },
+        { name: 'actions', align: 'center', field: '_id' },
       ],
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
     }

@@ -8,7 +8,7 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
 
 export default {
@@ -18,9 +18,7 @@ export default {
   },
   metaInfo: { title: 'Infos personnelles' },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
+    ...mapState('main', ['loggedUser']),
   },
 }
 </script>

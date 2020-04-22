@@ -86,13 +86,7 @@ export default {
           field: row => get(row, 'user.sector.name', ''),
           sortable: true,
         },
-        {
-          name: 'type',
-          label: 'Nature',
-          field: 'type',
-          align: 'left',
-          sortable: true,
-        },
+        { name: 'type', label: 'Nature', field: 'type', align: 'left', sortable: true },
         {
           name: 'startDate',
           label: 'Date de début',
@@ -101,20 +95,8 @@ export default {
           align: 'center',
           sortable: true,
         },
-        {
-          name: 'weeklyHours',
-          label: 'Nombre d\'heures',
-          field: 'weeklyHours',
-          align: 'center',
-          sortable: true,
-        },
-        {
-          name: 'grossHourlyRate',
-          label: 'Taux horaire',
-          field: 'grossHourlyRate',
-          align: 'center',
-          sortable: true,
-        },
+        { name: 'weeklyHours', label: 'Nombre d\'heures', field: 'weeklyHours', align: 'center', sortable: true },
+        { name: 'grossHourlyRate', label: 'Taux horaire', field: 'grossHourlyRate', align: 'center', sortable: true },
         {
           name: 'endDate',
           label: 'Date de fin',
@@ -123,24 +105,12 @@ export default {
           align: 'center',
           sortable: true,
         },
-        {
-          name: 'actions',
-          align: 'center',
-          field: 'user',
-        },
+        { name: 'actions', align: 'center', field: 'user' },
       ],
     }
   },
   async mounted () {
     await this.refreshContracts();
-  },
-  computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
-    userCompany () {
-      return this.loggedUser.company;
-    },
   },
   methods: {
     async refreshContracts () {

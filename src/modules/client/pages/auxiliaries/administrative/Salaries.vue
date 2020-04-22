@@ -8,7 +8,7 @@
 </template>
 
 <script>
-
+import { mapState } from 'vuex';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
 export default {
@@ -18,9 +18,7 @@ export default {
   },
   metaInfo: { title: 'Documents de paie' },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
+    ...mapState('main', ['loggedUser']),
   },
 }
 </script>

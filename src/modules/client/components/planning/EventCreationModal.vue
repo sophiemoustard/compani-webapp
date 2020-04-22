@@ -76,7 +76,16 @@
 
 <script>
 import get from 'lodash/get';
-import { ABSENCE, INTERNAL_HOUR, HOURLY, UNJUSTIFIED, CUSTOMER_CONTRACT, COMPANY_CONTRACT, INTERVENTION, NEVER } from '@data/constants';
+import {
+  ABSENCE,
+  INTERNAL_HOUR,
+  HOURLY,
+  UNJUSTIFIED,
+  CUSTOMER_CONTRACT,
+  COMPANY_CONTRACT,
+  INTERVENTION,
+  NEVER,
+} from '@data/constants';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 
 export default {

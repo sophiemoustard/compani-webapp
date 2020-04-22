@@ -15,10 +15,10 @@ const routes = [
         const refresh = await alenvi.refreshAlenviCookies();
         if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const loggedUser = store.getters['main/loggedUser'];
+        const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
-        if (!get(loggedUser, 'role.vendor')) return next({ name: '404' });
 
+        if (!get(loggedUser, 'role.vendor.name')) return next({ name: '404' });
         return next({ name: 'courses directory' });
       } catch (e) {
         console.error(e);
@@ -94,7 +94,7 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER],
           parent: 'management',
         },
       },

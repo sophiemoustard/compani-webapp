@@ -10,13 +10,9 @@
       <ni-menu-item name="courses directory" icon="mdi-teach" label="Formations" />
     </q-expansion-item>
     <q-separator />
-    <q-expansion-item ref="users" v-model="activeRoutes.users.open" label="Utilisateurs">
-      <ni-menu-item name="companies directory" icon="apartment" label="Structures" />
-      <ni-menu-item name="trainers directory" icon="contacts" label="Formateurs" />
-    </q-expansion-item>
-    <q-separator />
-    <q-expansion-item ref="configuration" v-model="activeRoutes.configuration.open" label="Configuration">
-      <ni-menu-item name="programs directory" icon="view_headline" label="Catalogue" />
+    <q-expansion-item ref="administrative" v-model="activeRoutes.administrative.open" label="Administration">
+      <ni-menu-item name="trainer personal info" :params="{ id: loggedUser._id }" icon="person"
+        label="Infos personnelles" />
     </q-expansion-item>
     <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
@@ -37,8 +33,7 @@ export default {
   data () {
     return {
       activeRoutes: {
-        users: { open: false },
-        configuration: { open: false },
+        administrative: { open: false },
         management: { open: false },
       },
     };

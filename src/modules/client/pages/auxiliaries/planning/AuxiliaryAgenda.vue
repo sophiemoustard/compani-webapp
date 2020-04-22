@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background" :style="{ height: height }">
-    <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
+    <div :class="[{ 'planning': !drawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-sm-5 person-name">
           <template v-if="Object.keys(selectedAuxiliary).length > 0">
@@ -85,9 +85,6 @@ export default {
     placeholder () {
       if (!this.selectedAuxiliary.identity) return '';
       return formatIdentity(this.selectedAuxiliary.identity, 'FL');
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
     },
     activeAuxiliaries () {
       return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0], this.days[6]) ||

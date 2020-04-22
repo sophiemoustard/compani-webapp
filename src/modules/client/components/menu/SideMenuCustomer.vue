@@ -24,13 +24,14 @@
 </template>
 
 <script>
-const get = require('lodash/get');
+import get from 'lodash/get';
 import Customers from '@api/Customers';
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
+  name: 'SideMenuCustomer',
   mixins: [sideMenuMixin],
   components: {
     'ni-menu-item': MenuItem,
@@ -47,11 +48,8 @@ export default {
   },
   computed: {
     hasContracts () {
-      return this.loggedUser && this.loggedUser.customers && this.loggedUser.customers.length > 0 && this.loggedUser.customers[0].contracts &&
-        this.loggedUser.customers[0].contracts.length > 0;
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
+      return this.loggedUser && this.loggedUser.customers && this.loggedUser.customers.length > 0 &&
+        this.loggedUser.customers[0].contracts && this.loggedUser.customers[0].contracts.length > 0;
     },
     hasBillingAssistance () {
       return get(this.loggedUser, 'company.billingAssistance');

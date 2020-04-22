@@ -5,9 +5,7 @@ export const validationMixin = {
         if (path.match(/address/i)) {
           const unwatch = this.$watch(() => !this.$_.get(validationObj, path).$pending, (notPending) => {
             if (notPending) {
-              if (unwatch) {
-                unwatch();
-              }
+              if (unwatch) unwatch();
               resolve(!this.$_.get(validationObj, path).$error);
             }
           }, { immediate: true });
@@ -20,9 +18,7 @@ export const validationMixin = {
       return new Promise((resolve) => {
         const unwatch = this.$watch(() => !validationObj.$pending, (notPending) => {
           if (notPending) {
-            if (unwatch) {
-              unwatch();
-            }
+            if (unwatch) unwatch();
             validationObj.$touch();
             resolve(!validationObj.$error);
           }

@@ -1,3 +1,4 @@
+import { mapState } from 'vuex';
 import { THREE_DAYS_VIEW } from '@data/constants';
 
 export const planningTimelineMixin = {
@@ -9,9 +10,7 @@ export const planningTimelineMixin = {
     };
   },
   computed: {
-    toggleDrawer () {
-      return this.$store.getters['main/toggleDrawer'];
-    },
+    ...mapState('main', ['drawer']),
     isThreeDaysView () {
       if (this.viewMode) return this.viewMode === THREE_DAYS_VIEW;
       return false;

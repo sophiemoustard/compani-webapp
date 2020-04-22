@@ -56,7 +56,7 @@
 
 <script>
 import get from 'lodash/get';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import Users from '@api/Users';
 import Twilio from '@api/Twilio';
 import Input from '@components/form/Input';
@@ -91,10 +91,8 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({
-      loggedUser: 'main/loggedUser',
-      userProfile: 'rh/getUserProfile',
-    }),
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({ userProfile: 'rh/getUserProfile' }),
     isPlanningRouterDisable () {
       return !this.userProfile.contracts || !this.userProfile.contracts.length;
     },

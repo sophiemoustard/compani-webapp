@@ -12,11 +12,11 @@
           <q-item-section>{{ col.value.name }}</q-item-section>
         </q-item>
         <template v-else-if="col.name === 'profileErrors'">
-          <q-icon v-if="notificationsProfiles[props.row.auxiliary._id] && props.row.isActive" name="error"
+          <q-icon v-if="notifications.profiles[props.row.auxiliary._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
         </template>
         <template v-else-if="col.name === 'tasksErrors'">
-          <q-icon v-if="notificationsTasks[props.row.auxiliary._id] && props.row.isActive" name="error"
+          <q-icon v-if="notifications.tasks[props.row.auxiliary._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
         </template>
         <template v-else-if="col.name === 'active'">
@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
@@ -152,7 +153,6 @@ export default {
         {
           name: 'profileErrors',
           label: 'Infos',
-          field: 'profileErrors',
           align: 'left',
           sortable: true,
           style: 'min-width: 75px; width: 8%',
@@ -160,7 +160,6 @@ export default {
         {
           name: 'tasksErrors',
           label: 'Tâches',
-          field: 'tasksErrors',
           align: 'left',
           sortable: true,
           style: 'min-width: 82px; width: 8%',
@@ -206,33 +205,21 @@ export default {
     }
   },
   validations () { return { newUser: this.userValidation } },
-  created () {
+  async created () {
     this.newUser = cloneDeep(this.defaultNewUser);
-  },
-  mounted () {
-    this.getUserList();
+    await this.getUserList();
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
-    company () {
-      return get(this.loggedUser, 'company');
-    },
+    ...mapGetters({
+      company: 'main/company',
+      notifications: 'rh/getNotifications',
+    }),
     activeUserList () {
-      if (this.activeUsers) {
-        return this.userList.filter(user => user.isActive);
-      }
+      if (this.activeUsers) return this.userList.filter(user => user.isActive);
       return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
       return this.activeUserList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
-    },
-    notificationsProfiles () {
-      return this.$store.getters['rh/getNotificationsProfiles'];
-    },
-    notificationsTasks () {
-      return this.$store.getters['rh/getNotificationsTasks'];
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
@@ -269,11 +256,10 @@ export default {
       if (!user.isActive) return formattedUser;
 
       const checkProfileErrors = userProfileValidation(user);
-      this.$store.commit('rh/saveNotification', {
-        type: 'profiles',
-        _id: user._id,
-        exists: !!checkProfileErrors.error,
-      });
+      this.$store.commit(
+        'rh/saveNotification',
+        { type: 'profiles', _id: user._id, exists: !!checkProfileErrors.error }
+      );
       const checkTasks = taskValidation(user);
       this.$store.commit('rh/saveNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
 
@@ -282,7 +268,7 @@ export default {
     async getUserList () {
       try {
         this.tableLoading = true;
-        const users = await Users.list({ role: AUXILIARY_ROLES, company: this.loggedUser.company._id });
+        const users = await Users.list({ role: AUXILIARY_ROLES, company: this.company._id });
         this.userList = users.map(this.formatUser);
       } catch (e) {
         console.error(e);

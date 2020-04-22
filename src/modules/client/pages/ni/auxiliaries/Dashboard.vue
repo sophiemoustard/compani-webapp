@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background">
+  <q-page class="neutral-background q-pb-xl">
     <div class="title-padding row items-start">
       <div class="col-xs-12 col-md-5 row q-mb-md">
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
@@ -110,7 +110,7 @@
 <script>
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import Companies from '@api/Companies';
 import Pay from '@api/Pay';
 import Events from '@api/Events';
@@ -144,8 +144,10 @@ export default {
     };
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
     ...mapGetters({
-      loggedUser: 'main/loggedUser',
+      company: 'main/company',
+      clientRole: 'main/clientRole',
       filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
@@ -178,20 +180,18 @@ export default {
     },
   },
   async mounted () {
-    await this.fillFilter({ loggedUser: this.loggedUser });
+    await this.fillFilter({ company: this.company });
     const firstIntervention = await Companies.getFirstIntervention();
     this.firstInterventionStartDate = get(firstIntervention, 'startDate', null) || '';
     this.initFilters();
   },
   methods: {
-    ...mapActions({
-      fillFilter: 'planning/fillFilter',
-    }),
+    ...mapActions({ fillFilter: 'planning/fillFilter' }),
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
     initFilters () {
-      if (AUXILIARY_ROLES.includes(this.loggedUser.role.client.name)) {
+      if (AUXILIARY_ROLES.includes(this.clientRole)) {
         const userSector = this.filters.find(filter => filter._id === this.loggedUser.sector);
         if (userSector) this.$refs.teamAutocomplete.add(userSector.label);
       }
@@ -299,7 +299,7 @@ export default {
     },
     async refresh (sectors) {
       try {
-        if (!sectors.length === 0) return;
+        if (sectors.length === 0) return;
 
         this.setDisplayStats(sectors, { loading: true, openedDetails: false });
         const params = { month: this.selectedMonth, sector: sectors };

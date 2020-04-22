@@ -273,18 +273,13 @@ export default {
       editedEstablishment: this.establishmentValidation,
     };
   },
-  computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
-  },
   async mounted () {
     await Promise.all([this.refreshCompany(), this.getEstablishments()]);
   },
   methods: {
     async refreshCompany () {
       await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
-      this.company = this.loggedUser.company;
+      this.company = this.loggedCompany;
       this.company.address = this.company.address || { fullAddress: '' };
       this.company.legalRepresentative =
         this.company.legalRepresentative || { lastname: '', firstname: '', position: '' };

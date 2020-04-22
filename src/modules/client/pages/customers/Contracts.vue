@@ -30,8 +30,9 @@ export default {
   },
   computed: {
     customer () {
-      const helper = this.$store.getters['main/loggedUser'];
-      return helper && helper.customers && helper.customers.length > 0 ? helper.customers[0] : {};
+      return this.loggedUser && this.loggedUser.customers && this.loggedUser.customers.length > 0
+        ? this.loggedUser.customers[0]
+        : {};
     },
   },
   async mounted () {
