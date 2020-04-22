@@ -4,6 +4,7 @@
 </template>
 
 <script>
+import sortBy from 'lodash/sortBy';
 import Sectors from '@api/Sectors';
 import Select from '@components/form/Select';
 import { REQUIRED_LABEL } from '@data/constants';
@@ -35,7 +36,7 @@ export default {
       try {
         const sectors = await Sectors.list();
         if (this.allowNullOption) sectors.push({ name: 'Toutes les équipes', _id: '' });
-        this.sectors = this.$_.sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
+        this.sectors = sortBy(sectors.map(sector => ({ label: sector.name, value: sector._id })), ['label']);
       } catch (e) {
         console.error(e);
       }

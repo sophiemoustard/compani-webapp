@@ -1,6 +1,13 @@
 /* eslint-disable func-names */
 require('dotenv').config();
 const path = require('path');
+const webpack = require('webpack');
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
+const PreloadWebpackPlugin = require('preload-webpack-plugin');
+const BrotliPlugin = require('brotli-webpack-plugin');
+const PurgecssPlugin = require('purgecss-webpack-plugin');
+const glob = require('glob')
+const PATHS = { src: path.join(__dirname, 'src') };
 
 module.exports = function (ctx) {
   return {
@@ -8,7 +15,6 @@ module.exports = function (ctx) {
       // 'i18n',
       'axios',
       'alenviAxios',
-      'lodash',
       'moment',
       'vue-croppa',
       'vuelidate',
@@ -107,7 +113,13 @@ module.exports = function (ctx) {
       scopeHoisting: true,
       vueRouterMode: 'history',
       publicPath: '/',
-      gzip: true,
+      gzip: {
+        filename: '[path].gz[query]',
+        algorithm: 'gzip',
+        test: /\.(js|css|html|svg)$/,
+        threshold: 8192,
+        minRatio: 0.8,
+      },
       useNotifier: false,
       extendWebpack (cfg) {
         cfg.module.rules.push({
@@ -127,6 +139,29 @@ module.exports = function (ctx) {
           '@data': path.resolve(__dirname, './src/core/data'),
           '@mixins': path.resolve(__dirname, './src/core/mixins'),
         }
+        cfg.plugins.push(
+          new BundleAnalyzerPlugin(),
+          // Select moment local files
+          new webpack.ContextReplacementPlugin(
+            /moment[/\\]locale$/,
+            /fr/
+          ),
+          // Ignore moment-timezon data
+          new webpack.IgnorePlugin(/moment-timezone\/data\/packed\/latest\.json/),
+          // Ignore astronomia (date-holidays)
+          new webpack.IgnorePlugin(/^\.\/vsop87B.*$/),
+          new PreloadWebpackPlugin(),
+          new BrotliPlugin({
+            asset: '[path].br[query]',
+            test: /\.(js|css|html|svg)$/,
+            threshold: 10240,
+            minRatio: 0.8,
+          }),
+          new PurgecssPlugin({
+            paths: glob.sync(`${PATHS.src}/**/*`, { nodir: true }),
+            only: ['bundle', 'vendor'],
+          })
+        )
       },
       env: {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),

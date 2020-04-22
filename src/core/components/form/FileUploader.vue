@@ -24,7 +24,7 @@
 
 <script>
 import { Cookies, openURL } from 'quasar';
-
+import get from 'lodash/get';
 import CustomImg from '@components/form/CustomImg';
 import { NotifyNegative } from '@components/popup/notify';
 
@@ -75,7 +75,7 @@ export default {
       return [{ name: 'fileName', value: this.additionalValue }, { name: 'type', value: this.name }];
     },
     document () {
-      return this.$_.get(this.entity, this.path);
+      return get(this.entity, this.path);
     },
   },
 };
