@@ -193,16 +193,14 @@ export default {
     },
     async getCustomers () {
       try {
-        this.tableLoading = true;
         return Customers.list();
       } catch (e) {
         console.error(e);
-      } finally {
-        this.tableLoading = false;
       }
     },
     async getCustomersFirstIntervention () {
       try {
+        this.tableLoading = true;
         this.firstInterventions = Object.freeze(await Customers.listWithFirstIntervention());
         const customers = await this.getCustomers();
         this.customers = Object.freeze(customers.map(customer => ({
@@ -213,6 +211,8 @@ export default {
       } catch (e) {
         this.firstInterventions = [];
         console.error(e);
+      } finally {
+        this.tableLoading = false;
       }
     },
     goToCustomerProfile (customer) {
