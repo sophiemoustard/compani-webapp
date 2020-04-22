@@ -141,17 +141,14 @@ export default {
   },
   computed: {
     displayedCustomersFundingsMonitoring () {
-      let allCustomersFundingsMonitoring = this.allCustomersFundingsMonitoring;
+      let monitoring = this.allCustomersFundingsMonitoring;
       if (this.selectedSector !== '') {
-        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
-          get(elem, 'sector._id', null) === this.selectedSector);
+        monitoring = monitoring.filter(elem => get(elem, 'sector._id', null) === this.selectedSector);
       }
       if (this.selectedThirdPartyPayer !== '') {
-        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem => {
-          return elem.tpp._id === this.selectedThirdPartyPayer
-        });
+        monitoring = monitoring.filter(elem => elem.tpp._id === this.selectedThirdPartyPayer);
       }
-      return allCustomersFundingsMonitoring;
+      return monitoring;
     },
   },
   methods: {
@@ -171,7 +168,7 @@ export default {
       if (this.selectedSector !== '') this.selectedThirdPartyPayer = '';
     },
   },
-  async mounted () {
+  async created () {
     try {
       this.tableLoading = true;
       await this.getThirdPartyPayerOptions();
