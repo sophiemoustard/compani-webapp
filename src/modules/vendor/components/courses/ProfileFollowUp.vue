@@ -42,8 +42,9 @@
       </q-item>
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-            type="a" :href="!disabledFollowUp && downloadCompletionCertificates()" target="_blank" />
+          <q-btn color="primary" size="sm" :disable="disableDownloadCompletionCertificates" icon="file_download"
+            flat dense type="a" target="_blank"
+            :href="!disableDownloadCompletionCertificates && downloadCompletionCertificates()" />
         </q-item-section>
         <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
       </q-item>
@@ -152,6 +153,9 @@ export default {
     ...mapGetters({ course: 'course/getCourse' }),
     disabledFollowUp () {
       return this.followUpMissingInfo.length > 0;
+    },
+    disableDownloadCompletionCertificates () {
+      return this.disabledFollowUp || !get(this.course, 'program.learningGoals');
     },
     followUpMissingInfo () {
       const missingInfo = [];
