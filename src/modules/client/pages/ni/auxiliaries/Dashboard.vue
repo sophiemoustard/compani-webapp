@@ -8,7 +8,8 @@
         <q-btn icon-right="arrow_drop_down" :label="monthLabel" flat dense>
           <q-menu anchor="bottom right" self="top right">
             <q-list dense padding>
-              <q-item v-for="(month, index) in monthsOptions" :key="index" clickable @click="selectMonth(month.value)">
+              <q-item v-for="(month, index) in monthsOptions" :key="index" clickable @click="selectMonth(month.value)"
+                v-close-popup>
                 <q-item-section>{{ month.label }}</q-item-section>
               </q-item>
             </q-list>
@@ -136,7 +137,6 @@ export default {
       terms: [],
       filteredSectors: [],
       unassignedHours: [],
-      monthModal: false,
       firstInterventionStartDate: '',
       auxiliariesStats: {},
       displayStats: {},
@@ -179,7 +179,7 @@ export default {
       this.removeElementFromFilter(val);
     },
   },
-  async mounted () {
+  async created () {
     await this.fillFilter({ company: this.company });
     const firstIntervention = await Companies.getFirstIntervention();
     this.firstInterventionStartDate = get(firstIntervention, 'startDate', null) || '';
@@ -200,7 +200,6 @@ export default {
     roundFrenchPercentage,
     async selectMonth (month) {
       this.selectedMonth = month;
-      this.monthModal = false;
       this.auxiliariesStats = {};
       await this.refresh(this.filteredSectors);
     },
@@ -223,27 +222,19 @@ export default {
         }
         if (!sectors.length) return;
 
-        const paidInterventionStatsByAuxiliary = await Stats.getPaidInterventionStats({
-          sector: sectors,
-          month: this.selectedMonth,
-        });
+        const paidInterventions = await Stats.getPaidInterventionStats({ sector: sectors, month: this.selectedMonth });
+        const hoursBalance = await Pay.getHoursBalanceDetail({ sector: sectors, month: this.selectedMonth });
 
-        const hoursBalanceDetail = await Pay.getHoursBalanceDetail({
-          sector: sectors,
-          month: this.selectedMonth,
-        });
-
-        for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
+        for (const auxiliaryPaidInterventions of paidInterventions) {
           for (const sector of auxiliaryPaidInterventions.sectors) {
             if (!sectors.includes(sector)) continue;
-            const auxiliaryHoursDetails = hoursBalanceDetail.find(hbd =>
-              hbd.auxiliaryId === auxiliaryPaidInterventions._id);
+            const hoursDetails = hoursBalance.find(hbd => hbd.auxiliaryId === auxiliaryPaidInterventions._id);
             const auxiliaryStats = {
               _id: auxiliaryPaidInterventions._id,
-              identity: auxiliaryHoursDetails.identity,
-              picture: auxiliaryHoursDetails.picture,
+              identity: hoursDetails.identity,
+              picture: hoursDetails.picture,
               paidIntervention: omit(auxiliaryPaidInterventions, 'sectors'),
-              hoursBalanceDetail: omit(auxiliaryHoursDetails, ['sectors', 'auxiliary']),
+              hoursBalance: omit(hoursDetails, ['sectors', 'auxiliary']),
             }
             auxiliariesStats[sector].push(auxiliaryStats);
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
@@ -309,6 +300,7 @@ export default {
           Pay.getHoursToWork(params),
           Events.getPaidTransportStatsBySector(params),
         ]);
+
         if (this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month')) {
           this.unassignedHours = await Events.getUnassignedHoursBySector(params);
         } else {
@@ -326,6 +318,7 @@ export default {
             },
           }
         }
+
         await this.getAuxiliariesStats(sectors);
         this.setDisplayStats(sectors, { loading: false });
       } catch (e) {
@@ -344,13 +337,11 @@ export default {
     async removeElementFromFilter (sector) {
       this.filteredSectors = this.filteredSectors.filter(sec => sec !== sector._id);
       delete this.displayStats[sector._id];
+      delete this.stats[sector._id];
     },
     setDisplayStats (sectors, data) {
       for (const sector of sectors) {
-        this.displayStats = {
-          ...this.displayStats,
-          [sector]: { ...this.displayStats[sector], ...data },
-        };
+        this.displayStats = { ...this.displayStats, [sector]: { ...this.displayStats[sector], ...data } };
       }
     },
   },
