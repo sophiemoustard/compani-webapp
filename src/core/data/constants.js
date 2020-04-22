@@ -277,3 +277,7 @@ export const PAY_DOCUMENT_NATURES = [
 // COMPANY
 export const COMPANY = 'company';
 export const ASSOCIATION = 'association';
+
+// SMS
+export const CONVOCATION = 'convocation';
+export const REMINDER = 'reminder';
