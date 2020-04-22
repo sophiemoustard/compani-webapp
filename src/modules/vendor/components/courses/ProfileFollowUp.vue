@@ -195,7 +195,7 @@ export default {
     async refreshSms () {
       try {
         this.smsLoading = true;
-        const smsSent = await Courses.getSMS(this.course._id);
+        const smsSent = await Courses.getSMSHistory(this.course._id);
         this.smsSent = smsSent.sort((a, b) => new Date(b.date) - new Date(a.date))
       } catch (e) {
         console.error(e);
