@@ -17,7 +17,7 @@
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <q-btn :disable="props.row.default" flat round small color="grey" icon="delete"
-                      @click="validateInternalHourDeletion(col.value, props.row)" />
+                      @click="validateInternalHourDeletion(props.row)" />
                   </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
@@ -77,7 +77,7 @@
               <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
                 type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
                 @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
-                @blur="updateCompanyTransportSubs({ vuelidatePath: `rhConfig.transportSubs.$each[${index}]`, index })" />
+                @blur="updateCompanyTransportSubs(index)" />
             </template>
           </template>
         </div>
@@ -153,9 +153,9 @@
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="grey" icon="edit"
-                        @click.native="openEditionModal(col.value._id)" />
-                      <q-btn flat round small color="grey" icon="delete" :disable="col.value.auxiliaryCount > 0"
-                        @click="validateSectorDeletion(col.value._id, props.row)" />
+                        @click.native="openEditionModal(props.row._id)" />
+                      <q-btn flat round small color="grey" icon="delete" :disable="props.row.hasAuxiliaries"
+                        @click="validateSectorDeletion(props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -285,12 +285,7 @@ export default {
       sectors: [],
       sectorsColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: row => ({ _id: row._id, auxiliaryCount: row.auxiliaryCount }),
-        },
+        { name: 'actions', label: '', align: 'center' },
       ],
       sectorsLoading: false,
       sectorsPagination: { rowsPerPage: 0, sortBy: 'name' },
@@ -336,28 +331,23 @@ export default {
     ]);
   },
   methods: {
-    get,
-    async updateCompanyTransportSubs (params) {
+    async updateCompanyTransportSubs (index) {
       try {
-        get(this.$v.company, params.vuelidatePath).$touch();
-        if (get(this.$v.company, params.vuelidatePath).$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.company.rhConfig.transportSubs.$each[index].$touch();
+        if (this.$v.company.rhConfig.transportSubs.$each[index].$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const price = this.company.rhConfig.transportSubs[params.index].price
-        if (this.tmpInput === price) return;
+        const transports = get(this.company, 'rhConfig.transportSubs');
+        if (this.tmpInput === transports[index].price) return;
+
         const payload = {
-          rhConfig: {
-            transportSubs: {
-              subId: this.company.rhConfig.transportSubs[params.index]._id,
-              price: this.company.rhConfig.transportSubs[params.index].price,
-            },
-          },
+          rhConfig: { transportSubs: { subId: transports[index]._id, price: transports[index].price } },
         };
         await Companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée.');
-        this.tmpInput = '';
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
+      } finally {
         this.tmpInput = '';
       }
     },
@@ -411,12 +401,12 @@ export default {
         this.loading = false;
       }
     },
-    async deleteInternalHour (internalHourId, row) {
+    async deleteInternalHour (internalHour) {
       try {
-        const index = this.getRowIndex(this.internalHours, row);
-        await InternalHours.remove(internalHourId);
+        await InternalHours.remove(internalHour._id);
         await this.refreshCompany();
 
+        const index = this.getRowIndex(this.internalHours, internalHour);
         this.internalHours.splice(index, 1);
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
@@ -424,13 +414,13 @@ export default {
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
     },
-    validateInternalHourDeletion (internalHourId, row) {
+    validateInternalHourDeletion (internalHour) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteInternalHour(internalHourId, row))
+      }).onOk(() => this.deleteInternalHour(internalHour))
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     async updateDefaultInternalHour (internalHourId) {
@@ -510,10 +500,11 @@ export default {
       this.editedSector = { name: '' };
       this.$v.editedSector.$reset();
     },
-    async deleteSector (sectorId, row) {
+    async deleteSector (sector) {
       try {
-        const index = this.getRowIndex(this.sectors, row);
-        await Sectors.deleteById(sectorId);
+        await Sectors.deleteById(sector._id);
+
+        const index = this.getRowIndex(this.sectors, sector);
         this.sectors.splice(index, 1);
         NotifyPositive('Équipe supprimée.');
       } catch (e) {
@@ -521,13 +512,13 @@ export default {
         NotifyNegative("Erreur lors de la suppression de l'équipe.");
       }
     },
-    validateSectorDeletion (sectorId, row) {
+    validateSectorDeletion (sector) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteSector(sectorId, row))
+      }).onOk(() => this.deleteSector(sector))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     sectorNameError (obj) {
@@ -577,10 +568,11 @@ export default {
         this.loading = false;
       }
     },
-    async deleteAdministrativeDocument (administrativeDocument) {
+    async deleteAdministrativeDocument (doc) {
       try {
-        const index = this.getRowIndex(this.administrativeDocuments, administrativeDocument);
-        await AdministrativeDocument.remove(administrativeDocument._id);
+        await AdministrativeDocument.remove(doc._id);
+
+        const index = this.getRowIndex(this.administrativeDocuments, doc);
         this.administrativeDocuments.splice(index, 1);
         NotifyPositive('Document supprimé.');
       } catch (e) {
@@ -588,13 +580,13 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
-    validateAdministrativeDocumentDeletion (administrativeDocument) {
+    validateAdministrativeDocumentDeletion (doc) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Etes-vous sûr de vouloir supprimer ce document ?',
         ok: 'OK',
         cancel: 'Annuler',
-      }).onOk(() => this.deleteAdministrativeDocument(administrativeDocument))
+      }).onOk(() => this.deleteAdministrativeDocument(doc))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },

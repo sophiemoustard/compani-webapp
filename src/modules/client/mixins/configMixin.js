@@ -43,11 +43,8 @@ export const configMixin = {
     async deleteDocument (driveId, type, key) {
       try {
         await GoogleDrive.removeFileById({ id: driveId });
-        const payload = {
-          [key]: {
-            templates: { [type]: { driveId: null, link: null } },
-          },
-        };
+
+        const payload = { [key]: { templates: { [type]: { driveId: null, link: null } } } };
         await Companies.updateById(this.company._id, payload);
         this.refreshCompany();
         NotifyPositive('Document supprimé');
