@@ -28,6 +28,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -59,7 +60,7 @@ export default {
         type: 'intra',
       },
       courseCreationModal: false,
-      courses: [],
+      coursesWithGroupedSlot: [],
       programOptions: [],
       companyOptions: [],
     }
@@ -81,10 +82,19 @@ export default {
     },
     trello () {
       return [
-        { title: 'À venir', courses: this.courses },
-        { title: 'En cours', courses: this.courses },
-        { title: 'Terminée(s)', courses: this.courses },
+        { title: 'À venir', courses: this.courseListForthcoming },
+        { title: 'En cours', courses: this.courseListInProgress },
+        { title: 'Terminée(s)', courses: this.courseListCompleted },
       ]
+    },
+    courseListForthcoming () {
+      return this.coursesWithGroupedSlot.filter(this.isForthcoming);
+    },
+    courseListInProgress () {
+      return this.coursesWithGroupedSlot.filter(this.isInProgress);
+    },
+    courseListCompleted () {
+      return this.coursesWithGroupedSlot.filter(this.isCompleted);
     },
   },
   async created () {
@@ -94,10 +104,14 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        this.courses = await Courses.list();
+        const courses = await Courses.list();
+        this.coursesWithGroupedSlot = courses.map(course => ({
+          ...course,
+          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
+        }));
       } catch (e) {
         console.error(e);
-        this.courses = [];
+        this.coursesWithGroupedSlot = [];
       }
     },
     async refreshPrograms () {
@@ -145,13 +159,39 @@ export default {
         this.modalLoading = false;
       }
     },
+    happened (sameDaySlots) {
+      return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
+    },
+    isForthcoming (course) {
+      const noSlot = !course.slots.length;
+      const noSlotsHappened = !course.slots.some((sameDaySlots) =>
+        this.happened(sameDaySlots));
+
+      return noSlot || noSlotsHappened;
+    },
+    isInProgress (course) {
+      const atLeastOneSlot = course.slots.length;
+      const atLeastOneSlothappened = course.slots.some((sameDaySlots) =>
+        this.happened(sameDaySlots));
+      const notEverySlotsHappened = course.slots.some((sameDaySlots) =>
+        !this.happened(sameDaySlots));
+
+      return atLeastOneSlot && atLeastOneSlothappened && notEverySlotsHappened;
+    },
+    isCompleted (course) {
+      const atLeastOneSlot = course.slots.length;
+      const everySlotsHappened = course.slots.every((sameDaySlots) =>
+        this.happened(sameDaySlots));
+
+      return atLeastOneSlot && everySlotsHappened;
+    },
   },
 }
 </script>
 
 <style lang="stylus" scoped>
 .trello
-  overflow: overlay;
+  overflow: auto;
   display: flex
   flex-direction: row
   @media screen and (min-width: 768px)
