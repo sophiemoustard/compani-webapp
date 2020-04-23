@@ -164,17 +164,14 @@ export default {
     },
     isForthcoming (course) {
       const noSlot = !course.slots.length;
-      const noSlotsHappened = !course.slots.some((sameDaySlots) =>
-        this.happened(sameDaySlots));
+      const noSlotsHappened = !course.slots.some((sameDaySlots) => this.happened(sameDaySlots));
 
       return noSlot || noSlotsHappened;
     },
     isInProgress (course) {
       const atLeastOneSlot = course.slots.length;
-      const atLeastOneSlothappened = course.slots.some((sameDaySlots) =>
-        this.happened(sameDaySlots));
-      const notEverySlotsHappened = course.slots.some((sameDaySlots) =>
-        !this.happened(sameDaySlots));
+      const atLeastOneSlothappened = course.slots.some((sameDaySlots) => this.happened(sameDaySlots));
+      const notEverySlotsHappened = course.slots.some((sameDaySlots) => !this.happened(sameDaySlots));
 
       return atLeastOneSlot && atLeastOneSlothappened && notEverySlotsHappened;
     },

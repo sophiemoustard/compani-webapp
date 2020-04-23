@@ -20,7 +20,6 @@
 
 <script>
 import get from 'lodash/get';
-import groupBy from 'lodash/groupBy';
 import { courseMixin } from '../../mixins/courseMixin';
 import { formatIdentity } from '@helpers/utils';
 
@@ -38,8 +37,7 @@ export default {
       return get(this.course, 'trainees.length') || 0;
     },
     courseSlotsCount () {
-      const courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
-      return Object.keys(courseSlots).length || 0;
+      return this.course.slots.length;
     },
     headerInfo () {
       return [
