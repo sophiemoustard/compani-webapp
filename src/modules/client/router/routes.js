@@ -27,8 +27,10 @@ const routes = [
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
 
+        const userVendorRole = get(loggedUser, 'role.vendor.name');
         const userClientRole = get(loggedUser, 'role.client.name');
-        if (!userClientRole) return next({ name: '404' });
+        if (!userClientRole && !userVendorRole) return next({ name: '404' });
+        if (!userClientRole) return next({ path: '/ad' });
 
         if (userClientRole === HELPER) return next({ name: 'customer agenda' });
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'client account info', params: { id: loggedUser._id } });
