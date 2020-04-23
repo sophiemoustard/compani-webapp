@@ -9,6 +9,11 @@
         </q-item>
       </div>
       <q-item class="infos-course-container text-weight-bold">
+        <q-item-section><q-icon size="xs" :name="formatNearestDate.icon" />
+          <div class="info-course-next-date-text"> {{ formatNearestDate.label }} </div>
+        </q-item-section>
+      </q-item>
+      <q-item class="infos-course-container text-weight-bold">
         <q-item-section><q-icon size="xs" name="people"/> ({{ traineesCount }}) </q-item-section>
       </q-item>
       <q-item class="infos-course-container text-weight-bold">
@@ -45,6 +50,39 @@ export default {
         { icon: 'apartment', label: `${this.companyName}` },
         { icon: 'emoji_people', label: `${this.trainerName}` },
       ];
+    },
+    formatNearestDate () {
+      if (this.courseSlotsCount === 0) return { label: 'Pas de date prévue', icon: 'flight_takeoff' };
+      const listDaySlots = Object.values(this.course.slots);
+
+      if (listDaySlots.every((daySlot) => !this.isDone(daySlot))) {
+        const firstSlot = listDaySlots[0];
+        return {
+          label: `Commence dans ${this.$moment(firstSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd')} jour(s)`,
+          icon: 'flight_takeoff',
+        };
+      } else if (listDaySlots.every((daySlot) => this.isDone(daySlot))) {
+        const lastSlot = listDaySlots[listDaySlots.length - 1];
+        return {
+          label: `Dernière date il y a ${this.$moment(0, 'HH').diff(this.$moment(lastSlot[0].startDate), 'd')} jour(s) `,
+          icon: 'flight_land',
+        };
+      } else {
+        const nextSlot = listDaySlots.filter((daySlot) => !this.isDone(daySlot))[0];
+        const daysToNextSlot = this.$moment(nextSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd');
+        if (daysToNextSlot === 0) {
+          return { label: 'Prochaine date aujourd’hui', icon: 'flight_takeoff' };
+        }
+        return {
+          label: `Prochaine date dans ${daysToNextSlot} jour(s)`,
+          icon: 'flight_takeoff',
+        };
+      }
+    },
+  },
+  methods: {
+    isDone (daySlot) {
+      return this.$moment(daySlot[daySlot.length - 1].endDate).isBefore(this.$moment());
     },
   },
 }
@@ -84,4 +122,6 @@ export default {
     flex-direction: row;
   .infos-course-container > .q-item__section > .q-icon
     margin-right: 10px;
+  .info-course-next-date-text
+    color: $orange
 </style>
