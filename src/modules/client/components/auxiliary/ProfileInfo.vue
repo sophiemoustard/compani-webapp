@@ -24,7 +24,7 @@
         <div class="col-xs-12 col-md-6">
           <div class="row" style="background: white">
             <div class="row justify-center col-xs-12" style="padding: 12px 0px;">
-              <croppa v-model="croppa" canvas-color="#EEE" accept="image/*" :initial-image="hasPicture"
+              <croppa v-model="croppa" canvas-color="#EEE" accept="image/*" :initial-image="pictureLink"
                 :prevent-white-space="true" placeholder="Clique ici pour choisir ta photo" placeholder-color="black"
                 :placeholder-font-size="10" :show-remove-button="false" :disable-drag-and-drop="disablePictureEdition"
                 :disable-drag-to-move="disablePictureEdition" :disable-scroll-to-zoom="disablePictureEdition"
@@ -44,7 +44,7 @@
               <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
                 @click="uploadImage" round flat size="1rem" />
               <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem"
-                type="a" :href="pictureDlLink(hasPicture)" target="_blank" />
+                type="a" :href="pictureDlLink(pictureLink)" target="_blank" />
             </div>
           </div>
         </div>
@@ -564,7 +564,10 @@ export default {
       return `${process.env.API_HOSTNAME}/users/${this.mergedUserProfile._id}/cloudinary/upload`;
     },
     hasPicture () {
-      return !this.mergedUserProfile.picture || (this.mergedUserProfile.picture && !this.mergedUserProfile.picture.link) ? null : this.mergedUserProfile.picture.link;
+      return !!this.pictureLink;
+    },
+    pictureLink () {
+      return get(this.mergedUserProfile, 'picture.link') || null;
     },
     birthStateError () {
       if (!this.$v.mergedUserProfile.identity.birthState.required) {
