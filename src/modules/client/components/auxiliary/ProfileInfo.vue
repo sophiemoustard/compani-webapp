@@ -94,9 +94,9 @@
           @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
         <div v-if="isCoach" class="col-12 col-md-6 row items-center">
           <div class="col-xs-11">
-            <ni-input ref="userEmail" name="emailInput" caption="Adresse email" :error="$v.mergedUserProfile.local.email.$error"
-              :error-label="emailError($v.mergedUserProfile)" type="email" lower-case :disable="emailLock" v-model.trim="mergedUserProfile.local.email"
-              @focus="saveTmp('local.email')" />
+            <ni-input ref="userEmail" name="emailInput" caption="Adresse email" type="email" :disable="emailLock"
+              :error="$v.mergedUserProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
+              :error-label="emailError($v.mergedUserProfile)" v-model.trim="mergedUserProfile.local.email" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
             <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
@@ -131,9 +131,8 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="IBAN" :error="$v.mergedUserProfile.administrative.payment.rib.iban.$error"
-          :error-label="ibanError" v-model="mergedUserProfile.administrative.payment.rib.iban"
-          @focus="saveTmp('administrative.payment.rib.iban')" upper-case
-          @blur="updateUser('administrative.payment.rib.iban')" />
+          :error-label="ibanError" v-model="mergedUserProfile.administrative.payment.rib.iban" upper-case
+          @focus="saveTmp('administrative.payment.rib.iban')" @blur="updateUser('administrative.payment.rib.iban')" />
         <ni-input caption="BIC" :error="$v.mergedUserProfile.administrative.payment.rib.bic.$error"
           :error-label="bicError" upper-case v-model.trim="mergedUserProfile.administrative.payment.rib.bic"
           @focus="saveTmp('administrative.payment.rib.bic')" @blur="updateUser('administrative.payment.rib.bic')" />
@@ -457,19 +456,13 @@ export default {
             phoneNumber: { required, frPhoneNumber },
           },
           idCardRecto: {
-            driveId: {
-              required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'cni'),
-            },
+            driveId: { required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'cni') },
           },
           passport: {
-            driveId: {
-              required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'pp'),
-            },
+            driveId: { required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'pp') },
           },
           residencePermitRecto: {
-            driveId: {
-              required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'ts'),
-            },
+            driveId: { required: requiredIf(() => this.mergedUserProfile.administrative.identityDocs === 'ts') },
           },
           healthAttest: {
             driveId: { required },
@@ -508,17 +501,20 @@ export default {
     ...mapGetters({ clientRole: 'main/clientRole' }),
     captionTransportUploader () {
       const coachText = 'Justificatif d\'abonnement';
-      const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement'
+      const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement';
+
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
     userProfile () {
       return this.$store.getters['rh/getUserProfile'] ? this.$store.getters['rh/getUserProfile'] : this.loggedUser;
     },
     nationalitiesOptions () {
-      return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')].map(nationality => ({ value: nationality, label: nationalities[nationality] }));
+      return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')]
+        .map(nationality => ({ value: nationality, label: nationalities[nationality] }));
     },
     countriesOptions () {
-      return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')].map(country => ({ value: country, label: countries[country] }));
+      return ['FR', ...Object.keys(countries).filter(country => country !== 'FR')]
+        .map(country => ({ value: country, label: countries[country] }));
     },
     docsUploadUrl () {
       const driveId = get(this.mergedUserProfile, 'administrative.driveFolder.driveId');
@@ -536,63 +532,54 @@ export default {
       return get(this.mergedUserProfile, 'picture.link') || null;
     },
     birthStateError () {
-      if (!this.$v.mergedUserProfile.identity.birthState.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.identity.birthState.minLength ||
-      !this.$v.mergedUserProfile.identity.birthState.maxLength ||
-      !this.$v.mergedUserProfile.identity.birthState.numeric) {
-        return 'Departement non valide';
-      }
+      const { required, minLength, maxLength, numeric } = this.$v.mergedUserProfile.identity.birthState
+      if (!required) return REQUIRED_LABEL;
+      else if (!minLength || !maxLength || !numeric) return 'Departement non valide';
+
       return '';
     },
     ssnError () {
-      if (!this.$v.mergedUserProfile.identity.socialSecurityNumber.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.identity.socialSecurityNumber.minLength ||
-      !this.$v.mergedUserProfile.identity.socialSecurityNumber.maxLength ||
-      !this.$v.mergedUserProfile.identity.socialSecurityNumber.numeric) {
-        return 'Numéro de sécurité sociale non valide';
-      }
+      const { required, minLength, maxLength, numeric } = this.$v.mergedUserProfile.identity.socialSecurityNumber;
+
+      if (!required) return REQUIRED_LABEL;
+      else if (!minLength || !maxLength || !numeric) return 'Numéro de sécurité sociale non valide';
+
       return '';
     },
     zipCodeError () {
-      if (!this.$v.mergedUserProfile.contact.zipCode.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.contact.zipCode.frZipCode || !this.$v.mergedUserProfile.contact.zipCode.maxLength) {
-        return 'Code postal non valide';
-      }
+      const { required, frZipCode, maxLength } = this.$v.mergedUserProfile.contact.zipCode;
+
+      if (!required) return REQUIRED_LABEL;
+      else if (!frZipCode || !maxLength) return 'Code postal non valide';
+
       return '';
     },
     emergencyPhoneNbrError () {
-      if (!this.$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.frPhoneNumber ||
-        !this.$v.mergedUserProfile.administrative.emergencyContact.phoneNumber.maxLength) {
-        return 'Numéro de téléphone non valide';
-      }
+      const { required, frPhoneNumber, maxLength } = this.$v.mergedUserProfile.administrative.emergencyContact.phoneNumber;
+
+      if (!required) return REQUIRED_LABEL;
+      else if (!frPhoneNumber || !maxLength) return 'Numéro de téléphone non valide';
+
       return '';
     },
     ibanError () {
-      if (!this.$v.mergedUserProfile.administrative.payment.rib.iban.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.administrative.payment.rib.iban.iban) {
-        return 'IBAN non valide';
-      }
+      const { required, iban } = this.$v.mergedUserProfile.administrative.payment.rib.iban;
+
+      if (!required) return REQUIRED_LABEL;
+      else if (!iban) return 'IBAN non valide';
+
       return '';
     },
     bicError () {
-      if (!this.$v.mergedUserProfile.administrative.payment.rib.bic.required) {
-        return REQUIRED_LABEL;
-      } else if (!this.$v.mergedUserProfile.administrative.payment.rib.bic.bic) {
-        return 'BIC non valide';
-      }
+      const { required, bic } = this.$v.mergedUserProfile.administrative.payment.rib.bic;
+
+      if (!required) return REQUIRED_LABEL;
+      else if (!bic) return 'BIC non valide';
+
       return '';
     },
     addressError () {
-      if (!this.$v.mergedUserProfile.contact.address.fullAddress.required) {
-        return REQUIRED_LABEL;
-      }
-      return 'Adresse non valide';
+      return !this.$v.mergedUserProfile.contact.address.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.clientRole);
@@ -604,24 +591,21 @@ export default {
       return this.emailLock ? 'lock' : 'lock_open';
     },
     establishmentsOptions () {
-      const options = this.establishments.map(est => ({ label: est.name, value: est._id, inactive: false }));
-      return [{ label: 'Non affecté', value: null, inactive: true }, ...options];
+      return [
+        { label: 'Non affecté', value: null, inactive: true },
+        ...this.establishments.map(est => ({ label: est.name, value: est._id, inactive: false })),
+      ];
     },
   },
-  async mounted () {
+  async created () {
     this.mergeUser(this.userProfile);
-    if (this.isCoach) {
-      await this.getAuxiliaryRoles();
-      await this.getEstablishments();
-    }
+    if (this.isCoach) await Promise.all([this.getAuxiliaryRoles(), this.getEstablishments()]);
     this.$v.mergedUserProfile.$touch();
     this.isLoaded = true;
   },
   watch: {
     userProfile (value) {
-      if (this.emailLock && !isEqual(value, this.mergedUserProfile)) {
-        this.mergeUser(value);
-      }
+      if (this.emailLock && !isEqual(value, this.mergedUserProfile)) this.mergeUser(value);
     },
   },
   methods: {
@@ -661,6 +645,7 @@ export default {
         this.mergedUserProfile.identity.birthState = '99';
         payload.identity.birthState = '99';
       }
+
       await Users.updateById(this.mergedUserProfile._id, payload);
     },
     async uploadImage () {
@@ -676,7 +661,12 @@ export default {
         data.append('fileName', `photo_${this.mergedUserProfile.identity.firstname}_${this.mergedUserProfile.identity.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
-        await this.$axios.post(this.pictureUploadUrl, data, { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } });
+
+        await this.$axios.post(
+          this.pictureUploadUrl,
+          data,
+          { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } }
+        );
         await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
@@ -765,12 +755,6 @@ export default {
       let j = 0;
       const groupName = `${group}Group`;
       for (let i = 0, l = this[groupName].length; i < l; i++) {
-        // eslint-disable-next-line no-console
-        console.log('this.$v[groupName]', this.$v[groupName]);
-        // eslint-disable-next-line no-console
-        console.log('groupName', groupName);
-        // eslint-disable-next-line no-console
-        console.log('this[groupName][i]', this[groupName][i]);
         if (this.$v[groupName][`mergedUserProfile.${this[groupName][i]}`].$error) j++;
       }
 
@@ -787,12 +771,8 @@ export default {
     closePictureEdition () {
       this.disablePictureEdition = true;
       this.fileChosen = false;
-      if (!this.hasPicture && !this.fileChosen) {
-        this.croppa.remove();
-      }
-      if (this.hasPicture && !this.fileChosen) {
-        this.croppa.refresh();
-      }
+      if (!this.hasPicture && !this.fileChosen) this.croppa.remove();
+      if (this.hasPicture && !this.fileChosen) this.croppa.refresh();
     },
     pictureDlLink (link) {
       const lastname = removeDiacritics(get(this.mergedUserProfile, 'identity.lastname'));
