@@ -173,7 +173,7 @@ export default {
     },
   },
   async created () {
-    await this.getCustomersFirstIntervention();
+    await this.getCustomers();
   },
   computed: {
     filteredCustomers () {
@@ -188,7 +188,7 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
-    async getCustomersFirstIntervention () {
+    async getCustomers () {
       try {
         this.tableLoading = true;
         const [customers, firstInterventions] = await Promise.all([Customers.list(), Customers.listWithFirstIntervention()]);
@@ -228,7 +228,7 @@ export default {
         const payload = pickBy(this.newCustomer);
         await Customers.create(payload);
 
-        await this.getCustomersFirstIntervention();
+        await this.getCustomers();
         this.customerCreationModal = false;
         NotifyPositive('Fiche bénéficiaire créée');
       } catch (e) {
