@@ -60,7 +60,7 @@ export default {
         type: 'intra',
       },
       courseCreationModal: false,
-      courses: [],
+      coursesWithGroupedSlot: [],
       programOptions: [],
       companyOptions: [],
     }
@@ -96,12 +96,6 @@ export default {
     courseListCompleted () {
       return this.coursesWithGroupedSlot.filter(this.isCompleted);
     },
-    coursesWithGroupedSlot () {
-      return this.courses.map(course => ({
-        ...course,
-        slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
-      }));
-    },
   },
   async created () {
     await this.refreshCourses();
@@ -110,10 +104,14 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        this.courses = await Courses.list();
+        const courses = await Courses.list();
+        this.coursesWithGroupedSlot = courses.map(course => ({
+          ...course,
+          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
+        }));
       } catch (e) {
         console.error(e);
-        this.courses = [];
+        this.coursesWithGroupedSlot = [];
       }
     },
     async refreshPrograms () {
@@ -164,25 +162,25 @@ export default {
     happened (sameDaySlots) {
       return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
-    isForthcoming (courseWithGroupedSlots) {
-      const noSlot = !courseWithGroupedSlots.slots.length;
-      const noSlotsHappened = !courseWithGroupedSlots.slots.some((sameDaySlots) =>
+    isForthcoming (course) {
+      const noSlot = !course.slots.length;
+      const noSlotsHappened = !course.slots.some((sameDaySlots) =>
         this.happened(sameDaySlots));
 
       return noSlot || noSlotsHappened;
     },
-    isInProgress (courseWithGroupedSlots) {
-      const atLeastOneSlot = courseWithGroupedSlots.slots.length;
-      const atLeastOneSlothappened = courseWithGroupedSlots.slots.some((sameDaySlots) =>
+    isInProgress (course) {
+      const atLeastOneSlot = course.slots.length;
+      const atLeastOneSlothappened = course.slots.some((sameDaySlots) =>
         this.happened(sameDaySlots));
-      const notEverySlotsHappened = courseWithGroupedSlots.slots.some((sameDaySlots) =>
+      const notEverySlotsHappened = course.slots.some((sameDaySlots) =>
         !this.happened(sameDaySlots));
 
       return atLeastOneSlot && atLeastOneSlothappened && notEverySlotsHappened;
     },
-    isCompleted (courseWithGroupedSlots) {
-      const atLeastOneSlot = courseWithGroupedSlots.slots.length;
-      const everySlotsHappened = courseWithGroupedSlots.slots.every((sameDaySlots) =>
+    isCompleted (course) {
+      const atLeastOneSlot = course.slots.length;
+      const everySlotsHappened = course.slots.every((sameDaySlots) =>
         this.happened(sameDaySlots));
 
       return atLeastOneSlot && everySlotsHappened;
