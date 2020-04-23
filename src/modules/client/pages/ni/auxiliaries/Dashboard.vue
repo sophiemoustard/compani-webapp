@@ -222,8 +222,10 @@ export default {
         }
         if (!sectors.length) return;
 
-        const paidInterventions = await Stats.getPaidInterventionStats({ sector: sectors, month: this.selectedMonth });
-        const hoursBalance = await Pay.getHoursBalanceDetail({ sector: sectors, month: this.selectedMonth });
+        const [paidInterventions, hoursBalance] = await Promise.all([
+          Stats.getPaidInterventionStats({ sector: sectors, month: this.selectedMonth }),
+          Pay.getHoursBalanceDetail({ sector: sectors, month: this.selectedMonth }),
+        ]);
 
         for (const auxiliaryPaidInterventions of paidInterventions) {
           for (const sector of auxiliaryPaidInterventions.sectors) {
