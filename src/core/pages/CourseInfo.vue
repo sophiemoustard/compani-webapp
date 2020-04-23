@@ -104,7 +104,7 @@ export default {
   },
   methods: {
     isDone (slot) {
-      return this.$moment(slot[0].startDate).isBefore(this.$moment());
+      return this.$moment(slot[slot.length - 1].endDate).isBefore(this.$moment());
     },
     isNext (slot) {
       const nextCourses = Object.values(this.courseSlots).filter(slot => !this.isDone(slot))

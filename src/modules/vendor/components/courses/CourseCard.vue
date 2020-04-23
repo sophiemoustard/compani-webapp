@@ -57,24 +57,26 @@ export default {
 
       if (listDaySlots.every((daySlot) => !this.isDone(daySlot))) {
         const firstSlot = listDaySlots[0];
+        const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd');
         return {
-          label: `Commence dans ${this.$moment(firstSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd')} jour(s)`,
+          label: `Commence dans ${rangeToNextDate} jour(s)`,
           icon: 'flight_takeoff',
         };
       } else if (listDaySlots.every((daySlot) => this.isDone(daySlot))) {
         const lastSlot = listDaySlots[listDaySlots.length - 1];
+        const rangeToLastDate = this.$moment(0, 'HH').diff(this.$moment(lastSlot[0].startDate), 'd');
         return {
-          label: `Dernière date il y a ${this.$moment(0, 'HH').diff(this.$moment(lastSlot[0].startDate), 'd')} jour(s) `,
+          label: `Dernière date il y a ${rangeToLastDate} jour(s) `,
           icon: 'flight_land',
         };
       } else {
         const nextSlot = listDaySlots.filter((daySlot) => !this.isDone(daySlot))[0];
-        const daysToNextSlot = this.$moment(nextSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd');
-        if (daysToNextSlot === 0) {
+        const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd');
+        if (rangeToNextDate === 0) {
           return { label: 'Prochaine date aujourd’hui', icon: 'flight_takeoff' };
         }
         return {
-          label: `Prochaine date dans ${daysToNextSlot} jour(s)`,
+          label: `Prochaine date dans ${rangeToNextDate} jour(s)`,
           icon: 'flight_takeoff',
         };
       }
