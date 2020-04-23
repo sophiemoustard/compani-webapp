@@ -335,45 +335,35 @@ export default {
       isLoaded: false,
       tmpInput: '',
       identityType: '',
-      pictureGroup: ['mergedUserProfile.picture.link'],
+      pictureGroup: ['picture.link'],
       identityGroup: [
-        'mergedUserProfile.identity.firstname',
-        'mergedUserProfile.identity.lastname',
-        'mergedUserProfile.identity.nationality',
-        'mergedUserProfile.identity.birthDate',
-        'mergedUserProfile.identity.birthCountry',
-        'mergedUserProfile.identity.birthState',
-        'mergedUserProfile.identity.birthCity',
-        'mergedUserProfile.identity.socialSecurityNumber',
+        'identity.firstname',
+        'identity.lastname',
+        'identity.nationality',
+        'identity.birthDate',
+        'identity.birthCountry',
+        'identity.birthState',
+        'identity.birthCity',
+        'identity.socialSecurityNumber',
       ],
-      contactGroup: [
-        'mergedUserProfile.contact.address',
-        'mergedUserProfile.contact.zipCode',
-        'mergedUserProfile.contact.city',
-      ],
+      contactGroup: ['contact.address', 'contact.zipCode', 'contact.city'],
       emergencyContactGroup: [
-        'mergedUserProfile.administrative.emergencyContact.name',
-        'mergedUserProfile.administrative.emergencyContact.phoneNumber',
+        'administrative.emergencyContact.name',
+        'administrative.emergencyContact.phoneNumber',
       ],
-      ibanGroup: [
-        'mergedUserProfile.administrative.payment.rib.iban',
-        'mergedUserProfile.administrative.payment.rib.bic',
-      ],
+      ibanGroup: ['administrative.payment.rib.iban', 'administrative.payment.rib.bic'],
       documentsGroup: [
-        'mergedUserProfile.administrative.identityDocs',
-        'mergedUserProfile.administrative.idCardRecto.driveId',
-        'mergedUserProfile.administrative.passport.driveId',
-        'mergedUserProfile.administrative.residencePermitRecto.driveId',
-        'mergedUserProfile.administrative.healthAttest.driveId',
-        'mergedUserProfile.administrative.phoneInvoice.driveId',
+        'administrative.identityDocs',
+        'administrative.idCardRecto.driveId',
+        'administrative.passport.driveId',
+        'administrative.residencePermitRecto.driveId',
+        'administrative.healthAttest.driveId',
+        'administrative.phoneInvoice.driveId',
       ],
-      mutualFundGroup: [
-        'mergedUserProfile.administrative.mutualFund.has',
-        'mergedUserProfile.administrative.mutualFund.driveId',
-      ],
+      mutualFundGroup: ['administrative.mutualFund.has', 'administrative.mutualFund.driveId'],
       transportInvoiceGroup: [
-        'mergedUserProfile.administrative.transportInvoice.transportType',
-        'mergedUserProfile.administrative.transportInvoice.driveId',
+        'administrative.transportInvoice.transportType',
+        'administrative.transportInvoice.driveId',
       ],
       mergedUserProfile: {
         mentorId: '',
@@ -448,12 +438,7 @@ export default {
             maxLength: maxLength(3),
           },
           birthCity: { required },
-          socialSecurityNumber: {
-            required,
-            numeric,
-            minLength: minLength(15),
-            maxLength: maxLength(15),
-          },
+          socialSecurityNumber: { required, numeric, minLength: minLength(15), maxLength: maxLength(15) },
         },
         contact: {
           phone: { required, frPhoneNumber },
@@ -508,14 +493,14 @@ export default {
           },
         },
       },
-      pictureGroup: this.pictureGroup,
-      identityGroup: this.identityGroup,
-      contactGroup: this.contactGroup,
-      emergencyContactGroup: this.emergencyContactGroup,
-      ibanGroup: this.ibanGroup,
-      documentsGroup: this.documentsGroup,
-      mutualFundGroup: this.mutualFundGroup,
-      transportInvoiceGroup: this.transportInvoiceGroup,
+      pictureGroup: this.pictureGroup.map(g => `mergedUserProfile.${g}`),
+      identityGroup: this.identityGroup.map(g => `mergedUserProfile.${g}`),
+      contactGroup: this.contactGroup.map(g => `mergedUserProfile.${g}`),
+      emergencyContactGroup: this.emergencyContactGroup.map(g => `mergedUserProfile.${g}`),
+      ibanGroup: this.ibanGroup.map(g => `mergedUserProfile.${g}`),
+      documentsGroup: this.documentsGroup.map(g => `mergedUserProfile.${g}`),
+      mutualFundGroup: this.mutualFundGroup.map(g => `mergedUserProfile.${g}`),
+      transportInvoiceGroup: this.transportInvoiceGroup.map(g => `mergedUserProfile.${g}`),
     }
   },
   computed: {
@@ -780,7 +765,13 @@ export default {
       let j = 0;
       const groupName = `${group}Group`;
       for (let i = 0, l = this[groupName].length; i < l; i++) {
-        if (this.$v[groupName][this[groupName][i]].$error) j++;
+        // eslint-disable-next-line no-console
+        console.log('this.$v[groupName]', this.$v[groupName]);
+        // eslint-disable-next-line no-console
+        console.log('groupName', groupName);
+        // eslint-disable-next-line no-console
+        console.log('this[groupName][i]', this[groupName][i]);
+        if (this.$v[groupName][`mergedUserProfile.${this[groupName][i]}`].$error) j++;
       }
 
       return { errors: j, msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes' };
