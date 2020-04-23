@@ -61,7 +61,6 @@ export default {
       },
       courseCreationModal: false,
       courses: [],
-      coursesWithGroupedSlot: [],
       programOptions: [],
       companyOptions: [],
     }
@@ -97,6 +96,12 @@ export default {
     courseListCompleted () {
       return this.coursesWithGroupedSlot.filter(this.isCompleted);
     },
+    coursesWithGroupedSlot () {
+      return this.courses.map(course => ({
+        ...course,
+        slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
+      }));
+    },
   },
   async created () {
     await this.refreshCourses();
@@ -106,10 +111,6 @@ export default {
     async refreshCourses () {
       try {
         this.courses = await Courses.list();
-        this.coursesWithGroupedSlot = this.courses.map(course => ({
-          ...course,
-          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
-        }));
       } catch (e) {
         console.error(e);
         this.courses = [];
