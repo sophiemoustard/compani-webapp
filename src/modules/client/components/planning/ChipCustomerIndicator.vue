@@ -9,7 +9,7 @@
         </q-chip>
       </div>
     </div>
-    <div class="referent-name overflow-hidden-nowrap">{{ getReferent(person) | formatIdentity('fL') }}</div>
+    <div class="referent-name overflow-hidden-nowrap">{{ getReferent(person) | formatIdentity('Fl') }}</div>
   </div>
 </template>
 
