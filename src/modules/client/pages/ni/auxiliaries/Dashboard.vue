@@ -96,7 +96,7 @@
                 </div>
               </div>
               <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail"
-                :customers-details="auxiliary.paidIntervention" />
+                :customers-details="auxiliary.paidInterventions" />
             </div>
           </div>
         </q-slide-transition>
@@ -235,8 +235,8 @@ export default {
               _id: auxiliaryPaidInterventions._id,
               identity: hoursDetails.identity,
               picture: hoursDetails.picture,
-              paidIntervention: omit(auxiliaryPaidInterventions, 'sectors'),
-              hoursBalance: omit(hoursDetails, ['sectors', 'auxiliary']),
+              paidInterventions: omit(auxiliaryPaidInterventions, 'sectors'),
+              hoursBalanceDetail: omit(hoursDetails, ['sectors', 'auxiliary']),
             }
             auxiliariesStats[sector].push(auxiliaryStats);
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
