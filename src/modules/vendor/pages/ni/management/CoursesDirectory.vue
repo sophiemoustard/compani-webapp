@@ -89,13 +89,13 @@ export default {
       ]
     },
     courseListForthcoming () {
-      return this.coursesWithGroupedSlot.filter((course) => this.isForthcoming(course));
+      return this.coursesWithGroupedSlot.filter(this.isForthcoming);
     },
     courseListInProgress () {
-      return this.coursesWithGroupedSlot.filter((course) => this.isInProgress(course));
+      return this.coursesWithGroupedSlot.filter(this.isInProgress);
     },
     courseListCompleted () {
-      return this.coursesWithGroupedSlot.filter((course) => this.isCompleted(course));
+      return this.coursesWithGroupedSlot.filter(this.isCompleted);
     },
   },
   async created () {
@@ -106,7 +106,7 @@ export default {
     async refreshCourses () {
       try {
         this.courses = await Courses.list();
-        this.coursesWithGroupedSlot = await this.courses.map(course => ({
+        this.coursesWithGroupedSlot = this.courses.map(course => ({
           ...course,
           slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
         }));
