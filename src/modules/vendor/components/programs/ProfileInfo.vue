@@ -3,11 +3,11 @@
     <div class="q-mb-xl">
       <div class="row gutter-profile">
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
-          :error="$v.program.name.$error" />
+          :error="$v.program.name.$error" required-field />
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
-          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')"/>
+          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field />
       </div>
     </div>
   </div>
@@ -32,7 +32,7 @@ export default {
   },
   validations () {
     return {
-      program: { name: { required } },
+      program: { name: { required }, learningGoals: { required } },
     }
   },
   computed: {
