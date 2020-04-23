@@ -17,8 +17,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Photo</p>
-        <p :class="[groupErrors('picture').errors > 0 ? 'group-error' : 'group-error-ok']">
-          {{groupErrors('picture').msg }}</p>
+        <p :class="groupErrorsClass('picture')">{{ groupErrors('picture').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
@@ -53,8 +52,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Identité</p>
-        <p :class="[groupErrors('identity').errors > 0 ? 'group-error' : 'group-error-ok']">{{
-          groupErrors('identity').msg }}</p>
+        <p :class="groupErrorsClass('identity')">{{ groupErrors('identity').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom" :error="$v.mergedUserProfile.identity.firstname.$error"
@@ -88,8 +86,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact</p>
-        <p :class="[groupErrors('contact').errors > 0 ? 'group-error' : 'group-error-ok']">
-          {{ groupErrors('contact').msg }}</p>
+        <p :class="groupErrorsClass('contact')">{{ groupErrors('contact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Numéro de téléphone" :error="$v.mergedUserProfile.contact.phone.$error"
@@ -113,8 +110,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Contact d'urgence</p>
-        <p :class="[groupErrors('emergencyContact').errors > 0 ? 'group-error' : 'group-error-ok']">
-          {{ groupErrors('emergencyContact').msg }}</p>
+        <p :class="groupErrorsClass('emergencyContact')">{{ groupErrors('emergencyContact').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Prénom et nom" :error="$v.mergedUserProfile.administrative.emergencyContact.name.$error"
@@ -131,8 +127,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">IBAN</p>
-        <p :class="[groupErrors('iban').errors > 0 ? 'group-error' : 'group-error-ok']">{{ groupErrors('iban').msg }}
-        </p>
+        <p :class="groupErrorsClass('iban')">{{ groupErrors('iban').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <ni-input caption="IBAN" :error="$v.mergedUserProfile.administrative.payment.rib.iban.$error"
@@ -147,8 +142,7 @@
     <div v-if="mergedUserProfile.administrative.driveFolder" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
-        <p :class="[groupErrors('documents').errors > 0 ? 'group-error' : 'group-error-ok']">
-          {{groupErrors('documents').msg }}</p>
+        <p :class="groupErrorsClass('documents')">{{ groupErrors('documents').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12">
@@ -220,8 +214,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Mutuelle</p>
-        <p :class="[groupErrors('mutualFund').errors > 0 ? 'group-error' : 'group-error-ok']">
-          {{ groupErrors('mutualFund').msg }}</p>
+        <p :class="groupErrorsClass('mutualFund')">{{ groupErrors('mutualFund').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12">
@@ -254,8 +247,7 @@
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Transports</p>
-        <p :class="[groupErrors('transportInvoice').errors > 0 ? 'group-error' : 'group-error-ok']">
-          {{ groupErrors('transportInvoice').msg }}</p>
+        <p :class="groupErrorsClass('transportInvoice')">{{ groupErrors('transportInvoice').msg }}</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12">
@@ -785,6 +777,9 @@ export default {
       }
 
       return { errors: j, msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes' };
+    },
+    groupErrorsClass (group) {
+      return this.groupErrors(group).errors > 0 ? 'group-error' : 'group-error-ok';
     },
     choosePicture () {
       this.fileChosen = true;
