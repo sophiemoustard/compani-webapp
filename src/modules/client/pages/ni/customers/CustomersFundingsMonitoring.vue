@@ -175,7 +175,7 @@ export default {
     try {
       this.tableLoading = true;
       await this.getThirdPartyPayerOptions();
-      this.allCustomersFundingsMonitoring = await Stats.getAllCustomersFundingsMonitoring();
+      this.allCustomersFundingsMonitoring = Object.freeze(await Stats.getAllCustomersFundingsMonitoring());
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
       this.tableLoading = true;
