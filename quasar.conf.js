@@ -2,12 +2,7 @@
 require('dotenv').config();
 const path = require('path');
 const webpack = require('webpack');
-const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-const PreloadWebpackPlugin = require('preload-webpack-plugin');
-const BrotliPlugin = require('brotli-webpack-plugin');
-const PurgecssPlugin = require('purgecss-webpack-plugin');
-const glob = require('glob')
-const PATHS = { src: path.join(__dirname, 'src') };
+// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = function (ctx) {
   return {
@@ -113,14 +108,9 @@ module.exports = function (ctx) {
       scopeHoisting: true,
       vueRouterMode: 'history',
       publicPath: '/',
-      gzip: {
-        filename: '[path].gz[query]',
-        algorithm: 'gzip',
-        test: /\.(js|css|html|svg)$/,
-        threshold: 8192,
-        minRatio: 0.8,
-      },
+      gzip: true,
       useNotifier: false,
+      preloadChunks: true,
       extendWebpack (cfg) {
         cfg.module.rules.push({
           enforce: 'pre',
@@ -140,27 +130,11 @@ module.exports = function (ctx) {
           '@mixins': path.resolve(__dirname, './src/core/mixins'),
         }
         cfg.plugins.push(
-          new BundleAnalyzerPlugin(),
-          // Select moment local files
-          new webpack.ContextReplacementPlugin(
-            /moment[/\\]locale$/,
-            /fr/
-          ),
-          // Ignore moment-timezon data
-          new webpack.IgnorePlugin(/moment-timezone\/data\/packed\/latest\.json/),
+          // new BundleAnalyzerPlugin(),
+          // Select moment locale files
+          new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/),
           // Ignore astronomia (date-holidays)
-          new webpack.IgnorePlugin(/^\.\/vsop87B.*$/),
-          new PreloadWebpackPlugin(),
-          new BrotliPlugin({
-            asset: '[path].br[query]',
-            test: /\.(js|css|html|svg)$/,
-            threshold: 10240,
-            minRatio: 0.8,
-          }),
-          new PurgecssPlugin({
-            paths: glob.sync(`${PATHS.src}/**/*`, { nodir: true }),
-            only: ['bundle', 'vendor'],
-          })
+          new webpack.IgnorePlugin(/^\.\/vsop87B.*$/)
         )
       },
       env: {
