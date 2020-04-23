@@ -154,58 +154,52 @@
         <div v-if="mergedUserProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (recto)" path="administrative.idCardRecto" alt="cni recto"
             :entity="mergedUserProfile" name="idCardRecto" @uploaded="refreshUser" :url="docsUploadUrl"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.idCardRecto.driveId, 'administrative.idCardRecto')"
+            @delete="validateDocumentDeletion('administrative.idCardRecto')"
             :error="$v.mergedUserProfile.administrative.idCardRecto.driveId.$error" :extensions="extensions"
-            :additional-value="`cni_recto_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+            :additional-value="documentTitle('cni_recto')" />
         </div>
         <div v-if="mergedUserProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
             :entity="mergedUserProfile" :url="docsUploadUrl" name="idCardVerso" @uploaded="refreshUser"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.idCardVerso.driveId, 'administrative.idCardVerso')"
-            :extensions="extensions"
-            :additional-value="`cni_verso_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+            @delete="validateDocumentDeletion('administrative.idCardVerso')"
+            :extensions="extensions" :additional-value="documentTitle('cni_verso')" />
         </div>
         <div v-if="mergedUserProfile.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
-          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport"
-            :entity="mergedUserProfile" name="passport" :url="docsUploadUrl" @uploaded="refreshUser"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.passport.driveId, 'administrative.passport')"
-            :error="$v.mergedUserProfile.administrative.passport.driveId.$error" :extensions="extensions"
-            :additional-value="`passport_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+          <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :url="docsUploadUrl"
+            :entity="mergedUserProfile" name="passport" :additional-value="documentTitle('passport')"
+            @delete="validateDocumentDeletion('administrative.passport')" @uploaded="refreshUser"
+            :error="$v.mergedUserProfile.administrative.passport.driveId.$error" :extensions="extensions" />
         </div>
         <div v-if="mergedUserProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
             alt="titre de séjour (recto)" :entity="mergedUserProfile" @uploaded="refreshUser" :url="docsUploadUrl"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.residencePermitRecto.driveId, 'administrative.residencePermitRecto')"
+            @delete="validateDocumentDeletion('administrative.residencePermitRecto')" :extensions="extensions"
             :error="$v.mergedUserProfile.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
-            :additional-value="`titre_de_séjour_recto_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`"
-            :extensions="extensions" />
+            :additional-value="documentTitle('titre_de_séjour_recto')" />
         </div>
         <div v-if="mergedUserProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso"
-            alt="titre de séjour (verso)" name="residencePermitVerso"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.residencePermitVerso.driveId, 'administrative.residencePermitVerso')"
-            :entity="mergedUserProfile" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions"
-            :additional-value="`titre_de_séjour_verso_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+            alt="titre de séjour (verso)" name="residencePermitVerso" @uploaded="refreshUser" :url="docsUploadUrl"
+            @delete="validateDocumentDeletion('administrative.residencePermitVerso')" :extensions="extensions"
+            :entity="mergedUserProfile"  :additional-value="documentTitle('titre_de_séjour_verso')" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
             alt="attestation secu" :entity="mergedUserProfile" :url="docsUploadUrl" :extensions="extensions"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.healthAttest.driveId, 'administrative.healthAttest')"
-            name="healthAttest" @uploaded="refreshUser"
-            :error="$v.mergedUserProfile.administrative.healthAttest.driveId.$error"
-            :additional-value="`attestation_secu_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+            @delete="validateDocumentDeletion('administrative.healthAttest')"
+            name="healthAttest" @uploaded="refreshUser" :additional-value="documentTitle('attestation_secu')"
+            :error="$v.mergedUserProfile.administrative.healthAttest.driveId.$error" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
             :entity="mergedUserProfile" :url="docsUploadUrl" :extensions="extensions"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.phoneInvoice.driveId, 'administrative.phoneInvoice')"
-            name="phoneInvoice" @uploaded="refreshUser"
-            :error="$v.mergedUserProfile.administrative.phoneInvoice.driveId.$error"
-            :additional-value="`facture_telephone_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+            @delete="validateDocumentDeletion('administrative.phoneInvoice')"
+            name="phoneInvoice" @uploaded="refreshUser" :additional-value="documentTitle('facture_telephone')"
+            :error="$v.mergedUserProfile.administrative.phoneInvoice.driveId.$error" />
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
-            alt="facture téléphone" @delete="validateDocumentDeletion($event, 'certificates')" name="certificates"
+            alt="facture téléphone" @delete="validateCertificateDeletion" name="certificates"
             collapsible-label="Ajouter un diplôme" :user-profile="mergedUserProfile" :url="docsUploadUrl"
             additional-fields-name="diplomes" @uploaded="refreshUser" :extensions="extensions" />
         </div>
@@ -227,20 +221,16 @@
             :error-label="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary"
               v-model="mergedUserProfile.administrative.mutualFund.has"
-              @input="updateUser('administrative.mutualFund.has')" :options="[
-                  { label: 'Oui', value: false },
-                  { label: 'Non', value: true }
-                ]" />
+              @input="updateUser('administrative.mutualFund.has')" :options="mutualOptions" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6" v-if="$_.get(mergedUserProfile, 'administrative.mutualFund.has')">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
-            path="administrative.mutualFund" alt="justif mutuelle" :entity="mergedUserProfile"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.mutualFund.driveId, 'administrative.mutualFund')"
-            name="mutualFund" @uploaded="refreshUser" :url="docsUploadUrl" :extensions="extensions" entity-url="users"
-            :error="$v.mergedUserProfile.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary"
-            :additional-value="`mutuelle_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+            path="administrative.mutualFund" alt="justif mutuelle" :entity="mergedUserProfile" :url="docsUploadUrl"
+            @delete="validateDocumentDeletion('administrative.mutualFund')" :extensions="extensions" entity-url="users"
+            name="mutualFund" @uploaded="refreshUser" :additional-value="documentTitle('mutuelle')"
+            :error="$v.mergedUserProfile.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary" />
         </div>
       </div>
     </div>
@@ -262,9 +252,8 @@
           <ni-file-uploader :caption="captionTransportUploader" path="administrative.transportInvoice"
             alt="justif transport" :entity="mergedUserProfile" name="transportInvoice" @uploaded="refreshUser"
             :error="$v.mergedUserProfile.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
-            :extensions="extensions"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.transportInvoice.driveId, 'administrative.transportInvoice')"
-            :additional-value="`justif_transport_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`" />
+            :extensions="extensions" :additional-value="documentTitle('justif_transport')"
+            @delete="validateDocumentDeletion('administrative.transportInvoice')" />
         </div>
       </div>
     </div>
@@ -274,9 +263,8 @@
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate"
             alt="certificat médical" :entity="mergedUserProfile" name="medicalCertificate" @uploaded="refreshUser"
-            @delete="validateDocumentDeletion(mergedUserProfile.administrative.medicalCertificate.driveId, 'administrative.medicalCertificate')"
-            :additional-value="`certificat_medical_${mergedUserProfile.identity.firstname}_${mergedUserProfile.identity.lastname}`"
-            :url="docsUploadUrl" :extensions="extensions" />
+            @delete="validateDocumentDeletion('administrative.medicalCertificate')"
+            :additional-value="documentTitle('certificat_medical')" :url="docsUploadUrl" :extensions="extensions" />
         </div>
       </div>
     </div>
@@ -432,6 +420,7 @@ export default {
       ],
       establishments: [],
       REQUIRED_LABEL,
+      mutualOptions: [{ label: 'Oui', value: false }, { label: 'Non', value: true }],
     }
   },
   validations () {
@@ -713,17 +702,15 @@ export default {
         this.loadingImage = false;
       }
     },
-    async deleteDocument (path, driveId) {
+    documentTitle (path) {
+      return `${path}_${this.mergedUserProfile.identity.firstname}_${this.mergedUserProfile.identity.lastname}`;
+    },
+    async deleteDocument (path) {
       try {
-        await gdrive.removeFileById({ id: driveId });
-        let payload;
-        if (path === 'certificates') {
-          payload = { certificates: { driveId } };
-          await Users.updateCertificates(this.mergedUserProfile._id, payload);
-        } else {
-          payload = set({}, path, { driveId: null, link: null });
-          await Users.updateById(this.mergedUserProfile._id, payload);
-        }
+        const payload = set({}, path, { driveId: null, link: null });
+        await Users.updateById(this.mergedUserProfile._id, payload);
+        await gdrive.removeFileById({ id: get(this.mergedUserProfile, `${path}.driveId`) });
+
         await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
         NotifyPositive('Document supprimé');
       } catch (e) {
@@ -731,14 +718,34 @@ export default {
         NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
-    validateDocumentDeletion (driveId, path) {
+    validateDocumentDeletion (path) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
-      })
-        .onOk(() => this.deleteDocument(path, driveId))
+      }).onOk(() => this.deleteDocument(path))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteCertificate (driveId) {
+      try {
+        await Users.updateCertificates(this.mergedUserProfile._id, { certificates: { driveId } });
+        await gdrive.removeFileById({ id: driveId });
+
+        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
+        NotifyPositive('Document supprimé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du document.');
+      }
+    },
+    validateCertificateDeletion (driveId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteCertificate(driveId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async deleteImage () {
