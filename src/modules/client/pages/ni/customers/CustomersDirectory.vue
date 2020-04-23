@@ -172,8 +172,8 @@ export default {
       },
     },
   },
-  async mounted () {
-    await this.refresh();
+  async created () {
+    await this.getCustomersFirstIntervention();
   },
   computed: {
     filteredCustomers () {
@@ -188,21 +188,11 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
-    async refresh () {
-      await Promise.all([this.getCustomers(), this.getCustomersFirstIntervention()]);
-    },
-    async getCustomers () {
-      try {
-        return Customers.list();
-      } catch (e) {
-        console.error(e);
-      }
-    },
     async getCustomersFirstIntervention () {
       try {
         this.tableLoading = true;
-        this.firstInterventions = Object.freeze(await Customers.listWithFirstIntervention());
-        const customers = await this.getCustomers();
+        const [customers, firstInterventions] = await Promise.all([Customers.list(), Customers.listWithFirstIntervention()]);
+        this.firstInterventions = Object.freeze(firstInterventions);
         this.customers = Object.freeze(customers.map(customer => ({
           ...customer,
           firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
@@ -238,7 +228,7 @@ export default {
         const payload = pickBy(this.newCustomer);
         await Customers.create(payload);
 
-        await this.refresh();
+        await this.getCustomersFirstIntervention();
         this.customerCreationModal = false;
         NotifyPositive('Fiche bénéficiaire créée');
       } catch (e) {
