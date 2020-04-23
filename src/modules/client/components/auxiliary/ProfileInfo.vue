@@ -355,45 +355,45 @@ export default {
       isLoaded: false,
       tmpInput: '',
       identityType: '',
-      pictureGroup: ['user.picture.link'],
+      pictureGroup: ['mergedUserProfile.picture.link'],
       identityGroup: [
-        'user.identity.firstname',
-        'user.identity.lastname',
-        'user.identity.nationality',
-        'user.identity.birthDate',
-        'user.identity.birthCountry',
-        'user.identity.birthState',
-        'user.identity.birthCity',
-        'user.identity.socialSecurityNumber',
+        'mergedUserProfile.identity.firstname',
+        'mergedUserProfile.identity.lastname',
+        'mergedUserProfile.identity.nationality',
+        'mergedUserProfile.identity.birthDate',
+        'mergedUserProfile.identity.birthCountry',
+        'mergedUserProfile.identity.birthState',
+        'mergedUserProfile.identity.birthCity',
+        'mergedUserProfile.identity.socialSecurityNumber',
       ],
       contactGroup: [
-        'user.contact.address',
-        'user.contact.zipCode',
-        'user.contact.city',
+        'mergedUserProfile.contact.address',
+        'mergedUserProfile.contact.zipCode',
+        'mergedUserProfile.contact.city',
       ],
       emergencyContactGroup: [
-        'user.administrative.emergencyContact.name',
-        'user.administrative.emergencyContact.phoneNumber',
+        'mergedUserProfile.administrative.emergencyContact.name',
+        'mergedUserProfile.administrative.emergencyContact.phoneNumber',
       ],
       ibanGroup: [
-        'user.administrative.payment.rib.iban',
-        'user.administrative.payment.rib.bic',
+        'mergedUserProfile.administrative.payment.rib.iban',
+        'mergedUserProfile.administrative.payment.rib.bic',
       ],
       documentsGroup: [
-        'user.administrative.identityDocs',
-        'user.administrative.idCardRecto.driveId',
-        'user.administrative.passport.driveId',
-        'user.administrative.residencePermitRecto.driveId',
-        'user.administrative.healthAttest.driveId',
-        'user.administrative.phoneInvoice.driveId',
+        'mergedUserProfile.administrative.identityDocs',
+        'mergedUserProfile.administrative.idCardRecto.driveId',
+        'mergedUserProfile.administrative.passport.driveId',
+        'mergedUserProfile.administrative.residencePermitRecto.driveId',
+        'mergedUserProfile.administrative.healthAttest.driveId',
+        'mergedUserProfile.administrative.phoneInvoice.driveId',
       ],
       mutualFundGroup: [
-        'user.administrative.mutualFund.has',
-        'user.administrative.mutualFund.driveId',
+        'mergedUserProfile.administrative.mutualFund.has',
+        'mergedUserProfile.administrative.mutualFund.driveId',
       ],
       transportInvoiceGroup: [
-        'user.administrative.transportInvoice.transportType',
-        'user.administrative.transportInvoice.driveId',
+        'mergedUserProfile.administrative.transportInvoice.transportType',
+        'mergedUserProfile.administrative.transportInvoice.driveId',
       ],
       mergedUserProfile: {
         mentorId: '',
@@ -778,14 +778,10 @@ export default {
       let j = 0;
       const groupName = `${group}Group`;
       for (let i = 0, l = this[groupName].length; i < l; i++) {
-        if (this.$v[groupName][this[groupName][i]].$error) {
-          j++;
-        }
+        if (this.$v[groupName][this[groupName][i]].$error) j++;
       }
-      return {
-        errors: j,
-        msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes',
-      };
+
+      return { errors: j, msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes' };
     },
     choosePicture () {
       this.fileChosen = true;
