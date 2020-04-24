@@ -345,7 +345,7 @@ export default {
         'identity.birthCity',
         'identity.socialSecurityNumber',
       ],
-      contactGroup: ['contact.address', 'contact.zipCode', 'contact.city'],
+      contactGroup: ['contact.address', 'contact.zipCode', 'contact.city', 'contact.phone', 'contact.fullAddress'],
       emergencyContactGroup: [
         'administrative.emergencyContact.name',
         'administrative.emergencyContact.phoneNumber',
