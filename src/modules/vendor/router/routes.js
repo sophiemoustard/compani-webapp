@@ -119,18 +119,24 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [TRAINER],
-          parent: 'configuration',
+          parent: 'management',
         },
       },
       {
         path: 'trainers/management/courses/:courseId',
         name: 'trainer course info',
         component: () => import('src/modules/vendor/pages/ni/management/CourseProfile'),
+        async beforeEnter (to, from, next) {
+          await store.dispatch('course/getCourse', { courseId: to.params.courseId });
+          const { course } = store.state.course;
+
+          return Cookies.get('user_id') === course.trainer._id ? next() : next('/404');
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [TRAINER],
-          parent: 'configuration',
+          parent: 'management',
         },
       },
       {
