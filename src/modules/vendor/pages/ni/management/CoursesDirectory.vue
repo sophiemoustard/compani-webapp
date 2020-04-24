@@ -164,24 +164,20 @@ export default {
     },
     isForthcoming (course) {
       const noSlot = !course.slots.length;
-      const noSlotsHappened = !course.slots.some((sameDaySlots) =>
-        this.happened(sameDaySlots));
+      const noSlotHappened = !course.slots.some(this.happened);
 
-      return noSlot || noSlotsHappened;
+      return noSlot || noSlotHappened;
     },
     isInProgress (course) {
       const atLeastOneSlot = course.slots.length;
-      const atLeastOneSlothappened = course.slots.some((sameDaySlots) =>
-        this.happened(sameDaySlots));
-      const notEverySlotsHappened = course.slots.some((sameDaySlots) =>
-        !this.happened(sameDaySlots));
+      const atLeastOneSlothappened = course.slots.some(this.happened);
+      const notEverySlotsHappened = course.slots.some((sameDaySlots) => !this.happened(sameDaySlots));
 
       return atLeastOneSlot && atLeastOneSlothappened && notEverySlotsHappened;
     },
     isCompleted (course) {
       const atLeastOneSlot = course.slots.length;
-      const everySlotsHappened = course.slots.every((sameDaySlots) =>
-        this.happened(sameDaySlots));
+      const everySlotsHappened = course.slots.every(this.happened);
 
       return atLeastOneSlot && everySlotsHappened;
     },
