@@ -52,39 +52,35 @@ export default {
       ];
     },
     formatNearestDate () {
-      if (this.courseSlotsCount === 0) return { label: 'Pas de date prévue', icon: 'flight_takeoff' };
-      const listDaySlots = Object.values(this.course.slots);
+      if (this.courseSlotsCount === 0) {
+        return { label: 'Pas de date prévue', icon: 'img:statics/calendar-arrow-right.svg' };
+      }
 
-      if (listDaySlots.every((daySlot) => !this.isDone(daySlot))) {
-        const firstSlot = listDaySlots[0];
-        const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd');
+      if (this.course.slots.every((daySlots) => !this.happened(daySlots))) {
+        const firstSlot = this.course.slots[0];
+        const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
         return {
           label: `Commence dans ${rangeToNextDate} jour(s)`,
-          icon: 'flight_takeoff',
-        };
-      } else if (listDaySlots.every((daySlot) => this.isDone(daySlot))) {
-        const lastSlot = listDaySlots[listDaySlots.length - 1];
-        const rangeToLastDate = this.$moment(0, 'HH').diff(this.$moment(lastSlot[0].startDate), 'd');
-        return {
-          label: `Dernière date il y a ${rangeToLastDate} jour(s) `,
-          icon: 'flight_land',
-        };
-      } else {
-        const nextSlot = listDaySlots.filter((daySlot) => !this.isDone(daySlot))[0];
-        const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment(0, 'HH'), 'd');
-        if (rangeToNextDate === 0) {
-          return { label: 'Prochaine date aujourd’hui', icon: 'flight_takeoff' };
-        }
-        return {
-          label: `Prochaine date dans ${rangeToNextDate} jour(s)`,
-          icon: 'flight_takeoff',
+          icon: 'img:statics/calendar-arrow-right.svg',
         };
       }
-    },
-  },
-  methods: {
-    isDone (daySlot) {
-      return this.$moment(daySlot[daySlot.length - 1].endDate).isBefore(this.$moment());
+      if (this.course.slots.every(this.happened)) {
+        const lastSlot = this.course.slots[this.course.slots.length - 1];
+        const rangeToLastDate = this.$moment().endOf('day').diff(this.$moment(lastSlot[0].startDate), 'd');
+        return {
+          label: `Dernière date il y a ${rangeToLastDate} jour(s) `,
+          icon: 'img:statics/calendar-arrow-left.svg',
+        };
+      }
+      const nextSlot = this.course.slots.filter((daySlots) => !this.happened(daySlots))[0];
+      const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
+      if (rangeToNextDate === 0) {
+        return { label: 'Prochaine date aujourd’hui', icon: 'img:statics/calendar-arrow-right.svg' };
+      }
+      return {
+        label: `Prochaine date dans ${rangeToNextDate} jour(s)`,
+        icon: 'img:statics/calendar-arrow-right.svg',
+      }
     },
   },
 }
@@ -125,5 +121,5 @@ export default {
   .infos-course-container > .q-item__section > .q-icon
     margin-right: 10px;
   .info-course-next-date-text
-    color: $orange
+    color: $primary
 </style>
