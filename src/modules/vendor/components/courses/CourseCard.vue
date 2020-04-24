@@ -17,7 +17,7 @@
         <q-item-section><q-icon size="xs" name="people"/> ({{ traineesCount }}) </q-item-section>
       </q-item>
       <q-item class="infos-course-container text-weight-bold">
-        <q-item-section><q-icon size="xs" name="date_range"/> ({{ courseSlotsCount }}) </q-item-section>
+        <q-item-section><q-icon size="xs" name="mdi-calendar-range"/> ({{ courseSlotsCount }}) </q-item-section>
       </q-item>
     </q-card-section>
   </q-card>
@@ -53,7 +53,7 @@ export default {
     },
     formatNearestDate () {
       if (this.courseSlotsCount === 0) {
-        return { label: 'Pas de date prévue', icon: 'img:statics/calendar-arrow-right.svg' };
+        return { label: 'Pas de date prévue', icon: 'mdi-calendar-remove' };
       }
 
       if (this.course.slots.every((daySlots) => !this.happened(daySlots))) {
