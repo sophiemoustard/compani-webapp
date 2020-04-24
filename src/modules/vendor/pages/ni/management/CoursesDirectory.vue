@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapGetters, mapState } from 'vuex';
+import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
@@ -37,7 +37,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
+import { TRAINER } from '@data/constants';
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
@@ -78,11 +78,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ vendorRole: 'main/vendorRole' }),
     ...mapState('main', ['loggedUser']),
-    isAdmin () {
-      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
-    },
     trello () {
       return [
         { title: 'À venir', courses: this.courseListForthcoming },

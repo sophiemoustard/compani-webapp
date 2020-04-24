@@ -123,6 +123,17 @@ const routes = [
         },
       },
       {
+        path: 'trainers/management/courses/:courseId',
+        name: 'trainer course info',
+        component: () => import('src/modules/vendor/pages/ni/management/CourseProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [TRAINER],
+          parent: 'configuration',
+        },
+      },
+      {
         path: 'trainers/info',
         name: 'trainer personal info',
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),

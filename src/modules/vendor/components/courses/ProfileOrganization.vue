@@ -4,7 +4,7 @@
       <div class="row gutter-profile">
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" :error="$v.course.name.$error" />
-        <ni-select caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
+        <ni-select v-if="isAdmin" caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
           @blur="updateCourse('trainer')" :options="trainerOptions" :error="$v.course.trainer.$error" />
       </div>
     </div>
@@ -189,10 +189,11 @@ import { TRAINER, REQUIRED_LABEL } from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
+import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
 export default {
   name: 'ProfileOrganization',
-  mixins: [userMixin],
+  mixins: [userMixin, courseMixin],
   props: {
     profileId: { type: String },
   },
@@ -345,7 +346,7 @@ export default {
   async mounted () {
     if (!this.course) await this.refreshCourse();
     else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
-    await this.refreshTrainers();
+    if (this.isAdmin) await this.refreshTrainers();
   },
   methods: {
     get,
