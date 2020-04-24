@@ -2,7 +2,6 @@
 require('dotenv').config();
 const path = require('path');
 const webpack = require('webpack');
-// const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 module.exports = function (ctx) {
   return {
@@ -130,7 +129,6 @@ module.exports = function (ctx) {
           '@mixins': path.resolve(__dirname, './src/core/mixins'),
         }
         cfg.plugins.push(
-          // new BundleAnalyzerPlugin(),
           // Select moment locale files
           new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/),
           // Ignore astronomia (date-holidays)
