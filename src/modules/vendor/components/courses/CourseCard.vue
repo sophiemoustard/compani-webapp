@@ -151,7 +151,7 @@ export default {
       & > .q-icon
         margin-right: 10px;
   .slots
-    height: 12px;
+    height: 10px;
     flex: 0 1 calc(25% - 4px);
     background-color: $light-pink;
     &-happened
