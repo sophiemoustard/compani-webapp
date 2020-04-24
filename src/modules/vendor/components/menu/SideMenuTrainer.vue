@@ -7,11 +7,11 @@
     </div>
     <q-separator />
     <q-expansion-item ref="management" v-model="activeRoutes.management.open" label="Gestion">
-      <ni-menu-item name="courses directory" icon="mdi-teach" label="Formations" />
+      <ni-menu-item name="trainer courses directory" icon="mdi-teach" label="Formations" />
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="administrative" v-model="activeRoutes.administrative.open" label="Administration">
-      <ni-menu-item name="trainer personal info" :params="{ id: loggedUser._id }" icon="person"
+      <ni-menu-item name="trainer personal info" :params="{ trainerId: loggedUser._id }" icon="person"
         label="Infos personnelles" />
     </q-expansion-item>
     <q-separator />

@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
@@ -37,7 +37,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 
 export default {
@@ -77,6 +77,7 @@ export default {
   },
   computed: {
     ...mapGetters({ vendorRole: 'main/vendorRole' }),
+    ...mapState('main', ['loggedUser']),
     isAdmin () {
       return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },
@@ -104,7 +105,10 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list();
+        const params = {};
+        if (this.vendorRole === TRAINER) params.trainer = this.loggedUser._id;
+
+        const courses = await Courses.list(params);
         this.coursesWithGroupedSlot = courses.map(course => ({
           ...course,
           slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),

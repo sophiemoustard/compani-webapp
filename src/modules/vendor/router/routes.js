@@ -1,5 +1,4 @@
 import { Cookies } from 'quasar';
-import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
 import store from 'src/store/index';
@@ -18,7 +17,10 @@ const routes = [
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
 
-        if (!get(loggedUser, 'role.vendor.name')) return next({ name: '404' });
+        const userVendorRole = store.getters['main/vendorRole'];
+        if (!userVendorRole) return next({ name: '404' });
+
+        if (userVendorRole === TRAINER) return next({ name: 'trainer courses directory' });
         return next({ name: 'courses directory' });
       } catch (e) {
         console.error(e);
@@ -94,7 +96,7 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER],
+          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'management',
         },
       },
@@ -107,6 +109,31 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'configuration',
+        },
+      },
+      {
+        path: 'trainers/management/courses',
+        name: 'trainer courses directory',
+        component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [TRAINER],
+          parent: 'configuration',
+        },
+      },
+      {
+        path: 'trainers/info',
+        name: 'trainer personal info',
+        component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
+        props: true,
+        beforeEnter (to, from, next) {
+          return to.params.trainerId === Cookies.get('user_id') ? next() : next('/404');
+        },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [TRAINER],
+          parent: 'administrative',
         },
       },
       {
