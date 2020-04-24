@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
@@ -66,7 +67,7 @@ export default {
       this.$emit('focus');
     },
     update (value) {
-      this.$emit('input', this.$_.pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
+      this.$emit('input', pick(value, ['fullAddress', 'street', 'city', 'zipCode', 'location']));
     },
     resetValue () {
       this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' });

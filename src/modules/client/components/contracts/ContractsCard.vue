@@ -89,6 +89,8 @@
 
 <script>
 import { Cookies } from 'quasar';
+import orderBy from 'lodash/orderBy';
+import get from 'lodash/get';
 import esign from '@api/Esign.js';
 import { NotifyNegative } from '@components/popup/notify.js';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -194,7 +196,7 @@ export default {
       return formFields;
     },
     getLastVersion (contract) {
-      return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
+      return orderBy(contract.versions, ['startDate'], ['desc'])[0];
     },
     visibleColumns (contract) {
       if (contract.status === CUSTOMER_CONTRACT) return this.columns.filter(col => col !== 'weeklyHours');
@@ -239,7 +241,7 @@ export default {
       return !!templates.contractWithCustomerVersion && !!templates.contractWithCustomerVersion.driveId;
     },
     docsUploadUrl (contractId) {
-      const driveId = this.$_.get(this.user, 'administrative.driveFolder.driveId');
+      const driveId = get(this.user, 'administrative.driveFolder.driveId');
       if (!driveId) return '';
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;

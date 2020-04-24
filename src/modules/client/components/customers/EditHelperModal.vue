@@ -17,7 +17,7 @@
 </template>
 
 <script>
-
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 
@@ -35,7 +35,7 @@ export default {
   },
   computed: {
     phoneNbrError () {
-      if (!this.$_.get(this.validations, 'contact.phone.frPhoneNumber', null)) {
+      if (!get(this.validations, 'contact.phone.frPhoneNumber', null)) {
         return 'Numéro de téléphone non valide';
       }
 
