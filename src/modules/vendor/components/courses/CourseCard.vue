@@ -8,13 +8,16 @@
           <q-item-section>{{ info.label }}</q-item-section>
         </q-item>
       </div>
-      <q-item class="infos-course-container text-weight-bold">
-        <q-item-section><q-icon size="xs" :name="formatNearestDate.icon" />
-          <div class="info-course-next-date-text"> {{ formatNearestDate.label }} </div>
+      <q-item class="infos-course-container">
+        <q-item-section side>
+          <q-icon size="xs" :name="formatNearestDate.icon" />
+        </q-item-section>
+        <q-item-section>
+          <div class="info-course-nearest-date"> {{ formatNearestDate.label }} </div>
         </q-item-section>
       </q-item>
       <q-item class="infos-course-container text-weight-bold">
-        <q-item-section><q-icon size="xs" name="people"/> ({{ traineesCount }}) </q-item-section>
+        <q-item-section><q-icon size="xs" name="mdi-account-multiple"/> ({{ traineesCount }}) </q-item-section>
       </q-item>
       <q-item class="infos-course-container text-weight-bold">
         <q-item-section><q-icon size="xs" name="mdi-calendar-range"/> ({{ courseSlotsCount }}) </q-item-section>
@@ -52,35 +55,33 @@ export default {
       ];
     },
     formatNearestDate () {
-      if (this.courseSlotsCount === 0) {
-        return { label: 'Pas de date prévue', icon: 'mdi-calendar-remove' };
-      }
+      if (this.courseSlotsCount === 0) return { label: 'Pas de date prévue', icon: 'mdi-calendar-remove' };
 
       if (this.course.slots.every((daySlots) => !this.happened(daySlots))) {
         const firstSlot = this.course.slots[0];
         const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
-        return {
-          label: `Commence dans ${rangeToNextDate} jour(s)`,
-          icon: 'img:statics/calendar-arrow-right.svg',
-        };
+
+        return { label: `Commence dans ${rangeToNextDate} jour(s)`, icon: 'img:statics/calendar-arrow-right.svg' };
       }
+
       if (this.course.slots.every(this.happened)) {
         const lastSlot = this.course.slots[this.course.slots.length - 1];
         const rangeToLastDate = this.$moment().endOf('day').diff(this.$moment(lastSlot[0].startDate), 'd');
+
         return {
           label: `Dernière date il y a ${rangeToLastDate} jour(s) `,
           icon: 'img:statics/calendar-arrow-left.svg',
         };
       }
+
       const nextSlot = this.course.slots.filter((daySlots) => !this.happened(daySlots))[0];
       const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
+
       if (rangeToNextDate === 0) {
         return { label: 'Prochaine date aujourd’hui', icon: 'img:statics/calendar-arrow-right.svg' };
       }
-      return {
-        label: `Prochaine date dans ${rangeToNextDate} jour(s)`,
-        icon: 'img:statics/calendar-arrow-right.svg',
-      }
+
+      return { label: `Prochaine date dans ${rangeToNextDate} jour(s)`, icon: 'img:statics/calendar-arrow-right.svg' };
     },
   },
 }
@@ -114,12 +115,14 @@ export default {
     display: flex;
     font-size: 14px;
     margin-top: 10px;
+    align-items: center
   .infos-course-container > .q-item__section
     display: flex;
     justify-content: flex-start;
     flex-direction: row;
+    color: $black;
   .infos-course-container > .q-item__section > .q-icon
     margin-right: 10px;
-  .info-course-next-date-text
+  .info-course-nearest-date
     color: $primary
 </style>
