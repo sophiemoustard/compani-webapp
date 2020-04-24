@@ -1,5 +1,4 @@
 import { Cookies } from 'quasar';
-import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
 import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
 import store from 'src/store/index';
@@ -18,7 +17,7 @@ const routes = [
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
 
-        const userVendorRole = get(loggedUser, 'role.vendor.name');
+        const userVendorRole = store.getters['main/vendorRole'];
         if (!userVendorRole) return next({ name: '404' });
 
         if (userVendorRole === TRAINER) return next({ name: 'trainer courses directory' });
@@ -124,7 +123,7 @@ const routes = [
         },
       },
       {
-        path: 'trainers/users/trainers/:trainerId',
+        path: 'trainers/info',
         name: 'trainer personal info',
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
         props: true,
@@ -134,7 +133,7 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           roles: [TRAINER],
-          parent: 'users',
+          parent: 'administrative',
         },
       },
       {

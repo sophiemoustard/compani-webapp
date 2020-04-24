@@ -27,8 +27,8 @@ const routes = [
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
 
-        const userVendorRole = get(loggedUser, 'role.vendor.name');
-        const userClientRole = get(loggedUser, 'role.client.name');
+        const userVendorRole = store.getters['main/vendorRole'];
+        const userClientRole = store.getters['main/clientRole'];
         if (!userClientRole && !userVendorRole) return next({ name: '404' });
         if (!userClientRole) return next({ path: '/ad' });
 
