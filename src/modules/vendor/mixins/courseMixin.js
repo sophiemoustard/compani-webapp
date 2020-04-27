@@ -10,4 +10,9 @@ export const courseMixin = {
       return get(this.course, 'program.name') || '';
     },
   },
+  methods: {
+    happened (sameDaySlots) {
+      return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
+    },
+  },
 }

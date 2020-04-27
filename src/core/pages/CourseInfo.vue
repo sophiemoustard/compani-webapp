@@ -15,8 +15,8 @@
       <p class="text-weight-bold q-pl-xl">Dates de la formation</p>
       <q-stepper value="date" vertical flat>
         <q-step v-for="(daySlot, index) in Object.values(courseSlots)" name="date" :color="getSlotColor(daySlot)"
-          :class="{ 'opacity': isDone(daySlot) || !isNext(daySlot), 'next-slot': isNext(daySlot) }" :key="index"
-          :title="formatSlotTitle(daySlot, index)" :active-icon="isDone(daySlot) ? 'check' : 'none'">
+          :class="{ 'opacity': happened(daySlot) || !isNext(daySlot), 'next-slot': isNext(daySlot) }" :key="index"
+          :title="formatSlotTitle(daySlot, index)" :active-icon="happened(daySlot) ? 'check' : 'none'">
           <div v-for="hourSlot in daySlot" :key="hourSlot._id" class="hour-slot">
             <q-item>
               <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
@@ -71,10 +71,12 @@ import Courses from '@api/Courses';
 import { formatIdentity, formatPhone } from '@helpers/utils';
 import HtmlModal from '@components/modal/HtmlModal';
 import rules from 'src/statics/rules.html';
+import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
 export default {
   metaInfo: { title: 'Formation' },
   name: 'CourseInfo',
+  mixins: [courseMixin],
   components: {
     'ni-html-modal': HtmlModal,
   },
@@ -103,17 +105,14 @@ export default {
     }
   },
   methods: {
-    isDone (slot) {
-      return this.$moment(slot[0].startDate).isBefore(this.$moment());
-    },
     isNext (slot) {
-      const nextCourses = Object.values(this.courseSlots).filter(slot => !this.isDone(slot))
+      const nextCourses = Object.values(this.courseSlots).filter(slot => !this.happened(slot))
         .sort((a, b) => new Date(a[0].startDate) - new Date(b[0].startDate));
 
       return !nextCourses.length || nextCourses[0][0]._id === slot[0]._id;
     },
     getSlotColor (slot) {
-      return this.isDone(slot) ? 'grey' : 'primary';
+      return this.happened(slot) ? 'grey' : 'primary';
     },
     formatSlotTitle (slot, index) {
       return `${this.$moment(slot[0].startDate).format('DD MMM YYYY')}` +
