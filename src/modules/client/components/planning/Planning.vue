@@ -292,9 +292,7 @@ export default {
         isAllowed = can({
           user: this.loggedUser,
           auxiliaryIdEvent: eventInfo.person._id,
-          permissions: [
-            { name: 'events:edit' },
-            { name: 'events:own:edit', rule: 'isOwner' },
+          permissions: [{ name: 'events:edit', rule: 'isAuxiliaryOrOwner' },
           ],
         });
       }

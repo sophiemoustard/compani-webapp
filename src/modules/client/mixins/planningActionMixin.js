@@ -381,7 +381,7 @@ export const planningActionMixin = {
       return can({
         user: this.loggedUser,
         auxiliaryIdEvent: event.auxiliary._id,
-        permissions: [{ name: 'events:edit' }, { name: 'events:own:edit', rule: 'isOwner' }],
+        permissions: [{ name: 'events:edit', rule: 'isAuxiliaryOrOwner' }],
       });
     },
     resetEditionForm () {
