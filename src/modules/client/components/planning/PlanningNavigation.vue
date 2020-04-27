@@ -1,18 +1,18 @@
 <template>
   <div class="items-center row justify-around">
     <div class="planning-month col-6">
-      <q-btn flat dense icon-right="arrow_drop_down" :label="timelineTitle" data-cy="timeline-title">
+      <q-btn flat dense icon-right="arrow_drop_down" :label="timelineTitle">
         <q-menu self="top middle" anchor="bottom middle">
           <q-date minimal @input="goToWeek" :value="date" />
         </q-menu>
       </q-btn>
-      <div class="week-number"><span>{{ weekNumber }}</span></div>
+      <div data-cy="week-number" class="week-number"><span>{{ weekNumber }}</span></div>
     </div>
     <div class="planning-navigation-actions col-6">
       <div>
-        <q-btn icon="chevron_left" dense flat round @click="goToPreviousWeek()" />
-        <q-btn icon="chevron_right" dense flat round @click="goToNextWeek()" />
-        <q-btn icon="today" dense flat round @click="goToToday" />
+        <q-btn data-cy="planning_before" icon="chevron_left" dense flat round @click="goToPreviousWeek()" />
+        <q-btn data-cy="planning_after" icon="chevron_right" dense flat round @click="goToNextWeek()" />
+        <q-btn data-cy="planning_today" icon="today" dense flat round @click="goToToday" />
       </div>
       <template v-if="$q.platform.is.mobile && isAgenda">
         <q-btn class="planning-view" sizs="sm" flat v-if="!isThreeDaysView" label="3J"
