@@ -4,23 +4,35 @@
       <div class="title-text text-weight-bold">{{ course.name }}</div>
       <div class="items-container">
         <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container text-weight-bold">
-          <q-item-section side><q-icon size="12px" :name="info.icon"/></q-item-section>
+          <q-item-section side>
+            <q-icon size="12px" :name="info.icon" />
+          </q-item-section>
           <q-item-section>{{ info.label }}</q-item-section>
         </q-item>
       </div>
       <q-item class="infos-course-container">
-        <q-item-section side>
+        <q-item-section>
           <q-icon size="xs" :name="formatNearestDate.icon" />
+          <q-item-label class="infos-course-nearest-date">{{ formatNearestDate.label }}</q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-item class="infos-course-container text-weight-bold">
+        <q-item-section>
+          <q-icon size="xs" name="mdi-account-multiple" />
+          <q-item-label>({{ traineesCount }})</q-item-label>
+        </q-item-section>
+      </q-item>
+      <q-item class="infos-course-container text-weight-bold">
+        <q-item-section side>
+          <q-icon size="xs" name="mdi-calendar-range" />
+          <q-item-label>({{ courseSlotsCount }})</q-item-label>
         </q-item-section>
         <q-item-section>
-          <div class="info-course-nearest-date"> {{ formatNearestDate.label }} </div>
+          <div class="row fit q-gutter-xs">
+            <div v-for="(slot, index) in course.slots" :key="index"
+              :class="['col-3', 'slots', { 'slots-happened': happened(slot) }]" />
+          </div>
         </q-item-section>
-      </q-item>
-      <q-item class="infos-course-container text-weight-bold">
-        <q-item-section><q-icon size="xs" name="mdi-account-multiple"/> ({{ traineesCount }}) </q-item-section>
-      </q-item>
-      <q-item class="infos-course-container text-weight-bold">
-        <q-item-section><q-icon size="xs" name="mdi-calendar-range"/> ({{ courseSlotsCount }}) </q-item-section>
       </q-item>
     </q-card-section>
   </q-card>
@@ -111,18 +123,26 @@ export default {
     padding: 0px;
     min-height: auto;
     margin-right: 10px;
-  .infos-course-container
-    display: flex;
-    font-size: 14px;
-    margin-top: 10px;
-    align-items: center
-  .infos-course-container > .q-item__section
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: row;
-    color: $black;
-  .infos-course-container > .q-item__section > .q-icon
-    margin-right: 10px;
-  .info-course-nearest-date
-    color: $primary
+  .infos-course
+    &-nearest-date
+      color: $primary !important;
+    &-container
+      align-items: center;
+      font-size: 14px;
+      margin-top: 10px;
+      & > .q-item__section
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: row;
+        color: $black;
+        &.q-item__section--side
+          margin-right: 10px
+        & > .q-icon
+          margin-right: 10px;
+  .slots
+    height: 10px;
+    flex: 0 1 calc(25% - 4px);
+    background-color: $light-pink;
+    &-happened
+      background-color: $primary;
 </style>
