@@ -223,7 +223,7 @@
               @input="updateUser('administrative.mutualFund.has')" :options="mutualOptions" />
           </q-field>
         </div>
-        <div class="col-xs-12 col-md-6" v-if="$_.get(mergedUserProfile, 'administrative.mutualFund.has')">
+        <div class="col-xs-12 col-md-6" v-if="hasMutual">
           <ni-file-uploader
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="mergedUserProfile" :url="docsUploadUrl"
@@ -595,6 +595,9 @@ export default {
         { label: 'Non affecté', value: null, inactive: true },
         ...this.establishments.map(est => ({ label: est.name, value: est._id, inactive: false })),
       ];
+    },
+    hasMutual () {
+      return get(this.mergedUserProfile, 'administrative.mutualFund.has');
     },
   },
   async created () {
