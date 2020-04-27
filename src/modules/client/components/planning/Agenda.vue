@@ -5,7 +5,7 @@
         <th class="capitalize bottom-border" v-for="(day, index) in daysHeader" :key="index">
           <div class="row justify-center items-baseline days-header">
             <div class="days-name q-mr-lg">{{ day.name }}</div>
-            <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+            <div :data-cy="`days-number-${index}`" :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
           </div>
         </th>
       </thead>

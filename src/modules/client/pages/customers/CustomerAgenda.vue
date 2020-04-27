@@ -4,8 +4,8 @@
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-sm-5 person-name row" v-if="customer && customer.identity">
           <img :src="DEFAULT_AVATAR" class="avatar">
-          <input class="q-pl-sm neutral-background identity" :value="formatIdentity(customer.identity, 'FL')"
-            readonly />
+          <input sclass="q-pl-sm neutral-background identity" :value="formatIdentity(customer.identity, 'FL')"
+            readonly data-cy="customer-identity" />
         </div>
         <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" :targetDate="targetDate"

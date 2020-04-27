@@ -1,7 +1,7 @@
 <template>
   <div class="items-center row justify-around">
     <div class="planning-month col-6">
-      <q-btn flat dense icon-right="arrow_drop_down" :label="timelineTitle">
+      <q-btn flat dense icon-right="arrow_drop_down" :label="timelineTitle" data-cy="timeline-title">
         <q-menu self="top middle" anchor="bottom middle">
           <q-date minimal @input="goToWeek" :value="date" />
         </q-menu>
