@@ -11,11 +11,9 @@
         </q-item>
       </div>
       <q-item class="infos-course-container">
-        <q-item-section side>
-          <q-icon size="xs" :name="formatNearestDate.icon" />
-        </q-item-section>
         <q-item-section>
-          <div class="info-course-nearest-date"> {{ formatNearestDate.label }} </div>
+          <q-icon size="xs" :name="formatNearestDate.icon" />
+          <q-item-label class="infos-course-nearest-date">{{ formatNearestDate.label }}</q-item-label>
         </q-item-section>
       </q-item>
       <q-item class="infos-course-container text-weight-bold">
@@ -125,36 +123,26 @@ export default {
     padding: 0px;
     min-height: auto;
     margin-right: 10px;
-  .infos-course-container
-    align-items: center;
-    font-size: 14px;
-    margin-top: 10px;
-<<<<<<< HEAD
-    align-items: center
-  .infos-course-container > .q-item__section
-    display: flex;
-    justify-content: flex-start;
-    flex-direction: row;
-    color: $black;
-  .infos-course-container > .q-item__section > .q-icon
-    margin-right: 10px;
-  .info-course-nearest-date
-    color: $primary
-=======
-    & > .q-item__section
-      display: flex;
-      justify-content: flex-start;
-      flex-direction: row;
-      color: $black;
-      &.q-item__section--side
-        margin-right: 10px
-      & > .q-icon
-        margin-right: 10px;
+  .infos-course
+    &-nearest-date
+      color: $primary !important;
+    &-container
+      align-items: center;
+      font-size: 14px;
+      margin-top: 10px;
+      & > .q-item__section
+        display: flex;
+        justify-content: flex-start;
+        flex-direction: row;
+        color: $black;
+        &.q-item__section--side
+          margin-right: 10px
+        & > .q-icon
+          margin-right: 10px;
   .slots
     height: 10px;
     flex: 0 1 calc(25% - 4px);
     background-color: $light-pink;
     &-happened
       background-color: $primary;
->>>>>>> COM-1133 Add slots progression
 </style>

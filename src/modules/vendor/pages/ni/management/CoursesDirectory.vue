@@ -171,10 +171,6 @@ export default {
         this.modalLoading = false;
       }
     },
-<<<<<<< HEAD
-=======
-
->>>>>>> COM-1133 Add slots progression
     isForthcoming (course) {
       const noSlot = !course.slots.length;
       const noSlotHappened = !course.slots.some(this.happened);
