@@ -30,7 +30,7 @@
           <q-item-label>({{ courseSlotsCount }})</q-item-label>
         </q-item-section>
         <q-item-section>
-          <div class="row fit q-gutter-y-sm q-gutter-x-xs">
+          <div class="row fit q-gutter-xs">
             <div v-for="(slot, index) in course.slots" :key="index"
               :class="['col-3', 'slots', { 'slots-happened': happened(slot) }]" />
           </div>
