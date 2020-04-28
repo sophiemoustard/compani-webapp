@@ -16,7 +16,7 @@
 
 <script>
 import get from 'lodash/get';
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileOrganization from 'src/modules/vendor/components/courses/ProfileOrganization';
@@ -55,7 +55,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ course: 'course/getCourse' }),
+    ...mapState('course', ['course']),
     courseType () {
       return get(this.course, 'type') || '';
     },
@@ -79,14 +79,14 @@ export default {
   methods: {
     async refreshCourse () {
       try {
-        await this.$store.dispatch('course/getCourse', { courseId: this.courseId });
+        await this.$store.dispatch('course/get', { courseId: this.courseId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.commit('course/saveCourse', null);
+    this.$store.dispatch('course/remove');
   },
 
 }

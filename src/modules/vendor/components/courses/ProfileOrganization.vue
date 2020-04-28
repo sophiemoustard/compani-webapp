@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -244,35 +244,25 @@ export default {
           name: 'firstname',
           label: 'Prénom',
           align: 'left',
-          field: row => get(row, 'identity.firstname', '') || '',
+          field: row => get(row, 'identity.firstname') || '',
           classes: 'text-capitalize',
         },
         {
           name: 'lastname',
           label: 'Nom',
           align: 'left',
-          field: row => get(row, 'identity.lastname', '') || '',
+          field: row => get(row, 'identity.lastname') || '',
           classes: 'text-capitalize',
         },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => get(row, 'local.email', '') || '',
-        },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => get(row, 'contact.phone', '') || '',
+          field: row => get(row, 'contact.phone') || '',
           format: (value) => formatPhone(value),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       traineesPagination: {
         rowsPerPage: 0,
@@ -319,7 +309,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ course: 'course/getCourse' }),
+    ...mapState('course', ['course']),
     addressError () {
       if (!this.$v.newCourseSlot.address.fullAddress.required) {
         return REQUIRED_LABEL;
@@ -368,7 +358,7 @@ export default {
     async refreshCourse () {
       try {
         this.courseSlotsLoading = true;
-        await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
+        await this.$store.dispatch('course/get', { courseId: this.profileId });
         this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
       } catch (e) {
         console.error(e);

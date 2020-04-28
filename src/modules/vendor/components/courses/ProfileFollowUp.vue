@@ -96,7 +96,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import Input from '@components/form/Input';
@@ -150,7 +150,7 @@ export default {
     await Promise.all([this.refreshCourse(), this.refreshSms()]);
   },
   computed: {
-    ...mapGetters({ course: 'course/getCourse' }),
+    ...mapState('course', ['course']),
     disabledFollowUp () {
       return this.followUpMissingInfo.length > 0;
     },
@@ -204,7 +204,7 @@ export default {
     async refreshCourse () {
       try {
         this.courseLoading = true;
-        await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
+        await this.$store.dispatch('course/get', { courseId: this.profileId });
       } catch (e) {
         console.error(e);
       } finally {
