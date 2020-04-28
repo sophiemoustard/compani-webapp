@@ -103,6 +103,7 @@ import {
   PLANNING_REFERENT,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
+  AUXILIARY,
 } from '@data/constants';
 import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
@@ -286,16 +287,13 @@ export default {
     },
     createEvent (eventInfo) {
       let isAllowed = true;
-      if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
+      if (this.personKey === AUXILIARY && eventInfo.sectorId) { // Unassigned event
         isAllowed = can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
-      } else if (this.personKey === 'auxiliary') {
+      } else if (this.personKey === AUXILIARY) {
         isAllowed = can({
           user: this.loggedUser,
           auxiliaryIdEvent: eventInfo.person._id,
-          permissions: [
-            { name: 'events:edit' },
-            { name: 'events:own:edit', rule: 'isOwner' },
-          ],
+          permissions: [{ name: 'events:edit', rule: 'canEdit' }],
         });
       }
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
