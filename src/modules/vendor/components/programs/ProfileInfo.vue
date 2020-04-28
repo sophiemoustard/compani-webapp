@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -36,7 +36,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ program: 'program/getProgram' }),
+    ...mapState('program', ['program']),
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
@@ -47,7 +47,7 @@ export default {
     },
     async refreshProgram () {
       try {
-        await this.$store.dispatch('program/getProgram', { programId: this.profileId });
+        await this.$store.dispatch('program/get', { programId: this.profileId });
       } catch (e) {
         console.error(e);
       }
