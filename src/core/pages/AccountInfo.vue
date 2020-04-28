@@ -127,9 +127,9 @@ export default {
       this.$q.cookies.remove('user_id', { path: '/' });
       this.$q.localStorage.clear();
 
-      this.$store.commit('company/saveCompany', null);
       this.$store.dispatch('course/remove');
-      this.$store.commit('program/saveProgram', null);
+      this.$store.dispatch('program/remove');
+      this.$store.commit('company/saveCompany', null);
       this.$store.commit('customer/saveCustomer', null);
       this.$store.commit('customer/saveNotification', null);
       this.$store.commit('rh/saveUserProfile', null);
