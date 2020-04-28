@@ -129,7 +129,7 @@ export default {
 
       this.$store.dispatch('course/remove');
       this.$store.dispatch('program/remove');
-      this.$store.commit('company/saveCompany', null);
+      this.$store.dispatch('company/remove');
       this.$store.commit('customer/saveCustomer', null);
       this.$store.commit('customer/saveNotification', null);
       this.$store.commit('rh/saveUserProfile', null);
