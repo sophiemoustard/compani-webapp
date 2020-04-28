@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import { TRAINER } from '@data/constants';
 import CourseCard from 'src/modules/vendor/components/courses/CourseCard';
 
 export default {
@@ -18,9 +19,15 @@ export default {
   components: {
     'course-card': CourseCard,
   },
+  computed: {
+    vendorRole () {
+      return this.$store.getters['main/vendorRole'];
+    },
+  },
   methods: {
     goToCourseProfile (course) {
-      this.$router.push({ name: 'profile course info', params: { courseId: course._id } });
+      if (this.vendorRole === TRAINER) this.$router.push({ name: 'trainer course info', params: { courseId: course._id } });
+      else this.$router.push({ name: 'profile course info', params: { courseId: course._id } });
     },
   },
 }

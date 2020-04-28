@@ -37,7 +37,6 @@ export default {
   },
   data () {
     return {
-      courseName: '',
       tabsContent: [
         {
           label: 'Organisation de la formation',
@@ -56,6 +55,9 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    courseName () {
+      return get(this.course, 'name') || '';
+    },
     courseType () {
       return get(this.course, 'type') || '';
     },
@@ -67,14 +69,8 @@ export default {
       ];
     },
   },
-  watch: {
-    course () {
-      this.courseName = get(this.course, 'name') || '';
-    },
-  },
   async mounted () {
     if (!this.course) await this.refreshCourse();
-    else this.courseName = '';
   },
   methods: {
     async refreshCourse () {
