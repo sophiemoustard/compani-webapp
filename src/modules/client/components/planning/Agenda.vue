@@ -24,7 +24,7 @@
                 :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
                   <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                     <div class="col-12 event-title">
-                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                      <p :data-cy="`event-title-${event._id}`" v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
                         {{ eventTitle(event) }}
                       </p>
                       <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
@@ -37,7 +37,9 @@
                         {{ event.internalHour.name }}
                       </p>
                     </div>
-                    <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                    <p :data-cy="`event-hours-${event._id}`" class="no-margin event-subtitle overflow-hidden-nowrap">
+                      {{ getEventHours(event) }}
+                    </p>
                     <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                   </div>
                 </div>
