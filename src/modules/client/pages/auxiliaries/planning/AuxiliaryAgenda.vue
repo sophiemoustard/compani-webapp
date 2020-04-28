@@ -158,7 +158,7 @@ export default {
       const isAllowed = can({
         user: this.loggedUser,
         auxiliaryIdEvent: this.selectedAuxiliary._id,
-        permissions: [{ name: 'events:edit', rule: 'isAuxiliaryOrOwner' }],
+        permissions: [{ name: 'events:edit', rule: 'canEdit' }],
       });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
