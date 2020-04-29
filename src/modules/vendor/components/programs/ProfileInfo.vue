@@ -7,7 +7,8 @@
       </div>
       <div class="row gutter-profile">
         <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
-          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field />
+          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
+          :error="$v.program.learningGoals.$error" />
       </div>
     </div>
   </div>
@@ -40,6 +41,7 @@ export default {
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
+    this.$v.program.$touch();
   },
   methods: {
     saveTmp (path) {
