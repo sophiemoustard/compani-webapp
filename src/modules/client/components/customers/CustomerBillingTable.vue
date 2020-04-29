@@ -1,7 +1,7 @@
 <template>
   <ni-simple-table :data="documents" :columns="columns" :loading="loading">
     <template v-slot:top-row="{ props }" >
-      <q-tr :props="props">
+      <q-tr :data-cy="`start-period-${type}`" :props="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
         <q-td class="bold">Début de période</q-td>
         <q-td />

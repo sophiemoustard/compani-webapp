@@ -2,8 +2,8 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
-        <ni-date-range v-model="billingDates" @input="refresh" />
+        <p data-cy="customer-identity" class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
+        <ni-date-range data-cy="date-range" v-model="billingDates" @input="refresh" />
       </div>
       <div v-if="isHelper && company.billingAssistance" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à
@@ -230,7 +230,7 @@ export default {
       return years.map(year => ({ label: year.format('YYYY'), value: year.format('YYYY') }));
     },
   },
-  async mounted () {
+  async created () {
     this.setBillingDates();
     await this.refresh();
     await this.getTaxCertificates();
