@@ -5,7 +5,7 @@
         <th class="capitalize bottom-border" v-for="(day, index) in daysHeader" :key="index">
           <div class="row justify-center items-baseline days-header">
             <div class="days-name q-mr-lg">{{ day.name }}</div>
-            <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+            <div data-cy="days-number" :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
           </div>
         </th>
       </thead>
@@ -24,7 +24,7 @@
                 :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
                   <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                     <div class="col-12 event-title">
-                      <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                      <p data-cy="event-title" v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
                         {{ eventTitle(event) }}
                       </p>
                       <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
@@ -37,7 +37,9 @@
                         {{ event.internalHour.name }}
                       </p>
                     </div>
-                    <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+                    <p data-cy="event-hours" class="no-margin event-subtitle overflow-hidden-nowrap">
+                      {{ getEventHours(event) }}
+                    </p>
                     <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                   </div>
                 </div>
