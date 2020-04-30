@@ -73,7 +73,10 @@ export default {
         const firstSlot = this.course.slots[0];
         const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
-        return { label: `Commence dans ${rangeToNextDate} jour(s)`, icon: 'img:statics/calendar-arrow-right.svg' };
+        return {
+          label: rangeToNextDate ? `Commence dans ${rangeToNextDate} jour(s)` : 'Commence aujourd’hui',
+          icon: 'img:statics/calendar-arrow-right.svg',
+        };
       }
 
       if (this.course.slots.every(this.happened)) {
@@ -81,7 +84,7 @@ export default {
         const rangeToLastDate = this.$moment().endOf('day').diff(this.$moment(lastSlot[0].startDate), 'd');
 
         return {
-          label: `Dernière date il y a ${rangeToLastDate} jour(s) `,
+          label: rangeToLastDate ? `Dernière date il y a ${rangeToLastDate} jour(s) ` : 'Dernière date aujourd’hui',
           icon: 'img:statics/calendar-arrow-left.svg',
         };
       }
@@ -89,11 +92,10 @@ export default {
       const nextSlot = this.course.slots.filter((daySlots) => !this.happened(daySlots))[0];
       const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
-      if (rangeToNextDate === 0) {
-        return { label: 'Prochaine date aujourd’hui', icon: 'img:statics/calendar-arrow-right.svg' };
-      }
-
-      return { label: `Prochaine date dans ${rangeToNextDate} jour(s)`, icon: 'img:statics/calendar-arrow-right.svg' };
+      return {
+        label: rangeToNextDate ? `Prochaine date dans ${rangeToNextDate} jour(s)` : 'Prochaine date aujourd’hui',
+        icon: 'img:statics/calendar-arrow-right.svg',
+      };
     },
   },
 }
