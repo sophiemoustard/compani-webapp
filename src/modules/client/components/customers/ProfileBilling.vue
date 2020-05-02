@@ -2,8 +2,9 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p data-cy="customer-identity" class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
-        <ni-date-range data-cy="date-range" v-model="billingDates" @input="refresh" />
+        <p :data-cy="`${CUSTOMER}-identity`" class="text-weight-bold text-primary">
+          {{ this.customer.identity | formatIdentity('FL') }}</p>
+        <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <div v-if="isHelper && company.billingAssistance" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à
@@ -18,7 +19,7 @@
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
-      <p class="text-weight-bold text-primary">{{ tpp.name }}</p>
+      <p :data-cy="`${THIRD_PARTY_PAYER}-identity`" class="text-weight-bold text-primary">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :displayActions="isCoach"
         @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
         :endBalance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
@@ -37,8 +38,8 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" type="a" :href="taxCertificatesUrl(props.row)"
-                    target="_blank" icon="file_download" />
+                  <q-btn flat round small color="primary" type="a" :href="taxCertificatesUrl(props.row)" target="_blank"
+                    icon="file_download" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>

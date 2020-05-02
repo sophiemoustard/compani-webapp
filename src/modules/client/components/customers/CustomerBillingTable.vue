@@ -1,6 +1,6 @@
 <template>
   <ni-simple-table :data="documents" :columns="columns" :loading="loading">
-    <template v-slot:top-row="{ props }" >
+    <template v-slot:top-row="{ props }">
       <q-tr :data-cy="`start-period-${type}`" :props="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
         <q-td class="bold">Début de période</q-td>
@@ -10,19 +10,21 @@
       </q-tr>
     </template>
     <template v-slot:body="{ props }">
-      <q-tr :props="props" v-if="Object.keys(documents).length > 0">
-        <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
+      <q-tr :data-cy="`${type}-billing-row`" :props="props" v-if="Object.keys(documents).length > 0">
+        <q-td :data-cy="`${type}-billing-col-${col.name}`" v-for="col in props.cols" :key="col.name"
+          :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <template v-if="props.row.number">
-                <a v-if="canDownloadBill(props.row)" :href="billUrl(props.row)" target="_blank" class="download">
+                <a :data-cy="`${type}-${props.row.type}-link`" v-if="canDownloadBill(props.row)"
+                  :href="billUrl(props.row)" target="_blank" class="download">
                   Facture {{ props.row.number }}
                 </a>
                 <div v-else>Facture {{ props.row.number }}</div>
               </template>
               <div v-else>Facture tiers</div>
             </template>
-            <template  v-else-if="props.row.type === CREDIT_NOTE">
+            <template v-else-if="props.row.type === CREDIT_NOTE">
               <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
                 class="download">
                 Avoir {{ props.row.number }}
@@ -34,10 +36,11 @@
           <template v-else-if="col.name === 'balance'">
             <q-item class="row no-wrap items-center">
               <q-item-section side>
-                <q-icon :name="balanceIcon(col.value)" :color="balanceIconColor(col.value)" class="balance-icon"/>
+                <q-icon data-cy="balance-icon" :name="balanceIcon(col.value)" :color="balanceIconColor(col.value)"
+                  class="balance-icon" />
               </q-item-section>
               <q-item-section>
-                <q-item-label>{{ formatBalance(col.value) }}</q-item-label>
+                <q-item-label data-cy="balance-amount">{{ formatBalance(col.value) }}</q-item-label>
               </q-item-section>
             </q-item>
           </template>
@@ -50,7 +53,7 @@
       </q-tr>
     </template>
     <template v-slot:bottom-row="{ props }">
-      <q-tr :props="props">
+      <q-tr :data-cy="`end-period-${type}`" :props="props">
         <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
         <q-td class="bold">Fin de période</q-td>
         <q-td />
