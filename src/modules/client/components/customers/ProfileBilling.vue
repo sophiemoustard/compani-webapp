@@ -33,13 +33,13 @@
       <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" :loading="tableLoading"
         :pagination.sync="taxCertificatesPagination">
         <template v-slot:body="{ props }">
-          <q-tr :props="props">
+          <q-tr data-cy="tax-certificate" :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" type="a" :href="taxCertificatesUrl(props.row)" target="_blank"
-                    icon="file_download" />
+                  <q-btn data-cy="tax-certificate-link" flat round small color="primary" type="a"
+                    :href="taxCertificatesUrl(props.row)" target="_blank" icon="file_download" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>

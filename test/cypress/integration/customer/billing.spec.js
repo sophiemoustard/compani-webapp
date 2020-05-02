@@ -97,7 +97,20 @@ describe('Customer billing tests', () => {
         const href = $a.prop('href');
         expect(href).to.match(/^http(s)?:\/\/.*\/bills\/[0-9a-fA-F]{24}\/pdfs\?x-access-token=.*$/);
         cy.request(href).its('status').should('equal', 200);
-      })
+      });
     });
+  })
+
+  it('should correctly display tax certificate table', () => {
+    cy.get('[data-cy=tax-certificate] td').should('have.length', 3).and(($tds) => {
+      expect($tds.eq(0)).to.have.text(Cypress.moment().subtract(1, 'y').format('YYYY'));
+      expect($tds.eq(1)).to.have.text(Cypress.moment().subtract(1, 'y').endOf('y').format('DD/MM/YYYY'));
+      expect($tds.eq(2)).to.contain('file_download');
+    });
+    cy.get('[data-cy=tax-certificate-link]').then(($a) => {
+      const href = $a.prop('href');
+      expect(href).to.match(/^http(s)?:\/\/.*\/taxcertificates\/[0-9a-fA-F]{24}\/pdfs\?x-access-token=.*$/);
+      cy.request(href).its('status').should('equal', 200);
+    })
   })
 });

@@ -10,7 +10,7 @@
       </q-tr>
     </template>
     <template v-slot:body="{ props }">
-      <q-tr :data-cy="`${type}-billing-row`" :props="props" v-if="Object.keys(documents).length > 0">
+      <q-tr :props="props" v-if="Object.keys(documents).length > 0">
         <q-td :data-cy="`${type}-billing-col-${col.name}`" v-for="col in props.cols" :key="col.name"
           :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
