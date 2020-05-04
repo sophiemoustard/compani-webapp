@@ -35,14 +35,12 @@ export default {
   },
   data () {
     return {
+      companyTradeName: '',
       tabsContent: [{ label: 'Infos', name: 'infos', default: this.defaultTab === 'infos', component: ProfileInfo }],
     }
   },
   computed: {
     ...mapState('company', ['company']),
-    companyTradeName () {
-      return get(this.company, 'tradeName') || '';
-    },
     companyType () {
       switch (get(this.company, 'type')) {
         case COMPANY:
@@ -52,6 +50,11 @@ export default {
         default:
           return '';
       };
+    },
+  },
+  watch: {
+    company () {
+      this.companyTradeName = get(this.company, 'tradeName') || '';
     },
   },
   async mounted () {

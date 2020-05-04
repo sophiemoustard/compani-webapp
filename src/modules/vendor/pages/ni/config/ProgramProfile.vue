@@ -25,6 +25,7 @@ export default {
   },
   data () {
     return {
+      programName: '',
       tabsContent: [
         { label: 'Programme', name: 'program', default: this.defaultTab === 'program', component: ProfileInfo },
       ],
@@ -32,8 +33,10 @@ export default {
   },
   computed: {
     ...mapState('program', ['program']),
-    programName () {
-      return get(this.program, 'name') || '';
+  },
+  watch: {
+    program () {
+      this.programName = get(this.program, 'name') || '';
     },
   },
   async mounted () {

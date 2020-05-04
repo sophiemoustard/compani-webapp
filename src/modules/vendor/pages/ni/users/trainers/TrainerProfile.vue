@@ -27,6 +27,7 @@ export default {
   },
   data () {
     return {
+      userIdentity: '',
       tabsContent: [
         {
           label: 'Infos personnelles',
@@ -45,12 +46,10 @@ export default {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    userIdentity () {
-      return formatIdentity(get(this, 'userProfile.identity'), 'FL');
-    },
   },
   watch: {
     async userProfile () {
+      this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
       await this.$store.dispatch('rh/updateNotifications');
     },
   },
