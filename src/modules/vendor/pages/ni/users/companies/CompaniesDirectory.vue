@@ -55,7 +55,7 @@ export default {
       companies: [],
       tableLoading: false,
       visibleColumns: ['name'],
-      columns: [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }],
+      columns: [{ name: 'tradeName', label: 'Nom commercial', align: 'left', field: 'tradeName', sortable: true }],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
       companyCreationModal: false,
