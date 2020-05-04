@@ -1,7 +1,7 @@
 <template>
   <ni-simple-table :data="documents" :columns="columns" :loading="loading">
     <template v-slot:top-row="{ props }">
-      <q-tr :data-cy="`start-period-${type}`" :props="props">
+      <q-tr data-cy="start-period" :props="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
         <q-td class="bold">Début de période</q-td>
         <q-td />
@@ -11,12 +11,12 @@
     </template>
     <template v-slot:body="{ props }">
       <q-tr :props="props" v-if="Object.keys(documents).length > 0">
-        <q-td :data-cy="`${type}-billing-col-${col.name}`" v-for="col in props.cols" :key="col.name"
+        <q-td :data-cy="`col-${col.name}`" v-for="col in props.cols" :key="col.name"
           :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <template v-if="props.row.number">
-                <a :data-cy="`${type}-${props.row.type}-link`" v-if="canDownloadBill(props.row)"
+                <a data-cy="link" v-if="canDownloadBill(props.row)"
                   :href="billUrl(props.row)" target="_blank" class="download">
                   Facture {{ props.row.number }}
                 </a>
@@ -53,7 +53,7 @@
       </q-tr>
     </template>
     <template v-slot:bottom-row="{ props }">
-      <q-tr :data-cy="`end-period-${type}`" :props="props">
+      <q-tr data-cy="end-period" :props="props">
         <q-td class="bold">{{ formatDate(billingDates.endDate) }}</q-td>
         <q-td class="bold">Fin de période</q-td>
         <q-td />

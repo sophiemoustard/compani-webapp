@@ -2,7 +2,7 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p :data-cy="`${CUSTOMER}-identity`" class="text-weight-bold text-primary">
+        <p data-cy="customer-identity" class="text-weight-bold text-primary">
           {{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
@@ -19,7 +19,7 @@
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
-      <p :data-cy="`${THIRD_PARTY_PAYER}-identity`" class="text-weight-bold text-primary">{{ tpp.name }}</p>
+      <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :displayActions="isCoach"
         @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
         :endBalance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
@@ -38,7 +38,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn data-cy="tax-certificate-link" flat round small color="primary" type="a"
+                  <q-btn data-cy="link" flat round small color="primary" type="a"
                     :href="taxCertificatesUrl(props.row)" target="_blank" icon="file_download" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />

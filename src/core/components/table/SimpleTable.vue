@@ -1,8 +1,8 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination" class="neutral-background"
+    <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination"
       :hide-bottom="pagination.rowsPerPage === 0" :visible-columns="visibleColumns" :rows-per-page-options="[]"
-      v-on="$listeners">
+      v-on="$listeners" class="neutral-background">
       <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
         <slot name="top-row" :props="props" />
       </template>
