@@ -1,6 +1,6 @@
 describe('Customer billing tests', () => {
   before(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed`);
+    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/billing`);
     cy.login({ email: 'helper@alenvi.io', password: '123456!eR' });
     cy.visit('/customers/documents');
   });

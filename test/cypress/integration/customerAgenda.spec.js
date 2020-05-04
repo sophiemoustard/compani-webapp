@@ -1,6 +1,6 @@
 describe('Customer agenda tests', () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed`);
+    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
     cy.login({ email: 'helper@alenvi.io', password: '123456!eR' });
     cy.visit('/customers/agenda');
   });
