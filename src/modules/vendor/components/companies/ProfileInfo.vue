@@ -2,9 +2,16 @@
   <div v-if="company">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Nom" v-model.trim="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')"
-          :error="$v.company.name.$error" />
+        <ni-input caption="Raison sociale" v-model.trim="company.name" @focus="saveTmp('name')"
+          @blur="updateCompany('name')" :error="$v.company.name.$error" />
+        <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
+          @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error" />
       </div>
+    </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Abonnements</p>
+      <q-checkbox dense v-model="company.subscriptions.erp" color="primary" label="ERP"
+        @input="updateCompany('subscriptions.erp')" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Utilisateurs</p>
@@ -112,6 +119,7 @@ export default {
   data () {
     return {
       loading: false,
+      tmpInput: '',
       usersLoading: false,
       userCreationModal: false,
       userEditionModal: false,
@@ -165,6 +173,7 @@ export default {
     return {
       company: {
         name: { required },
+        tradeName: { required },
       },
       newUser: this.userValidations,
       selectedUser: this.userValidations,

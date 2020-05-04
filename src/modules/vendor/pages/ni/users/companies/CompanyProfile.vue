@@ -1,6 +1,15 @@
 <template>
   <q-page padding class="neutral-background">
-    <ni-profile-header :title="companyName" />
+    <ni-profile-header :title="companyTradeName">
+      <template v-slot:body>
+        <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
+          <q-item>
+            <q-item-section side><q-icon size="xs" name="bookmark_border"/></q-item-section>
+            <q-item-section class="text-capitalize">{{ companyType }}</q-item-section>
+          </q-item>
+        </div>
+      </template>
+    </ni-profile-header>
     <profile-tabs :profile-id="companyId" :tabsContent="tabsContent" />
   </q-page>
 </template>
@@ -8,6 +17,7 @@
 <script>
 import get from 'lodash/get';
 import { mapState } from 'vuex';
+import { COMPANY, ASSOCIATION } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
@@ -30,8 +40,18 @@ export default {
   },
   computed: {
     ...mapState('company', ['company']),
-    companyName () {
-      return get(this.company, 'name') || '';
+    companyTradeName () {
+      return get(this.company, 'tradeName') || '';
+    },
+    companyType () {
+      switch (get(this.company, 'type')) {
+        case COMPANY:
+          return 'Entreprise';
+        case ASSOCIATION:
+          return 'Association';
+        default:
+          return '';
+      };
     },
   },
   async mounted () {

@@ -210,6 +210,7 @@ export default {
       trainerOptions: [],
       courseSlots: {},
       loading: false,
+      tmpInput: '',
       courseSlotsLoading: false,
       courseSlotCreationModal: false,
       newCourseSlot: {
