@@ -95,7 +95,6 @@ export default {
     'ni-responsive-table': ResponsiveTable,
   },
   props: {
-    users: { type: Array, default: () => [] },
     company: { type: Object, default: () => ({}) },
   },
   mixins: [userMixin],
@@ -148,6 +147,7 @@ export default {
         contact: {},
       },
       roles: [],
+      users: [],
     };
   },
   validations () {
@@ -155,6 +155,9 @@ export default {
       newUser: this.userValidations,
       selectedUser: this.userValidations,
     };
+  },
+  async created () {
+    await this.getUsers();
   },
   computed: {
     roleOptions () {
@@ -173,7 +176,7 @@ export default {
 
         await Users.create(this.formatUserPayload(this.newUser));
         this.userCreationModal = false;
-        this.$emit('refreshUsers');
+        this.getUsers();
         NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
         console.error(e);
@@ -227,13 +230,24 @@ export default {
 
         await Users.updateById(this.selectedUser._id, this.formatUpdatedUserPayload(this.selectedUser));
         this.userEditionModal = false;
-        this.$emit('refreshUsers');
+        this.getUsers();
         NotifyPositive('Utilisateur modifié.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'utilisateur.');
       } finally {
         this.loading = false;
+      }
+    },
+    async getUsers () {
+      try {
+        this.usersLoading = true;
+        this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
+      } catch (e) {
+        console.error(e);
+        this.users = [];
+      } finally {
+        this.usersLoading = false;
       }
     },
   },

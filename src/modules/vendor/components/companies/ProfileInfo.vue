@@ -8,7 +8,7 @@
           @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error" />
       </div>
     </div>
-    <ni-coach-config-table :users="users" :company="company" @refreshUsers="getUsers" />
+    <ni-coach-config-table :company="company" />
   </div>
 </template>
 
@@ -18,11 +18,9 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
 import Companies from '@api/Companies';
-import Users from '@api/Users';
 import Input from '@components/form/Input';
 import CoachConfigTable from '@components/table/CoachConfigTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { CLIENT_ADMIN, COACH } from '@data/constants';
 import { companyMixin } from '@mixins/companyMixin'
 
 export default {
@@ -35,11 +33,6 @@ export default {
     'ni-coach-config-table': CoachConfigTable,
   },
   mixins: [companyMixin],
-  data () {
-    return {
-      users: [],
-    };
-  },
   validations () {
     return {
       company: pick(this.companyValidation, ['name', 'tradeName']),
@@ -48,9 +41,8 @@ export default {
   computed: {
     ...mapState('company', ['company']),
   },
-  async mounted () {
+  async created () {
     if (!this.company) await this.refreshCompany();
-    await this.getUsers();
   },
   methods: {
     saveTmp (path) {
@@ -81,17 +73,6 @@ export default {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
-      }
-    },
-    async getUsers () {
-      try {
-        this.usersLoading = true;
-        this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
-      } catch (e) {
-        console.error(e);
-        this.users = [];
-      } finally {
-        this.usersLoading = false;
       }
     },
   },
