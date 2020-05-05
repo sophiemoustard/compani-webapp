@@ -73,6 +73,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/config/coachs',
+        name: 'coachs config',
+        component: () => import('src/modules/client/pages/ni/config/CoachConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          roles: [CLIENT_ADMIN],
+          parent: 'configuration',
+        },
+      },
+      {
         path: 'ni/config/tags',
         name: 'tags config',
         component: () => import('src/modules/client/pages/ni/config/TagConfig'),
