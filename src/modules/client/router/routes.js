@@ -24,11 +24,14 @@ const routes = [
         const refresh = await alenvi.refreshAlenviCookies();
         if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const loggedUser = store.getters['main/loggedUser'];
+        const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
-        if (!get(loggedUser, 'role.client')) return next({ name: '404' });
 
-        const userClientRole = loggedUser.role.client.name;
+        const userVendorRole = store.getters['main/vendorRole'];
+        const userClientRole = store.getters['main/clientRole'];
+        if (!userClientRole && !userVendorRole) return next({ name: '404' });
+        if (!userClientRole) return next({ path: '/ad' });
+
         if (userClientRole === HELPER) return next({ name: 'customer agenda' });
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'client account info', params: { id: loggedUser._id } });
         if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliary agenda' });
@@ -379,7 +382,7 @@ const routes = [
         name: 'customer contact',
         component: () => import('src/modules/client/pages/customers/Contact'),
         async beforeEnter (to, from, next) {
-          const loggedUser = store.getters['main/loggedUser'];
+          const loggedUser = store.state.main.loggedUser;
           const customer = await Customers.getById(loggedUser.customers[0]._id);
           return get(loggedUser, 'company.billingAssistance') || customer.referent
             ? next()

@@ -1,5 +1,5 @@
 <template>
-  <div :class="[{ 'planning': !toggleDrawer }]">
+  <div :class="[{ 'planning': !drawer }]">
     <div class="row items-center planning-header" ref="planningHeader">
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters" />
@@ -88,7 +88,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import Customers from '@api/Customers';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -103,6 +103,7 @@ import {
   PLANNING_REFERENT,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
+  AUXILIARY,
 } from '@data/constants';
 import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
@@ -171,15 +172,13 @@ export default {
     this.getTimelineHours();
   },
   computed: {
-    ...mapGetters({ loggedUser: 'main/loggedUser' }),
-    loggedUserRole () {
-      return this.loggedUser.role.client.name;
-    },
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({ clientRole: 'main/clientRole' }),
     isCoach () {
-      return COACH_ROLES.includes(this.loggedUserRole);
+      return COACH_ROLES.includes(this.clientRole);
     },
     isPlanningReferent () {
-      return this.loggedUserRole === PLANNING_REFERENT;
+      return this.clientRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
       return this.isCustomerPlanning ? { allSectors: this.persons } : groupBy(this.persons, 'sector._id');
@@ -288,16 +287,13 @@ export default {
     },
     createEvent (eventInfo) {
       let isAllowed = true;
-      if (this.personKey === 'auxiliary' && eventInfo.sectorId) { // Unassigned event
+      if (this.personKey === AUXILIARY && eventInfo.sectorId) { // Unassigned event
         isAllowed = can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
-      } else if (this.personKey === 'auxiliary') {
+      } else if (this.personKey === AUXILIARY) {
         isAllowed = can({
           user: this.loggedUser,
           auxiliaryIdEvent: eventInfo.person._id,
-          permissions: [
-            { name: 'events:edit' },
-            { name: 'events:own:edit', rule: 'isOwner' },
-          ],
+          permissions: [{ name: 'events:edit', rule: 'canEdit' }],
         });
       }
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');

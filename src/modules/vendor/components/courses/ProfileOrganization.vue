@@ -4,7 +4,7 @@
       <div class="row gutter-profile">
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" :error="$v.course.name.$error" />
-        <ni-select caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
+        <ni-select v-if="isAdmin" caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
           @blur="updateCourse('trainer')" :options="trainerOptions" :error="$v.course.trainer.$error" />
       </div>
     </div>
@@ -168,7 +168,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -189,10 +189,11 @@ import { TRAINER, REQUIRED_LABEL } from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
+import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
 export default {
   name: 'ProfileOrganization',
-  mixins: [userMixin],
+  mixins: [userMixin, courseMixin],
   props: {
     profileId: { type: String },
   },
@@ -244,35 +245,25 @@ export default {
           name: 'firstname',
           label: 'Prénom',
           align: 'left',
-          field: row => get(row, 'identity.firstname', '') || '',
+          field: row => get(row, 'identity.firstname') || '',
           classes: 'text-capitalize',
         },
         {
           name: 'lastname',
           label: 'Nom',
           align: 'left',
-          field: row => get(row, 'identity.lastname', '') || '',
+          field: row => get(row, 'identity.lastname') || '',
           classes: 'text-capitalize',
         },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => get(row, 'local.email', '') || '',
-        },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => get(row, 'contact.phone', '') || '',
+          field: row => get(row, 'contact.phone') || '',
           format: (value) => formatPhone(value),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       traineesPagination: {
         rowsPerPage: 0,
@@ -319,7 +310,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ course: 'course/getCourse' }),
+    ...mapState('course', ['course']),
     addressError () {
       if (!this.$v.newCourseSlot.address.fullAddress.required) {
         return REQUIRED_LABEL;
@@ -355,7 +346,7 @@ export default {
   async mounted () {
     if (!this.course) await this.refreshCourse();
     else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
-    await this.refreshTrainers();
+    if (this.isAdmin) await this.refreshTrainers();
   },
   methods: {
     get,
@@ -368,7 +359,7 @@ export default {
     async refreshCourse () {
       try {
         this.courseSlotsLoading = true;
-        await this.$store.dispatch('course/getCourse', { courseId: this.profileId });
+        await this.$store.dispatch('course/get', { courseId: this.profileId });
         this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
       } catch (e) {
         console.error(e);
@@ -526,7 +517,7 @@ export default {
         await this.refreshCourse();
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyNegative('Ce stagiaire n\'est pas relié à la structure de la formation');
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
         this.loading = false;

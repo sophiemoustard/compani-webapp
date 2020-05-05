@@ -77,7 +77,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -117,54 +117,31 @@ export default {
       userEditionModal: false,
       users: [],
       usersColumns: [
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          align: 'left',
-          field: row => get(row, 'identity.firstname', ''),
-        },
-        {
-          name: 'lastname',
-          label: 'Nom',
-          align: 'left',
-          field: row => get(row, 'identity.lastname', ''),
-        },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => get(row, 'local.email', ''),
-        },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => get(row, 'identity.firstname') || '' },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => get(row, 'identity.lastname') || '' },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => get(row, 'contact.phone', ''),
+          field: row => get(row, 'contact.phone') || '',
           format: (value) => formatPhone(value),
         },
         {
           name: 'role',
           label: 'Role',
           align: 'left',
-          field: row => get(row, 'role.client.name', ''),
+          field: row => get(row, 'role.client.name') || '',
           format: value => value ? ROLES_TRANSLATION[value] : '',
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       usersPagination: {
         rowsPerPage: 0,
         sortBy: 'lastname',
       },
       newUser: {
-        identity: {
-          firstname: '',
-          lastname: '',
-        },
+        identity: { firstname: '', lastname: '' },
         contact: { phone: '' },
         role: '',
         local: { email: '' },
@@ -194,7 +171,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ company: 'company/getCompany' }),
+    ...mapState('company', ['company']),
     roleOptions () {
       return this.roles.map(role => ({ label: ROLES_TRANSLATION[role.name], value: role._id }));
     },
@@ -209,7 +186,7 @@ export default {
     },
     async refreshCompany () {
       try {
-        await this.$store.dispatch('company/getCompany', { companyId: this.profileId });
+        await this.$store.dispatch('company/get', { companyId: this.profileId });
       } catch (e) {
         console.error(e);
       }

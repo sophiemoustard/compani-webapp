@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background">
+  <q-page class="neutral-background q-pb-xl">
     <div class="title-padding row items-start">
       <div class="col-xs-12 col-md-5 row q-mb-md">
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
@@ -8,7 +8,8 @@
         <q-btn icon-right="arrow_drop_down" :label="monthLabel" flat dense>
           <q-menu anchor="bottom right" self="top right">
             <q-list dense padding>
-              <q-item v-for="(month, index) in monthsOptions" :key="index" clickable @click="selectMonth(month.value)">
+              <q-item v-for="(month, index) in monthsOptions" :key="index" clickable @click="selectMonth(month.value)"
+                v-close-popup>
                 <q-item-section>{{ month.label }}</q-item-section>
               </q-item>
             </q-list>
@@ -95,7 +96,7 @@
                 </div>
               </div>
               <ni-auxiliary-indicators :hours-details="auxiliary.hoursBalanceDetail"
-                :customers-details="auxiliary.paidIntervention" />
+                :customers-details="auxiliary.paidInterventions" />
             </div>
           </div>
         </q-slide-transition>
@@ -110,7 +111,7 @@
 <script>
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { mapActions, mapGetters } from 'vuex';
+import { mapActions, mapGetters, mapState } from 'vuex';
 import Companies from '@api/Companies';
 import Pay from '@api/Pay';
 import Events from '@api/Events';
@@ -136,7 +137,6 @@ export default {
       terms: [],
       filteredSectors: [],
       unassignedHours: [],
-      monthModal: false,
       firstInterventionStartDate: '',
       auxiliariesStats: {},
       displayStats: {},
@@ -144,8 +144,10 @@ export default {
     };
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
     ...mapGetters({
-      loggedUser: 'main/loggedUser',
+      company: 'main/company',
+      clientRole: 'main/clientRole',
       filters: 'planning/getFilters',
       elementToAdd: 'planning/getElementToAdd',
       elementToRemove: 'planning/getElementToRemove',
@@ -177,21 +179,19 @@ export default {
       this.removeElementFromFilter(val);
     },
   },
-  async mounted () {
-    await this.fillFilter({ loggedUser: this.loggedUser });
+  async created () {
+    await this.fillFilter({ company: this.company });
     const firstIntervention = await Companies.getFirstIntervention();
     this.firstInterventionStartDate = get(firstIntervention, 'startDate', null) || '';
     this.initFilters();
   },
   methods: {
-    ...mapActions({
-      fillFilter: 'planning/fillFilter',
-    }),
+    ...mapActions({ fillFilter: 'planning/fillFilter' }),
     getAvatar (picture) {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
     initFilters () {
-      if (AUXILIARY_ROLES.includes(this.loggedUser.role.client.name)) {
+      if (AUXILIARY_ROLES.includes(this.clientRole)) {
         const userSector = this.filters.find(filter => filter._id === this.loggedUser.sector);
         if (userSector) this.$refs.teamAutocomplete.add(userSector.label);
       }
@@ -200,7 +200,6 @@ export default {
     roundFrenchPercentage,
     async selectMonth (month) {
       this.selectedMonth = month;
-      this.monthModal = false;
       this.auxiliariesStats = {};
       await this.refresh(this.filteredSectors);
     },
@@ -223,27 +222,21 @@ export default {
         }
         if (!sectors.length) return;
 
-        const paidInterventionStatsByAuxiliary = await Stats.getPaidInterventionStats({
-          sector: sectors,
-          month: this.selectedMonth,
-        });
+        const [paidInterventions, hoursBalance] = await Promise.all([
+          Stats.getPaidInterventionStats({ sector: sectors, month: this.selectedMonth }),
+          Pay.getHoursBalanceDetail({ sector: sectors, month: this.selectedMonth }),
+        ]);
 
-        const hoursBalanceDetail = await Pay.getHoursBalanceDetail({
-          sector: sectors,
-          month: this.selectedMonth,
-        });
-
-        for (const auxiliaryPaidInterventions of paidInterventionStatsByAuxiliary) {
+        for (const auxiliaryPaidInterventions of paidInterventions) {
           for (const sector of auxiliaryPaidInterventions.sectors) {
             if (!sectors.includes(sector)) continue;
-            const auxiliaryHoursDetails = hoursBalanceDetail.find(hbd =>
-              hbd.auxiliaryId === auxiliaryPaidInterventions._id);
+            const hoursDetails = hoursBalance.find(hbd => hbd.auxiliaryId === auxiliaryPaidInterventions._id);
             const auxiliaryStats = {
               _id: auxiliaryPaidInterventions._id,
-              identity: auxiliaryHoursDetails.identity,
-              picture: auxiliaryHoursDetails.picture,
-              paidIntervention: omit(auxiliaryPaidInterventions, 'sectors'),
-              hoursBalanceDetail: omit(auxiliaryHoursDetails, ['sectors', 'auxiliary']),
+              identity: hoursDetails.identity,
+              picture: hoursDetails.picture,
+              paidInterventions: omit(auxiliaryPaidInterventions, 'sectors'),
+              hoursBalanceDetail: omit(hoursDetails, ['sectors', 'auxiliary']),
             }
             auxiliariesStats[sector].push(auxiliaryStats);
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
@@ -299,7 +292,7 @@ export default {
     },
     async refresh (sectors) {
       try {
-        if (!sectors.length === 0) return;
+        if (sectors.length === 0) return;
 
         this.setDisplayStats(sectors, { loading: true, openedDetails: false });
         const params = { month: this.selectedMonth, sector: sectors };
@@ -309,6 +302,7 @@ export default {
           Pay.getHoursToWork(params),
           Events.getPaidTransportStatsBySector(params),
         ]);
+
         if (this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month')) {
           this.unassignedHours = await Events.getUnassignedHoursBySector(params);
         } else {
@@ -326,6 +320,7 @@ export default {
             },
           }
         }
+
         await this.getAuxiliariesStats(sectors);
         this.setDisplayStats(sectors, { loading: false });
       } catch (e) {
@@ -344,13 +339,11 @@ export default {
     async removeElementFromFilter (sector) {
       this.filteredSectors = this.filteredSectors.filter(sec => sec !== sector._id);
       delete this.displayStats[sector._id];
+      delete this.stats[sector._id];
     },
     setDisplayStats (sectors, data) {
       for (const sector of sectors) {
-        this.displayStats = {
-          ...this.displayStats,
-          [sector]: { ...this.displayStats[sector], ...data },
-        };
+        this.displayStats = { ...this.displayStats, [sector]: { ...this.displayStats[sector], ...data } };
       }
     },
   },

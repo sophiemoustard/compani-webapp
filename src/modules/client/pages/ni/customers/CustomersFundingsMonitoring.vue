@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="Suivi des plans d'aide">
+    <ni-title-header title="Suivi des plans d'aide" padding>
       <template slot="content">
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div class="col-xs-12 col-sm-6 col-md-4">
@@ -141,17 +141,14 @@ export default {
   },
   computed: {
     displayedCustomersFundingsMonitoring () {
-      let allCustomersFundingsMonitoring = this.allCustomersFundingsMonitoring;
+      let monitoring = this.allCustomersFundingsMonitoring;
       if (this.selectedSector !== '') {
-        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem =>
-          get(elem, 'sector._id', null) === this.selectedSector);
+        monitoring = monitoring.filter(elem => get(elem, 'sector._id', null) === this.selectedSector);
       }
       if (this.selectedThirdPartyPayer !== '') {
-        allCustomersFundingsMonitoring = allCustomersFundingsMonitoring.filter(elem => {
-          return elem.tpp._id === this.selectedThirdPartyPayer
-        });
+        monitoring = monitoring.filter(elem => elem.tpp._id === this.selectedThirdPartyPayer);
       }
-      return allCustomersFundingsMonitoring;
+      return monitoring;
     },
   },
   methods: {
@@ -171,11 +168,11 @@ export default {
       if (this.selectedSector !== '') this.selectedThirdPartyPayer = '';
     },
   },
-  async mounted () {
+  async created () {
     try {
       this.tableLoading = true;
       await this.getThirdPartyPayerOptions();
-      this.allCustomersFundingsMonitoring = await Stats.getAllCustomersFundingsMonitoring();
+      this.allCustomersFundingsMonitoring = Object.freeze(await Stats.getAllCustomersFundingsMonitoring());
     } catch (e) {
       this.allCustomersFundingsMonitoring = [];
       this.tableLoading = true;

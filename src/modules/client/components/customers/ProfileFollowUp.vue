@@ -99,6 +99,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Stats from '@api/Stats';
 import Users from '@api/Users';
@@ -133,17 +134,8 @@ export default {
       customerFollowUp: [],
       followUpLoading: false,
       followUpColumns: [
-        {
-          name: 'identity',
-          align: 'left',
-          field: row => row,
-        },
-        {
-          name: 'hours',
-          align: 'center',
-          label: 'Heures réalisées',
-          field: row => formatHours(row.totalHours, 1),
-        },
+        { name: 'identity', align: 'left', field: row => row },
+        { name: 'hours', align: 'center', label: 'Heures réalisées', field: row => formatHours(row.totalHours, 1) },
         {
           name: 'lastEvent',
           align: 'center',
@@ -155,18 +147,8 @@ export default {
       fundingsMonitoring: [],
       fundingsLoading: false,
       fundingsMonitoringColumns: [
-        {
-          name: 'thirdPartyPayer',
-          align: 'left',
-          label: 'Financeur',
-          field: 'thirdPartyPayer',
-        },
-        {
-          name: 'careHours',
-          align: 'center',
-          label: 'Heures attribuées',
-          field: 'careHours',
-        },
+        { name: 'thirdPartyPayer', align: 'left', label: 'Financeur', field: 'thirdPartyPayer' },
+        { name: 'careHours', align: 'center', label: 'Heures attribuées', field: 'careHours' },
         {
           name: 'prevMonthCareHours',
           align: 'center',
@@ -190,6 +172,7 @@ export default {
     },
   },
   computed: {
+    ...mapGetters({ clientRole: 'main/clientRole' }),
     auxiliaryAvatar () {
       const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
       return this.getAuxiliaryAvatar(auxiliaryPicture);
@@ -197,11 +180,8 @@ export default {
     customer () {
       return this.$store.getters['customer/getCustomer'];
     },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
     isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.loggedUser.role.client.name);
+      return AUXILIARY_ROLES.includes(this.clientRole);
     },
     hasSecondaryAddress () {
       return !!get(this.customer, 'contact.secondaryAddress.fullAddress');
@@ -245,7 +225,7 @@ export default {
         this.loading = true;
         const activeAuxiliaries = await Users.listActive({
           role: [AUXILIARY, PLANNING_REFERENT],
-          company: this.loggedUser.company._id,
+          company: this.company._id,
         });
         this.auxiliaries = activeAuxiliaries.filter(aux => aux.contracts.some(c => !c.endDate));
         this.loading = false;

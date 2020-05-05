@@ -16,7 +16,8 @@
         @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" />
       <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model.trim="newTrainer.local.email" :error="$v.newTrainer.local.email.$error"
-        @blur="$v.newTrainer.local.email.$touch" required-field caption="Email" />
+        @blur="$v.newTrainer.local.email.$touch" required-field caption="Email"
+        :error-label="emailError($v.newTrainer)"/>
       <ni-option-group v-model="newTrainer.status" type="radio" :options="trainerTypeOptions" inline caption="Statut"
         required-field />
       <template slot="footer">

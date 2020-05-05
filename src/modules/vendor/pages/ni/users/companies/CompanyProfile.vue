@@ -7,7 +7,7 @@
 
 <script>
 import get from 'lodash/get';
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
@@ -25,36 +25,29 @@ export default {
   },
   data () {
     return {
-      companyName: '',
       tabsContent: [{ label: 'Infos', name: 'infos', default: this.defaultTab === 'infos', component: ProfileInfo }],
     }
   },
   computed: {
-    ...mapGetters({
-      company: 'company/getCompany',
-    }),
+    ...mapState('company', ['company']),
+    companyName () {
+      return get(this.company, 'name') || '';
+    },
   },
   async mounted () {
     if (!this.company) await this.refreshCompany();
-    else this.companyName = get(this.company, 'name') || '';
-  },
-  watch: {
-    company () {
-      this.companyName = get(this.company, 'name') || '';
-    },
   },
   methods: {
     async refreshCompany () {
       try {
-        await this.$store.dispatch('company/getCompany', { companyId: this.companyId });
-        this.companyName = get(this.company, 'name') || '';
+        await this.$store.dispatch('company/get', { companyId: this.companyId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.commit('company/saveCompany', null);
+    this.$store.dispatch('company/remove');
   },
 }
 </script>

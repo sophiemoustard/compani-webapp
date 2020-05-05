@@ -1,3 +1,5 @@
+import { mapState } from 'vuex';
+
 export const layoutMixin = {
   data () {
     return {
@@ -5,14 +7,9 @@ export const layoutMixin = {
     };
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
+    ...mapState('main', ['loggedUser', 'drawer']),
     menuIcon () {
       return this.isMini ? 'view_headline' : 'chevron_left';
-    },
-    toggleDrawer () {
-      return this.$store.state.main.toggleDrawer;
     },
     chevronClasses () {
       return !this.isMini ? 'chevron chevron-left' : 'chevron chevron-right';
@@ -23,11 +20,11 @@ export const layoutMixin = {
   },
   methods: {
     toggleMenu (value) {
-      this.$store.commit('main/setToggleDrawer', value);
+      this.$store.dispatch('main/setDrawer', value);
     },
   },
   beforeRouteUpdate (to, from, next) {
-    if (this.toggleDrawer && !this.isMini) this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
+    if (this.drawer && !this.isMini) this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
 
     next();
   },

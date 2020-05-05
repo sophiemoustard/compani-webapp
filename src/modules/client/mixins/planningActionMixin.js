@@ -1,3 +1,4 @@
+import { mapState } from 'vuex';
 import omit from 'lodash/omit';
 import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
@@ -29,6 +30,9 @@ import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
+  computed: {
+    ...mapState('main', ['loggedUser']),
+  },
   validations () {
     return {
       newEvent: {
@@ -370,20 +374,14 @@ export const planningActionMixin = {
       }
     },
     canEditEvent (event) {
-      if (!event.auxiliary) { // Unassigned event
-        return can({
-          user: this.$store.getters['main/loggedUser'],
-          permissions: [{ name: 'events:edit' }],
-        });
+      if (!event.auxiliary) {
+        return can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
       }
 
       return can({
-        user: this.$store.getters['main/loggedUser'],
+        user: this.loggedUser,
         auxiliaryIdEvent: event.auxiliary._id,
-        permissions: [
-          { name: 'events:edit' },
-          { name: 'events:own:edit', rule: 'isOwner' },
-        ],
+        permissions: [{ name: 'events:edit', rule: 'canEdit' }],
       });
     },
     resetEditionForm () {

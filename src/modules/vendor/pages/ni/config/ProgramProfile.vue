@@ -7,7 +7,7 @@
 
 <script>
 import get from 'lodash/get';
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/programs/ProfileInfo';
@@ -25,40 +25,31 @@ export default {
   },
   data () {
     return {
-      programName: '',
       tabsContent: [
-        {
-          label: 'Programme',
-          name: 'program',
-          default: this.defaultTab === 'program',
-          component: ProfileInfo,
-        },
+        { label: 'Programme', name: 'program', default: this.defaultTab === 'program', component: ProfileInfo },
       ],
     }
   },
   computed: {
-    ...mapGetters({ program: 'program/getProgram' }),
-  },
-  watch: {
-    program () {
-      this.programName = get(this.program, 'name') || '';
+    ...mapState('program', ['program']),
+    programName () {
+      return get(this.program, 'name') || '';
     },
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
-    else this.programName = '';
   },
   methods: {
     async refreshProgram () {
       try {
-        await this.$store.dispatch('program/getProgram', { programId: this.programId });
+        await this.$store.dispatch('program/get', { programId: this.programId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.commit('program/saveProgram', null);
+    this.$store.dispatch('program/remove');
   },
 
 }

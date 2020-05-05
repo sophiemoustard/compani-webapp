@@ -1,3 +1,4 @@
+import capitalize from 'lodash/capitalize';
 import { getLastVersion } from '@helpers/utils';
 import { days } from '@data/days';
 import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants.js';
@@ -29,7 +30,7 @@ export const fundingMixin = {
           align: 'left',
           format: (value) => {
             const nature = NATURE_OPTIONS.find(option => option.value === value);
-            return nature ? this.$_.capitalize(nature.label) : ''
+            return nature ? capitalize(nature.label) : ''
           },
           field: 'nature',
         },
@@ -133,7 +134,7 @@ export const fundingMixin = {
     },
     frequencyFormat (value) {
       const freq = FUNDING_FREQ_OPTIONS.find(option => option.value === value);
-      return freq ? this.$_.capitalize(freq.label) : ''
+      return freq ? capitalize(freq.label) : ''
     },
   },
 };

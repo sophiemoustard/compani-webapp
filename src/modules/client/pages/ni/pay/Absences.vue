@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="Absences">
+    <ni-title-header title="Absences" padding>
       <template slot="content">
         <div class="col-xs-12 col-md-6">
           <ni-date-range v-model="dates" @input="refresh" :error.sync="datesHasError" />
@@ -138,20 +138,9 @@ export default {
           align: 'left',
           sortable: true,
         },
-        {
-          name: 'attachment',
-          label: 'Justificatif',
-        },
-        {
-          name: 'misc',
-          label: 'Notes',
-          field: 'misc',
-          align: 'left',
-        },
-        {
-          name: 'actions',
-          label: '',
-        },
+        { name: 'attachment', label: 'Justificatif' },
+        { name: 'misc', label: 'Notes', field: 'misc', align: 'left' },
+        { name: 'actions', label: '' },
       ],
       dates: {
         startDate: this.$moment().startOf('M').toISOString(),
@@ -166,9 +155,6 @@ export default {
   computed: {
     activeAuxiliaries () {
       return [this.selectedAuxiliary];
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
     },
   },
   methods: {

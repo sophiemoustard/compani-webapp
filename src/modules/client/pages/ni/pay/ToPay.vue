@@ -1,6 +1,6 @@
 <template>
   <q-page class="neutral-background q-pb-xl">
-    <ni-title-header title="Paie mensuelle">
+    <ni-title-header title="Paie mensuelle" padding>
       <template slot="title">
         <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
           :disable="displayedDraftPay.length === 0" />

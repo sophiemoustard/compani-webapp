@@ -6,9 +6,9 @@
     </div>
     <q-field dense borderless :error="error" :error-message="errorLabel">
       <div class="date-container justify-center items-center row">
-        <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blur" />
+        <ni-date-input data-cy="date-input" :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blur" />
         <p class="delimiter">-</p>
-        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+        <ni-date-input data-cy="date-input" :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           :min="value.startDate" @blur="blur" />
       </div>
     </q-field>

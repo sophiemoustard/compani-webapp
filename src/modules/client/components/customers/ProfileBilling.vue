@@ -2,7 +2,8 @@
   <div>
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
-        <p class="text-weight-bold text-primary">{{ this.customer.identity | formatIdentity('FL') }}</p>
+        <p data-cy="customer-identity" class="text-weight-bold text-primary">
+          {{ this.customer.identity | formatIdentity('FL') }}</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <div v-if="isHelper && company.billingAssistance" class="message">
@@ -18,7 +19,7 @@
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
-      <p class="text-weight-bold text-primary">{{ tpp.name }}</p>
+      <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :displayActions="isCoach"
         @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
         :endBalance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
@@ -32,13 +33,13 @@
       <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" :loading="tableLoading"
         :pagination.sync="taxCertificatesPagination">
         <template v-slot:body="{ props }">
-          <q-tr :props="props">
+          <q-tr data-cy="tax-certificate" :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" type="a" :href="taxCertificatesUrl(props.row)"
-                    target="_blank" icon="file_download" />
+                  <q-btn data-cy="link" flat round small color="primary" type="a"
+                    :href="taxCertificatesUrl(props.row)" target="_blank" icon="file_download" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
@@ -85,6 +86,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import snakeCase from 'lodash/snakeCase';
@@ -186,14 +188,16 @@ export default {
     }
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
+    ...mapGetters({
+      company: 'main/company',
+      clientRole: 'main/clientRole',
+    }),
     customer () {
       return this.$store.getters['customer/getCustomer'];
     },
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);
-    },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
     },
     documentQuery () {
       return {
@@ -202,20 +206,14 @@ export default {
         endDate: this.billingDates.endDate,
       };
     },
-    userRole () {
-      return this.loggedUser.role.client.name;
-    },
-    company () {
-      return this.loggedUser.company;
-    },
     isHelper () {
-      return HELPER === this.userRole;
+      return HELPER === this.clientRole;
     },
     isAdmin () {
-      return CLIENT_ADMIN === this.userRole;
+      return CLIENT_ADMIN === this.clientRole;
     },
     isCoach () {
-      return COACH_ROLES.includes(this.userRole);
+      return COACH_ROLES.includes(this.clientRole);
     },
     taxCertificateFileError () {
       if (!this.$v.taxCertificate.file.required) return REQUIRED_LABEL;
@@ -233,7 +231,7 @@ export default {
       return years.map(year => ({ label: year.format('YYYY'), value: year.format('YYYY') }));
     },
   },
-  async mounted () {
+  async created () {
     this.setBillingDates();
     await this.refresh();
     await this.getTaxCertificates();

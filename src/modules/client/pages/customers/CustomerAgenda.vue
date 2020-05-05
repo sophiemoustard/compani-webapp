@@ -1,10 +1,11 @@
 <template>
   <q-page class="neutral-background" :style="{ height: height }">
-    <div :class="[{ 'planning': !toggleDrawer, 'full-height' : true }]">
+    <div :class="[{ 'planning': !drawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-sm-5 person-name row" v-if="customer && customer.identity">
-          <img :src="getAvatar()" class="avatar">
-          <input class="q-pl-sm neutral-background identity" :value="formatIdentity(customer.identity, 'FL')" readonly />
+          <img :src="DEFAULT_AVATAR" class="avatar">
+          <input class="q-pl-sm neutral-background identity" :value="formatIdentity(customer.identity, 'FL')"
+            readonly data-cy="customer-identity" />
         </div>
         <div class="col-xs-12 col-sm-7">
           <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" :targetDate="targetDate"
@@ -18,6 +19,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
 import { formatIdentity } from '@helpers/utils';
@@ -42,23 +44,22 @@ export default {
       viewMode: WEEK_VIEW,
       AGENDA,
       personKey: CUSTOMER,
+      DEFAULT_AVATAR,
     };
   },
   computed: {
-    helper () {
-      return this.$store.getters['main/loggedUser'];
-    },
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
+    ...mapState({ helper: state => state.main.loggedUser }),
+    ...mapGetters({ customer: 'customer/getCustomer' }),
   },
-  async mounted () {
+  async created () {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
-    this.height = window.innerHeight;
     this.startOfWeek = this.$moment().startOf('week').toISOString();
     this.getTimelineDays();
     if (!this.customer) await this.refreshCustomer();
     await this.getEvents();
+  },
+  mounted () {
+    this.height = window.innerHeight;
   },
   methods: {
     async refreshCustomer () {
@@ -69,9 +70,6 @@ export default {
         console.error(e);
       }
     },
-    getAvatar () {
-      return DEFAULT_AVATAR;
-    },
     // Refresh data
     async updateTimeline () {
       this.getTimelineDays();
@@ -79,12 +77,11 @@ export default {
     },
     async getEvents () {
       try {
-        const params = {
+        this.events = await Events.list({
           startDate: this.startOfWeek,
           endDate: this.endOfWeek,
           customer: this.customer._id,
-        }
-        this.events = await Events.list(params);
+        });
       } catch (e) {
         this.events = [];
       }

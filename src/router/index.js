@@ -35,17 +35,17 @@ Router.beforeEach(async (to, from, next) => {
         const permission = checkRole(to, store.getters['main/loggedUser']);
         if (!permission) next('/404');
         else {
-          store.commit('main/changeRefreshState', false);
+          store.dispatch('main/updateRefreshState', false);
           next();
         }
       } else next({ path: '/login', query: { from: to.fullPath } });
     } else {
       if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-      const permission = checkRole(to, store.getters['main/loggedUser']);
+      const permission = checkRole(to, store.state.main.loggedUser);
       if (!permission) next('/404');
       else {
-        store.commit('main/changeRefreshState', false);
+        store.dispatch('main/updateRefreshState', false);
         next();
       }
     }

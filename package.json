@@ -10,7 +10,7 @@
     "lint": "eslint --ext .js,.vue src",
     "test:e2e:ci": "NODE_ENV=test quasar test --e2e cypress",
     "test:e2e": "cypress open",
-    "postinstall": "quasar build",
+    "postinstall": "holidays2json --pick FR --min && quasar build",
     "start": "node server.js"
   },
   "dependencies": {
@@ -39,7 +39,7 @@
   },
   "devDependencies": {
     "@quasar/app": "^1.6.1",
-    "@quasar/cli": "^1.0.5",
+    "@quasar/cli": "^1.0.7",
     "@quasar/quasar-app-extension-testing": "^1.0.0",
     "@quasar/quasar-app-extension-testing-e2e-cypress": "^1.0.0-beta.10",
     "@vue/eslint-config-airbnb": "^4.0.0",

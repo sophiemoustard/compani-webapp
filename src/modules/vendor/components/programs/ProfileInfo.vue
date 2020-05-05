@@ -3,14 +3,19 @@
     <div class="q-mb-xl">
       <div class="row gutter-profile">
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
-          :error="$v.program.name.$error" />
+          :error="$v.program.name.$error" required-field />
+      </div>
+      <div class="row gutter-profile">
+        <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
+          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
+          :error="$v.program.learningGoals.$error" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -28,14 +33,15 @@ export default {
   },
   validations () {
     return {
-      program: { name: { required } },
+      program: { name: { required }, learningGoals: { required } },
     }
   },
   computed: {
-    ...mapGetters({ program: 'program/getProgram' }),
+    ...mapState('program', ['program']),
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
+    this.$v.program.$touch();
   },
   methods: {
     saveTmp (path) {
@@ -43,7 +49,7 @@ export default {
     },
     async refreshProgram () {
       try {
-        await this.$store.dispatch('program/getProgram', { programId: this.profileId });
+        await this.$store.dispatch('program/get', { programId: this.profileId });
       } catch (e) {
         console.error(e);
       }

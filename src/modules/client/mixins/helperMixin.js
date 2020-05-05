@@ -1,3 +1,4 @@
+import { mapGetters } from 'vuex';
 import has from 'lodash/has';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
@@ -52,6 +53,7 @@ export const helperMixin = {
     }
   },
   computed: {
+    ...mapGetters({ company: 'main/company' }),
     sortedHelpers () {
       return [...this.helpers]
         .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
@@ -62,9 +64,6 @@ export const helperMixin = {
         return `le ${approvalDate} par ${this.acceptedBy}`;
       }
     },
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
   },
   methods: {
     // Refresh
@@ -72,7 +71,7 @@ export const helperMixin = {
       try {
         this.helpersLoading = true;
         const params = { customers: this.customer._id };
-        if (has(this.loggedUser, 'company._id')) params.company = this.loggedUser.company._id;
+        if (has(this.company, '_id')) params.company = this.company._id;
         this.helpers = await Users.list(params);
       } catch (e) {
         this.helpers = [];

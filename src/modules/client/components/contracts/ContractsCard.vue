@@ -89,6 +89,8 @@
 
 <script>
 import { Cookies } from 'quasar';
+import orderBy from 'lodash/orderBy';
+import get from 'lodash/get';
 import esign from '@api/Esign.js';
 import { NotifyNegative } from '@components/popup/notify.js';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -123,12 +125,7 @@ export default {
       embeddedUrl: '',
       pagination: { rowsPerPage: 0 },
       contractsColumns: [
-        {
-          name: 'weeklyHours',
-          label: 'Volume horaire hebdomadaire',
-          align: 'center',
-          field: 'weeklyHours',
-        },
+        { name: 'weeklyHours', label: 'Volume horaire hebdomadaire', align: 'center', field: 'weeklyHours' },
         {
           name: 'startDate',
           label: 'Date d\'effet',
@@ -143,35 +140,16 @@ export default {
           field: 'endDate',
           format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
         },
-        {
-          name: 'grossHourlyRate',
-          label: 'Taux horaire',
-          align: 'center',
-          field: 'grossHourlyRate',
-        },
-        {
-          name: 'contractEmpty',
-          label: 'Word',
-          align: 'center',
-          field: 'contractEmpty',
-        },
+        { name: 'grossHourlyRate', label: 'Taux horaire', align: 'center', field: 'grossHourlyRate' },
+        { name: 'contractEmpty', label: 'Word', align: 'center', field: 'contractEmpty' },
         {
           name: 'contractSigned',
           label: 'Contrat / Avenant',
           align: 'center',
           field: (val) => val.signature ? val.signature.eversignId : '',
         },
-        {
-          name: 'archives',
-          label: 'Archives',
-          align: 'center',
-          field: 'auxiliaryArchives',
-        },
-        {
-          name: 'actions',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'archives', label: 'Archives', align: 'center', field: 'auxiliaryArchives' },
+        { name: 'actions', align: 'center', field: '_id' },
       ],
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
     }
@@ -218,7 +196,7 @@ export default {
       return formFields;
     },
     getLastVersion (contract) {
-      return this.$_.orderBy(contract.versions, ['startDate'], ['desc'])[0];
+      return orderBy(contract.versions, ['startDate'], ['desc'])[0];
     },
     visibleColumns (contract) {
       if (contract.status === CUSTOMER_CONTRACT) return this.columns.filter(col => col !== 'weeklyHours');
@@ -263,7 +241,7 @@ export default {
       return !!templates.contractWithCustomerVersion && !!templates.contractWithCustomerVersion.driveId;
     },
     docsUploadUrl (contractId) {
-      const driveId = this.$_.get(this.user, 'administrative.driveFolder.driveId');
+      const driveId = get(this.user, 'administrative.driveFolder.driveId');
       if (!driveId) return '';
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;

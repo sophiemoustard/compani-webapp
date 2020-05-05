@@ -37,6 +37,7 @@
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import Modal from '@components/modal/Modal';
 import { formatHours } from '@helpers/utils';
 import { SURCHARGES } from '@data/constants';
@@ -58,7 +59,7 @@ export default {
   },
   methods: {
     getSurcharges (surchargesPlanDetails) {
-      return this.$_.pick(surchargesPlanDetails, Object.keys(SURCHARGES));
+      return pick(surchargesPlanDetails, Object.keys(SURCHARGES));
     },
     displayDiff (plan) {
       return Object.values(plan).some(sur => sur.hours);

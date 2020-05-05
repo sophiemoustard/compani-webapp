@@ -1,5 +1,6 @@
 import moment from 'moment';
 import get from 'lodash/get';
+import omit from 'lodash/omit';
 import { formatPrice, formatIdentity, formatHours } from '@helpers/utils';
 import { downloadCsv } from '@helpers/file';
 import { END_CONTRACT_REASONS, SURCHARGES } from '@data/constants';
@@ -189,7 +190,7 @@ export const payMixin = {
   methods: {
     formatPayload (payload) {
       return {
-        ...this.$_.omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'compensationEdition', 'paidKm']),
+        ...omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'compensationEdition', 'paidKm']),
         hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
         auxiliary: payload.auxiliary._id,
       };
@@ -199,7 +200,7 @@ export const payMixin = {
 
       const formattedPlans = [];
       for (const plan of Object.keys(details)) {
-        const surchages = Object.entries(this.$_.omit(details[plan], 'planName'));
+        const surchages = Object.entries(omit(details[plan], 'planName'));
         if (surchages.length === 0) continue;
 
         const lines = [details[plan].planName];

@@ -16,15 +16,17 @@
 
 <script>
 import get from 'lodash/get';
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileOrganization from 'src/modules/vendor/components/courses/ProfileOrganization';
 import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
 export default {
   name: 'CourseProfile',
   metadata: { title: 'Fiche formation' },
+  mixins: [courseMixin],
   props: {
     courseId: { type: String },
     defaultTab: { type: String, default: 'organization' },
@@ -35,7 +37,6 @@ export default {
   },
   data () {
     return {
-      courseName: '',
       tabsContent: [
         {
           label: 'Organisation de la formation',
@@ -53,16 +54,12 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ course: 'course/getCourse' }),
+    ...mapState('course', ['course']),
+    courseName () {
+      return get(this.course, 'name') || '';
+    },
     courseType () {
       return get(this.course, 'type') || '';
-    },
-    companyName () {
-      if (!get(this.course, 'companies') || !this.course.companies.length) return '';
-      return this.course.companies[0].tradeName || '';
-    },
-    programName () {
-      return get(this.course, 'program.name') || '';
     },
     headerInfo () {
       return [
@@ -72,26 +69,20 @@ export default {
       ];
     },
   },
-  watch: {
-    course () {
-      this.courseName = get(this.course, 'name') || '';
-    },
-  },
   async mounted () {
     if (!this.course) await this.refreshCourse();
-    else this.courseName = '';
   },
   methods: {
     async refreshCourse () {
       try {
-        await this.$store.dispatch('course/getCourse', { courseId: this.courseId });
+        await this.$store.dispatch('course/get', { courseId: this.courseId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.commit('course/saveCourse', null);
+    this.$store.dispatch('course/remove');
   },
 
 }

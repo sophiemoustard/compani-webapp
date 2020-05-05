@@ -124,6 +124,7 @@
 </template>
 
 <script>
+import { mapState, mapGetters } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -169,18 +170,8 @@ export default {
       embeddedUrl: '',
       mandatesLoading: false,
       mandatesColumns: [
-        {
-          name: 'rum',
-          label: 'RUM',
-          align: 'left',
-          field: 'rum',
-        },
-        {
-          name: 'sign',
-          label: 'Signature',
-          align: 'left',
-          field: 'signedAt',
-        },
+        { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
+        { name: 'sign', label: 'Signature', align: 'left', field: 'signedAt' },
         {
           name: 'createdAt',
           align: 'left',
@@ -189,10 +180,7 @@ export default {
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
-        {
-          name: '_id',
-          field: '_id',
-        },
+        { name: '_id', field: '_id' },
       ],
       mandatesVisibleColumns: ['rum', 'sign'],
       fundingModal: false,
@@ -215,12 +203,8 @@ export default {
     },
   },
   computed: {
-    helper () {
-      return this.$store.getters['main/loggedUser'];
-    },
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
+    ...mapState({ helper: state => state.main.loggedUser }),
+    ...mapGetters({ customer: 'customer/getCustomer' }),
     ibanError () {
       if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
       else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
@@ -258,7 +242,7 @@ export default {
         : '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.customer) await this.refreshCustomer();
     else {
       this.refreshSubscriptions(this.customer);

@@ -1,6 +1,9 @@
+import get from 'lodash/get';
+import { AUXILIARY } from '@data/constants';
+
 export default {
-  isOwner (params) {
+  canEdit (params) {
     if (!params.user._id || !params.auxiliaryIdEvent) throw new Error('[can] wrong rule parameters');
-    return params.user._id === params.auxiliaryIdEvent;
+    return get(params, 'user.role.client.name') !== AUXILIARY || params.user._id === params.auxiliaryIdEvent;
   },
 }

@@ -16,7 +16,8 @@
           </div>
         </div>
         <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup:enter="submit" />
-        <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password" @keyup:enter="submit" />
+        <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password"
+          @keyup:enter="submit" />
         <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
           <small>Mot de passe oublié ?</small>
         </router-link>
@@ -30,7 +31,6 @@
 </template>
 
 <script>
-import get from 'lodash/get';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
@@ -53,24 +53,15 @@ export default {
   mixins: [logInMixin],
   data () {
     return {
-      credentials: {
-        email: '',
-        password: '',
-      },
+      credentials: { email: '', password: '' },
     }
   },
   computed: {
-    loggedUser () {
-      return this.$store.getters['main/loggedUser'];
-    },
-    userRole () {
-      return get(this.loggedUser, 'role.client.name') || null;
-    },
     isAuxiliary () {
-      return this.loggedUser ? AUXILIARY_ROLES.includes(this.userRole) : false;
+      return AUXILIARY_ROLES.includes(this.clientRole);
     },
     isAuxiliaryWithoutCompany () {
-      return this.userRole === AUXILIARY_WITHOUT_COMPANY;
+      return this.clientRole === AUXILIARY_WITHOUT_COMPANY;
     },
   },
   methods: {
