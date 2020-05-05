@@ -51,6 +51,7 @@
         <ni-menu-item name="company config" icon="house" label="Configuration générale" />
         <ni-menu-item name="rh config" icon="accessibility" label="Configuration RH" />
         <ni-menu-item name="customers config" icon="settings" label="Configuration bénéficiaires" />
+        <ni-menu-item name="coachs" icon="people" label="Coachs" />
         <ni-menu-item name="tags config" icon="list_alt" label="Tags" />
       </q-expansion-item>
     </template>
