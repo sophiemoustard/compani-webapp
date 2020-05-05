@@ -1,6 +1,6 @@
 describe('Login page tests', () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed`);
+    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/authentication`);
     cy.visit('/login');
   });
 
