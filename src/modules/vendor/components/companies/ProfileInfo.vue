@@ -2,9 +2,16 @@
   <div v-if="company">
     <div class="q-mb-xl">
       <div class="row gutter-profile">
-        <ni-input caption="Nom" v-model.trim="company.name" @focus="saveTmp('name')" @blur="updateCompany('name')"
-          :error="$v.company.name.$error" />
+        <ni-input caption="Raison sociale" v-model.trim="company.name" @focus="saveTmp('name')"
+          @blur="updateCompany('name')" :error="$v.company.name.$error" />
+        <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
+          @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error" />
       </div>
+    </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Abonnements</p>
+      <q-checkbox dense v-model="company.subscriptions.erp" color="primary" label="ERP"
+        @input="updateCompany('subscriptions.erp')" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Utilisateurs</p>
@@ -96,6 +103,7 @@ import { CLIENT_ADMIN, COACH, ROLES_TRANSLATION } from '@data/constants';
 import { formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
+import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -108,10 +116,11 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
   },
-  mixins: [userMixin],
+  mixins: [userMixin, companyMixin],
   data () {
     return {
       loading: false,
+      tmpInput: '',
       usersLoading: false,
       userCreationModal: false,
       userEditionModal: false,
@@ -163,9 +172,7 @@ export default {
   },
   validations () {
     return {
-      company: {
-        name: { required },
-      },
+      company: pick(this.companyValidation, ['name', 'tradeName']),
       newUser: this.userValidations,
       selectedUser: this.userValidations,
     };

@@ -27,6 +27,7 @@ export default {
   },
   data () {
     return {
+      userIdentity: '',
       tabsContent: [
         {
           label: 'Infos personnelles',
@@ -38,19 +39,18 @@ export default {
       ],
     }
   },
-  async mounted () {
+  async created () {
     await this.$store.dispatch('rh/getUserProfile', { userId: this.trainerId });
+    this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
   },
   computed: {
     userProfile () {
       return this.$store.getters['rh/getUserProfile'];
     },
-    userIdentity () {
-      return formatIdentity(get(this, 'userProfile.identity'), 'FL');
-    },
   },
   watch: {
     async userProfile () {
+      this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
       await this.$store.dispatch('rh/updateNotifications');
     },
   },

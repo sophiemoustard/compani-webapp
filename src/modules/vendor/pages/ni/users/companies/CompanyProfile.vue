@@ -1,6 +1,15 @@
 <template>
   <q-page padding class="neutral-background">
-    <ni-profile-header :title="companyName" />
+    <ni-profile-header :title="companyTradeName">
+      <template v-slot:body>
+        <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
+          <q-item>
+            <q-item-section side><q-icon size="xs" name="bookmark_border"/></q-item-section>
+            <q-item-section class="text-capitalize">{{ companyType }}</q-item-section>
+          </q-item>
+        </div>
+      </template>
+    </ni-profile-header>
     <profile-tabs :profile-id="companyId" :tabsContent="tabsContent" />
   </q-page>
 </template>
@@ -8,6 +17,7 @@
 <script>
 import get from 'lodash/get';
 import { mapState } from 'vuex';
+import { COMPANY_TYPES } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
@@ -25,17 +35,25 @@ export default {
   },
   data () {
     return {
+      companyTradeName: '',
       tabsContent: [{ label: 'Infos', name: 'infos', default: this.defaultTab === 'infos', component: ProfileInfo }],
     }
   },
   computed: {
     ...mapState('company', ['company']),
-    companyName () {
-      return get(this.company, 'name') || '';
+    companyType () {
+      const companyType = COMPANY_TYPES.find(type => type.value === get(this.company, 'type'));
+      return companyType ? companyType.label : '';
     },
   },
-  async mounted () {
+  watch: {
+    company () {
+      this.companyTradeName = get(this.company, 'tradeName') || '';
+    },
+  },
+  async created () {
     if (!this.company) await this.refreshCompany();
+    this.companyTradeName = get(this.company, 'tradeName') || '';
   },
   methods: {
     async refreshCompany () {
@@ -51,3 +69,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.q-item
+  padding: 0
+  min-height: 0
+</style>
