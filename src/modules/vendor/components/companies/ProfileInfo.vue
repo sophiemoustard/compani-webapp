@@ -26,7 +26,6 @@
                   <div class="row no-wrap table-actions">
                     <div class="row no-wrap table-actions">
                       <q-icon color="grey" name="edit" @click.native="openUserEditionModal(props.row)" />
-                      <q-icon color="grey" name="delete" @click.native="validateUserDeletion(col.value)" />
                     </div>
                   </div>
                 </template>
@@ -302,25 +301,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    async deleteUser (userId) {
-      try {
-        await Users.deleteById(userId);
-        await this.getUsers();
-        NotifyPositive('Utilisateur supprimé.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'utilisateur.");
-      }
-    },
-    validateUserDeletion (userId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer cet utilisateur ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.deleteUser(userId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 }
