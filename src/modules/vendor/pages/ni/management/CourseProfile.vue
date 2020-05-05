@@ -72,8 +72,9 @@ export default {
       this.courseName = get(this.course, 'name') || '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.course) await this.refreshCourse();
+    this.courseName = get(this.course, 'name') || '';
   },
   methods: {
     async refreshCourse () {

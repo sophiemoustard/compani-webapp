@@ -36,7 +36,7 @@ import Modal from '@components/modal/Modal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { COMPANY, ASSOCIATION } from '@data/constants';
+import { COMPANY_TYPES } from '@data/constants';
 import { companyMixin } from '@mixins/companyMixin';
 
 export default {
@@ -58,6 +58,7 @@ export default {
       columns: [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
+      companyTypeOptions: COMPANY_TYPES,
       companyCreationModal: false,
       newCompany: {
         name: '',
@@ -78,9 +79,6 @@ export default {
   computed: {
     filteredCompanies () {
       return this.companies.filter(company => company.name.match(new RegExp(this.searchStr, 'i')));
-    },
-    companyTypeOptions () {
-      return [{ label: 'Association', value: ASSOCIATION }, { label: 'Entreprise', value: COMPANY }]
     },
   },
   methods: {

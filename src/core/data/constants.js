@@ -277,6 +277,10 @@ export const PAY_DOCUMENT_NATURES = [
 // COMPANY
 export const COMPANY = 'company';
 export const ASSOCIATION = 'association';
+export const COMPANY_TYPES = [
+  { label: 'Association', value: ASSOCIATION },
+  { label: 'Entreprise', value: COMPANY },
+]
 
 // SMS
 export const CONVOCATION = 'convocation';

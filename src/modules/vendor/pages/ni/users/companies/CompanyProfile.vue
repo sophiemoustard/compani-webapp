@@ -17,7 +17,7 @@
 <script>
 import get from 'lodash/get';
 import { mapState } from 'vuex';
-import { COMPANY, ASSOCIATION } from '@data/constants';
+import { COMPANY_TYPES } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
@@ -42,14 +42,8 @@ export default {
   computed: {
     ...mapState('company', ['company']),
     companyType () {
-      switch (get(this.company, 'type')) {
-        case COMPANY:
-          return 'Entreprise';
-        case ASSOCIATION:
-          return 'Association';
-        default:
-          return '';
-      };
+      const companyType = COMPANY_TYPES.find(type => type.value === get(this.company, 'type'));
+      return companyType ? companyType.label : '';
     },
   },
   watch: {
@@ -57,8 +51,9 @@ export default {
       this.companyTradeName = get(this.company, 'tradeName') || '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.company) await this.refreshCompany();
+    this.companyTradeName = get(this.company, 'tradeName') || '';
   },
   methods: {
     async refreshCompany () {
@@ -74,3 +69,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.q-item
+  padding: 0
+  min-height: 0
+</style>

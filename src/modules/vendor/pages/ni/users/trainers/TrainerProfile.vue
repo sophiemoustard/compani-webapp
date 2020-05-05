@@ -39,8 +39,9 @@ export default {
       ],
     }
   },
-  async mounted () {
+  async created () {
     await this.$store.dispatch('rh/getUserProfile', { userId: this.trainerId });
+    this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
   },
   computed: {
     userProfile () {

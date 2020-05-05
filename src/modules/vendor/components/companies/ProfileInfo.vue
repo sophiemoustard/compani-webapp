@@ -103,6 +103,7 @@ import { CLIENT_ADMIN, COACH, ROLES_TRANSLATION } from '@data/constants';
 import { formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { userMixin } from '@mixins/userMixin';
+import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -115,7 +116,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
   },
-  mixins: [userMixin],
+  mixins: [userMixin, companyMixin],
   data () {
     return {
       loading: false,
@@ -171,10 +172,7 @@ export default {
   },
   validations () {
     return {
-      company: {
-        name: { required },
-        tradeName: { required },
-      },
+      company: pick(this.companyValidation, ['name', 'tradeName']),
       newUser: this.userValidations,
       selectedUser: this.userValidations,
     };

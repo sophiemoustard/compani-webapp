@@ -39,8 +39,9 @@ export default {
       this.programName = get(this.program, 'name') || '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.program) await this.refreshProgram();
+    this.programName = get(this.program, 'name') || '';
   },
   methods: {
     async refreshProgram () {
