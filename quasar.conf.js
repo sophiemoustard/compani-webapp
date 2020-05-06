@@ -13,6 +13,7 @@ module.exports = function (ctx) {
       'vue-croppa',
       'vuelidate',
       'vueclipboard',
+      // 'ability',
       process.env.NODE_ENV === 'production' ? 'vue-analytics' : null,
     ],
     css: [

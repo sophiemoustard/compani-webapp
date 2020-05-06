@@ -8,29 +8,30 @@
     <q-separator />
     <template v-if="isAuxiliaryWithCompany">
       <q-expansion-item ref="planning" v-model="activeRoutes.planning.open" label="Planning">
-        <ni-menu-item name="auxiliary agenda" icon="event" label="Le mien" />
-        <ni-menu-item name="auxiliaries planning" icon="face" label="Auxiliaires" />
-        <ni-menu-item name="customers planning" icon="people" label="Bénéficiaires" />
+        <ni-menu-item name="auxiliaries agenda" icon="event" label="Le mien" />
+        <ni-menu-item name="ni planning auxiliaries" icon="face" label="Auxiliaires" />
+        <ni-menu-item name="ni planning customers" icon="people" label="Bénéficiaires" />
       </q-expansion-item>
       <q-separator />
       <q-expansion-item ref="benef" v-model="activeRoutes.benef.open" label="Bénéficiaires">
-        <ni-menu-item name="profile customers" :params="{ id: loggedUser._id }" icon="contacts" label="Fiches" />
-        <ni-menu-item name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
+        <ni-menu-item name="auxiliaries customers directory" :params="{ id: loggedUser._id }" icon="contacts"
+          label="Fiches" />
+        <ni-menu-item name="ni customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
       </q-expansion-item>
       <q-separator />
     </template>
     <q-expansion-item ref="administrative" v-model="activeRoutes.administrative.open" label="Administratif">
-      <ni-menu-item v-if="isAuxiliaryWithCompany" name="auxiliary personal info" :params="{ id: loggedUser._id }" icon="person"
+      <ni-menu-item v-if="isAuxiliaryWithCompany" name="auxiliaries info" :params="{ id: loggedUser._id }" icon="person"
         label="Infos personnelles" />
-      <ni-menu-item name="profile salaries" :params="{ id: loggedUser._id }" icon="layers" label="Paie" />
-      <ni-menu-item v-if="isAuxiliaryWithCompany" name="profile docs" :params="{ id: loggedUser._id }" icon="insert_drive_file" label="Documents" />
-      <ni-menu-item name="profile contracts" icon="description" label="Contrats" />
+      <ni-menu-item name="auxiliaries pay" :params="{ id: loggedUser._id }" icon="layers" label="Paie" />
+      <ni-menu-item v-if="isAuxiliaryWithCompany" name="auxiliaries docs" :params="{ id: loggedUser._id }" icon="insert_drive_file" label="Documents" />
+      <ni-menu-item name="auxiliaries contracts" icon="description" label="Contrats" />
     </q-expansion-item>
     <template v-if="isAuxiliaryWithCompany">
       <q-separator />
       <q-expansion-item ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
-        <ni-menu-item name="teams directory" :params="{ id: loggedUser._id }" icon="contacts" label="Répertoire" />
-        <ni-menu-item name="dashboard" icon="dashboard" label="Tableau de bord" />
+        <ni-menu-item name="auxiliaries teams directory" :params="{ id: loggedUser._id }" icon="contacts" label="Répertoire" />
+        <ni-menu-item name="ni auxiliaries dashboard" icon="dashboard" label="Tableau de bord" />
       </q-expansion-item>
     </template>
     <q-separator />

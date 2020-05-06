@@ -73,7 +73,6 @@ export default {
     'ni-modal': Modal,
   },
   props: {
-    customer: { type: Boolean, default: false },
     profileId: String,
   },
   data () {
@@ -146,8 +145,7 @@ export default {
       this.smsModal = true;
     },
     goToPlanning () {
-      if (this.customer) this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.userProfile } });
-      else this.$router.push({ name: 'auxiliaries planning', params: { targetedAuxiliary: this.userProfile } });
+      this.$router.push({ name: 'ni planning auxiliaries', params: { targetedAuxiliary: this.userProfile } });
     },
     async sendMessage () {
       this.loading = true;

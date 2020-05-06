@@ -6,17 +6,17 @@
       </q-item-label>
     </div>
     <q-separator />
-    <ni-menu-item class="customer-menu-size" name="customer agenda" icon="date_range" label="Planning" />
+    <ni-menu-item class="customer-menu-size" name="customers agenda" icon="date_range" label="Planning" />
     <q-separator />
     <ni-menu-item v-if="hasBillingAssistance || (customer && customer.referent)" class="customer-menu-size"
-      name="customer contact" icon="contact_support" label="Contact" />
+      name="customers contact" icon="contact_support" label="Contact" />
     <q-separator v-if="hasBillingAssistance || (customer && customer.referent)" />
-    <ni-menu-item class="customer-menu-size" name="customer documents" icon="euro_symbol" label="Facturation" />
+    <ni-menu-item class="customer-menu-size" name="customers documents" icon="euro_symbol" label="Facturation" />
     <q-separator />
-    <ni-menu-item class="customer-menu-size" name="customer subscription" icon="playlist_add" label="Abonnement" />
+    <ni-menu-item class="customer-menu-size" name="customers subscription" icon="playlist_add" label="Abonnement" />
     <q-separator />
     <template v-if="hasContracts">
-      <ni-menu-item class="customer-menu-size" name="customer contracts" icon="description" label="Contrats" />
+      <ni-menu-item class="customer-menu-size" name="customers contracts" icon="description" label="Contrats" />
       <q-separator />
     </template>
     <ni-side-menu-footer :label="loggedUser.identity.lastname" :userId="loggedUser._id" :interface-type="interfaceType" />

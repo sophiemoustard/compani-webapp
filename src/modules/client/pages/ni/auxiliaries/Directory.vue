@@ -277,7 +277,7 @@ export default {
       }
     },
     goToUserProfile (row) {
-      this.$router.push({ name: 'personal info', params: { auxiliaryId: row.auxiliary._id } });
+      this.$router.push({ name: 'ni auxiliaries info', params: { auxiliaryId: row.auxiliary._id } });
     },
     resetForm () {
       this.$v.newUser.$reset();

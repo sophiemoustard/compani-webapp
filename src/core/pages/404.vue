@@ -10,6 +10,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'Error404',
   data () {
@@ -17,11 +19,16 @@ export default {
       canGoBack: window.history.length > 1,
     }
   },
+  computed: {
+    ...mapGetters({ clientRole: 'main/clientRole' }),
+  },
   methods: {
     goBack () {
       window.history.go(-1);
     },
     goTo () {
+      // eslint-disable-next-line no-console
+      console.log(this.clientRole, !this.clientRole, this.$router.currentRoute.path)
       return /\/ad\//.test(this.$router.currentRoute.path) || !this.clientRole
         ? this.$router.replace('/ad').catch(e => {})
         : this.$router.replace('/').catch(e => {});

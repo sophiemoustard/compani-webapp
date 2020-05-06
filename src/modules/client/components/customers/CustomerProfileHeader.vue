@@ -54,13 +54,13 @@ export default {
   },
   methods: {
     goToPlanning () {
-      this.$router.push({ name: 'customers planning', params: { targetedCustomer: this.customer } });
+      this.$router.push({ name: 'ni planning customers', params: { targetedCustomer: this.customer } });
     },
     async deleteCustomer () {
       try {
         await Customers.remove(this.customer._id);
         NotifyPositive('Bénéficiaire supprimé.');
-        this.$router.push({ name: 'customers directory' });
+        this.$router.push({ name: 'ni customers directory' });
       } catch (e) {
         console.error(e);
         if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer ce bénéficiaire.');
