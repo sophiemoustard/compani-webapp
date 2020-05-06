@@ -30,10 +30,21 @@
         </q-step>
       </q-stepper>
     </div>
-    <div v-if="course.trainer" class="course-container course-bottom-info q-mx-sm q-my-lg row">
+    <div v-if="course.program" class="course-container course-bottom-info q-mx-sm q-my-lg row">
       <div class="col-xs-4 col-md-3 course-img-container">
           <img class="course-img course-img-explanation"
            src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
+      </div>
+      <div class="col-xs-8 col-md-9">
+        <div class="text-weight-bold">Programme de la formation</div>
+        <div class="">{{ course.program.name }}</div>
+        <div class="learning-goals">{{ course.program.learningGoals }}</div>
+      </div>
+    </div>
+    <div v-if="course.trainer" class="course-container course-bottom-info q-mx-sm q-my-lg row">
+      <div class="col-xs-4 col-md-3 course-img-container">
+          <img class="course-img course-img-explanation"
+           src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-quizz.png" />
       </div>
       <div class="col-xs-8 col-md-9">
         <div class="text-weight-bold">Intervenant(e)</div>
@@ -212,6 +223,10 @@ export default {
 .course-title-text > h5
   color: $primary
   font-weight: bold
+
+.learning-goals
+  white-space: break-spaces;
+  font-style: italic;
 
 @media screen and (min-width: 768px)
   .course-info-title-container
