@@ -14,7 +14,7 @@
       </q-expansion-item>
       <q-separator />
       <q-expansion-item ref="benef" v-model="activeRoutes.benef.open" label="Bénéficiaires">
-        <ni-menu-item name="profile customers" :params="{ id: loggedUser._id }" icon="account_box" label="Fiches" />
+        <ni-menu-item name="profile customers" :params="{ id: loggedUser._id }" icon="contacts" label="Fiches" />
         <ni-menu-item name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
       </q-expansion-item>
       <q-separator />
@@ -29,7 +29,7 @@
     <template v-if="isAuxiliaryWithCompany">
       <q-separator />
       <q-expansion-item ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
-        <ni-menu-item name="teams directory" :params="{ id: loggedUser._id }" icon="group" label="Répertoire" />
+        <ni-menu-item name="teams directory" :params="{ id: loggedUser._id }" icon="contacts" label="Répertoire" />
         <ni-menu-item name="dashboard" icon="dashboard" label="Tableau de bord" />
       </q-expansion-item>
     </template>
