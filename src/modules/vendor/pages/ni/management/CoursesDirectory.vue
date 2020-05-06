@@ -29,6 +29,7 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
@@ -40,7 +41,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { TRAINER, INTRA, COURSE_TYPES } from '@data/constants';
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
@@ -76,10 +77,10 @@ export default {
   validations () {
     return {
       newCourse: {
-        program: { required: true },
-        company: { required: true },
-        name: { required: true },
-        type: { required: true },
+        program: { required },
+        company: { required },
+        name: { required },
+        type: { required },
       },
     }
   },
@@ -159,6 +160,9 @@ export default {
     },
     async createCourse () {
       try {
+        this.$v.newCourse.$touch();
+        if (this.$v.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.modalLoading = true;
         await Courses.create(pickBy(this.newCourse));
 
