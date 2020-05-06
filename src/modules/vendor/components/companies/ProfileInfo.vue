@@ -8,7 +8,7 @@
           @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error" />
       </div>
     </div>
-    <ni-coach-config-table :company="company" />
+    <ni-coach-list :company="company" />
   </div>
 </template>
 
@@ -19,7 +19,7 @@ import set from 'lodash/set';
 import pick from 'lodash/pick';
 import Companies from '@api/Companies';
 import Input from '@components/form/Input';
-import CoachConfigTable from '@components/table/CoachConfigTable';
+import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { companyMixin } from '@mixins/companyMixin'
 
@@ -30,7 +30,7 @@ export default {
   },
   components: {
     'ni-input': Input,
-    'ni-coach-config-table': CoachConfigTable,
+    'ni-coach-list': CoachList,
   },
   mixins: [companyMixin],
   validations () {

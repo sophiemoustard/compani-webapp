@@ -5,16 +5,20 @@
       <q-card>
         <ni-responsive-table :data="users" :columns="usersColumns" :pagination.sync="usersPagination"
           :loading="usersLoading">
+          <template v-slot:header="{ props }">
+            <q-tr :props="props">
+              <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
+                :class="[{ 'actions':col.name === 'actions' }]">
+                {{ col.label }}
+              </q-th>
+            </q-tr>
+          </template>
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <div class="row no-wrap table-actions">
-                      <q-icon color="grey" name="edit" @click.native="openUserEditionModal(props.row)" />
-                    </div>
-                  </div>
+                  <q-btn flat dense round small color="grey" icon="edit" @click="openUserEditionModal(props.row)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -87,7 +91,7 @@ import { ROLES_TRANSLATION, CLIENT_ADMIN, COACH } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
-  name: 'CoachConfigTable',
+  name: 'CoachList',
   components: {
     'ni-select': Select,
     'ni-modal': Modal,
@@ -122,7 +126,7 @@ export default {
           field: row => get(row, 'role.client.name') || '',
           format: value => value ? ROLES_TRANSLATION[value] : '',
         },
-        { name: 'actions', label: '', align: 'left', field: '_id' },
+        { name: 'actions', label: '', align: 'center' },
       ],
       usersPagination: {
         rowsPerPage: 0,
@@ -199,12 +203,12 @@ export default {
       }
     },
     async openUserCreationModal () {
-      await this.getRoles();
+      if (!this.roles.length) await this.getRoles();
       const coachRole = this.roles.find(role => role.name === COACH);
       if (coachRole) this.newUser.role = coachRole._id;
     },
     async openUserEditionModal (user) {
-      if (this.roles.length === 0) await this.getRoles();
+      if (!this.roles.length) await this.getRoles();
 
       this.selectedUser = {
         ...this.selectedUser,
@@ -253,3 +257,9 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+@media screen and (min-width: 767px)
+  .actions
+    width: 75px
+</style>
