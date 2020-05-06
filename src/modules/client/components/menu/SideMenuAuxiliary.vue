@@ -34,7 +34,8 @@
       </q-expansion-item>
     </template>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" @myClick="connectToBotMessenger" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" @myClick="connectToBotMessenger"
+      :type-interface="typeInterface"/>
   </q-list>
 </template>
 
@@ -43,7 +44,7 @@ import { Cookies } from 'quasar';
 import { mapGetters } from 'vuex';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
-import { AUXILIARY, PLANNING_REFERENT } from '@data/constants';
+import { AUXILIARY, PLANNING_REFERENT, CLIENT } from '@data/constants';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
@@ -60,6 +61,7 @@ export default {
         administrative: { open: false },
         teams: { open: false },
       },
+      typeInterface: CLIENT,
     }
   },
   mounted () {

@@ -56,13 +56,13 @@
       </q-expansion-item>
     </template>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :type-interface="typeInterface" />
   </q-list>
 </template>
 
 <script>
 import { mapGetters } from 'vuex';
-import { CLIENT_ADMIN } from '@data/constants';
+import { CLIENT_ADMIN, CLIENT } from '@data/constants';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
@@ -76,6 +76,7 @@ export default {
   data () {
     return {
       CLIENT_ADMIN,
+      typeInterface: CLIENT,
       activeRoutes: {
         planning: { open: false },
         benef: { open: false },

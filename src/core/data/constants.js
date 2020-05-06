@@ -132,6 +132,10 @@ export const CANCELLATION_REASONS = [
 export const INTERNAL = 'internal';
 export const EXTERNAL = 'external';
 
+// INTERFACE
+export const VENDOR = 'vendor';
+export const CLIENT = 'client';
+
 // ROLES CLIENT
 export const CLIENT_ADMIN = 'client_admin';
 export const COACH = 'coach';

@@ -1,15 +1,20 @@
 import { mapState } from 'vuex';
+import { CLIENT } from '@data/constants'
 
 export const sideMenuMixin = {
-  data () {
-    return {
-      companiLogo: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png',
-    }
-  },
   computed: {
     ...mapState('main', ['loggedUser']),
     userFirstnameUpper () {
       return (this.loggedUser.identity.firstname || '').toUpperCase();
+    },
+    accessBothInterface () {
+      return this.loggedUser.role.client && this.loggedUser.role.vendor;
+    },
+    companiLogo () {
+      if (this.typeInterface === CLIENT) {
+        return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png';
+      }
+      return 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_texte_burgundy.png';
     },
   },
   methods: {
@@ -22,6 +27,12 @@ export const sideMenuMixin = {
       if (this.$refs[from.meta.parent] && to.meta.parent !== from.meta.parent) {
         this.activeRoutes[from.meta.parent].open = false;
       }
+    },
+    switchInterface () {
+      if (!this.accessBothInterface) return;
+
+      if (this.typeInterface === 'client') this.$router.push({ path: '/ad' }).catch(e => {});
+      else this.$router.push({ path: '/' }).catch(e => {});
     },
   },
 };

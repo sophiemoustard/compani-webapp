@@ -19,7 +19,7 @@
       <ni-menu-item class="customer-menu-size" name="customer contracts" icon="description" label="Contrats" />
       <q-separator />
     </template>
-    <ni-side-menu-footer :label="loggedUser.identity.lastname" :userId="loggedUser._id" />
+    <ni-side-menu-footer :label="loggedUser.identity.lastname" :userId="loggedUser._id" :type-interface="typeInterface" />
   </q-list>
 </template>
 
@@ -29,6 +29,7 @@ import Customers from '@api/Customers';
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import { CLIENT } from '@data/constants'
 
 export default {
   name: 'SideMenuCustomer',
@@ -44,6 +45,7 @@ export default {
         benef: { open: false },
         administrative: { open: false },
       },
+      typeInterface: CLIENT,
     }
   },
   computed: {
