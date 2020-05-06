@@ -502,7 +502,7 @@ export default {
       this.$v.newTrainee.$reset();
     },
     formatTraineeCreationPayload (payload) {
-      return { ...removeEmptyProps(payload), company: this.course.companies[0]._id };
+      return { ...removeEmptyProps(payload), company: this.course.company._id };
     },
     async addTrainee () {
       try {
