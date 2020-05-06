@@ -285,3 +285,7 @@ export const COMPANY_TYPES = [
 // SMS
 export const CONVOCATION = 'convocation';
 export const REMINDER = 'reminder';
+
+// COURSE
+export const INTRA = 'intra';
+export const INTER_B2B = 'inter_b2b';

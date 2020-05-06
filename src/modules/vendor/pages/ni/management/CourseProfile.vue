@@ -59,13 +59,6 @@ export default {
     courseType () {
       return get(this.course, 'type') || '';
     },
-    headerInfo () {
-      return [
-        { icon: 'bookmark_border', label: `${this.courseType}` },
-        { icon: 'apartment', label: `${this.companyName}` },
-        { icon: 'library_books', label: `${this.programName}` },
-      ];
-    },
   },
   watch: {
     course () {

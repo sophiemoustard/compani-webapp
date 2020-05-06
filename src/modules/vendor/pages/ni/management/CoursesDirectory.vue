@@ -12,11 +12,13 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
+      <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="$v.newCourse.type.$error"
+        caption="Type" required-field inline />
       <ni-input in-modal v-model.trim="newCourse.name" :error="$v.newCourse.name.$error"
         @blur="$v.newCourse.name.$touch" required-field caption="Nom" />
       <ni-select in-modal v-model.trim="newCourse.program" :error="$v.newCourse.program.$error"
         @blur="$v.newCourse.program.$touch" required-field caption="Programme" :options="programOptions" />
-      <ni-select in-modal v-model.trim="newCourse.company" :error="$v.newCourse.company.$error"
+      <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="$v.newCourse.company.$error"
         @blur="$v.newCourse.company.$touch" required-field caption="Structure" :options="companyOptions" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
@@ -29,6 +31,7 @@
 <script>
 import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
+import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
@@ -36,8 +39,9 @@ import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
+import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { TRAINER } from '@data/constants';
+import { TRAINER, INTRA, INTER_B2B } from '@data/constants';
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
@@ -51,6 +55,7 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
     'course-container': CourseContainer,
+    'ni-option-group': OptionGroup,
   },
   data () {
     return {
@@ -59,12 +64,16 @@ export default {
         program: '',
         company: '',
         name: '',
-        type: 'intra',
+        type: INTRA,
       },
       courseCreationModal: false,
       coursesWithGroupedSlot: [],
       programOptions: [],
       companyOptions: [],
+      courseTypes: [
+        { label: 'Intra', value: INTRA },
+        { label: 'Inter', value: INTER_B2B },
+      ],
     }
   },
   validations () {
@@ -79,6 +88,9 @@ export default {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
+    isIntraCourse () {
+      return this.newCourse.type === INTRA;
+    },
     trello () {
       return [
         { title: 'À venir', courses: this.courseListForthcoming },
@@ -146,12 +158,12 @@ export default {
     },
     resetCreationModal () {
       this.$v.newCourse.$reset();
-      this.newCourse = { program: '', company: '', name: '', type: 'intra' };
+      this.newCourse = { program: '', company: '', name: '', type: INTRA };
     },
     async createCourse () {
       try {
         this.modalLoading = true;
-        await Courses.create(this.newCourse);
+        await Courses.create(pickBy(this.newCourse));
 
         this.courseCreationModal = false;
         NotifyPositive('Formation créée.')
