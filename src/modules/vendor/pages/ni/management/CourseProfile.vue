@@ -1,9 +1,9 @@
-<template>
+`<template>
   <q-page padding class="neutral-background">
     <ni-profile-header :title="courseName">
       <template v-slot:body>
-        <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
-          <q-item v-for="info in headerInfo" :key="info.icon">
+        <div class="row profile-info q-pl-lg">
+          <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
             <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
             <q-item-section class="text-capitalize">{{ info.label }}</q-item-section>
           </q-item>
@@ -56,9 +56,6 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    courseType () {
-      return get(this.course, 'type') || '';
-    },
   },
   watch: {
     course () {

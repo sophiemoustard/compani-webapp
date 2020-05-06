@@ -289,3 +289,7 @@ export const REMINDER = 'reminder';
 // COURSE
 export const INTRA = 'intra';
 export const INTER_B2B = 'inter_b2b';
+export const COURSE_TYPES = [
+  { label: 'Intra', value: INTRA },
+  { label: 'Inter B2B', value: INTER_B2B },
+]

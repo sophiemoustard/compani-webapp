@@ -41,7 +41,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { TRAINER, INTRA, INTER_B2B } from '@data/constants';
+import { TRAINER, INTRA, COURSE_TYPES } from '@data/constants';
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
@@ -70,10 +70,7 @@ export default {
       coursesWithGroupedSlot: [],
       programOptions: [],
       companyOptions: [],
-      courseTypes: [
-        { label: 'Intra', value: INTRA },
-        { label: 'Inter', value: INTER_B2B },
-      ],
+      courseTypes: COURSE_TYPES,
     }
   },
   validations () {

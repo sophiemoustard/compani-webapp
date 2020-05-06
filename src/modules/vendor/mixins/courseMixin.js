@@ -1,6 +1,6 @@
 import get from 'lodash/get';
 import { mapGetters } from 'vuex';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, INTRA } from '@data/constants';
+import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, INTRA, COURSE_TYPES } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 
 export const courseMixin = {
@@ -18,19 +18,19 @@ export const courseMixin = {
     isIntraCourse () {
       return get(this.course, 'type') === INTRA;
     },
+    courseType () {
+      const type = COURSE_TYPES.find(t => t.value === get(this.course, 'type'));
+      return type ? type.label : '';
+    },
     headerInfo () {
-      if (this.isIntraCourse) {
-        return [
-          { icon: 'library_books', label: `${this.programName}` },
-          { icon: 'apartment', label: `${this.companyName}` },
-          { icon: 'emoji_people', label: `${this.trainerName}` },
-        ];
-      }
+      const infos = [
+        { icon: 'library_books', label: this.programName },
+        { icon: 'bookmark_border', label: this.courseType },
+        { icon: 'emoji_people', label: this.trainerName },
+      ]
+      if (this.isIntraCourse) infos.push({ icon: 'apartment', label: this.companyName });
 
-      return [
-        { icon: 'library_books', label: `${this.programName}` },
-        { icon: 'emoji_people', label: `${this.trainerName}` },
-      ];
+      return infos;
     },
     trainerName () {
       return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
