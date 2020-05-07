@@ -27,8 +27,6 @@ export default {
       window.history.go(-1);
     },
     goTo () {
-      // eslint-disable-next-line no-console
-      console.log(this.clientRole, !this.clientRole, this.$router.currentRoute.path)
       return /\/ad\//.test(this.$router.currentRoute.path) || !this.clientRole
         ? this.$router.replace('/ad').catch(e => {})
         : this.$router.replace('/').catch(e => {});

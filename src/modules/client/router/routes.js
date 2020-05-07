@@ -28,10 +28,17 @@ const routes = [
         if (!userClientRole && !userVendorRole) return next({ name: '404' });
         if (!userClientRole) return next({ path: '/ad' });
 
+        const company = store.getters['main/company'];
         if (userClientRole === HELPER) return next({ name: 'customers agenda' });
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account client', params: { id: loggedUser._id } });
-        if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliaries agenda' });
-        if (COACH_ROLES.includes(userClientRole)) return next({ name: 'ni auxiliaries' });
+        if (AUXILIARY_ROLES.includes(userClientRole)) {
+          if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries agenda' });
+          return next({ name: 'account client', params: { id: loggedUser._id } });
+        }
+        if (COACH_ROLES.includes(userClientRole)) {
+          if (get(company, 'subscriptions.erp')) return next({ name: 'ni auxiliaries' });
+          return next({ name: 'account client', params: { id: loggedUser._id } });
+        }
         return next({ name: '404' });
       } catch (e) {
         console.error(e);

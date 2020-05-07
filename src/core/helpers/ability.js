@@ -1,6 +1,7 @@
 
 import { Ability, AbilityBuilder } from '@casl/ability';
 import { roleBasedAccessControl } from '@helpers/rbac';
+import { CLIENT_ADMIN } from '@data/constants';
 
 const getClientAbilities = (role, subscriptions) => {
   return roleBasedAccessControl[role]
@@ -13,9 +14,12 @@ const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name)
 export const defineAbilitiesFor = (clientRole, vendorRole, company) => {
   const { can, rules } = new AbilityBuilder();
 
-  const companySubscriptions = Object.keys(company.subscriptions).filter(key => company.subscriptions[key]);
+  const companySubscriptions = company
+    ? Object.keys(company.subscriptions).filter(key => company.subscriptions[key])
+    : [];
   if (clientRole) can('read', getClientAbilities(clientRole, companySubscriptions));
   if (vendorRole) can('read', getVendorAbilities(vendorRole));
+  if (clientRole === CLIENT_ADMIN && companySubscriptions.includes('erp')) can('update', 'erp_config');
 
   return new Ability(rules);
 }
