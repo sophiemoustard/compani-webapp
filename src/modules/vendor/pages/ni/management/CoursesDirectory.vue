@@ -13,7 +13,7 @@
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
       <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="$v.newCourse.type.$error"
-        caption="Type" required-field inline />
+        caption="Type" required-field inline @input="updateCourseCompany" />
       <ni-input in-modal v-model.trim="newCourse.name" :error="$v.newCourse.name.$error"
         @blur="$v.newCourse.name.$touch" required-field caption="Nom" />
       <ni-select in-modal v-model.trim="newCourse.program" :error="$v.newCourse.program.$error"
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
@@ -42,7 +42,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { TRAINER, INTRA, COURSE_TYPES } from '@data/constants';
+import { TRAINER, INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
 import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
@@ -78,7 +78,7 @@ export default {
     return {
       newCourse: {
         program: { required },
-        company: { required },
+        company: { required: requiredIf((item) => { return item.type === INTRA; }) },
         name: { required },
         type: { required },
       },
@@ -153,6 +153,9 @@ export default {
         console.error(e);
         this.companyOptions = [];
       }
+    },
+    updateCourseCompany () {
+      if (this.newCourse.type === INTER_B2B) delete this.newCourse.company;
     },
     resetCreationModal () {
       this.$v.newCourse.$reset();
