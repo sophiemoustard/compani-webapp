@@ -25,11 +25,11 @@
       <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
       <div class="slots-cards-container row">
         <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index">
-          <div class="card-title">
-            <div class="card-number">{{ index + 1 }}</div>
-            <div class="card-date text-weight-bold">{{ key }}</div>
+          <div class="slots-cards-title">
+            <div class="slots-cards-number">{{ index + 1 }}</div>
+            <div class="slots-cards-date text-weight-bold">{{ key }}</div>
           </div>
-          <div class="card-content" v-for="slot in value" :key="slot._id">
+          <div class="slots-cards-content" v-for="slot in value" :key="slot._id">
             <div>
               <q-item>
                 <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
@@ -568,42 +568,43 @@ export default {
 .table-top
   font-size: 15px
 
-.slots-cards-container
-  grid-auto-rows: 1fr
-  display: grid
-  grid-template-areas: 'a a'
-  grid-gap: 20px 10px
-
-.card-number
-  font-size: 12px
-  border: solid 1px
-  display: flex
-  height: 20px
-  width: 20px
-  border-radius: 50%
-  align-content: center
-  justify-content: center
-
 .slots-cards
   padding: 10px
-.card-title
-  display: flex
-  justify-content: space-between
-  align-items: center
-  margin-bottom: 10px
-  margin-left: 10px
-  margin-right: 10px
-.card-date
-  color: $primary
-  font-size: 16px
-.card-content
-  margin: 5px 10px
-  display: flex
-  justify-content: space-between
-.card-content > div > .q-item
-  font-size: 14px
-  padding: 0px
-  min-height: auto
-.card-content > div > .q-icon
-  cursor: pointer
+  min-width: 300px
+  &-container
+    grid-auto-rows: 1fr
+    display: grid
+    grid-template-areas: 'a a'
+    grid-gap: 20px 10px
+    @media (max-width: 767px)
+      grid-template-areas: 'a'
+  &-number
+    font-size: 12px
+    border: solid 1px
+    display: flex
+    height: 20px
+    width: 20px
+    border-radius: 50%
+    align-content: center
+    justify-content: center
+  &-title
+    display: flex
+    justify-content: space-between
+    align-items: center
+    margin-bottom: 10px
+    margin-left: 10px
+    margin-right: 10px
+  &-date
+    color: $primary
+    font-size: 16px
+  &-content
+    margin: 5px 10px
+    display: flex
+    justify-content: space-between
+  &-content > div > .q-item
+    font-size: 14px
+    padding: 0px
+    min-height: auto
+  &-content > div > .q-icon
+    cursor: pointer
 </style>
