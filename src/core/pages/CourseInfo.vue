@@ -12,7 +12,7 @@
       </div>
     </div>
     <div class="course-container course-stepper q-mx-sm q-my-lg">
-      <p class="text-weight-bold q-pl-xl">Dates de la formation</p>
+      <p class="text-weight-bold">Dates de la formation</p>
       <q-stepper value="date" vertical flat>
         <q-step v-for="(daySlot, index) in Object.values(courseSlots)" name="date" :color="getSlotColor(daySlot)"
           :class="{ 'opacity': happened(daySlot) || !isNext(daySlot), 'next-slot': isNext(daySlot) }" :key="index"
@@ -30,43 +30,47 @@
         </q-step>
       </q-stepper>
     </div>
-    <div v-if="course.program" class="course-container course-bottom-info q-mx-sm q-my-lg row">
-      <div class="col-xs-4 col-md-3 course-img-container">
-          <img class="course-img course-img-explanation"
-           src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
-      </div>
-      <div class="col-xs-8 col-md-9">
-        <div class="text-weight-bold">Programme de la formation</div>
-        <div class="">{{ course.program.name }}</div>
-        <div class="learning-goals">{{ course.program.learningGoals }}</div>
-      </div>
-    </div>
-    <div v-if="course.trainer" class="course-container course-bottom-info q-mx-sm q-my-lg row">
-      <div class="col-xs-4 col-md-3 course-img-container">
-          <img class="course-img course-img-explanation"
-           src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-quizz.png" />
-      </div>
-      <div class="col-xs-8 col-md-9">
-        <div class="text-weight-bold">Intervenant(e)</div>
-        <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
-        <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
-      </div>
-    </div>
-    <div v-if="course.referent" class="course-container course-bottom-info q-mx-sm q-my-lg row">
-      <div class="col-xs-4 col-md-3 course-img-container">
-        <img class="course-img course-img-referent"
-          src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
-      </div>
-      <div class="col-xs-8 col-md-9">
-        <div class="text-weight-bold">Votre contact pour la formation</div>
-        <div>{{ course.referent.name }}</div>
-        <div><a :href="referentPhoneLink">{{ formatPhone(course.referent.phone) }}</a></div>
-        <div>
-          <a v-if="course.referent.email" :href="'mailto:' + course.referent.email" >{{ course.referent.email }}</a>
+    <div class="course-container">
+      <div>
+        <div v-if="course.program" class="course-bottom-info row">
+          <div class="course-img-container">
+              <img class="course-img course-img-explanation"
+              src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
+          </div>
+          <div>
+            <div class="text-weight-bold">Programme de la formation</div>
+            <div class="">{{ course.program.name }}</div>
+            <div class="learning-goals">{{ course.program.learningGoals }}</div>
+          </div>
+        </div>
+        <div v-if="course.trainer" class="course-bottom-info row">
+          <div class="course-img-container">
+              <img class="course-img course-img-explanation"
+              src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-quizz.png" />
+          </div>
+          <div>
+            <div class="text-weight-bold">Intervenant(e)</div>
+            <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
+            <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
+          </div>
+        </div>
+        <div v-if="course.referent" class="course-bottom-info row">
+          <div class="course-img-container">
+            <img class="course-img course-img-referent"
+              src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
+          </div>
+          <div>
+            <div class="text-weight-bold">Votre contact pour la formation</div>
+            <div>{{ course.referent.name }}</div>
+            <div><a :href="referentPhoneLink">{{ formatPhone(course.referent.phone) }}</a></div>
+            <div>
+              <a v-if="course.referent.email" :href="'mailto:' + course.referent.email" >{{ course.referent.email }}</a>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="q-mx-sm q-my-lg course-container cursor-pointer">
+    <div class="q-mx-sm q-my-lg course-link-container cursor-pointer">
       <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
     </div>
 
@@ -153,6 +157,13 @@ export default {
   &-container
     display:flex
     flex-direction: column
+    justify-content: center
+    align-items: center
+    @media screen and (min-width: 768px)
+      width: 600px
+  &-link-container
+    display:flex
+    flex-direction: column
     @media screen and (min-width: 768px)
       width: 600px
   &-header
@@ -170,8 +181,16 @@ export default {
     margin-right: 10px
     &-explanation
       width: 110px
+      @media screen and (max-width: 365px)
+        width: 94px
+        height: 94px
     &-referent
       width: 84px
+      margin-left: 13px
+      margin-right: 23px
+      @media screen and (max-width: 365px)
+        margin-left: 5px
+        margin-right: 15px
     &-thumb
       width: 80px
     &-container
@@ -181,8 +200,8 @@ export default {
     display: flex
     flex-direction: column
   &-bottom-info
-    display: flex
-    flex-direction: row
+    width: fit-content
+    margin-bottom: 30px
 .biography
   font-style: italic
 
