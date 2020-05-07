@@ -37,7 +37,7 @@
               <img class="course-img course-img-explanation"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
           </div>
-          <div>
+          <div class="course-txt-info-container">
             <div class="text-weight-bold">Programme de la formation</div>
             <div class="">{{ course.program.name }}</div>
             <div class="learning-goals">{{ course.program.learningGoals }}</div>
@@ -48,7 +48,7 @@
               <img class="course-img course-img-explanation"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-quizz.png" />
           </div>
-          <div>
+          <div class="course-txt-info-container">
             <div class="text-weight-bold">Intervenant(e)</div>
             <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
             <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
@@ -59,7 +59,7 @@
             <img class="course-img course-img-referent"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
           </div>
-          <div>
+          <div class="course-txt-info-container">
             <div class="text-weight-bold">Votre contact pour la formation</div>
             <div>{{ course.referent.name }}</div>
             <div><a :href="referentPhoneLink">{{ formatPhone(course.referent.phone) }}</a></div>
@@ -196,6 +196,10 @@ export default {
     &-container
       display: flex
       justify-content: center
+  &-txt-info-container
+    max-width: min(60vw, 480px)
+    @media screen and (max-width: 365px)
+      max-width: 195px
   &-stepper
     display: flex
     flex-direction: column
