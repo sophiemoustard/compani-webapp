@@ -12,9 +12,9 @@ export const sideMenuMixin = {
     },
     companiLogo () {
       if (this.typeInterface === CLIENT) {
-        return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png';
+        return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_test_rose.png';
       }
-      return 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_texte_burgundy.png';
+      return 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_test_burgundy.png';
     },
   },
   methods: {
