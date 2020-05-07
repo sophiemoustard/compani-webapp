@@ -1,6 +1,9 @@
 <template>
   <div class="sidemenu-footer">
     <q-item class="full-width">
+      <q-item-section v-if="accessBothInterface" class="footer-logo-container" @click.native="switchInterface">
+        <img :src="interfaceLogo" alt="go to other interface" >
+      </q-item-section>
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
@@ -28,12 +31,17 @@ import {
   VENDOR_ADMIN,
   TRAINING_ORGANISATION_MANAGER,
   TRAINER,
+  CLIENT,
 } from '@data/constants';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
 export default {
+  name: 'SideMenuFooter',
+  mixins: [sideMenuMixin],
   props: {
     userId: { type: String, required: true },
     label: { type: String, default: '' },
+    interfaceType: { type: String, default: CLIENT },
   },
   computed: {
     ...mapGetters({
@@ -46,6 +54,11 @@ export default {
     userCanFeedback () {
       return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.clientRole) ||
         [TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
+    },
+    interfaceLogo () {
+      return this.interfaceType === CLIENT
+        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_burgundy_32.png'
+        : 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_rose_32.png';
     },
   },
   methods: {
@@ -65,3 +78,15 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.footer-logo-container
+  width: 25px
+  flex: auto
+  cursor: pointer
+
+.footer-logo-container > img
+  width: 25px
+  height: 25px
+
+</style>

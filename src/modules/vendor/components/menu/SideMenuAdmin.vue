@@ -19,7 +19,7 @@
       <ni-menu-item name="programs directory" icon="view_headline" label="Catalogue" />
     </q-expansion-item>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
   </q-list>
 </template>
 
@@ -27,6 +27,7 @@
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import { VENDOR } from '@data/constants'
 
 export default {
   mixins: [sideMenuMixin],
@@ -41,6 +42,7 @@ export default {
         configuration: { open: false },
         management: { open: false },
       },
+      interfaceType: VENDOR,
     };
   },
   mounted () {

@@ -15,7 +15,7 @@
         label="Infos personnelles" />
     </q-expansion-item>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
   </q-list>
 </template>
 
@@ -23,6 +23,7 @@
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import { VENDOR } from '@data/constants'
 
 export default {
   mixins: [sideMenuMixin],
@@ -36,6 +37,7 @@ export default {
         administrative: { open: false },
         management: { open: false },
       },
+      interfaceType: VENDOR,
     };
   },
   mounted () {
