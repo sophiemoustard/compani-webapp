@@ -31,6 +31,7 @@ import {
   VENDOR_ADMIN,
   TRAINING_ORGANISATION_MANAGER,
   TRAINER,
+  CLIENT,
 } from '@data/constants';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
 
@@ -40,7 +41,7 @@ export default {
   props: {
     userId: { type: String, required: true },
     label: { type: String, default: '' },
-    interfaceType: { type: String, default: 'client' },
+    interfaceType: { type: String, default: CLIENT },
   },
   computed: {
     ...mapGetters({
@@ -55,10 +56,9 @@ export default {
         [TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },
     interfaceLogo () {
-      if (this.interfaceType === 'client') {
-        return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_burgundy_32.png'
-      }
-      return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_rose_32.png'
+      return this.interfaceType === CLIENT
+        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_burgundy_32.png'
+        : 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_rose_32.png';
     },
   },
   methods: {
