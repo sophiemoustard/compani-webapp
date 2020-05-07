@@ -204,9 +204,6 @@ export default {
   &-stepper
     display: flex
     flex-direction: column
-  &-bottom-info
-    width: fit-content
-    margin-bottom: 30px
 .biography
   font-style: italic
 
