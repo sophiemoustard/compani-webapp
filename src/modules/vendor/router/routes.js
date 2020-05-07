@@ -1,7 +1,7 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import alenvi from '@helpers/alenvi';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
+import { TRAINER } from '@data/constants';
 import store from 'src/store/index';
 
 const routes = [
@@ -21,8 +21,8 @@ const routes = [
         const userVendorRole = store.getters['main/vendorRole'];
         if (!userVendorRole) return next({ name: '404' });
 
-        if (userVendorRole === TRAINER) return next({ name: 'trainer courses directory' });
-        return next({ name: 'courses directory' });
+        if (userVendorRole === TRAINER) return next({ name: 'trainers courses' });
+        return next({ name: 'ni management courses' });
       } catch (e) {
         console.error(e);
       }
@@ -30,102 +30,93 @@ const routes = [
     children: [
       {
         path: 'ni/users/companies',
-        name: 'companies directory',
+        name: 'ni users companies',
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompaniesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'users',
         },
       },
       {
         path: 'ni/users/companies/:companyId',
-        name: 'profile company info',
+        name: 'ni users companies info',
         component: () => import('src/modules/vendor/pages/ni/users/companies/CompanyProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'users',
         },
       },
       {
         path: 'ni/users/trainers',
-        name: 'trainers directory',
+        name: 'ni users trainers',
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'users',
         },
       },
       {
         path: 'ni/users/trainers/:trainerId',
-        name: 'profile trainer info',
+        name: 'ni users trainers info',
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'users',
         },
       },
       {
         path: 'ni/config/programs',
-        name: 'programs directory',
+        name: 'ni users programs',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'configuration',
         },
       },
       {
         path: 'ni/config/programs/:programId',
-        name: 'profile program info',
+        name: 'ni users programs info',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'configuration',
         },
       },
       {
         path: 'ni/management/courses',
-        name: 'courses directory',
+        name: 'ni management courses',
         component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'management',
         },
       },
       {
         path: 'ni/management/courses/:courseId',
-        name: 'profile course info',
+        name: 'ni management courses info',
         component: () => import('src/modules/vendor/pages/ni/management/CourseProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER],
           parent: 'management',
         },
       },
       {
         path: 'trainers/management/courses',
-        name: 'trainer courses directory',
+        name: 'trainers courses',
         component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [TRAINER],
           parent: 'management',
         },
       },
       {
         path: 'trainers/management/courses/:courseId',
-        name: 'trainer course info',
+        name: 'trainers courses info',
         component: () => import('src/modules/vendor/pages/ni/management/CourseProfile'),
         async beforeEnter (to, from, next) {
           await store.dispatch('course/get', { courseId: to.params.courseId });
@@ -136,13 +127,12 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [TRAINER],
           parent: 'management',
         },
       },
       {
         path: 'trainers/info',
-        name: 'trainer personal info',
+        name: 'trainers info',
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
         props: true,
         beforeEnter (to, from, next) {
@@ -150,20 +140,18 @@ const routes = [
         },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [TRAINER],
           parent: 'administrative',
         },
       },
       {
         path: ':id/account',
-        name: 'vendor account info',
+        name: 'account vendor',
         component: () => import('src/core/pages/AccountInfo'),
         beforeEnter (to, from, next) {
           return to.params.id === Cookies.get('user_id') ? next() : next('/404');
         },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER],
         },
       },
     ],

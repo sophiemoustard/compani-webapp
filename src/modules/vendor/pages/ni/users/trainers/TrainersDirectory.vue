@@ -89,7 +89,7 @@ export default {
       this.searchStr = value;
     },
     goToTrainerProfile (row) {
-      this.$router.push({ name: 'profile trainer info', params: { trainerId: row._id } });
+      this.$router.push({ name: 'ni users trainers info', params: { trainerId: row._id } });
     },
     async refreshTrainers () {
       try {

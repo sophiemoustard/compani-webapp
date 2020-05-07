@@ -60,7 +60,7 @@ export default {
       try {
         await Customers.remove(this.customer._id);
         NotifyPositive('Bénéficiaire supprimé.');
-        this.$router.push({ name: 'ni customers directory' });
+        this.$router.push({ name: 'ni customers' });
       } catch (e) {
         console.error(e);
         if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer ce bénéficiaire.');

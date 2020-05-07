@@ -20,15 +20,17 @@ const Router = new VueRouter({
 })
 
 Router.beforeEach(async (to, from, next) => {
-  // eslint-disable-next-line no-console
-  console.log('to.path', to.name);
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       const refresh = await alenvi.refreshAlenviCookies();
       if (refresh) {
         if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const ability = defineAbilitiesFor(store.getters['main/clientRole']);
+        const ability = defineAbilitiesFor(
+          store.getters['main/clientRole'],
+          store.getters['main/vendorRole'],
+          store.getters['main/company']
+        );
         if (!ability.can('read', to.name)) next('/404');
         else {
           store.dispatch('main/updateRefreshState', false);
@@ -38,7 +40,11 @@ Router.beforeEach(async (to, from, next) => {
     } else {
       if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-      const ability = defineAbilitiesFor(store.getters['main/clientRole']);
+      const ability = defineAbilitiesFor(
+        store.getters['main/clientRole'],
+        store.getters['main/vendorRole'],
+        store.getters['main/company']
+      );
       if (!ability.can('read', to.name)) next('/404');
       else {
         store.dispatch('main/updateRefreshState', false);

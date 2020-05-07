@@ -72,7 +72,7 @@ export default {
       this.searchStr = value;
     },
     goToProgramProfile (row) {
-      this.$router.push({ name: 'profile program info', params: { programId: row._id } });
+      this.$router.push({ name: 'ni users programs info', params: { programId: row._id } });
     },
     async refreshProgram () {
       try {
