@@ -41,7 +41,6 @@
 <script>
 import get from 'lodash/get';
 import { courseMixin } from '../../mixins/courseMixin';
-import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'CourseDetail',
@@ -50,21 +49,11 @@ export default {
     course: { type: Object, default: () => ({}) },
   },
   computed: {
-    trainerName () {
-      return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
-    },
     traineesCount () {
       return get(this.course, 'trainees.length') || 0;
     },
     courseSlotsCount () {
       return this.course.slots.length;
-    },
-    headerInfo () {
-      return [
-        { icon: 'library_books', label: `${this.programName}` },
-        { icon: 'apartment', label: `${this.companyName}` },
-        { icon: 'emoji_people', label: `${this.trainerName}` },
-      ];
     },
     formatNearestDate () {
       if (this.courseSlotsCount === 0) return { label: 'Pas de date prévue', icon: 'mdi-calendar-remove' };
