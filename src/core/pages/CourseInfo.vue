@@ -32,33 +32,33 @@
     </div>
     <div class="course-container">
       <div>
-        <div v-if="course.program" class="course-bottom-info row">
-          <div class="course-img-container">
+        <q-item v-if="course.program" class="row">
+          <q-item-section side class="course-img-container">
               <img class="course-img course-img-explanation"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
-          </div>
-          <div class="course-txt-info-container">
+          </q-item-section>
+          <q-item-section class="course-txt-info-container">
             <div class="text-weight-bold">Programme de la formation</div>
             <div class="">{{ course.program.name }}</div>
             <div class="learning-goals">{{ course.program.learningGoals }}</div>
-          </div>
-        </div>
-        <div v-if="course.trainer" class="course-bottom-info row">
-          <div class="course-img-container">
+          </q-item-section>
+        </q-item>
+        <q-item v-if="course.trainer" class="row">
+          <q-item-section side class="course-img-container">
               <img class="course-img course-img-explanation"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-quizz.png" />
-          </div>
-          <div class="course-txt-info-container">
+          </q-item-section>
+          <q-item-section class="course-txt-info-container">
             <div class="text-weight-bold">Intervenant(e)</div>
             <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
             <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
-          </div>
-        </div>
-        <div v-if="course.referent" class="course-bottom-info row">
-          <div class="course-img-container">
+          </q-item-section>
+        </q-item>
+        <q-item v-if="course.referent" class="row">
+          <q-item-section side class="course-img-container">
             <img class="course-img course-img-referent"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
-          </div>
+          </q-item-section>
           <div class="course-txt-info-container">
             <div class="text-weight-bold">Votre contact pour la formation</div>
             <div>{{ course.referent.name }}</div>
@@ -67,11 +67,11 @@
               <a v-if="course.referent.email" :href="'mailto:' + course.referent.email" >{{ course.referent.email }}</a>
             </div>
           </div>
-        </div>
+        </q-item>
+        <q-item class="course-link-container">
+          <a class="cursor-pointer" @click.prevent="rulesModal = true" >Règlement intérieur</a>
+        </q-item>
       </div>
-    </div>
-    <div class="q-mx-sm q-my-lg course-link-container cursor-pointer">
-      <a @click.prevent="rulesModal = true" >Règlement intérieur</a>
     </div>
 
     <!-- Modal reglement interieur -->
@@ -164,8 +164,9 @@ export default {
   &-link-container
     display:flex
     flex-direction: column
-    @media screen and (min-width: 768px)
-      width: 600px
+    justify-content: flex-start
+    > a
+      width: fit-content
   &-header
     background-color: $primary
     font-size: 20px
@@ -195,7 +196,7 @@ export default {
       width: 80px
     &-container
       display: flex
-      justify-content: center
+      justify-content: flex-start
   &-txt-info-container
     max-width: min(60vw, 480px)
     @media screen and (max-width: 365px)
@@ -246,15 +247,14 @@ export default {
 .course-title-text > h5
   color: $primary
   font-weight: bold
+  @media screen and (min-width: 768px)
+    margin-bottom: 20px !importants
 
 .learning-goals
   white-space: break-spaces;
   font-style: italic;
 
-@media screen and (min-width: 768px)
-  .course-info-title-container
+.course-info-title-container
+  @media screen and (min-width: 768px)
     padding: 0px 125px
-
-  .course-title-text > h5
-    margin-bottom: 20px !important
 </style>
