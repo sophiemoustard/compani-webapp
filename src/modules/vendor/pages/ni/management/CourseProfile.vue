@@ -40,13 +40,13 @@ export default {
       courseName: '',
       tabsContent: [
         {
-          label: 'Organisation de la formation',
+          label: 'Organisation',
           name: 'organization',
           default: this.defaultTab === 'organization',
           component: ProfileOrganization,
         },
         {
-          label: 'Suivi de la formation',
+          label: 'Suivi',
           name: 'followUp',
           default: this.defaultTab === 'course',
           component: ProfileFollowUp,
