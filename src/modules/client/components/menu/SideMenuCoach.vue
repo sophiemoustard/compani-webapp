@@ -56,7 +56,7 @@
       </q-expansion-item>
     </template>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :type-interface="typeInterface" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
   </q-list>
 </template>
 
@@ -76,7 +76,7 @@ export default {
   data () {
     return {
       CLIENT_ADMIN,
-      typeInterface: CLIENT,
+      interfaceType: CLIENT,
       activeRoutes: {
         planning: { open: false },
         benef: { open: false },

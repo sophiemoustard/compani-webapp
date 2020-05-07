@@ -11,10 +11,9 @@ export const sideMenuMixin = {
       return this.loggedUser.role.client && this.loggedUser.role.vendor;
     },
     companiLogo () {
-      if (this.typeInterface === CLIENT) {
-        return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_test_rose.png';
-      }
-      return 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_test_burgundy.png';
+      return this.interfaceType === CLIENT
+        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_test_rose.png'
+        : 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_test_burgundy.png';
     },
   },
   methods: {
@@ -31,7 +30,7 @@ export const sideMenuMixin = {
     switchInterface () {
       if (!this.accessBothInterface) return;
 
-      if (this.typeInterface === 'client') this.$router.push({ path: '/ad' }).catch(e => {});
+      if (this.interfaceType === CLIENT) this.$router.push({ path: '/ad' }).catch(e => {});
       else this.$router.push({ path: '/' }).catch(e => {});
     },
   },

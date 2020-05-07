@@ -19,7 +19,7 @@
       <ni-menu-item class="customer-menu-size" name="customer contracts" icon="description" label="Contrats" />
       <q-separator />
     </template>
-    <ni-side-menu-footer :label="loggedUser.identity.lastname" :userId="loggedUser._id" :type-interface="typeInterface" />
+    <ni-side-menu-footer :label="loggedUser.identity.lastname" :userId="loggedUser._id" :interface-type="interfaceType" />
   </q-list>
 </template>
 
@@ -45,7 +45,7 @@ export default {
         benef: { open: false },
         administrative: { open: false },
       },
-      typeInterface: CLIENT,
+      interfaceType: CLIENT,
     }
   },
   computed: {

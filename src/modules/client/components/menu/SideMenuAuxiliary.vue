@@ -35,7 +35,7 @@
     </template>
     <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" @myClick="connectToBotMessenger"
-      :type-interface="typeInterface"/>
+      :interface-type="interfaceType"/>
   </q-list>
 </template>
 
@@ -61,7 +61,7 @@ export default {
         administrative: { open: false },
         teams: { open: false },
       },
-      typeInterface: CLIENT,
+      interfaceType: CLIENT,
     }
   },
   mounted () {

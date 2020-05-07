@@ -40,7 +40,7 @@ export default {
   props: {
     userId: { type: String, required: true },
     label: { type: String, default: '' },
-    typeInterface: { type: String, default: 'client' },
+    interfaceType: { type: String, default: 'client' },
   },
   computed: {
     ...mapGetters({
@@ -55,7 +55,7 @@ export default {
         [TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },
     interfaceLogo () {
-      if (this.typeInterface === 'client') {
+      if (this.interfaceType === 'client') {
         return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_burgundy_32.png'
       }
       return 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_rose_32.png'
