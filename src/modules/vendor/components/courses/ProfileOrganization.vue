@@ -23,53 +23,30 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
-      <q-card>
-        <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none"
-          :loading="courseSlotsLoading">
-          <template v-slot:header="{ props }">
-            <q-tr :props="props" :class="{ 'th-border-bottom': Object.values(courseSlots).length === 0 }">
-              <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-                <template v-if="col.name === 'hours'">
-                  Créneaux ({{ course.slots ? course.slots.length : 0 }})
-                </template>
-                <template v-else-if="col.name === 'duration'">Durée ({{ slotsDurationColumnTitle }})</template>
-                <template v-else>{{ col.label }}</template>
-              </q-th>
-            </q-tr>
-          </template>
-          <template v-slot:body="{ props }">
-            <q-tr v-for="(slot, index) in props.row" :key="slot._id" :props="props"
-              :class="{ 'td-border-top': index === 0 && !$q.platform.is.mobile }">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <template v-if="col.name === 'date' && (index === 0 || $q.platform.is.mobile)">
-                  {{ $moment(slot.startDate).format('DD/MM/YYYY') }}
-                </template>
-                <template v-else-if="col.name === 'hours'">
-                  {{ $moment(slot.startDate).format('HH:mm') }} - {{ $moment(slot.endDate).format('HH:mm') }}
-                </template>
-                <template v-else-if="col.name === 'duration'">
-                  {{ getSlotDuration(slot) }}
-                </template>
-                <template v-else-if="col.name === 'address'">
-                  {{ get(slot, 'address.fullAddress') || '' }}
-                </template>
-                <template v-else-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="edit" @click="openCourseSlotEditionModal(slot)" />
-                    <q-icon color="grey" name="delete" @click="validateCourseSlotDeletion(slot._id)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </template>
-        </ni-responsive-table>
-        <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un créneau"
-            @click="courseSlotCreationModal = true" :disable="courseSlotsLoading" />
-        </q-card-actions>
-      </q-card>
+      <div class="slots-cards-container row">
+        <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index">
+          <div class="card-title">
+            <div class="card-number">{{ index + 1 }}</div>
+            <div class="card-date text-weight-bold">{{ key }}</div>
+          </div>
+          <div class="card-content" v-for="slot in value" :key="slot._id">
+            <div>
+              <q-item>
+                <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
+                <q-item-section>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item-section>
+              </q-item>
+              <q-item>
+                <q-item-section side><q-icon name="location_on" flat dense size="xs" /></q-item-section>
+                <q-item-section>{{ getSlotAddress(slot) }}</q-item-section>
+              </q-item>
+            </div>
+            <div class="row no-wrap">
+              <q-icon color="grey" size="sm" name="edit" @click="openCourseSlotEditionModal(slot)" />
+              <q-icon color="grey" size="sm" name="delete" @click="validateCourseSlotDeletion(slot._id)" />
+            </div>
+          </div>
+        </q-card>
+      </div>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Participants ({{ traineesNumber }})</p>
@@ -404,6 +381,12 @@ export default {
 
       return paddedMinutes ? `${duration.hours()}h${paddedMinutes}` : `${duration.hours()}h`;
     },
+    formatSlotHour (slot) {
+      return `${this.$moment(slot.startDate).format('HH:mm')} - ${this.$moment(slot.endDate).format('HH:mm')}`;
+    },
+    getSlotAddress (slot) {
+      return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
+    },
     resetCourseSlotCreationModal () {
       this.newCourseSlot = {
         dates: {
@@ -584,4 +567,43 @@ export default {
 
 .table-top
   font-size: 15px
+
+.slots-cards-container
+  grid-auto-rows: 1fr
+  display: grid
+  grid-template-areas: 'a a'
+  grid-gap: 20px 10px
+
+.card-number
+  font-size: 12px
+  border: solid 1px
+  display: flex
+  height: 20px
+  width: 20px
+  border-radius: 50%
+  align-content: center
+  justify-content: center
+
+.slots-cards
+  padding: 10px
+.card-title
+  display: flex
+  justify-content: space-between
+  align-items: center
+  margin-bottom: 10px
+  margin-left: 10px
+  margin-right: 10px
+.card-date
+  color: $primary
+  font-size: 16px
+.card-content
+  margin: 5px 10px
+  display: flex
+  justify-content: space-between
+.card-content > div > .q-item
+  font-size: 14px
+  padding: 0px
+  min-height: auto
+.card-content > div > .q-icon
+  cursor: pointer
 </style>
