@@ -40,7 +40,7 @@ export default {
   },
   async create (data) {
     const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, data);
-    return newUser.data.data.user;
+    return newUser.data.data;
   },
   async createPasswordToken (id, data) {
     const passwordToken = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${id}/create-password-token`, data);

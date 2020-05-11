@@ -113,11 +113,13 @@ export const helperMixin = {
         if (this.$v.newHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         const payload = await this.formatHelper();
-        await Users.create(pickBy(payload));
+        const infos = await Users.create(pickBy(payload));
         NotifyPositive('Aidant créé');
 
-        await Email.sendWelcome({ email: this.newHelper.local.email, type: HELPER });
-        NotifyPositive('Email envoyé');
+        if (infos.isNew) {
+          await Email.sendWelcome({ email: this.newHelper.local.email, type: HELPER });
+          NotifyPositive('Email envoyé');
+        }
 
         await this.getUserHelpers();
         this.openNewHelperModal = false;

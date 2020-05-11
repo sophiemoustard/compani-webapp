@@ -302,9 +302,9 @@ export default {
 
       const payload = await this.formatUserCreationPayload();
 
-      const newUser = await Users.create(payload);
-      await Users.createDriveFolder(newUser._id, { parentFolderId: folderId });
-      return newUser;
+      const { user } = await Users.create(payload);
+      await Users.createDriveFolder(user._id, { parentFolderId: folderId });
+      return user;
     },
     async sendSMS (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');

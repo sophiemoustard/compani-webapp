@@ -112,12 +112,15 @@ export default {
         const roles = await Roles.list({ name: TRAINER });
         if (roles.length === 0) throw new Error('Role not found');
 
-        await Users.create({ ...this.newTrainer, role: roles[0]._id });
+        const infos = await Users.create({ ...this.newTrainer, role: roles[0]._id });
         this.trainerCreationModal = false;
         NotifyPositive('Formateur créé.')
 
-        await Email.sendWelcome({ email: this.newTrainer.local.email, type: TRAINER });
-        NotifyPositive('Email envoyé');
+        if (infos.isNew) {
+          await Email.sendWelcome({ email: this.newTrainer.local.email, type: TRAINER });
+          NotifyPositive('Email envoyé');
+        }
+
         await this.refreshTrainers();
       } catch (e) {
         console.error(e);
