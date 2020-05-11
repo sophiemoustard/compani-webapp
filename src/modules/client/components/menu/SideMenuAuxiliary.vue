@@ -6,32 +6,12 @@
       </q-item-label>
     </div>
     <q-separator />
-    <template v-if="isAuxiliaryWithCompany">
-      <q-expansion-item ref="planning" v-model="activeRoutes.planning.open" label="Planning">
-        <ni-menu-item name="auxiliary agenda" icon="event" label="Le mien" />
-        <ni-menu-item name="auxiliaries planning" icon="face" label="Auxiliaires" />
-        <ni-menu-item name="customers planning" icon="people" label="Bénéficiaires" />
+    <template v-for="route of routes">
+      <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label" :key="route.ref">
+        <ni-menu-item v-for="item of route.children" :name="item.name" :icon="item.icon" :label="item.label"
+          :key="item.name" :params="route.params" />
       </q-expansion-item>
-      <q-separator />
-      <q-expansion-item ref="benef" v-model="activeRoutes.benef.open" label="Bénéficiaires">
-        <ni-menu-item name="profile customers" :params="{ id: loggedUser._id }" icon="contacts" label="Fiches" />
-        <ni-menu-item name="customers fundings monitoring" icon="view_headline" label="Suivi des plans d'aide" />
-      </q-expansion-item>
-      <q-separator />
-    </template>
-    <q-expansion-item ref="administrative" v-model="activeRoutes.administrative.open" label="Administratif">
-      <ni-menu-item v-if="isAuxiliaryWithCompany" name="auxiliary personal info" :params="{ id: loggedUser._id }" icon="person"
-        label="Infos personnelles" />
-      <ni-menu-item name="profile salaries" :params="{ id: loggedUser._id }" icon="layers" label="Paie" />
-      <ni-menu-item v-if="isAuxiliaryWithCompany" name="profile docs" :params="{ id: loggedUser._id }" icon="insert_drive_file" label="Documents" />
-      <ni-menu-item name="profile contracts" icon="description" label="Contrats" />
-    </q-expansion-item>
-    <template v-if="isAuxiliaryWithCompany">
-      <q-separator />
-      <q-expansion-item ref="teams" v-model="activeRoutes.teams.open" label="Équipes">
-        <ni-menu-item name="teams directory" :params="{ id: loggedUser._id }" icon="contacts" label="Répertoire" />
-        <ni-menu-item name="dashboard" icon="dashboard" label="Tableau de bord" />
-      </q-expansion-item>
+      <q-separator :key="`separator-${route.ref}`" />
     </template>
     <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" @myClick="connectToBotMessenger"
@@ -46,6 +26,7 @@ import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
 import { AUXILIARY, PLANNING_REFERENT, CLIENT } from '@data/constants';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import { defineAbilitiesFor } from '@helpers/ability';
 
 export default {
   mixins: [sideMenuMixin],
@@ -57,7 +38,7 @@ export default {
     return {
       activeRoutes: {
         planning: { open: false },
-        benef: { open: false },
+        customers: { open: false },
         administrative: { open: false },
         teams: { open: false },
       },
@@ -68,9 +49,61 @@ export default {
     this.collapsibleOpening();
   },
   computed: {
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({ clientRole: 'main/clientRole', company: 'main/company' }),
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);
+    },
+    routes () {
+      const routes = [
+        {
+          ref: 'planning',
+          label: 'Planning',
+          children: [
+            { name: 'auxiliaries agenda', icon: 'event', label: 'Le mien' },
+            { name: 'ni planning auxiliaries', icon: 'face', label: 'Auxiliaires' },
+            { name: 'ni planning customers', icon: 'people', label: 'Bénéficiaires' },
+          ],
+        }, {
+          ref: 'customers',
+          label: 'Beneficiaires',
+          children: [
+            { name: 'auxiliaries customers', icon: 'contacts', label: 'Fiches' },
+            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: "Suivi des plans d'aide" },
+          ],
+        }, {
+          ref: 'administrative',
+          label: 'Administratif',
+          children: [
+            {
+              name: 'auxiliaries info',
+              params: { id: this.loggedUser._id },
+              icon: 'person',
+              label: 'Infos personnelles',
+            },
+            { name: 'auxiliaries pay', params: { id: this.loggedUser._id }, icon: 'layers', label: 'Paie' },
+            {
+              name: 'auxiliaries docs',
+              params: { id: this.loggedUser._id },
+              icon: 'insert_drive_file',
+              label: 'Documents',
+            },
+            { name: 'auxiliaries contracts', icon: 'description', label: 'Contrats' },
+          ],
+        }, {
+          ref: 'teams',
+          label: 'Équipes',
+          children: [
+            { name: 'auxiliaries teams', icon: 'contacts', label: 'Répertoire' },
+            { name: 'ni auxiliaries dashboard', icon: 'dashboard', label: 'Tableau de bord' },
+          ],
+        },
+      ];
+
+      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+
+      return routes
+        .map(r => ({ ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
+        .filter(r => r.children.length);
     },
   },
   methods: {

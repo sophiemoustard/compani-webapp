@@ -206,7 +206,7 @@ export default {
       }
     },
     goToCustomerProfile (customer) {
-      this.$router.push({ name: 'customers profile', params: { customerId: customer._id } });
+      this.$router.push({ name: 'ni customers info', params: { customerId: customer._id } });
     },
     resetForm () {
       this.$v.newCustomer.$reset();

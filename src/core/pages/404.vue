@@ -10,12 +10,17 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'Error404',
   data () {
     return {
       canGoBack: window.history.length > 1,
     }
+  },
+  computed: {
+    ...mapGetters({ clientRole: 'main/clientRole' }),
   },
   methods: {
     goBack () {

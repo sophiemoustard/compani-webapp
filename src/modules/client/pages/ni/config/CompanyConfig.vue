@@ -19,7 +19,7 @@
             @blur="updateCompany('rna')" :error="$v.company.rna.$error" :error-label="rcsError" />
         </div>
       </div>
-      <div class="q-mb-xl">
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Représentant légal</p>
         <div class="row gutter-profile">
           <ni-input caption="Prénom" :error="$v.company.legalRepresentative.firstname.$error"
@@ -33,7 +33,7 @@
             error-label="Fonction invalide" @blur="updateCompany('legalRepresentative.position')" />
         </div>
       </div>
-      <div class="q-mb-xl">
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Facturation</p>
         <div class="row gutter-profile">
           <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
@@ -47,14 +47,14 @@
             @focus="saveTmp('billingAssistance')" @blur="updateCompany('billingAssistance')" />
         </div>
       </div>
-      <div class="q-mb-xl">
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Paie</p>
         <div class="row gutter-profile">
           <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
             v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
         </div>
       </div>
-      <div class="q-mb-xl">
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Établissements</p>
         <q-card>
           <ni-responsive-table :data="establishments" :columns="establishmentsColumns" :loading="establishmentsLoading"
@@ -149,6 +149,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
@@ -171,6 +172,7 @@ import { REQUIRED_LABEL, COMPANY } from '@data/constants';
 import { urssafCodes } from '@data/urssafCodes';
 import { workHealthServices } from '@data/workHealthServices';
 import { companyMixin } from '@mixins/companyMixin';
+import { defineAbilitiesFor } from '@helpers/ability';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
@@ -279,8 +281,16 @@ export default {
       editedEstablishment: this.establishmentValidation,
     };
   },
+  computed: {
+    ...mapGetters({ clientRole: 'main/clientRole' }),
+    canUpdateErpConfig () {
+      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+      return ability.can('update', 'erp_config');
+    },
+  },
   async mounted () {
-    await Promise.all([this.refreshCompany(), this.getEstablishments()]);
+    if (this.canUpdateErpConfig) await Promise.all([this.refreshCompany(), this.getEstablishments()]);
+    else await this.refreshCompany();
   },
   methods: {
     async refreshCompany () {

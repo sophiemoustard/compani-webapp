@@ -76,7 +76,7 @@ export default {
       }
     },
     goToCustomerProfile (row) {
-      this.$router.push({ name: 'profile customers info', params: { customerId: row.customerId } });
+      this.$router.push({ name: 'auxiliaries customers info', params: { customerId: row.customerId } });
     },
   },
 }
