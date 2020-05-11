@@ -24,7 +24,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
       <div class="slots-cards-container row">
-        <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index">
+        <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index" flat>
           <div class="slots-cards-title">
             <div class="slots-cards-number">{{ index + 1 }}</div>
             <div class="slots-cards-date text-weight-bold">{{ key }}</div>
