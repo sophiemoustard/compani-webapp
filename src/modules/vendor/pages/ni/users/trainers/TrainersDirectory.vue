@@ -33,6 +33,7 @@ import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import Users from '@api/Users';
 import Roles from '@api/Roles';
+import Email from '@api/Email';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
@@ -112,9 +113,11 @@ export default {
         if (roles.length === 0) throw new Error('Role not found');
 
         await Users.create({ ...this.newTrainer, role: roles[0]._id });
-
         this.trainerCreationModal = false;
         NotifyPositive('Formateur créé.')
+
+        await Email.sendWelcome({ email: this.newTrainer.local.email, type: TRAINER });
+        NotifyPositive('Email envoyé');
         await this.refreshTrainers();
       } catch (e) {
         console.error(e);
