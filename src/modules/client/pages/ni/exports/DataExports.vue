@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background q-pb-xl">
+  <q-page padding class="client-background q-pb-xl">
     <h4>Données</h4>
     <div class="row">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />

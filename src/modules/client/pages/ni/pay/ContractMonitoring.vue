@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background q-pb-xl">
+  <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi Contrats/Avenants" padding>
       <template slot="content">
         <div class="col-xs-12 col-md-6">

@@ -26,7 +26,7 @@
         <div class="col-md-6 col-xs-12 referent items-center">
           <img :src="auxiliaryAvatar" class="avatar q-mr-sm" />
           <ni-select v-model="customer.referent._id" :options="auxiliariesOptions" no-error icon="swap_vert"
-            @focus="saveTmp('referent')" @input="updateCustomer('referent')" bg-color="grey-3" />
+            @focus="saveTmp('referent')" @input="updateCustomer('referent')" bg-color="neutral-grey" />
         </div>
       </div>
     </div>

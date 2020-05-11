@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="vendor-background">
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity" />
       <profile-tabs :profile-id="trainerId" :tabsContent="tabsContent" />

@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="vendor-background">
     <ni-profile-header :title="companyTradeName">
       <template v-slot:body>
         <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">

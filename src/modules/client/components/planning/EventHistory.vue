@@ -314,7 +314,7 @@ export default {
       display: block;
       margin: auto;
       width: 95%;
-      border-bottom: 1px solid $grey-3;
+      border-bottom: 1px solid $neutral-grey;
     .avatar
       height: 20px !important;
       width: 20px !important;

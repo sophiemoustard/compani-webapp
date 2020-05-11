@@ -133,7 +133,7 @@ export default {
   .slots
     height: 10px;
     flex: 0 1 calc(25% - 4px);
-    background-color: $light-pink;
+    background-color: $primary-light;
     &-happened
       background-color: $primary;
 </style>

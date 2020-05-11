@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="vendor-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
     <div class="trello">
       <course-container v-for="col in trello" :title="col.title" :courses="col.courses" :key="col.title" />

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire" @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
       <template v-slot:body="{ props, col }">

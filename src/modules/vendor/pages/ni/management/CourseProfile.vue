@@ -1,5 +1,5 @@
 `<template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="vendor-background">
     <ni-profile-header :title="courseName">
       <template v-slot:body>
         <div class="row profile-info q-pl-lg">

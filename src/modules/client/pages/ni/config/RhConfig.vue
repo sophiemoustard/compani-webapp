@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="client-background" padding>
     <div v-if="company">
       <h4>Configuration RH</h4>
       <div class="q-mb-xl">
@@ -592,11 +592,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .doc-thumbnail
-    padding: 13px 0px 40px 12px
-
-  .doc-delete
-    padding: 0px 14px 17px 0px
-</style>

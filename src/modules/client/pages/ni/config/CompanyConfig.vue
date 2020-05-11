@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="client-background" padding>
     <div v-if="company">
       <h4>Configuration générale</h4>
       <div class="q-mb-xl">
@@ -431,7 +431,3 @@ export default {
   },
 }
 </script>
-
-<style lang="less" scoped>
-
-</style>

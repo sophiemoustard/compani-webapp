@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"

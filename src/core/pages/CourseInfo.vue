@@ -37,10 +37,10 @@
               <img class="course-img course-img-explanation"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
           </q-item-section>
-          <q-item-section class="course-txt-info-container">
+          <q-item-section class="course-item-container">
             <div class="text-weight-bold">Programme de la formation</div>
-            <div class="">{{ course.program.name }}</div>
-            <div class="learning-goals">{{ course.program.learningGoals }}</div>
+            <div>{{ course.program.name }}</div>
+            <div class="description">{{ course.program.learningGoals }}</div>
           </q-item-section>
         </q-item>
         <q-item v-if="course.trainer" class="row">
@@ -48,10 +48,10 @@
               <img class="course-img course-img-explanation"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-quizz.png" />
           </q-item-section>
-          <q-item-section class="course-txt-info-container">
+          <q-item-section class="course-item-container">
             <div class="text-weight-bold">Intervenant(e)</div>
             <div>{{ course.trainer.identity | formatIdentity('FL') }}</div>
-            <div v-if="course.trainer.biography" class="biography">"{{ course.trainer.biography }}"</div>
+            <div v-if="course.trainer.biography" class="description">"{{ course.trainer.biography }}"</div>
           </q-item-section>
         </q-item>
         <q-item v-if="course.referent" class="row">
@@ -59,7 +59,7 @@
             <img class="course-img course-img-referent"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
           </q-item-section>
-          <div class="course-txt-info-container">
+          <div class="course-item-container">
             <div class="text-weight-bold">Votre contact pour la formation</div>
             <div>{{ course.referent.name }}</div>
             <div><a :href="referentPhoneLink">{{ formatPhone(course.referent.phone) }}</a></div>
@@ -176,7 +176,12 @@ export default {
     display: flex
     flex-direction: row
     &-text
-      border-bottom: 2px solid $grey-3
+      border-bottom: 2px solid $neutral-grey
+      > h5
+        color: $primary
+        font-weight: bold
+        @media screen and (min-width: 768px)
+          margin-bottom: 20px !importants
   &-img
     height: 110px
     margin-right: 10px
@@ -197,15 +202,13 @@ export default {
     &-container
       display: flex
       justify-content: flex-start
-  &-txt-info-container
+  &-item-container
     max-width: min(60vw, 480px)
     @media screen and (max-width: 365px)
       max-width: 195px
   &-stepper
     display: flex
     flex-direction: column
-.biography
-  font-style: italic
 
 /deep/.q-stepper
   &__title
@@ -223,7 +226,7 @@ export default {
 .next-slot
   /deep/.q-stepper
     &__title
-      font-size:18px
+      font-size: 18px
     &__dot
       height: 24px
       width: 24px
@@ -241,17 +244,7 @@ export default {
 .opacity
   opacity: 0.6
 
-.course-title-text > h5
-  color: $primary
-  font-weight: bold
-  @media screen and (min-width: 768px)
-    margin-bottom: 20px !importants
-
-.learning-goals
+.description
   white-space: break-spaces;
   font-style: italic;
-
-.course-info-title-container
-  @media screen and (min-width: 768px)
-    padding: 0px 125px
 </style>

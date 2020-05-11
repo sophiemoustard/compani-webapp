@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" :style="{ height: height }">
+  <q-page class="client-background" :style="{ height: height }">
     <div :class="[{ 'planning': !drawer, 'full-height' : true }]">
       <div class="row items-center planning-header">
         <div class="col-xs-12 col-sm-5 person-name">
@@ -194,5 +194,5 @@ export default {
 <style lang="stylus" scoped>
 .planning-header
   /deep/ .q-field__control
-    background-color: $grey-3 !important
+    background-color: inherit !important
 </style>

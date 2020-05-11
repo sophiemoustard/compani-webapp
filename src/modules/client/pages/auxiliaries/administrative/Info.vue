@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <div v-if="loggedUser">
       <h4>Informations personnelles</h4>
       <profile-info />

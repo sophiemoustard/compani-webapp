@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background q-pb-xl">
+  <q-page class="client-background q-pb-xl">
     <ni-title-header title="Paie mensuelle" padding>
       <template slot="title">
         <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
@@ -272,12 +272,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @media screen and (max-width: 767px)
-    .responsive
-      &-margin-bottom
-        margin-bottom: 5px
-      &-sort
-        width: 100%
-</style>

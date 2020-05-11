@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <div v-if="userProfile">
       <auxiliary-profile-header :profile-id="auxiliaryId" />
       <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" type="auxiliary" />

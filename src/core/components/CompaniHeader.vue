@@ -6,7 +6,6 @@
 </template>
 
 <style lang="stylus" scoped>
-  .signup
-    &-header-padding
+  .signup-header-padding
       padding: 24px 16px
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page :class="backgroungClass" padding>
     <h4>Mon compte</h4>
     <div class="center-account">
       <ni-input v-model.trim="user.local.email" caption="Email" :error="$v.user.local.email.$error"
@@ -69,6 +69,7 @@ export default {
       cguModal: false,
       cguCompani,
       tmpInput: '',
+      backgroungClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
     }
   },
   validations () {

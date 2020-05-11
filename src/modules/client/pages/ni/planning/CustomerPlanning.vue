@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background">
+  <q-page class="client-background">
     <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
@@ -240,17 +240,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .modal-subtitle
-    justify-content: flex-end;
-    display: flex;
-
-  .light-checkbox
-    color: $grey
-    font-size: 14px
-
-  .cancel
-    padding-right: 3px;
-
-</style>

@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <h4>Contact</h4>
     <div class="referent-container" v-if="referent">
       Pour toutes les questions concernant l’organisation des interventions et le planning, nous vous invitons à

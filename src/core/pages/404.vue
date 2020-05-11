@@ -38,5 +38,5 @@ export default {
 <style lang="stylus" scoped>
 .q-btn
   margin: 5px
-  width:200px
+  width: 200px
 </style>

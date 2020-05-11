@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <h4>Contrats</h4>
     <ni-contracts-card v-if="contracts" :contracts="contracts" :user="customer" :columns="contractsVisibleColumns"
       @refresh="refreshContracts" :person-key="CUSTOMER" @refreshWithTimeout="refreshContractsWithTimeout"

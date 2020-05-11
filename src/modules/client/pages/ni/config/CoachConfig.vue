@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="client-background" padding>
     <h4>Coachs</h4>
     <ni-coach-list :company="loggedCompany" />
   </q-page>
