@@ -194,5 +194,5 @@ export default {
 <style lang="stylus" scoped>
 .planning-header
   /deep/ .q-field__control
-    background-color: $grey-3 !important
+    background-color: inherit !important
 </style>

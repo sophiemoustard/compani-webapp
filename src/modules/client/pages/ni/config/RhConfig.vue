@@ -592,11 +592,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .doc-thumbnail
-    padding: 13px 0px 40px 12px
-
-  .doc-delete
-    padding: 0px 14px 17px 0px
-</style>

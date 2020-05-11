@@ -272,12 +272,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  @media screen and (max-width: 767px)
-    .responsive
-      &-margin-bottom
-        margin-bottom: 5px
-      &-sort
-        width: 100%
-</style>

@@ -80,11 +80,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-.export-form
-  display: flex
-  justify-content: space-between
-  div
-    width: auto
-</style>

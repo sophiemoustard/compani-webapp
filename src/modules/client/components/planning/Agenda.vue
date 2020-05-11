@@ -133,8 +133,8 @@ export default {
           180deg,
           $white,
           $white 13.1%,
-          $grey-3,
-          $grey-3 13.3%
+          $neutral-grey,
+          $neutral-grey 13.3%
         )
         height: 100%;
         position: relative;

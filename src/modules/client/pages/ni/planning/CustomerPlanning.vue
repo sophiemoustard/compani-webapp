@@ -240,17 +240,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .modal-subtitle
-    justify-content: flex-end;
-    display: flex;
-
-  .light-checkbox
-    color: $grey
-    font-size: 14px
-
-  .cancel
-    padding-right: 3px;
-
-</style>

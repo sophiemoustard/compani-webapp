@@ -808,7 +808,6 @@ export default {
 
 <style lang="stylus" scoped>
   .q-btn-group
-    box-shadow: none
     & /deep/ button
       flex: 1
   .group-error
@@ -817,8 +816,4 @@ export default {
     &-ok
       font-size: 12px
       color: $accent
-  /deep/.q-field--standard .q-field__control::before
-    border-bottom: none !important
-  /deep/.q-field--standard .q-field__control::after
-    background: none !important
 </style>

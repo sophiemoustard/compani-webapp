@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <div v-if="customer">
-      <customer-profile-header :profile-id="customerId" class="header" />
+      <customer-profile-header :profile-id="customerId" />
       <profile-tabs :profile-id="customerId" :tabsContent="tabsContent" type="customer" />
     </div>
   </q-page>
@@ -67,10 +67,3 @@ export default {
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-  .header-margin
-    margin-bottom: 60px
-    @media (max-width: 768px)
-      margin-bottom: 40px
-</style>
