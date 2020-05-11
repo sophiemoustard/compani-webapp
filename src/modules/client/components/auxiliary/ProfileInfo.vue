@@ -817,10 +817,6 @@ export default {
     &-ok
       font-size: 12px
       color: $accent
-  .picture-container
-     width: 200px
-     height: 200px
-     background: $neutral
   /deep/.q-field--standard .q-field__control::before
     border-bottom: none !important
   /deep/.q-field--standard .q-field__control::after

@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background q-pb-xl">
+  <q-page class="client-background q-pb-xl">
     <div class="title-padding row items-start">
       <div class="col-xs-12 col-md-5 row q-mb-md">
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />

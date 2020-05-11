@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <h4>Documents</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
     <ni-large-table :data="documents" :columns="columns" :pagination.sync="pagination" row-key="name"

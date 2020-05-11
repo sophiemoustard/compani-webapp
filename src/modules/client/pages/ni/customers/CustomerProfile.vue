@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <div v-if="customer">
       <customer-profile-header :profile-id="customerId" class="header" />
       <profile-tabs :profile-id="customerId" :tabsContent="tabsContent" type="customer" />

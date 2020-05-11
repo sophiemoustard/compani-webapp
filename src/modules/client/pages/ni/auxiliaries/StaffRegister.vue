@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background q-pb-xl">
+  <q-page class="client-background q-pb-xl">
     <div class="title-padding">
       <h4>Registre unique du personnel</h4>
     </div>

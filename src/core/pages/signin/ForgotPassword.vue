@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="row justify-center q-layout-padding neutral-background page-container">
+    <div class="row justify-center q-layout-padding client-background page-container">
       <div class="col-md-6 col-xs-12">
         <div class="q-mb-lg message">Nous allons vous envoyer un email pour réinitialiser votre mot de passe.
           Veuillez renseigner votre adresse email.</div>

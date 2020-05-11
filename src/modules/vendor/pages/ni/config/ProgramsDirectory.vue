@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="vendor-background" padding>
     <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"

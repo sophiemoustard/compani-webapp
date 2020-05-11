@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <div v-if="customer">
       <div class="row items-center col-xs-12 header-margin">
         <div>

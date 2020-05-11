@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un formateur"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"

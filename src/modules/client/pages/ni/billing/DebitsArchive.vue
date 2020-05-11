@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background">
+  <q-page class="client-background">
     <div class="title-padding">
       <h4>Archive Prélèvements</h4>
     </div>

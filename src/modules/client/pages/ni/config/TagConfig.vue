@@ -1,5 +1,5 @@
 <template>
-  <q-page  class="neutral-background" padding>
+  <q-page  class="client-background" padding>
     <div class="q-mb-xl">
       <table>
         <th>Nom tag</th>

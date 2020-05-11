@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <template v-if="customer">
       <div class="q-mb-lg">
         <h4>Abonnement</h4>
