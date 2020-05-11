@@ -57,7 +57,6 @@ export default {
     'ni-html-modal': HtmlModal,
   },
   data () {
-    const backgroungClass = /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background'
     return {
       user: {
         local: { email: '', password: '' },
@@ -70,7 +69,7 @@ export default {
       cguModal: false,
       cguCompani,
       tmpInput: '',
-      backgroungClass,
+      backgroungClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
     }
   },
   validations () {
