@@ -116,7 +116,7 @@ export const helperMixin = {
         await Users.create(pickBy(payload));
         NotifyPositive('Aidant créé');
 
-        await Email.sendWelcome({ email: this.newHelper.local.email });
+        await Email.sendWelcome({ email: this.newHelper.local.email, type: HELPER });
         NotifyPositive('Email envoyé');
 
         await this.getUserHelpers();
