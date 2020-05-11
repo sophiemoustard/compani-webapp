@@ -567,17 +567,14 @@ export default {
 
 .table-top
   font-size: 15px
-
 .slots-cards
   padding: 10px
-  min-width: 300px
   &-container
     grid-auto-rows: 1fr
+    grid-auto-flow: row
     display: grid
-    grid-template-areas: 'a a'
     grid-gap: 20px 10px
-    @media (max-width: 767px)
-      grid-template-areas: 'a'
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))
   &-number
     font-size: 12px
     border: solid 1px
@@ -591,9 +588,7 @@ export default {
     display: flex
     justify-content: space-between
     align-items: center
-    margin-bottom: 10px
-    margin-left: 10px
-    margin-right: 10px
+    margin: 0 10px 10px 10px
   &-date
     color: $primary
     font-size: 16px
