@@ -30,7 +30,7 @@
           <div class="text-weight-bold">
             {{ Object.keys(courseSlots).length }} date(s), {{ slotsDurationTitle }}
           </div>
-          <div class="slot-section-title-date-range ">du {{ firstSlotTitle }} au {{ lastSlotTitle }}</div>
+          <div class="slot-section-title-date-range">du {{ firstSlotTitle }} au {{ lastSlotTitle }}</div>
         </q-item-section>
       </q-item>
       <div class="slots-cards-container row">
