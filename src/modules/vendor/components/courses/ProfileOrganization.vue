@@ -47,6 +47,10 @@
           </div>
         </q-card>
       </div>
+      <div class="q-mt-md" align="right">
+        <q-btn class="add-slot" label="Ajouter un créneau" no-caps flat color="white" icon="add"
+          :disable="courseSlotsLoading" @click="courseSlotCreationModal = true" />
+      </div>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Participants ({{ traineesNumber }})</p>
@@ -602,4 +606,6 @@ export default {
     min-height: auto
   &-content > div > .q-icon
     cursor: pointer
+.add-slot
+  background: $primary
 </style>
