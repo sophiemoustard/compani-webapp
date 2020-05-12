@@ -24,13 +24,11 @@
     <div class="q-mb-xl">
       <q-item class="slot-section-title">
         <q-item-section side>
-          <q-icon color="black" size="xl" name="mdi-calendar-range" flat dense/>
+          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense/>
         </q-item-section>
         <q-item-section>
-          <div class="text-weight-bold">
-            {{ Object.keys(courseSlots).length }} date(s), {{ slotsDurationTitle }}
-          </div>
-          <div class="slot-section-title-date-range">du {{ firstSlotTitle }} au {{ lastSlotTitle }}</div>
+          <div class="text-weight-bold">{{ formatSlotTitle.title }}</div>
+          <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
         </q-item-section>
       </q-item>
       <div class="slots-cards-container row">
@@ -322,13 +320,29 @@ export default {
 
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
-    firstSlotTitle () {
+    formatSlotTitle () {
       const slotList = Object.values(this.courseSlots);
-      return this.$moment(slotList[0][0].startDate).format('LL');
-    },
-    lastSlotTitle () {
-      const slotList = Object.values(this.courseSlots);
-      return this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+
+      if (!slotList.length) {
+        return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
+      }
+
+      const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
+
+      if (slotList.length === 1) {
+        return {
+          title: `1 date, ${this.slotsDurationTitle}`,
+          subtitle: `le ${firstSlot}`,
+          icon: 'mdi-calendar-range',
+        };
+      }
+
+      const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+      return {
+        title: `${slotList.length} dates, ${this.slotsDurationTitle}`,
+        subtitle: `du ${firstSlot} au ${lastSlot}`,
+        icon: 'mdi-calendar-range',
+      };
     },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
@@ -624,18 +638,14 @@ export default {
     min-height: auto
   &-content > div > .q-icon
     cursor: pointer
-<<<<<<< HEAD
 .add-slot
   background: $primary
-=======
 .slot-section-title
   padding: 0;
   margin: 10px 0px
-  &-date-range
+  &-subtitle
      font-style: italic
      font-size: 16px
      @media (max-width: 767px)
       font-size: 13px
-
->>>>>>> COM-1181 add icone and infos on slots title
 </style>
