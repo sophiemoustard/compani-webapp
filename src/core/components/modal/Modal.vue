@@ -10,7 +10,7 @@
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>
-              <q-icon name="clear" v-close-popup />
+              <q-icon name="clear" v-close-popup data-cy="close-modal" />
             </span>
           </div>
         </div>

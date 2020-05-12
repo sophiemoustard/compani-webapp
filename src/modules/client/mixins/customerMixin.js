@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import has from 'lodash/has';
 import set from 'lodash/set';
 import Customers from '@api/Customers';
+import { CIVILITY_OPTIONS } from '@data/constants';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
 
 export const customerMixin = {
@@ -18,7 +19,9 @@ export const customerMixin = {
     },
     acceptedBy () {
       if (!has(this.lastSubscriptionHistory, 'helper.lastname')) return '';
-      return `${this.lastSubscriptionHistory.helper.title || ''} ${this.lastSubscriptionHistory.helper.firstname || ''} ${this.lastSubscriptionHistory.helper.lastname}`;
+      const helperTitle = get(this.lastSubscriptionHistory, 'helper.title');
+      const helperCivility = CIVILITY_OPTIONS.find(title => title.value === helperTitle);
+      return `${helperCivility ? helperCivility.label : ''} ${this.lastSubscriptionHistory.helper.firstname || ''} ${this.lastSubscriptionHistory.helper.lastname}`;
     },
   },
   methods: {
