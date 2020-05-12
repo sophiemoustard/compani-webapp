@@ -22,7 +22,15 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
+      <q-item class="slot-section-title">
+        <q-item-section side>
+          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense/>
+        </q-item-section>
+        <q-item-section>
+          <div class="text-weight-bold">{{ formatSlotTitle.title }}</div>
+          <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
+        </q-item-section>
+      </q-item>
       <div class="slots-cards-container row">
         <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index" flat>
           <div class="slots-cards-title">
@@ -299,7 +307,7 @@ export default {
       }
       return 'Adresse non valide';
     },
-    slotsDurationColumnTitle () {
+    slotsDurationTitle () {
       if (!this.course || !this.course.slots) return '0h';
 
       const total = this.course.slots.reduce(
@@ -311,6 +319,30 @@ export default {
       const hours = total.days() * 24 + total.hours();
 
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+    },
+    formatSlotTitle () {
+      const slotList = Object.values(this.courseSlots);
+
+      if (!slotList.length) {
+        return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
+      }
+
+      const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
+
+      if (slotList.length === 1) {
+        return {
+          title: `1 date, ${this.slotsDurationTitle}`,
+          subtitle: `le ${firstSlot}`,
+          icon: 'mdi-calendar-range',
+        };
+      }
+
+      const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+      return {
+        title: `${slotList.length} dates, ${this.slotsDurationTitle}`,
+        subtitle: `du ${firstSlot} au ${lastSlot}`,
+        icon: 'mdi-calendar-range',
+      };
     },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
@@ -608,4 +640,12 @@ export default {
     cursor: pointer
 .add-slot
   background: $primary
+.slot-section-title
+  padding: 0;
+  margin: 10px 0px
+  &-subtitle
+     font-style: italic
+     font-size: 16px
+     @media (max-width: 767px)
+      font-size: 13px
 </style>
