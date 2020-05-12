@@ -125,7 +125,7 @@ export default {
         display: flex;
         justify-content: flex-start;
         flex-direction: row;
-        color: $black;
+        color: black;
         &.q-item__section--side
           margin-right: 10px
         & > .q-icon
