@@ -63,7 +63,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Participants ({{ traineesNumber }})</p>
       <q-card>
-        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination">
+        <ni-responsive-table :data="course.trainees" :columns="traineesVisibleColumns"
+          :pagination.sync="traineesPagination">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -130,6 +131,8 @@
       <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch"
         :error-label="phoneNbrError($v.newTrainee)" />
+      <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" :error="$v.newTrainee.company.$error"
+        @blur="$v.newTrainee.company.$touch" required-field caption="Structure" :options="companyOptions" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter à la formation" icon-right="add" color="primary"
           :loading="loading" @click="addTrainee" :disable="$v.newTrainee.$invalid" />
@@ -174,7 +177,7 @@ import DateTimeRange from '@components/form/DatetimeRange';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TRAINER, REQUIRED_LABEL } from '@data/constants';
+import { TRAINER, REQUIRED_LABEL, INTER_B2B, INTRA } from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
@@ -273,6 +276,7 @@ export default {
         identity: { lastname: { required } },
         local: { email: { required, email } },
         contact: { phone: { frPhoneNumber } },
+        company: { required: requiredIf((item) => { return this.course.type === INTER_B2B; }) },
       },
       traineeEditionModal: false,
       editedTrainee: {
@@ -280,6 +284,7 @@ export default {
         contact: {},
         local: {},
       },
+      companyOptions: [],
     }
   },
   validations () {
@@ -306,6 +311,19 @@ export default {
         return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
+    },
+    traineesVisibleColumns () {
+      if (this.course.type === INTRA) return this.traineesColumns;
+      return [
+        {
+          name: 'company',
+          label: 'Structure',
+          align: 'left',
+          field: row => get(row, 'company.tradeName') || '',
+          classes: 'text-capitalize',
+        },
+        ...this.traineesColumns,
+      ]
     },
     slotsDurationTitle () {
       if (!this.course || !this.course.slots) return '0h';
@@ -357,10 +375,10 @@ export default {
       return '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.course) await this.refreshCourse();
     else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
-    if (this.isAdmin) await this.refreshTrainers();
+    if (this.isAdmin) await Promise.all([this.refreshTrainers(), this.refreshCompanies()]);
   },
   methods: {
     get,
@@ -521,7 +539,9 @@ export default {
       this.$v.newTrainee.$reset();
     },
     formatTraineeCreationPayload (payload) {
-      return { ...removeEmptyProps(payload), company: this.course.company._id };
+      const newTraineePayload = removeEmptyProps(payload);
+      if (this.course.type === INTRA) newTraineePayload.company = this.course.company._id;
+      return newTraineePayload;
     },
     async addTrainee () {
       try {

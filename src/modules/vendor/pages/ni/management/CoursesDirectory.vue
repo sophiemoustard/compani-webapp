@@ -34,7 +34,6 @@ import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
-import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
@@ -141,17 +140,6 @@ export default {
       } catch (e) {
         console.error(e);
         this.programOptions = [];
-      }
-    },
-    async refreshCompanies () {
-      try {
-        const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.tradeName, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-      } catch (e) {
-        console.error(e);
-        this.companyOptions = [];
       }
     },
     updateCourseCompany () {
