@@ -66,7 +66,7 @@ export default {
     background-color: $white
     & .delimiter
       margin: 0
-      color: $black
+      color: black
   .date-item
     max-width: 150px
     /deep/ .q-field--with-bottom

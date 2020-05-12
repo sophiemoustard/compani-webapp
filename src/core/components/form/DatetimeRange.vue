@@ -152,7 +152,7 @@ export default {
 
   .delimiter
     margin: 0
-    color: $black
+    color: black
     @media screen and (max-width: 767px)
       display: none
 
