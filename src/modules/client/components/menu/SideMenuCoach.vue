@@ -13,7 +13,6 @@
       </q-expansion-item>
       <q-separator :key="`separator-${route.ref}`" />
     </template>
-    <q-separator />
     <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
   </q-list>
 </template>

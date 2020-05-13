@@ -73,6 +73,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
@@ -87,7 +88,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { formatPhone, clear, removeEmptyProps } from '@helpers/utils';
-import { ROLES_TRANSLATION, CLIENT_ADMIN, COACH } from '@data/constants';
+import { ROLES_TRANSLATION, CLIENT_ADMIN, COACH, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
@@ -164,13 +165,19 @@ export default {
     await this.getUsers();
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
     roleOptions () {
       return this.roles.map(role => ({ label: ROLES_TRANSLATION[role.name], value: role._id }));
+    },
+    canSetUserCompany () {
+      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(get(this.loggedUser, 'role.vendor.name'));
     },
   },
   methods: {
     formatUserPayload (user) {
-      return { ...removeEmptyProps(user), company: this.company._id };
+      const userPayload = removeEmptyProps(user);
+      if (this.canSetUserCompany) userPayload.company = this.company._id;
+      return userPayload;
     },
     async createUser () {
       try {
