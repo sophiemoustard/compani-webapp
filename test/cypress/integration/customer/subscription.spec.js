@@ -33,7 +33,7 @@ describe('customers subscription tests', () => {
 
     cy.get('[data-cy=agreement]').should(
       'contain',
-      `(Accepté le ${moment().format('DD/MM/YYYY')} par Monsieur Helper Test)`
+      `(Accepté le ${moment().format('DD/MM/YYYY')} par Helper TEST)`
     )
 
     cy.get('[data-cy=show-subscription-history]').click();

@@ -54,12 +54,12 @@ const auxiliaryRoutes = [
   { name: 'auxiliaries docs', subscription: 'erp' },
   { name: 'auxiliaries contracts', subscription: 'erp' },
   { name: 'auxiliaries info', subscription: 'erp' },
-  { name: 'account client', subscription: 'erp' },
+  { name: 'account client' },
 ];
 const auxiliaryWithoutCompanyRoutes = [
   { name: 'auxiliaries pay', subscription: 'erp' },
   { name: 'auxiliaries contracts', subscription: 'erp' },
-  { name: 'account client', subscription: 'erp' },
+  { name: 'account client' },
 ];
 const planningReferentRoutes = [...auxiliaryRoutes];
 const helperRoutes = [
@@ -68,7 +68,7 @@ const helperRoutes = [
   { name: 'customers documents', subscription: 'erp' },
   { name: 'customers subscription', subscription: 'erp' },
   { name: 'customers contracts', subscription: 'erp' },
-  { name: 'account client', subscription: 'erp' },
+  { name: 'account client' },
 ];
 const vendorAdminRoutes = [
   { name: 'ni users companies' },

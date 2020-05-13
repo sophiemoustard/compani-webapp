@@ -1,9 +1,8 @@
 import get from 'lodash/get';
-import has from 'lodash/has';
 import set from 'lodash/set';
 import Customers from '@api/Customers';
-import { CIVILITY_OPTIONS } from '@data/constants';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
+import { formatIdentity } from '@helpers/utils';
 
 export const customerMixin = {
   computed: {
@@ -18,10 +17,7 @@ export const customerMixin = {
       return {};
     },
     acceptedBy () {
-      if (!has(this.lastSubscriptionHistory, 'helper.lastname')) return '';
-      const helperTitle = get(this.lastSubscriptionHistory, 'helper.title');
-      const helperCivility = CIVILITY_OPTIONS.find(title => title.value === helperTitle);
-      return `${helperCivility ? helperCivility.label : ''} ${this.lastSubscriptionHistory.helper.firstname || ''} ${this.lastSubscriptionHistory.helper.lastname}`;
+      return formatIdentity(get(this.lastSubscriptionHistory, 'helper'), 'FL');
     },
   },
   methods: {
