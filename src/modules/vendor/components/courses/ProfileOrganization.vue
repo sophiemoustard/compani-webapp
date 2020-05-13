@@ -63,8 +63,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Participants ({{ traineesNumber }})</p>
       <q-card>
-        <ni-responsive-table :data="course.trainees" :columns="traineesVisibleColumns"
-          :pagination.sync="traineesPagination">
+        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
+          :visible-columns="traineesVisibleColumns">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -235,6 +235,13 @@ export default {
       },
       traineesColumns: [
         {
+          name: 'company',
+          label: 'Structure',
+          align: 'left',
+          field: row => get(row, 'company.tradeName') || '',
+          classes: 'text-capitalize',
+        },
+        {
           name: 'firstname',
           label: 'Prénom',
           align: 'left',
@@ -276,7 +283,7 @@ export default {
         identity: { lastname: { required } },
         local: { email: { required, email } },
         contact: { phone: { frPhoneNumber } },
-        company: { required: requiredIf((item) => { return this.course.type === INTER_B2B; }) },
+        company: { required: requiredIf(() => { return this.course.type === INTER_B2B; }) },
       },
       traineeEditionModal: false,
       editedTrainee: {
@@ -313,17 +320,9 @@ export default {
       return 'Adresse non valide';
     },
     traineesVisibleColumns () {
-      if (this.course.type === INTRA) return this.traineesColumns;
-      return [
-        {
-          name: 'company',
-          label: 'Structure',
-          align: 'left',
-          field: row => get(row, 'company.tradeName') || '',
-          classes: 'text-capitalize',
-        },
-        ...this.traineesColumns,
-      ]
+      const visibleColumns = ['firstname', 'lastname', 'email', 'phone', 'actions'];
+      if (this.course.type === INTRA) return visibleColumns;
+      return ['company', ...visibleColumns];
     },
     slotsDurationTitle () {
       if (!this.course || !this.course.slots) return '0h';
