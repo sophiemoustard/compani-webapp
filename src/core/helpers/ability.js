@@ -1,7 +1,7 @@
 
 import { Ability, AbilityBuilder } from '@casl/ability';
 import { roleBasedAccessControl } from '@helpers/rbac';
-import { CLIENT_ADMIN } from '@data/constants';
+import { CLIENT_ADMIN, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
 
 const getClientAbilities = (role, subscriptions) => {
   return roleBasedAccessControl[role]
@@ -20,6 +20,7 @@ export const defineAbilitiesFor = (clientRole, vendorRole, company) => {
   if (clientRole) can('read', getClientAbilities(clientRole, companySubscriptions));
   if (vendorRole) can('read', getVendorAbilities(vendorRole));
   if (clientRole === CLIENT_ADMIN && companySubscriptions.includes('erp')) can('update', 'erp_config');
+  if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
 
   return new Ability(rules);
 }
