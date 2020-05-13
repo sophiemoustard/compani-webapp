@@ -26,6 +26,17 @@ import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxili
 import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer';
 
 export default {
+  metaInfo: {
+    link: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/' +
+          'compani_rose_32.png',
+      },
+    ],
+  },
   name: 'ClientLayout',
   components: {
     'side-menu-coach': SideMenuCoach,

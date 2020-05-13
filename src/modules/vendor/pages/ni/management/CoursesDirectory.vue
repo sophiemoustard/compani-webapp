@@ -46,18 +46,7 @@ import CourseContainer from 'src/modules/vendor/components/courses/CourseContain
 import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
 
 export default {
-  metaInfo: {
-    title: 'Catalogue',
-    link: [
-      {
-        rel: 'icon',
-        type: 'image/png',
-        sizes: '32x32',
-        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/' +
-          'compani_burgundy_32.png',
-      },
-    ],
-  },
+  metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
   mixins: [courseMixin],
   components: {

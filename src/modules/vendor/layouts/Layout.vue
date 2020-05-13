@@ -24,6 +24,17 @@ import SideMenuAdmin from 'src/modules/vendor/components/menu/SideMenuAdmin';
 import SideMenuTrainer from 'src/modules/vendor/components/menu/SideMenuTrainer';
 
 export default {
+  metaInfo: {
+    link: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '32x32',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/' +
+          'compani_burgundy_32.png',
+      },
+    ],
+  },
   components: {
     'side-menu-admin': SideMenuAdmin,
     'side-menu-trainer': SideMenuTrainer,
