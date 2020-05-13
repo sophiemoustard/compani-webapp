@@ -88,7 +88,8 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { formatPhone, clear, removeEmptyProps } from '@helpers/utils';
-import { ROLES_TRANSLATION, CLIENT_ADMIN, COACH, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import { defineAbilitiesFor } from '@helpers/ability';
+import { ROLES_TRANSLATION, CLIENT_ADMIN, COACH } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
@@ -170,7 +171,12 @@ export default {
       return this.roles.map(role => ({ label: ROLES_TRANSLATION[role.name], value: role._id }));
     },
     canSetUserCompany () {
-      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(get(this.loggedUser, 'role.vendor.name'));
+      const ability = defineAbilitiesFor(
+        get(this.loggedUser, 'role.client.name'),
+        get(this.loggedUser, 'role.vendor.name'),
+        this.company
+      );
+      return ability.can('set', 'user_company');
     },
   },
   methods: {
