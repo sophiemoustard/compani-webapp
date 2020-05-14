@@ -6,10 +6,10 @@
         <q-list separator dense>
           <q-item v-for="col in filterCols(props.cols)" :key="col.name">
             <q-item-section>
-              <q-item-label>{{ col.label }}</q-item-label>
+              <q-item-label :data-cy="`col-${col.name}`">{{ col.label }}</q-item-label>
             </q-item-section>
             <q-item-section side>
-              <q-item-label caption>{{ col.value }}</q-item-label>
+              <q-item-label caption :data-cy="`col-side-${col.name}`">{{ col.value }}</q-item-label>
             </q-item-section>
           </q-item>
         </q-list>
