@@ -30,6 +30,20 @@ export const SURCHARGES = {
   custom: 'Personnalisée',
 };
 
+// CUSTOMERS SITUATION
+export const UNKNOWN = 'unknown';
+export const HOME = 'home';
+export const NURSING_HOME = 'nursing_home';
+export const HOSPITALIZED = 'hospitalized';
+export const DECEASED = 'deceased';
+export const SITUATION_OPTIONS = [
+  { label: 'Non renseigné', value: UNKNOWN },
+  { label: 'Domicile', value: HOME },
+  { label: 'EHPAD', value: NURSING_HOME },
+  { label: 'Hospitalisé', value: HOSPITALIZED },
+  { label: 'Décédé', value: DECEASED },
+];
+
 // CONTRACTS
 export const CONTRACT = 'contract';
 export const OTHER = 'other';
