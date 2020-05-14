@@ -35,6 +35,8 @@
         <p class="text-weight-bold">Accompagnement</p>
       </div>
       <div class="row gutter-profile">
+        <ni-select caption="Situation" v-model="customer.followUp.situation" @focus="saveTmp('followUp.situation')"
+          @input="updateCustomer('followUp.situation')" :options="situationOptions" />
         <ni-input caption="Environnement du bénéficiaire" v-model="customer.followUp.environment"
           @blur="updateCustomer('followUp.environment')" @focus="saveTmp('followUp.environment')" type="textarea" />
         <ni-input caption="Objectifs de l’accompagnement" v-model="customer.followUp.objectives"
@@ -110,7 +112,14 @@ import { NotifyNegative } from '@components/popup/notify.js';
 import SimpleTable from '@components/table/SimpleTable';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatHours } from '@helpers/utils.js';
-import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
+import {
+  AUXILIARY,
+  PLANNING_REFERENT,
+  AUXILIARY_ROLES,
+  DEFAULT_AVATAR,
+  UNKNOWN_AVATAR,
+  SITUATION_OPTIONS,
+} from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin.js';
@@ -162,6 +171,7 @@ export default {
           field: row => formatHours(row.currentMonthCareHours, 1),
         },
       ],
+      situationOptions: SITUATION_OPTIONS,
     };
   },
   validations: {
@@ -290,7 +300,7 @@ export default {
     font-size: 12px;
   .referent
     display: flex
-  /deep/ .q-field__append
-    .q-select__dropdown-icon
-      display: none
+    /deep/ .q-field__append
+      .q-select__dropdown-icon
+        display: none
 </style>
