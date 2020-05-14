@@ -2,12 +2,23 @@
   <q-page :class="backgroungClass" padding>
     <h4>Mon compte</h4>
     <div class="center-account">
-      <ni-input v-model.trim="user.local.email" caption="Email" :error="$v.user.local.email.$error"
-        error-label="Email invalide." @blur="$v.user.local.email.$touch" :disable="isAuxiliaryWithoutCompany"
-        @focus="saveTmp('local.email')" />
-      <ni-input v-model.trim="user.local.password" :error="$v.user.local.password.$error"
-        caption="Nouveau mot de passe" :error-label="passwordError($v.user.local.password)"
-        @blur="$v.user.local.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
+      <div class="row gutter-profile">
+        <div class="col-12 col-md-6 row items-center">
+          <div class="col-xs-11">
+            <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
+              :error="$v.mergedUserProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
+              :error-label="emailError($v.mergedUserProfile)" v-model.trim="mergedUserProfile.local.email" />
+          </div>
+          <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
+            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
+          </div>
+        </div>
+        <ni-input v-model.trim="mergedUserProfile.contact.phone" caption="Téléphone" :error="$v.mergedUserProfile.contact.phone.$error"
+          error-label="Téléphone invalide." @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
+      </div>
+      <ni-input v-model.trim="mergedUserProfile.local.password" :error="$v.mergedUserProfile.local.password.$error"
+        caption="Nouveau mot de passe" :error-label="passwordError($v.mergedUserProfile.local.password)"
+        @blur="$v.mergedUserProfile.local.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
       <ni-input v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error"
         caption="Confirmation mot de passe" :error-label="passwordConfirmError"
         @blur="$v.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
@@ -39,19 +50,22 @@
 <script>
 import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
-import Users from '@api/Users'
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import set from 'lodash/set';
+import Users from '@api/Users';
 import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
 import { passwordMixin } from '@mixins/passwordMixin';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { userMixin } from '@mixins/userMixin';
 import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {
   name: 'AccountInfo',
   metaInfo: { title: 'Mon compte' },
-  mixins: [passwordMixin],
+  mixins: [passwordMixin, validationMixin, userMixin],
   components: {
     'ni-input': Input,
     'ni-html-modal': HtmlModal,
@@ -60,10 +74,18 @@ export default {
     return {
       user: {
         local: { email: '', password: '' },
-        alenvi: {},
+        contact: { phone: '' },
+        fromBack: {},
         contracts: [],
       },
+      mergedUserProfile: {
+        local: { email: '', password: '' },
+        contact: { phone: '' },
+        fromBack: {},
+      },
+      emailLock: true,
       passwordConfirm: '',
+      changePasswordModal: false,
       rgpd,
       rgpdModal: false,
       cguModal: false,
@@ -74,10 +96,13 @@ export default {
   },
   validations () {
     return {
-      user: {
+      mergedUserProfile: {
         local: {
           email: { required, email },
           password: { ...this.passwordValidation },
+        },
+        contact: {
+          phone: { frPhoneNumber },
         },
       },
       passwordConfirm: {
@@ -88,8 +113,9 @@ export default {
   },
   async mounted () {
     try {
-      this.user.alenvi = await Users.getById(this.$route.params.id);
-      this.user.local.email = this.user.alenvi.local.email;
+      this.mergedUserProfile.fromBack = await Users.getById(this.$route.params.id);
+      this.mergedUserProfile.local.email = this.mergedUserProfile.fromBack.local.email;
+      this.mergedUserProfile.contact.phone = get(this.mergedUserProfile.fromBack, 'contact.phone') || '';
     } catch (e) {
       console.error(e);
     }
@@ -101,25 +127,12 @@ export default {
   },
   methods: {
     saveTmp (path) {
-      if (this.tmpInput === '') this.tmpInput = get(this.user, path);
+      if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
     },
-    async updateUser () {
-      try {
-        if (this.tmpInput !== '' && this.user.local.email !== this.tmpInput) {
-          await Users.updateById(this.$route.params.id, { local: { email: this.user.local.email } });
-        }
-        if (this.user.local.password) {
-          await Users.updatePassword(this.$route.params.id, { local: { password: this.user.local.password } });
-        }
-        NotifyPositive('Profil modifié.');
-      } catch (e) {
-        NotifyNegative('Erreur lors de la modification du profil.');
-        console.error(e);
-      } finally {
-        this.user.local.password = '';
-        this.passwordConfirm = '';
-        this.tmpInput = '';
-      }
+    async updateAlenviUser (path) {
+      const value = get(this.mergedUserProfile, path);
+      const payload = set({}, path, value);
+      await Users.updateById(this.$route.params.id, payload);
     },
     logout () {
       this.$q.cookies.remove('alenvi_token', { path: '/' });
@@ -147,7 +160,6 @@ export default {
 
 <style lang="stylus" scoped>
   .center-account
-    max-width: 40%
     @media screen && (max-width: 600px)
       max-width: 100%
   .links
