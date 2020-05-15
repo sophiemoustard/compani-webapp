@@ -2,7 +2,7 @@ const moment = require('moment');
 
 describe('customers subscription tests', () => {
   beforeEach(() => {
-    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
+    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/billing`);
     cy.login({ email: 'helper@alenvi.io', password: '123456!eR' });
     cy.visit('/customers/subscriptions');
   });
