@@ -51,11 +51,6 @@ export default {
         href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
           '/site.webmanifest?v=XBblAqBLQR',
       },
-      {
-        rel: 'shortcut icon',
-        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
-          '/favicon.ico?v=XBblAqBLQR',
-      },
     ],
   },
   components: {

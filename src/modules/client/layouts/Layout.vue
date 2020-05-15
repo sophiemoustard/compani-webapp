@@ -50,8 +50,7 @@ export default {
       },
       {
         rel: 'manifest',
-        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
-          '/site.webmanifest?v=A0mxgJvdbx',
+        href: '/statics/favicon_meta/browserconfig_rose.xml',
       },
     ],
   },
