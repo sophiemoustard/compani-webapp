@@ -11,9 +11,11 @@
         <ni-time-input :value="startHour" @input="updateHours($event, 'startHour')" class="time-item"
           @blur="blurHandler" :disable="disable || disableStartHour" />
         <p class="delimiter">-</p>
+        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item mobile"
+          @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
         <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item"
           @blur="blurHandler" :disable="disable || disableEndHour" :min="startHour" />
-        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
+        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item desktop"
           @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
       </div>
     </q-field>
@@ -122,9 +124,9 @@ export default {
 
   .date-item
     @media screen and (min-width: 768px)
-      width: 22%
+      width: 26%
     @media screen and (max-width: 767px)
-      width: 50%
+      width: 60%
     /deep/ .q-field--with-bottom
       padding: 0
     /deep/ .q-field__control
@@ -137,9 +139,9 @@ export default {
 
   .time-item
     @media screen and (min-width: 768px)
-      width: 22%
+      width: 18%
     @media screen and (max-width: 767px)
-      width: 50%
+      width: 40%
     /deep/ .q-field--with-bottom
       padding: 0
     /deep/ .q-field__inner
@@ -155,5 +157,12 @@ export default {
     color: black
     @media screen and (max-width: 767px)
       display: none
+
+  .desktop
+    @media screen and (max-width: 767px)
+        display: none
+  .mobile
+    @media screen and (min-width: 768px)
+        display: none
 
 </style>
