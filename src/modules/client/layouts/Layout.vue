@@ -29,11 +29,29 @@ export default {
   metaInfo: {
     link: [
       {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
+          '/apple-touch-icon.png?v=A0mxgJvdbx',
+      },
+      {
         rel: 'icon',
         type: 'image/png',
         sizes: '32x32',
-        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/' +
-          'compani_rose_32.png',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
+          '/favicon-32x32.png?v=A0mxgJvdbx',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
+          '/favicon-16x16.png?v=A0mxgJvdbx',
+      },
+      {
+        rel: 'manifest',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
+          '/site.webmanifest?v=A0mxgJvdbx',
       },
     ],
   },

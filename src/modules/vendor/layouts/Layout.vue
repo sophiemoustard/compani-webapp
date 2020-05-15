@@ -27,11 +27,34 @@ export default {
   metaInfo: {
     link: [
       {
+        rel: 'apple-touch-icon',
+        sizes: '180x180',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
+          '/apple-touch-icon.png?v=XBblAqBLQR',
+      },
+      {
         rel: 'icon',
         type: 'image/png',
         sizes: '32x32',
-        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/' +
-          'compani_burgundy_32.png',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
+          '/favicon-32x32.png?v=XBblAqBLQR',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '16x16',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
+          '/favicon-16x16.png?v=XBblAqBLQR',
+      },
+      {
+        rel: 'manifest',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
+          '/site.webmanifest?v=XBblAqBLQR',
+      },
+      {
+        rel: 'shortcut icon',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
+          '/favicon.ico?v=XBblAqBLQR',
       },
     ],
   },
