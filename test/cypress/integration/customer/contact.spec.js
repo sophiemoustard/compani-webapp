@@ -3,7 +3,6 @@ describe('Customer contact tests', () => {
     cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
     cy.login({ email: 'helper@alenvi.io', password: '123456!eR' });
     cy.visit('/customers/contact');
-    cy.get('#q-app').click(500, 500);
   });
 
   it('should display correctly customer contact page', () => {
