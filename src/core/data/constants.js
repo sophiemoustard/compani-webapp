@@ -154,7 +154,7 @@ export const TRAINER = 'trainer';
 
 // ROLE TRANSLATION
 export const ROLES_TRANSLATION = {
-  [CLIENT_ADMIN]: 'Admin Client',
+  [CLIENT_ADMIN]: 'Administrateur',
   [COACH]: 'Coach',
 };
 
