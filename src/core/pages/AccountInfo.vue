@@ -44,11 +44,12 @@
         required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
-           icon-right="done" @click="submitPasswordChange" />
+          :disable="$v.mergedUserProfile.local.password.$invalid || $v.passwordConfirm.$invalid" icon-right="done"
+          @click="submitPasswordChange" />
       </template>
     </ni-modal>
 
-    <!-- RGPD modal :disable="$v.$invalid" -->
+    <!-- RGPD modal -->
     <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
 
     <!-- CSU modal -->
@@ -120,7 +121,7 @@ export default {
   async created () {
     try {
       const user = await Users.getById(this.$route.params.id);
-      this.mergedUserProfile = pick(user, ['local', 'contact']);
+      this.mergedUserProfile = { contact: {}, ...pick(user, ['local.email', 'contact']) };
     } catch (e) {
       console.error(e);
     }
@@ -137,9 +138,10 @@ export default {
     async submitPasswordChange () {
       try {
         this.loading = true;
-        if (this.$v.$invalid) {
-          this.$v.mergedUserProfile.local.password.$touch();
-          this.$v.passwordConfirm.$touch();
+
+        this.$v.mergedUserProfile.local.password.$touch();
+        this.$v.passwordConfirm.$touch();
+        if (this.$v.mergedUserProfile.local.password.$error || this.$v.passwordConfirm.$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 

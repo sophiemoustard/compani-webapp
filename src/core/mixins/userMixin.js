@@ -58,7 +58,7 @@ export const userMixin = {
         }
         await this.updateAlenviUser(path);
 
-        this.emailLock = true;
+        if (path === 'local.email') this.emailLock = true;
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
