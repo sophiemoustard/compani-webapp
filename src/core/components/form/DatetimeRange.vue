@@ -11,11 +11,9 @@
         <ni-time-input :value="startHour" @input="updateHours($event, 'startHour')" class="time-item"
           @blur="blurHandler" :disable="disable || disableStartHour" />
         <p class="delimiter">-</p>
-        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item mobile"
-          @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
         <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item"
           @blur="blurHandler" :disable="disable || disableEndHour" :min="startHour" />
-        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item desktop"
+        <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
           @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
       </div>
     </q-field>
@@ -157,12 +155,4 @@ export default {
     color: black
     @media screen and (max-width: 767px)
       display: none
-
-  .desktop
-    @media screen and (max-width: 767px)
-        display: none
-  .mobile
-    @media screen and (min-width: 768px)
-        display: none
-
 </style>
