@@ -47,7 +47,7 @@ export const userMixin = {
     async updateUser (path) {
       try {
         if (this.tmpInput === get(this.mergedUserProfile, path)) {
-          this.emailLock = true;
+          if (path === 'local.email' && this.tmpInput !== '') this.emailLock = true;
           return;
         }
 

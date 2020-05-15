@@ -1,39 +1,38 @@
 <template>
   <q-page :class="backgroungClass" padding>
     <h4>Mon compte</h4>
-    <div>
       <div class="row gutter-profile q-mb-xl">
-        <div class="col-12 col-md-6 row items-center">
-          <div class="col-xs-11">
+        <div class="col-xs-12 col-md-6 row items-center">
+          <div class="col-11">
             <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
               :error="$v.mergedUserProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
               :error-label="emailError($v.mergedUserProfile)" v-model.trim="mergedUserProfile.local.email" />
           </div>
-          <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
+          <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
             <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
           </div>
         </div>
-        <ni-input v-model.trim="mergedUserProfile.contact.phone" caption="Téléphone" :error="$v.mergedUserProfile.contact.phone.$error"
-          error-label="Téléphone invalide." @blur="updateUser('contact.phone')" @focus="saveTmp('contact.phone')" />
+        <ni-input v-model.trim="mergedUserProfile.contact.phone" @focus="saveTmp('contact.phone')"
+          error-label="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
+          :error="$v.mergedUserProfile.contact.phone.$error" />
       </div>
-      <div class="row justify-center">
-        <q-btn big @click="newPasswordModale = true" color="primary" icon="mdi-lock-reset"
+      <div class="row">
+        <q-btn big @click="newPasswordModal = true" color="primary" icon="mdi-lock-reset"
           label="Modifier mon mot de passe" />
       </div>
-      <hr class="horizontal-separator">
-      <div class="row justify-center">
+      <hr class="q-my-lg">
+      <div class="row">
         <q-btn big color="primary" @click="logout" icon="logout" label="Déconnexion" />
       </div>
-      <div class="q-mt-md links">
+      <div class="q-mt-lg links">
         <div class="cursor-pointer q-mb-sm">
           <a @click.prevent="cguModal = true">Conditions générales d’utilisation</a>
         </div>
         <div class="cursor-pointer"><a @click.prevent="rgpdModal = true">Politique RGPD</a></div>
       </div>
-    </div>
 
     <!-- New password modal -->
-    <ni-modal v-model="newPasswordModale" @hide="resetForm">
+    <ni-modal v-model="newPasswordModal" @hide="resetForm">
       <template slot="title">
         Modifier mon <span class="text-weight-bold">mot de passe</span>
       </template>
@@ -44,12 +43,12 @@
         caption="Confirmation mot de passe" :error-label="passwordConfirmError" @blur="$v.passwordConfirm.$touch"
         required-field />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Modifier" :loading="loadingPasswordChange" color="primary"
-           icon-right="done" :disable="$v.$invalid || passwordConfirm === ''" @click="submitPasswordChange" />
+        <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
+           icon-right="done" @click="submitPasswordChange" />
       </template>
     </ni-modal>
 
-    <!-- RGPD modal -->
+    <!-- RGPD modal :disable="$v.$invalid" -->
     <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
 
     <!-- CSU modal -->
@@ -61,10 +60,12 @@
 import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import pick from 'lodash/pick';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
 import Modal from '@components/modal/Modal';
+import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
@@ -86,13 +87,12 @@ export default {
       mergedUserProfile: {
         local: { email: '', password: '' },
         contact: { phone: '' },
-        fromBack: {},
       },
       tmpInput: '',
       emailLock: true,
-      newPasswordModale: false,
+      newPasswordModal: false,
       passwordConfirm: '',
-      loadingPasswordChange: false,
+      loading: false,
       rgpd,
       rgpdModal: false,
       cguModal: false,
@@ -105,7 +105,7 @@ export default {
       mergedUserProfile: {
         local: {
           email: { required, email },
-          password: { ...this.passwordValidation },
+          password: { required, ...this.passwordValidation },
         },
         contact: {
           phone: { frPhoneNumber },
@@ -117,11 +117,10 @@ export default {
       },
     }
   },
-  async mounted () {
+  async created () {
     try {
-      this.mergedUserProfile.fromBack = await Users.getById(this.$route.params.id);
-      this.mergedUserProfile.local.email = this.mergedUserProfile.fromBack.local.email;
-      this.mergedUserProfile.contact.phone = get(this.mergedUserProfile.fromBack, 'contact.phone') || '';
+      const user = await Users.getById(this.$route.params.id);
+      this.mergedUserProfile = pick(user, ['local', 'contact']);
     } catch (e) {
       console.error(e);
     }
@@ -133,17 +132,35 @@ export default {
     async updateAlenviUser (path) {
       const value = get(this.mergedUserProfile, path);
       const payload = set({}, path, value);
-
-      if (path === 'local.password') await Users.updatePassword(this.$route.params.id, payload);
-      else await Users.updateById(this.$route.params.id, payload);
+      await Users.updateById(this.$route.params.id, payload);
     },
     async submitPasswordChange () {
-      await this.updateUser('local.password');
-      this.newPasswordModale = false;
+      try {
+        this.loading = true;
+        if (this.$v.$invalid) {
+          this.$v.mergedUserProfile.local.password.$touch();
+          this.$v.passwordConfirm.$touch();
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
+        const value = get(this.mergedUserProfile, 'local.password');
+        const payload = set({}, 'local.password', value);
+        await Users.updatePassword(this.$route.params.id, payload);
+
+        NotifyPositive('Modification enregistrée.');
+        this.newPasswordModal = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification.');
+      } finally {
+        this.loading = false;
+      }
     },
     resetForm () {
       this.mergedUserProfile.local.password = '';
       this.passwordConfirm = '';
+      this.$v.mergedUserProfile.local.password.$reset();
+      this.$v.passwordConfirm.$reset();
     },
     logout () {
       this.$q.cookies.remove('alenvi_token', { path: '/' });
@@ -173,10 +190,4 @@ export default {
   .links
     display: flex
     flex-direction: column
-  .horizontal-separator
-    margin-top: 5%
-    margin-bottom: 5%
-    @media screen and (max-width: 767px)
-      margin-top: calc(5% + 7px)
-      margin-bottom: calc(5% + 7px)
 </style>
