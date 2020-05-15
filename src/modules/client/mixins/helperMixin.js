@@ -30,20 +30,13 @@ export const helperMixin = {
       helpersColumns: [
         { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
         { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
-        {
-          name: 'email',
-          label: 'Email',
-          align: 'left',
-          field: row => get(row, 'local.email') || '',
-          style: 'word-break: break-word',
-        },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
           format: (value) => formatPhone(value),
-          style: 'width: 75px',
         },
         {
           name: 'startDate',
