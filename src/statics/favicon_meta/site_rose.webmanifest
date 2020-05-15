@@ -3,12 +3,12 @@
     "short_name": "",
     "icons": [
         {
-            "src": "https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/android-chrome-192x192.png?v=A0mxgJvdbx",
+            "src": "https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose/android-chrome-192x192.png?v=A0mxgJvdbx",
             "sizes": "192x192",
             "type": "image/png"
         },
         {
-            "src": "https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/android-chrome-512x512.png?v=A0mxgJvdbx",
+            "src": "https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose/android-chrome-512x512.png?v=A0mxgJvdbx",
             "sizes": "512x512",
             "type": "image/png"
         }

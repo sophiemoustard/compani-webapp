@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<browserconfig>
+    <msapplication>
+        <tile>
+            <square150x150logo src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux/mstile-150x150.png?v=XBblAqBLQR"/>
+            <TileColor>#dedede</TileColor>
+        </tile>
+    </msapplication>
+</browserconfig>

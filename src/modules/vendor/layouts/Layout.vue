@@ -25,6 +25,9 @@ import SideMenuTrainer from 'src/modules/vendor/components/menu/SideMenuTrainer'
 
 export default {
   metaInfo: {
+    meta: [
+      { name: 'msapplication-config', content: '/statics/favicon_meta/browserconfig_bordeaux.xml' },
+    ],
     link: [
       {
         rel: 'apple-touch-icon',
@@ -48,8 +51,12 @@ export default {
       },
       {
         rel: 'manifest',
+        href: 'statics/favicon_meta/site_bordeaux.webmanifest',
+      },
+      {
+        rel: 'shortcut icon',
         href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
-          '/site.webmanifest?v=XBblAqBLQR',
+          '/favicon.ico?v=XBblAqBLQR',
       },
     ],
   },

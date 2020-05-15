@@ -27,6 +27,9 @@ import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustome
 
 export default {
   metaInfo: {
+    meta: [
+      { name: 'msapplication-config', content: '/statics/favicon_meta/browserconfig_rose.xml' },
+    ],
     link: [
       {
         rel: 'apple-touch-icon',
@@ -50,7 +53,12 @@ export default {
       },
       {
         rel: 'manifest',
-        href: '/statics/favicon_meta/browserconfig_rose.xml',
+        href: 'statics/favicon_meta/site_rose.webmanifest',
+      },
+      {
+        rel: 'shortcut icon',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
+          '/favicon.ico?v=A0mxgJvdbx',
       },
     ],
   },
