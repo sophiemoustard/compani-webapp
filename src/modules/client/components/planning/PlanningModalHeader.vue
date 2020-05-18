@@ -41,3 +41,15 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.person-name
+  &-text
+    padding: 9px 14px 11px
+    margin-left: 5px
+    @media screen and (max-width: 767px)
+      font-size: 14px !important
+  &-select
+    @media screen and (max-width: 767px)
+      width: 80%
+</style>

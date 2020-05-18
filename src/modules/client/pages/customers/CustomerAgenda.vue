@@ -98,4 +98,7 @@ export default {
     flex-grow: 1
   input:focus
     outline: none
+
+.person-name
+  font-size: 14px;
 </style>

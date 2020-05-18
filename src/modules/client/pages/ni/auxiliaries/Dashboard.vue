@@ -86,10 +86,10 @@
         </div>
         <q-slide-transition>
           <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
-            class="sector-card row">
+            class="auxiliary-card-container row">
             <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
-              class="col-md-6 col-xs-12 auxiliary-card q-mb-lg q-pb-lg">
-              <div class="row person-name">
+              class="col-md-6 col-xs-12 auxiliary-card q-mb-lg">
+              <div class="row person-name q-mb-md">
                 <img :src="getAvatar(auxiliary.picture)" class="avatar">
                 <div class="q-pl-md">
                   {{ auxiliary.identity.firstname }} {{ auxiliary.identity.lastname.toUpperCase() }}
@@ -370,6 +370,15 @@ export default {
     border-bottom: 1px solid $light-grey
   div
     padding: 5px
+  &-card
+    display: flex
+    flex-direction: column
+    &:not(:nth-last-child(-n+2))
+      border-bottom: 1px solid $light-grey
+    &-container
+      margin: 0 16px
+      @media screen and (max-width: 767px)
+        margin: 0 8px
 
 .auxiliary-label
   border-right: 1px solid $light-grey
@@ -380,6 +389,8 @@ export default {
 
 .sector-card
   margin: 0 16px 16px
+  @media screen and (max-width: 767px)
+    font-size: 12px
 
 /deep/ .q-circular-progress__text
   font-size: 15px
@@ -389,6 +400,8 @@ export default {
   display: flex
   flex-direction: column
   justify-content: center;
+  @media screen and (max-width: 767px)
+    margin-top: 8px
   .col-4
     display: flex
     justify-content: center
@@ -400,6 +413,8 @@ export default {
       color: $grey
   &-value
     font-size: 48px
+    @media screen and (max-width: 767px)
+      font-size: 24px
   &-label
     padding: 0 10px
     text-align: center
@@ -411,13 +426,7 @@ export default {
 
 .gauge-wrapper
   display: flex
-  justify-content: space-around
-
-.auxiliary-card
-  display: flex
-  flex-direction: column
-  &:not(:nth-last-child(-n+2))
-    border-bottom: 1px solid $light-grey
+  justify-content: space-between
 
 .unassigned-hours
   font-style: italic
