@@ -1,6 +1,6 @@
 <template>
   <div class="indicators-container">
-    <div class="economic-indicators">
+    <div class="economic-indicators indicators">
       <div class="indicator row">
         <div class="col-4 indicator-title">Heures à travailler</div>
         <div class="col-8 row indicator-hours">
@@ -20,7 +20,7 @@
         <div class="col-2 indicator-hours">{{ hoursBalance | formatHours }}</div>
       </div>
     </div>
-    <div class="quality-indicators">
+    <div class="quality-indicators indicators">
       <div class="quality-indicators-item">
         <span class="highlight">{{ customersDetails.customerCount }}</span> bénéficiaires accompagnés,
         <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }} en moyenne</span>
@@ -99,6 +99,7 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+
   .indicator
     display: flex;
     border-top: 1px solid $light-grey
@@ -116,13 +117,15 @@ export default {
     color: $primary
     font-weight: bold
 
-  .economic-indicators
+  .indicators
     padding: 0 24px
     margin: 0 0 24px
-    border-left: 5px solid $primary-dark !important
+    @media screen and (max-width: 1024px)
+      padding: 0 12px
 
+  .economic-indicators
+    border-left: 5px solid $primary-dark !important
   .quality-indicators
-    padding: 0 24px
     border-left: 5px solid $primary !important
 
   .quality-indicators-item

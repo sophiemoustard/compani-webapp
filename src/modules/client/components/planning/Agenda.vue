@@ -1,11 +1,13 @@
 <template>
   <div class="planning-container full-width full-height">
     <table class="agenda-table full-height">
-      <thead style="height: 5%">
+      <thead>
         <th class="capitalize bottom-border" v-for="(day, index) in daysHeader" :key="index">
           <div class="row justify-center items-baseline days-header">
             <div class="days-name q-mr-lg">{{ day.name }}</div>
-            <div data-cy="days-number" :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+            <div data-cy="days-number" :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">
+              {{ day.number }}
+            </div>
           </div>
         </th>
       </thead>
@@ -121,9 +123,9 @@ export default {
   .agenda-table
     th
       @media screen and (min-width: 768px)
-        top: 90px;
+        top: 85px;
       @media screen and (max-width: 767px)
-        top: 110px;
+        top: 100px;
     td
       padding: 0px;
       height: 100%;

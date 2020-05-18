@@ -195,4 +195,10 @@ export default {
 .planning-header
   /deep/ .q-field__control
     background-color: inherit !important
+
+.person-name
+  font-size: 14px;
+  &-select
+    @media screen and (max-width: 767px)
+      width: 80%
 </style>
