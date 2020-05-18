@@ -69,14 +69,15 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading" />
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
+        :responsive="false" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
       <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
-        :loading="followUpLoading">
+        :loading="followUpLoading" :responsive="false">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"

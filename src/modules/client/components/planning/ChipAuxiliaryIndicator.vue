@@ -18,7 +18,7 @@
       <div class="modal-container modal-container-md">
         <div class="q-mb-md">
           <div class="row justify-between items-center q-pa-lg">
-            <div class="col-11 row person-name">
+            <div class="col-11 person-name modal">
               <img :src="getAvatar(person.picture)" class="avatar">
               <div class="q-pl-md">{{ person.identity.firstname }} {{ person.identity.lastname.toUpperCase() }}</div>
             </div>
@@ -185,4 +185,6 @@ export default {
   /deep/ .q-ripple
     display: none
 
+  .person-name.modal
+    font-size: 15px;
 </style>

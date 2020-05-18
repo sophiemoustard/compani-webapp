@@ -427,4 +427,7 @@ export default {
 .card-height
   height: 100px
 
+.person-name
+  font-size: 14px !important;
+
 </style>

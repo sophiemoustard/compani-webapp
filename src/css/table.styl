@@ -153,50 +153,6 @@
     .q-table__middle
       margin: 0 10px;
 
-  @media screen and (max-width: 767px)
-    table
-      border: 0
-
-      thead
-        border: none
-        clip: rect(0 0 0 0)
-        height: 1px
-        margin: -1px
-        overflow: hidden
-        padding: 0
-        position: absolute
-        width: 1px
-
-      tr
-        border: 1px solid #ddd
-        padding: .35em
-        border-bottom: 2px solid #ddd
-        display: block
-        margin: .625em
-
-      td
-        border-bottom: 1px solid #ddd
-        display: block
-        text-align: right
-        white-space: initial
-        height: auto
-        padding: 8px 8px
-        min-height: 32px
-
-        &::before
-          content: attr(data-label)
-          float: left
-          position: relative
-
-        &:first-child
-          width: 100%
-
-        &:last-child
-          border-bottom: 0
-        
-        & .table-actions
-          justify-content: flex-end !important
-
 .table-list
   margin-bottom: 25px
   .q-table
@@ -239,3 +195,39 @@
 
 .loading-container
   height: 50px;
+
+
+.table-simple, .table-responsive
+  @media screen and (max-width: 767px)
+    table
+      border: 0
+
+      thead
+        display: none
+
+      tr
+        border: 1px solid #ddd
+        padding: .35em
+        border-bottom: 2px solid #ddd
+        display: block
+        margin: .625em
+
+      td
+        border-bottom: 1px solid #ddd
+        display: block
+        text-align: right
+        white-space: initial
+        height: auto
+        padding: 8px 8px
+        min-height: 32px
+
+        &::before
+          content: attr(data-label)
+          float: left
+          position: relative
+
+        &:last-child
+          border-bottom: 0
+
+        & .table-actions
+          justify-content: flex-end !important
