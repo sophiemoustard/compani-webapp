@@ -56,6 +56,12 @@ export default {
         href: 'statics/favicon_meta/site_rose.webmanifest',
       },
       {
+        rel: 'mask-icon',
+        color: '#E2007A',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
+          '/safari-pinned-tab.svg?v=A0mxgJvdbx',
+      },
+      {
         rel: 'shortcut icon',
         href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
           '/favicon.ico?v=A0mxgJvdbx',

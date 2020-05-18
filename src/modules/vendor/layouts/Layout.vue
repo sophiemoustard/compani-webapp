@@ -58,6 +58,17 @@ export default {
         href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
           '/favicon.ico?v=XBblAqBLQR',
       },
+      {
+        rel: 'mask-icon',
+        color: '#7A0146',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_rose' +
+          '/safari-pinned-tab.svg?v=A0mxgJvdbx',
+      },
+      {
+        rel: 'shortcut icon',
+        href: 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon_bordeaux' +
+          '/favicon.ico?v=XBblAqBLQR',
+      },
     ],
   },
   components: {
