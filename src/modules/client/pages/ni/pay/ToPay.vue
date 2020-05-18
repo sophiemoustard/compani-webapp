@@ -157,15 +157,6 @@ export default {
         { label: 'Transport', value: 'transport' },
         { label: 'Autres frais', value: 'otherFees' },
       ],
-      period: 1,
-      periodOptions: [
-        { label: 'Mois en cours', value: 1 },
-        { label: 'Mois précédent', value: 0 },
-      ],
-      dates: {
-        startDate: this.$moment().startOf('M').toISOString(),
-        endDate: this.$moment().endOf('M').toISOString(),
-      },
       sortOption: 'auxiliary',
     };
   },
@@ -192,17 +183,7 @@ export default {
     },
     async period (value) {
       this.selected = [];
-      if (value) {
-        this.dates = {
-          startDate: this.$moment().startOf('M').toISOString(),
-          endDate: this.$moment().endOf('M').toISOString(),
-        }
-      } else {
-        this.dates = {
-          startDate: this.$moment().subtract(1, 'M').startOf('M').toISOString(),
-          endDate: this.$moment().subtract(1, 'M').endOf('M').toISOString(),
-        }
-      }
+      this.setSelectedPeriod(value);
       await this.refreshDraftPay();
     },
   },
@@ -231,7 +212,6 @@ export default {
         this.tableLoading = false;
       }
     },
-    // Surcharge modal
     openSurchargeDetailModal (id, details) {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
       if (!draft) return;
@@ -244,7 +224,6 @@ export default {
       this.pay = {};
       this.surchargeDetailKey = '';
     },
-    // Creation
     validateCreation () {
       this.$q.dialog({
         title: 'Confirmation',
