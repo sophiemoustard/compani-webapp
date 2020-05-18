@@ -1,32 +1,53 @@
 <template>
   <q-page :class="backgroungClass" padding>
     <h4>Mon compte</h4>
-    <div class="center-account">
-      <ni-input v-model.trim="user.local.email" caption="Email" :error="$v.user.local.email.$error"
-        error-label="Email invalide." @blur="$v.user.local.email.$touch" :disable="isAuxiliaryWithoutCompany"
-        @focus="saveTmp('local.email')" />
-      <ni-input v-model.trim="user.local.password" :error="$v.user.local.password.$error"
-        caption="Nouveau mot de passe" :error-label="passwordError($v.user.local.password)"
-        @blur="$v.user.local.password.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
-      <ni-input v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error"
-        caption="Confirmation mot de passe" :error-label="passwordConfirmError"
-        @blur="$v.passwordConfirm.$touch" type="password" :disable="isAuxiliaryWithoutCompany" />
-      <div class="row justify-center">
-        <q-btn big @click="updateUser" color="primary" :disable="$v.$invalid || isAuxiliaryWithoutCompany">
-          Éditer
-        </q-btn>
+      <div class="row gutter-profile q-mb-xl">
+        <div class="col-xs-12 col-md-6 row items-center">
+          <div class="col-11">
+            <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
+              :error="$v.mergedUserProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
+              :error-label="emailError($v.mergedUserProfile)" v-model.trim="mergedUserProfile.local.email" />
+          </div>
+          <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
+            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
+          </div>
+        </div>
+        <ni-input v-model.trim="mergedUserProfile.contact.phone" @focus="saveTmp('contact.phone')"
+          error-label="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
+          :error="$v.mergedUserProfile.contact.phone.$error" />
       </div>
-      <hr style="margin-top: 5%; margin-bottom: 5%">
-      <div class="row justify-center">
-        <q-btn big color="primary" @click="logout">Déconnexion</q-btn>
+      <div class="row">
+        <q-btn big @click="newPasswordModal = true" color="primary" icon="mdi-lock-reset"
+          label="Modifier mon mot de passe" />
       </div>
-      <div class="q-mt-md links">
+      <hr class="q-my-lg">
+      <div class="row">
+        <q-btn big color="primary" @click="logout" icon="logout" label="Déconnexion" />
+      </div>
+      <div class="q-mt-lg links">
         <div class="cursor-pointer q-mb-sm">
           <a @click.prevent="cguModal = true">Conditions générales d’utilisation</a>
         </div>
         <div class="cursor-pointer"><a @click.prevent="rgpdModal = true">Politique RGPD</a></div>
       </div>
-    </div>
+
+    <!-- New password modal -->
+    <ni-modal v-model="newPasswordModal" @hide="resetForm">
+      <template slot="title">
+        Modifier mon <span class="text-weight-bold">mot de passe</span>
+      </template>
+      <ni-input in-modal v-model.trim="mergedUserProfile.local.password" type="password"
+        caption="Nouveau mot de passe" :error-label="passwordError($v.mergedUserProfile.local.password)" required-field
+        @blur="$v.mergedUserProfile.local.password.$touch" :error="$v.mergedUserProfile.local.password.$error" />
+      <ni-input in-modal v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error" type="password"
+        caption="Confirmation mot de passe" :error-label="passwordConfirmError" @blur="$v.passwordConfirm.$touch"
+        required-field />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
+          :disable="$v.mergedUserProfile.local.password.$invalid || $v.passwordConfirm.$invalid" icon-right="done"
+          @click="submitPasswordChange" />
+      </template>
+    </ni-modal>
 
     <!-- RGPD modal -->
     <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
@@ -39,87 +60,109 @@
 <script>
 import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
-import Users from '@api/Users'
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import set from 'lodash/set';
+import pick from 'lodash/pick';
+import Users from '@api/Users';
 import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
-import { AUXILIARY_WITHOUT_COMPANY } from '@data/constants';
+import Modal from '@components/modal/Modal';
+import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { passwordMixin } from '@mixins/passwordMixin';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { userMixin } from '@mixins/userMixin';
 import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {
   name: 'AccountInfo',
   metaInfo: { title: 'Mon compte' },
-  mixins: [passwordMixin],
+  mixins: [passwordMixin, validationMixin, userMixin],
   components: {
     'ni-input': Input,
     'ni-html-modal': HtmlModal,
+    'ni-modal': Modal,
   },
   data () {
     return {
-      user: {
+      mergedUserProfile: {
         local: { email: '', password: '' },
-        alenvi: {},
-        contracts: [],
+        contact: { phone: '' },
       },
+      tmpInput: '',
+      emailLock: true,
+      newPasswordModal: false,
       passwordConfirm: '',
+      loading: false,
       rgpd,
       rgpdModal: false,
       cguModal: false,
       cguCompani,
-      tmpInput: '',
       backgroungClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
     }
   },
   validations () {
     return {
-      user: {
+      mergedUserProfile: {
         local: {
           email: { required, email },
-          password: { ...this.passwordValidation },
+          password: { required, ...this.passwordValidation },
+        },
+        contact: {
+          phone: { frPhoneNumber },
         },
       },
       passwordConfirm: {
-        required: requiredIf((item) => !!item.user.local.password),
-        sameAsPassword: sameAs((item) => item.user.local.password),
+        required: requiredIf((item) => !!item.mergedUserProfile.local.password),
+        sameAsPassword: sameAs((item) => item.mergedUserProfile.local.password),
       },
     }
   },
-  async mounted () {
+  async created () {
     try {
-      this.user.alenvi = await Users.getById(this.$route.params.id);
-      this.user.local.email = this.user.alenvi.local.email;
+      const user = await Users.getById(this.$route.params.id);
+      this.mergedUserProfile = { contact: {}, ...pick(user, ['local.email', 'contact']) };
     } catch (e) {
       console.error(e);
     }
   },
-  computed: {
-    isAuxiliaryWithoutCompany () {
-      return get(this.user, 'alenvi.client.name', null) === AUXILIARY_WITHOUT_COMPANY;
-    },
-  },
   methods: {
     saveTmp (path) {
-      if (this.tmpInput === '') this.tmpInput = get(this.user, path);
+      if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
     },
-    async updateUser () {
+    async updateAlenviUser (path) {
+      const value = get(this.mergedUserProfile, path);
+      const payload = set({}, path, value);
+      await Users.updateById(this.$route.params.id, payload);
+    },
+    async submitPasswordChange () {
       try {
-        if (this.tmpInput !== '' && this.user.local.email !== this.tmpInput) {
-          await Users.updateById(this.$route.params.id, { local: { email: this.user.local.email } });
+        this.loading = true;
+
+        this.$v.mergedUserProfile.local.password.$touch();
+        this.$v.passwordConfirm.$touch();
+        if (this.$v.mergedUserProfile.local.password.$error || this.$v.passwordConfirm.$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
         }
-        if (this.user.local.password) {
-          await Users.updatePassword(this.$route.params.id, { local: { password: this.user.local.password } });
-        }
-        NotifyPositive('Profil modifié.');
+
+        const value = get(this.mergedUserProfile, 'local.password');
+        const payload = set({}, 'local.password', value);
+        await Users.updatePassword(this.$route.params.id, payload);
+
+        NotifyPositive('Modification enregistrée.');
+        this.newPasswordModal = false;
       } catch (e) {
-        NotifyNegative('Erreur lors de la modification du profil.');
         console.error(e);
+        NotifyNegative('Erreur lors de la modification.');
       } finally {
-        this.user.local.password = '';
-        this.passwordConfirm = '';
-        this.tmpInput = '';
+        this.loading = false;
       }
+    },
+    resetForm () {
+      this.mergedUserProfile.local.password = '';
+      this.passwordConfirm = '';
+      this.$v.mergedUserProfile.local.password.$reset();
+      this.$v.passwordConfirm.$reset();
     },
     logout () {
       this.$q.cookies.remove('alenvi_token', { path: '/' });
@@ -146,10 +189,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .center-account
-    max-width: 40%
-    @media screen && (max-width: 600px)
-      max-width: 100%
   .links
     display: flex
     flex-direction: column

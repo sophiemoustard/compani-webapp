@@ -587,9 +587,6 @@ export default {
     isCoach () {
       return COACH_ROLES.includes(this.clientRole);
     },
-    lockIcon () {
-      return this.emailLock ? 'lock' : 'lock_open';
-    },
     establishmentsOptions () {
       return [
         { label: 'Non affecté', value: null, inactive: true },
@@ -612,31 +609,12 @@ export default {
     },
   },
   methods: {
-    async toggleEmailLock (toLock) {
-      if (!toLock) {
-        this.emailLock = false;
-        await this.$nextTick();
-        this.$refs.userEmail.$refs.emailInput.focus();
-      } else {
-        await this.updateUser('local.email');
-      }
-    },
     mergeUser (value = null) {
       const args = [this.mergedUserProfile, value];
       this.mergedUserProfile = Object.assign({}, extend(true, ...args));
     },
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
-    },
-    async emailErrorHandler (path) {
-      try {
-        NotifyNegative('Email déjà existant.');
-        this.mergedUserProfile.local.email = this.tmpInput;
-        await this.$nextTick();
-        this.$refs.userEmail.select();
-      } catch (e) {
-        console.error(e);
-      }
     },
     async updateAlenviUser (path) {
       let value = get(this.mergedUserProfile, path);
@@ -650,6 +628,7 @@ export default {
       }
 
       await Users.updateById(this.mergedUserProfile._id, payload);
+      this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
     },
     async uploadImage () {
       try {
