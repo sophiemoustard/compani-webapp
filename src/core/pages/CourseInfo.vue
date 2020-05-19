@@ -86,7 +86,7 @@ import Courses from '@api/Courses';
 import { formatIdentity, formatPhone } from '@helpers/utils';
 import HtmlModal from '@components/modal/HtmlModal';
 import rules from 'src/statics/rules.html';
-import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   metaInfo: { title: 'Formation' },

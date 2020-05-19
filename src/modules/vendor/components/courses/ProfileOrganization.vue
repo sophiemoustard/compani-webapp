@@ -181,7 +181,7 @@ import { TRAINER, REQUIRED_LABEL, INTER_B2B, INTRA } from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
-import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileOrganization',
