@@ -36,6 +36,7 @@ export default {
       CLIENT_ADMIN,
       interfaceType: CLIENT,
       activeRoutes: {
+        courses: { open: false },
         planning: { open: false },
         customers: { open: false },
         teams: { open: false },
@@ -74,6 +75,12 @@ export default {
           children: [
             { name: 'ni customers', icon: 'contacts', label: 'Répertoire bénéficiaires' },
             { name: 'ni customers fundings monitoring', icon: 'view_headline', label: "Suivi des plans d'aide" },
+          ],
+        }, {
+          ref: 'courses',
+          label: 'Formations',
+          children: [
+            { name: 'ni courses', icon: 'mdi-teach', label: 'Mes formations' },
           ],
         }, {
           ref: 'billing',
