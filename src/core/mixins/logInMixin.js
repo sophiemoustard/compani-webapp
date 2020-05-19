@@ -3,7 +3,10 @@ import Users from '@api/Users';
 
 export const logInMixin = {
   computed: {
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({
+      clientRole: 'main/clientRole',
+      vendorRole: 'main/vendorRole',
+    }),
   },
   methods: {
     async logInUser (authenticationPayload) {
@@ -20,7 +23,7 @@ export const logInMixin = {
       await this.$store.dispatch('main/getLoggedUser', this.$q.cookies.get('user_id'));
 
       if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
-      if (!this.clientRole) return this.$router.replace('/ad').catch(e => {});
+      if (this.vendorRole && !this.clientRole) return this.$router.replace('/ad').catch(e => {});
       return this.$router.replace('/').catch(e => {});
     },
   },

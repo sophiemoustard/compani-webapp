@@ -2,8 +2,9 @@
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
       <side-menu-coach ref="coachMenu" v-if="isCoach && !isMini" />
-      <side-menu-auxiliary ref="auxiliaryMenu" v-if="isAuxiliary && !isMini" />
-      <side-menu-customer ref="helperMenu" v-if="isHelper && !isMini" />
+      <side-menu-auxiliary ref="auxiliaryMenu" v-else-if="isAuxiliary && !isMini" />
+      <side-menu-customer ref="helperMenu" v-else-if="isHelper && !isMini" />
+      <side-menu-empty ref="emptyMenu" v-else-if="!isMini" />
       <div :class="chevronContainerClasses">
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
@@ -24,6 +25,7 @@ import { layoutMixin } from '@mixins/layoutMixin';
 import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach';
 import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxiliary';
 import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer';
+import SideMenuEmpty from 'src/modules/client/components/menu/SideMenuEmpty';
 
 export default {
   name: 'ClientLayout',
@@ -31,6 +33,7 @@ export default {
     'side-menu-coach': SideMenuCoach,
     'side-menu-auxiliary': SideMenuAuxiliary,
     'side-menu-customer': SideMenuCustomer,
+    'side-menu-empty': SideMenuEmpty,
   },
   mixins: [layoutMixin],
   data () {

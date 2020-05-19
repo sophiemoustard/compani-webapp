@@ -25,12 +25,14 @@ const routes = [
 
         const userVendorRole = store.getters['main/vendorRole'];
         const userClientRole = store.getters['main/clientRole'];
-        if (!userClientRole && !userVendorRole) return next({ name: '404' });
+        if (!userClientRole && !userVendorRole) return next({ name: 'account client', params: { id: loggedUser._id } });
         if (!userClientRole) return next({ path: '/ad' });
 
         const company = store.getters['main/company'];
         if (userClientRole === HELPER) return next({ name: 'customers agenda' });
-        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account client', params: { id: loggedUser._id } });
+        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
+          return next({ name: 'account client', params: { id: loggedUser._id } });
+        }
         if (AUXILIARY_ROLES.includes(userClientRole)) {
           if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries agenda' });
           return next({ name: 'account client', params: { id: loggedUser._id } });
