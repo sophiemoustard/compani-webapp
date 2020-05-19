@@ -3,7 +3,6 @@
     <ni-title-header title="Fin de contrats" padding slots>
       <template slot="content">
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
-          <div>Afficher</div>
           <div class="col-xs-12 col-sm-6 col-md-3">
             <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator in-form />
           </div>
@@ -100,7 +99,6 @@ export default {
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
     'ni-title-header': TitleHeader,
     'ni-select': Select,
-
   },
   data () {
     return {

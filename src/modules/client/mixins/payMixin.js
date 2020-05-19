@@ -185,10 +185,10 @@ export const payMixin = {
           format: formatPrice,
         },
       ],
-      period: 1,
+      period: 0,
       periodOptions: [
-        { label: 'Mois en cours', value: 1 },
-        { label: 'Mois précédent', value: 0 },
+        { label: 'Mois en cours', value: 0 },
+        { label: 'Mois précédent', value: 1 },
       ],
       dates: {
         startDate: this.$moment().startOf('M').toISOString(),
@@ -227,17 +227,10 @@ export const payMixin = {
 
       return parseFloat(hours).toFixed(2);
     },
-    setSelectedPeriod (value) {
-      if (value) {
-        this.dates = {
-          startDate: this.$moment().startOf('M').toISOString(),
-          endDate: this.$moment().endOf('M').toISOString(),
-        }
-      } else {
-        this.dates = {
-          startDate: this.$moment().subtract(1, 'M').startOf('M').toISOString(),
-          endDate: this.$moment().subtract(1, 'M').endOf('M').toISOString(),
-        }
+    setSelectedPeriod (offset) {
+      this.dates = {
+        startDate: this.$moment().subtract(offset, 'M').startOf('M').toISOString(),
+        endDate: this.$moment().subtract(offset, 'M').endOf('M').toISOString(),
       }
     },
     async exportToCSV () {
