@@ -1,5 +1,4 @@
 import get from 'lodash/get';
-import Companies from '@api/Companies';
 import { mapGetters } from 'vuex';
 import { INTRA, COURSE_TYPES } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
@@ -35,17 +34,6 @@ export const courseMixin = {
     },
   },
   methods: {
-    async refreshCompanies () {
-      try {
-        const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.tradeName, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-      } catch (e) {
-        console.error(e);
-        this.companyOptions = [];
-      }
-    },
     happened (sameDaySlots) {
       return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },

@@ -11,7 +11,7 @@ import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import TitleHeader from '@components/TitleHeader';
-import Trello from '@components/Trello';
+import Trello from '@components/courses/Trello';
 
 export default {
   metaInfo: { title: 'Catalogue' },

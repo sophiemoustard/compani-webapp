@@ -10,13 +10,11 @@ import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import TitleHeader from '@components/TitleHeader';
-import Trello from '@components/Trello';
-import { trelloMixin } from '@mixins/trelloMixin';
+import Trello from '@components/courses/Trello';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
-  mixins: [trelloMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-trello': Trello,

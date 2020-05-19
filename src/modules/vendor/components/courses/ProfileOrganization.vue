@@ -170,6 +170,7 @@ import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import CourseSlots from '@api/CourseSlots';
 import Users from '@api/Users';
+import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
@@ -391,6 +392,17 @@ export default {
   },
   methods: {
     get,
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = companies
+          .map(c => ({ label: c.tradeName, value: c._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
+      }
+    },
     saveTmp (path) {
       this.tmpInput = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
     },

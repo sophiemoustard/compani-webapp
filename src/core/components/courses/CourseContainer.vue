@@ -8,7 +8,7 @@
 
 <script>
 import { TRAINER } from '@data/constants';
-import CourseCard from 'src/modules/vendor/components/courses/CourseCard';
+import CourseCard from '@components/courses/CourseCard';
 
 export default {
   name: 'CourseContainer',

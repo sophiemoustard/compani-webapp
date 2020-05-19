@@ -32,21 +32,20 @@ import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
+import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
-import Trello from '@components/Trello';
+import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
-import { trelloMixin } from '@mixins/trelloMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
-  mixins: [trelloMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-input': Input,
@@ -112,6 +111,17 @@ export default {
       } catch (e) {
         console.error(e);
         this.programOptions = [];
+      }
+    },
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = companies
+          .map(c => ({ label: c.tradeName, value: c._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
       }
     },
     updateCourseCompany () {

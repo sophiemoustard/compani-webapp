@@ -1,6 +1,20 @@
-import Companies from '@api/Companies';
+<template>
+  <div class="trello">
+    <course-container v-for="col in trello" :title="col.title" :courses="col.courses" :key="col.title" />
+  </div>
+</template>
 
-export const trelloMixin = {
+<script>
+import CourseContainer from '@components/courses/CourseContainer';
+
+export default {
+  name: 'Trello',
+  components: {
+    'course-container': CourseContainer,
+  },
+  props: {
+    courses: { type: Array, default: () => [] },
+  },
   computed: {
     courseListForthcoming () {
       return this.courses
@@ -62,16 +76,15 @@ export const trelloMixin = {
     happened (sameDaySlots) {
       return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
-    async refreshCompanies () {
-      try {
-        const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.tradeName, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-      } catch (e) {
-        console.error(e);
-        this.companyOptions = [];
-      }
-    },
   },
-};
+}
+</script>
+
+<style lang="stylus" scoped>
+.trello
+  overflow: auto;
+  display: flex
+  flex-direction: row
+  @media screen and (min-width: 768px)
+    justify-content: space-between
+</style>
