@@ -142,10 +142,6 @@ export const CANCELLATION_REASONS = [
   { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
 ];
 
-// TRAINER STATUS
-export const INTERNAL = 'internal';
-export const EXTERNAL = 'external';
-
 // INTERFACE
 export const VENDOR = 'vendor';
 export const CLIENT = 'client';
