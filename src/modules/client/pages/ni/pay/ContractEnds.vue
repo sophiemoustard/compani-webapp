@@ -1,8 +1,14 @@
 <template>
   <q-page class="client-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Fins de contrats</h4>
-    </div>
+    <ni-title-header title="Fin de contrats" padding slots>
+      <template slot="content">
+        <div class=" col-xs-12 row items-baseline justify-end fill-width">
+          <div class="col-xs-12 col-sm-6 col-md-3">
+            <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator in-form />
+          </div>
+        </div>
+      </template>
+    </ni-title-header>
     <ni-large-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
       <template v-slot:header="{ props }" >
@@ -76,6 +82,8 @@
 import FinalPay from '@api/FinalPay';
 import EditableTd from '@components/table/EditableTd';
 import LargeTable from '@components/table/LargeTable';
+import TitleHeader from '@components/TitleHeader'
+import Select from '@components/form/Select';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
@@ -89,6 +97,8 @@ export default {
     'ni-editable-td': EditableTd,
     'ni-large-table': LargeTable,
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
+    'ni-title-header': TitleHeader,
+    'ni-select': Select,
   },
   data () {
     return {
@@ -107,7 +117,14 @@ export default {
       return this.selected.length > 0;
     },
   },
-  async mounted () {
+  watch: {
+    async period (value) {
+      this.selected = [];
+      this.setSelectedPeriod(value);
+      await this.refreshFinalPay();
+    },
+  },
+  async created () {
     this.tableLoading = true;
     await this.refreshFinalPay();
     this.tableLoading = false;
@@ -115,10 +132,7 @@ export default {
   methods: {
     async refreshFinalPay () {
       try {
-        const draftFinalPay = await FinalPay.getDraftFinalPay({
-          startDate: this.$moment().startOf('M').toISOString(),
-          endDate: this.$moment().endOf('M').toISOString(),
-        });
+        const draftFinalPay = await FinalPay.getDraftFinalPay(this.dates);
         this.draftFinalPay = draftFinalPay.map(dp => ({
           ...dp,
           hoursCounterEdition: false,
@@ -132,7 +146,6 @@ export default {
         console.error(e);
       }
     },
-    // Surcharge modal
     openSurchargeDetailModal (id, details) {
       const draft = this.draftFinalPay.find(ds => ds.auxiliary._id === id);
       if (!draft) return;
@@ -145,7 +158,6 @@ export default {
       this.pay = {};
       this.surchargeDetailKey = '';
     },
-    // Creation
     validateFinalPayListCreation () {
       this.$q.dialog({
         title: 'Confirmation',

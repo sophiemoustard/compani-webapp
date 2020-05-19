@@ -63,7 +63,7 @@ export default {
       ],
     }
   },
-  async mounted () {
+  async created () {
     await this.$store.dispatch('rh/getUserProfile', { userId: this.auxiliaryId });
   },
   watch: {
