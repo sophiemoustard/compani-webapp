@@ -177,7 +177,14 @@ import DateTimeRange from '@components/form/DatetimeRange';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TRAINER, REQUIRED_LABEL, INTER_B2B, INTRA } from '@data/constants';
+import {
+  VENDOR_ADMIN,
+  TRAINING_ORGANISATION_MANAGER,
+  TRAINER,
+  REQUIRED_LABEL,
+  INTER_B2B,
+  INTRA,
+} from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
@@ -313,6 +320,9 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    isAdmin () {
+      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
+    },
     addressError () {
       if (!this.$v.newCourseSlot.address.fullAddress.required) {
         return REQUIRED_LABEL;

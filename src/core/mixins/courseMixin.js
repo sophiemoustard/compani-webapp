@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import Companies from '@api/Companies';
 import { mapGetters } from 'vuex';
-import { VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, INTRA, COURSE_TYPES } from '@data/constants';
+import { INTRA, COURSE_TYPES } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 
 export const courseMixin = {
@@ -12,9 +12,6 @@ export const courseMixin = {
     },
     programName () {
       return get(this.course, 'program.name') || '';
-    },
-    isAdmin () {
-      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },
     isIntraCourse () {
       return get(this.course, 'type') === INTRA;

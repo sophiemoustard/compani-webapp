@@ -107,7 +107,7 @@ const routes = [
       {
         path: 'trainers/management/courses',
         name: 'trainers courses',
-        component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
+        component: () => import('src/modules/vendor/pages/trainers/management/CoursesDirectory'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

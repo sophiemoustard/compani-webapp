@@ -2,8 +2,8 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
     <ni-trello :courses="coursesWithGroupedSlot" />
-    <q-btn v-if="isAdmin" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
-      label="Ajouter une formation" @click="courseCreationModal = true" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
+      @click="courseCreationModal = true" />
 
     <!-- Course creation modal -->
     <ni-modal v-model="courseCreationModal" @hide="resetCreationModal">
@@ -40,7 +40,7 @@ import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
 import Trello from '@components/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { TRAINER, INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
+import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
@@ -88,16 +88,12 @@ export default {
     },
   },
   async created () {
-    await this.refreshCourses();
-    if (this.isAdmin) await Promise.all([this.refreshPrograms(), this.refreshCompanies()]);
+    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies()]);
   },
   methods: {
     async refreshCourses () {
       try {
-        const params = {};
-        if (this.vendorRole === TRAINER) params.trainer = this.loggedUser._id;
-
-        const courses = await Courses.list(params);
+        const courses = await Courses.list();
         this.coursesWithGroupedSlot = courses.map(course => ({
           ...course,
           slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
