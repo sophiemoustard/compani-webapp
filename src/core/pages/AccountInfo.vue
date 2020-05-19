@@ -16,12 +16,12 @@
           error-label="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="$v.mergedUserProfile.contact.phone.$error" />
       </div>
-      <div class="row">
+      <div class="row button">
         <q-btn big @click="newPasswordModal = true" color="primary" icon="mdi-lock-reset"
           label="Modifier mon mot de passe" />
       </div>
       <hr class="q-my-lg">
-      <div class="row">
+      <div class="row button">
         <q-btn big color="primary" @click="logout" icon="logout" label="Déconnexion" />
       </div>
       <div class="q-mt-lg links">
@@ -189,7 +189,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .links
+.links
+  display: flex
+  flex-direction: column
+.button
+  @media screen and (max-width: 676px)
     display: flex
-    flex-direction: column
+    justify-content: center
 </style>
