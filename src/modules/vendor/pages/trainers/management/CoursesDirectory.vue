@@ -11,12 +11,12 @@ import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import TitleHeader from '@components/TitleHeader';
 import Trello from '@components/Trello';
-import { courseMixin } from '@mixins/courseMixin';
+import { trelloMixin } from '@mixins/trelloMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
-  mixins: [courseMixin],
+  mixins: [trelloMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-trello': Trello,

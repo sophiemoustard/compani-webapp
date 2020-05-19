@@ -6,14 +6,14 @@
 
 <script>
 import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
-import { courseMixin } from '@mixins/courseMixin';
+import { trelloMixin } from '@mixins/trelloMixin';
 
 export default {
   name: 'Trello',
   components: {
     'course-container': CourseContainer,
   },
-  mixins: [courseMixin],
+  mixins: [trelloMixin],
   props: {
     courses: { type: Array, default: () => [] },
   },

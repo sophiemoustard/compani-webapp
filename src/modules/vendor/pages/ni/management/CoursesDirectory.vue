@@ -41,12 +41,12 @@ import OptionGroup from '@components/form/OptionGroup';
 import Trello from '@components/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
-import { courseMixin } from '@mixins/courseMixin';
+import { trelloMixin } from '@mixins/trelloMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
-  mixins: [courseMixin],
+  mixins: [trelloMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-input': Input,
