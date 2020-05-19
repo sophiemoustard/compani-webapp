@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="vendor-background">
     <ni-profile-header :title="programName" />
     <profile-tabs :profile-id="programId" :tabsContent="tabsContent" />
   </q-page>
@@ -25,6 +25,7 @@ export default {
   },
   data () {
     return {
+      programName: '',
       tabsContent: [
         { label: 'Programme', name: 'program', default: this.defaultTab === 'program', component: ProfileInfo },
       ],
@@ -32,12 +33,15 @@ export default {
   },
   computed: {
     ...mapState('program', ['program']),
-    programName () {
-      return get(this.program, 'name') || '';
+  },
+  watch: {
+    program () {
+      this.programName = get(this.program, 'name') || '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.program) await this.refreshProgram();
+    this.programName = get(this.program, 'name') || '';
   },
   methods: {
     async refreshProgram () {

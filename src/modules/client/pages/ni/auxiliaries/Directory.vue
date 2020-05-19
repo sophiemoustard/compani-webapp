@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @updateSearch="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
@@ -277,7 +277,7 @@ export default {
       }
     },
     goToUserProfile (row) {
-      this.$router.push({ name: 'personal info', params: { auxiliaryId: row.auxiliary._id } });
+      this.$router.push({ name: 'ni auxiliaries info', params: { auxiliaryId: row.auxiliary._id } });
     },
     resetForm () {
       this.$v.newUser.$reset();

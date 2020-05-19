@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <h4>Contact</h4>
     <div class="referent-container" v-if="referent">
       Pour toutes les questions concernant l’organisation des interventions et le planning, nous vous invitons à
@@ -7,18 +7,20 @@
       <div class="items-center row">
         <img :src="referentAvatar" class="avatar q-mr-sm" />
         <div class="referent-info">
-          {{ referentIdentity }}
-          <span>
+          <div data-cy="referent-identity">{{ referentIdentity }}</div>
+          <div data-cy="referent-phone">
             Numéro de téléphone :
             <a v-if="referentPhoneNumber" class="text-primary" :href="referentPhoneLink">{{referentPhoneNumber}}</a>
-          </span>
+          </div>
         </div>
       </div>
     </div>
     <div v-if="company && company.billingAssistance">
       Pour toutes les questions concernant la facturation ou l’utilisation de votre espace Compani,
       merci de nous adresser un email à
-      <a :href="'mailto:' + company.billingAssistance">{{ company.billingAssistance }}</a>.
+      <a data-cy="billing-asssistance-email" :href="'mailto:' + company.billingAssistance">
+        {{ company.billingAssistance }}
+      </a>.
       Nous vous répondrons dans les plus brefs délais.
     </div>
   </q-page>
@@ -76,7 +78,7 @@ export default {
 .referent-container
   margin-bottom: 20px;
 
-.referent-container div
+.referent-container > div
   margin-bottom: 10px;
   margin-top: 10px;
 

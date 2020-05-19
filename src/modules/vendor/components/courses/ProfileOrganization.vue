@@ -22,59 +22,49 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Dates ({{ Object.keys(courseSlots).length }})</p>
-      <q-card>
-        <ni-responsive-table :data="Object.values(courseSlots)" :columns="courseSlotsColumns" separator="none"
-          :loading="courseSlotsLoading">
-          <template v-slot:header="{ props }">
-            <q-tr :props="props" :class="{ 'th-border-bottom': Object.values(courseSlots).length === 0 }">
-              <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">
-                <template v-if="col.name === 'hours'">
-                  Créneaux ({{ course.slots ? course.slots.length : 0 }})
-                </template>
-                <template v-else-if="col.name === 'duration'">Durée ({{ slotsDurationColumnTitle }})</template>
-                <template v-else>{{ col.label }}</template>
-              </q-th>
-            </q-tr>
-          </template>
-          <template v-slot:body="{ props }">
-            <q-tr v-for="(slot, index) in props.row" :key="slot._id" :props="props"
-              :class="{ 'td-border-top': index === 0 && !$q.platform.is.mobile }">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <template v-if="col.name === 'date' && (index === 0 || $q.platform.is.mobile)">
-                  {{ $moment(slot.startDate).format('DD/MM/YYYY') }}
-                </template>
-                <template v-else-if="col.name === 'hours'">
-                  {{ $moment(slot.startDate).format('HH:mm') }} - {{ $moment(slot.endDate).format('HH:mm') }}
-                </template>
-                <template v-else-if="col.name === 'duration'">
-                  {{ getSlotDuration(slot) }}
-                </template>
-                <template v-else-if="col.name === 'address'">
-                  {{ get(slot, 'address.fullAddress') || '' }}
-                </template>
-                <template v-else-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="edit" @click="openCourseSlotEditionModal(slot)" />
-                    <q-icon color="grey" name="delete" @click="validateCourseSlotDeletion(slot._id)" />
-                  </div>
-                </template>
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </template>
-        </ni-responsive-table>
-        <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un créneau"
-            @click="courseSlotCreationModal = true" :disable="courseSlotsLoading" />
-        </q-card-actions>
-      </q-card>
+      <q-item class="slot-section-title">
+        <q-item-section side>
+          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense/>
+        </q-item-section>
+        <q-item-section>
+          <div class="text-weight-bold">{{ formatSlotTitle.title }}</div>
+          <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
+        </q-item-section>
+      </q-item>
+      <div class="slots-cards-container row">
+        <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index" flat>
+          <div class="slots-cards-title">
+            <div class="slots-cards-number">{{ index + 1 }}</div>
+            <div class="slots-cards-date text-weight-bold">{{ key }}</div>
+          </div>
+          <div class="slots-cards-content" v-for="slot in value" :key="slot._id">
+            <div>
+              <q-item>
+                <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
+                <q-item-section>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item-section>
+              </q-item>
+              <q-item>
+                <q-item-section side><q-icon name="location_on" flat dense size="xs" /></q-item-section>
+                <q-item-section>{{ getSlotAddress(slot) }}</q-item-section>
+              </q-item>
+            </div>
+            <div class="row no-wrap">
+              <q-icon color="grey" size="sm" name="edit" @click="openCourseSlotEditionModal(slot)" />
+              <q-icon color="grey" size="sm" name="delete" @click="validateCourseSlotDeletion(slot._id)" />
+            </div>
+          </div>
+        </q-card>
+      </div>
+      <div class="q-mt-md" align="right">
+        <q-btn class="add-slot" label="Ajouter un créneau" no-caps flat color="white" icon="add"
+          :disable="courseSlotsLoading" @click="courseSlotCreationModal = true" />
+      </div>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Participants ({{ traineesNumber }})</p>
       <q-card>
-        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination">
+        <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
+          :visible-columns="traineesVisibleColumns">
           <template v-slot:body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -141,6 +131,8 @@
       <ni-input in-modal v-model.trim="newTrainee.contact.phone" :error="$v.newTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch"
         :error-label="phoneNbrError($v.newTrainee)" />
+      <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" :error="$v.newTrainee.company.$error"
+        @blur="$v.newTrainee.company.$touch" required-field caption="Structure" :options="companyOptions" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter à la formation" icon-right="add" color="primary"
           :loading="loading" @click="addTrainee" :disable="$v.newTrainee.$invalid" />
@@ -185,7 +177,7 @@ import DateTimeRange from '@components/form/DatetimeRange';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TRAINER, REQUIRED_LABEL } from '@data/constants';
+import { TRAINER, REQUIRED_LABEL, INTER_B2B, INTRA } from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
@@ -210,6 +202,7 @@ export default {
       trainerOptions: [],
       courseSlots: {},
       loading: false,
+      tmpInput: '',
       courseSlotsLoading: false,
       courseSlotCreationModal: false,
       newCourseSlot: {
@@ -241,6 +234,13 @@ export default {
         },
       },
       traineesColumns: [
+        {
+          name: 'company',
+          label: 'Structure',
+          align: 'left',
+          field: row => get(row, 'company.tradeName') || '',
+          classes: 'text-capitalize',
+        },
         {
           name: 'firstname',
           label: 'Prénom',
@@ -283,6 +283,7 @@ export default {
         identity: { lastname: { required } },
         local: { email: { required, email } },
         contact: { phone: { frPhoneNumber } },
+        company: { required: requiredIf(() => { return this.course.type === INTER_B2B; }) },
       },
       traineeEditionModal: false,
       editedTrainee: {
@@ -290,6 +291,7 @@ export default {
         contact: {},
         local: {},
       },
+      companyOptions: [],
     }
   },
   validations () {
@@ -317,7 +319,12 @@ export default {
       }
       return 'Adresse non valide';
     },
-    slotsDurationColumnTitle () {
+    traineesVisibleColumns () {
+      const visibleColumns = ['firstname', 'lastname', 'email', 'phone', 'actions'];
+      if (this.course.type === INTRA) return visibleColumns;
+      return ['company', ...visibleColumns];
+    },
+    slotsDurationTitle () {
       if (!this.course || !this.course.slots) return '0h';
 
       const total = this.course.slots.reduce(
@@ -329,6 +336,30 @@ export default {
       const hours = total.days() * 24 + total.hours();
 
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
+    },
+    formatSlotTitle () {
+      const slotList = Object.values(this.courseSlots);
+
+      if (!slotList.length) {
+        return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
+      }
+
+      const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
+
+      if (slotList.length === 1) {
+        return {
+          title: `1 date, ${this.slotsDurationTitle}`,
+          subtitle: `le ${firstSlot}`,
+          icon: 'mdi-calendar-range',
+        };
+      }
+
+      const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+      return {
+        title: `${slotList.length} dates, ${this.slotsDurationTitle}`,
+        subtitle: `du ${firstSlot} au ${lastSlot}`,
+        icon: 'mdi-calendar-range',
+      };
     },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
@@ -343,10 +374,10 @@ export default {
       return '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.course) await this.refreshCourse();
     else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
-    if (this.isAdmin) await this.refreshTrainers();
+    if (this.isAdmin) await Promise.all([this.refreshTrainers(), this.refreshCompanies()]);
   },
   methods: {
     get,
@@ -402,6 +433,12 @@ export default {
       const paddedMinutes = this.padMinutes(duration.minutes());
 
       return paddedMinutes ? `${duration.hours()}h${paddedMinutes}` : `${duration.hours()}h`;
+    },
+    formatSlotHour (slot) {
+      return `${this.$moment(slot.startDate).format('HH:mm')} - ${this.$moment(slot.endDate).format('HH:mm')}`;
+    },
+    getSlotAddress (slot) {
+      return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
     },
     resetCourseSlotCreationModal () {
       this.newCourseSlot = {
@@ -501,7 +538,9 @@ export default {
       this.$v.newTrainee.$reset();
     },
     formatTraineeCreationPayload (payload) {
-      return { ...removeEmptyProps(payload), company: this.course.companies[0]._id };
+      const newTraineePayload = removeEmptyProps(payload);
+      if (this.course.type === INTRA) newTraineePayload.company = this.course.company._id;
+      return newTraineePayload;
     },
     async addTrainee () {
       try {
@@ -583,4 +622,49 @@ export default {
 
 .table-top
   font-size: 15px
+.slots-cards
+  padding: 10px
+  &-container
+    grid-auto-rows: 1fr
+    grid-auto-flow: row
+    display: grid
+    grid-gap: 20px 10px
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))
+  &-number
+    font-size: 12px
+    border: solid 1px
+    display: flex
+    height: 20px
+    width: 20px
+    border-radius: 50%
+    align-content: center
+    justify-content: center
+  &-title
+    display: flex
+    justify-content: space-between
+    align-items: center
+    margin: 0 10px 10px 10px
+  &-date
+    color: $primary
+    font-size: 16px
+  &-content
+    margin: 5px 10px
+    display: flex
+    justify-content: space-between
+  &-content > div > .q-item
+    font-size: 14px
+    padding: 0px
+    min-height: auto
+  &-content > div > .q-icon
+    cursor: pointer
+.add-slot
+  background: $primary
+.slot-section-title
+  padding: 0;
+  margin: 10px 0px
+  &-subtitle
+     font-style: italic
+     font-size: 16px
+     @media (max-width: 767px)
+      font-size: 13px
 </style>

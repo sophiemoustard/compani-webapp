@@ -7,15 +7,15 @@
     </div>
     <q-separator />
     <q-expansion-item ref="management" v-model="activeRoutes.management.open" label="Gestion">
-      <ni-menu-item name="trainer courses directory" icon="mdi-teach" label="Formations" />
+      <ni-menu-item name="trainers courses" icon="mdi-teach" label="Formations" />
     </q-expansion-item>
     <q-separator />
     <q-expansion-item ref="administrative" v-model="activeRoutes.administrative.open" label="Administration">
-      <ni-menu-item name="trainer personal info" :params="{ trainerId: loggedUser._id }" icon="person"
+      <ni-menu-item name="trainers info" :params="{ trainerId: loggedUser._id }" icon="person"
         label="Infos personnelles" />
     </q-expansion-item>
     <q-separator />
-    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" />
+    <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
   </q-list>
 </template>
 
@@ -23,6 +23,7 @@
 import MenuItem from '@components/menu/MenuItem';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import { VENDOR } from '@data/constants'
 
 export default {
   mixins: [sideMenuMixin],
@@ -36,6 +37,7 @@ export default {
         administrative: { open: false },
         management: { open: false },
       },
+      interfaceType: VENDOR,
     };
   },
   mounted () {

@@ -79,7 +79,7 @@ export const companyMixin = {
   methods: {
     tradeNameError (validation) {
       if (!validation.tradeName.required) return REQUIRED_LABEL;
-      else if (!validation.tradeName.maxLength) return 'Doit contenir 11 caractères (espaces inclus).';
+      else if (!validation.tradeName.maxLength) return 'Doit contenir 11 caractères maximum (espaces inclus).';
 
       return '';
     },

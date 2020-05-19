@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background q-pb-xl">
+  <q-page class="client-background q-pb-xl">
     <div class="title-padding row items-start">
       <div class="col-xs-12 col-md-5 row q-mb-md">
         <ni-chips-autocomplete ref="teamAutocomplete" v-model="terms" :filters="filters" />
@@ -31,7 +31,7 @@
                 {{ roundFrenchPercentage(hoursRatio(sector), 0).replace('&nbsp;', '') }}
               </q-circular-progress>
             </div>
-            <div class="q-mb-md">
+            <div class="q-mb-lg">
               <div class="row auxiliary">
                 <div class="col-8 auxiliary-label">Heures facturées</div>
                 <div class="col-4 auxiliary-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
@@ -44,7 +44,7 @@
                 <div class="col-12">{{ formatHours(getUnassignedHours(sector)) }} à affecter</div>
               </div>
             </div>
-            <div class="q-pt-md gauge-wrapper">
+            <div class="gauge-wrapper">
               <ni-gauge v-if="getInternalHours(sector) !== 0" :min="5" :max="20" :value="getInternalHoursRatio(sector)">
                 <div slot="title" class="q-mt-sm">
                   <span class="text-weight-bold">Heures internes</span> -
@@ -86,10 +86,10 @@
         </div>
         <q-slide-transition>
           <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
-            class="sector-card row">
+            class="auxiliary-card-container row">
             <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
-              class="col-md-6 col-xs-12 auxiliary-card q-mb-lg q-pb-lg">
-              <div class="row person-name">
+              class="col-md-6 col-xs-12 auxiliary-card q-mb-lg">
+              <div class="row person-name q-mb-md">
                 <img :src="getAvatar(auxiliary.picture)" class="avatar">
                 <div class="q-pl-md">
                   {{ auxiliary.identity.firstname }} {{ auxiliary.identity.lastname.toUpperCase() }}
@@ -354,7 +354,6 @@ export default {
 .stats-header
   display: flex
   justify-content: space-between
-  align-items: center
 
 .sector-name
   font-size: 24px
@@ -369,18 +368,29 @@ export default {
   border-right: 1px solid $light-grey
   &:nth-child(2)
     border-bottom: 1px solid $light-grey
+  div
+    padding: 5px
+  &-card
+    display: flex
+    flex-direction: column
+    &:not(:nth-last-child(-n+2))
+      border-bottom: 1px solid $light-grey
+    &-container
+      margin: 0 16px
+      @media screen and (max-width: 767px)
+        margin: 0 8px
 
 .auxiliary-label
   border-right: 1px solid $light-grey
-  padding: 3px 4px
 
 .auxiliary-value
   justify-content: flex-end
   display: flex
-  padding: 5px
 
 .sector-card
   margin: 0 16px 16px
+  @media screen and (max-width: 767px)
+    font-size: 12px
 
 /deep/ .q-circular-progress__text
   font-size: 15px
@@ -390,6 +400,8 @@ export default {
   display: flex
   flex-direction: column
   justify-content: center;
+  @media screen and (max-width: 767px)
+    margin-top: 8px
   .col-4
     display: flex
     justify-content: center
@@ -401,6 +413,8 @@ export default {
       color: $grey
   &-value
     font-size: 48px
+    @media screen and (max-width: 767px)
+      font-size: 24px
   &-label
     padding: 0 10px
     text-align: center
@@ -412,13 +426,7 @@ export default {
 
 .gauge-wrapper
   display: flex
-  justify-content: space-around
-
-.auxiliary-card
-  display: flex
-  flex-direction: column
-  &:not(:nth-last-child(-n+2))
-    border-bottom: 1px solid $light-grey
+  justify-content: space-between
 
 .unassigned-hours
   font-style: italic
@@ -427,5 +435,8 @@ export default {
 
 .card-height
   height: 100px
+
+.person-name
+  font-size: 14px !important;
 
 </style>

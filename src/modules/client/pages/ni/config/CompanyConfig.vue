@@ -1,33 +1,25 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="client-background" padding>
     <div v-if="company">
       <h4>Configuration générale</h4>
       <div class="q-mb-xl">
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
-            @blur="updateCompany('name')" />
+            @blur="updateCompany('name')"  :error="$v.company.name.$error" />
           <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
             @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
-              :error-label="tradeNameError($v.company)" />
+            :error-label="tradeNameError($v.company)" />
           <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
-          <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')" />
           <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
             @blur="updateCompany('rcs')" :error="$v.company.rcs.$error" :error-label="rcsError" />
           <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
             @blur="updateCompany('rna')" :error="$v.company.rna.$error" :error-label="rcsError" />
-          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
-            @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
-          <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
-            v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
-          <ni-input caption="Support facturation" :error="$v.company.billingAssistance.$error"
-            :error-label="billingAssistanceError" v-model.trim="company.billingAssistance"
-            @focus="saveTmp('billingAssistance')" @blur="updateCompany('billingAssistance')" />
         </div>
       </div>
-      <div class="q-mb-xl">
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Représentant légal</p>
         <div class="row gutter-profile">
           <ni-input caption="Prénom" :error="$v.company.legalRepresentative.firstname.$error"
@@ -41,14 +33,28 @@
             error-label="Fonction invalide" @blur="updateCompany('legalRepresentative.position')" />
         </div>
       </div>
-      <div class="q-mb-xl">
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
+        <p class="text-weight-bold">Facturation</p>
+        <div class="row gutter-profile">
+          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
+            @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
+          <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
+            v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
+          <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')"
+            :error="$v.company.ics.$error" />
+          <ni-input caption="Support facturation" :error="$v.company.billingAssistance.$error"
+            :error-label="billingAssistanceError" v-model.trim="company.billingAssistance"
+            @focus="saveTmp('billingAssistance')" @blur="updateCompany('billingAssistance')" />
+        </div>
+      </div>
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Paie</p>
         <div class="row gutter-profile">
           <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
             v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
         </div>
       </div>
-      <div class="q-mb-xl">
+      <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Établissements</p>
         <q-card>
           <ni-responsive-table :data="establishments" :columns="establishmentsColumns" :loading="establishmentsLoading"
@@ -143,6 +149,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
@@ -165,6 +172,7 @@ import { REQUIRED_LABEL, COMPANY } from '@data/constants';
 import { urssafCodes } from '@data/urssafCodes';
 import { workHealthServices } from '@data/workHealthServices';
 import { companyMixin } from '@mixins/companyMixin';
+import { defineAbilitiesFor } from '@helpers/ability';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
@@ -273,8 +281,16 @@ export default {
       editedEstablishment: this.establishmentValidation,
     };
   },
+  computed: {
+    ...mapGetters({ clientRole: 'main/clientRole' }),
+    canUpdateErpConfig () {
+      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+      return ability.can('update', 'erp_config');
+    },
+  },
   async mounted () {
-    await Promise.all([this.refreshCompany(), this.getEstablishments()]);
+    if (this.canUpdateErpConfig) await Promise.all([this.refreshCompany(), this.getEstablishments()]);
+    else await this.refreshCompany();
   },
   methods: {
     async refreshCompany () {
@@ -415,7 +431,3 @@ export default {
   },
 }
 </script>
-
-<style lang="less" scoped>
-
-</style>

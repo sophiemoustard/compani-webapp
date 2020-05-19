@@ -10,12 +10,17 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
+
 export default {
   name: 'Error404',
   data () {
     return {
       canGoBack: window.history.length > 1,
     }
+  },
+  computed: {
+    ...mapGetters({ clientRole: 'main/clientRole' }),
   },
   methods: {
     goBack () {
@@ -33,5 +38,5 @@ export default {
 <style lang="stylus" scoped>
 .q-btn
   margin: 5px
-  width:200px
+  width: 200px
 </style>

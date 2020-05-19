@@ -120,11 +120,8 @@ export default {
   data () {
     return {
       smsModal: false,
-      messageType: 'convocation',
-      messageTypeOptions: [
-        { label: 'Convocation', value: CONVOCATION },
-        { label: 'Rappel', value: REMINDER },
-      ],
+      messageType: '',
+      messageTypeOptions: [],
       message: '',
       loading: false,
       courseLoading: false,
@@ -148,6 +145,8 @@ export default {
   },
   async created () {
     await Promise.all([this.refreshCourse(), this.refreshSms()]);
+    this.setMessageTypeOptions();
+    this.setDefaultMessageType();
   },
   computed: {
     ...mapState('course', ['course']),
@@ -171,6 +170,10 @@ export default {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
       return !slots.length;
     },
+    courseNotStartedYet () {
+      const slots = this.course.slots.filter(slot => this.$moment().isAfter(slot.endDate))
+      return !slots.length;
+    },
     courseLink () {
       return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
         `trainees/courses/${this.course._id}`;
@@ -180,6 +183,14 @@ export default {
     getType (value) {
       const type = this.messageTypeOptions.find(type => type.value === value);
       return type ? type.label : '';
+    },
+    setMessageTypeOptions () {
+      this.messageTypeOptions = [];
+      if (this.courseNotStartedYet) this.messageTypeOptions.push({ label: 'Convocation', value: CONVOCATION });
+      this.messageTypeOptions.push({ label: 'Rappel', value: REMINDER });
+    },
+    setDefaultMessageType () {
+      this.messageType = this.courseNotStartedYet ? CONVOCATION : REMINDER;
     },
     async refreshSms () {
       try {
@@ -219,15 +230,15 @@ export default {
       this.smsHistory = {};
     },
     updateMessage () {
-      if (this.messageType === 'convocation') this.setConvocationMessage();
-      else if (this.messageType === 'reminder') this.setReminderMessage();
+      if (this.messageType === CONVOCATION) this.setConvocationMessage();
+      else if (this.messageType === REMINDER) this.setReminderMessage();
     },
     setConvocationMessage () {
       const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrits à la formation ${this.course.name}.\nLa première session à ` +
+      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.course.name}.\nLa première session à ` +
         `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
         `formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne formation,` +
         '\nCompani';
@@ -238,7 +249,7 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrits à la formation ${this.course.name}.\nVotre ` +
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.course.name}.\nVotre ` +
       `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
       `le début de la formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne ` +
       'formation,\nCompani'
@@ -256,7 +267,7 @@ export default {
         this.smsModal = false;
         this.loading = false;
         this.message = '';
-        this.messageType = 'convocation';
+        this.setDefaultMessageType();
       }
     },
     downloadAttendanceSheet () {

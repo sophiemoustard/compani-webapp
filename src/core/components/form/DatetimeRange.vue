@@ -122,9 +122,9 @@ export default {
 
   .date-item
     @media screen and (min-width: 768px)
-      width: 22%
+      width: 26%
     @media screen and (max-width: 767px)
-      width: 50%
+      width: 60%
     /deep/ .q-field--with-bottom
       padding: 0
     /deep/ .q-field__control
@@ -137,9 +137,9 @@ export default {
 
   .time-item
     @media screen and (min-width: 768px)
-      width: 22%
+      width: 18%
     @media screen and (max-width: 767px)
-      width: 50%
+      width: 40%
     /deep/ .q-field--with-bottom
       padding: 0
     /deep/ .q-field__inner
@@ -152,8 +152,7 @@ export default {
 
   .delimiter
     margin: 0
-    color: $black
+    color: black
     @media screen and (max-width: 767px)
       display: none
-
 </style>

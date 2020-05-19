@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="neutral-background">
+  <q-page padding class="client-background">
     <template v-if="customer">
       <div class="q-mb-lg">
         <h4>Abonnement</h4>
@@ -10,12 +10,13 @@
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                  :style="col.style">
+                  :style="col.style" :data-cy="`col-${col.name}`">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)" />
+                      <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)"
+                        data-cy="show-subscription-history" />
                       <q-btn :disable="!getFunding(col.value).length" flat round small color="grey" icon="mdi-calculator"
-                        @click="showFunding(col.value)" />
+                        @click="showFunding(col.value)" data-cy="show-fundings-history" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -32,7 +33,7 @@
               :disable="customer.subscriptionsAccepted" dense />
             <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que
               les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
-                Alenvi</a>.<span class="text-weight-thin text-italic"> {{ agreement }}</span></span>
+                Alenvi</a>.<span class="text-weight-thin text-italic" data-cy="agreement"> {{ agreement }}</span></span>
           </div>
         </div>
       </div>
@@ -108,17 +109,17 @@
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
-      <template slot="title">
+      <template slot="title" data-cy="service-name">
         Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
           selectedSubscription.service.name}}</span>
       </template>
       <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
-        :pagination.sync="paginationHistory" />
+        :pagination.sync="paginationHistory" data-cy="subscriptions-history" />
     </ni-modal>
 
     <!-- Funding modal -->
     <ni-modal v-model="fundingModal" @hide="resetFundingData" title="Financement">
-      <ni-funding-grid-table :data="fundingData" :columns="fundingsColumns" />
+      <ni-funding-grid-table :data="fundingData" :columns="fundingsColumns" data-cy="fundings-history" />
     </ni-modal>
   </q-page>
 </template>

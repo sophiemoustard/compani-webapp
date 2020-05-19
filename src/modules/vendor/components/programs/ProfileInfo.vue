@@ -31,6 +31,11 @@ export default {
   components: {
     'ni-input': Input,
   },
+  data () {
+    return {
+      tmpInput: '',
+    }
+  },
   validations () {
     return {
       program: { name: { required }, learningGoals: { required } },

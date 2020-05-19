@@ -2,7 +2,7 @@
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination"
       :hide-bottom="pagination.rowsPerPage === 0" :visible-columns="visibleColumns" :rows-per-page-options="[]"
-      v-on="$listeners" class="neutral-background">
+      v-on="$listeners" :class="[{'table-simple': responsive }]">
       <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
         <slot name="top-row" :props="props" />
       </template>
@@ -37,6 +37,7 @@ export default {
     visibleColumns: Array,
     pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
     loading: { type: Boolean, default: false },
+    responsive: { type: Boolean, default: true },
   },
 }
 </script>

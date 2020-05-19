@@ -1,7 +1,7 @@
 <template>
   <div>
     <compani-header />
-    <div class="col-12 row justify-center neutral-background" style="min-height: 100vh">
+    <div class="col-12 row justify-center client-background">
       <div class="signup-body-padding">
         <div class="row items-center">
           <div class="col-2" style="text-align: left">
@@ -89,7 +89,8 @@ export default {
       margin-top: 20px
       margin-bottom: 24px
 
-  .neutral-background
+  .client-background
+    min-height: 100vh
     @media screen and (max-width: 768px)
       height: 85vh
 

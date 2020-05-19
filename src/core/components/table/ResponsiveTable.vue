@@ -14,7 +14,7 @@
         <slot name="body" :props="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-              :style="col.style">
+              :style="col.style" :data-cy="`col-${col.name}`">
               {{ col.value }}
             </q-td>
           </q-tr>

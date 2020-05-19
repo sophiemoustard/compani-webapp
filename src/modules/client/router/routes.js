@@ -8,10 +8,6 @@ import {
   AUXILIARY_ROLES,
   COACH_ROLES,
   AUXILIARY_WITHOUT_COMPANY,
-  CLIENT_ADMIN,
-  COACH,
-  PLANNING_REFERENT,
-  AUXILIARY,
 } from 'src/core/data/constants';
 
 const routes = [
@@ -32,10 +28,17 @@ const routes = [
         if (!userClientRole && !userVendorRole) return next({ name: '404' });
         if (!userClientRole) return next({ path: '/ad' });
 
-        if (userClientRole === HELPER) return next({ name: 'customer agenda' });
-        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'client account info', params: { id: loggedUser._id } });
-        if (AUXILIARY_ROLES.includes(userClientRole)) return next({ name: 'auxiliary agenda' });
-        if (COACH_ROLES.includes(userClientRole)) return next({ name: 'auxiliaries directory' });
+        const company = store.getters['main/company'];
+        if (userClientRole === HELPER) return next({ name: 'customers agenda' });
+        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account client', params: { id: loggedUser._id } });
+        if (AUXILIARY_ROLES.includes(userClientRole)) {
+          if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries agenda' });
+          return next({ name: 'account client', params: { id: loggedUser._id } });
+        }
+        if (COACH_ROLES.includes(userClientRole)) {
+          if (get(company, 'subscriptions.erp')) return next({ name: 'ni auxiliaries' });
+          return next({ name: 'account client', params: { id: loggedUser._id } });
+        }
         return next({ name: '404' });
       } catch (e) {
         console.error(e);
@@ -44,342 +47,318 @@ const routes = [
     children: [
       {
         path: 'ni/config/company',
-        name: 'company config',
+        name: 'ni config company',
         component: () => import('src/modules/client/pages/ni/config/CompanyConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'configuration',
         },
       },
       {
         path: 'ni/config/rh',
-        name: 'rh config',
+        name: 'ni config rh',
         component: () => import('src/modules/client/pages/ni/config/RhConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'configuration',
         },
       },
       {
         path: 'ni/config/customers',
-        name: 'customers config',
+        name: 'ni config customers',
         component: () => import('src/modules/client/pages/ni/config/CustomersConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
+          parent: 'configuration',
+        },
+      },
+      {
+        path: 'ni/config/coachs',
+        name: 'ni config coach',
+        component: () => import('src/modules/client/pages/ni/config/CoachConfig'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
           parent: 'configuration',
         },
       },
       {
         path: 'ni/config/tags',
-        name: 'tags config',
+        name: 'ni config tags',
         component: () => import('src/modules/client/pages/ni/config/TagConfig'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'configuration',
         },
       },
       {
         path: 'ni/billing/to-bill',
-        name: 'to bill',
+        name: 'ni billing to bill',
         component: () => import('src/modules/client/pages/ni/billing/ToBill'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'billing',
         },
       },
       {
         path: 'ni/billing/credit-notes',
-        name: 'credit note',
+        name: 'ni billing credit note',
         component: () => import('src/modules/client/pages/ni/billing/CreditNotes'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'billing',
         },
       },
       {
         path: 'ni/billing/clients-balances',
-        name: 'clients balances',
+        name: 'ni billing clients balances',
         component: () => import('src/modules/client/pages/ni/billing/ClientsBalances'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'billing',
         },
       },
       {
         path: 'ni/billing/tpp-bill-slips',
-        name: 'tpp bill slips',
+        name: 'ni billing tpp bill slips',
         component: () => import('src/modules/client/pages/ni/billing/TppBillSlips'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'billing',
         },
       },
       {
         path: 'ni/billing/debits-archive',
-        name: 'debits archive',
+        name: 'ni billing debits archive',
         component: () => import('src/modules/client/pages/ni/billing/DebitsArchive'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'billing',
         },
       },
       {
         path: 'ni/pay/to-pay',
-        name: 'to pay',
+        name: 'ni pay to pay',
         component: () => import('src/modules/client/pages/ni/pay/ToPay'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'pay',
         },
       },
       {
         path: 'ni/pay/contract-ends',
-        name: 'contract ends',
+        name: 'ni pay contract ends',
         component: () => import('src/modules/client/pages/ni/pay/ContractEnds'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN],
           parent: 'pay',
         },
       },
       {
         path: 'ni/pay/contract-monitoring',
-        name: 'contract monitoring',
+        name: 'ni pay contract monitoring',
         component: () => import('src/modules/client/pages/ni/pay/ContractMonitoring'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
           parent: 'pay',
         },
       },
       {
         path: 'ni/pay/absences',
-        name: 'absences',
+        name: 'ni pay absences',
         component: () => import('src/modules/client/pages/ni/pay/Absences'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
           parent: 'pay',
         },
       },
       {
         path: 'ni/exports/data',
-        name: 'data',
+        name: 'ni exports data',
         component: () => import('src/modules/client/pages/ni/exports/DataExports'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
           parent: 'exports',
         },
       },
       {
         path: 'ni/exports/history',
-        name: 'history',
+        name: 'ni exports history',
         component: () => import('src/modules/client/pages/ni/exports/HistoryExports'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
           parent: 'exports',
         },
       },
       {
         path: 'ni/auxiliaries',
-        name: 'auxiliaries directory',
+        name: 'ni auxiliaries',
         component: () => import('src/modules/client/pages/ni/auxiliaries/Directory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
           parent: 'teams',
         },
       },
       {
         path: 'ni/auxiliaries/dashboard',
-        name: 'dashboard',
+        name: 'ni auxiliaries dashboard',
         component: () => import('src/modules/client/pages/ni/auxiliaries/Dashboard'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT],
           parent: 'teams',
         },
       },
       {
         path: 'ni/auxiliaries/staff-register',
-        name: 'staff register',
+        name: 'ni auxiliaries staff register',
         component: () => import('src/modules/client/pages/ni/auxiliaries/StaffRegister'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
           parent: 'teams',
         },
       },
       {
         path: 'ni/auxiliaries/:auxiliaryId',
-        name: 'personal info',
+        name: 'ni auxiliaries info',
         component: () => import('src/modules/client/pages/ni/auxiliaries/AuxiliaryProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
           parent: 'teams',
         },
       },
       {
         path: 'ni/customers',
-        name: 'customers directory',
+        name: 'ni customers',
         component: () => import('src/modules/client/pages/ni/customers/CustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
-          parent: 'benef',
+          parent: 'customers',
         },
       },
       {
         path: 'ni/customers/fundings',
-        name: 'customers fundings monitoring',
+        name: 'ni customers fundings monitoring',
         component: () => import('src/modules/client/pages/ni/customers/CustomersFundingsMonitoring'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT],
-          parent: 'benef',
+          parent: 'customers',
         },
       },
       {
         path: 'ni/customers/:customerId',
-        name: 'customers profile',
+        name: 'ni customers info',
         props: true,
         component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: COACH_ROLES,
-          parent: 'benef',
+          parent: 'customers',
         },
       },
       {
         path: 'ni/planning/auxiliaries',
-        name: 'auxiliaries planning',
+        name: 'ni planning auxiliaries',
         component: () => import('src/modules/client/pages/ni/planning/AuxiliaryPlanning'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT],
           parent: 'planning',
         },
       },
       {
         path: 'ni/planning/customers',
-        name: 'customers planning',
+        name: 'ni planning customers',
         component: () => import('src/modules/client/pages/ni/planning/CustomerPlanning'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [CLIENT_ADMIN, COACH, AUXILIARY, PLANNING_REFERENT],
           parent: 'planning',
         },
       },
       // Auxiliary view routes
       {
         path: 'auxiliaries/agenda',
-        name: 'auxiliary agenda',
+        name: 'auxiliaries agenda',
         component: () => import('src/modules/client/pages/auxiliaries/planning/AuxiliaryAgenda'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
           parent: 'planning',
         },
       },
       {
         path: 'auxiliaries/teams',
-        name: 'teams directory',
+        name: 'auxiliaries teams',
         component: () => import('src/modules/client/pages/auxiliaries/teams/TeamsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
           parent: 'teams',
         },
       },
       {
         path: 'auxiliaries/customers',
-        name: 'profile customers',
+        name: 'auxiliaries customers',
         component: () => import('src/modules/client/pages/auxiliaries/customers/AuxiliaryCustomersDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
-          parent: 'benef',
+          parent: 'customers',
         },
       },
       {
         path: 'auxiliaries/customers/:customerId',
-        name: 'profile customers info',
+        name: 'auxiliaries customers info',
         props: true,
         component: () => import('src/modules/client/pages/auxiliaries/customers/CustomerInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
         },
       },
       {
         path: 'auxiliaries/pay',
-        name: 'profile salaries',
+        name: 'auxiliaries pay',
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Salaries'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: AUXILIARY_ROLES,
           parent: 'administrative',
         },
       },
       {
         path: 'auxiliaries/docs',
-        name: 'profile docs',
+        name: 'auxiliaries docs',
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Documents'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
           parent: 'administrative',
         },
       },
       {
         path: 'auxiliaries/contracts',
-        name: 'profile contracts',
+        name: 'auxiliaries contracts',
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Contracts'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: AUXILIARY_ROLES,
           parent: 'administrative',
         },
       },
       {
         path: 'auxiliaries/info',
-        name: 'auxiliary personal info',
+        name: 'auxiliaries info',
         component: () => import('src/modules/client/pages/auxiliaries/administrative/Info'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [AUXILIARY, PLANNING_REFERENT],
           parent: 'administrative',
         },
       },
       // Customers view routes
       {
         path: 'customers/agenda',
-        name: 'customer agenda',
+        name: 'customers agenda',
         component: () => import('src/modules/client/pages/customers/CustomerAgenda'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [HELPER],
         },
       },
       {
         path: 'customers/contact',
-        name: 'customer contact',
+        name: 'customers contact',
         component: () => import('src/modules/client/pages/customers/Contact'),
         async beforeEnter (to, from, next) {
           const loggedUser = store.state.main.loggedUser;
@@ -390,47 +369,42 @@ const routes = [
         },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [HELPER],
         },
       },
       {
         path: 'customers/documents',
-        name: 'customer documents',
+        name: 'customers documents',
         component: () => import('src/modules/client/pages/customers/Billing'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [HELPER],
         },
       },
       {
         path: 'customers/subscriptions',
-        name: 'customer subscription',
+        name: 'customers subscription',
         component: () => import('src/modules/client/pages/customers/Subscriptions'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [HELPER],
         },
       },
       {
         path: 'customers/contracts',
-        name: 'customer contracts',
+        name: 'customers contracts',
         component: () => import('src/modules/client/pages/customers/Contracts'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [HELPER],
         },
       },
       // All profiles
       {
         path: ':id/account',
-        name: 'client account info',
+        name: 'account client',
         component: () => import('src/core/pages/AccountInfo'),
         beforeEnter (to, from, next) {
           return to.params.id === Cookies.get('user_id') ? next() : next('/404');
         },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          roles: [...COACH_ROLES, ...AUXILIARY_ROLES, HELPER],
         },
       },
     ],

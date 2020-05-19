@@ -4,7 +4,7 @@
       <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label"
         :name="tab.name" :alert="alert(tab)"/>
     </q-tabs>
-    <q-tab-panels v-model="selectedTab" class="no-border neutral-background" flat>
+    <q-tab-panels v-model="selectedTab" class="no-border" flat>
       <q-tab-panel v-for="(tab, index) in tabsContent" :name="tab.name" :key="index">
         <component :is="tab.component" :profile-id="profileId" />
       </q-tab-panel>
@@ -60,12 +60,13 @@ export default {
       color: $light-grey
       opacity: 1
     & /deep/.q-tab-panels
-        .scroll
-          overflow: initial
-        .q-panel
-          .q-tab-panel
-            padding: 0
-            padding-top: 24px
+      background-color: inherit
+      .scroll
+        overflow: initial
+      .q-panel
+        .q-tab-panel
+          padding: 0
+          padding-top: 24px
     & /deep/ .q-tabs
       & div:nth-last-child(1)
         margin-right: 0 !important
@@ -79,6 +80,10 @@ export default {
           justify-content: start
           margin-right: 24px
           text-transform: none
+          @media (max-width: 767px)
+            max-width: 66%
+          @media (min-width: 768px)
+            max-width: 33%
           & .q-tab__content
             & .q-tab__label
               color: $dark-grey

@@ -30,7 +30,6 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
-import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
@@ -57,43 +56,22 @@ export default {
   },
   computed: {
     ...mapGetters({ mergedUserProfile: 'rh/getUserProfile' }),
-    lockIcon () {
-      return this.emailLock ? 'lock' : 'lock_open';
-    },
   },
   async mounted () {
     this.$v.mergedUserProfile.$touch();
     this.isLoaded = true;
   },
   methods: {
-    async toggleEmailLock (toLock) {
-      if (!toLock) {
-        this.emailLock = false;
-        await this.$nextTick();
-        this.$refs.userEmail.$refs.emailInput.focus();
-      } else {
-        await this.updateUser('local.email');
-      }
-    },
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
     },
     async updateAlenviUser (path) {
       const value = get(this.mergedUserProfile, path);
       const payload = set({}, path, value);
-      await Users.updateById(this.mergedUserProfile._id, payload);
-    },
-    async emailErrorHandler (path) {
-      try {
-        NotifyNegative('Email déjà existant.');
-        this.mergedUserProfile.local.email = this.tmpInput;
-        await this.$nextTick();
-        this.$refs.userEmail.select();
-      } catch (e) {
-        console.error(e);
-      }
-    },
 
+      await Users.updateById(this.mergedUserProfile._id, payload);
+      this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
+    },
   },
 };
 </script>

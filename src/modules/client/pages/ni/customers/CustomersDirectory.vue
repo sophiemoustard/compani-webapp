@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
       display-toggle @updateSearch="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
@@ -206,7 +206,7 @@ export default {
       }
     },
     goToCustomerProfile (customer) {
-      this.$router.push({ name: 'customers profile', params: { customerId: customer._id } });
+      this.$router.push({ name: 'ni customers info', params: { customerId: customer._id } });
     },
     resetForm () {
       this.$v.newCustomer.$reset();

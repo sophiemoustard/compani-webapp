@@ -29,11 +29,25 @@ export const userMixin = {
       },
     };
   },
+  computed: {
+    lockIcon () {
+      return this.emailLock ? 'lock' : 'lock_open';
+    },
+  },
   methods: {
+    async toggleEmailLock () {
+      if (this.emailLock) {
+        this.emailLock = false;
+        await this.$nextTick();
+        this.$refs.userEmail.$refs.emailInput.focus();
+      } else {
+        await this.updateUser('local.email');
+      }
+    },
     async updateUser (path) {
       try {
         if (this.tmpInput === get(this.mergedUserProfile, path)) {
-          this.emailLock = true;
+          if (path === 'local.email' && this.tmpInput !== '') this.emailLock = true;
           return;
         }
 
@@ -44,8 +58,7 @@ export const userMixin = {
         }
         await this.updateAlenviUser(path);
 
-        this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
-        this.emailLock = true;
+        if (path === 'local.email') this.emailLock = true;
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
@@ -64,6 +77,16 @@ export const userMixin = {
       if (get(validationObj, 'contact.phone.required', null) === false) return REQUIRED_LABEL;
       else if (!get(validationObj, 'contact.phone.frPhoneNumber', null)) return 'Numéro de téléphone non valide';
       return '';
+    },
+    async emailErrorHandler (path) {
+      try {
+        NotifyNegative('Email déjà existant.');
+        this.mergedUserProfile.local.email = this.tmpInput;
+        await this.$nextTick();
+        this.$refs.userEmail.select();
+      } catch (e) {
+        console.error(e);
+      }
     },
   },
 }

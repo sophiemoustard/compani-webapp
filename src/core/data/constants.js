@@ -30,6 +30,20 @@ export const SURCHARGES = {
   custom: 'Personnalisée',
 };
 
+// CUSTOMERS SITUATION
+export const UNKNOWN = 'unknown';
+export const HOME = 'home';
+export const NURSING_HOME = 'nursing_home';
+export const HOSPITALIZED = 'hospitalized';
+export const DECEASED = 'deceased';
+export const SITUATION_OPTIONS = [
+  { label: 'Non renseigné', value: UNKNOWN },
+  { label: 'Domicile', value: HOME },
+  { label: 'EHPAD', value: NURSING_HOME },
+  { label: 'Hospitalisé', value: HOSPITALIZED },
+  { label: 'Décédé', value: DECEASED },
+];
+
 // CONTRACTS
 export const CONTRACT = 'contract';
 export const OTHER = 'other';
@@ -132,6 +146,10 @@ export const CANCELLATION_REASONS = [
 export const INTERNAL = 'internal';
 export const EXTERNAL = 'external';
 
+// INTERFACE
+export const VENDOR = 'vendor';
+export const CLIENT = 'client';
+
 // ROLES CLIENT
 export const CLIENT_ADMIN = 'client_admin';
 export const COACH = 'coach';
@@ -150,7 +168,7 @@ export const TRAINER = 'trainer';
 
 // ROLE TRANSLATION
 export const ROLES_TRANSLATION = {
-  [CLIENT_ADMIN]: 'Admin Client',
+  [CLIENT_ADMIN]: 'Administrateur',
   [COACH]: 'Coach',
 };
 
@@ -277,7 +295,19 @@ export const PAY_DOCUMENT_NATURES = [
 // COMPANY
 export const COMPANY = 'company';
 export const ASSOCIATION = 'association';
+export const COMPANY_TYPES = [
+  { label: 'Association', value: ASSOCIATION },
+  { label: 'Entreprise', value: COMPANY },
+]
 
 // SMS
 export const CONVOCATION = 'convocation';
 export const REMINDER = 'reminder';
+
+// COURSE
+export const INTRA = 'intra';
+export const INTER_B2B = 'inter_b2b';
+export const COURSE_TYPES = [
+  { label: 'Intra', value: INTRA },
+  { label: 'Inter B2B', value: INTER_B2B },
+]

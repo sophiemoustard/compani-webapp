@@ -1,5 +1,5 @@
 <template>
-  <q-page class="neutral-background" padding>
+  <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
       @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"
@@ -36,7 +36,7 @@ import Modal from '@components/modal/Modal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { COMPANY, ASSOCIATION } from '@data/constants';
+import { COMPANY_TYPES } from '@data/constants';
 import { companyMixin } from '@mixins/companyMixin';
 
 export default {
@@ -55,9 +55,10 @@ export default {
       companies: [],
       tableLoading: false,
       visibleColumns: ['name'],
-      columns: [{ name: 'tradeName', label: 'Nom commercial', align: 'left', field: 'tradeName', sortable: true }],
+      columns: [{ name: 'tradeName', label: 'Nom', align: 'left', field: 'tradeName', sortable: true }],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
+      companyTypeOptions: COMPANY_TYPES,
       companyCreationModal: false,
       newCompany: {
         name: '',
@@ -79,16 +80,13 @@ export default {
     filteredCompanies () {
       return this.companies.filter(company => company.name.match(new RegExp(this.searchStr, 'i')));
     },
-    companyTypeOptions () {
-      return [{ label: 'Association', value: ASSOCIATION }, { label: 'Entreprise', value: COMPANY }]
-    },
   },
   methods: {
     updateSearch (value) {
       this.searchStr = value;
     },
     goToCompanyProfile (row) {
-      this.$router.push({ name: 'profile company info', params: { companyId: row._id } });
+      this.$router.push({ name: 'ni users companies info', params: { companyId: row._id } });
     },
     async refreshCompanies () {
       try {

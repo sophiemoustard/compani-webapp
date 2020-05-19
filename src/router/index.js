@@ -7,20 +7,14 @@ import vendorRoutes from 'src/modules/vendor/router/routes';
 import routes from 'src/router/routes';
 import alenvi from '@helpers/alenvi';
 import store from 'src/store/index';
-import { checkRole } from '@helpers/role';
+import { defineAbilitiesFor } from '@helpers/ability';
 
 Vue.use(VueRouter)
 Vue.use(VueMeta);
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation
- */
-
 const Router = new VueRouter({
   scrollBehavior: () => ({ y: 0 }),
   routes: [...clientRoutes, ...vendorRoutes, ...routes], // routes needs to be at the end of array cf. /src/router/routes.js
-
   mode: process.env.VUE_ROUTER_MODE,
   base: process.env.VUE_ROUTER_BASE,
 })
@@ -32,8 +26,12 @@ Router.beforeEach(async (to, from, next) => {
       if (refresh) {
         if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const permission = checkRole(to, store.getters['main/loggedUser']);
-        if (!permission) next('/404');
+        const ability = defineAbilitiesFor(
+          store.getters['main/clientRole'],
+          store.getters['main/vendorRole'],
+          store.getters['main/company']
+        );
+        if (!ability.can('read', to.name)) next('/404');
         else {
           store.dispatch('main/updateRefreshState', false);
           next();
@@ -42,8 +40,12 @@ Router.beforeEach(async (to, from, next) => {
     } else {
       if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-      const permission = checkRole(to, store.state.main.loggedUser);
-      if (!permission) next('/404');
+      const ability = defineAbilitiesFor(
+        store.getters['main/clientRole'],
+        store.getters['main/vendorRole'],
+        store.getters['main/company']
+      );
+      if (!ability.can('read', to.name)) next('/404');
       else {
         store.dispatch('main/updateRefreshState', false);
         next();

@@ -198,8 +198,8 @@ export const planningModalMixin = {
     },
     customerProfileRedirect () {
       return COACH_ROLES.includes(this.clientRole)
-        ? { name: 'customers profile', params: { customerId: this.selectedCustomer._id } }
-        : { name: 'profile customers info', params: { customerId: this.selectedCustomer._id } };
+        ? { name: 'ni customers info', params: { customerId: this.selectedCustomer._id } }
+        : { name: 'auxiliaries customers info', params: { customerId: this.selectedCustomer._id } };
     },
     // Event creation
     customerSubscriptionsOptions () {

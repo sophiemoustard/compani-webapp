@@ -26,7 +26,7 @@
         <div class="col-md-6 col-xs-12 referent items-center">
           <img :src="auxiliaryAvatar" class="avatar q-mr-sm" />
           <ni-select v-model="customer.referent._id" :options="auxiliariesOptions" no-error icon="swap_vert"
-            @focus="saveTmp('referent')" @input="updateCustomer('referent')" bg-color="grey-3" />
+            @focus="saveTmp('referent')" @input="updateCustomer('referent')" bg-color="neutral-grey" />
         </div>
       </div>
     </div>
@@ -35,6 +35,8 @@
         <p class="text-weight-bold">Accompagnement</p>
       </div>
       <div class="row gutter-profile">
+        <ni-select caption="Situation" v-model="customer.followUp.situation" @focus="saveTmp('followUp.situation')"
+          @input="updateCustomer('followUp.situation')" :options="situationOptions" />
         <ni-input caption="Environnement du bénéficiaire" v-model="customer.followUp.environment"
           @blur="updateCustomer('followUp.environment')" @focus="saveTmp('followUp.environment')" type="textarea" />
         <ni-input caption="Objectifs de l’accompagnement" v-model="customer.followUp.objectives"
@@ -67,14 +69,15 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading" />
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
+        :responsive="false" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
       <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
-        :loading="followUpLoading">
+        :loading="followUpLoading" :responsive="false">
         <template v-slot:body="{ props }" >
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -110,7 +113,14 @@ import { NotifyNegative } from '@components/popup/notify.js';
 import SimpleTable from '@components/table/SimpleTable';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatHours } from '@helpers/utils.js';
-import { AUXILIARY, PLANNING_REFERENT, AUXILIARY_ROLES, DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
+import {
+  AUXILIARY,
+  PLANNING_REFERENT,
+  AUXILIARY_ROLES,
+  DEFAULT_AVATAR,
+  UNKNOWN_AVATAR,
+  SITUATION_OPTIONS,
+} from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin.js';
@@ -162,6 +172,7 @@ export default {
           field: row => formatHours(row.currentMonthCareHours, 1),
         },
       ],
+      situationOptions: SITUATION_OPTIONS,
     };
   },
   validations: {
@@ -290,7 +301,7 @@ export default {
     font-size: 12px;
   .referent
     display: flex
-  /deep/ .q-field__append
-    .q-select__dropdown-icon
-      display: none
+    /deep/ .q-field__append
+      .q-select__dropdown-icon
+        display: none
 </style>

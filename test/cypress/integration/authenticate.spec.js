@@ -61,14 +61,15 @@ describe('Login page tests', () => {
       identity: { firstname: 'Auxiliary', lastname: 'Test', title: 'mr' },
       local: { email: 'auxiliary@alenvi.io', password: '123456' },
       refreshToken: 'token',
-      company: '987765uyt654321',
+      company: { _id: '987765uyt654321', subscriptions: { erp: false } },
     }
     cy.server()
     cy.route('post', '/users/authenticate', {
-      data: { token: 'token', refreshToken: 'refreshToken', expiresIn: 3600 * 24, user },
-    })
+      data: { token: 'token', refreshToken: 'token', expiresIn: 3600 * 24, user },
+    });
 
     cy.route('get', `/users/${user._id}`, { data: { user } }).as('user')
+    cy.route('post', '/users/refreshToken', { data: { token: 'token', refreshToken: 'token', expiresIn: 3600 * 24, user } })
 
     cy.get('[data-cy=email]').type('auxiliary-without-company@alenvi.io');
     cy.get('[data-cy=password]').type('123456');

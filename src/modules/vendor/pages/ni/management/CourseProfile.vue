@@ -1,9 +1,9 @@
-<template>
-  <q-page padding class="neutral-background">
+`<template>
+  <q-page padding class="vendor-background">
     <ni-profile-header :title="courseName">
       <template v-slot:body>
-        <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
-          <q-item v-for="info in headerInfo" :key="info.icon">
+        <div class="row profile-info q-pl-lg">
+          <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
             <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
             <q-item-section class="text-capitalize">{{ info.label }}</q-item-section>
           </q-item>
@@ -37,15 +37,16 @@ export default {
   },
   data () {
     return {
+      courseName: '',
       tabsContent: [
         {
-          label: 'Organisation de la formation',
+          label: 'Organisation',
           name: 'organization',
           default: this.defaultTab === 'organization',
           component: ProfileOrganization,
         },
         {
-          label: 'Suivi de la formation',
+          label: 'Suivi',
           name: 'followUp',
           default: this.defaultTab === 'course',
           component: ProfileFollowUp,
@@ -55,22 +56,15 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    courseName () {
-      return get(this.course, 'name') || '';
-    },
-    courseType () {
-      return get(this.course, 'type') || '';
-    },
-    headerInfo () {
-      return [
-        { icon: 'bookmark_border', label: `${this.courseType}` },
-        { icon: 'apartment', label: `${this.companyName}` },
-        { icon: 'library_books', label: `${this.programName}` },
-      ];
+  },
+  watch: {
+    course () {
+      this.courseName = get(this.course, 'name') || '';
     },
   },
-  async mounted () {
+  async created () {
     if (!this.course) await this.refreshCourse();
+    this.courseName = get(this.course, 'name') || '';
   },
   methods: {
     async refreshCourse () {

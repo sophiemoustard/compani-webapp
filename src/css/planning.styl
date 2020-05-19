@@ -24,24 +24,24 @@
     bottom: 0;
     width: fit-content;
   &-intervention
-    background: $light-pink
+    background: $primary-light
   &-internalHour
     background: $light-purple
   &-absence
-    background: $grey-3
+    background: $neutral-grey
   &-unavailability
     background: repeating-linear-gradient(
       45deg,
-      $grey-3,
-      $grey-3 3px,
+      $neutral-grey,
+      $neutral-grey 3px,
       $white 3px,
       $white 7px
     )
   &-cancelled
     background: repeating-linear-gradient(
       45deg,
-      $light-pink,
-      $light-pink 3px,
+      $primary-light,
+      $primary-light 3px,
       $white 3px,
       $white 7px
     )
@@ -87,8 +87,6 @@
   &-container
     background: white;
     padding: 0 5px;
-    @media screen and (max-width: 767px)
-      padding: 2px;
     th
       background-color: white;
       position: -webkit-sticky;
@@ -164,22 +162,12 @@
   display: flex
   flex-direction: row
   align-items: center
-  &-text
-    padding: 9px 14px 11px
-    margin-left: 5px
-    font-size: 1.3em
-  &-select
-    @media screen and (max-width: 767px)
-      width: 80%
-  .q-field__control
-    font-size: 1.3rem
-  .q-select
-    border: none;
-    margin-left: 5px;
-    .q-field__control
-      border: none
-  .q-icon
-    display: none;
+  font-weight: 600;
+  font-size: 14px;
+  @media (min-width: 421px) and (max-width: 1024px)
+    font-size: 12px;
+  @media (max-width: 420px)
+    font-size: 10px;
   
 .customer-info
   .q-icon
@@ -199,17 +187,5 @@
   &-address
     margin-right: 6px
 
-.person
-  &-name
-    font-weight: 600;
-    font-size: 14px;
-    @media (min-width: 1025px)
-      margin-bottom: 15px;
-    @media (min-width: 421px) and (max-width: 1024px)
-      margin-bottom: 15px;
-      font-size: 12px;
-    @media (max-width: 420px)
-      font-size: 8px;
-      margin-bottom: 0px;
-  &-inner-cell
+.person-inner-cell
     margin-top: 4px;
