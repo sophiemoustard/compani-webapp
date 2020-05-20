@@ -1,7 +1,7 @@
 <template functional>
   <q-dialog :value="props.value" v-on="listeners" full-height full-width>
     <q-card class="full-height" style="width: 80vw">
-      <q-card-section class="row justify-between no-wrap">
+      <q-card-section class="row justify-between no-wrap title-modal">
         <h5 class="q-ml-md q-mb-xs">{{ props.title }}</h5>
         <q-icon class="cursor-pointer" name="clear" size="1.5rem"  v-close-popup />
       </q-card-section>
@@ -26,3 +26,11 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.title-modal
+  position: sticky;
+  top: 0px;
+  z-index: 1;
+  background-color: white;
+</style>
