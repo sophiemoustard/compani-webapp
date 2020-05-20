@@ -12,8 +12,8 @@ export const sideMenuMixin = {
     },
     companiLogo () {
       return this.interfaceType === CLIENT
-        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_test_rose.png'
-        : 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_test_burgundy.png';
+        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose.png'
+        : 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_texte_bordeaux.png';
     },
   },
   methods: {
