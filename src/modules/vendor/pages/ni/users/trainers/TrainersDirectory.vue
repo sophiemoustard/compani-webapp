@@ -18,18 +18,15 @@
       <ni-input in-modal v-model.trim="newTrainer.local.email" :error="$v.newTrainer.local.email.$error"
         @blur="$v.newTrainer.local.email.$touch" required-field caption="Email"
         :error-label="emailError($v.newTrainer)"/>
-      <ni-option-group v-model="newTrainer.status" type="radio" :options="trainerTypeOptions" inline caption="Statut"
-        required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le formateur" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createTrainer" :disable="$v.newTrainer.$anyError || !$v.newTrainer.$anyDirty" />
+          icon-right="add" @click="createTrainer" :disable="$v.newTrainer.$error || !$v.newTrainer.$anyDirty" />
       </template>
     </ni-modal>
   </q-page>
 </template>
 
 <script>
-import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import Users from '@api/Users';
 import Roles from '@api/Roles';
@@ -38,10 +35,9 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
-import { TRAINER, INTERNAL, EXTERNAL } from '@data/constants';
+import { TRAINER } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 
 export default {
@@ -52,7 +48,6 @@ export default {
     'ni-table-list': TableList,
     'ni-modal': Modal,
     'ni-input': Input,
-    'ni-option-group': OptionGroup,
   },
   mixins: [userMixin],
   data () {
@@ -63,12 +58,12 @@ export default {
       pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
       searchStr: '',
       trainerCreationModal: false,
-      newTrainer: { identity: { lastname: '', firstname: '' }, local: { email: '' }, status: INTERNAL },
+      newTrainer: { identity: { lastname: '', firstname: '' }, local: { email: '' } },
       modalLoading: false,
     }
   },
   validations () {
-    return { newTrainer: { ...pick(this.userValidation, ['identity.lastname', 'local.email']), status: { required } } };
+    return { newTrainer: { ...pick(this.userValidation, ['identity.lastname', 'local.email']) } };
   },
   async mounted () {
     await this.refreshTrainers();
@@ -77,13 +72,10 @@ export default {
     filteredTrainers () {
       return this.trainers.filter(trainer => trainer.name.match(new RegExp(this.searchStr, 'i')));
     },
-    trainerTypeOptions () {
-      return [{ label: 'interne', value: INTERNAL }, { label: 'externe', value: EXTERNAL }]
-    },
   },
   methods: {
     resetCreationModal () {
-      this.newTrainer = { identity: { lastname: '', firstname: '' }, local: { email: '' }, status: INTERNAL };
+      this.newTrainer = { identity: { lastname: '', firstname: '' }, local: { email: '' } };
       this.$v.newTrainer.$reset();
     },
     updateSearch (value) {
