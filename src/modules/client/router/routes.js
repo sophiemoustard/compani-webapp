@@ -274,6 +274,16 @@ const routes = [
           parent: 'planning',
         },
       },
+      {
+        path: 'ni/courses',
+        name: 'ni courses',
+        component: () => import('src/modules/client/pages/ni/courses/CoursesDirectory'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
       // Auxiliary view routes
       {
         path: 'auxiliaries/agenda',

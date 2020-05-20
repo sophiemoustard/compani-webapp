@@ -21,7 +21,7 @@ import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from 'src/modules/client/components/ProfileTabs';
 import ProfileOrganization from 'src/modules/vendor/components/courses/ProfileOrganization';
 import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
-import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'CourseProfile',

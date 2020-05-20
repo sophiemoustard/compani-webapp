@@ -170,6 +170,7 @@ import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import CourseSlots from '@api/CourseSlots';
 import Users from '@api/Users';
+import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
@@ -177,11 +178,18 @@ import DateTimeRange from '@components/form/DatetimeRange';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TRAINER, REQUIRED_LABEL, INTER_B2B, INTRA } from '@data/constants';
+import {
+  VENDOR_ADMIN,
+  TRAINING_ORGANISATION_MANAGER,
+  TRAINER,
+  REQUIRED_LABEL,
+  INTER_B2B,
+  INTRA,
+} from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
-import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileOrganization',
@@ -313,6 +321,9 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    isAdmin () {
+      return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
+    },
     addressError () {
       if (!this.$v.newCourseSlot.address.fullAddress.required) {
         return REQUIRED_LABEL;
@@ -381,6 +392,17 @@ export default {
   },
   methods: {
     get,
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = companies
+          .map(c => ({ label: c.tradeName, value: c._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
+      }
+    },
     saveTmp (path) {
       this.tmpInput = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
     },
