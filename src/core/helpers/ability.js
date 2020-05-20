@@ -19,7 +19,7 @@ export const defineAbilitiesFor = (clientRole, vendorRole, company) => {
     : [];
   if (clientRole) can('read', getClientAbilities(clientRole, companySubscriptions));
   if (vendorRole) can('read', getVendorAbilities(vendorRole));
-  else can('read', 'account client');
+  if (!clientRole && !vendorRole) can('read', 'account client');
   if (clientRole === CLIENT_ADMIN && companySubscriptions.includes('erp')) can('update', 'erp_config');
   if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
 

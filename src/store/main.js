@@ -18,7 +18,6 @@ export default {
   actions: {
     updateRefreshState: ({ commit }, refresh) => { commit('REFRESH_STATE', refresh) },
     setDrawer: ({ commit }, toggle) => { commit('DRAWER', toggle) },
-    // j'ai un doute pour ce nom, pq [get]LoggedUser, je mettrais fetch, get fait trop getters nan ?
     getLoggedUser: async ({ commit }, userId) => {
       try {
         const user = await users.getById(userId);
@@ -28,7 +27,11 @@ export default {
         if (e.status === 401) redirect.redirectToLogin();
       }
     },
-    removeLoggedUser: ({ commit }) => { commit('LOGGED_USER', null) },
+    reset: ({ commit }) => {
+      commit('LOGGED_USER', null);
+      commit('REFRESH_STATE', true);
+      commit('DRAWER', !!Platform.is.desktop);
+    },
   },
   getters: {
     company: (state) => state.loggedUser.company,
