@@ -98,7 +98,7 @@ export default {
       rgpdModal: false,
       cguModal: false,
       cguCompani,
-      backgroungClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
+      backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
     }
   },
