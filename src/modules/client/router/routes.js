@@ -286,6 +286,16 @@ const routes = [
           parent: 'courses',
         },
       },
+      {
+        path: 'ni/courses/:courseId',
+        name: 'ni courses info',
+        component: () => import('src/core/pages/courses/CourseProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
       // Auxiliary view routes
       {
         path: 'auxiliaries/agenda',
