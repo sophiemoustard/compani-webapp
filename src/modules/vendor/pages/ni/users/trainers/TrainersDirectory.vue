@@ -86,16 +86,14 @@ export default {
       try {
         const userInfo = await Users.exists({ email: this.newTrainer.local.email });
 
-        if (userInfo.exists) {
-          if (get(userInfo, 'user.role.vendor')) {
-            NotifyNegative('Utilisateur déjà existant');
-          } else {
-            const roles = await Roles.list({ name: TRAINER });
-            if (roles.length === 0) throw new Error('Role not found');
-            await Users.updateById(userInfo.user._id, { role: roles[0]._id });
-            NotifyPositive('Formateur créé');
-            await this.refreshTrainers();
-          }
+        if (userInfo.exists && get(userInfo, 'user.role.vendor')) {
+          NotifyNegative('Utilisateur déjà existant');
+        } else if (userInfo.exists) {
+          const roles = await Roles.list({ name: TRAINER });
+          if (roles.length === 0) throw new Error('Role not found');
+          await Users.updateById(userInfo.user._id, { role: roles[0]._id });
+          NotifyPositive('Formateur créé');
+          await this.refreshTrainers();
           this.resetCreationModal();
           this.trainerCreationModal = false;
         } else {
