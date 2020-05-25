@@ -37,7 +37,7 @@ const routes = [
         }
         if (COACH_ROLES.includes(userClientRole)) {
           if (get(company, 'subscriptions.erp')) return next({ name: 'ni auxiliaries' });
-          return next({ name: 'account client', params: { id: loggedUser._id } });
+          return next({ name: 'ni courses' });
         }
         return next({ name: '404' });
       } catch (e) {
