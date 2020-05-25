@@ -12,15 +12,21 @@
       <template slot="title">
         Créer un nouveau <span class="text-weight-bold">formateur</span>
       </template>
-      <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="$v.newTrainer.identity.lastname.$error"
-        @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" />
-      <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model.trim="newTrainer.local.email" :error="$v.newTrainer.local.email.$error"
-        @blur="$v.newTrainer.local.email.$touch" required-field caption="Email"
-        :error-label="emailError($v.newTrainer)"/>
+      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainer.local.email" required-field
+        @blur="$v.newTrainer.local.email.$touch" caption="Email" @input="$v.newTrainer.local.email.$touch"
+        :error-label="emailError($v.newTrainer)" :error="$v.newTrainer.local.email.$error" />
+      <template v-if="!firstStep">
+        <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="$v.newTrainer.identity.lastname.$error"
+          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" />
+        <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
+      </template>
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter le formateur" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createTrainer" :disable="$v.newTrainer.$error || !$v.newTrainer.$anyDirty" />
+        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
+          :loading="modalLoading" icon-right="add" @click="nextStep"
+          :disable="$v.newTrainer.local.email.$error || !newTrainer.local.email" />
+        <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter le formateur" color="primary"
+          :loading="modalLoading" icon-right="add" @click="createTrainer"
+          :disable="$v.newTrainer.$error || !$v.newTrainer.$anyDirty" />
       </template>
     </ni-modal>
   </q-page>
@@ -28,6 +34,7 @@
 
 <script>
 import pick from 'lodash/pick';
+import get from 'lodash/get';
 import Users from '@api/Users';
 import Roles from '@api/Roles';
 import Email from '@api/Email';
@@ -60,6 +67,7 @@ export default {
       trainerCreationModal: false,
       newTrainer: { identity: { lastname: '', firstname: '' }, local: { email: '' } },
       modalLoading: false,
+      firstStep: true,
     }
   },
   validations () {
@@ -74,7 +82,30 @@ export default {
     },
   },
   methods: {
+    async nextStep () {
+      try {
+        const userInfo = await Users.exists({ email: this.newTrainer.local.email });
+
+        if (userInfo.exists && get(userInfo, 'user.role.vendor')) {
+          NotifyNegative('Utilisateur déjà existant');
+        } else if (userInfo.exists) {
+          const roles = await Roles.list({ name: TRAINER });
+          if (roles.length === 0) throw new Error('Role not found');
+          await Users.updateById(userInfo.user._id, { role: roles[0]._id });
+          NotifyPositive('Formateur créé');
+          await this.refreshTrainers();
+          this.resetCreationModal();
+          this.trainerCreationModal = false;
+        } else {
+          this.firstStep = false;
+        }
+      } catch (e) {
+        NotifyNegative('Erreur lors de la création du formateur');
+        this.resetCreationModal();
+      }
+    },
     resetCreationModal () {
+      this.firstStep = true;
       this.newTrainer = { identity: { lastname: '', firstname: '' }, local: { email: '' } };
       this.$v.newTrainer.$reset();
     },
