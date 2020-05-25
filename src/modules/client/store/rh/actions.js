@@ -21,3 +21,8 @@ export const updateNotifications = async ({ commit, state }, type) => {
     commit('saveNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
   }
 }
+
+export const reset = ({ commit }) => {
+  commit('saveNotification', null);
+  commit('saveUserProfile', null);
+}

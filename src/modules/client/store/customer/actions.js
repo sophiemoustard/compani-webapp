@@ -13,10 +13,15 @@ export const getCustomer = async ({ commit }, params) => {
   } catch (e) {
     console.error(e);
   }
-}
+};
 
 export const updateNotifications = async ({ commit, state }) => {
   const customer = state.customer;
   const validation = customerProfileValidation(customer);
   commit('saveNotification', { type: 'profiles', _id: customer._id, exists: !!validation.error });
+};
+
+export const reset = ({ commit }) => {
+  commit('saveCustomer', null);
+  commit('saveNotification', null);
 };
