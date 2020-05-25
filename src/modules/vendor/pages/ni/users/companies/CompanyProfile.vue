@@ -65,7 +65,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('company/remove');
+    this.$store.dispatch('company/reset');
   },
 }
 </script>
