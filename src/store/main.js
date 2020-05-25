@@ -27,6 +27,11 @@ export default {
         if (e.status === 401) redirect.redirectToLogin();
       }
     },
+    reset: ({ commit }) => {
+      commit('LOGGED_USER', null);
+      commit('REFRESH_STATE', true);
+      commit('DRAWER', !!Platform.is.desktop);
+    },
   },
   getters: {
     company: (state) => state.loggedUser.company,

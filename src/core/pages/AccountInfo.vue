@@ -99,6 +99,7 @@ export default {
       cguModal: false,
       cguCompani,
       backgroungClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
+      isLoggingOut: false,
     }
   },
   validations () {
@@ -125,6 +126,9 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  async beforeDestroy () {
+    if (this.isLoggingOut) this.$store.dispatch('main/reset');
   },
   methods: {
     saveTmp (path) {
@@ -165,6 +169,7 @@ export default {
       this.$v.passwordConfirm.$reset();
     },
     logout () {
+      this.isLoggingOut = true;
       this.$q.cookies.remove('alenvi_token', { path: '/' });
       this.$q.cookies.remove('alenvi_token_expires_in', { path: '/' });
       this.$q.cookies.remove('refresh_token', { path: '/' });

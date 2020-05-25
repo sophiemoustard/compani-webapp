@@ -1,14 +1,15 @@
 import { mapState } from 'vuex';
+import get from 'lodash/get';
 import { CLIENT } from '@data/constants'
 
 export const sideMenuMixin = {
   computed: {
     ...mapState('main', ['loggedUser']),
     userFirstnameUpper () {
-      return (this.loggedUser.identity.firstname || '').toUpperCase();
+      return (get(this.loggedUser, 'identity.firstname') || '').toUpperCase();
     },
     accessBothInterface () {
-      return this.loggedUser.role.client && this.loggedUser.role.vendor;
+      return get(this.loggedUser, 'role.client') && get(this.loggedUser, 'role.vendor');
     },
     companiLogo () {
       return this.interfaceType === CLIENT
