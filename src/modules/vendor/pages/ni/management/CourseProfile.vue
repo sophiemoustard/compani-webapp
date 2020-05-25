@@ -76,7 +76,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('course/remove');
+    this.$store.dispatch('course/reset');
   },
 
 }

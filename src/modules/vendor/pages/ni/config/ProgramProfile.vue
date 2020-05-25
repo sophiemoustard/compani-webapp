@@ -53,7 +53,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('program/remove');
+    this.$store.dispatch('program/reset');
   },
 
 }

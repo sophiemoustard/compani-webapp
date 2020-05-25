@@ -17,6 +17,6 @@ export default {
         console.error(e);
       }
     },
-    remove: ({ commit }) => { commit('SAVE', null) },
+    reset: ({ commit }) => { commit('SAVE', null) },
   },
 }
