@@ -46,7 +46,12 @@
             flat dense type="a" target="_blank"
             :href="!disableDownloadCompletionCertificates && downloadCompletionCertificates()" />
         </q-item-section>
-        <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
+        <q-item-section>
+          <q-item-label>Télécharger les attestations de fin de formation</q-item-label>
+          <q-item-label v-if="!get(this.course, 'program.learningGoals')" caption>
+            Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger les attestations de fin de formation.
+          </q-item-label>
+        </q-item-section>
       </q-item>
     </div>
     <div class="q-mb-xl">
@@ -180,6 +185,7 @@ export default {
     },
   },
   methods: {
+    get,
     getType (value) {
       const type = this.messageTypeOptions.find(type => type.value === value);
       return type ? type.label : '';
