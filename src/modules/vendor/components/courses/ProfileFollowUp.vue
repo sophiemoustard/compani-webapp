@@ -8,6 +8,19 @@
       </div>
     </q-banner>
     <div class="q-mb-xl">
+      <p class="text-weight-bold">Contact pour la formation</p>
+      <div class="row gutter-profile">
+        <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
+          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error"/>
+        <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
+            @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
+            :error="$v.course.contact.phone.$error" :error-label="phoneNbrErrorcontact" />
+        <ni-input caption="Email" v-model.trim="course.contact.email"
+            @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
+            :error="$v.course.contact.email.$error" :error-label="emailErrorcontact" />
+      </div>
+    </div>
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Actions utiles</p>
       <div class="course-link">
         <q-item>
@@ -97,6 +110,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import Input from '@components/form/Input';
@@ -104,7 +118,9 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import { CONVOCATION, REMINDER } from '@data/constants';
+import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'ProfileFollowUp',
@@ -114,6 +130,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
   },
+  mixins: [courseMixin],
   props: {
     profileId: { type: String },
   },
@@ -148,6 +165,17 @@ export default {
     this.setMessageTypeOptions();
     this.setDefaultMessageType();
   },
+  validations () {
+    return {
+      course: {
+        contact: {
+          name: { required },
+          phone: { required, frPhoneNumber },
+          email: { email },
+        },
+      },
+    };
+  },
   computed: {
     ...mapState('course', ['course']),
     disabledFollowUp () {
@@ -161,8 +189,8 @@ export default {
       if (!this.course.trainer) missingInfo.push('le formateur');
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
-      if (!get(this.course, 'referent.name')) missingInfo.push('le nom du référent structure');
-      if (!get(this.course, 'referent.phone')) missingInfo.push('le numéro du référent structure');
+      if (!get(this.course, 'contact.name')) missingInfo.push('le nom du référent structure');
+      if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du référent structure');
 
       return missingInfo;
     },
@@ -177,6 +205,15 @@ export default {
     courseLink () {
       return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
         `trainees/courses/${this.course._id}`;
+    },
+    emailErrorcontact () {
+      if (!this.$v.course.contact.email.email) return 'Email non valide';
+      return '';
+    },
+    phoneNbrErrorcontact () {
+      if (this.$v.course.contact.phone.required === false) return REQUIRED_LABEL;
+      else if (!this.$v.course.contact.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
+      return '';
     },
   },
   methods: {

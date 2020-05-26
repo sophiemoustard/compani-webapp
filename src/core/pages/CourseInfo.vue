@@ -54,17 +54,17 @@
             <div v-if="course.trainer.biography" class="description">"{{ course.trainer.biography }}"</div>
           </q-item-section>
         </q-item>
-        <q-item v-if="course.referent" class="row">
+        <q-item v-if="course.contact" class="row">
           <q-item-section side class="course-img-container">
-            <img class="course-img course-img-referent"
+            <img class="course-img course-img-contact"
               src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
           </q-item-section>
           <div class="course-item-container">
             <div class="text-weight-bold">Votre contact pour la formation</div>
-            <div>{{ course.referent.name }}</div>
-            <div><a :href="referentPhoneLink">{{ formatPhone(course.referent.phone) }}</a></div>
+            <div>{{ course.contact.name }}</div>
+            <div><a :href="contactPhoneLink">{{ formatPhone(course.contact.phone) }}</a></div>
             <div>
-              <a v-if="course.referent.email" :href="'mailto:' + course.referent.email" >{{ course.referent.email }}</a>
+              <a v-if="course.contact.email" :href="'mailto:' + course.contact.email" >{{ course.contact.email }}</a>
             </div>
           </div>
         </q-item>
@@ -106,8 +106,8 @@ export default {
     courseSlots () {
       return this.course.slots ? groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')) : {};
     },
-    referentPhoneLink () {
-      const phoneNumber = get(this.course, 'referent.phone');
+    contactPhoneLink () {
+      const phoneNumber = get(this.course, 'contact.phone');
       return phoneNumber ? `tel:+33${phoneNumber.substring(1)}` : '';
     },
   },
@@ -190,7 +190,7 @@ export default {
       @media screen and (max-width: 365px)
         width: 94px
         height: 94px
-    &-referent
+    &-contact
       width: 84px
       margin-left: 13px
       margin-right: 23px

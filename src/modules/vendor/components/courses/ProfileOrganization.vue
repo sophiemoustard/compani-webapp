@@ -9,19 +9,6 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Référent structure</p>
-      <div class="row gutter-profile">
-        <ni-input caption="Nom référent structure" v-model.trim="course.referent.name" @focus="saveTmp('referent.name')"
-          @blur="updateCourse('referent.name')" :error="$v.course.referent.name.$error"/>
-        <ni-input caption="Téléphone référent structure" @blur="updateCourse('referent.phone')"
-            @focus="saveTmp('referent.phone')" v-model.trim="course.referent.phone"
-            :error="$v.course.referent.phone.$error" :error-label="phoneNbrErrorReferent" />
-        <ni-input caption="Email référent structure" v-model.trim="course.referent.email"
-            @focus="saveTmp('referent.email')" @blur="updateCourse('referent.email')"
-            :error="$v.course.referent.email.$error" :error-label="emailErrorReferent" />
-      </div>
-    </div>
-    <div class="q-mb-xl">
       <q-item class="slot-section-title">
         <q-item-section side>
           <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense/>
@@ -163,7 +150,6 @@
 import { mapState } from 'vuex';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
-import set from 'lodash/set';
 import pick from 'lodash/pick';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
@@ -307,11 +293,6 @@ export default {
       course: {
         name: { required },
         trainer: { required },
-        referent: {
-          name: { required },
-          phone: { required, frPhoneNumber },
-          email: { email },
-        },
       },
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
@@ -375,15 +356,6 @@ export default {
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
     },
-    emailErrorReferent () {
-      if (!this.$v.course.referent.email.email) return 'Email non valide';
-      return '';
-    },
-    phoneNbrErrorReferent () {
-      if (this.$v.course.referent.phone.required === false) return REQUIRED_LABEL;
-      else if (!this.$v.course.referent.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
-      return '';
-    },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
@@ -402,9 +374,6 @@ export default {
         console.error(e);
         this.companyOptions = [];
       }
-    },
-    saveTmp (path) {
-      this.tmpInput = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
     },
     padMinutes (minutes) {
       return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
@@ -426,26 +395,6 @@ export default {
         this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }))
       } catch (e) {
         console.error(e);
-      }
-    },
-    async updateCourse (path) {
-      try {
-        const value = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
-        if (this.tmpInput === value) return;
-        get(this.$v.course, path).$touch();
-        if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
-
-        const payload = set({}, path, value);
-        await Courses.update(this.profileId, payload);
-        NotifyPositive('Modification enregistrée.');
-
-        await this.refreshCourse();
-      } catch (e) {
-        console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification.');
-      } finally {
-        this.tmpInput = null;
       }
     },
     // Course slot
