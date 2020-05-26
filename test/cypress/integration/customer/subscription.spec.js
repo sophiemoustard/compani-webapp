@@ -8,13 +8,15 @@ describe('customers subscription tests', () => {
   });
 
   it('should display correctly the subscriptions part of the page', function () {
-    cy.get('th').should('have.length', 6).and(($th) => {
-      expect($th.eq(0)).to.have.text('Service');
-      expect($th.eq(1)).to.have.text('Nature');
-      expect($th.eq(2)).to.have.text('Prix unitaire TTC');
-      expect($th.eq(3)).to.have.text('Volume hebdomadaire estimatif');
-      expect($th.eq(4)).to.have.text('Coût hebdomadaire TTC *');
-      expect($th.eq(5)).to.have.text('');
+    cy.get('[data-cy=subscriptions-table]').within(() => {
+      cy.get('th').should('have.length', 6).and(($th) => {
+        expect($th.eq(0)).to.have.text('Service');
+        expect($th.eq(1)).to.have.text('Nature');
+        expect($th.eq(2)).to.have.text('Prix unitaire TTC');
+        expect($th.eq(3)).to.have.text('Volume hebdomadaire estimatif');
+        expect($th.eq(4)).to.have.text('Coût hebdomadaire TTC *');
+        expect($th.eq(5)).to.have.text('');
+      });
     });
 
     cy.get('[data-cy=col-service]').should('contain', 'Service 1')
@@ -77,5 +79,45 @@ describe('customers subscription tests', () => {
       cy.get('[data-cy=col-side-amountTTC]').should('contain', '1600€');
       cy.get('[data-cy=col-side-customerParticipationRate]').should('contain', '66%');
     });
+  });
+
+  it('should display correctly the payment part and open the modal for the mandate', function () {
+    cy.get('#q-app').click(500, 500);
+
+    cy.get('[data-cy=bank-account-owner]').should('have.value', 'David gaudu');
+    cy.get('[data-cy=iban]').should('have.value', 'FR3617569000306699167186M11');
+    cy.get('[data-cy=bic]').should('have.value', 'ABNAFRPP');
+
+    cy.get('[data-cy=mandate-table]').within(() => {
+      cy.get('th').should('have.length', 2).and(($th) => {
+        expect($th.eq(0)).to.have.text('RUM');
+        expect($th.eq(1)).to.have.text('Signature');
+      });
+    });
+
+    cy.server();
+    cy.route('POST', '/customers/*/mandates/*/esign').as('esign');
+
+    cy.get('[data-cy=open-mandate]').click();
+    cy.wait('@esign').should((xhr) => {
+      expect(xhr.request.body.customer).to.deep.equal({
+        name: 'Bardet',
+        email: 'helper@alenvi.io',
+      });
+      expect(xhr.request.body.fields).to.deep.equal({
+        bankAccountOwner: 'David gaudu',
+        customerAddress: '12 rue de ponthieu 75008 Paris',
+        ics: '9876',
+        rum: 'R012345678903456789',
+        bic: 'ABNAFRPP',
+        iban: 'FR3617569000306699167186M11',
+        companyName: 'Test SAS',
+        companyAddress: '37 rue de Ponthieu 75008 Paris',
+        downloadDate: Cypress.moment().format('DD/MM/YYYY'),
+      });
+    });
+
+    cy.get('iframe');
+    cy.get('[data-cy=esign-modal]').should('be.visible');
   });
 });
