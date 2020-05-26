@@ -7,6 +7,12 @@
         {{ followUpMissingInfo.join(', ') }}.
       </div>
     </q-banner>
+    <q-banner v-if="!get(this.course, 'program.learningGoals')" class="full-width warning q-mb-md" dense>
+      <q-icon size="sm" name="warning" />
+      <div>
+        Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger les attestations de fin de formation.
+      </div>
+    </q-banner>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
@@ -217,6 +223,7 @@ export default {
     },
   },
   methods: {
+    get,
     getType (value) {
       const type = this.messageTypeOptions.find(type => type.value === value);
       return type ? type.label : '';
