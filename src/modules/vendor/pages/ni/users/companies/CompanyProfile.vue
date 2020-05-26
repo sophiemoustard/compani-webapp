@@ -19,7 +19,7 @@ import get from 'lodash/get';
 import { mapState } from 'vuex';
 import { COMPANY_TYPES } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
-import ProfileTabs from 'src/modules/client/components/ProfileTabs';
+import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/companies/ProfileInfo';
 
 export default {

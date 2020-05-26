@@ -9,7 +9,7 @@
 import get from 'lodash/get';
 import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
-import ProfileTabs from 'src/modules/client/components/ProfileTabs';
+import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/programs/ProfileInfo';
 
 export default {

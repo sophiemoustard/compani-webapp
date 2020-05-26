@@ -1,5 +1,5 @@
 <template>
-  <q-page :class="backgroungClass" padding>
+  <q-page :class="backgroundClass" padding>
     <h4>Mon compte</h4>
       <div class="row gutter-profile q-mb-xl">
         <div class="col-xs-12 col-md-6 row items-center">
@@ -98,7 +98,7 @@ export default {
       rgpdModal: false,
       cguModal: false,
       cguCompani,
-      backgroungClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
+      backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
     }
   },

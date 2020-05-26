@@ -26,8 +26,19 @@ export default {
   },
   methods: {
     goToCourseProfile (course) {
-      if (this.vendorRole === TRAINER) this.$router.push({ name: 'trainers courses info', params: { courseId: course._id } });
-      else this.$router.push({ name: 'ni management courses info', params: { courseId: course._id } });
+      let route = {};
+      if (/\/ad\//.test(this.$router.currentRoute.path)) {
+        route = {
+          name: this.vendorRole === TRAINER ? 'trainers courses info' : 'ni management courses info',
+          params: { courseId: course._id },
+        }
+      } else {
+        route = {
+          name: 'ni courses info',
+          params: { courseId: course._id },
+        };
+      }
+      this.$router.push(route);
     },
   },
 }
