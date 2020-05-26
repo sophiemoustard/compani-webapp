@@ -4,7 +4,7 @@
       <div class="row gutter-profile">
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" :error="$v.course.name.$error" />
-        <ni-select v-if="isAdmin" caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
+        <ni-select v-if="trainerInputVisible" caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
           @blur="updateCourse('trainer')" :options="trainerOptions" :error="$v.course.trainer.$error" />
       </div>
     </div>
@@ -171,6 +171,8 @@ import {
   REQUIRED_LABEL,
   INTER_B2B,
   INTRA,
+  VENDOR,
+  CLIENT,
 } from '@data/constants';
 import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
@@ -286,6 +288,7 @@ export default {
         local: {},
       },
       companyOptions: [],
+      interfaceType: /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT,
     }
   },
   validations () {
@@ -310,6 +313,9 @@ export default {
         return REQUIRED_LABEL;
       }
       return 'Adresse non valide';
+    },
+    trainerInputVisible () {
+      return this.isAdmin && this.interfaceType === VENDOR;
     },
     traineesVisibleColumns () {
       const visibleColumns = ['firstname', 'lastname', 'email', 'phone', 'actions'];
