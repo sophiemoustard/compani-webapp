@@ -8,16 +8,16 @@
       </div>
     </q-banner>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Référent structure</p>
+      <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
-        <ni-input caption="Nom référent structure" v-model.trim="course.referent.name" @focus="saveTmp('referent.name')"
-          @blur="updateCourse('referent.name')" :error="$v.course.referent.name.$error"/>
-        <ni-input caption="Téléphone référent structure" @blur="updateCourse('referent.phone')"
-            @focus="saveTmp('referent.phone')" v-model.trim="course.referent.phone"
-            :error="$v.course.referent.phone.$error" :error-label="phoneNbrErrorReferent" />
-        <ni-input caption="Email référent structure" v-model.trim="course.referent.email"
-            @focus="saveTmp('referent.email')" @blur="updateCourse('referent.email')"
-            :error="$v.course.referent.email.$error" :error-label="emailErrorReferent" />
+        <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
+          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error"/>
+        <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
+            @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
+            :error="$v.course.contact.phone.$error" :error-label="phoneNbrErrorcontact" />
+        <ni-input caption="Email" v-model.trim="course.contact.email"
+            @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
+            :error="$v.course.contact.email.$error" :error-label="emailErrorcontact" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -168,7 +168,7 @@ export default {
   validations () {
     return {
       course: {
-        referent: {
+        contact: {
           name: { required },
           phone: { required, frPhoneNumber },
           email: { email },
@@ -189,8 +189,8 @@ export default {
       if (!this.course.trainer) missingInfo.push('le formateur');
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
-      if (!get(this.course, 'referent.name')) missingInfo.push('le nom du référent structure');
-      if (!get(this.course, 'referent.phone')) missingInfo.push('le numéro du référent structure');
+      if (!get(this.course, 'contact.name')) missingInfo.push('le nom du référent structure');
+      if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du référent structure');
 
       return missingInfo;
     },
@@ -206,13 +206,13 @@ export default {
       return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
         `trainees/courses/${this.course._id}`;
     },
-    emailErrorReferent () {
-      if (!this.$v.course.referent.email.email) return 'Email non valide';
+    emailErrorcontact () {
+      if (!this.$v.course.contact.email.email) return 'Email non valide';
       return '';
     },
-    phoneNbrErrorReferent () {
-      if (this.$v.course.referent.phone.required === false) return REQUIRED_LABEL;
-      else if (!this.$v.course.referent.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
+    phoneNbrErrorcontact () {
+      if (this.$v.course.contact.phone.required === false) return REQUIRED_LABEL;
+      else if (!this.$v.course.contact.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
       return '';
     },
   },
