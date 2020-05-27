@@ -24,7 +24,7 @@ export const layoutMixin = {
     },
   },
   beforeRouteUpdate (to, from, next) {
-    if (this.drawer && !this.isMini) this.$refs[this.sidemenusRefs].collapsibleClosing(to, from);
+    if (this.drawer && !this.isMini) this.collapsibleClosing(to, from);
 
     next();
   },

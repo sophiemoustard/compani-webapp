@@ -1,10 +1,31 @@
 <template>
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
-      <side-menu-coach ref="coachMenu" v-if="isCoach && !isMini" />
-      <side-menu-auxiliary ref="auxiliaryMenu" v-else-if="isAuxiliary && !isMini" />
-      <side-menu-customer ref="helperMenu" v-else-if="isHelper && !isMini" />
-      <side-menu-empty ref="emptyMenu" v-else-if="!isMini" />
+      <q-list v-if="!isMini" class="no-border sidemenu-alenvi sidemenu-flex">
+        <div class="sidemenu-header">
+          <q-item-label header class="justify-center">
+            <img :src="companiLogo" alt="Compani logo">
+          </q-item-label>
+        </div>
+        <q-separator />
+        <template v-for="route of routes">
+          <template v-if="isHelper">
+            <ni-menu-item class="customer-menu-size" :name="route.name" :icon="route.icon" :label="route.label"
+              :key="route.name" />
+            <q-separator :key="`separator-${route.name}`" />
+          </template>
+          <template v-else >
+            <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label"
+              :key="route.ref">
+              <ni-menu-item v-for="item of route.children" :name="item.name" :icon="item.icon" :label="item.label"
+                :key="item.name" :params="item.params" />
+            </q-expansion-item>
+          <q-separator :key="`separator-${route.ref}`" />
+          </template>
+        </template>
+        <ni-side-menu-footer :label="headerFormat.label" :userId="loggedUser._id" :interface-type="interfaceType"
+          @myClick="headerFormat.myClick"/>
+      </q-list>
       <div :class="chevronContainerClasses">
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
@@ -19,48 +40,21 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import { AUXILIARY_ROLES, HELPER, COACH_ROLES } from '@data/constants';
 import { layoutMixin } from '@mixins/layoutMixin';
-import SideMenuCoach from 'src/modules/client/components/menu/SideMenuCoach';
-import SideMenuAuxiliary from 'src/modules/client/components/menu/SideMenuAuxiliary';
-import SideMenuCustomer from 'src/modules/client/components/menu/SideMenuCustomer';
-import SideMenuEmpty from 'src/modules/client/components/menu/SideMenuEmpty';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import SideMenuFooter from '@components/menu/SideMenuFooter';
+import MenuItem from '@components/menu/MenuItem';
+import { menuItems } from './menuItems'
 
 export default {
   name: 'ClientLayout',
+  mixins: [layoutMixin, sideMenuMixin, menuItems],
   components: {
-    'side-menu-coach': SideMenuCoach,
-    'side-menu-auxiliary': SideMenuAuxiliary,
-    'side-menu-customer': SideMenuCustomer,
-    'side-menu-empty': SideMenuEmpty,
+    'ni-side-menu-footer': SideMenuFooter,
+    'ni-menu-item': MenuItem,
   },
-  mixins: [layoutMixin],
-  data () {
-    return {
-      HELPER,
-    }
-  },
-  computed: {
-    ...mapGetters({ clientRole: 'main/clientRole' }),
-    isAuxiliary () {
-      return AUXILIARY_ROLES.includes(this.clientRole);
-    },
-    isCoach () {
-      return COACH_ROLES.includes(this.clientRole);
-    },
-    isHelper () {
-      return this.clientRole === HELPER;
-    },
-    sidemenusRefs () {
-      if (!this.loggedUser) return 'defaultMenu';
-
-      if (this.isAuxiliary) return 'auxiliaryMenu';
-      if (this.isCoach) return 'coachMenu';
-      if (this.isHelper) return 'helperMenu';
-
-      return 'defaultMenu';
-    },
+  mounted () {
+    this.collapsibleOpening();
   },
 }
 </script>

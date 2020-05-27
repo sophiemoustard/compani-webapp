@@ -64,7 +64,7 @@ export default {
         },
         { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
         { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement', condition: true },
-        { name: 'customers contracts', icon: 'description', label: 'Contrats', condition: this.hasContracts },
+        this.hasContracts ? { name: 'customers contracts', icon: 'description', label: 'Contrats', condition: this.hasContracts } : {},
       ];
 
       const ability = defineAbilitiesFor(this.clientRole, null, this.company);
