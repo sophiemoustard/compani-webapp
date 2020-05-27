@@ -66,10 +66,16 @@ export const menuItemsMixin = {
       return COACH_ROLES.includes(this.clientRole);
     },
     routes () {
-      if (this.isHelper) return this.customerRoutes;
-      else if (this.isCoach) return this.coachRoutes;
-      else if (this.isAuxiliary) return this.auxiliaryRoutes;
+      let routes = {};
+      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+
+      if (this.isHelper) routes = this.customerRoutes;
+      else if (this.isCoach) routes = this.coachRoutes;
+      else if (this.isAuxiliary) routes = this.auxiliaryRoutes;
       else return {};
+      return routes
+        .map(r => ({ ...r, children: !this.isHelper ? r.children.filter(c => ability.can('read', c.name)) : null }))
+        .filter(r => !this.isHelper ? r.children.length : ability.can('read', r.name))
     },
     activeRoutes () {
       if (this.isHelper) {
@@ -88,7 +94,7 @@ export const menuItemsMixin = {
       else return this.loggedUser.identity.lastname;
     },
     customerRoutes () {
-      const routes = [
+      return [
         { name: 'customers agenda', icon: 'date_range', label: 'Planning' },
         this.hasBillingAssistance || (this.customer && this.customer.referent)
           ? { name: 'customers contact', icon: 'contact_support', label: 'Contact' }
@@ -99,13 +105,9 @@ export const menuItemsMixin = {
           ? { name: 'customers contracts', icon: 'description', label: 'Contrats' }
           : {},
       ];
-
-      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
-
-      return routes.filter(r => ability.can('read', r.name));
     },
     coachRoutes () {
-      const routes = [
+      return [
         {
           ref: 'teams',
           label: 'Équipes',
@@ -172,15 +174,9 @@ export const menuItemsMixin = {
           ],
         },
       ];
-
-      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
-
-      return routes
-        .map(r => ({ ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
-        .filter(r => r.children.length);
     },
     auxiliaryRoutes () {
-      const routes = [
+      return [
         {
           ref: 'planning',
           label: 'Planning',
@@ -224,12 +220,6 @@ export const menuItemsMixin = {
           ],
         },
       ];
-
-      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
-
-      return routes
-        .map(r => ({ ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
-        .filter(r => r.children.length);
     },
   },
   methods: {
