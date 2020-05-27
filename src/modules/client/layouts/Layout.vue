@@ -23,7 +23,7 @@
           <q-separator :key="`separator-${route.ref}`" />
           </template>
         </template>
-        <ni-side-menu-footer :label="footerLabel" :userId="loggedUser._id" :interface-type="CLIENT"
+        <ni-side-menu-footer :label="footerLabel" :userId="loggedUser._id" :interface-type="interfaceType"
           @click="connectToBotMessenger"/>
       </q-list>
       <div :class="chevronContainerClasses">
@@ -57,7 +57,7 @@ export default {
   },
   data () {
     return {
-      CLIENT,
+      interfaceType: CLIENT,
     }
   },
   mounted () {

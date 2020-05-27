@@ -1,5 +1,6 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import { CLIENT } from '@data/constants';
 
 export const sideMenuMixin = {
   computed: {
@@ -8,7 +9,7 @@ export const sideMenuMixin = {
       return (get(this.loggedUser, 'identity.firstname') || '').toUpperCase();
     },
     companiLogo () {
-      return this.CLIENT
+      return this.interfaceType === CLIENT
         ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose.png'
         : 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_texte_bordeaux.png';
     },

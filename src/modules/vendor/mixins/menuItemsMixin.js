@@ -40,7 +40,7 @@ export const menuItemsMixin = {
     routes () {
       if (this.isAdmin) return this.adminRoutes;
       else if (this.isTrainer) return this.trainerRoutes;
-      else return {};
+      else return [];
     },
     activeRoutes () {
       if (this.isAdmin) return this.adminActiveRoutes;

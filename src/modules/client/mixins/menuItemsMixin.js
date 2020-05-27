@@ -66,26 +66,20 @@ export const menuItemsMixin = {
       return COACH_ROLES.includes(this.clientRole);
     },
     routes () {
-      let routes = {};
+      let routes = [];
       const ability = defineAbilitiesFor(this.clientRole, null, this.company);
 
       if (this.isHelper) routes = this.customerRoutes;
       else if (this.isCoach) routes = this.coachRoutes;
       else if (this.isAuxiliary) routes = this.auxiliaryRoutes;
-      else return {};
+
       return routes
-        .map(r => ({ ...r, children: !this.isHelper ? r.children.filter(c => ability.can('read', c.name)) : null }))
-        .filter(r => !this.isHelper ? r.children.length : ability.can('read', r.name))
+        .map(r => (this.isHelper ? r : { ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
+        .filter(r => r.children ? r.children.length : ability.can('read', r.name))
     },
     activeRoutes () {
-      if (this.isHelper) {
-        return {
-          planning: { open: false },
-          customers: { open: false },
-          administrative: { open: false },
-          teams: { open: false },
-        };
-      } else if (this.isCoach) return this.coachActiveRoutes;
+      if (this.isHelper) return this.customerActiveRoutes;
+      else if (this.isCoach) return this.coachActiveRoutes;
       else if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
       else return {};
     },
@@ -95,16 +89,17 @@ export const menuItemsMixin = {
     },
     customerRoutes () {
       return [
-        { name: 'customers agenda', icon: 'date_range', label: 'Planning' },
-        this.hasBillingAssistance || (this.customer && this.customer.referent)
-          ? { name: 'customers contact', icon: 'contact_support', label: 'Contact' }
-          : {},
-        { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation' },
-        { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement' },
-        this.hasContracts
-          ? { name: 'customers contracts', icon: 'description', label: 'Contrats' }
-          : {},
-      ];
+        { name: 'customers agenda', icon: 'date_range', label: 'Planning', condition: true },
+        {
+          name: 'customers contact',
+          icon: 'contact_support',
+          label: 'Contact',
+          condition: this.hasBillingAssistance || (this.customer && this.customer.referent),
+        },
+        { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
+        { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement', condition: true },
+        { name: 'customers contracts', icon: 'description', label: 'Contrats', condition: this.hasContracts },
+      ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs)
     },
     coachRoutes () {
       return [

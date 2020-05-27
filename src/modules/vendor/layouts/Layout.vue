@@ -16,7 +16,7 @@
             </q-expansion-item>
           <q-separator :key="`separator-${route.ref}`" />
         </template>
-        <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="VENDOR" />
+        <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
       </q-list>
       <div :class="chevronContainerClasses" >
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
@@ -51,7 +51,7 @@ export default {
   },
   data () {
     return {
-      VENDOR,
+      interfaceType: VENDOR,
     }
   },
   computed: {
