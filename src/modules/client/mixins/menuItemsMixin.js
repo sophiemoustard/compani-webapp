@@ -1,9 +1,7 @@
-import { Cookies } from 'quasar';
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import {
-  CLIENT,
   CLIENT_ADMIN,
   AUXILIARY,
   PLANNING_REFERENT,
@@ -13,10 +11,9 @@ import {
 } from '@data/constants';
 import { defineAbilitiesFor } from '@helpers/ability';
 
-export const menuItems = {
+export const menuItemsMixin = {
   data () {
     return {
-      interfaceType: CLIENT,
       customerActiveRoutes: {
         planning: { open: false },
         customers: { open: false },
@@ -69,37 +66,26 @@ export const menuItems = {
       return COACH_ROLES.includes(this.clientRole);
     },
     routes () {
-      if (this.isHelper) {
-        return this.customerRoutes;
-      } else if (this.isCoach) {
-        return this.coachRoutes;
-      } else if (this.isAuxiliary) {
-        return this.auxiliaryRoutes;
-      } else {
-        return [];
-      }
+      if (this.isHelper) return this.customerRoutes;
+      else if (this.isCoach) return this.coachRoutes;
+      else if (this.isAuxiliary) return this.auxiliaryRoutes;
+      else return {};
     },
     activeRoutes () {
-      if (this.Helper) {
-        return [this.customerActiveRoutes];
-      } else if (this.isCoach) {
-        return this.coachActiveRoutes;
-      } else if (this.isAuxiliary) {
-        return this.auxiliaryActiveRoutes;
-      } else {
-        return [];
-      }
-    },
-    headerFormat () {
       if (this.isHelper) {
-        return { label: this.loggedUser.identity.lastname, myClick: () => {} };
-      } else if (this.isCoach) {
-        return { label: this.userFirstnameUpper, myClick: () => {} };
-      } else if (this.isAuxiliary) {
-        return { label: this.userFirstnameUpper, myClick: this.connectToBotMessenger };
-      } else {
-        return [];
-      }
+        return {
+          planning: { open: false },
+          customers: { open: false },
+          administrative: { open: false },
+          teams: { open: false },
+        };
+      } else if (this.isCoach) return this.coachActiveRoutes;
+      else if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
+      else return {};
+    },
+    footerLabel () {
+      if (this.isCoach || this.isAuxiliary) return this.userFirstnameUpper;
+      else return this.loggedUser.identity.lastname;
     },
     customerRoutes () {
       const routes = [
@@ -252,10 +238,6 @@ export const menuItems = {
         const customer = await Customers.getById(this.loggedUser.customers[0]._id);
         this.$store.commit('customer/saveCustomer', customer);
       }
-    },
-    connectToBotMessenger () {
-      const token = Cookies.get('alenvi_token');
-      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
     },
   },
 };

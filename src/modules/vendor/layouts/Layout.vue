@@ -16,7 +16,7 @@
             </q-expansion-item>
           <q-separator :key="`separator-${route.ref}`" />
         </template>
-        <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
+        <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="VENDOR" />
       </q-list>
       <div :class="chevronContainerClasses" >
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
@@ -35,19 +35,24 @@
 import { mapGetters } from 'vuex';
 import { layoutMixin } from '@mixins/layoutMixin';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
-import { TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, VENDOR } from '@data/constants';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
-import { menuItems } from './menuItems'
+import { menuItemsMixin } from '../mixins/menuItemsMixin'
 
 export default {
   components: {
     'ni-side-menu-footer': SideMenuFooter,
     'ni-menu-item': MenuItem,
   },
-  mixins: [layoutMixin, sideMenuMixin, menuItems],
+  mixins: [layoutMixin, sideMenuMixin, menuItemsMixin],
   mounted () {
     this.collapsibleOpening();
+  },
+  data () {
+    return {
+      VENDOR,
+    }
   },
   computed: {
     ...mapGetters({ vendorRole: 'main/vendorRole' }),

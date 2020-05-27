@@ -1,6 +1,5 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
-import { CLIENT } from '@data/constants'
 
 export const sideMenuMixin = {
   computed: {
@@ -8,11 +7,8 @@ export const sideMenuMixin = {
     userFirstnameUpper () {
       return (get(this.loggedUser, 'identity.firstname') || '').toUpperCase();
     },
-    accessBothInterface () {
-      return get(this.loggedUser, 'role.client') && get(this.loggedUser, 'role.vendor');
-    },
     companiLogo () {
-      return this.interfaceType === CLIENT
+      return this.CLIENT
         ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose.png'
         : 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_texte_bordeaux.png';
     },
@@ -27,12 +23,6 @@ export const sideMenuMixin = {
       if (this.$refs[from.meta.parent] && to.meta.parent !== from.meta.parent) {
         this.activeRoutes[from.meta.parent].open = false;
       }
-    },
-    switchInterface () {
-      if (!this.accessBothInterface) return;
-
-      if (this.interfaceType === CLIENT) this.$router.push({ path: '/ad' }).catch(e => {});
-      else this.$router.push({ path: '/' }).catch(e => {});
     },
   },
 };

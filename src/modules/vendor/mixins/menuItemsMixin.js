@@ -1,9 +1,6 @@
-import { VENDOR } from '@data/constants';
-
-export const menuItems = {
+export const menuItemsMixin = {
   data () {
     return {
-      interfaceType: VENDOR,
       adminActiveRoutes: {
         users: { open: false },
         configuration: { open: false },
@@ -41,35 +38,21 @@ export const menuItems = {
   },
   computed: {
     routes () {
-      if (this.isAdmin) {
-        return this.adminRoutes;
-      } else if (this.isTrainer) {
-        return this.trainerRoutes;
-      } else {
-        return [];
-      }
+      if (this.isAdmin) return this.adminRoutes;
+      else if (this.isTrainer) return this.trainerRoutes;
+      else return {};
     },
     activeRoutes () {
-      if (this.isAdmin) {
-        return this.adminActiveRoutes;
-      } else if (this.isTrainer) {
-        return this.trainerActiveRoutes;
-      } else {
-        return [];
-      }
+      if (this.isAdmin) return this.adminActiveRoutes;
+      else if (this.isTrainer) return this.trainerActiveRoutes;
+      else return {};
     },
     trainerRoutes () {
       return [
         {
           ref: 'management',
           label: 'Gestion',
-          children: [
-            {
-              name: 'trainers courses',
-              icon: 'mdi-teach',
-              label: 'Formations',
-            },
-          ],
+          children: [{ name: 'trainers courses', icon: 'mdi-teach', label: 'Formations' }],
         },
         {
           ref: 'administrative',
@@ -85,7 +68,5 @@ export const menuItems = {
         },
       ];
     },
-  },
-  methods: {
   },
 };
