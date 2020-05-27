@@ -158,7 +158,7 @@ export default {
 
       .planning-hour
         position: absolute;
-        color: $light-grey;
+        color: $middle-grey;
         background-color: $white;
         font-size: 12px;
         padding: 0 5px

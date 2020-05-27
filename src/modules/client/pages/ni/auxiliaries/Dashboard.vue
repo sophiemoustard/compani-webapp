@@ -363,25 +363,25 @@ export default {
   font-style: italic
 
 .auxiliary
-  border-top: 1px solid $light-grey
-  border-left: 1px solid $light-grey
-  border-right: 1px solid $light-grey
+  border-top: 1px solid $middle-grey
+  border-left: 1px solid $middle-grey
+  border-right: 1px solid $middle-grey
   &:nth-child(2)
-    border-bottom: 1px solid $light-grey
+    border-bottom: 1px solid $middle-grey
   div
     padding: 5px
   &-card
     display: flex
     flex-direction: column
     &:not(:nth-last-child(-n+2))
-      border-bottom: 1px solid $light-grey
+      border-bottom: 1px solid $middle-grey
     &-container
       margin: 0 16px
       @media screen and (max-width: 767px)
         margin: 0 8px
 
 .auxiliary-label
-  border-right: 1px solid $light-grey
+  border-right: 1px solid $middle-grey
 
 .auxiliary-value
   justify-content: flex-end

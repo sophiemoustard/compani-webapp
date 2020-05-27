@@ -80,7 +80,7 @@ export default {
 
   .chevron
     background-color: white
-    border: 1px solid $light-grey
+    border: 1px solid $middle-grey
     top: 5px
     position: fixed
     z-index: 5000

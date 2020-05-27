@@ -51,7 +51,7 @@ export default {
 
 <style lang="stylus" scoped>
   .borders
-    border: 1px solid $light-grey
+    border: 1px solid $middle-grey
 
   /deep/ .q-field__append
     .text-negative

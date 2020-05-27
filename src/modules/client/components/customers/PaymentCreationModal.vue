@@ -102,5 +102,5 @@ export default {
         width: 50%
         border-radius: 20px;
         margin: 5px;
-        background-color: $light-grey;
+        background-color: $middle-grey;
 </style>
