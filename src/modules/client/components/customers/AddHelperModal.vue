@@ -3,15 +3,19 @@
     <template slot="title">
       Ajouter un <span class="text-weight-bold">aidant</span>
     </template>
-    <ni-input in-modal v-model="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
-      caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
-    <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-    <ni-input in-modal v-model="newHelper.local.email" :error="validations.local.email.$error" caption="Email"
+    <ni-input :disable="!firstStep" in-modal v-model="newHelper.local.email" :error="validations.local.email.$error" caption="Email"
       @blur="validations.local.email.$touch" :error-label="emailError" required-field />
-    <ni-input in-modal v-model.trim="newHelper.contact.phone" last :error="validations.contact.phone.$error"
-      caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
+    <template v-if="!firstStep">
+      <ni-input in-modal v-model="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
+        caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
+      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model.trim="newHelper.contact.phone" last :error="validations.contact.phone.$error"
+        caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
+    </template>
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
+      <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary" @click="nextStep"
+        :loading="loading" icon-right="add" :disable="validations.local.email.$error || !newHelper.local.email" />
+      <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
@@ -31,6 +35,7 @@ export default {
     company: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    firstStep: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
@@ -59,6 +64,10 @@ export default {
     submit () {
       this.$emit('submit');
     },
+    nextStep () {
+      this.$emit('nextStep');
+    },
+
   },
 }
 </script>
