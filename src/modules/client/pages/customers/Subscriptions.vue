@@ -6,7 +6,8 @@
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-card">
-          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
+          <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading"
+            data-cy="subscriptions-table">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -54,10 +55,11 @@
         <div class="row gutter-profile">
           <ni-input caption="Nom associé au compte bancaire" v-model="customer.payment.bankAccountOwner"
             :error="$v.customer.payment.bankAccountOwner.$error" @focus="saveTmp('payment.bankAccountOwner')"
-            @blur="updateCustomer('payment.bankAccountOwner')" />
+            @blur="updateCustomer('payment.bankAccountOwner')" data-cy="bank-account-owner" />
           <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error"
-            :error-label="ibanError" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
-          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error"
+            :error-label="ibanError" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')"
+            data-cy="iban" />
+          <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" data-cy="bic"
             :error-label="bicError" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
         </div>
       </div>
@@ -66,7 +68,7 @@
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
           <ni-responsive-table :data="customer.payment.mandates" :columns="mandatesColumns" :loading="mandatesLoading"
-            :pagination.sync="pagination" :visible-columns="mandatesVisibleColumns">
+            :pagination.sync="pagination" :visible-columns="mandatesVisibleColumns" data-cy="mandate-table">
             <template v-slot:body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -74,7 +76,7 @@
                   <template v-if="col.name === 'sign'">
                     <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
                       {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
-                    <q-btn color="primary" @click="preOpenESignModal(props.row)"
+                    <q-btn color="primary" @click="preOpenESignModal(props.row)" data-cy="open-mandate"
                       v-else-if="getRowIndex(customer.payment.mandates, props.row) === customer.payment.mandates.length - 1">
                       Signer
                     </q-btn>
@@ -92,7 +94,7 @@
     </template>
 
     <!-- Mandate signature modal -->
-    <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width>
+    <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width data-cy="esign-modal">
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end no-wrap">
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
