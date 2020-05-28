@@ -31,25 +31,32 @@
         </q-card-actions>
       </q-card>
     </div>
-        <ni-modal v-model="userCreationModal" @hide="resetUserCreationForm" @show="openUserCreationModal">
+
+    <!-- User creation modal -->
+    <ni-modal v-model="userCreationModal" @hide="resetUserCreationForm" @show="openUserCreationModal">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">utilisateur</span>
       </template>
-      <ni-input in-modal v-model="newUser.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-        @blur="$v.newUser.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
+      <ni-input :disable="!firstStep" in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
         @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
-      <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error"
-        caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="phoneNbrError($v.newUser)" />
-      <ni-select in-modal caption="Role" :options="roleOptions" v-model="newUser.role" :error="$v.newUser.role.$error"
+      <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role" :error="$v.newUser.role.$error"
         @blur="$v.newUser.role.$touch" last required-field />
+      <template v-if="!firstStep">
+        <ni-input in-modal v-model="newUser.identity.firstname" caption="Prénom" />
+        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
+          @blur="$v.newUser.identity.lastname.$touch" required-field />
+        <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error"
+          caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="phoneNbrError($v.newUser)" />
+      </template>
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un utilisateur" icon-right="add" color="primary"
-          :loading="loading" @click="createUser" :disable="$v.newUser.$invalid" />
+        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" icon-right="add" color="primary"
+          :loading="loading" @click="nextStep" :disable="$v.newUser.local.email.$error || !newUser.local.email" />
+        <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter un utilisateur" icon-right="add"
+          color="primary" :loading="loading" @click="createUser" :disable="$v.newUser.$invalid" />
       </template>
     </ni-modal>
 
+    <!-- User edition modal -->
     <ni-modal v-model="userEditionModal" @hide="resetUserEditionForm">
       <template slot="title">
         Éditer un <span class="text-weight-bold">utilisateur</span>
@@ -110,6 +117,7 @@ export default {
       usersLoading: false,
       userCreationModal: false,
       userEditionModal: false,
+      firstStep: true,
       usersColumns: [
         { name: 'firstname', label: 'Prénom', align: 'left', field: row => get(row, 'identity.firstname') || '' },
         { name: 'lastname', label: 'Nom', align: 'left', field: row => get(row, 'identity.lastname') || '' },
@@ -185,6 +193,31 @@ export default {
       if (this.canSetUserCompany) userPayload.company = this.company._id;
       return userPayload;
     },
+    async nextStep () {
+      try {
+        this.loading = true;
+        const userInfo = await Users.exists({ email: this.newUser.local.email });
+        const user = userInfo.user;
+
+        const sameOrNoCompany = !user.company || user.company === this.company._id;
+        if (userInfo.exists && (get(userInfo, 'user.role.client') || !sameOrNoCompany)) {
+          NotifyNegative('Utilisateur déjà existant');
+        } else if (userInfo.exists) {
+          await Users.updateById(userInfo.user._id, { role: this.newUser.role, company: this.company._id });
+          NotifyPositive('Formateur créé');
+          await this.getUsers();
+          this.userCreationModal = false;
+          this.resetUserCreationForm();
+        } else {
+          this.firstStep = false;
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du formateur');
+      } finally {
+        this.loading = false;
+      }
+    },
     async createUser () {
       try {
         this.loading = true;
@@ -201,9 +234,11 @@ export default {
         NotifyNegative('Erreur lors de la création de l\'utilisateur.');
       } finally {
         this.loading = false;
+        this.firstStep = true;
       }
     },
     resetUserCreationForm () {
+      this.firstStep = true;
       this.newUser = Object.assign({}, clear(this.newUser));
       this.$v.newUser.$reset();
     },
