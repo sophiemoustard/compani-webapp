@@ -85,6 +85,7 @@ export const helperMixin = {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
       this.openNewHelperModal = false;
+      this.firstStep = true;
     },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
@@ -127,6 +128,35 @@ export const helperMixin = {
         NotifyNegative('Erreur lors de la création de l\'aidant.');
       } finally {
         this.loading = false;
+        this.firstStep = true;
+      }
+    },
+    async nextStep () {
+      try {
+        const userInfo = await Users.exists({ email: this.newHelper.local.email });
+        const user = userInfo.user;
+
+        const sameOrNoCompany = !user.company || user.company === this.company._id;
+        if (userInfo.exists && (get(user, 'role.client') || !sameOrNoCompany)) {
+          NotifyNegative('Utilisateur déjà existant');
+        } else if (userInfo.exists) {
+          const roles = await Roles.list({ name: HELPER });
+          if (roles.length === 0) throw new Error('Role not found');
+          const payload = { role: roles[0]._id, customers: [this.customer._id] };
+          if (!user.company) payload.company = this.customer.company;
+
+          await Users.updateById(user._id, payload);
+          NotifyPositive('Aidant créé');
+
+          this.getUserHelpers()
+          this.resetAddHelperForm();
+        } else {
+          this.firstStep = false;
+        }
+      } catch (e) {
+        NotifyNegative('Erreur lors de la création de l\'aidant');
+        this.resetAddHelperForm();
+        this.firstStep = true;
       }
     },
     async editHelper () {
