@@ -119,5 +119,5 @@ export default {
       width: 100%
       font-size: 0
     &.borders
-      border: 1px solid $light-grey
+      border: 1px solid $middle-grey
 </style>

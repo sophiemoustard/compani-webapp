@@ -80,7 +80,7 @@ export default {
 <style lang="stylus" scoped>
   .borders
     /deep/ .q-field__control
-      border: 1px solid $light-grey
+      border: 1px solid $middle-grey
 
   .q-input
     /deep/ .q-field__control
