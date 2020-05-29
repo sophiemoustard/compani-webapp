@@ -1,18 +1,5 @@
 <template>
   <div>
-    <q-banner v-if="disabledFollowUp" class="full-width warning q-mb-md" dense>
-      <q-icon size="sm" name="warning" />
-      <div>
-        Il manque la ou les information(s) suivante(s) pour assurer le suivi de la formation :
-        {{ followUpMissingInfo.join(', ') }}.
-      </div>
-    </q-banner>
-    <q-banner v-if="!get(this.course, 'program.learningGoals')" class="full-width warning q-mb-md" dense>
-      <q-icon size="sm" name="warning" />
-      <div>
-        Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger les attestations de fin de formation.
-      </div>
-    </q-banner>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
@@ -28,6 +15,20 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Actions utiles</p>
+      <q-banner v-if="disabledFollowUp" :class="`full-width warning q-mb-md ${backgroundClass}`" dense>
+        <q-icon size="sm" name="warning" />
+        <div>
+          Il manque la ou les information(s) suivante(s) pour assurer le suivi de la formation :
+          {{ followUpMissingInfo.join(', ') }}.
+        </div>
+      </q-banner>
+      <q-banner v-if="!get(this.course, 'program.learningGoals')" dense
+        :class="`full-width warning q-mb-md ${backgroundClass}`">
+        <q-icon size="sm" name="warning" />
+        <div>
+          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger les attestations de fin de formation.
+        </div>
+      </q-banner>
       <div class="course-link">
         <q-item>
           <q-item-section side>
@@ -124,7 +125,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
+import { CONVOCATION, REMINDER, REQUIRED_LABEL, VENDOR, CLIENT } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -141,6 +142,8 @@ export default {
     profileId: { type: String },
   },
   data () {
+    const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
+
     return {
       smsModal: false,
       messageType: '',
@@ -164,6 +167,7 @@ export default {
       smsLoading: false,
       smsHistoriesModal: false,
       smsHistory: {},
+      backgroundClass: interfaceType === CLIENT ? 'grey-background' : 'beige-background',
     };
   },
   async created () {
