@@ -150,7 +150,6 @@ export default {
         this.modalLoading = false;
       }
     },
-
   },
 }
 </script>
