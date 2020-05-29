@@ -58,9 +58,4 @@ export default {
     width: 33%
   @media screen and (max-width: 767px)
     min-width: 250px
-.grey-background
-  background-color: $middle-grey
-.beige-background
-  background-color: $middle-beige
-
 </style>
