@@ -50,9 +50,9 @@
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" icon-right="add" color="primary"
-          :loading="loading" @click="nextStep" :disable="$v.newUser.local.email.$error || !newUser.local.email" />
+          :loading="loading" @click="nextStep" />
         <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter un utilisateur" icon-right="add"
-          color="primary" :loading="loading" @click="createUser" :disable="$v.newUser.$invalid" />
+          color="primary" :loading="loading" @click="createUser" />
       </template>
     </ni-modal>
 
@@ -196,6 +196,8 @@ export default {
     async nextStep () {
       try {
         this.loading = true;
+        this.$v.newUser.local.email.$touch();
+        if (this.$v.newUser.local.email.$error || !this.newUser.local.email) return NotifyWarning('Champs invalides');
         const userInfo = await Users.exists({ email: this.newUser.local.email });
         const user = userInfo.user;
 
