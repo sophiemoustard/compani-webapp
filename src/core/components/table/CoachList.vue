@@ -202,16 +202,14 @@ export default {
         const user = userInfo.user;
 
         const sameOrNoCompany = !user.company || user.company === this.company._id;
-        if (userInfo.exists && (get(userInfo, 'user.role.client') || !sameOrNoCompany)) {
-          NotifyNegative('Utilisateur déjà existant');
-        } else if (userInfo.exists) {
+        if (userInfo.exists && !sameOrNoCompany) return NotifyNegative('Impossible de créer cet utilisateur');
+        else if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
+        else if (userInfo.exists) {
           await Users.updateById(userInfo.user._id, { role: this.newUser.role, company: this.company._id });
           NotifyPositive('Coach créé');
           await this.getUsers();
-          this.resetUserCreationForm();
-        } else {
-          this.firstStep = false;
-        }
+          this.userCreationModal = false;
+        } else this.firstStep = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du coach');
@@ -226,7 +224,7 @@ export default {
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Users.create(this.formatUserPayload(this.newUser));
-        this.resetUserCreationForm();
+        this.userCreationModal = false;
         this.getUsers();
         NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
@@ -238,7 +236,6 @@ export default {
     },
     resetUserCreationForm () {
       this.firstStep = true;
-      this.userCreationModal = false;
       this.newUser = Object.assign({}, clear(this.newUser));
       this.$v.newUser.$reset();
     },
