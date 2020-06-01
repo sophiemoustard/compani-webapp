@@ -204,16 +204,15 @@ export default {
           NotifyNegative('Utilisateur déjà existant');
         } else if (userInfo.exists) {
           await Users.updateById(userInfo.user._id, { role: this.newUser.role, company: this.company._id });
-          NotifyPositive('Formateur créé');
+          NotifyPositive('Coach créé');
           await this.getUsers();
-          this.userCreationModal = false;
           this.resetUserCreationForm();
         } else {
           this.firstStep = false;
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du formateur');
+        NotifyNegative('Erreur lors de la création du coach');
       } finally {
         this.loading = false;
       }
@@ -225,20 +224,19 @@ export default {
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Users.create(this.formatUserPayload(this.newUser));
-        this.userCreationModal = false;
+        this.resetUserCreationForm();
         this.getUsers();
         NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant.');
         NotifyNegative('Erreur lors de la création de l\'utilisateur.');
       } finally {
         this.loading = false;
-        this.firstStep = true;
       }
     },
     resetUserCreationForm () {
       this.firstStep = true;
+      this.userCreationModal = false;
       this.newUser = Object.assign({}, clear(this.newUser));
       this.$v.newUser.$reset();
     },
