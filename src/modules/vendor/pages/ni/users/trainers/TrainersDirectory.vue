@@ -84,6 +84,7 @@ export default {
   methods: {
     async nextStep () {
       try {
+        this.modalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainer.local.email });
 
         if (userInfo.exists && get(userInfo, 'user.role.vendor')) {
@@ -102,6 +103,8 @@ export default {
       } catch (e) {
         NotifyNegative('Erreur lors de la création du formateur');
         this.resetCreationModal();
+      } finally {
+        this.modalLoading = false;
       }
     },
     resetCreationModal () {
