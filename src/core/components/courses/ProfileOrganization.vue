@@ -157,7 +157,7 @@ import { mapState } from 'vuex';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
-import set from 'lodash/set';
+import cloneDeep from 'lodash/cloneDeep';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 import Courses from '@api/Courses';
@@ -371,12 +371,6 @@ export default {
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
     },
-    invalidAddTraineeForm () {
-      this.$v.newTrainee.$touch();
-      if (this.firstStep) return !this.newTrainee.local.email || this.$v.newTrainee.local.email.$error;
-      else if (this.addNewTraineeCompanyStep) return this.$v.newTrainee.company.$error;
-      else return this.$v.newTrainee.$invalid;
-    },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
@@ -533,29 +527,25 @@ export default {
     },
     async nextStepAddTraineeModal () {
       try {
-        if (this.invalidAddTraineeForm) return NotifyWarning('Champ(s) invalide(s).');
+        this.$v.newTrainee.$touch();
+        if (!this.newTrainee.local.email || this.$v.newTrainee.local.email.$error) {
+          return NotifyWarning('Champ(s) invalide(s).');
+        }
 
         this.addTraineeModalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainee.local.email });
 
         if (this.isIntraCourse) {
           this.newTrainee.company = this.course.company._id;
-          if (userInfo.exists) {
-            this.addTrainee();
-          } else {
-            this.firstStep = false;
-          }
+          if (userInfo.exists) this.addTrainee();
+          else this.firstStep = false;
         } else {
-          if (userInfo.exists && userInfo.user.company) {
-            this.addTrainee();
-          } else if (userInfo.exists) {
-            this.addNewTraineeCompanyStep = true;
-            this.firstStep = false;
-          } else {
+          if (userInfo.exists && userInfo.user.company) this.addTrainee();
+          else {
+            if (userInfo.exists) this.addNewTraineeCompanyStep = true;
             this.firstStep = false;
           }
         }
-
         this.$v.newTrainee.$reset();
       } catch (e) {
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
@@ -564,21 +554,28 @@ export default {
         this.addTraineeModalLoading = false;
       }
     },
-    formatAddTraineePayload (payload) {
-      const props = ['identity.lastname', 'identity.firstname', 'contact.phone', 'local.email', 'company'];
-      const compactPayload = {};
-      props.forEach(prop => {
-        const value = get(payload, prop);
-        if (value && value !== '') set(compactPayload, prop, value);
-      });
-      return compactPayload;
+    formatAddTraineePayload () {
+      const payload = cloneDeep(this.newTrainee);
+      if (get(payload, 'identity.firstname') === '') {
+        if (get(payload, 'identity.lastname') === '') delete payload.identity;
+        else delete payload.identity.firstname;
+      }
+      if (get(payload, 'contact.phone') === '') delete payload.contact;
+      if (get(payload, 'company') === '') delete payload.company;
+
+      return payload;
     },
     async addTrainee () {
       try {
-        if (this.invalidAddTraineeForm) return NotifyWarning('Champ(s) invalide(s).');
+        if (!this.firstStep) {
+          this.$v.newTrainee.$touch();
+          const companyFieldError = this.addNewTraineeCompanyStep && this.$v.newTrainee.company.$error;
+          const newTraineeFormInvalid = !this.addNewTraineeCompanyStep && this.$v.newTrainee.$invalid;
+          if (companyFieldError || newTraineeFormInvalid) return NotifyWarning('Champ(s) invalide(s).');
+        }
 
         this.addTraineeModalLoading = true;
-        const payload = this.formatAddTraineePayload(this.newTrainee);
+        const payload = this.formatAddTraineePayload();
         await Courses.addTrainee(this.course._id, payload);
         NotifyPositive('Stagiaire ajouté.');
 
