@@ -121,18 +121,20 @@ export const helperMixin = {
         NotifyPositive('Email envoyé');
 
         await this.getUserHelpers();
-        this.openNewHelperModal = false;
+        this.resetAddHelperForm();
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant.');
         NotifyNegative('Erreur lors de la création de l\'aidant.');
       } finally {
         this.loading = false;
-        this.firstStep = true;
       }
     },
     async nextStep () {
       try {
+        this.loading = true;
+        this.$v.newHelper.local.email.$touch();
+        if (this.$v.newHelper.local.email.$error || !this.newHelper.local.email) return NotifyWarning('Champs invalides');
+
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
         const user = userInfo.user;
 
@@ -154,9 +156,10 @@ export const helperMixin = {
           this.firstStep = false;
         }
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la création de l\'aidant');
-        this.resetAddHelperForm();
-        this.firstStep = true;
+      } finally {
+        this.loading = false;
       }
     },
     async editHelper () {

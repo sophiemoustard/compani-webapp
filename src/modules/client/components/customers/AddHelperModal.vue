@@ -14,7 +14,7 @@
     </template>
     <template slot="footer">
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary" @click="nextStep"
-        :loading="loading" icon-right="add" :disable="validations.local.email.$error || !newHelper.local.email" />
+        :loading="loading" icon-right="add" />
       <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter un aidant" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>
