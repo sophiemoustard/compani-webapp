@@ -157,6 +157,7 @@ import { mapState } from 'vuex';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
+import set from 'lodash/set';
 import groupBy from 'lodash/groupBy';
 import omit from 'lodash/omit';
 import Courses from '@api/Courses';
@@ -179,7 +180,7 @@ import {
   VENDOR,
   CLIENT,
 } from '@data/constants';
-import { formatIdentity, formatPhone, clear, removeEmptyProps } from '@helpers/utils';
+import { formatIdentity, formatPhone, clear } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -563,12 +564,21 @@ export default {
         this.addTraineeModalLoading = false;
       }
     },
+    formatAddTraineePayload (payload) {
+      const props = ['identity.lastname', 'identity.firstname', 'contact.phone', 'local.email', 'company'];
+      const compactPayload = {};
+      props.forEach(prop => {
+        const value = get(payload, prop);
+        if (value && value !== '') set(compactPayload, prop, value);
+      });
+      return compactPayload;
+    },
     async addTrainee () {
       try {
         if (this.invalidAddTraineeForm) return NotifyWarning('Champ(s) invalide(s).');
 
         this.addTraineeModalLoading = true;
-        const payload = removeEmptyProps(this.newTrainee);
+        const payload = this.formatAddTraineePayload(this.newTrainee);
         await Courses.addTrainee(this.course._id, payload);
         NotifyPositive('Stagiaire ajouté.');
 
