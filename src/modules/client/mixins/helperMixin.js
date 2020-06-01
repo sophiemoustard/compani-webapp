@@ -84,7 +84,6 @@ export const helperMixin = {
     resetAddHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
-      this.openNewHelperModal = false;
       this.firstStep = true;
     },
     resetEditedHelperForm () {
@@ -124,15 +123,17 @@ export const helperMixin = {
         this.openNewHelperModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant.');
         NotifyNegative('Erreur lors de la création de l\'aidant.');
       } finally {
         this.loading = false;
-        this.firstStep = true;
       }
     },
     async nextStep () {
       try {
+        this.loading = true;
+        this.$v.newHelper.local.email.$touch();
+        if (this.$v.newHelper.local.email.$error) return NotifyWarning('Champs invalides');
+
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
         const user = userInfo.user;
 
@@ -149,14 +150,15 @@ export const helperMixin = {
           NotifyPositive('Aidant créé');
 
           this.getUserHelpers()
-          this.resetAddHelperForm();
+          this.openNewHelperModal = false;
         } else {
           this.firstStep = false;
         }
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la création de l\'aidant');
-        this.resetAddHelperForm();
-        this.firstStep = true;
+      } finally {
+        this.loading = false;
       }
     },
     async editHelper () {
