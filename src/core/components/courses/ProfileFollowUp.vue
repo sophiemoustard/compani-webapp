@@ -15,20 +15,17 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Actions utiles</p>
-      <q-banner v-if="disabledFollowUp" :class="`full-width warning q-mb-md ${backgroundClass}`" dense>
-        <q-icon size="sm" name="warning" />
-        <div>
+      <ni-banner v-if="disabledFollowUp">
+        <template v-slot:message>
           Il manque la ou les information(s) suivante(s) pour assurer le suivi de la formation :
           {{ followUpMissingInfo.join(', ') }}.
-        </div>
-      </q-banner>
-      <q-banner v-if="!get(this.course, 'program.learningGoals')" dense
-        :class="`full-width warning q-mb-md ${backgroundClass}`">
-        <q-icon size="sm" name="warning" />
-        <div>
+        </template>
+      </ni-banner>
+      <ni-banner v-if="!get(this.course, 'program.learningGoals')">
+        <template v-slot:message>
           Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger les attestations de fin de formation.
-        </div>
-      </q-banner>
+        </template>
+      </ni-banner>
       <div class="course-link">
         <q-item>
           <q-item-section side>
@@ -123,9 +120,10 @@ import Courses from '@api/Courses';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
+import Banner from '@components/Banner';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import { CONVOCATION, REMINDER, REQUIRED_LABEL, VENDOR, CLIENT } from '@data/constants';
+import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -136,14 +134,13 @@ export default {
     'ni-select': Select,
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
+    'ni-banner': Banner,
   },
   mixins: [courseMixin],
   props: {
     profileId: { type: String },
   },
   data () {
-    const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
-
     return {
       smsModal: false,
       messageType: '',
@@ -167,7 +164,6 @@ export default {
       smsLoading: false,
       smsHistoriesModal: false,
       smsHistory: {},
-      backgroundClass: interfaceType === CLIENT ? 'grey-background' : 'beige-background',
     };
   },
   async created () {
