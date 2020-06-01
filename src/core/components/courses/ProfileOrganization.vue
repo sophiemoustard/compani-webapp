@@ -4,8 +4,8 @@
       <div class="row gutter-profile">
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" :error="$v.course.name.$error" />
-        <ni-select v-if="trainerInputVisible" caption="Formateur" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')"
-          @blur="updateCourse('trainer')" :options="trainerOptions" :error="$v.course.trainer.$error" />
+        <ni-select v-if="trainerInputVisible"  v-model.trim="course.trainer._id" :error="$v.course.trainer.$error"
+          @blur="updateCourse('trainer')" :options="trainerOptions" @focus="saveTmp('trainer')" caption="Formateur" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -111,25 +111,24 @@
         Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
       </template>
       <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field
-        @blur="$v.newTrainee.local.email.$touch" caption="Email" @input="$v.newTrainee.local.email.$touch"
-        :error-label="emailError($v.newTrainee)" :error="$v.newTrainee.local.email.$error" />
+        @blur="$v.newTrainee.local.email.$touch" caption="Email" :error-label="emailError($v.newTrainee)"
+        :error="$v.newTrainee.local.email.$error" />
       <template v-if="!firstStep">
-        <ni-input in-modal v-if="!missingOnlyNewTraineeCompany" v-model="newTrainee.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-if="!missingOnlyNewTraineeCompany" v-model="newTrainee.identity.lastname" required-field
-          caption="Nom" @blur="$v.newTrainee.identity.lastname.$touch" :error="$v.newTrainee.identity.lastname.$error" />
-        <ni-input in-modal v-if="!missingOnlyNewTraineeCompany" v-model.trim="newTrainee.contact.phone"
+        <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model="newTrainee.identity.firstname" caption="Prénom" />
+        <ni-input in-modal v-if="!addNewTraineeCompanyStep" @blur="$v.newTrainee.identity.lastname.$touch" caption="Nom"
+          required-field v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" />
+        <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model.trim="newTrainee.contact.phone"
           caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error="$v.newTrainee.contact.phone.$error"
           :error-label="phoneNbrError($v.newTrainee)" />
-        <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" :error="$v.newTrainee.company.$error"
-          @blur="$v.newTrainee.company.$touch" required-field caption="Structure" :options="companyOptions" />
+        <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" required-field caption="Structure"
+          @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions" />
       </template>
 
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
-          :loading="addTraineeModalLoading" icon-right="add" @click="nextStepAddTraineeModal"
-          :disable="addTraineeFormIsInvalid" />
-        <q-btn v-else no-caps class="full-width modal-btn" color="primary" :disable="addTraineeFormIsInvalid"
-          :loading="addTraineeModalLoading" icon-right="add" @click="addTrainee" label="Ajouter à la formation" />
+          :loading="addTraineeModalLoading" icon-right="add" @click="nextStepAddTraineeModal" />
+        <q-btn v-else no-caps class="full-width modal-btn" color="primary" label="Ajouter à la formation"
+          :loading="addTraineeModalLoading" icon-right="add" @click="addTrainee" />
       </template>
     </ni-modal>
 
@@ -274,7 +273,7 @@ export default {
       addTraineeModal: false,
       addTraineeModalLoading: false,
       firstStep: true,
-      missingOnlyNewTraineeCompany: false,
+      addNewTraineeCompanyStep: false,
       newTrainee: {
         identity: {
           firstname: '',
@@ -371,9 +370,10 @@ export default {
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
     },
-    addTraineeFormIsInvalid () {
-      if (this.firstStep) return this.$v.newTrainee.local.email.$error || !this.newTrainee.local.email;
-      else if (this.missingOnlyNewTraineeCompany) return this.$v.newTrainee.company.$error;
+    invalidAddTraineeForm () {
+      this.$v.newTrainee.$touch();
+      if (this.firstStep) return !this.newTrainee.local.email || this.$v.newTrainee.local.email.$error;
+      else if (this.addNewTraineeCompanyStep) return this.$v.newTrainee.company.$error;
       else return this.$v.newTrainee.$invalid;
     },
   },
@@ -526,12 +526,14 @@ export default {
     },
     resetAddTraineeForm () {
       this.firstStep = true;
-      this.missingOnlyNewTraineeCompany = false;
+      this.addNewTraineeCompanyStep = false;
       this.newTrainee = Object.assign({}, clear(this.newTrainee));
       this.$v.newTrainee.$reset();
     },
     async nextStepAddTraineeModal () {
       try {
+        if (this.invalidAddTraineeForm) return NotifyWarning('Champ(s) invalide(s).');
+
         this.addTraineeModalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainee.local.email });
 
@@ -546,12 +548,14 @@ export default {
           if (userInfo.exists && userInfo.user.company) {
             this.addTrainee();
           } else if (userInfo.exists) {
-            this.missingOnlyNewTraineeCompany = true;
+            this.addNewTraineeCompanyStep = true;
             this.firstStep = false;
           } else {
             this.firstStep = false;
           }
         }
+
+        this.$v.newTrainee.$reset();
       } catch (e) {
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
         this.resetAddTraineeForm();
@@ -561,9 +565,10 @@ export default {
     },
     async addTrainee () {
       try {
-        const payload = removeEmptyProps(this.newTrainee);
+        if (this.invalidAddTraineeForm) return NotifyWarning('Champ(s) invalide(s).');
 
         this.addTraineeModalLoading = true;
+        const payload = removeEmptyProps(this.newTrainee);
         await Courses.addTrainee(this.course._id, payload);
         NotifyPositive('Stagiaire ajouté.');
 
