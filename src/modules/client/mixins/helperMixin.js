@@ -84,7 +84,6 @@ export const helperMixin = {
     resetAddHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
-      this.openNewHelperModal = false;
       this.firstStep = true;
     },
     resetEditedHelperForm () {
@@ -121,7 +120,7 @@ export const helperMixin = {
         NotifyPositive('Email envoyé');
 
         await this.getUserHelpers();
-        this.resetAddHelperForm();
+        this.openNewHelperModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'aidant.');
@@ -133,7 +132,7 @@ export const helperMixin = {
       try {
         this.loading = true;
         this.$v.newHelper.local.email.$touch();
-        if (this.$v.newHelper.local.email.$error || !this.newHelper.local.email) return NotifyWarning('Champs invalides');
+        if (this.$v.newHelper.local.email.$error) return NotifyWarning('Champs invalides');
 
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
         const user = userInfo.user;
@@ -151,7 +150,7 @@ export const helperMixin = {
           NotifyPositive('Aidant créé');
 
           this.getUserHelpers()
-          this.resetAddHelperForm();
+          this.openNewHelperModal = false;
         } else {
           this.firstStep = false;
         }
