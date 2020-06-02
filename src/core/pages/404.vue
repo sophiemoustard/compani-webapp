@@ -20,14 +20,17 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({
+      clientRole: 'main/clientRole',
+      vendorRole: 'main/vendorRole',
+    }),
   },
   methods: {
     goBack () {
       window.history.go(-1);
     },
     goTo () {
-      return /\/ad\//.test(this.$router.currentRoute.path) || !this.clientRole
+      return /\/ad\//.test(this.$router.currentRoute.path) || (this.vendorRole && !this.clientRole)
         ? this.$router.replace('/ad').catch(e => {})
         : this.$router.replace('/').catch(e => {});
     },

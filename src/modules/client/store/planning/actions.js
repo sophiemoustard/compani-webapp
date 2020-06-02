@@ -27,4 +27,10 @@ export const fillFilter = async ({ commit }, { company, roleToSearch }) => {
   }
 
   commit('setFilters', elems);
-}
+};
+
+export const reset = ({ commit }) => {
+  commit('setFilters', []);
+  commit('setElementToAdd', []);
+  commit('setElementToRemove', []);
+};

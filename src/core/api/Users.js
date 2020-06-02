@@ -38,6 +38,10 @@ export default {
     const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
     return userRaw.data.data.user;
   },
+  async exists (params) {
+    const exists = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/exists`, { params });
+    return exists.data.data;
+  },
   async create (data) {
     const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, data);
     return newUser.data.data.user;

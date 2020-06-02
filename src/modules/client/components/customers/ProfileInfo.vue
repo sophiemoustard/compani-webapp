@@ -235,7 +235,8 @@
 
     <!-- Add helper modal -->
     <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
-      :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" />
+      :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" @nextStep="nextStep"
+      :firstStep="firstStep" />
 
     <!-- Edit helper modal -->
     <edit-helper-modal :editedHelper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
@@ -554,6 +555,7 @@ export default {
         rowsPerPage: 0,
       },
       extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      firstStep: true,
     }
   },
   computed: {

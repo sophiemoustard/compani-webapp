@@ -97,7 +97,7 @@ const routes = [
       {
         path: 'ni/management/courses/:courseId',
         name: 'ni management courses info',
-        component: () => import('src/modules/vendor/pages/ni/management/CourseProfile'),
+        component: () => import('src/core/pages/courses/CourseProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -107,7 +107,7 @@ const routes = [
       {
         path: 'trainers/management/courses',
         name: 'trainers courses',
-        component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
+        component: () => import('src/modules/vendor/pages/trainers/management/CoursesDirectory'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -117,7 +117,7 @@ const routes = [
       {
         path: 'trainers/management/courses/:courseId',
         name: 'trainers courses info',
-        component: () => import('src/modules/vendor/pages/ni/management/CourseProfile'),
+        component: () => import('src/core/pages/courses/CourseProfile'),
         async beforeEnter (to, from, next) {
           await store.dispatch('course/get', { courseId: to.params.courseId });
           const { course } = store.state.course;

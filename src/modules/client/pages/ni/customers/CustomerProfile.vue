@@ -9,7 +9,7 @@
 
 <script>
 import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
-import ProfileTabs from 'src/modules/client/components/ProfileTabs';
+import ProfileTabs from '@components/ProfileTabs';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 import ProfileInfo from 'src/modules/client/components/customers/ProfileInfo';
 import ProfileBilling from 'src/modules/client/components/customers/ProfileBilling';

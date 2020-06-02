@@ -1,11 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
-    <div class="trello">
-      <course-container v-for="col in trello" :title="col.title" :courses="col.courses" :key="col.title" />
-    </div>
-    <q-btn v-if="isAdmin" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
-      label="Ajouter une formation" @click="courseCreationModal = true" />
+    <ni-trello :courses="coursesWithGroupedSlot" />
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
+      @click="courseCreationModal = true" />
 
     <!-- Course creation modal -->
     <ni-modal v-model="courseCreationModal" @hide="resetCreationModal">
@@ -34,28 +32,27 @@ import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
+import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
+import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { TRAINER, INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
-import CourseContainer from 'src/modules/vendor/components/courses/CourseContainer';
-import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
+import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
-  mixins: [courseMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
-    'course-container': CourseContainer,
     'ni-option-group': OptionGroup,
+    'ni-trello': Trello,
   },
   data () {
     return {
@@ -88,40 +85,14 @@ export default {
     isIntraCourse () {
       return this.newCourse.type === INTRA;
     },
-    trello () {
-      return [
-        { title: 'À venir', courses: this.courseListForthcoming },
-        { title: 'En cours', courses: this.courseListInProgress },
-        { title: 'Terminée(s)', courses: this.courseListCompleted },
-      ]
-    },
-    courseListForthcoming () {
-      return this.coursesWithGroupedSlot
-        .filter(this.isForthcoming)
-        .sort((a, b) => this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b));
-    },
-    courseListInProgress () {
-      return this.coursesWithGroupedSlot
-        .filter(this.isInProgress)
-        .sort((a, b) => this.getRangeNowToNextSlot(a) - this.getRangeNowToNextSlot(b));
-    },
-    courseListCompleted () {
-      return this.coursesWithGroupedSlot
-        .filter(this.isCompleted)
-        .sort((a, b) => this.getRangeNowToEndCourse(a) - this.getRangeNowToEndCourse(b));
-    },
   },
   async created () {
-    await this.refreshCourses();
-    if (this.isAdmin) await Promise.all([this.refreshPrograms(), this.refreshCompanies()]);
+    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies()]);
   },
   methods: {
     async refreshCourses () {
       try {
-        const params = {};
-        if (this.vendorRole === TRAINER) params.trainer = this.loggedUser._id;
-
-        const courses = await Courses.list(params);
+        const courses = await Courses.list();
         this.coursesWithGroupedSlot = courses.map(course => ({
           ...course,
           slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
@@ -140,6 +111,17 @@ export default {
       } catch (e) {
         console.error(e);
         this.programOptions = [];
+      }
+    },
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = companies
+          .map(c => ({ label: c.tradeName, value: c._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
       }
     },
     updateCourseCompany () {
@@ -167,48 +149,6 @@ export default {
         this.modalLoading = false;
       }
     },
-    isForthcoming (course) {
-      const noSlot = !course.slots.length;
-      const noSlotHappened = !course.slots.some(this.happened);
-
-      return noSlot || noSlotHappened;
-    },
-    isInProgress (course) {
-      const atLeastOneSlot = course.slots.length;
-      const atLeastOneSlothappened = course.slots.some(this.happened);
-      const notEverySlotsHappened = course.slots.some((sameDaySlots) => !this.happened(sameDaySlots));
-
-      return atLeastOneSlot && atLeastOneSlothappened && notEverySlotsHappened;
-    },
-    isCompleted (course) {
-      const atLeastOneSlot = course.slots.length;
-      const everySlotsHappened = course.slots.every(this.happened);
-
-      return atLeastOneSlot && everySlotsHappened;
-    },
-    getRangeNowToStartCourse (course) {
-      if (course.slots.length === 0) return Number.MAX_SAFE_INTEGER;
-
-      const firstSlot = course.slots[0];
-      return this.$moment(firstSlot[0].startDate).diff(this.$moment(), 'd', true);
-    },
-    getRangeNowToNextSlot (course) {
-      const nextSlot = course.slots.filter((daySlots) => !this.happened(daySlots))[0];
-      return this.$moment(nextSlot[0].startDate).diff(this.$moment(), 'd', true);
-    },
-    getRangeNowToEndCourse (course) {
-      const lastSlot = course.slots[course.slots.length - 1];
-      return this.$moment().diff(this.$moment(lastSlot[0].startDate), 'd', true);
-    },
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-.trello
-  overflow: auto;
-  display: flex
-  flex-direction: row
-  @media screen and (min-width: 768px)
-    justify-content: space-between
-</style>

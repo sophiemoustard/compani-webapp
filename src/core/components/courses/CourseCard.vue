@@ -40,7 +40,7 @@
 
 <script>
 import get from 'lodash/get';
-import { courseMixin } from '../../mixins/courseMixin';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'CourseDetail',

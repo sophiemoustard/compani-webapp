@@ -84,7 +84,7 @@ export const helperMixin = {
     resetAddHelperForm () {
       this.$v.newHelper.$reset();
       this.newHelper = Object.assign({}, clear(this.newHelper));
-      this.openNewHelperModal = false;
+      this.firstStep = true;
     },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
@@ -123,8 +123,40 @@ export const helperMixin = {
         this.openNewHelperModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Cet email est déjà utilisé par un compte existant.');
         NotifyNegative('Erreur lors de la création de l\'aidant.');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async nextStep () {
+      try {
+        this.loading = true;
+        this.$v.newHelper.local.email.$touch();
+        if (this.$v.newHelper.local.email.$error) return NotifyWarning('Champs invalides');
+
+        const userInfo = await Users.exists({ email: this.newHelper.local.email });
+        const user = userInfo.user;
+
+        const sameOrNoCompany = !user.company || user.company === this.company._id;
+        if (userInfo.exists && (get(user, 'role.client') || !sameOrNoCompany)) {
+          NotifyNegative('Utilisateur déjà existant');
+        } else if (userInfo.exists) {
+          const roles = await Roles.list({ name: HELPER });
+          if (roles.length === 0) throw new Error('Role not found');
+          const payload = { role: roles[0]._id, customers: [this.customer._id] };
+          if (!user.company) payload.company = this.customer.company;
+
+          await Users.updateById(user._id, payload);
+          NotifyPositive('Aidant créé');
+
+          this.getUserHelpers()
+          this.openNewHelperModal = false;
+        } else {
+          this.firstStep = false;
+        }
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de l\'aidant');
       } finally {
         this.loading = false;
       }

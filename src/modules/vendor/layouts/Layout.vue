@@ -1,8 +1,23 @@
 <template>
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
-      <side-menu-admin ref="adminMenu" v-if="!isMini && isAdmin" />
-      <side-menu-trainer ref="trainerMenu" v-if="!isMini && isTrainer" />
+      <q-list  v-if="!isMini" class="no-border sidemenu-alenvi sidemenu-flex">
+        <div class="sidemenu-header">
+          <q-item-label header class="justify-center">
+            <img :src="companiLogo" alt="Compani logo">
+          </q-item-label>
+        </div>
+        <q-separator />
+        <template v-for="route of routes">
+          <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label"
+              :key="route.ref">
+              <ni-menu-item v-for="item of route.children" :name="item.name" :icon="item.icon" :label="item.label"
+                :key="item.name" :params="item.params" />
+            </q-expansion-item>
+          <q-separator :key="`separator-${route.ref}`" />
+        </template>
+        <ni-side-menu-footer :label="userFirstnameUpper" :userId="loggedUser._id" :interface-type="interfaceType" />
+      </q-list>
       <div :class="chevronContainerClasses" >
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
@@ -19,16 +34,26 @@
 <script>
 import { mapGetters } from 'vuex';
 import { layoutMixin } from '@mixins/layoutMixin';
-import { TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
-import SideMenuAdmin from 'src/modules/vendor/components/menu/SideMenuAdmin';
-import SideMenuTrainer from 'src/modules/vendor/components/menu/SideMenuTrainer';
+import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import { TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, VENDOR } from '@data/constants';
+import SideMenuFooter from '@components/menu/SideMenuFooter';
+import MenuItem from '@components/menu/MenuItem';
+import { menuItemsMixin } from '../mixins/menuItemsMixin'
 
 export default {
   components: {
-    'side-menu-admin': SideMenuAdmin,
-    'side-menu-trainer': SideMenuTrainer,
+    'ni-side-menu-footer': SideMenuFooter,
+    'ni-menu-item': MenuItem,
   },
-  mixins: [layoutMixin],
+  mixins: [layoutMixin, sideMenuMixin, menuItemsMixin],
+  mounted () {
+    this.collapsibleOpening();
+  },
+  data () {
+    return {
+      interfaceType: VENDOR,
+    }
+  },
   computed: {
     ...mapGetters({ vendorRole: 'main/vendorRole' }),
     isAdmin () {
@@ -36,14 +61,6 @@ export default {
     },
     isTrainer () {
       return this.vendorRole === TRAINER;
-    },
-    sidemenusRefs () {
-      if (!this.loggedUser) return 'defaultMenu';
-
-      if (this.isAdmin) return 'adminMenu';
-      if (this.isTrainer) return 'trainerMenu';
-
-      return 'defaultMenu';
     },
   },
 }
@@ -57,7 +74,7 @@ export default {
 
   .chevron
     background-color: white
-    border: 1px solid $light-grey
+    border: 1px solid $middle-grey
     top: 5px
     position: fixed
     z-index: 5000

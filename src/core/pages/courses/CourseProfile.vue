@@ -1,5 +1,5 @@
 `<template>
-  <q-page padding class="vendor-background">
+  <q-page padding :class="backgroundClass">
     <ni-profile-header :title="courseName">
       <template v-slot:body>
         <div class="row profile-info q-pl-lg">
@@ -18,10 +18,10 @@
 import get from 'lodash/get';
 import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
-import ProfileTabs from 'src/modules/client/components/ProfileTabs';
-import ProfileOrganization from 'src/modules/vendor/components/courses/ProfileOrganization';
-import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
-import { courseMixin } from 'src/modules/vendor/mixins/courseMixin';
+import ProfileTabs from '@components/ProfileTabs';
+import ProfileOrganization from '@components/courses/ProfileOrganization';
+import ProfileFollowUp from '@components/courses/ProfileFollowUp';
+import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   name: 'CourseProfile',
@@ -52,6 +52,7 @@ export default {
           component: ProfileFollowUp,
         },
       ],
+      backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
     }
   },
   computed: {
@@ -76,7 +77,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('course/remove');
+    this.$store.dispatch('course/reset');
   },
 
 }

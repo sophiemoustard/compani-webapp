@@ -57,7 +57,7 @@ export default {
       & > .q-tab__indicator
         color: $primary
     /deep/.q-tab__indicator
-      color: $light-grey
+      color: $middle-grey
       opacity: 1
     & /deep/.q-tab-panels
       background-color: inherit

@@ -1,5 +1,5 @@
 <template>
-  <div class="course-container">
+  <div :class="`course-container ${backgroundClass}`">
     <div class="text-weight-bold q-mb-sm">{{ title }}</div>
     <course-card class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course"
       @click="goToCourseProfile" />
@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import { TRAINER } from '@data/constants';
-import CourseCard from 'src/modules/vendor/components/courses/CourseCard';
+import { TRAINER, CLIENT, VENDOR } from '@data/constants';
+import CourseCard from '@components/courses/CourseCard';
 
 export default {
   name: 'CourseContainer',
@@ -19,6 +19,14 @@ export default {
   components: {
     'course-card': CourseCard,
   },
+  data () {
+    const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
+
+    return {
+      interfaceType,
+      backgroundClass: interfaceType === CLIENT ? 'grey-background' : 'beige-background',
+    }
+  },
   computed: {
     vendorRole () {
       return this.$store.getters['main/vendorRole'];
@@ -26,8 +34,13 @@ export default {
   },
   methods: {
     goToCourseProfile (course) {
-      if (this.vendorRole === TRAINER) this.$router.push({ name: 'trainers courses info', params: { courseId: course._id } });
-      else this.$router.push({ name: 'ni management courses info', params: { courseId: course._id } });
+      let name = '';
+      if (this.interfaceType === VENDOR) {
+        name = this.vendorRole === TRAINER ? 'trainers courses info' : 'ni management courses info';
+      } else {
+        name = 'ni courses info';
+      }
+      this.$router.push({ name, params: { courseId: course._id } });
     },
   },
 }
@@ -35,7 +48,6 @@ export default {
 
 <style lang="stylus" scoped>
 .course-container
-  background-color: $light-grey
   padding: 10px
   border-radius: 2%
   &:not(:first-child)
@@ -46,5 +58,4 @@ export default {
     width: 33%
   @media screen and (max-width: 767px)
     min-width: 250px
-
 </style>

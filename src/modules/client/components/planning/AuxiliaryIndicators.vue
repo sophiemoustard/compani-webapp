@@ -102,16 +102,16 @@ export default {
 
   .indicator
     display: flex;
-    border-top: 1px solid $light-grey
-    border-left: 1px solid $light-grey
-    border-right: 1px solid $light-grey
+    border-top: 1px solid $middle-grey
+    border-left: 1px solid $middle-grey
+    border-right: 1px solid $middle-grey
     .indicator-title
       padding: 5px
     .indicator-hours
       padding: 5px
-      border-left:  1px solid $light-grey
+      border-left:  1px solid $middle-grey
     &:last-child
-      border-bottom: 1px solid $light-grey
+      border-bottom: 1px solid $middle-grey
 
   .highlight
     color: $primary
@@ -129,6 +129,6 @@ export default {
     border-left: 5px solid $primary !important
 
   .quality-indicators-item
-    border-top: 1px solid $light-grey
+    border-top: 1px solid $middle-grey
     padding: 10px 0
 </style>

@@ -8,10 +8,9 @@
         @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
       <q-btn :disable="disableContractCreation || contractsLoading" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
         label="Créer un nouveau contrat" @click="openCreationModal" />
-      <q-banner v-if="disableContractCreation" class="full-width warning" dense>
-        <q-icon size="sm" name="warning" />
-        <div>{{ creationMissingInfo }}</div>
-      </q-banner>
+      <ni-banner v-if="disableContractCreation">
+        <template v-slot:message>{{ creationMissingInfo }}</template>
+      </ni-banner>
     </div>
 
     <!-- New contract modal -->
@@ -106,6 +105,7 @@ import Events from '@api/Events';
 import Contracts from '@api/Contracts';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
+import Banner from '@components/Banner';
 import DateInput from '@components/form/DateInput';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -137,6 +137,7 @@ export default {
     'ni-contracts-card': ContractsCard,
     'ni-modal': Modal,
     'version-edition-modal': VersionEditionModal,
+    'ni-banner': Banner,
   },
   data () {
     return {

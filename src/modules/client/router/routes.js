@@ -25,19 +25,21 @@ const routes = [
 
         const userVendorRole = store.getters['main/vendorRole'];
         const userClientRole = store.getters['main/clientRole'];
-        if (!userClientRole && !userVendorRole) return next({ name: '404' });
+        if (!userClientRole && !userVendorRole) return next({ name: 'account client', params: { id: loggedUser._id } });
         if (!userClientRole) return next({ path: '/ad' });
 
         const company = store.getters['main/company'];
         if (userClientRole === HELPER) return next({ name: 'customers agenda' });
-        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) return next({ name: 'account client', params: { id: loggedUser._id } });
+        if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
+          return next({ name: 'account client', params: { id: loggedUser._id } });
+        }
         if (AUXILIARY_ROLES.includes(userClientRole)) {
           if (get(company, 'subscriptions.erp')) return next({ name: 'auxiliaries agenda' });
           return next({ name: 'account client', params: { id: loggedUser._id } });
         }
         if (COACH_ROLES.includes(userClientRole)) {
           if (get(company, 'subscriptions.erp')) return next({ name: 'ni auxiliaries' });
-          return next({ name: 'account client', params: { id: loggedUser._id } });
+          return next({ name: 'ni courses' });
         }
         return next({ name: '404' });
       } catch (e) {
@@ -272,6 +274,26 @@ const routes = [
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'planning',
+        },
+      },
+      {
+        path: 'ni/courses',
+        name: 'ni courses',
+        component: () => import('src/modules/client/pages/ni/courses/CoursesDirectory'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
+      {
+        path: 'ni/courses/:courseId',
+        name: 'ni courses info',
+        component: () => import('src/core/pages/courses/CourseProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
         },
       },
       // Auxiliary view routes

@@ -1,5 +1,5 @@
 <template>
-  <q-page :class="backgroungClass" padding>
+  <q-page :class="backgroundClass" padding>
     <h4>Mon compte</h4>
       <div class="row gutter-profile q-mb-xl">
         <div class="col-xs-12 col-md-6 row items-center">
@@ -98,7 +98,8 @@ export default {
       rgpdModal: false,
       cguModal: false,
       cguCompani,
-      backgroungClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
+      backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
+      isLoggingOut: false,
     }
   },
   validations () {
@@ -125,6 +126,9 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  async beforeDestroy () {
+    if (this.isLoggingOut) this.$store.dispatch('main/reset');
   },
   methods: {
     saveTmp (path) {
@@ -165,22 +169,19 @@ export default {
       this.$v.passwordConfirm.$reset();
     },
     logout () {
+      this.isLoggingOut = true;
       this.$q.cookies.remove('alenvi_token', { path: '/' });
       this.$q.cookies.remove('alenvi_token_expires_in', { path: '/' });
       this.$q.cookies.remove('refresh_token', { path: '/' });
       this.$q.cookies.remove('user_id', { path: '/' });
       this.$q.localStorage.clear();
 
-      this.$store.dispatch('course/remove');
-      this.$store.dispatch('program/remove');
-      this.$store.dispatch('company/remove');
-      this.$store.commit('customer/saveCustomer', null);
-      this.$store.commit('customer/saveNotification', null);
-      this.$store.commit('rh/saveUserProfile', null);
-      this.$store.commit('rh/saveNotification', null);
-      this.$store.commit('planning/setFilters', []);
-      this.$store.commit('planning/setElementToAdd', []);
-      this.$store.commit('planning/setElementToRemove', []);
+      this.$store.dispatch('course/reset');
+      this.$store.dispatch('program/reset');
+      this.$store.dispatch('company/reset');
+      this.$store.dispatch('customer/reset');
+      this.$store.dispatch('rh/reset');
+      this.$store.dispatch('planning/reset');
 
       this.$router.replace('/login');
     },

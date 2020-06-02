@@ -139,12 +139,8 @@ export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 export const CANCELLATION_REASONS = [
   { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
-  { label: 'Initiative du de l\'intervenant', value: AUXILIARY_INITIATIVE },
+  { label: 'Initiative de l\'intervenant', value: AUXILIARY_INITIATIVE },
 ];
-
-// TRAINER STATUS
-export const INTERNAL = 'internal';
-export const EXTERNAL = 'external';
 
 // INTERFACE
 export const VENDOR = 'vendor';

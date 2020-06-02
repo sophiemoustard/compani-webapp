@@ -24,6 +24,7 @@
 
 <script>
 import { mapGetters } from 'vuex';
+import get from 'lodash/get';
 import {
   COACH_ROLES,
   AUXILIARY,
@@ -57,13 +58,18 @@ export default {
     },
     interfaceLogo () {
       return this.interfaceType === CLIENT
-        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_burgundy_32.png'
-        : 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_rose_32.png';
+        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon' +
+          '/favicon_bordeaux-32x32.png'
+        : 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon' +
+          '/favicon-32x32.png';
+    },
+    accessBothInterface () {
+      return get(this.loggedUser, 'role.client') && get(this.loggedUser, 'role.vendor');
     },
   },
   methods: {
     clickHandler () {
-      this.$emit('myClick');
+      this.$emit('click');
     },
     openExtenalUrl (url) {
       window.open(url, '_blank');
@@ -74,6 +80,12 @@ export default {
           ? this.$router.push({ name: 'account vendor', params: { id: this.userId } })
           : this.$router.push({ name: 'account client', params: { id: this.userId } });
       }
+    },
+    switchInterface () {
+      if (!this.accessBothInterface) return;
+
+      if (this.interfaceType === CLIENT) this.$router.push({ path: '/ad' }).catch(e => {});
+      else this.$router.push({ path: '/' }).catch(e => {});
     },
   },
 }
