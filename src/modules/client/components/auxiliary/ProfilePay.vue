@@ -121,7 +121,7 @@ export default {
     },
     userProfile () {
       if (AUXILIARY_ROLES.includes(this.clientRole)) return this.loggedUser;
-      if (COACH_ROLES.includes(this.clientRole)) return this.$store.getters['rh/getUserProfile'];
+      if (COACH_ROLES.includes(this.clientRole)) return this.$store.getters['rh/fetchUserProfile'];
       return {};
     },
     isCoach () {

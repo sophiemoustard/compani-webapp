@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
@@ -210,10 +210,8 @@ export default {
     await this.getUserList();
   },
   computed: {
-    ...mapState({
-      company: state => state.main.loggedUser.company,
-      notifications: state => state.rh.notifications,
-    }),
+    ...mapState('rh', ['notifications']),
+    ...mapGetters({ company: 'main/company' }),
     activeUserList () {
       if (this.activeUsers) return this.userList.filter(user => user.isActive);
       return this.userList.filter(user => !user.isActive);

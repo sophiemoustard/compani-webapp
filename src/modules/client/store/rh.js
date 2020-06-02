@@ -12,7 +12,7 @@ export default {
     },
   },
   mutations: {
-    SET_USERPROFILE: (state, data) => { state.userProfile = !data ? data : Object.assign({}, data); },
+    SET_USER_PROFILE: (state, data) => { state.userProfile = !data ? data : Object.assign({}, data); },
     SET_NOTIFICATION: (state, notification) => {
       if (!notification) {
         state.notifications = {}
@@ -24,16 +24,16 @@ export default {
     },
   },
   actions: {
-    getUserProfile: async ({ commit }, params) => {
+    fetchUserProfile: async ({ commit }, params) => {
       try {
         const user = await Users.getById(params.userId);
-        commit('SET_USERPROFILE', user);
+        commit('SET_USER_PROFILE', user);
       } catch (e) {
         console.error(e);
       }
     },
-    setUserProfile: ({ commit }, data) => commit('SET_USERPROFILE', data),
-    resetUserProfile: ({ commit }) => commit('SET_USERPROFILE', null),
+    setUserProfile: ({ commit }, data) => commit('SET_USER_PROFILE', data),
+    resetUserProfile: ({ commit }) => commit('SET_USER_PROFILE', null),
     updateNotifications: async ({ commit, state }) => {
       const user = state.userProfile;
       const validation = userProfileValidation(user);
@@ -45,9 +45,9 @@ export default {
       }
     },
     setNotification: ({ commit }, data) => commit('SET_NOTIFICATION', data),
-    resetAll: ({ commit }) => {
+    resetRh: ({ commit }) => {
       commit('SET_NOTIFICATION', null);
-      commit('SET_USERPROFILE', null);
+      commit('SET_USER_PROFILE', null);
     },
   },
 }

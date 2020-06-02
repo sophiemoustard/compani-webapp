@@ -506,7 +506,7 @@ export default {
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
     userProfile () {
-      return this.$store.getters['rh/getUserProfile'] ? this.$store.getters['rh/getUserProfile'] : this.loggedUser;
+      return this.$store.getters['rh/fetchUserProfile'] ? this.$store.getters['rh/fetchUserProfile'] : this.loggedUser;
     },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')]
@@ -649,7 +649,7 @@ export default {
           data,
           { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } }
         );
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
+        await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
       } catch (e) {
@@ -668,7 +668,7 @@ export default {
         await Users.updateById(this.mergedUserProfile._id, payload);
         await gdrive.removeFileById({ id: get(this.mergedUserProfile, `${path}.driveId`) });
 
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
+        await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
@@ -689,7 +689,7 @@ export default {
         await Users.updateCertificates(this.mergedUserProfile._id, { certificates: { driveId } });
         await gdrive.removeFileById({ id: driveId });
 
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
+        await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
@@ -712,7 +712,7 @@ export default {
           this.croppa.remove();
         }
         await Users.updateById(this.mergedUserProfile._id, { picture: { link: null, publicId: null } });
-        await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
+        await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
         NotifyPositive('Photo supprimée');
       } catch (e) {
         console.error(e);
@@ -730,7 +730,7 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async refreshUser () {
-      await this.$store.dispatch('rh/getUserProfile', { userId: this.mergedUserProfile._id });
+      await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
       NotifyPositive('Document envoyé');
     },
     groupErrors (group) {
