@@ -628,7 +628,7 @@ export default {
       }
 
       await Users.updateById(this.mergedUserProfile._id, payload);
-      this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
+      this.$store.dispatch('rh/setUserProfile', this.mergedUserProfile);
     },
     async uploadImage () {
       try {

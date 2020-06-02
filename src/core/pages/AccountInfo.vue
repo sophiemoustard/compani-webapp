@@ -180,7 +180,7 @@ export default {
       this.$store.dispatch('program/reset');
       this.$store.dispatch('company/reset');
       this.$store.dispatch('customer/reset');
-      this.$store.dispatch('rh/reset');
+      this.$store.dispatch('rh/resetAll');
       this.$store.dispatch('planning/reset');
 
       this.$router.replace('/login');

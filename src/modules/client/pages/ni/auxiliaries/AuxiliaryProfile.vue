@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
@@ -27,9 +28,7 @@ export default {
   name: 'AuxiliaryProfile',
   metaInfo: { title: 'Fiche auxiliaire' },
   computed: {
-    userProfile () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
+    ...mapState('rh', ['userProfile']),
   },
   data () {
     return {
@@ -72,7 +71,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.commit('rh/saveUserProfile', null);
+    this.$store.dispatch('rh/resetUserProfile');
   },
 }
 </script>

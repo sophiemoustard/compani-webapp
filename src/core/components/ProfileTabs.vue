@@ -33,9 +33,9 @@ export default {
     notifications () {
       switch (this.type) {
         case 'customer':
-          return this.$store.getters['customer/getNotifications'];
+          return this.$store.state['customer.notifications'];
         case 'auxiliary':
-          return this.$store.getters['rh/getNotifications'];
+          return this.$store.state['rh.notifications'];
         default:
           return null;
       }

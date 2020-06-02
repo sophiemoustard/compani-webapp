@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify.js';
 import { displayTask } from 'src/modules/client/helpers/taskValidation.js';
@@ -23,9 +24,7 @@ export default {
     }
   },
   computed: {
-    getUser () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
+    ...mapState({ getUser: state => state.rh.userProfile }),
   },
   async mounted () {
     try {
