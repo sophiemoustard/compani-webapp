@@ -2,12 +2,13 @@
   <q-page padding class="client-background">
     <div v-if="customer">
       <customer-profile-header :profile-id="customerId" />
-      <profile-tabs :profile-id="customerId" :tabsContent="tabsContent" type="customer" />
+      <profile-tabs :profile-id="customerId" :tabsContent="tabsContent" :notifications="notifications" />
     </div>
   </q-page>
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import CustomerProfileHeader from 'src/modules/client/components/customers/CustomerProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
@@ -24,11 +25,6 @@ export default {
     ProfileTabs,
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
-  computed: {
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
-  },
   data () {
     return {
       tabsContent: [
@@ -56,6 +52,9 @@ export default {
   },
   async mounted () {
     await this.$store.dispatch('customer/getCustomer', { customerId: this.customerId });
+  },
+  computed: {
+    ...mapState('customer', ['customer', 'notifications']),
   },
   watch: {
     async customer () {

@@ -50,4 +50,7 @@ export default {
       commit('SET_USER_PROFILE', null);
     },
   },
+  getters: {
+    getUserProfile: (state) => state.userProfile,
+  },
 }

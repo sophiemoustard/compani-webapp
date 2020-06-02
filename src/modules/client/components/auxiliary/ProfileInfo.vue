@@ -506,7 +506,7 @@ export default {
       return this.isAuxiliary ? auxiliaryText : coachText;
     },
     userProfile () {
-      return this.$store.getters['rh/fetchUserProfile'] ? this.$store.getters['rh/fetchUserProfile'] : this.loggedUser;
+      return this.$store.getters['rh/getUserProfile'] || this.loggedUser;
     },
     nationalitiesOptions () {
       return ['FR', ...Object.keys(nationalities).filter(nationality => nationality !== 'FR')]

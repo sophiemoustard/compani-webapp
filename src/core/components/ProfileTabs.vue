@@ -18,7 +18,7 @@ export default {
   props: {
     tabsContent: { type: Array, default: () => [] },
     profileId: { type: String, default: '' },
-    type: { type: String, default: '' },
+    notifications: { type: Object, default: () => {} },
   },
   data () {
     return {
@@ -28,18 +28,6 @@ export default {
   mounted () {
     const selectedTab = this.tabsContent.find(tab => tab.default);
     this.selectedTab = selectedTab.name;
-  },
-  computed: {
-    notifications () {
-      switch (this.type) {
-        case 'customer':
-          return this.$store.state['customer.notifications'];
-        case 'auxiliary':
-          return this.$store.state['rh.notifications'];
-        default:
-          return null;
-      }
-    },
   },
   methods: {
     alert (tab) {

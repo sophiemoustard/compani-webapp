@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <div v-if="userProfile">
       <auxiliary-profile-header :profile-id="auxiliaryId" />
-      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" type="auxiliary" />
+      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" :notifications="notifications" />
     </div>
   </q-page>
 </template>
@@ -27,9 +27,6 @@ export default {
   },
   name: 'AuxiliaryProfile',
   metaInfo: { title: 'Fiche auxiliaire' },
-  computed: {
-    ...mapState('rh', ['userProfile']),
-  },
   data () {
     return {
       tabsContent: [
@@ -64,6 +61,9 @@ export default {
   },
   async created () {
     await this.$store.dispatch('rh/fetchUserProfile', { userId: this.auxiliaryId });
+  },
+  computed: {
+    ...mapState('rh', ['userProfile', 'notifications']),
   },
   watch: {
     async userProfile () {
