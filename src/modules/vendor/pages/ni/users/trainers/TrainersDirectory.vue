@@ -14,11 +14,11 @@
       </template>
       <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainer.local.email" required-field
         @blur="$v.newTrainer.local.email.$touch" caption="Email" @input="$v.newTrainer.local.email.$touch"
-        :error-label="emailError($v.newTrainer)" :error="$v.newTrainer.local.email.$error" />
+        :error-label="emailError($v.newTrainer)" :error="$v.newTrainer.local.email.$error" :last="firstStep" />
       <template v-if="!firstStep">
         <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
         <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="$v.newTrainer.identity.lastname.$error"
-          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" />
+          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" last />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
