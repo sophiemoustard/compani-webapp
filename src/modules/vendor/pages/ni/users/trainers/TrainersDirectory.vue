@@ -18,7 +18,7 @@
       <template v-if="!firstStep">
         <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
         <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="$v.newTrainer.identity.lastname.$error"
-          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" />
+          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" last />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"

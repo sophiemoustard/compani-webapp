@@ -119,9 +119,10 @@
           required-field v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" />
         <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model.trim="newTrainee.contact.phone"
           caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error="$v.newTrainee.contact.phone.$error"
-          :error-label="phoneNbrError($v.newTrainee)" />
+          :error-label="phoneNbrError($v.newTrainee)" :last="isIntraCourse" />
         <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" required-field caption="Structure"
-          @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions" />
+          @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions"
+          :last="!isIntraCourse" />
       </template>
 
       <template slot="footer">
@@ -137,10 +138,10 @@
       <template slot="title">
         Éditer un <span class="text-weight-bold">stagiaire</span>
       </template>
+      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal v-model="editedTrainee.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="editedTrainee.identity.lastname" :error="$v.editedTrainee.identity.lastname.$error"
         caption="Nom" @blur="$v.editedTrainee.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
         :error-label="phoneNbrError($v.editedTrainee)" />

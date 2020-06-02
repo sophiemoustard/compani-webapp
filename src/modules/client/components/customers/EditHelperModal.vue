@@ -3,10 +3,10 @@
     <template slot="title">
       Éditer l'<span class="text-weight-bold">aidant</span>
     </template>
+    <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
     <ni-input in-modal v-model="editedHelper.identity.lastname" :error="validations.identity.lastname.$error"
       caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
     <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
-    <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
     <ni-input in-modal v-model="editedHelper.contact.phone" last :error="validations.contact.phone.$error"
       caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
     <template slot="footer">
