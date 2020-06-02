@@ -110,7 +110,7 @@
       <template slot="title">
         Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
       </template>
-      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field
+      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field :last="firstStep"
         @blur="$v.newTrainee.local.email.$touch" caption="Email" :error-label="emailError($v.newTrainee)"
         :error="$v.newTrainee.local.email.$error" />
       <template v-if="!firstStep">

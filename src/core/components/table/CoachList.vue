@@ -37,14 +37,14 @@
       <template slot="title">
         Ajouter un <span class="text-weight-bold">utilisateur</span>
       </template>
-      <ni-input :disable="!firstStep" in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
-      <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role" :error="$v.newUser.role.$error"
-        @blur="$v.newUser.role.$touch" last required-field />
+      <ni-input :disable="!firstStep" in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
+        caption="Email" @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
+      <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role"
+        :error="$v.newUser.role.$error" @blur="$v.newUser.role.$touch" :last="firstStep" required-field />
       <template v-if="!firstStep">
         <ni-input in-modal v-model="newUser.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-          @blur="$v.newUser.identity.lastname.$touch" required-field />
+        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
+          caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error"
           caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="phoneNbrError($v.newUser)" />
       </template>
