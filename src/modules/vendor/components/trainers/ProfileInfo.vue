@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
@@ -55,7 +55,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ mergedUserProfile: 'rh/getUserProfile' }),
+    ...mapState({ mergedUserProfile: state => state.rh.userProfile }),
   },
   async mounted () {
     this.$v.mergedUserProfile.$touch();
@@ -70,7 +70,7 @@ export default {
       const payload = set({}, path, value);
 
       await Users.updateById(this.mergedUserProfile._id, payload);
-      this.$store.commit('rh/saveUserProfile', this.mergedUserProfile);
+      this.$store.dispatch('rh/setUserProfile', this.mergedUserProfile);
     },
   },
 };

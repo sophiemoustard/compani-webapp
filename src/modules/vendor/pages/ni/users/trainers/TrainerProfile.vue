@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -40,13 +41,11 @@ export default {
     }
   },
   async created () {
-    await this.$store.dispatch('rh/getUserProfile', { userId: this.trainerId });
+    await this.$store.dispatch('rh/fetchUserProfile', { userId: this.trainerId });
     this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
   },
   computed: {
-    userProfile () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
+    ...mapState('rh', ['userProfile']),
   },
   watch: {
     async userProfile () {
@@ -55,7 +54,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.commit('rh/saveUserProfile', null);
+    this.$store.dispatch('rh/resetUserProfile');
   },
 }
 </script>

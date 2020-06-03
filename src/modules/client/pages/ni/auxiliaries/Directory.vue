@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
@@ -210,10 +210,8 @@ export default {
     await this.getUserList();
   },
   computed: {
-    ...mapGetters({
-      company: 'main/company',
-      notifications: 'rh/getNotifications',
-    }),
+    ...mapState('rh', ['notifications']),
+    ...mapGetters({ company: 'main/company' }),
     activeUserList () {
       if (this.activeUsers) return this.userList.filter(user => user.isActive);
       return this.userList.filter(user => !user.isActive);
@@ -256,12 +254,12 @@ export default {
       if (!user.isActive) return formattedUser;
 
       const checkProfileErrors = userProfileValidation(user);
-      this.$store.commit(
-        'rh/saveNotification',
+      this.$store.dispatch(
+        'rh/setNotification',
         { type: 'profiles', _id: user._id, exists: !!checkProfileErrors.error }
       );
       const checkTasks = taskValidation(user);
-      this.$store.commit('rh/saveNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
+      this.$store.dispatch('rh/setNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
 
       return { ...formattedUser, profileErrors: checkProfileErrors.error, tasksErrors: checkTasks };
     },
