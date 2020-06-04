@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import get from 'lodash/get';
 import Stats from '@api/Stats';
 import Users from '@api/Users';
@@ -183,13 +183,11 @@ export default {
     },
   },
   computed: {
+    ...mapState('customer', ['customer']),
     ...mapGetters({ clientRole: 'main/clientRole' }),
     auxiliaryAvatar () {
       const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
       return this.getAuxiliaryAvatar(auxiliaryPicture);
-    },
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
     },
     isAuxiliary () {
       return AUXILIARY_ROLES.includes(this.clientRole);
@@ -270,7 +268,7 @@ export default {
     },
     async refreshCustomer () {
       try {
-        await this.$store.dispatch('customer/getCustomer', { customerId: this.customer._id });
+        await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customer._id });
         this.$v.customer.$touch();
         this.isLoaded = true;
       } catch (e) {

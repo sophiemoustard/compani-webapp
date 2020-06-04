@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import { formatIdentity } from '@helpers/utils';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp.vue';
 
@@ -24,18 +25,16 @@ export default {
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
+    ...mapState('customer', ['customer']),
   },
   async mounted () {
-    await this.$store.dispatch('customer/getCustomer', { customerId: this.customerId });
+    await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customerId });
   },
   filters: {
     formatIdentity,
   },
   beforeDestroy () {
-    this.$store.commit('customer/saveCustomer', null);
+    this.$store.dispatch('customer/resetCustomer');
   },
 }
 </script>

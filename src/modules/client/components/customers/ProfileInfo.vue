@@ -401,6 +401,7 @@
 
 <script>
 import { Cookies } from 'quasar';
+import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
@@ -559,6 +560,7 @@ export default {
     }
   },
   computed: {
+    ...mapState('customer', ['customer']),
     docsUploadUrl () {
       if (!this.customer.driveFolder) return '';
 
@@ -580,9 +582,6 @@ export default {
         label: this.getServiceLastVersion(service).name,
         value: { _id: service._id, nature: service.nature },
       }));
-    },
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
     },
     primaryAddressError () {
       if (!this.$v.customer.contact.primaryAddress.fullAddress.required) return REQUIRED_LABEL;
@@ -754,8 +753,8 @@ export default {
         this.mandatesLoading = true;
         const mandates = await Customers.getMandates(this.customer._id);
 
-        this.$store.commit(
-          'customer/saveCustomer',
+        this.$store.dispatch(
+          'customer/setCustomer',
           { ...this.customer, payment: { ...this.customer.payment, mandates } }
         );
         this.$v.customer.$touch();
@@ -770,7 +769,7 @@ export default {
         this.quotesLoading = true;
         const quotes = await Customers.getQuotes(this.customer._id);
 
-        this.$store.commit('customer/saveCustomer', { ...this.customer, quotes });
+        this.$store.dispatch('customer/setCustomer', { ...this.customer, quotes });
         this.$v.customer.$touch();
       } catch (e) {
         console.error(e);
@@ -783,8 +782,8 @@ export default {
       await this.refreshSubscriptions(customer);
       await this.refreshFundings(customer);
 
-      this.$store.commit(
-        'customer/saveCustomer',
+      this.$store.dispatch(
+        'customer/setCustomer',
         { ...customer, subscriptions: [...this.subscriptions], fundings: [...this.fundings] }
       );
       this.$v.customer.$touch();

@@ -33,7 +33,6 @@ export default {
       }
     },
     setUserProfile: ({ commit }, data) => commit('SET_USER_PROFILE', data),
-    resetUserProfile: ({ commit }) => commit('SET_USER_PROFILE', null),
     updateNotifications: async ({ commit, state }) => {
       const user = state.userProfile;
       const validation = userProfileValidation(user);

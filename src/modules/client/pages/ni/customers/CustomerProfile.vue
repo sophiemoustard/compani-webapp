@@ -51,7 +51,7 @@ export default {
     }
   },
   async mounted () {
-    await this.$store.dispatch('customer/getCustomer', { customerId: this.customerId });
+    await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customerId });
   },
   computed: {
     ...mapState('customer', ['customer', 'notifications']),
@@ -62,7 +62,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.commit('customer/saveCustomer', null);
+    this.$store.dispatch('customer/resetCustomer');
   },
 }
 </script>

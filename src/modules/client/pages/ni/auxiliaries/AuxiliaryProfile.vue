@@ -71,7 +71,7 @@ export default {
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('rh/resetUserProfile');
+    this.$store.dispatch('rh/resetRh');
   },
 }
 </script>

@@ -221,7 +221,7 @@ export const menuItemsMixin = {
     async refreshCustomer () {
       if (this.loggedUser && this.loggedUser.customers) {
         const customer = await Customers.getById(this.loggedUser.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
+        this.$store.dispatch('customer/setCustomer', customer);
       }
     },
   },
