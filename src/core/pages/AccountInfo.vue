@@ -179,7 +179,7 @@ export default {
       this.$store.dispatch('course/reset');
       this.$store.dispatch('program/reset');
       this.$store.dispatch('company/reset');
-      this.$store.dispatch('customer/reset');
+      this.$store.dispatch('customer/resetCustomer');
       this.$store.dispatch('rh/resetRh');
       this.$store.dispatch('planning/reset');
 

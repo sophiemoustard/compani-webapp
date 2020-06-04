@@ -23,14 +23,14 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'ProfileHeader',
   computed: {
-    ...mapGetters({ customer: 'customer/getCustomer' }),
+    ...mapState('customer', ['customer']),
     deletionDisabled () {
       return !!this.customer.firstIntervention || (this.customer.contracts && !!this.customer.contracts.length);
     },

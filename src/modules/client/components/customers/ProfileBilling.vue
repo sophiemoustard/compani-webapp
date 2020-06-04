@@ -188,14 +188,14 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['loggedUser']),
+    ...mapState({
+      loggedUser: state => state.main.loggedUser,
+      customer: state => state.customer.customer,
+    }),
     ...mapGetters({
       company: 'main/company',
       clientRole: 'main/clientRole',
     }),
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);
     },
