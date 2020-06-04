@@ -3,13 +3,14 @@ import omit from 'lodash/omit';
 import get from 'lodash/get';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
+import { subject } from '@casl/ability';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { frAddress, validHour } from '@helpers/vuelidateCustomVal.js';
-import { can } from '@helpers/rights';
+import { defineAbilitiesFor } from '@helpers/ability';
 import {
   INTERNAL_HOUR,
   ABSENCE,
@@ -314,8 +315,9 @@ export const planningActionMixin = {
     },
     // Event edition
     openEditionModal (event) {
-      const can = this.canEditEvent(event);
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
+      const eventPermissionInfo = { auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector }
+      const isAllowed = this.canEditEvent(eventPermissionInfo);
+      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
       this.formatEditedEvent(event);
 
       this.editionModal = true;
@@ -374,15 +376,14 @@ export const planningActionMixin = {
       }
     },
     canEditEvent (event) {
-      if (!event.auxiliary) {
-        return can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
-      }
-
-      return can({
-        user: this.loggedUser,
-        auxiliaryIdEvent: event.auxiliary._id,
-        permissions: [{ name: 'events:edit', rule: 'canEdit' }],
-      });
+      const ability = defineAbilitiesFor(
+        get(this.loggedUser, 'role.client.name'),
+        null,
+        this.loggedUser.company,
+        this.loggedUser._id,
+        this.loggedUser.sector
+      );
+      return ability.can('edit', subject('Events', event));
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();

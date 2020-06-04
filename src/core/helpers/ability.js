@@ -1,7 +1,7 @@
 
 import { Ability, AbilityBuilder } from '@casl/ability';
 import { roleBasedAccessControl } from '@helpers/rbac';
-import { CLIENT_ADMIN, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER } from '@data/constants';
+import { CLIENT_ADMIN, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, COACH, AUXILIARY } from '@data/constants';
 
 const getClientAbilities = (role, subscriptions) => {
   return roleBasedAccessControl[role]
@@ -11,7 +11,7 @@ const getClientAbilities = (role, subscriptions) => {
 
 const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 
-export const defineAbilitiesFor = (clientRole, vendorRole, company) => {
+export const defineAbilitiesFor = (clientRole, vendorRole, company, auxiliaryUserId = null, auxiliarySectorId = null) => {
   const { can, rules } = new AbilityBuilder();
 
   const companySubscriptions = company
@@ -23,5 +23,10 @@ export const defineAbilitiesFor = (clientRole, vendorRole, company) => {
   if (clientRole === CLIENT_ADMIN && companySubscriptions.includes('erp')) can('update', 'erp_config');
   if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
 
+  if ([CLIENT_ADMIN, COACH].includes(clientRole) && companySubscriptions.includes('erp')) can('edit', 'Events');
+  if (clientRole === AUXILIARY && companySubscriptions.includes('erp')) {
+    can('edit', 'Events', { auxiliaryId: { $eq: auxiliaryUserId } })
+    can('edit', 'Events', { sectorId: { $eq: auxiliarySectorId } })
+  }
   return new Ability(rules);
 }
