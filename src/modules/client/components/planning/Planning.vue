@@ -113,10 +113,11 @@ import DeleteEventsModal from 'src/modules/client/components/planning/DeleteEven
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation.vue';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
+import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
 export default {
   name: 'PlanningManager',
-  mixins: [planningTimelineMixin, planningEventMixin],
+  mixins: [planningTimelineMixin, planningEventMixin, planningActionMixin],
   components: {
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
@@ -132,7 +133,6 @@ export default {
     persons: { type: Array, default: () => [] },
     filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
-    canEdit: { type: Function, default: () => {} },
     displayAllSectors: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },
@@ -271,9 +271,9 @@ export default {
     async drop (toDay, target) {
       try {
         if (target.type === SECTOR) { // Unassign event
-          if (this.draggedObject.sector === target._id &&
-            (!this.draggedObject.auxiliary || !this.draggedObject.auxiliary._id) &&
-            toDay.isSame(this.draggedObject.startDate, 'd')) return;
+          const dropToSameSector = this.draggedObject.sector === target._id && !get(this.draggedObject, 'auxiliary._id')
+          const dropToSameDay = toDay.isSame(this.draggedObject.startDate, 'd')
+          if (dropToSameSector && dropToSameDay) return;
         } else { // Update event auxiliary
           if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
             toDay.isSame(this.draggedObject.startDate, 'd')) return;
@@ -289,7 +289,7 @@ export default {
     },
     createEvent (event) {
       const eventPermissionInfo = { auxiliaryId: get(event, 'person._id'), sectorId: event.sectorId }
-      const isAllowed = this.canEdit(eventPermissionInfo);
+      const isAllowed = this.canEditEvent(eventPermissionInfo);
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
       this.$emit('createEvent', event);
@@ -298,8 +298,8 @@ export default {
       this.$emit('editEvent', event);
     },
     canDrag (event) {
-      const selectedEvent = { auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector }
-      return this.canEdit(selectedEvent)
+      const eventPermissionInfo = { auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector }
+      return this.canEditEvent(eventPermissionInfo)
     },
   },
 }

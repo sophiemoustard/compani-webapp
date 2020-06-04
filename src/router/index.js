@@ -26,11 +26,11 @@ Router.beforeEach(async (to, from, next) => {
       if (refresh) {
         if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-        const ability = defineAbilitiesFor(
-          store.getters['main/clientRole'],
-          store.getters['main/vendorRole'],
-          store.getters['main/company']
-        );
+        const ability = defineAbilitiesFor({
+          clientRole: store.getters['main/clientRole'],
+          vendorRole: store.getters['main/vendorRole'],
+          company: store.getters['main/company'],
+        });
         if (!ability.can('read', to.name)) next('/404');
         else {
           store.dispatch('main/updateRefreshState', false);
@@ -40,11 +40,11 @@ Router.beforeEach(async (to, from, next) => {
     } else {
       if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
 
-      const ability = defineAbilitiesFor(
-        store.getters['main/clientRole'],
-        store.getters['main/vendorRole'],
-        store.getters['main/company']
-      );
+      const ability = defineAbilitiesFor({
+        clientRole: store.getters['main/clientRole'],
+        vendorRole: store.getters['main/vendorRole'],
+        company: store.getters['main/company'],
+      });
       if (!ability.can('read', to.name)) next('/404');
       else {
         store.dispatch('main/updateRefreshState', false);

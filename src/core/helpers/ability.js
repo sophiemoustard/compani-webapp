@@ -1,7 +1,14 @@
 
 import { Ability, AbilityBuilder } from '@casl/ability';
 import { roleBasedAccessControl } from '@helpers/rbac';
-import { CLIENT_ADMIN, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, COACH, AUXILIARY } from '@data/constants';
+import {
+  CLIENT_ADMIN,
+  VENDOR_ADMIN,
+  TRAINING_ORGANISATION_MANAGER,
+  COACH,
+  AUXILIARY,
+  PLANNING_REFERENT,
+} from '@data/constants';
 
 const getClientAbilities = (role, subscriptions) => {
   return roleBasedAccessControl[role]
@@ -11,7 +18,8 @@ const getClientAbilities = (role, subscriptions) => {
 
 const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 
-export const defineAbilitiesFor = (clientRole, vendorRole, company, auxiliaryUserId = null, auxiliarySectorId = null) => {
+export const defineAbilitiesFor = (user) => {
+  const { clientRole, vendorRole, company, auxiliaryUserId, auxiliarySectorId } = user;
   const { can, rules } = new AbilityBuilder();
 
   const companySubscriptions = company
@@ -20,13 +28,16 @@ export const defineAbilitiesFor = (clientRole, vendorRole, company, auxiliaryUse
   if (clientRole) can('read', getClientAbilities(clientRole, companySubscriptions));
   if (vendorRole) can('read', getVendorAbilities(vendorRole));
   if (!clientRole && !vendorRole) can('read', 'account client');
-  if (clientRole === CLIENT_ADMIN && companySubscriptions.includes('erp')) can('update', 'erp_config');
   if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
 
-  if ([CLIENT_ADMIN, COACH].includes(clientRole) && companySubscriptions.includes('erp')) can('edit', 'Events');
-  if (clientRole === AUXILIARY && companySubscriptions.includes('erp')) {
-    can('edit', 'Events', { auxiliaryId: { $eq: auxiliaryUserId } })
-    can('edit', 'Events', { sectorId: { $eq: auxiliarySectorId } })
+  if (companySubscriptions.includes('erp')) {
+    if (clientRole === CLIENT_ADMIN) can('update', 'erp_config');
+
+    if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('edit', 'Events');
+    if (clientRole === AUXILIARY) {
+      can('edit', 'Events', { auxiliaryId: { $eq: auxiliaryUserId } })
+      can('edit', 'Events', { sectorId: { $eq: auxiliarySectorId } })
+    }
   }
   return new Ability(rules);
 }

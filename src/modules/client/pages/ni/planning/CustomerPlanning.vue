@@ -1,12 +1,12 @@
 <template>
   <q-page class="client-background">
-    <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
+    <ni-planning-manager :events="events" :persons="customers" :personKey="personKey"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :personKey="personKey"
-      :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
+    <ni-event-creation-modal :validations="$v.newEvent"  :newEvent.sync="newEvent" :personKey="personKey"
+      :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
       @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->

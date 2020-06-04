@@ -192,6 +192,7 @@ export default {
       const eventPermissionInfo = { auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector }
       const isAllowed = this.canEditEvent(eventPermissionInfo);
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
+
       this.selectedAuxiliary = event.auxiliary ? event.auxiliary : { picture: {}, identity: { lastname: '' } };
       this.formatEditedEvent(event);
 

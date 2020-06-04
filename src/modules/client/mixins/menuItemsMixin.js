@@ -67,7 +67,7 @@ export const menuItemsMixin = {
     },
     routes () {
       let routes = [];
-      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+      const ability = defineAbilitiesFor({ clientRole: this.clientRole, company: this.company });
 
       if (this.isHelper) routes = this.customerRoutes;
       else if (this.isCoach) routes = this.coachRoutes;

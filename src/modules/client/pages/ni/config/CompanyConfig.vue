@@ -284,7 +284,7 @@ export default {
   computed: {
     ...mapGetters({ clientRole: 'main/clientRole' }),
     canUpdateErpConfig () {
-      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+      const ability = defineAbilitiesFor({ clientRole: this.clientRole, company: this.company });
       return ability.can('update', 'erp_config');
     },
   },
