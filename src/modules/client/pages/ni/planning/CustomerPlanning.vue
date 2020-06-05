@@ -5,8 +5,8 @@
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :personKey="personKey"
-      :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers"
+    <ni-event-creation-modal :validations="$v.newEvent"  :newEvent.sync="newEvent" :personKey="personKey"
+      :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
       @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->

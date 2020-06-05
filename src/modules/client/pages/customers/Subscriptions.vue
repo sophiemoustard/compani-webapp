@@ -291,7 +291,7 @@ export default {
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
         await Customers.updateById(this.customer._id, set({}, path, value));
-        await this.$store.dispatch('main/getLoggedUser', this.helper._id);
+        await this.$store.dispatch('main/fetchLoggedUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
 

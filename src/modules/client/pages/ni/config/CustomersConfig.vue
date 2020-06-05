@@ -810,7 +810,7 @@ export default {
       }
     },
     async refreshCompany () {
-      await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
       this.company = this.loggedCompany;
       this.documents = this.company.customersConfig.templates || {};
       this.company.address = this.company.address || { fullAddress: '' };

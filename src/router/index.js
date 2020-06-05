@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
 import { Cookies } from 'quasar';
+import pick from 'lodash/pick';
 import clientRoutes from 'src/modules/client/router/routes';
 import vendorRoutes from 'src/modules/vendor/router/routes';
 import routes from 'src/router/routes';
@@ -24,13 +25,10 @@ Router.beforeEach(async (to, from, next) => {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
       const refresh = await alenvi.refreshAlenviCookies();
       if (refresh) {
-        if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
+        if (store.state.main.refreshState) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
-        const ability = defineAbilitiesFor(
-          store.getters['main/clientRole'],
-          store.getters['main/vendorRole'],
-          store.getters['main/company']
-        );
+        const loggedUser = store.getters['main/getLoggedUser']
+        const ability = defineAbilitiesFor(pick(loggedUser, ['role', 'company']));
         if (!ability.can('read', to.name)) next('/404');
         else {
           store.dispatch('main/updateRefreshState', false);
@@ -38,13 +36,10 @@ Router.beforeEach(async (to, from, next) => {
         }
       } else next({ path: '/login', query: { from: to.fullPath } });
     } else {
-      if (store.state.main.refreshState) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
+      if (store.state.main.refreshState) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
-      const ability = defineAbilitiesFor(
-        store.getters['main/clientRole'],
-        store.getters['main/vendorRole'],
-        store.getters['main/company']
-      );
+      const loggedUser = store.getters['main/getLoggedUser']
+      const ability = defineAbilitiesFor(pick(loggedUser, ['role', 'company']));
       if (!ability.can('read', to.name)) next('/404');
       else {
         store.dispatch('main/updateRefreshState', false);

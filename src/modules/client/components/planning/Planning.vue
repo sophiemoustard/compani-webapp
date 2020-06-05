@@ -55,7 +55,7 @@
                   :key="`hour_${hourIndex}`" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(sectorId, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
               </td>
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
@@ -71,7 +71,7 @@
                   :style="{ left: `${(hourIndex * hourWidth * 2)}%` }" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
               </td>
             </tr>
           </template>
@@ -89,10 +89,10 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import Customers from '@api/Customers';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { can } from '@helpers/rights';
 import {
   PLANNING,
   INVOICED_AND_PAID,
@@ -103,7 +103,6 @@ import {
   PLANNING_REFERENT,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
-  AUXILIARY,
 } from '@data/constants';
 import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
@@ -253,10 +252,12 @@ export default {
     },
     getPersonEvents (person) {
       if (this.isCustomerPlanning) {
-        return this.getRowEvents(person._id).filter(event => !event.isCancelled || event.cancel.condition !== NOT_INVOICED_AND_NOT_PAID);
+        return this.getRowEvents(person._id)
+          .filter(event => !event.isCancelled || event.cancel.condition !== NOT_INVOICED_AND_NOT_PAID);
       }
 
-      return this.getRowEvents(person._id).filter(event => !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID);
+      return this.getRowEvents(person._id)
+        .filter(event => !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID);
     },
     // History
     toggleHistory () {
@@ -270,8 +271,9 @@ export default {
     async drop (toDay, target) {
       try {
         if (target.type === SECTOR) { // Unassign event
-          if (this.draggedObject.sector === target._id && (!this.draggedObject.auxiliary || !this.draggedObject.auxiliary._id) &&
-            toDay.isSame(this.draggedObject.startDate, 'd')) return;
+          const dropToSameSector = this.draggedObject.sector === target._id && !get(this.draggedObject, 'auxiliary._id')
+          const dropToSameDay = toDay.isSame(this.draggedObject.startDate, 'd')
+          if (dropToSameSector && dropToSameDay) return;
         } else { // Update event auxiliary
           if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
             toDay.isSame(this.draggedObject.startDate, 'd')) return;
@@ -285,23 +287,17 @@ export default {
         this.draggedObject = {};
       }
     },
-    createEvent (eventInfo) {
-      let isAllowed = true;
-      if (this.personKey === AUXILIARY && eventInfo.sectorId) { // Unassigned event
-        isAllowed = can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
-      } else if (this.personKey === AUXILIARY) {
-        isAllowed = can({
-          user: this.loggedUser,
-          auxiliaryIdEvent: eventInfo.person._id,
-          permissions: [{ name: 'events:edit', rule: 'canEdit' }],
-        });
-      }
+    createEvent (event) {
+      const isAllowed = this.canEdit({ auxiliaryId: get(event, 'person._id'), sectorId: event.sectorId });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
-      this.$emit('createEvent', eventInfo);
+      this.$emit('createEvent', event);
     },
     editEvent (event) {
       this.$emit('editEvent', event);
+    },
+    canDrag (event) {
+      return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector })
     },
   },
 }
