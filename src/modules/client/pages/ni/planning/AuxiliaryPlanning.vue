@@ -2,16 +2,16 @@
   <q-page class="client-background">
     <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
-      :filteredSectors="filteredSectors" :personKey="personKey" :filters="activeFilters"
+      :filteredSectors="filteredSectors" :personKey="personKey" :filters="activeFilters" :can-edit="canEditEvent"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
       :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
       @updateFeeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :customers="customers"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
       :activeAuxiliaries="activeAuxiliaries" @resetForm="resetCreationForm" @createEvent="validateCreationEvent"
-      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" />
+      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" :customers="customers" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"

@@ -18,7 +18,7 @@ export default {
   actions: {
     updateRefreshState: ({ commit }, refresh) => { commit('REFRESH_STATE', refresh) },
     setDrawer: ({ commit }, toggle) => { commit('DRAWER', toggle) },
-    getLoggedUser: async ({ commit }, userId) => {
+    fetchLoggedUser: async ({ commit }, userId) => {
       try {
         const user = await users.getById(userId);
         commit('LOGGED_USER', user);
@@ -34,6 +34,7 @@ export default {
     },
   },
   getters: {
+    getLoggedUser: (state) => state.loggedUser,
     company: (state) => state.loggedUser.company,
     clientRole: (state) => get(state, 'loggedUser.role.client.name'),
     vendorRole: (state) => get(state, 'loggedUser.role.vendor.name'),

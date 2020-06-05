@@ -1,6 +1,7 @@
 import { mapState } from 'vuex';
 import omit from 'lodash/omit';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
 import { subject } from '@casl/ability';
@@ -315,8 +316,7 @@ export const planningActionMixin = {
     },
     // Event edition
     openEditionModal (event) {
-      const eventPermissionInfo = { auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector }
-      const isAllowed = this.canEditEvent(eventPermissionInfo);
+      const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
       this.formatEditedEvent(event);
@@ -377,12 +377,8 @@ export const planningActionMixin = {
       }
     },
     canEditEvent (event) {
-      const ability = defineAbilitiesFor({
-        clientRole: get(this.loggedUser, 'role.client.name'),
-        company: this.loggedUser.company,
-        auxiliaryUserId: this.loggedUser._id,
-        auxiliarySectorId: this.loggedUser.sector,
-      });
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+
       return ability.can('edit', subject('Events', event));
     },
     resetEditionForm () {

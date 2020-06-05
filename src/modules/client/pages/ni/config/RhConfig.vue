@@ -356,7 +356,7 @@ export default {
       else if (!get(this.$v.company.rhConfig, path).numeric) return 'Nombre non valide';
     },
     async refreshCompany () {
-      await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
       this.company = this.loggedCompany;
     },
     // Internal hours

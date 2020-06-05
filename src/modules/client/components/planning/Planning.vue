@@ -113,11 +113,10 @@ import DeleteEventsModal from 'src/modules/client/components/planning/DeleteEven
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation.vue';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
-import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
 export default {
   name: 'PlanningManager',
-  mixins: [planningTimelineMixin, planningEventMixin, planningActionMixin],
+  mixins: [planningTimelineMixin, planningEventMixin],
   components: {
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
@@ -133,6 +132,7 @@ export default {
     persons: { type: Array, default: () => [] },
     filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
+    canEdit: { type: Function, default: () => {} },
     displayAllSectors: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },
@@ -288,8 +288,7 @@ export default {
       }
     },
     createEvent (event) {
-      const eventPermissionInfo = { auxiliaryId: get(event, 'person._id'), sectorId: event.sectorId }
-      const isAllowed = this.canEditEvent(eventPermissionInfo);
+      const isAllowed = this.canEdit({ auxiliaryId: get(event, 'person._id'), sectorId: event.sectorId });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
       this.$emit('createEvent', event);
@@ -298,8 +297,7 @@ export default {
       this.$emit('editEvent', event);
     },
     canDrag (event) {
-      const eventPermissionInfo = { auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector }
-      return this.canEditEvent(eventPermissionInfo)
+      return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector })
     },
   },
 }

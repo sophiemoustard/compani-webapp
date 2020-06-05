@@ -179,11 +179,8 @@ export default {
       return this.roles.map(role => ({ label: ROLES_TRANSLATION[role.name], value: role._id }));
     },
     canSetUserCompany () {
-      const ability = defineAbilitiesFor({
-        clientRole: get(this.loggedUser, 'role.client.name'),
-        vendorRole: get(this.loggedUser, 'role.vendor.name'),
-        company: this.company,
-      });
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
+
       return ability.can('set', 'user_company');
     },
   },

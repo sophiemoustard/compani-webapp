@@ -284,7 +284,8 @@ export default {
   computed: {
     ...mapGetters({ clientRole: 'main/clientRole' }),
     canUpdateErpConfig () {
-      const ability = defineAbilitiesFor({ clientRole: this.clientRole, company: this.company });
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
+
       return ability.can('update', 'erp_config');
     },
   },
@@ -294,7 +295,7 @@ export default {
   },
   methods: {
     async refreshCompany () {
-      await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
       this.company = this.loggedCompany;
       this.company.address = this.company.address || { fullAddress: '' };
       this.company.legalRepresentative =

@@ -1,5 +1,6 @@
 
 import { Ability, AbilityBuilder } from '@casl/ability';
+import get from 'lodash/get';
 import { roleBasedAccessControl } from '@helpers/rbac';
 import {
   CLIENT_ADMIN,
@@ -19,7 +20,9 @@ const getClientAbilities = (role, subscriptions) => {
 const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 
 export const defineAbilitiesFor = (user) => {
-  const { clientRole, vendorRole, company, auxiliaryUserId, auxiliarySectorId } = user;
+  const { role, company, _id, sector } = user;
+  const clientRole = get(role, 'client.name');
+  const vendorRole = get(role, 'vendor.name');
   const { can, rules } = new AbilityBuilder();
 
   const companySubscriptions = company
@@ -35,8 +38,8 @@ export const defineAbilitiesFor = (user) => {
 
     if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('edit', 'Events');
     if (clientRole === AUXILIARY) {
-      can('edit', 'Events', { auxiliaryId: { $eq: auxiliaryUserId } })
-      can('edit', 'Events', { sectorId: { $eq: auxiliarySectorId } })
+      can('edit', 'Events', { auxiliaryId: { $eq: _id } })
+      can('edit', 'Events', { sectorId: { $eq: sector } })
     }
   }
   return new Ability(rules);

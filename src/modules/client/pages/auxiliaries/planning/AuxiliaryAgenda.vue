@@ -154,8 +154,7 @@ export default {
     },
     // Event creation
     openCreationModal (dayIndex) {
-      const eventPermissionInfo = { auxiliaryId: this.selectedAuxiliary._id }
-      const isAllowed = this.canEditEvent(eventPermissionInfo);
+      const isAllowed = this.canEditEvent({ auxiliaryId: this.selectedAuxiliary._id });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       const selectedDay = this.days[dayIndex];
