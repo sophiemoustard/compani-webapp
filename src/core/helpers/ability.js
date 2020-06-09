@@ -9,6 +9,7 @@ import {
   COACH,
   AUXILIARY,
   PLANNING_REFERENT,
+  ERP,
 } from '@data/constants';
 
 const getClientAbilities = (role, subscriptions) => {
@@ -33,7 +34,7 @@ export const defineAbilitiesFor = (user) => {
   if (!clientRole && !vendorRole) can('read', 'account client');
   if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
 
-  if (companySubscriptions.includes('erp')) {
+  if (companySubscriptions.includes(ERP)) {
     if (clientRole === CLIENT_ADMIN) can('update', 'erp_config');
 
     if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('edit', 'Events');

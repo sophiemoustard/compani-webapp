@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 
 export default {
   name: 'ChipsAutocomplete',
@@ -25,11 +25,11 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ elementToAdd: 'planning/getElementToAdd' }),
+    ...mapState('planning', ['elementToAdd']),
   },
   methods: {
     addEvent (el) {
-      this.$store.commit('planning/setElementToAdd', this.filters.find(elem => elem.value === el.value));
+      this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el.value));
       this.$refs.refFilter.hidePopup();
       this.$refs.refFilter.inputValue = '';
     },
@@ -37,7 +37,7 @@ export default {
       this.$emit('input', el);
     },
     removeEvent (el) {
-      this.$store.commit('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value[0]));
+      this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value[0]));
     },
     async search (terms, done) {
       try {
@@ -49,7 +49,7 @@ export default {
       }
     },
     add (el) {
-      this.$store.commit('planning/setElementToAdd', this.filters.find(elem => elem.value === el));
+      this.$store.dispatch('planning/setElementToAdd', this.filters.find(elem => elem.value === el));
       return this.$refs.refFilter.add(el);
     },
   },

@@ -144,13 +144,15 @@ export default {
     };
   },
   computed: {
-    ...mapState('main', ['loggedUser']),
+    ...mapState({
+      loggedUser: state => state.main.loggedUser,
+      filters: state => state.planning.filters,
+      elementToAdd: state => state.planning.elementToAdd,
+      elementToRemove: state => state.planning.elementToRemove,
+    }),
     ...mapGetters({
       company: 'main/company',
       clientRole: 'main/clientRole',
-      filters: 'planning/getFilters',
-      elementToAdd: 'planning/getElementToAdd',
-      elementToRemove: 'planning/getElementToRemove',
     }),
     monthsOptions () {
       if (this.firstInterventionStartDate === '') {

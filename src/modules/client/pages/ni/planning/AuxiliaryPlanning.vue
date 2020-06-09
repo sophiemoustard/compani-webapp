@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapState } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import Customers from '@api/Customers';
@@ -97,12 +97,10 @@ export default {
     },
   },
   computed: {
+    ...mapState('planning', ['filters', 'elementToAdd', 'elementToRemove']),
     ...mapGetters({
       clientRole: 'main/clientRole',
       company: 'main/company',
-      filters: 'planning/getFilters',
-      elementToAdd: 'planning/getElementToAdd',
-      elementToRemove: 'planning/getElementToRemove',
     }),
     displayedAuxiliaries () {
       return this.auxiliaries
