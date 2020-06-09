@@ -192,7 +192,7 @@ export default {
     },
     followUpMissingInfo () {
       const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('le formateur');
+      if (!this.course.trainer) missingInfo.push('l\'intervenant');
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
       if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
