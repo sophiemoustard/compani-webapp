@@ -550,7 +550,6 @@ export default {
         this.$v.newTrainee.$reset();
       } catch (e) {
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
-        this.resetAddTraineeForm();
       } finally {
         this.addTraineeModalLoading = false;
       }

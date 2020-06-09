@@ -33,35 +33,39 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
-      <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
-        required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
-      <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
-        @blur="$v.newUser.identity.lastname.$touch" required-field caption="Nom" />
-      <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
-        caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
-      <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
-        caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
-      <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
-      <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
-        @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
-        :error="$v.newUser.contact.address.$error" in-modal />
-      <div class="row margin-input">
-        <div class="col-12">
-          <div class="row justify-between">
-            <p class="input-caption required">Équipe</p>
-            <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
+      <ni-input in-modal :disable="!firstStep" v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
+        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" caption="Email" required-field />
+      <template v-if="!firstStep">
+        <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
+          required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
+        <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
+          @blur="$v.newUser.identity.lastname.$touch" required-field caption="Nom" />
+        <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
+          caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
+        <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
+          caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
+        <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
+          @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
+          :error="$v.newUser.contact.address.$error" in-modal />
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption required">Équipe</p>
+              <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
+            </div>
+            <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
+              :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
           </div>
-          <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
-            :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
         </div>
-      </div>
-      <div class="row margin-input last">
-        <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense />
-      </div>
+        <div class="row margin-input last">
+          <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense />
+        </div>
+      </template>
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
-          :loading="loading" @click="submit" />
+        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
+          :loading="loading" icon-right="add" @click="nextStep" />
+        <q-btn v-else no-caps class="full-width modal-btn" label="Créer la fiche" color="primary"
+          :loading="loading" icon-right="add" @click="submit" />
       </template>
     </ni-modal>
   </q-page>
@@ -70,6 +74,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
 import Roles from '@api/Roles';
@@ -108,6 +113,7 @@ export default {
       tableLoading: false,
       loading: false,
       auxiliaryCreationModal: false,
+      firstStep: true,
       sendWelcomeMsg: true,
       civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
@@ -280,6 +286,7 @@ export default {
     resetForm () {
       this.$v.newUser.$reset();
       this.newUser = cloneDeep(this.defaultNewUser);
+      this.firstStep = true;
     },
     async formatUserCreationPayload () {
       const roles = await Roles.list({ name: AUXILIARY });
@@ -316,6 +323,55 @@ export default {
           `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`,
       });
       NotifyPositive('SMS bien envoyé');
+    },
+    fillNewUser (user) {
+      const paths = [
+        'identity.lastname',
+        'identity.firstname',
+        'identity.title',
+        'contact.adresse.fullAddress',
+        'contact.phone',
+        'sector',
+      ];
+      paths.forEach(path => {
+        const value = get(user, path)
+        if (value) set(this.newUser, path, value);
+      });
+    },
+    async nextStep () {
+      try {
+        this.$v.newUser.$touch();
+        if (!this.newUser.local.email || this.$v.newUser.local.email.$error) {
+          return NotifyWarning('Champ(s) invalide(s).');
+        }
+
+        this.loading = true;
+        const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
+
+        const user = await Users.getById(userExistsInfo.user._id)
+        this.fillNewUser(user);
+
+        if (userExistsInfo.exists) {
+          const userIsFromSameCompany = get(userExistsInfo, 'user.company') === this.company._id;
+          const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
+
+          if (userIsFromSameCompany && !userHasClientRole) {
+            const user = await Users.getById(userExistsInfo.user._id)
+            this.fillNewUser(user);
+          } else {
+            if (!userIsFromSameCompany) NotifyNegative('Email relié à une autre structure.');
+            else if (userHasClientRole) NotifyNegative('Email déjà existant.');
+            throw new Error();
+          }
+        }
+
+        this.firstStep = false;
+        this.$v.newUser.$reset();
+      } catch (e) {
+        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+      } finally {
+        this.loading = false;
+      }
     },
     async submit () {
       try {
