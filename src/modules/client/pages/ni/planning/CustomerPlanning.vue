@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapState } from 'vuex';
 import get from 'lodash/get';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
@@ -92,12 +92,10 @@ export default {
     },
   },
   computed: {
+    ...mapState('planning', ['filters', 'elementToAdd', 'elementToRemove']),
     ...mapGetters({
       company: 'main/company',
       clientRole: 'main/clientRole',
-      filters: 'planning/getFilters',
-      elementToAdd: 'planning/getElementToAdd',
-      elementToRemove: 'planning/getElementToRemove',
     }),
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();

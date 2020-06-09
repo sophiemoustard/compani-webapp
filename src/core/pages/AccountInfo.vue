@@ -181,7 +181,7 @@ export default {
       this.$store.dispatch('company/reset');
       this.$store.dispatch('customer/resetCustomer');
       this.$store.dispatch('rh/resetRh');
-      this.$store.dispatch('planning/reset');
+      this.$store.dispatch('planning/resetPlanning');
 
       this.$router.replace('/login');
     },

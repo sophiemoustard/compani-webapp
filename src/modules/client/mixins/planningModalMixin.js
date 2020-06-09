@@ -1,4 +1,4 @@
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import get from 'lodash/get';
 import Gdrive from '@api/GoogleDrive';
 import SelectSector from '@components/form/SelectSector';
@@ -72,8 +72,8 @@ export const planningModalMixin = {
     };
   },
   computed: {
+    ...mapState('planning', ['filters']),
     ...mapGetters({
-      filters: 'planning/getFilters',
       clientRole: 'main/clientRole',
     }),
     absenceOptions () {
