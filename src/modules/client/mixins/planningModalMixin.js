@@ -84,34 +84,6 @@ export const planningModalMixin = {
     isCustomerPlanning () {
       return this.personKey === CUSTOMER;
     },
-    disableEditionButton () {
-      switch (this.editedEvent.type) {
-        case ABSENCE:
-          if (this.editedEvent.absenceNature === DAILY) {
-            return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature ||
-              (this.editedEvent.absence === OTHER && !this.editedEvent.misc) ||
-              ([WORK_ACCIDENT, ILLNESS].includes(this.editedEvent.absence) && !this.editedEvent.attachment.link);
-          }
-
-          return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.absenceNature;
-        case INTERVENTION: {
-          const shouldDisableButton = !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.dates.endDate;
-          if (this.editedEvent.isCancelled) {
-            return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason ||
-              !this.editedEvent.misc;
-          } else return shouldDisableButton;
-        }
-        case INTERNAL_HOUR:
-          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
-            !this.editedEvent.internalHour;
-        case UNAVAILABILITY:
-        default:
-          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate;
-      }
-    },
     eventTypeOptions () {
       if (this.isCustomerPlanning || (this.selectedAuxiliary && !this.selectedAuxiliary._id)) {
         return EVENT_TYPES.filter(type => type.value === INTERVENTION);

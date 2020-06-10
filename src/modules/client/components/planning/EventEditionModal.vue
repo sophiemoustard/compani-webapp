@@ -88,8 +88,7 @@
         </div>
       </div>
       <q-btn v-if="!isDisabled" class="modal-btn full-width" no-caps color="primary" :loading="loading"
-        label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton"
-        data-cy="event-edition-button" />
+        label="Editer l'évènement" @click="updateEvent" icon-right="check" data-cy="event-edition-button" />
     </div>
   </q-dialog>
 </template>
