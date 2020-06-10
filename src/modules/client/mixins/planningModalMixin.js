@@ -84,30 +84,6 @@ export const planningModalMixin = {
     isCustomerPlanning () {
       return this.personKey === CUSTOMER;
     },
-    disableCreationButton () {
-      if (!this.newEvent.type) return true;
-      switch (this.newEvent.type) {
-        case ABSENCE:
-          if (this.newEvent.absenceNature === DAILY) {
-            return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-              !this.newEvent.dates.endDate || !this.newEvent.absenceNature ||
-              (this.newEvent.absence === OTHER && !this.newEvent.misc) ||
-              ([WORK_ACCIDENT, ILLNESS].includes(this.newEvent.absence) && !this.newEvent.attachment.link);
-          }
-
-          return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-            !this.newEvent.absenceNature;
-        case INTERVENTION:
-          return (this.isCustomerPlanning && !this.newEvent.auxiliary) || !this.newEvent.customer ||
-            !this.newEvent.subscription || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate;
-        case INTERNAL_HOUR:
-          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
-            !this.newEvent.internalHour;
-        case UNAVAILABILITY:
-        default:
-          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate;
-      }
-    },
     disableEditionButton () {
       switch (this.editedEvent.type) {
         case ABSENCE:

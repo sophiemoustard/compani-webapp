@@ -51,7 +51,7 @@ export const planningActionMixin = {
             validHour,
           },
         },
-        auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
+        auxiliary: { required: requiredIf((item) => item && (item.type !== INTERVENTION || this.personKey === CUSTOMER)) },
         customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },

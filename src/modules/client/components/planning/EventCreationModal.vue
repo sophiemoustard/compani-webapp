@@ -70,7 +70,7 @@
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
-        @click="createEvent" :disable="disableCreationButton" icon-right="add" data-cy="event-creation-button" />
+        @click="createEvent" icon-right="add" data-cy="event-creation-button" />
     </div>
   </q-dialog>
 </template>
