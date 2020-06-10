@@ -114,7 +114,7 @@ export default {
       loading: false,
       auxiliaryCreationModal: false,
       firstStep: true,
-      userExistsInCreationModal: false,
+      userFetchedCreationModal: {},
       sendWelcomeMsg: true,
       civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
@@ -288,9 +288,9 @@ export default {
       this.$v.newUser.$reset();
       this.newUser = cloneDeep(this.defaultNewUser);
       this.firstStep = true;
-      this.userExistsInCreationModal = false;
+      this.userFetchedCreationModal = {};
     },
-    async formatUserCreationPayload () {
+    async formatUserSubmitPayload () {
       const roles = await Roles.list({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
 
@@ -302,16 +302,6 @@ export default {
       if (!get(payload, 'contact.address.fullAddress')) delete payload.contact.address;
 
       return payload;
-    },
-    async createAlenviUser () {
-      const folderId = get(this.company, 'auxiliariesFolderId', null);
-      if (!folderId) throw new Error('No auxiliary folder in company drive');
-
-      const payload = await this.formatUserCreationPayload();
-
-      const newUser = await Users.create(payload);
-      await Users.createDriveFolder(newUser._id, { parentFolderId: folderId });
-      return newUser;
     },
     async sendSMS (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
@@ -349,17 +339,16 @@ export default {
 
         this.loading = true;
         const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
-        this.userExistsInCreationModal = userExistsInfo.exists;
 
-        if (this.userExistsInCreationModal) {
+        if (userExistsInfo.exists) {
           const userHasValidCompany =
             !get(userExistsInfo, 'user.company') ||
              get(userExistsInfo, 'user.company') === this.company._id;
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
           if (userHasValidCompany && !userHasClientRole) {
-            const user = await Users.getById(userExistsInfo.user._id)
-            this.fillNewUser(user);
+            this.userFetchedCreationModal = await Users.getById(userExistsInfo.user._id)
+            this.fillNewUser(this.userFetchedCreationModal);
           } else {
             if (!userHasValidCompany) NotifyNegative('Email relié à une autre structure.');
             else if (userHasClientRole) NotifyNegative('Email déjà existant.');
@@ -382,11 +371,23 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        const userCreated = await this.createAlenviUser();
-        if (this.sendWelcomeMsg) await this.sendSMS(userCreated);
-        await this.getUserList();
+        const folderId = get(this.company, 'auxiliariesFolderId', null);
+        if (!folderId) throw new Error('No auxiliary folder in company drive');
 
+        const payload = await this.formatUserSubmitPayload();
+        let editedUser = {};
+
+        if (this.userFetchedCreationModal._id) {
+          await Users.updateById(this.userFetchedCreationModal._id, payload);
+          editedUser = this.userFetchedCreationModal;
+        } else {
+          editedUser = await Users.create(payload);
+        }
+        await Users.createDriveFolder(editedUser._id, { parentFolderId: folderId });
+        if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
+        await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
+
         this.auxiliaryCreationModal = false;
       } catch (e) {
         console.error(e);
