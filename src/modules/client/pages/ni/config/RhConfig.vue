@@ -547,7 +547,7 @@ export default {
     },
     async createNewAdministrativeDocument () {
       this.$v.newAdministrativeDocument.$touch();
-      if (!this.$v.newAdministrativeDocument.$anyDirty || this.$v.newAdministrativeDocument.$invalid) {
+      if (this.$v.newAdministrativeDocument.$error) {
         return NotifyWarning('Champ(s) invalide(s)');
       }
       this.loading = true;

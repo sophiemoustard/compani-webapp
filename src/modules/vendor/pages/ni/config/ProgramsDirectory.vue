@@ -92,7 +92,7 @@ export default {
     async createProgram () {
       try {
         this.$v.newProgram.$touch();
-        if (!this.newProgram.name) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.newProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
         await Programs.create({ ...this.newProgram });

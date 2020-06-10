@@ -326,9 +326,8 @@ export default {
     },
     async createNewEstablishment () {
       try {
-        this.$v.newEstablishment.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.newEstablishment);
-        if (!this.$v.newEstablishment.$anyDirty || this.$v.newEstablishment.$invalid || !formIsValid) {
+        if (!formIsValid) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
@@ -363,9 +362,8 @@ export default {
     },
     async updateEstablishment () {
       try {
-        this.$v.editedEstablishment.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.editedEstablishment);
-        if (this.$v.editedEstablishment.$invalid || !formIsValid) {
+        if (!formIsValid) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 

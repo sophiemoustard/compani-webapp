@@ -845,7 +845,7 @@ export default {
     async createNewSurcharge () {
       try {
         this.$v.newSurcharge.$touch();
-        if (this.$v.newSurcharge.$error || !this.newSurcharge.name) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
 
         const payload = this.getSurchargePayload(this.newSurcharge);
@@ -904,7 +904,7 @@ export default {
     async updateSurcharge () {
       try {
         this.$v.editedSurcharge.$touch();
-        if (this.$v.editedSurcharge.$error || !this.editedSurcharge.name) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         const surchargeId = this.editedSurcharge._id;
         const payload = this.getSurchargePayload(this.editedSurcharge);
@@ -973,13 +973,7 @@ export default {
     async createNewService () {
       try {
         this.$v.newService.$touch()
-        const isServiceCreationInvalid =
-        !this.newService.name ||
-        !this.newService.nature ||
-        !this.newService.defaultUnitAmount ||
-        !this.newService.vat < 0 ||
-        this.$v.newService.$error;
-        if (isServiceCreationInvalid) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.newService.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.formatCreatedService();
@@ -1026,13 +1020,7 @@ export default {
     async updateService () {
       try {
         this.$v.editedService.$touch();
-        const isServiceEditionInvalid =
-        !this.editedService.name ||
-        !this.editedService.startDate ||
-        !this.editedService.defaultUnitAmount ||
-        !this.editedService.vat < 0 ||
-        this.$v.editedService.$error
-        if (isServiceEditionInvalid) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const serviceId = this.editedService._id;
@@ -1113,17 +1101,13 @@ export default {
     async createNewThirdPartyPayer () {
       try {
         this.$v.newThirdPartyPayer.$touch();
-        const isTPPCreationInvalid =
-        this.$v.newThirdPartyPayer.$error ||
-        !this.newThirdPartyPayer.name ||
-        !this.newThirdPartyPayer.billingMode ||
-        this.$v.newThirdPartyPayer.$error;
-        if (isTPPCreationInvalid) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.newThirdPartyPayer.$anyError) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await ThirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur créé.');
+        this.thirdPartyPayerCreationModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du tiers payeur.');
@@ -1138,12 +1122,7 @@ export default {
     async updateThirdPartyPayer () {
       try {
         this.$v.editedThirdPartyPayer.$touch();
-        const isTPPEditionInvalid =
-        this.$v.editedThirdPartyPayer.$error ||
-        !this.editedThirdPartyPayer.name ||
-        !this.editedThirdPartyPayer.billingMode ||
-        this.$v.editedThirdPartyPayer.$error
-        if (isTPPEditionInvalid) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.editedThirdPartyPayer.$anyError) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;
@@ -1152,12 +1131,12 @@ export default {
         await ThirdPartyPayers.updateById(thirdPartyPayerId, this.formatThirdPartyPayerPayload(payload));
         await this.refreshThirdPartyPayers();
         NotifyPositive('Tiers payeur modifié.');
+        this.thirdPartyPayerEditionModal = false;
       } catch (e) {
         NotifyNegative('Erreur lors de la modification du tiers payeur.');
         console.error(e);
       } finally {
         this.loading = false;
-        this.thirdPartyPayerEditionModal = false;
       }
     },
     async deleteThirdPartyPayer (thirdPartyPayerId, row) {

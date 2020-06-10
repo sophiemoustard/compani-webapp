@@ -107,7 +107,7 @@ export default {
     async createCompany () {
       try {
         this.$v.newCompany.$touch();
-        if (this.$v.newCompany.$anyError || !this.$v.newCompany.$anyDirty) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.newCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
         await Companies.create({ ...this.newCompany });
 

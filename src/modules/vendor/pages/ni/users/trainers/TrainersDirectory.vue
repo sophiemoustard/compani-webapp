@@ -83,7 +83,7 @@ export default {
     async nextStep () {
       try {
         this.$v.newTrainer.local.email.$touch();
-        if (this.$v.newTrainer.local.email.$error || !this.newTrainer.local.email) {
+        if (this.$v.newTrainer.local.email.$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
@@ -137,7 +137,7 @@ export default {
     async createTrainer () {
       try {
         this.$v.newTrainer.$touch();
-        if (this.$v.newTrainer.$error || !this.$v.newTrainer.$anyDirty) {
+        if (this.$v.newTrainer.$error) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
