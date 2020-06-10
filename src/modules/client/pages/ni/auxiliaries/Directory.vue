@@ -114,6 +114,7 @@ export default {
       loading: false,
       auxiliaryCreationModal: false,
       firstStep: true,
+      userExistsInCreationModal: false,
       sendWelcomeMsg: true,
       civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
@@ -287,6 +288,7 @@ export default {
       this.$v.newUser.$reset();
       this.newUser = cloneDeep(this.defaultNewUser);
       this.firstStep = true;
+      this.userExistsInCreationModal = false;
     },
     async formatUserCreationPayload () {
       const roles = await Roles.list({ name: AUXILIARY });
@@ -341,25 +343,25 @@ export default {
     async nextStep () {
       try {
         this.$v.newUser.$touch();
-        if (!this.newUser.local.email || this.$v.newUser.local.email.$error) {
+        if (this.$v.newUser.local.email.$error) {
           return NotifyWarning('Champ(s) invalide(s).');
         }
 
         this.loading = true;
         const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
+        this.userExistsInCreationModal = userExistsInfo.exists;
 
-        const user = await Users.getById(userExistsInfo.user._id)
-        this.fillNewUser(user);
-
-        if (userExistsInfo.exists) {
-          const userIsFromSameCompany = get(userExistsInfo, 'user.company') === this.company._id;
+        if (this.userExistsInCreationModal) {
+          const userHasValidCompany =
+            !get(userExistsInfo, 'user.company') ||
+             get(userExistsInfo, 'user.company') === this.company._id;
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
-          if (userIsFromSameCompany && !userHasClientRole) {
+          if (userHasValidCompany && !userHasClientRole) {
             const user = await Users.getById(userExistsInfo.user._id)
             this.fillNewUser(user);
           } else {
-            if (!userIsFromSameCompany) NotifyNegative('Email relié à une autre structure.');
+            if (!userHasValidCompany) NotifyNegative('Email relié à une autre structure.');
             else if (userHasClientRole) NotifyNegative('Email déjà existant.');
             throw new Error();
           }
