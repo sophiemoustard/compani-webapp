@@ -216,7 +216,7 @@ export const payMixin = {
         for (const [surchageKey, surcharge] of surchages) {
           lines.push(`${SURCHARGES[surchageKey]}, ${surcharge.percentage}%, ${formatHours(surcharge.hours)}`);
         }
-        formattedPlans.push(lines.join('\r\n'));
+        formattedPlans.push(lines.join(' / '));
       }
 
       return formattedPlans.join('\r\n');
@@ -225,7 +225,7 @@ export const payMixin = {
       let hours = pay[key];
       if (pay.diff[key]) hours += pay.diff[key];
 
-      return parseFloat(hours).toFixed(2);
+      return this.formatNumberForCSV(hours);
     },
     setSelectedPeriod (offset) {
       this.dates = {
@@ -233,9 +233,13 @@ export const payMixin = {
         endDate: this.$moment().subtract(offset, 'M').endOf('M').toISOString(),
       }
     },
+    formatNumberForCSV (number) {
+      return parseFloat(number).toFixed(2).replace('.', ',');
+    },
     async exportToCSV () {
       const csvData = [[
-        'Auxiliaire',
+        'Auxiliaire - Nom',
+        'Auxiliaire - Prénom',
         'Équipe',
         'Début',
         'Fin',
@@ -262,11 +266,12 @@ export const payMixin = {
       for (const draftPay of this.displayedDraftPay) {
         const { auxiliary, startDate, endDate } = draftPay;
         csvData.push([
-          formatIdentity(auxiliary.identity, 'FL') || '',
-          auxiliary.sector ? auxiliary.sector.name : '',
+          get(auxiliary, 'identity.lastname') || '',
+          get(auxiliary, 'identity.firstname') || '',
+          get(auxiliary, 'sector.name') || '',
           startDate ? this.$moment(startDate).format('DD/MM/YYYY') : '',
           endDate ? this.$moment(endDate).format('DD/MM/YYYY') : '',
-          parseFloat(draftPay.contractHours).toFixed(2),
+          this.formatNumberForCSV(draftPay.contractHours),
           this.formatHoursWithDiff(draftPay, 'hoursToWork'),
           this.formatHoursWithDiff(draftPay, 'workedHours'),
           this.formatHoursWithDiff(draftPay, 'notSurchargedAndExempt'),
@@ -276,14 +281,14 @@ export const payMixin = {
           this.formatHoursWithDiff(draftPay, 'surchargedAndNotExempt'),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndNotExemptDetails)}"` || '',
           this.formatHoursWithDiff(draftPay, 'hoursBalance'),
-          get(draftPay, 'diff.hoursBalance') ? parseFloat(draftPay.diff.hoursBalance).toFixed(2) : '0,00',
-          parseFloat(draftPay.hoursCounter).toFixed(2),
-          parseFloat(draftPay.overtimeHours).toFixed(2),
-          parseFloat(draftPay.additionalHours).toFixed(2),
+          get(draftPay, 'diff.hoursBalance') ? this.formatNumberForCSV(draftPay.diff.hoursBalance) : '0,00',
+          this.formatNumberForCSV(draftPay.hoursCounter),
+          this.formatNumberForCSV(draftPay.overtimeHours),
+          this.formatNumberForCSV(draftPay.additionalHours),
           draftPay.mutual ? 'Oui' : 'Non',
-          parseFloat(draftPay.transport).toFixed(2),
-          parseFloat(draftPay.otherFees).toFixed(2),
-          parseFloat(draftPay.bonus).toFixed(2),
+          this.formatNumberForCSV(draftPay.transport),
+          this.formatNumberForCSV(draftPay.otherFees),
+          this.formatNumberForCSV(draftPay.bonus),
         ]);
       }
 
