@@ -20,7 +20,7 @@
         @blur="$v.newCourse.company.$touch" required-field caption="Structure" :options="companyOptions" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createCourse" :disable="$v.newCourse.$invalid" />
+          icon-right="add" @click="createCourse" />
       </template>
     </ni-modal>
   </q-page>

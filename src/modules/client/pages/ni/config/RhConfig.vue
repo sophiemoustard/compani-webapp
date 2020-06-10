@@ -195,8 +195,7 @@
         :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
-          :disable="!$v.newAdministrativeDocument.$anyDirty || $v.newAdministrativeDocument.$invalid" :loading="loading"
-          @click="createNewAdministrativeDocument" />
+          :loading="loading" @click="createNewAdministrativeDocument" />
       </template>
     </ni-modal>
 
@@ -209,7 +208,7 @@
         @blur="$v.newSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
-          :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
+          :loading="loading" @click="createNewSector" />
       </template>
     </ni-modal>
 
@@ -222,7 +221,7 @@
         @blur="$v.editedSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
-          :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
+          :loading="loading" @click="updateSector" />
       </template>
     </ni-modal>
   </q-page>
@@ -298,9 +297,6 @@ export default {
   computed: {
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
-    },
-    isSameThanEditedSector () {
-      return this.tmpInput === this.editedSector.name;
     },
   },
   validations () {
@@ -551,7 +547,9 @@ export default {
     },
     async createNewAdministrativeDocument () {
       this.$v.newAdministrativeDocument.$touch();
-      if (this.$v.newAdministrativeDocument.$error) return NotifyWarning('Champ(s) invalide(s)');
+      if (!this.$v.newAdministrativeDocument.$anyDirty || this.$v.newAdministrativeDocument.$invalid) {
+        return NotifyWarning('Champ(s) invalide(s)');
+      }
       this.loading = true;
 
       try {

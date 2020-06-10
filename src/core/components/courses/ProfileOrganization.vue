@@ -147,7 +147,7 @@
         :error-label="phoneNbrError($v.editedTrainee)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
-          :loading="loading" @click="updateTrainee" :disable="$v.editedTrainee.$invalid" />
+          :loading="loading" @click="updateTrainee" />
       </template>
     </ni-modal>
   </div>

@@ -18,10 +18,10 @@
         caption="Nom commercial" @blur="$v.newCompany.tradeName.$touch" required-field
         :error-label="tradeNameError($v.newCompany)" />
       <ni-option-group v-model="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
-        required-field />
+        :error="$v.newCompany.type.$error" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createCompany" :disable="$v.newCompany.$anyError || !$v.newCompany.$anyDirty" />
+          icon-right="add" @click="createCompany" />
       </template>
     </ni-modal>
   </q-page>
@@ -35,7 +35,7 @@ import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANY_TYPES } from '@data/constants';
 import { companyMixin } from '@mixins/companyMixin';
 
@@ -106,6 +106,8 @@ export default {
     },
     async createCompany () {
       try {
+        this.$v.newCompany.$touch();
+        if (this.$v.newCompany.$anyError || !this.$v.newCompany.$anyDirty) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
         await Companies.create({ ...this.newCompany });
 

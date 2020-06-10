@@ -154,7 +154,7 @@
         :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
-          :loading="loading" @click="createNewSurcharge" :disable="isSurchargeCreationDisabled" />
+          :loading="loading" @click="createNewSurcharge" />
       </template>
     </ni-modal>
 
@@ -195,7 +195,7 @@
         :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
-          color="primary" :loading="loading" @click="updateSurcharge" :disable="isSurchargeEditionDisabled" />
+          color="primary" :loading="loading" @click="updateSurcharge" />
       </template>
     </ni-modal>
 
@@ -223,7 +223,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
-          :loading="loading" @click="createNewService" :disable="isServiceCreationDisabled" />
+          :loading="loading" @click="createNewService" />
       </template>
     </ni-modal>
 
@@ -249,7 +249,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
-          :loading="loading" @click="updateService" :disable="isServiceEditionDisabled" />
+          :loading="loading" @click="updateService" />
       </template>
     </ni-modal>
 
@@ -283,7 +283,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
-          :loading="loading" @click="createNewThirdPartyPayer" :disable="isTppCreationDisabled" />
+          :loading="loading" @click="createNewThirdPartyPayer" />
       </template>
     </ni-modal>
 
@@ -308,7 +308,7 @@
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
-          :loading="loading" @click="updateThirdPartyPayer" :disable="isTppEditionDisabled" />
+          :loading="loading" @click="updateThirdPartyPayer" />
       </template>
     </ni-modal>
   </q-page>
@@ -725,26 +725,6 @@ export default {
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
-    isTppEditionDisabled () {
-      return this.$v.editedThirdPartyPayer.$error || !this.editedThirdPartyPayer.name || !this.editedThirdPartyPayer.billingMode;
-    },
-    isTppCreationDisabled () {
-      return this.$v.newThirdPartyPayer.$error || !this.newThirdPartyPayer.name || !this.newThirdPartyPayer.billingMode;
-    },
-    isSurchargeEditionDisabled () {
-      return this.$v.editedSurcharge.$error || !this.editedSurcharge.name;
-    },
-    isSurchargeCreationDisabled () {
-      return this.$v.newSurcharge.$error || !this.newSurcharge.name;
-    },
-    isServiceEditionDisabled () {
-      return !this.editedService.name || !this.editedService.startDate || !this.editedService.defaultUnitAmount ||
-        !this.editedService.vat < 0;
-    },
-    isServiceCreationDisabled () {
-      return !this.newService.name || !this.newService.nature || !this.newService.defaultUnitAmount ||
-        !this.newService.vat < 0;
-    },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
       return selectedService ? this.$moment(selectedService.startDate).add(1, 'd').toISOString() : '';
@@ -865,7 +845,7 @@ export default {
     async createNewSurcharge () {
       try {
         this.$v.newSurcharge.$touch();
-        if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.newSurcharge.$error || !this.newSurcharge.name) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
 
         const payload = this.getSurchargePayload(this.newSurcharge);
@@ -924,7 +904,7 @@ export default {
     async updateSurcharge () {
       try {
         this.$v.editedSurcharge.$touch();
-        if (this.$v.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.editedSurcharge.$error || !this.editedSurcharge.name) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
         const surchargeId = this.editedSurcharge._id;
         const payload = this.getSurchargePayload(this.editedSurcharge);
@@ -992,7 +972,14 @@ export default {
     },
     async createNewService () {
       try {
-        if (this.$v.newService.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newService.$touch()
+        const isServiceCreationInvalid =
+        !this.newService.name ||
+        !this.newService.nature ||
+        !this.newService.defaultUnitAmount ||
+        !this.newService.vat < 0 ||
+        this.$v.newService.$error;
+        if (isServiceCreationInvalid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const payload = this.formatCreatedService();
@@ -1038,7 +1025,15 @@ export default {
     },
     async updateService () {
       try {
-        if (this.$v.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.editedService.$touch();
+        const isServiceEditionInvalid =
+        !this.editedService.name ||
+        !this.editedService.startDate ||
+        !this.editedService.defaultUnitAmount ||
+        !this.editedService.vat < 0 ||
+        this.$v.editedService.$error
+        if (isServiceEditionInvalid) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
         const serviceId = this.editedService._id;
         const payload = pickBy(this.editedService);
@@ -1117,7 +1112,13 @@ export default {
     },
     async createNewThirdPartyPayer () {
       try {
-        if (this.$v.newThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newThirdPartyPayer.$touch();
+        const isTPPCreationInvalid =
+        this.$v.newThirdPartyPayer.$error ||
+        !this.newThirdPartyPayer.name ||
+        !this.newThirdPartyPayer.billingMode ||
+        this.$v.newThirdPartyPayer.$error;
+        if (isTPPCreationInvalid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await ThirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
@@ -1127,7 +1128,6 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création du tiers payeur.');
       } finally {
-        this.thirdPartyPayerCreationModal = false;
         this.loading = false;
       }
     },
@@ -1137,7 +1137,13 @@ export default {
     },
     async updateThirdPartyPayer () {
       try {
-        if (this.$v.editedThirdPartyPayer.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.editedThirdPartyPayer.$touch();
+        const isTPPEditionInvalid =
+        this.$v.editedThirdPartyPayer.$error ||
+        !this.editedThirdPartyPayer.name ||
+        !this.editedThirdPartyPayer.billingMode ||
+        this.$v.editedThirdPartyPayer.$error
+        if (isTPPEditionInvalid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;

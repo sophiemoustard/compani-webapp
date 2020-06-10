@@ -44,8 +44,7 @@
         required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
-          :disable="$v.mergedUserProfile.local.password.$invalid || $v.passwordConfirm.$invalid" icon-right="done"
-          @click="submitPasswordChange" />
+          icon-right="done" @click="submitPasswordChange" />
       </template>
     </ni-modal>
 

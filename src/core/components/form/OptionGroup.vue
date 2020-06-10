@@ -5,7 +5,7 @@
         <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
-      <q-field dense borderless :error="error" :error-label="errorLabel" class="col-12">
+      <q-field dense borderless :error="error" :error-message="errorLabel" class="col-12">
         <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
           :disable="disable" v-on="$listeners" />
       </q-field>
