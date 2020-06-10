@@ -5,7 +5,7 @@
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" :error="$v.course.name.$error" />
         <ni-select v-if="trainerInputVisible"  v-model.trim="course.trainer._id" :error="$v.course.trainer.$error"
-          @blur="updateCourse('trainer')" :options="trainerOptions" @focus="saveTmp('trainer')" caption="Formateur" />
+          @blur="updateCourse('trainer')" :options="trainerOptions" @focus="saveTmp('trainer')" caption="Intervenant" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -407,7 +407,7 @@ export default {
     },
     async refreshTrainers () {
       try {
-        const trainers = await Users.list({ role: [TRAINER] });
+        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }))
       } catch (e) {
         console.error(e);

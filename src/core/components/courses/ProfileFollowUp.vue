@@ -92,7 +92,7 @@
       <template slot="title">
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="messageType" required-field
+      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="messageType" required-field
         @input="updateMessage" />
       <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
       <template slot="footer">
@@ -144,7 +144,10 @@ export default {
     return {
       smsModal: false,
       messageType: '',
-      messageTypeOptions: [],
+      messageTypeOptions: [
+        { label: 'Convocation', value: CONVOCATION },
+        { label: 'Rappel', value: REMINDER },
+      ],
       message: '',
       loading: false,
       courseLoading: false,
@@ -168,7 +171,6 @@ export default {
   },
   async created () {
     await Promise.all([this.refreshCourse(), this.refreshSms()]);
-    this.setMessageTypeOptions();
     this.setDefaultMessageType();
   },
   validations () {
@@ -192,7 +194,7 @@ export default {
     },
     followUpMissingInfo () {
       const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('le formateur');
+      if (!this.course.trainer) missingInfo.push('l\'intervenant');
       if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
       if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
       if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
@@ -221,17 +223,17 @@ export default {
       else if (!this.$v.course.contact.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
       return '';
     },
+    filteredMessageTypeOptions () {
+      return this.courseNotStartedYet
+        ? this.messageTypeOptions
+        : this.messageTypeOptions.filter(t => t.value === REMINDER);
+    },
   },
   methods: {
     get,
     getType (value) {
       const type = this.messageTypeOptions.find(type => type.value === value);
       return type ? type.label : '';
-    },
-    setMessageTypeOptions () {
-      this.messageTypeOptions = [];
-      if (this.courseNotStartedYet) this.messageTypeOptions.push({ label: 'Convocation', value: CONVOCATION });
-      this.messageTypeOptions.push({ label: 'Rappel', value: REMINDER });
     },
     setDefaultMessageType () {
       this.messageType = this.courseNotStartedYet ? CONVOCATION : REMINDER;
