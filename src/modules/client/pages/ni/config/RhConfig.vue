@@ -195,8 +195,7 @@
         :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
-          :disable="!$v.newAdministrativeDocument.$anyDirty || $v.newAdministrativeDocument.$invalid" :loading="loading"
-          @click="createNewAdministrativeDocument" />
+          :loading="loading" @click="createNewAdministrativeDocument" />
       </template>
     </ni-modal>
 
