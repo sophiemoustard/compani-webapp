@@ -365,10 +365,9 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await Establishments.update(
-          this.editedEstablishment._id,
-          pick(this.editedEstablishment, Object.keys(this.editedEstablishment))
-        );
+        const fileds = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
+        await Establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, fileds));
+
         NotifyPositive('Établissement modifié.');
         this.establishmentEditionModal = false;
         await this.getEstablishments();

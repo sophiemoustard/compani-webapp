@@ -1,4 +1,4 @@
-`<template>
+<template>
   <q-page padding :class="backgroundClass">
     <ni-profile-header :title="courseName">
       <template v-slot:body>

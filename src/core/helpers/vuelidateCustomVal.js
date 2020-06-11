@@ -1,7 +1,6 @@
 const ibantools = require('ibantools');
 const axios = require('axios');
 const moment = require('moment');
-import sectors from '@api/Sectors';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 
@@ -43,14 +42,6 @@ export const frAddress = async (value) => {
   });
   return new Promise(resolve => {
     resolve(res.data.features.length === 1 && res.data.features[0].properties.score > 0.9);
-  });
-};
-
-export const sector = async (value) => {
-  if (!value) return true;
-  const res = await sectors.list({ name: value });
-  return new Promise(resolve => {
-    resolve(res.length === 0);
   });
 };
 
