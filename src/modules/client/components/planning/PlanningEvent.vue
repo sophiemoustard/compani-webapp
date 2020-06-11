@@ -15,7 +15,7 @@
     @click.stop="editEvent(event)" >
     <div class="event-container">
       <div class="event-title">
-        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+        <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">
           {{ eventTitle(event) }}
         </p>
         <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
@@ -25,7 +25,7 @@
         <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">{{
           event.internalHour.name }}</p>
       </div>
-      <p class="no-margin event-subtitle overflow-hidden-nowrap">{{ getEventHours(event) }}</p>
+      <p class="no-margin event-subtitle overflow-hidden-nowrap" data-cy="event-hours">{{ getEventHours(event) }}</p>
       <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
     </div>
   </div>
