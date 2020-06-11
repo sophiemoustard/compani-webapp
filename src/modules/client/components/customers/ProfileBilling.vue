@@ -90,7 +90,6 @@ import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import snakeCase from 'lodash/snakeCase';
-import { required } from 'vuelidate/lib/validators';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import TaxCertificates from '@api/TaxCertificates';
@@ -101,7 +100,6 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { validYear } from '@helpers/vuelidateCustomVal';
 import { formatIdentity } from '@helpers/utils';
 import {
   CREDIT_NOTE,
@@ -235,23 +233,6 @@ export default {
     this.setBillingDates();
     await this.refresh();
     await this.getTaxCertificates();
-  },
-  validations: {
-    editedPayment: {
-      netInclTaxes: { required },
-      type: { required },
-      date: { required },
-    },
-    newPayment: {
-      netInclTaxes: { required },
-      type: { required },
-      date: { required },
-    },
-    taxCertificate: {
-      date: { required },
-      year: { required, validYear },
-      file: { required, maxSize: file => !!file && file.size < 5000000 },
-    },
   },
   methods: {
     // Billing dates

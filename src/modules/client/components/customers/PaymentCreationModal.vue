@@ -17,7 +17,7 @@
       :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary" :loading="loading"
-        @click="createPayment" :disable="validations.$error || disableCreationButton" />
+        @click="createPayment" />
     </template>
   </ni-modal>
 </template>
