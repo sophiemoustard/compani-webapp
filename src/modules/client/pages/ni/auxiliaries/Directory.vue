@@ -329,6 +329,7 @@ export default {
         const value = get(user, path)
         if (value) set(this.newUser, path, value);
       });
+      this.newUser.company = this.company._id;
     },
     async nextStep () {
       try {
@@ -341,16 +342,17 @@ export default {
         const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
 
         if (userExistsInfo.exists) {
+          const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
           const userHasValidCompany =
             !get(userExistsInfo, 'user.company') ||
              get(userExistsInfo, 'user.company') === this.company._id;
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
-          if (userHasValidCompany && !userHasClientRole) {
+          if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
             this.userFetchedCreationModal = await Users.getById(userExistsInfo.user._id)
             this.fillNewUser(this.userFetchedCreationModal);
           } else {
-            if (!userHasValidCompany) NotifyNegative('Email relié à une autre structure.');
+            if (!userHasValidCompany || !hasPermissionOnUserInfo) NotifyNegative('Email relié à une autre structure.');
             else if (userHasClientRole) NotifyNegative('Email déjà existant.');
             throw new Error();
           }
