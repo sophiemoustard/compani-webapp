@@ -35,7 +35,7 @@
         required-field @input="getEvents" @blur="$v.newCreditNote.customer.$touch"
         :error="$v.newCreditNote.customer.$error" use-input clearable />
       <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer"
-        :options="thirdPartyPayerOptions" required-field @input="getEvents"
+        :options="thirdPartyPayerOptions" @input="getEvents"
         :disable="thirdPartyPayerOptions.length === 0" clearable />
       <ni-date-input caption="Date de l'avoir" v-model="newCreditNote.date" :error="$v.newCreditNote.date.$error"
         @blur="$v.newCreditNote.date.$touch" in-modal type="date" required-field />
@@ -86,7 +86,7 @@
       </template>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
-          :loading="loading" @click="createNewCreditNote" :disable="$v.newCreditNote.$error || disableCreationButton" />
+          :loading="loading" @click="createNewCreditNote" />
       </template>
     </ni-modal>
 
@@ -147,7 +147,7 @@
       </template>
       <template v-if="editedCreditNote.isEditable" slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
-          :loading="loading" @click="updateCreditNote" :disable="$v.editedCreditNote.$error || disableEditionButton" />
+          :loading="loading" @click="updateCreditNote" />
       </template>
     </ni-modal>
   </q-page>
@@ -169,7 +169,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { positiveNumber } from '@helpers/vuelidateCustomVal.js';
+import { strictPositiveNumber } from '@helpers/vuelidateCustomVal.js';
 import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils.js';
 import { COMPANI } from '@data/constants';
 
@@ -325,50 +325,34 @@ export default {
     this.tableLoading = false;
   },
   validations () {
-    return {
-      newCreditNote: {
-        date: { required },
-        customer: { required },
-        startDate: {
-          required: requiredIf(() => this.hasLinkedEvents),
-        },
-        endDate: {
-          required: requiredIf(() => this.hasLinkedEvents),
-        },
-        subscription: {
-          required: requiredIf(() => !this.hasLinkedEvents),
-        },
-        inclTaxesCustomer: {
-          positiveNumber,
-          required: requiredIf(() => !this.thirdPartyPayer),
-        },
-        inclTaxesTpp: {
-          positiveNumber,
-          required: requiredIf(() => this.thirdPartyPayer),
-        },
+    const creditNoteValidation = {
+      date: { required },
+      customer: { required },
+      startDate: {
+        required: requiredIf(() => this.hasLinkedEvents),
       },
-      editedCreditNote: {
-        date: { required },
-        customer: { required },
-        startDate: {
-          required: requiredIf(() => this.hasLinkedEvents),
-        },
-        endDate: {
-          required: requiredIf(() => this.hasLinkedEvents),
-        },
-        subscription: {
-          required: requiredIf(() => !this.hasLinkedEvents),
-        },
-        inclTaxesCustomer: {
-          required: requiredIf(() => !this.thirdPartyPayer),
-          positiveNumber,
-        },
-        inclTaxesTpp: {
-          positiveNumber,
-          required: requiredIf(() => this.thirdPartyPayer),
-        },
+      endDate: {
+        required: requiredIf(() => this.hasLinkedEvents),
       },
+      subscription: {
+        required: requiredIf(() => !this.hasLinkedEvents),
+      },
+      inclTaxesTpp: {},
+      inclTaxesCustomer: {},
     }
+
+    const inclTaxesValidation = { required, strictPositiveNumber };
+    const newCreditNoteValidation = this.newCreditNote.thirdPartyPayer
+      ? { inclTaxesTpp: inclTaxesValidation }
+      : { inclTaxesCustomer: inclTaxesValidation };
+    const editedCreditNoteValidation = this.editedCreditNote.thirdPartyPayer
+      ? { inclTaxesTpp: inclTaxesValidation }
+      : { inclTaxesCustomer: inclTaxesValidation };
+
+    return {
+      newCreditNote: { ...creditNoteValidation, ...newCreditNoteValidation },
+      editedCreditNote: { ...creditNoteValidation, ...editedCreditNoteValidation },
+    };
   },
   computed: {
     subscriptionsOptions () {
@@ -404,18 +388,6 @@ export default {
         label: tpp.name,
         value: tpp._id,
       }));
-    },
-    disableCreationButton () {
-      return !(this.newCreditNote.customer && this.newCreditNote.date &&
-      ((this.newCreditNote.events && this.newCreditNote.events.length > 0) ||
-      (this.newCreditNote.subscription &&
-        ((this.newCreditNote.thirdPartyPayer && this.newCreditNote.inclTaxesTpp) || this.newCreditNote.inclTaxesCustomer))));
-    },
-    disableEditionButton () {
-      return !(this.editedCreditNote.customer && this.editedCreditNote.date && this.editedCreditNote.isEditable &&
-      ((this.editedCreditNote.events && this.editedCreditNote.events.length > 0) ||
-      (this.editedCreditNote.subscription &&
-        ((this.editedCreditNote.thirdPartyPayer && this.editedCreditNote.inclTaxesTpp) || this.editedCreditNote.inclTaxesCustomer))));
     },
     inclTaxesError () {
       return 'Montant TTC non valide';
@@ -617,8 +589,10 @@ export default {
     async createNewCreditNote () {
       try {
         this.$v.newCreditNote.$touch();
-        if (this.$v.newCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        if (this.$v.newCreditNote.$error || (this.hasLinkedEvents && !this.newCreditNote.events.length)) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
         this.loading = true;
         await CreditNotes.create(this.formatPayload(this.newCreditNote));
 
