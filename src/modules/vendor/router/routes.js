@@ -19,7 +19,7 @@ const routes = [
         if (!loggedUser) return next({ path: '/login' });
 
         const userVendorRole = store.getters['main/vendorRole'];
-        if (!userVendorRole) return next({ name: '404' });
+        if (!userVendorRole) return next({ path: '/' });
 
         if (userVendorRole === TRAINER) return next({ name: 'trainers courses' });
         return next({ name: 'ni management courses' });
