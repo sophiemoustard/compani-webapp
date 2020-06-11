@@ -28,7 +28,9 @@ export const paymentMixin = {
         date: { required },
       },
       editedPayment: {
-        netInclTaxes: { required },
+        customer: { required },
+        nature: { required },
+        netInclTaxes: { required, strictPositiveNumber },
         type: { required },
         date: { required },
       },
