@@ -75,11 +75,10 @@
       <ni-select caption="Année" v-model="taxCertificate.year" :options="yearOptions"
         @blur="$v.taxCertificate.year.$touch" :error="$v.taxCertificate.year.$error" in-modal required-field />
       <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="$v.taxCertificate.file.$error"
-        @blur="$v.taxCertificate.file.$touch" in-modal required-field last />
+        @blur="$v.taxCertificate.file.$touch" in-modal required-field last :error-label="taxCertificateFileError" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
-          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading"
-          @click="createTaxCertificate" />
+          :loading="modalLoading" @click="createTaxCertificate" />
       </template>
     </ni-modal>
   </div>
