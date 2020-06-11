@@ -1,4 +1,4 @@
-describe('Auxiliary planning', () => {
+describe('Auxiliary planning - display', () => {
   beforeEach(() => {
     cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
     cy.login({ email: 'auxiliary@alenvi.io', password: '123456!eR' });
@@ -27,5 +27,52 @@ describe('Auxiliary planning', () => {
     cy.get('[data-cy=planning-search]').eq(1).click();
     cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 2{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 2);
+  });
+});
+
+describe('Auxiliary planning - actions', () => {
+  beforeEach(() => {
+    cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
+    cy.login({ email: 'planning-referent@alenvi.io', password: '123456!eR' });
+    cy.visit('/ni/planning/auxiliaries').as('page');
+  });
+
+  it('should create event', () => {
+    cy.get('#q-app').click(500, 500);
+    cy.get('[data-cy=planning-search]').eq(1).click();
+    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 1{downarrow}{enter}');
+    cy.get('[data-cy=planning-event]').should('have.length', 1);
+
+    cy.get('[data-cy=planning-cell]').eq(1).click();
+    cy.get('[data-cy=event-creation-customer]').eq(0).type('Romain{downarrow}{enter}');
+    cy.get('[data-cy=event-creation-button]').click();
+    cy.get('[data-cy=planning-event]').should('have.length', 2);
+  });
+
+  it('should update event', () => {
+    cy.get('#q-app').click(500, 500);
+    cy.get('[data-cy=planning-search]').eq(1).click();
+    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 1{downarrow}{enter}');
+    cy.get('[data-cy=planning-event]').should('have.length', 1);
+    cy.get('[data-cy=planning-event]').click();
+
+    cy.get('[data-cy=time-input]').eq(0).clear().type('15:00');
+    cy.get('[data-cy=time-input]').eq(1).clear().type('17:15');
+    cy.get('[data-cy=event-edition-button]').click();
+
+    cy.get('[data-cy=event-hours]').eq(0).should('contain', '15:00 - 17:15');
+  });
+
+  it('should delete event', () => {
+    cy.get('#q-app').click(500, 500);
+    cy.get('[data-cy=planning-search]').eq(1).click();
+    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 1{downarrow}{enter}');
+    cy.get('[data-cy=planning-event]').should('have.length', 1);
+
+    cy.get('[data-cy=planning-event]').click();
+    cy.get('[data-cy=event-deletion-button]').click();
+    cy.get('.q-dialog-plugin > .q-card__actions > .q-btn').eq(1).click();
+
+    cy.get('[data-cy=planning-event]').should('have.length', 0);
   });
 });

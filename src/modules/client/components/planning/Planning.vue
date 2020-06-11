@@ -68,7 +68,8 @@
                   :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background"
+                data-cy="planning-cell">
                 <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
                   :style="{ left: `${(hourIndex * hourWidth * 2)}%` }" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"

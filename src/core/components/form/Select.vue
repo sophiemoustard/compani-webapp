@@ -8,7 +8,7 @@
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
       :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorLabel" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" data-cy="select">
+      :option-disable="optionDisable" :data-cy="dataCy">
       <template v-if="value && !disable" v-slot:append>
         <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
       </template>
@@ -39,6 +39,7 @@ export default {
     noError: { type: Boolean, default: false },
     bgColor: { type: String, default: 'white' },
     optionDisable: { type: String, default: 'disable' },
+    dataCy: { type: String, default: '' },
   },
   data () {
     return {
