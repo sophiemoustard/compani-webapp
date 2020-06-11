@@ -36,7 +36,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Taux horaire brut par défaut"
             :error="$v.company.rhConfig.contractWithCompany.grossHourlyRate.$error"
-            :error-label="nbrError('contractWithCompany.grossHourlyRate')" type="number"
+            :error-label="nbrError('company.rhConfig.contractWithCompany.grossHourlyRate')" type="number"
             v-model="company.rhConfig.contractWithCompany.grossHourlyRate"
             @focus="saveTmp('rhConfig.contractWithCompany.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.contractWithCompany.grossHourlyRate')" />
@@ -47,7 +47,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Taux horaire brut par défaut"
             :error="$v.company.rhConfig.contractWithCustomer.grossHourlyRate.$error"
-            :error-label="nbrError('contractWithCustomer.grossHourlyRate')" type="number"
+            :error-label="nbrError('company.rhConfig.contractWithCustomer.grossHourlyRate')" type="number"
             v-model="company.rhConfig.contractWithCustomer.grossHourlyRate"
             @focus="saveTmp('rhConfig.contractWithCustomer.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.contractWithCustomer.grossHourlyRate')" />
@@ -57,7 +57,7 @@
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
-            :error-label="nbrError('feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
+            :error-label="nbrError('company.rhConfig.feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
             @focus="saveTmp('rhConfig.feeAmount')" suffix="€" @blur="updateCompany('rhConfig.feeAmount')" />
         </div>
       </div>
@@ -65,7 +65,7 @@
         <p class="text-weight-bold">Taux kilométrique</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error"
-            :error-label="nbrError('amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
+            :error-label="nbrError('company.rhConfig.amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
             @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
       </div>
@@ -77,6 +77,7 @@
               <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
                 type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
                 @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
+                :error-label="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
                 @blur="updateCompanyTransportSubs(index)" />
             </template>
           </template>
@@ -231,12 +232,12 @@
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
-import { required, maxValue } from 'vuelidate/lib/validators';
+import { required, numeric, maxValue } from 'vuelidate/lib/validators';
 import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
 import InternalHours from '@api/InternalHours';
-import { posDecimals } from '@helpers/vuelidateCustomVal';
+import { positiveFloat } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader.vue';
@@ -303,11 +304,11 @@ export default {
     return {
       company: {
         rhConfig: {
-          contractWithCompany: { grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) } },
-          contractWithCustomer: { grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) } },
-          feeAmount: { required, posDecimals, maxValue: maxValue(999) },
-          amountPerKm: { required, posDecimals, maxValue: maxValue(999) },
-          transportSubs: { $each: { price: { required, posDecimals, maxValue: maxValue(999) } } },
+          contractWithCompany: { grossHourlyRate: { required, positiveFloat, numeric, maxValue: maxValue(999) } },
+          contractWithCustomer: { grossHourlyRate: { required, positiveFloat, numeric, maxValue: maxValue(999) } },
+          feeAmount: { required, positiveFloat, numeric, maxValue: maxValue(999) },
+          amountPerKm: { required, positiveFloat, numeric, maxValue: maxValue(999) },
+          transportSubs: { $each: { price: { required, positiveFloat, numeric, maxValue: maxValue(999) } } },
         },
       },
       newInternalHour: { name: { required } },
@@ -346,10 +347,6 @@ export default {
       } finally {
         this.tmpInput = '';
       }
-    },
-    nbrError (path) {
-      if (!get(this.$v.company.rhConfig, path).required) return REQUIRED_LABEL;
-      else if (!get(this.$v.company.rhConfig, path).numeric) return 'Nombre non valide';
     },
     async refreshCompany () {
       await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);

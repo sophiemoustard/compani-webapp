@@ -126,18 +126,23 @@
       <ni-input in-modal caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error"
         @blur="$v.newSurcharge.name.$touch" required-field />
       <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
-        :error="$v.newSurcharge.saturday.$error" @blur="$v.newSurcharge.saturday.$touch" />
+        :error="$v.newSurcharge.saturday.$error" @blur="$v.newSurcharge.saturday.$touch"
+        :error-label="nbrError('newSurcharge.saturday')" />
       <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
-        :error="$v.newSurcharge.sunday.$error" @blur="$v.newSurcharge.sunday.$touch" />
+        :error="$v.newSurcharge.sunday.$error" @blur="$v.newSurcharge.sunday.$touch"
+        :error-label="nbrError('newSurcharge.sunday')" />
       <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
-        :error="$v.newSurcharge.publicHoliday.$error" @blur="$v.newSurcharge.publicHoliday.$touch" />
+        :error="$v.newSurcharge.publicHoliday.$error" @blur="$v.newSurcharge.publicHoliday.$touch"
+        :error-label="nbrError('newSurcharge.publicHoliday')" />
       <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number"
-        v-model="newSurcharge.twentyFifthOfDecember" :error="$v.newSurcharge.twentyFifthOfDecember.$error"
-        @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" />
+        v-model="newSurcharge.twentyFifthOfDecember" :error-label="nbrError('newSurcharge.twentyFifthOfDecember')"
+        @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" :error="$v.newSurcharge.twentyFifthOfDecember.$error" />
       <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
-        :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch" />
+        :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch"
+        :error-label="nbrError('newSurcharge.firstOfMay')" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
-        :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch" />
+        :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch"
+        :error-label="nbrError('newSurcharge.evening')" />
       <ni-time-input in-modal v-model="newSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch"
         :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-label="Heure invalide" />
@@ -166,19 +171,23 @@
       <ni-input in-modal caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error"
         @blur="$v.editedSurcharge.name.$touch" required-field />
       <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
-        :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch" />
+        :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch"
+        :error-label="nbrError('editedSurcharge.saturday')" />
       <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
-        :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch" />
+        :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch"
+        :error-label="nbrError('editedSurcharge.sunday')" />
       <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number"
         v-model="editedSurcharge.publicHoliday" :error="$v.editedSurcharge.publicHoliday.$error"
-        @blur="$v.editedSurcharge.publicHoliday.$touch" />
-      <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number"
-        v-model="editedSurcharge.twentyFifthOfDecember" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
-        @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch" />
+        @blur="$v.editedSurcharge.publicHoliday.$touch" :error-label="nbrError('editedSurcharge.publicHoliday')" />
+      <ni-input in-modal caption="Majoration 25 décembre" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
+        v-model="editedSurcharge.twentyFifthOfDecember" :error-label="nbrError('editedSurcharge.twentyFifthOfDecember')"
+        @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch" suffix="%" type="number" />
       <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
-        :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch" />
+        :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch"
+        :error-label="nbrError('editedSurcharge.firstOfMay')" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
-        :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch" />
+        :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch"
+        :error-label="nbrError('editedSurcharge.evening')" firstOfMay />
       <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
         :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-label="Heure invalide" />
@@ -211,8 +220,8 @@
       <ni-select in-modal caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error"
         @blur="$v.newService.nature.$touch" :options="natureOptions" required-field />
       <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
-        v-model="newService.defaultUnitAmount" :error="$v.newService.defaultUnitAmount.$error"
-        @blur="$v.newService.defaultUnitAmount.$touch" required-field />
+        v-model="newService.defaultUnitAmount" :error="$v.newService.defaultUnitAmount.$error" required-field
+        @blur="$v.newService.defaultUnitAmount.$touch" :error-label="nbrError('newService.defaultUnitAmount')" />
       <ni-input in-modal caption="TVA" suffix="%" v-model="newService.vat" type="number"
         :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
         error-label="La TVA doit être positive ou nulle" />
@@ -237,8 +246,8 @@
       <ni-date-input caption="Date d'effet" v-model="editedService.startDate" :error="$v.editedService.startDate.$error"
         @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
       <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
-        v-model="editedService.defaultUnitAmount" :error="$v.editedService.defaultUnitAmount.$error"
-        @blur="$v.editedService.defaultUnitAmount.$touch" required-field />
+        v-model="editedService.defaultUnitAmount" :error="$v.editedService.defaultUnitAmount.$error" required-field
+        @blur="$v.editedService.defaultUnitAmount.$touch" :error-label="nbrError('editedService.defaultUnitAmount')" />
       <ni-input in-modal caption="TVA" suffix="%" v-model="editedService.vat" type="number"
         :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
         error-label="La TVA doit être positive ou nulle" />
@@ -274,7 +283,7 @@
       <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
         v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
-        error-label="Le prix unitaire doit être positif" />
+        :error-label="nbrError('newThirdPartyPayer.unitTTCRate')" />
       <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
         :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
         @blur="$v.newThirdPartyPayer.billingMode.$touch" />
@@ -299,7 +308,7 @@
       <ni-input in-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
         v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
-        error-label="Le prix unitaire doit être positif" />
+        :error-label="nbrError('editedThirdPartyPayer.unitTTCRate')" />
       <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
         caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
         @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
@@ -333,7 +342,7 @@ import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress.vue';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
-import { frAddress, posDecimals, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { frAddress, positiveFloat, positiveNumber } from '@helpers/vuelidateCustomVal';
 import {
   BILLING_DIRECT,
   BILLING_INDIRECT,
@@ -652,12 +661,12 @@ export default {
   validations: {
     newSurcharge: {
       name: { required },
-      saturday: { numeric },
-      sunday: { numeric },
-      publicHoliday: { numeric },
-      twentyFifthOfDecember: { numeric },
-      firstOfMay: { numeric },
-      evening: { numeric },
+      saturday: { numeric, positiveFloat },
+      sunday: { numeric, positiveFloat },
+      publicHoliday: { numeric, positiveFloat },
+      twentyFifthOfDecember: { numeric, positiveFloat },
+      firstOfMay: { numeric, positiveFloat },
+      evening: { numeric, positiveFloat },
       eveningStartTime: { required: requiredIf((item) => item.evening) },
       eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
@@ -666,12 +675,12 @@ export default {
     },
     editedSurcharge: {
       name: { required },
-      saturday: { numeric },
-      sunday: { numeric },
-      publicHoliday: { numeric },
-      twentyFifthOfDecember: { numeric },
-      firstOfMay: { numeric },
-      evening: { numeric },
+      saturday: { numeric, positiveFloat },
+      sunday: { numeric, positiveFloat },
+      publicHoliday: { numeric, positiveFloat },
+      twentyFifthOfDecember: { numeric, positiveFloat },
+      firstOfMay: { numeric, positiveFloat },
+      evening: { numeric, positiveFloat },
       eveningStartTime: { required: requiredIf((item) => item.evening) },
       eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
@@ -682,13 +691,13 @@ export default {
       name: { required },
       type: { required },
       nature: { required },
-      defaultUnitAmount: { required },
+      defaultUnitAmount: { required, positiveFloat, numeric },
       vat: { positiveNumber },
     },
     editedService: {
       name: { required },
       startDate: { required },
-      defaultUnitAmount: { required },
+      defaultUnitAmount: { required, positiveFloat, numeric },
       vat: { positiveNumber },
     },
     company: {
@@ -705,7 +714,7 @@ export default {
         fullAddress: { frAddress },
       },
       billingMode: { required },
-      unitTTCRate: { posDecimals },
+      unitTTCRate: { positiveFloat, numeric },
       isApa: { required },
     },
     editedThirdPartyPayer: {
@@ -717,7 +726,7 @@ export default {
         fullAddress: { frAddress },
       },
       billingMode: { required },
-      unitTTCRate: { posDecimals },
+      unitTTCRate: { positiveFloat, numeric },
       isApa: { required },
     },
   },
@@ -1100,8 +1109,8 @@ export default {
     },
     async createNewThirdPartyPayer () {
       try {
-        this.$v.newThirdPartyPayer.$touch();
-        if (this.$v.newThirdPartyPayer.$anyError) return NotifyWarning('Champ(s) invalide(s)');
+        const formIsValid = await this.waitForFormValidation(this.$v.newThirdPartyPayer);
+        if (formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await ThirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
@@ -1121,8 +1130,8 @@ export default {
     },
     async updateThirdPartyPayer () {
       try {
-        this.$v.editedThirdPartyPayer.$touch();
-        if (this.$v.editedThirdPartyPayer.$anyError) return NotifyWarning('Champ(s) invalide(s)');
+        const formIsValid = await this.waitForFormValidation(this.$v.editedThirdPartyPayer);
+        if (formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;

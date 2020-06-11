@@ -28,8 +28,8 @@ export const bic = (value) => {
   return ibantools.isValidBIC(value);
 };
 
-export const posDecimals = (value) => {
-  return value ? parseFloat(value) >= 0 : false;
+export const positiveFloat = (value) => {
+  return value ? parseFloat(value) >= 0 : true;
 };
 
 export const frAddress = async (value) => {
