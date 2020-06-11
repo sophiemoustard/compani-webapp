@@ -381,7 +381,7 @@ export default {
 
         if (this.userFetchedCreationModal._id) {
           await Users.updateById(this.userFetchedCreationModal._id, payload);
-          editedUser = this.userFetchedCreationModal;
+          editedUser = { contact: { phone: get(payload, 'contact.phone') || '' }, ...this.userFetchedCreationModal };
         } else {
           editedUser = await Users.create(payload);
         }
