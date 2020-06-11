@@ -883,7 +883,7 @@ export default {
     openSurchargeEditionModal (id) {
       const selectedSurcharge = this.surcharges.find(surcharge => surcharge._id === id);
       const { eveningStartTime, eveningEndTime, customStartTime, customEndTime } = selectedSurcharge;
-      const pickedFileds = [
+      const pickedFields = [
         '_id',
         'name',
         'saturday',
@@ -895,7 +895,7 @@ export default {
         'custom',
       ];
       this.editedSurcharge = {
-        ...pick(selectedSurcharge, pickedFileds),
+        ...pick(selectedSurcharge, pickedFields),
         eveningStartTime: eveningStartTime ? this.$moment(eveningStartTime).format('HH:mm') : '',
         eveningEndTime: eveningEndTime ? this.$moment(eveningEndTime).format('HH:mm') : '',
         customStartTime: customStartTime ? this.$moment(customStartTime).format('HH:mm') : '',

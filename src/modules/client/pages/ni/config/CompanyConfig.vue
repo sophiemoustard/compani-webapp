@@ -365,8 +365,8 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const fileds = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
-        await Establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, fileds));
+        const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
+        await Establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, fields));
 
         NotifyPositive('Établissement modifié.');
         this.establishmentEditionModal = false;
