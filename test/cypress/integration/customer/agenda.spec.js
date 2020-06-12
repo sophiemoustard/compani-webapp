@@ -6,6 +6,7 @@ describe('customers agenda tests', () => {
   });
 
   it('should display correctly the agenda page', function () {
+    cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=customer-identity]').should('have.value', 'Romain BARDET');
 
     cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());

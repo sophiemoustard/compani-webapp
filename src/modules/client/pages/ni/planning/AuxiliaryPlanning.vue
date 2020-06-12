@@ -82,8 +82,6 @@ export default {
         this.getCustomers(),
       ]);
       this.initFilters();
-      // eslint-disable-next-line no-console
-      console.log('je passe dans mounted', this.filters)
       await this.setInternalHours();
     } catch (e) {
       console.error(e);

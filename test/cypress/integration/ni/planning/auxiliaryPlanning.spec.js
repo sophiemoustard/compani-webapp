@@ -2,7 +2,7 @@ describe('Auxiliary planning - display', () => {
   beforeEach(() => {
     cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
     cy.login({ email: 'auxiliary@alenvi.io', password: '123456!eR' });
-    cy.visit('/ni/planning/auxiliaries').as('page');
+    cy.visit('/ni/planning/auxiliaries');
   });
 
   it('should display correctly auxiliary planning', () => {
@@ -34,7 +34,7 @@ describe('Auxiliary planning - actions', () => {
   beforeEach(() => {
     cy.request(`${Cypress.env('API_HOSTNAME')}/end-to-end/seed/planning`);
     cy.login({ email: 'planning-referent@alenvi.io', password: '123456!eR' });
-    cy.visit('/ni/planning/auxiliaries').as('page');
+    cy.visit('/ni/planning/auxiliaries');
   });
 
   it('should create event', () => {
