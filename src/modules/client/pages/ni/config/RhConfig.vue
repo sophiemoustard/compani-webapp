@@ -206,7 +206,7 @@
         Ajouter une <span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
-        :error-label="sectorNameError($v.newSector)" @blur="$v.newSector.name.$touch" required-field />
+        @blur="$v.newSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
           :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
@@ -219,7 +219,7 @@
         Editer l'<span class="text-weight-bold">équipe</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
-        :error-label="sectorNameError($v.editedSector)" required-field />
+        @blur="$v.editedSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
           :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
@@ -237,7 +237,7 @@ import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
 import InternalHours from '@api/InternalHours';
-import { posDecimals, sector } from '@helpers/vuelidateCustomVal';
+import { posDecimals } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader.vue';
@@ -316,8 +316,8 @@ export default {
       },
       newInternalHour: { name: { required } },
       newAdministrativeDocument: { name: { required }, file: { required } },
-      newSector: { name: { required, sector } },
-      editedSector: { name: { required, sector } },
+      newSector: { name: { required } },
+      editedSector: { name: { required } },
     }
   },
   async mounted () {
@@ -462,6 +462,7 @@ export default {
         await this.getSectors();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative("Erreur lors de la création de l'équipe.");
       } finally {
         this.loading = false;
@@ -490,6 +491,7 @@ export default {
         await this.getSectors();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative("Erreur lors de la modification de l'équipe.");
       } finally {
         this.loading = false;
@@ -520,10 +522,6 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteSector(sector))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    sectorNameError (obj) {
-      if (!obj.name.required) return REQUIRED_LABEL;
-      else if (!obj.name.sector) return 'Nom déjà existant';
     },
     // Administrative document
     getAdministrativeDocumentLink (doc) {
