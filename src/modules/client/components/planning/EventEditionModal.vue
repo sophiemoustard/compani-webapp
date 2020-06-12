@@ -51,11 +51,10 @@
             :disable-end-date="isHourlyAbsence(editedEvent)" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(editedEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" />
-          <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence"
+          <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence" required-field
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" required-field in-modal
-            :error="validations.attachment.link.$error || validations.attachment.driveId.$error"
-            @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+            @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id"
+            :error="validations.attachment.$error" @delete="deleteDocument(editedEvent.attachment.driveId)" in-modal />
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
