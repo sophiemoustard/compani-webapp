@@ -2,7 +2,8 @@
   <div :class="[{ 'planning': !drawer }]">
     <div class="row items-center planning-header" ref="planningHeader">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters"
+          data-cy="planning-search" />
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
@@ -58,7 +59,8 @@
                   :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
               </td>
             </tr>
-            <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
+            <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id"
+              data-cy="planning-row">
               <td valign="top">
                 <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)"
                   :staffing-view="staffingView" :startOfWeek="startOfWeek" />
@@ -66,12 +68,13 @@
                   :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background"
+                data-cy="planning-cell">
                 <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
                   :style="{ left: `${(hourIndex * hourWidth * 2)}%` }" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" data-cy="planning-event" />
               </td>
             </tr>
           </template>

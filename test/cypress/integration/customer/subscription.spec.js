@@ -8,6 +8,7 @@ describe('customers subscription tests', () => {
   });
 
   it('should display correctly the subscriptions part of the page', function () {
+    cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=subscriptions-table]').within(() => {
       cy.get('th').should('have.length', 6).and(($th) => {
         expect($th.eq(0)).to.have.text('Service');

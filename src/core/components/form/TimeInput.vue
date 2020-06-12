@@ -6,7 +6,8 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
-     :error-message="showErrorLabel" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time">
+      :error-message="showErrorLabel" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time"
+      data-cy="time-input">
       <template v-slot:append>
         <q-icon name="far fa-clock" class="cursor-pointer icon-clock" @click.native="selectTime = !selectTime">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
