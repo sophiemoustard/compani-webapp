@@ -114,7 +114,7 @@ export default {
       loading: false,
       auxiliaryCreationModal: false,
       firstStep: true,
-      userFetchedCreationModal: {},
+      fetchedUser: {},
       sendWelcomeMsg: true,
       civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
@@ -288,9 +288,9 @@ export default {
       this.$v.newUser.$reset();
       this.newUser = cloneDeep(this.defaultNewUser);
       this.firstStep = true;
-      this.userFetchedCreationModal = {};
+      this.fetchedUser = {};
     },
-    async formatUserSubmitPayload () {
+    async formatUserPayload () {
       const roles = await Roles.list({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
 
@@ -334,9 +334,7 @@ export default {
     async nextStep () {
       try {
         this.$v.newUser.$touch();
-        if (this.$v.newUser.local.email.$error) {
-          return NotifyWarning('Champ(s) invalide(s).');
-        }
+        if (this.$v.newUser.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         this.loading = true;
         const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
@@ -349,12 +347,12 @@ export default {
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
           if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
-            this.userFetchedCreationModal = await Users.getById(userExistsInfo.user._id)
-            this.fillNewUser(this.userFetchedCreationModal);
+            this.fetchedUser = await Users.getById(userExistsInfo.user._id)
+            this.fillNewUser(this.fetchedUser);
           } else {
-            if (!userHasValidCompany || !hasPermissionOnUserInfo) NotifyNegative('Email relié à une autre structure.');
-            else if (userHasClientRole) NotifyNegative('Email déjà existant.');
-            throw new Error();
+            const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
+            if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
+            else if (userHasClientRole) return NotifyNegative('Email déjà existant.');
           }
         }
 
@@ -375,13 +373,13 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const folderId = get(this.company, 'auxiliariesFolderId', null);
-        if (!folderId) throw new Error('No auxiliary folder in company drive');
+        if (!folderId) return NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
 
-        const payload = await this.formatUserSubmitPayload();
+        const payload = await this.formatUserPayload();
 
-        if (this.userFetchedCreationModal._id) {
-          await Users.updateById(this.userFetchedCreationModal._id, payload);
-          editedUser = { contact: { phone: get(payload, 'contact.phone') || '' }, ...this.userFetchedCreationModal };
+        if (this.fetchedUser._id) {
+          await Users.updateById(this.fetchedUser._id, payload);
+          editedUser = { contact: { phone: get(payload, 'contact.phone') || '' }, ...this.fetchedUser };
         } else {
           editedUser = await Users.create(payload);
         }
