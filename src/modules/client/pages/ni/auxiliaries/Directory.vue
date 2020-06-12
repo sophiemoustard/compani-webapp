@@ -329,7 +329,7 @@ export default {
         const value = get(user, path)
         if (value) set(this.newUser, path, value);
       });
-      this.newUser.company = this.company._id;
+      if (!user.company) this.newUser.company = this.company._id;
     },
     async nextStep () {
       try {
@@ -367,6 +367,7 @@ export default {
       }
     },
     async submit () {
+      let editedUser = {};
       try {
         this.loading = true;
         this.$v.newUser.$touch();
@@ -377,7 +378,6 @@ export default {
         if (!folderId) throw new Error('No auxiliary folder in company drive');
 
         const payload = await this.formatUserSubmitPayload();
-        let editedUser = {};
 
         if (this.userFetchedCreationModal._id) {
           await Users.updateById(this.userFetchedCreationModal._id, payload);
@@ -386,7 +386,6 @@ export default {
           editedUser = await Users.create(payload);
         }
         await Users.createDriveFolder(editedUser._id, { parentFolderId: folderId });
-        if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
 
@@ -397,6 +396,13 @@ export default {
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
       } finally {
         this.loading = false;
+      }
+      try {
+        if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
+        NotifyNegative('Erreur lors de l\'envoi de SMS');
       }
     },
     getAvatar (link) {
