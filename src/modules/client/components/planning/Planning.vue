@@ -26,6 +26,7 @@
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+              <div v-if="isHoliday(day.moment)" class="holiday">Jour férié</div>
             </div>
             <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
@@ -184,6 +185,9 @@ export default {
     },
   },
   methods: {
+    isHoliday (day) {
+      return this.$moment(day).startOf('day').isHoliday();
+    },
     hideDeleteEventsModal () {
       this.deleteEventsModal = false;
       this.$emit('refresh');
@@ -321,7 +325,7 @@ export default {
       height: 75px;
       z-index: 0;
     .planning-background
-      position: relative;
+      height: 10px;
       margin-top: 2px;
       .line
         width: 1px;
@@ -344,4 +348,12 @@ export default {
   .q-page-sticky
     z-index: 20;
 
+  .holiday
+    background: $primary;
+    color: $white;
+    font-size: 12px;
+    margin: 5px 5px 5px 5px;
+    width: 100%;
+thead
+  vertical-align: baseline;
 </style>
