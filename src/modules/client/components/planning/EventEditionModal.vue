@@ -54,6 +54,7 @@
           <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence"
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additionalValue="additionalValue" required-field in-modal
+            :error="validations.attachment.link.$error || validations.attachment.driveId.$error"
             @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"

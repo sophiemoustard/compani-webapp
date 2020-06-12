@@ -52,7 +52,7 @@
           :disable="!hasLinkedEvents" @input="getEvents" required-field />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-            type="checkbox" required-field inline :error="noEventSelectedForNewCreditNote" />
+            type="checkbox" required-field inline :error="$v.newCreditNote.events.$error" />
         </template>
         <div v-if="newCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
@@ -114,7 +114,7 @@
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
-            :error="noEventSelectedForEditedCreditNote"/>
+            :error="$v.editedCreditNote.events.$error" />
         </template>
         <div v-if="editedCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
@@ -329,15 +329,10 @@ export default {
     const creditNoteValidation = {
       date: { required },
       customer: { required },
-      startDate: {
-        required: requiredIf(() => this.hasLinkedEvents),
-      },
-      endDate: {
-        required: requiredIf(() => this.hasLinkedEvents),
-      },
-      subscription: {
-        required: requiredIf(() => !this.hasLinkedEvents),
-      },
+      startDate: { required: requiredIf(() => this.hasLinkedEvents) },
+      endDate: { required: requiredIf(() => this.hasLinkedEvents) },
+      events: { required: requiredIf(() => this.hasLinkedEvents) },
+      subscription: { required: requiredIf(() => !this.hasLinkedEvents) },
       inclTaxesTpp: {},
       inclTaxesCustomer: {},
     }
@@ -396,14 +391,8 @@ export default {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate && !this.creditNoteEvents.length;
     },
-    noEventSelectedForNewCreditNote () {
-      return this.hasLinkedEvents && !this.newCreditNote.events.length;
-    },
     editedCreditNoteHasNoEvents () {
       return this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate && !this.creditNoteEvents.length;
-    },
-    noEventSelectedForEditedCreditNote () {
-      return this.hasLinkedEvents && !this.editedCreditNote.events.length;
     },
   },
   methods: {
