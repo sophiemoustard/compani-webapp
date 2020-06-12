@@ -232,18 +232,17 @@
 import get from 'lodash/get';
 import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
-import { required, numeric, maxValue } from 'vuelidate/lib/validators';
+import { required, maxValue } from 'vuelidate/lib/validators';
 import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
 import InternalHours from '@api/InternalHours';
-import { positiveFloat } from '@helpers/vuelidateCustomVal';
+import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader.vue';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { REQUIRED_LABEL } from '@data/constants';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -304,11 +303,11 @@ export default {
     return {
       company: {
         rhConfig: {
-          contractWithCompany: { grossHourlyRate: { required, positiveFloat, numeric, maxValue: maxValue(999) } },
-          contractWithCustomer: { grossHourlyRate: { required, positiveFloat, numeric, maxValue: maxValue(999) } },
-          feeAmount: { required, positiveFloat, numeric, maxValue: maxValue(999) },
-          amountPerKm: { required, positiveFloat, numeric, maxValue: maxValue(999) },
-          transportSubs: { $each: { price: { required, positiveFloat, numeric, maxValue: maxValue(999) } } },
+          contractWithCompany: { grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) } },
+          contractWithCustomer: { grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) } },
+          feeAmount: { required, positiveNumber, maxValue: maxValue(999) },
+          amountPerKm: { required, positiveNumber, maxValue: maxValue(999) },
+          transportSubs: { $each: { price: { required, positiveNumber, maxValue: maxValue(999) } } },
         },
       },
       newInternalHour: { name: { required } },

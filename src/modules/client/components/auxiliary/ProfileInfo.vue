@@ -217,7 +217,7 @@
               color="secondary" />
           </div>
           <q-field dense :error="$v.mergedUserProfile.administrative.mutualFund.has.$error"
-            :error-label="requiredLabel">
+            :error-message="requiredLabel">
             <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary"
               v-model="mergedUserProfile.administrative.mutualFund.has"
               @input="updateUser('administrative.mutualFund.has')" :options="mutualOptions" />

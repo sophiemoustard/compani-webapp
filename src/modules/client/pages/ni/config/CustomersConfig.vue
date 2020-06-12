@@ -342,7 +342,7 @@ import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress.vue';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
-import { frAddress, positiveFloat, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import {
   BILLING_DIRECT,
   BILLING_INDIRECT,
@@ -661,12 +661,12 @@ export default {
   validations: {
     newSurcharge: {
       name: { required },
-      saturday: { numeric, positiveFloat },
-      sunday: { numeric, positiveFloat },
-      publicHoliday: { numeric, positiveFloat },
-      twentyFifthOfDecember: { numeric, positiveFloat },
-      firstOfMay: { numeric, positiveFloat },
-      evening: { numeric, positiveFloat },
+      saturday: { positiveNumber },
+      sunday: { positiveNumber },
+      publicHoliday: { positiveNumber },
+      twentyFifthOfDecember: { positiveNumber },
+      firstOfMay: { positiveNumber },
+      evening: { positiveNumber },
       eveningStartTime: { required: requiredIf((item) => item.evening) },
       eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
@@ -675,12 +675,12 @@ export default {
     },
     editedSurcharge: {
       name: { required },
-      saturday: { numeric, positiveFloat },
-      sunday: { numeric, positiveFloat },
-      publicHoliday: { numeric, positiveFloat },
-      twentyFifthOfDecember: { numeric, positiveFloat },
-      firstOfMay: { numeric, positiveFloat },
-      evening: { numeric, positiveFloat },
+      saturday: { positiveNumber },
+      sunday: { positiveNumber },
+      publicHoliday: { positiveNumber },
+      twentyFifthOfDecember: { positiveNumber },
+      firstOfMay: { positiveNumber },
+      evening: { positiveNumber },
       eveningStartTime: { required: requiredIf((item) => item.evening) },
       eveningEndTime: { required: requiredIf((item) => item.evening) },
       custom: { numeric },
@@ -691,13 +691,13 @@ export default {
       name: { required },
       type: { required },
       nature: { required },
-      defaultUnitAmount: { required, positiveFloat, numeric },
+      defaultUnitAmount: { required, positiveNumber },
       vat: { positiveNumber },
     },
     editedService: {
       name: { required },
       startDate: { required },
-      defaultUnitAmount: { required, positiveFloat, numeric },
+      defaultUnitAmount: { required, positiveNumber },
       vat: { positiveNumber },
     },
     company: {
@@ -714,7 +714,7 @@ export default {
         fullAddress: { frAddress },
       },
       billingMode: { required },
-      unitTTCRate: { positiveFloat, numeric },
+      unitTTCRate: { positiveNumber },
       isApa: { required },
     },
     editedThirdPartyPayer: {
@@ -726,7 +726,7 @@ export default {
         fullAddress: { frAddress },
       },
       billingMode: { required },
-      unitTTCRate: { positiveFloat, numeric },
+      unitTTCRate: { positiveNumber },
       isApa: { required },
     },
   },
@@ -1110,7 +1110,7 @@ export default {
     async createNewThirdPartyPayer () {
       try {
         const formIsValid = await this.waitForFormValidation(this.$v.newThirdPartyPayer);
-        if (formIsValid) return NotifyWarning('Champ(s) invalide(s)');
+        if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await ThirdPartyPayers.create(this.formatThirdPartyPayerPayload(this.newThirdPartyPayer));
@@ -1131,7 +1131,7 @@ export default {
     async updateThirdPartyPayer () {
       try {
         const formIsValid = await this.waitForFormValidation(this.$v.editedThirdPartyPayer);
-        if (formIsValid) return NotifyWarning('Champ(s) invalide(s)');
+        if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const thirdPartyPayerId = this.editedThirdPartyPayer._id;

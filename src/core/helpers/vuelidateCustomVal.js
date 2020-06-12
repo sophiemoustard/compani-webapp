@@ -28,10 +28,6 @@ export const bic = (value) => {
   return ibantools.isValidBIC(value);
 };
 
-export const positiveFloat = (value) => {
-  return value ? parseFloat(value) >= 0 : true;
-};
-
 export const frAddress = async (value) => {
   if (!value) return true;
   const res = await axios.get('https://api-adresse.data.gouv.fr/search', {
