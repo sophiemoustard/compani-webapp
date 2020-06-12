@@ -36,7 +36,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Taux horaire brut par défaut"
             :error="$v.company.rhConfig.contractWithCompany.grossHourlyRate.$error"
-            :error-label="nbrError('contractWithCompany.grossHourlyRate')" type="number"
+            :error-label="nbrError('company.rhConfig.contractWithCompany.grossHourlyRate')" type="number"
             v-model="company.rhConfig.contractWithCompany.grossHourlyRate"
             @focus="saveTmp('rhConfig.contractWithCompany.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.contractWithCompany.grossHourlyRate')" />
@@ -47,7 +47,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Taux horaire brut par défaut"
             :error="$v.company.rhConfig.contractWithCustomer.grossHourlyRate.$error"
-            :error-label="nbrError('contractWithCustomer.grossHourlyRate')" type="number"
+            :error-label="nbrError('company.rhConfig.contractWithCustomer.grossHourlyRate')" type="number"
             v-model="company.rhConfig.contractWithCustomer.grossHourlyRate"
             @focus="saveTmp('rhConfig.contractWithCustomer.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.contractWithCustomer.grossHourlyRate')" />
@@ -57,7 +57,7 @@
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
-            :error-label="nbrError('feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
+            :error-label="nbrError('company.rhConfig.feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
             @focus="saveTmp('rhConfig.feeAmount')" suffix="€" @blur="updateCompany('rhConfig.feeAmount')" />
         </div>
       </div>
@@ -65,7 +65,7 @@
         <p class="text-weight-bold">Taux kilométrique</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error"
-            :error-label="nbrError('amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
+            :error-label="nbrError('company.rhConfig.amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
             @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
       </div>
@@ -77,6 +77,7 @@
               <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
                 type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
                 @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
+                :error-label="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
                 @blur="updateCompanyTransportSubs(index)" />
             </template>
           </template>
@@ -195,8 +196,7 @@
         :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
-          :disable="!$v.newAdministrativeDocument.$anyDirty || $v.newAdministrativeDocument.$invalid" :loading="loading"
-          @click="createNewAdministrativeDocument" />
+          :loading="loading" @click="createNewAdministrativeDocument" />
       </template>
     </ni-modal>
 
@@ -209,7 +209,7 @@
         @blur="$v.newSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
-          :disable="newSector.name === ''" :loading="loading" @click="createNewSector" />
+          :loading="loading" @click="createNewSector" />
       </template>
     </ni-modal>
 
@@ -222,7 +222,7 @@
         @blur="$v.editedSector.name.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
-          :disable="isSameThanEditedSector" :loading="loading" @click="updateSector" />
+          :loading="loading" @click="updateSector" />
       </template>
     </ni-modal>
   </q-page>
@@ -237,13 +237,12 @@ import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
 import InternalHours from '@api/InternalHours';
-import { posDecimals } from '@helpers/vuelidateCustomVal';
+import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader.vue';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { REQUIRED_LABEL } from '@data/constants';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -299,19 +298,16 @@ export default {
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
-    isSameThanEditedSector () {
-      return this.tmpInput === this.editedSector.name;
-    },
   },
   validations () {
     return {
       company: {
         rhConfig: {
-          contractWithCompany: { grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) } },
-          contractWithCustomer: { grossHourlyRate: { required, posDecimals, maxValue: maxValue(999) } },
-          feeAmount: { required, posDecimals, maxValue: maxValue(999) },
-          amountPerKm: { required, posDecimals, maxValue: maxValue(999) },
-          transportSubs: { $each: { price: { required, posDecimals, maxValue: maxValue(999) } } },
+          contractWithCompany: { grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) } },
+          contractWithCustomer: { grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) } },
+          feeAmount: { required, positiveNumber, maxValue: maxValue(999) },
+          amountPerKm: { required, positiveNumber, maxValue: maxValue(999) },
+          transportSubs: { $each: { price: { required, positiveNumber, maxValue: maxValue(999) } } },
         },
       },
       newInternalHour: { name: { required } },
@@ -350,10 +346,6 @@ export default {
       } finally {
         this.tmpInput = '';
       }
-    },
-    nbrError (path) {
-      if (!get(this.$v.company.rhConfig, path).required) return REQUIRED_LABEL;
-      else if (!get(this.$v.company.rhConfig, path).numeric) return 'Nombre non valide';
     },
     async refreshCompany () {
       await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
@@ -551,7 +543,9 @@ export default {
     },
     async createNewAdministrativeDocument () {
       this.$v.newAdministrativeDocument.$touch();
-      if (this.$v.newAdministrativeDocument.$error) return NotifyWarning('Champ(s) invalide(s)');
+      if (this.$v.newAdministrativeDocument.$error) {
+        return NotifyWarning('Champ(s) invalide(s)');
+      }
       this.loading = true;
 
       try {

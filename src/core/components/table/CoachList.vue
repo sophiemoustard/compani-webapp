@@ -73,7 +73,7 @@
         :error-label="phoneNbrError($v.selectedUser)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un utilisateur" icon-right="check" color="primary"
-          :loading="loading" @click="updateUser" :disable="$v.selectedUser.$invalid" />
+          :loading="loading" @click="updateUser" />
       </template>
     </ni-modal>
   </div>

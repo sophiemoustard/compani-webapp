@@ -4,6 +4,7 @@ import set from 'lodash/set';
 import Companies from '@api/Companies';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export const configMixin = {
   data () {
@@ -37,6 +38,12 @@ export const configMixin = {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
+      }
+    },
+    nbrError (path) {
+      if (get(this.$v, path).required === false) return REQUIRED_LABEL;
+      else if (get(this.$v, path).positiveNumber === false || get(this.$v, path).numeric === false) {
+        return 'Nombre non valide';
       }
     },
     // Documents

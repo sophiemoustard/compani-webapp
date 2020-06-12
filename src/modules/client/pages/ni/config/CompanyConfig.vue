@@ -110,8 +110,7 @@
         @blur="$v.newEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un établissement" icon-right="add" color="primary"
-          :disable="!$v.newEstablishment.$anyDirty || $v.newEstablishment.$invalid" :loading="loading"
-          @click="createNewEstablishment" />
+          :loading="loading" @click="createNewEstablishment" />
       </template>
     </ni-modal>
 
@@ -142,7 +141,7 @@
         @blur="$v.editedEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'établissement" icon-right="add" color="primary"
-          :disable="$v.editedEstablishment.$invalid" :loading="loading" @click="updateEstablishment" />
+          :loading="loading" @click="updateEstablishment" />
       </template>
     </ni-modal>
   </q-page>
@@ -327,8 +326,10 @@ export default {
     },
     async createNewEstablishment () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.newEstablishment);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        const formIsValid = await this.waitForFormValidation(this.$v.newEstablishment);
+        if (!formIsValid) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         this.loading = true;
         await Establishments.create(this.newEstablishment);
@@ -361,8 +362,10 @@ export default {
     },
     async updateEstablishment () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.editedEstablishment);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        const formIsValid = await this.waitForFormValidation(this.$v.editedEstablishment);
+        if (!formIsValid) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         this.loading = true;
         const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
