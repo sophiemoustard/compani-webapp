@@ -52,7 +52,7 @@
           :disable="!hasLinkedEvents" @input="getEvents" required-field />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-            type="checkbox" required-field inline />
+            type="checkbox" required-field inline :error="noEventSelectedForNewCreditNote" />
         </template>
         <div v-if="newCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
@@ -113,7 +113,8 @@
           :error="$v.editedCreditNote.endDate.$error" @blur="$v.editedCreditNote.endDate.$touch" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-            type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"/>
+            type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
+            :error="noEventSelectedForEditedCreditNote"/>
         </template>
         <div v-if="editedCreditNoteHasNoEvents" class="light warning">
           <p>{{ eventsNotFoundMessage }}</p>
@@ -395,8 +396,14 @@ export default {
     newCreditNoteHasNoEvents () {
       return this.newCreditNote.customer && this.newCreditNote.startDate && this.newCreditNote.endDate && !this.creditNoteEvents.length;
     },
+    noEventSelectedForNewCreditNote () {
+      return this.hasLinkedEvents && !this.newCreditNote.events.length;
+    },
     editedCreditNoteHasNoEvents () {
       return this.editedCreditNote.customer && this.editedCreditNote.startDate && this.editedCreditNote.endDate && !this.creditNoteEvents.length;
+    },
+    noEventSelectedForEditedCreditNote () {
+      return this.hasLinkedEvents && !this.editedCreditNote.events.length;
     },
   },
   methods: {
@@ -590,7 +597,7 @@ export default {
       try {
         this.$v.newCreditNote.$touch();
 
-        if (this.$v.newCreditNote.$error || (this.hasLinkedEvents && !this.newCreditNote.events.length)) {
+        if (this.$v.newCreditNote.$error || this.noEventSelectedForNewCreditNote) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
         this.loading = true;
@@ -637,7 +644,9 @@ export default {
     async updateCreditNote () {
       try {
         this.$v.editedCreditNote.$touch();
-        if (this.$v.editedCreditNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.editedCreditNote.$error || this.noEventSelectedForEditedCreditNote) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         this.loading = true;
         const payload = { ...this.formatPayload(this.editedCreditNote), customer: this.editedCreditNote.customer._id };
