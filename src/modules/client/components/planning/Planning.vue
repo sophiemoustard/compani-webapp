@@ -26,8 +26,8 @@
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+              <div v-if="isHoliday(day.moment)" class="holiday">JF</div>
             </div>
-            <div v-if="isHoliday(day.moment)" class="holiday">JF</div>
             <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
                 <div class="planning-hour" v-if="hourIndex !== 0"  :key="hourIndex"
