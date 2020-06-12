@@ -9,6 +9,7 @@
               {{ day.number }}
             </div>
           </div>
+          <div v-if="isHoliday(day.moment)" class="holiday">JF</div>
         </th>
       </thead>
       <tbody>
@@ -162,4 +163,8 @@ export default {
         background-color: $white;
         font-size: 12px;
         padding: 0 5px
+
+thead
+  vertical-align: baseline;
+
 </style>
