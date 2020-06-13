@@ -14,13 +14,12 @@
       :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
-        :loading="loading" @click="updatePayment" :disable="validations.$error || disableEditionButton" />
+        :loading="loading" @click="updatePayment" />
     </template>
   </ni-modal>
 </template>
 
 <script>
-import some from 'lodash/some';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
@@ -54,9 +53,6 @@ export default {
     netInclTaxesError () {
       if (!this.validations.netInclTaxes.required) return REQUIRED_LABEL;
       return 'Montant TTC non valide';
-    },
-    disableEditionButton () {
-      return some(this.editedPayment, (el) => !el);
     },
     editionModalNature () {
       if (!this.editedPayment.nature) return '';
