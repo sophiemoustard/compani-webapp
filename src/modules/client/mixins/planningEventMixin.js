@@ -31,6 +31,9 @@ export const planningEventMixin = {
     },
   },
   methods: {
+    isHoliday (day) {
+      return this.$moment(day).startOf('day').isHoliday();
+    },
     isCurrentDay (momentDay) {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },

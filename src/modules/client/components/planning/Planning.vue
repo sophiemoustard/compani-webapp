@@ -27,6 +27,7 @@
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+              <div v-if="isHoliday(day.moment)" class="holiday">JF</div>
             </div>
             <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
@@ -324,7 +325,7 @@ export default {
       height: 75px;
       z-index: 0;
     .planning-background
-      position: relative;
+      height: 10px;
       margin-top: 2px;
       .line
         width: 1px;
@@ -347,4 +348,6 @@ export default {
   .q-page-sticky
     z-index: 20;
 
+thead
+  vertical-align: baseline;
 </style>
