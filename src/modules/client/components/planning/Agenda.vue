@@ -8,8 +8,8 @@
             <div data-cy="days-number" :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">
               {{ day.number }}
             </div>
+            <div v-if="isHoliday(day.moment)" class="holiday">JF</div>
           </div>
-          <div v-if="isHoliday(day.moment)" class="holiday">JF</div>
         </th>
       </thead>
       <tbody>
