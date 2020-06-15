@@ -1,7 +1,11 @@
 <template>
   <q-card flat>
     <q-card-section @click="$emit('click', course)">
-      <div class="title-text text-weight-bold">{{ course.name }}</div>
+      <div class="infos-course-nearest-date">{{ formatNearestDate }}</div>
+      <div class="title-text text-weight-bold">
+        <span v-if="isIntraCourse" >{{ get(course, 'company.name') || '' }} - </span>
+        {{ get(course, 'program.name') || '' }} - {{ course.name || '' }}
+      </div>
       <div class="items-container">
         <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container text-weight-bold">
           <q-item-section side>
@@ -10,25 +14,26 @@
           <q-item-section>{{ info.label }}</q-item-section>
         </q-item>
       </div>
-      <q-item class="infos-course-container">
+      <div v-if="course.status === FORTHCOMING" class="additional-infos-container">
+        <q-item class="infos-course-container text-weight-bold">
+          <q-item-section class="additional-infos">
+            <q-icon size="xs" name="mdi-calendar-range" />
+            <q-item-label>{{ formatCourseSlotsInfos }}</q-item-label>
+          </q-item-section>
+        </q-item>
+        <q-item class="infos-course-container text-weight-bold">
+          <q-item-section class="additional-infos">
+            <q-icon size="xs" name="mdi-account-multiple" />
+            <q-item-label>({{ traineesCount }})</q-item-label>
+          </q-item-section>
+        </q-item>
+      </div>
+    </q-card-section>
+    <q-card-section v-if="course.status === IN_PROGRESS" class="slots-timeline-container">
+      <div class="additional-infos"> {{ slotsHappened }} / {{ course.slots.length }} </div>
+      <q-item>
         <q-item-section>
-          <q-icon size="xs" :name="formatNearestDate.icon" />
-          <q-item-label class="infos-course-nearest-date">{{ formatNearestDate.label }}</q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-item class="infos-course-container text-weight-bold">
-        <q-item-section>
-          <q-icon size="xs" name="mdi-account-multiple" />
-          <q-item-label>({{ traineesCount }})</q-item-label>
-        </q-item-section>
-      </q-item>
-      <q-item class="infos-course-container text-weight-bold">
-        <q-item-section side>
-          <q-icon size="xs" name="mdi-calendar-range" />
-          <q-item-label>({{ courseSlotsCount }})</q-item-label>
-        </q-item-section>
-        <q-item-section>
-          <div class="row fit q-gutter-xs">
+          <div class="row slots-timeline">
             <div v-for="(slot, index) in course.slots" :key="index"
               :class="['col-3', 'slots', { 'slots-happened': happened(slot) }]" />
           </div>
@@ -40,6 +45,7 @@
 
 <script>
 import get from 'lodash/get';
+import { FORTHCOMING, COMPLETED, IN_PROGRESS, INTRA } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
@@ -48,44 +54,71 @@ export default {
   props: {
     course: { type: Object, default: () => ({}) },
   },
+  data () {
+    return { INTRA, FORTHCOMING, IN_PROGRESS, COMPLETED };
+  },
   computed: {
+    headerInfo () {
+      const infos = [
+        { icon: 'bookmark_border', label: this.courseType },
+        { icon: 'emoji_people', label: this.trainerName },
+      ]
+
+      return infos;
+    },
     traineesCount () {
       return get(this.course, 'trainees.length') || 0;
+    },
+    slotsHappened () {
+      return this.course.slots.filter(slot => this.happened(slot)).length;
+    },
+    slotsDurationTitle () {
+      if (!this.course || !this.course.slots) return '0h';
+
+      let slotsDuration = this.$moment.duration();
+      for (const slotByDay of this.course.slots) {
+        slotsDuration = slotByDay.reduce(
+          (acc, slot) => acc.add(this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate))),
+          slotsDuration
+        );
+      }
+
+      const paddedMinutes = this.padMinutes(slotsDuration.minutes());
+      const hours = slotsDuration.days() * 24 + slotsDuration.hours();
+
+      return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
     courseSlotsCount () {
       return this.course.slots.length;
     },
+    formatCourseSlotsInfos () {
+      return !this.courseSlotsCount ? '0 date' : `${this.courseSlotsCount} dates (${this.slotsDurationTitle})`;
+    },
     formatNearestDate () {
-      if (this.courseSlotsCount === 0) return { label: 'Pas de date prévue', icon: 'mdi-calendar-remove' };
+      if (this.courseSlotsCount === 0) return 'Pas de date prévue';
 
-      if (this.course.slots.every((daySlots) => !this.happened(daySlots))) {
+      if (this.course.status === FORTHCOMING) {
         const firstSlot = this.course.slots[0];
         const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
-        return {
-          label: rangeToNextDate ? `Commence dans ${rangeToNextDate} jour(s)` : 'Commence aujourd’hui',
-          icon: 'img:statics/calendar-arrow-right.svg',
-        };
+        return rangeToNextDate ? `Commence dans ${rangeToNextDate} jour(s)` : 'Commence aujourd’hui'
       }
 
-      if (this.course.slots.every(this.happened)) {
+      if (this.course.status === COMPLETED) {
         const lastSlot = this.course.slots[this.course.slots.length - 1];
         const rangeToLastDate = this.$moment().endOf('day').diff(this.$moment(lastSlot[0].startDate), 'd');
 
-        return {
-          label: rangeToLastDate ? `Dernière date il y a ${rangeToLastDate} jour(s) ` : 'Dernière date aujourd’hui',
-          icon: 'img:statics/calendar-arrow-left.svg',
-        };
+        return rangeToLastDate ? `Dernière date il y a ${rangeToLastDate} jour(s) ` : 'Dernière date aujourd’hui'
       }
 
       const nextSlot = this.course.slots.filter((daySlots) => !this.happened(daySlots))[0];
       const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
-      return {
-        label: rangeToNextDate ? `Prochaine date dans ${rangeToNextDate} jour(s)` : 'Prochaine date aujourd’hui',
-        icon: 'img:statics/calendar-arrow-right.svg',
-      };
+      return rangeToNextDate ? `Prochaine date dans ${rangeToNextDate} jour(s)` : 'Prochaine date aujourd’hui'
     },
+  },
+  methods: {
+    get,
   },
 }
 </script>
@@ -103,10 +136,10 @@ export default {
   .items-container
     display: flex;
     flex-wrap: wrap;
+    font-size: 12px;
+    color: $grey;
   .item-section-container
     display: flex;
-    color: $grey;
-    font-size: 12px;
   .q-item__section--side
     padding: 0px;
     margin-right: 5px;
@@ -117,6 +150,7 @@ export default {
   .infos-course
     &-nearest-date
       color: $primary !important;
+      font-size: 14px;
     &-container
       align-items: center;
       font-size: 14px;
@@ -132,8 +166,36 @@ export default {
           margin-right: 10px;
   .slots
     height: 10px;
-    flex: 0 1 calc(25% - 4px);
+    flex: 1;
     background-color: $primary-light;
+    border: solid 1px $primary;
     &-happened
       background-color: $primary;
+
+.additional-infos
+  color: $primary !important;
+  &-container
+    display: flex;
+    justify-content: flex-end;
+
+.slots-timeline-container
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  overflow: hidden;
+  .q-item
+    margin-right: 0px;
+  .slots-timeline
+    width: 102%;
+    height: 102%;
+    margin-left: 0px;
+  .slots-timeline > :nth-child(1)
+    margin-left: 0px;
+  .slots-timeline > div
+    margin-left: 1px;
+  .additional-infos
+    display: flex;
+    font-weight: bold;
+    padding-right: 10px;
+    justify-content: flex-end;
 </style>

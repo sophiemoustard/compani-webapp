@@ -391,9 +391,6 @@ export default {
         this.companyOptions = [];
       }
     },
-    padMinutes (minutes) {
-      return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
-    },
     async refreshCourse () {
       try {
         this.courseSlotsLoading = true;

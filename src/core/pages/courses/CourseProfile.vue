@@ -57,6 +57,16 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    headerInfo () {
+      const infos = [
+        { icon: 'library_books', label: this.programName },
+        { icon: 'bookmark_border', label: this.courseType },
+        { icon: 'emoji_people', label: this.trainerName },
+      ]
+      if (this.isIntraCourse) infos.push({ icon: 'apartment', label: this.companyName });
+
+      return infos;
+    },
   },
   watch: {
     course () {
