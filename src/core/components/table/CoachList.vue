@@ -37,15 +37,15 @@
       <template slot="title">
         Ajouter un <span class="text-weight-bold">utilisateur</span>
       </template>
-      <ni-input :disable="!firstStep" in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
-      <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role" :error="$v.newUser.role.$error"
-        @blur="$v.newUser.role.$touch" last required-field />
+      <ni-input :disable="!firstStep" in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
+        caption="Email" @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
+      <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role"
+        :error="$v.newUser.role.$error" @blur="$v.newUser.role.$touch" :last="firstStep" required-field />
       <template v-if="!firstStep">
         <ni-input in-modal v-model="newUser.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error" caption="Nom"
-          @blur="$v.newUser.identity.lastname.$touch" required-field />
-        <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error"
+        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
+          caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
+        <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" last
           caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="phoneNbrError($v.newUser)" />
       </template>
       <template slot="footer">
@@ -61,19 +61,19 @@
       <template slot="title">
         Éditer un <span class="text-weight-bold">utilisateur</span>
       </template>
+      <ni-input in-modal v-model="selectedUser.local.email" :error="$v.selectedUser.local.email.$error" caption="Email"
+        @blur="$v.selectedUser.local.email.$touch" :error-label="emailError($v.selectedUser)" required-field />
+      <ni-select in-modal caption="Role" :options="roleOptions" v-model="selectedUser.role"
+        :error="$v.selectedUser.role.$error" @blur="$v.selectedUser.role.$touch" required-field />
       <ni-input in-modal v-model="selectedUser.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="selectedUser.identity.lastname" :error="$v.selectedUser.identity.lastname.$error"
         caption="Nom" @blur="$v.selectedUser.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="selectedUser.local.email" :error="$v.selectedUser.local.email.$error" caption="Email"
-        @blur="$v.selectedUser.local.email.$touch" :error-label="emailError($v.selectedUser)" required-field />
       <ni-input in-modal v-model.trim="selectedUser.contact.phone" :error="$v.selectedUser.contact.phone.$error"
-        caption="Téléphone" @blur="$v.selectedUser.contact.phone.$touch"
+        caption="Téléphone" @blur="$v.selectedUser.contact.phone.$touch" last
         :error-label="phoneNbrError($v.selectedUser)" />
-      <ni-select in-modal caption="Role" :options="roleOptions" v-model="selectedUser.role"
-        :error="$v.selectedUser.role.$error" @blur="$v.selectedUser.role.$touch" last required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un utilisateur" icon-right="check" color="primary"
-          :loading="loading" @click="updateUser" :disable="$v.selectedUser.$invalid" />
+          :loading="loading" @click="updateUser" />
       </template>
     </ni-modal>
   </div>
@@ -179,11 +179,8 @@ export default {
       return this.roles.map(role => ({ label: ROLES_TRANSLATION[role.name], value: role._id }));
     },
     canSetUserCompany () {
-      const ability = defineAbilitiesFor(
-        get(this.loggedUser, 'role.client.name'),
-        get(this.loggedUser, 'role.vendor.name'),
-        this.company
-      );
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
+
       return ability.can('set', 'user_company');
     },
   },

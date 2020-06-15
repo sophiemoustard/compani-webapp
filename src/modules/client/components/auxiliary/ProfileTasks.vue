@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify.js';
 import { displayTask } from 'src/modules/client/helpers/taskValidation.js';
@@ -23,9 +24,7 @@ export default {
     }
   },
   computed: {
-    getUser () {
-      return this.$store.getters['rh/getUserProfile'];
-    },
+    ...mapState({ getUser: state => state.rh.userProfile }),
   },
   async mounted () {
     try {
@@ -39,7 +38,7 @@ export default {
     async handleTask (task) {
       try {
         await Users.updateTask({ userId: this.getUser._id, taskId: task.task._id }, { isDone: task.check.isDone });
-        this.$store.dispatch('rh/getUserProfile', { userId: this.getUser._id });
+        this.$store.dispatch('rh/fetchUserProfile', { userId: this.getUser._id });
         NotifyPositive('Tâche mise à jour');
       } catch (e) {
         console.error(e);

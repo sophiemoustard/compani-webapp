@@ -17,6 +17,7 @@
             @blur="onBlur" >
         </i>
       </div>
+      <div class="file-error" v-if="error">{{errorLabel}}</div>
     </template>
     <template v-else>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
@@ -120,4 +121,9 @@ export default {
       font-size: 0
     &.borders
       border: 1px solid $middle-grey
+  .file-error
+    color: $secondary
+    line-height: 1
+    font-size: 11px
+    padding-top: 3px
 </style>

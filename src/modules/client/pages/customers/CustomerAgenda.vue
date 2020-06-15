@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
 import { formatIdentity } from '@helpers/utils';
@@ -48,8 +48,10 @@ export default {
     };
   },
   computed: {
-    ...mapState({ helper: state => state.main.loggedUser }),
-    ...mapGetters({ customer: 'customer/getCustomer' }),
+    ...mapState({
+      helper: state => state.main.loggedUser,
+      customer: state => state.customer.customer,
+    }),
   },
   async created () {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
@@ -65,7 +67,7 @@ export default {
     async refreshCustomer () {
       try {
         const customer = await Customers.getById(this.helper.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
+        this.$store.dispatch('customer/setCustomer', customer);
       } catch (e) {
         console.error(e);
       }

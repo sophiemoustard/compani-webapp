@@ -16,7 +16,7 @@
         @blur="$v.newProgram.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createProgram" :disable="!this.newProgram.name" />
+          icon-right="add" @click="createProgram" />
       </template>
     </ni-modal>
   </q-page>
@@ -29,7 +29,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -91,6 +91,9 @@ export default {
     },
     async createProgram () {
       try {
+        this.$v.newProgram.$touch();
+        if (this.$v.newProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.modalLoading = true;
         await Programs.create({ ...this.newProgram });
 

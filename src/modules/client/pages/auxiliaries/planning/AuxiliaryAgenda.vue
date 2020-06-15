@@ -42,7 +42,6 @@ import Events from '@api/Events';
 import Select from '@components/form/Select';
 import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
-import { can } from '@helpers/rights';
 import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '@data/constants';
 import Agenda from 'src/modules/client/components/planning/Agenda';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
@@ -155,11 +154,7 @@ export default {
     },
     // Event creation
     openCreationModal (dayIndex) {
-      const isAllowed = can({
-        user: this.loggedUser,
-        auxiliaryIdEvent: this.selectedAuxiliary._id,
-        permissions: [{ name: 'events:edit', rule: 'canEdit' }],
-      });
+      const isAllowed = this.canEditEvent({ auxiliaryId: this.selectedAuxiliary._id });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       const selectedDay = this.days[dayIndex];

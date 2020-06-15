@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import ProfileBilling from 'src/modules/client/components/customers/ProfileBilling.vue';
 import Customers from '@api/Customers';
 
@@ -17,8 +17,10 @@ export default {
     'ni-profile-billing': ProfileBilling,
   },
   computed: {
-    ...mapState({ helper: state => state.main.loggedUser }),
-    ...mapGetters({ customer: 'customer/getCustomer' }),
+    ...mapState({
+      helper: state => state.main.loggedUser,
+      customer: state => state.customer.customer,
+    }),
   },
   async created () {
     if (!this.customer) await this.refreshCustomer();
@@ -27,7 +29,7 @@ export default {
     async refreshCustomer () {
       try {
         const customer = await Customers.getById(this.helper.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
+        this.$store.dispatch('customer/setCustomer', customer);
       } catch (e) {
         console.error(e);
         this.customer = {};

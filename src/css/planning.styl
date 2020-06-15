@@ -68,6 +68,9 @@
     &-header
       padding: 8px 0px 8px 0px
       width: 100%
+      @media screen and (max-width: 767px)
+        flex-direction: column;
+        align-items: center;
     &-name
       font-size: 1.125rem
       color: $grey
@@ -189,3 +192,14 @@
 
 .person-inner-cell
     margin-top: 4px;
+
+.holiday
+  background-color: $primary;
+  color: $white;
+  font-size: 12px;
+  border-radius: 5px;
+  width: 20px;
+  margin-top: 10px;
+  @media (min-width: 768px)
+    margin-top: 0px;
+    margin-left: 10px;

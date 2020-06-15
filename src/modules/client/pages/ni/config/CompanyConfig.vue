@@ -110,8 +110,7 @@
         @blur="$v.newEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un établissement" icon-right="add" color="primary"
-          :disable="!$v.newEstablishment.$anyDirty || $v.newEstablishment.$invalid" :loading="loading"
-          @click="createNewEstablishment" />
+          :loading="loading" @click="createNewEstablishment" />
       </template>
     </ni-modal>
 
@@ -142,7 +141,7 @@
         @blur="$v.editedEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'établissement" icon-right="add" color="primary"
-          :disable="$v.editedEstablishment.$invalid" :loading="loading" @click="updateEstablishment" />
+          :loading="loading" @click="updateEstablishment" />
       </template>
     </ni-modal>
   </q-page>
@@ -284,7 +283,8 @@ export default {
   computed: {
     ...mapGetters({ clientRole: 'main/clientRole' }),
     canUpdateErpConfig () {
-      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
+
       return ability.can('update', 'erp_config');
     },
   },
@@ -294,7 +294,7 @@ export default {
   },
   methods: {
     async refreshCompany () {
-      await this.$store.dispatch('main/getLoggedUser', this.loggedUser._id);
+      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
       this.company = this.loggedCompany;
       this.company.address = this.company.address || { fullAddress: '' };
       this.company.legalRepresentative =
@@ -326,8 +326,10 @@ export default {
     },
     async createNewEstablishment () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.newEstablishment);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        const formIsValid = await this.waitForFormValidation(this.$v.newEstablishment);
+        if (!formIsValid) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         this.loading = true;
         await Establishments.create(this.newEstablishment);
@@ -360,14 +362,15 @@ export default {
     },
     async updateEstablishment () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.editedEstablishment);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        const formIsValid = await this.waitForFormValidation(this.$v.editedEstablishment);
+        if (!formIsValid) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         this.loading = true;
-        await Establishments.update(
-          this.editedEstablishment._id,
-          pick(this.editedEstablishment, Object.keys(this.editedEstablishment))
-        );
+        const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
+        await Establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, fields));
+
         NotifyPositive('Établissement modifié.');
         this.establishmentEditionModal = false;
         await this.getEstablishments();

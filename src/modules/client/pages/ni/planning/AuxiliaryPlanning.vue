@@ -2,16 +2,16 @@
   <q-page class="client-background">
     <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
-      :filteredSectors="filteredSectors" :can-edit="canEditEvent" :personKey="personKey" :filters="activeFilters"
+      :filteredSectors="filteredSectors" :personKey="personKey" :filters="activeFilters" :can-edit="canEditEvent"
       @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
       :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
       @updateFeeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :customers="customers"
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent"
       :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
       :activeAuxiliaries="activeAuxiliaries" @resetForm="resetCreationForm" @createEvent="validateCreationEvent"
-      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" />
+      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" :customers="customers" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapState } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import Customers from '@api/Customers';
@@ -97,12 +97,10 @@ export default {
     },
   },
   computed: {
+    ...mapState('planning', ['filters', 'elementToAdd', 'elementToRemove']),
     ...mapGetters({
       clientRole: 'main/clientRole',
       company: 'main/company',
-      filters: 'planning/getFilters',
-      elementToAdd: 'planning/getElementToAdd',
-      elementToRemove: 'planning/getElementToRemove',
     }),
     displayedAuxiliaries () {
       return this.auxiliaries

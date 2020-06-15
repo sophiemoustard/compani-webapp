@@ -20,9 +20,10 @@
             @blur="validations.auxiliary.$touch" />
           <ni-select v-else in-modal caption="Bénéficiaire" v-model="newEvent.customer" :options="customersOptions"
             :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
-            @input="setEventAddressAndSubscription" />
+            @input="setEventAddressAndSubscription" data-cy="event-creation-customer" />
           <ni-select in-modal caption="Service" v-model="newEvent.subscription" :error="validations.subscription.$error"
-            :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch" />
+            :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch"
+            data-cy="event-creation-service" />
         </template>
         <template v-if="newEvent.type === ABSENCE">
           <ni-select in-modal caption="Nature" v-model="newEvent.absenceNature" :options="absenceNatureOptions"
@@ -37,8 +38,8 @@
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
             :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
-            :additionalValue="additionalValue" required-field in-modal
-            @delete="deleteDocument(newEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+            :additionalValue="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
+            :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" v-model="newEvent.internalHour"
@@ -69,7 +70,7 @@
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
-        @click="createEvent" :disable="disableCreationButton" icon-right="add" />
+        @click="createEvent" icon-right="add" data-cy="event-creation-button" />
     </div>
   </q-dialog>
 </template>

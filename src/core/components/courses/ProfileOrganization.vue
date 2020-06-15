@@ -5,7 +5,7 @@
         <ni-input caption="Nom de la formation" v-model.trim="course.name" @focus="saveTmp('name')"
           @blur="updateCourse('name')" :error="$v.course.name.$error" />
         <ni-select v-if="trainerInputVisible"  v-model.trim="course.trainer._id" :error="$v.course.trainer.$error"
-          @blur="updateCourse('trainer')" :options="trainerOptions" @focus="saveTmp('trainer')" caption="Formateur" />
+          @blur="updateCourse('trainer')" :options="trainerOptions" @focus="saveTmp('trainer')" caption="Intervenant" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -110,7 +110,7 @@
       <template slot="title">
         Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
       </template>
-      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field
+      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field :last="firstStep"
         @blur="$v.newTrainee.local.email.$touch" caption="Email" :error-label="emailError($v.newTrainee)"
         :error="$v.newTrainee.local.email.$error" />
       <template v-if="!firstStep">
@@ -119,9 +119,10 @@
           required-field v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" />
         <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model.trim="newTrainee.contact.phone"
           caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error="$v.newTrainee.contact.phone.$error"
-          :error-label="phoneNbrError($v.newTrainee)" />
+          :error-label="phoneNbrError($v.newTrainee)" :last="isIntraCourse" />
         <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" required-field caption="Structure"
-          @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions" />
+          @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions"
+          :last="!isIntraCourse" />
       </template>
 
       <template slot="footer">
@@ -137,16 +138,16 @@
       <template slot="title">
         Éditer un <span class="text-weight-bold">stagiaire</span>
       </template>
+      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal v-model="editedTrainee.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="editedTrainee.identity.lastname" :error="$v.editedTrainee.identity.lastname.$error"
         caption="Nom" @blur="$v.editedTrainee.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
         :error-label="phoneNbrError($v.editedTrainee)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
-          :loading="loading" @click="updateTrainee" :disable="$v.editedTrainee.$invalid" />
+          :loading="loading" @click="updateTrainee" />
       </template>
     </ni-modal>
   </div>
@@ -406,7 +407,7 @@ export default {
     },
     async refreshTrainers () {
       try {
-        const trainers = await Users.list({ role: [TRAINER] });
+        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }))
       } catch (e) {
         console.error(e);
@@ -549,7 +550,6 @@ export default {
         this.$v.newTrainee.$reset();
       } catch (e) {
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
-        this.resetAddTraineeForm();
       } finally {
         this.addTraineeModalLoading = false;
       }

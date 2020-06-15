@@ -168,6 +168,9 @@ export const ROLES_TRANSLATION = {
   [COACH]: 'Coach',
 };
 
+// SUBSCRIPTIONS
+export const ERP = 'erp'
+
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
 export const WEEK_VIEW = 'week';

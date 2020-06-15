@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -206,8 +206,10 @@ export default {
     },
   },
   computed: {
-    ...mapState({ helper: state => state.main.loggedUser }),
-    ...mapGetters({ customer: 'customer/getCustomer' }),
+    ...mapState({
+      helper: state => state.main.loggedUser,
+      customer: state => state.customer.customer,
+    }),
     ibanError () {
       if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
       else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
@@ -262,7 +264,7 @@ export default {
       try {
         this.mandatesLoading = true;
         const customer = await Customers.getById(this.helper.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
+        this.$store.dispatch('customer/setCustomer', customer);
 
         this.refreshSubscriptions(this.customer);
         this.refreshFundings(this.customer);
@@ -289,7 +291,7 @@ export default {
         if (path.match(/iban/i)) value = value.split(' ').join('');
 
         await Customers.updateById(this.customer._id, set({}, path, value));
-        await this.$store.dispatch('main/getLoggedUser', this.helper._id);
+        await this.$store.dispatch('main/fetchLoggedUser', this.helper._id);
         await this.refreshCustomer();
         NotifyPositive('Modification enregistrée');
 

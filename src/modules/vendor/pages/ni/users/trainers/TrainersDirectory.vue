@@ -13,20 +13,18 @@
         Créer un nouveau <span class="text-weight-bold">formateur</span>
       </template>
       <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainer.local.email" required-field
-        @blur="$v.newTrainer.local.email.$touch" caption="Email" @input="$v.newTrainer.local.email.$touch"
-        :error-label="emailError($v.newTrainer)" :error="$v.newTrainer.local.email.$error" />
+        @blur="$v.newTrainer.local.email.$touch" caption="Email" :error="$v.newTrainer.local.email.$error"
+        :error-label="emailError($v.newTrainer)" :last="firstStep" />
       <template v-if="!firstStep">
         <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
         <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="$v.newTrainer.identity.lastname.$error"
-          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" />
+          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" last />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
-          :loading="modalLoading" icon-right="add" @click="nextStep"
-          :disable="$v.newTrainer.local.email.$error || !newTrainer.local.email" />
+          :loading="modalLoading" icon-right="add" @click="nextStep" />
         <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter le formateur" color="primary"
-          :loading="modalLoading" icon-right="add" @click="createTrainer"
-          :disable="$v.newTrainer.$error || !$v.newTrainer.$anyDirty" />
+          :loading="modalLoading" icon-right="add" @click="createTrainer" />
       </template>
     </ni-modal>
   </q-page>
@@ -42,7 +40,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
@@ -84,6 +82,11 @@ export default {
   methods: {
     async nextStep () {
       try {
+        this.$v.newTrainer.local.email.$touch();
+        if (this.$v.newTrainer.local.email.$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
         this.modalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainer.local.email });
 
@@ -133,6 +136,11 @@ export default {
     },
     async createTrainer () {
       try {
+        this.$v.newTrainer.$touch();
+        if (this.$v.newTrainer.$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
+
         this.modalLoading = true;
 
         const roles = await Roles.list({ name: TRAINER });

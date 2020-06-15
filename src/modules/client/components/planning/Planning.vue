@@ -2,7 +2,8 @@
   <div :class="[{ 'planning': !drawer }]">
     <div class="row items-center planning-header" ref="planningHeader">
       <div class="col-xs-12 col-md-5 planning-search">
-        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters" />
+        <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters"
+          data-cy="planning-search" />
         <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
@@ -26,6 +27,7 @@
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
+              <div v-if="isHoliday(day.moment)" class="holiday">JF</div>
             </div>
             <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
@@ -55,10 +57,11 @@
                   :key="`hour_${hourIndex}`" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(sectorId, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
               </td>
             </tr>
-            <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id">
+            <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id"
+              data-cy="planning-row">
               <td valign="top">
                 <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)"
                   :staffing-view="staffingView" :startOfWeek="startOfWeek" />
@@ -66,12 +69,13 @@
                   :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background">
+                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background"
+                data-cy="planning-cell">
                 <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
                   :style="{ left: `${(hourIndex * hourWidth * 2)}%` }" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canEdit" />
+                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" data-cy="planning-event" />
               </td>
             </tr>
           </template>
@@ -89,10 +93,10 @@
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import Customers from '@api/Customers';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { can } from '@helpers/rights';
 import {
   PLANNING,
   INVOICED_AND_PAID,
@@ -103,7 +107,6 @@ import {
   PLANNING_REFERENT,
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
-  AUXILIARY,
 } from '@data/constants';
 import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
@@ -253,10 +256,12 @@ export default {
     },
     getPersonEvents (person) {
       if (this.isCustomerPlanning) {
-        return this.getRowEvents(person._id).filter(event => !event.isCancelled || event.cancel.condition !== NOT_INVOICED_AND_NOT_PAID);
+        return this.getRowEvents(person._id)
+          .filter(event => !event.isCancelled || event.cancel.condition !== NOT_INVOICED_AND_NOT_PAID);
       }
 
-      return this.getRowEvents(person._id).filter(event => !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID);
+      return this.getRowEvents(person._id)
+        .filter(event => !event.isCancelled || event.cancel.condition === INVOICED_AND_PAID);
     },
     // History
     toggleHistory () {
@@ -270,8 +275,9 @@ export default {
     async drop (toDay, target) {
       try {
         if (target.type === SECTOR) { // Unassign event
-          if (this.draggedObject.sector === target._id && (!this.draggedObject.auxiliary || !this.draggedObject.auxiliary._id) &&
-            toDay.isSame(this.draggedObject.startDate, 'd')) return;
+          const dropToSameSector = this.draggedObject.sector === target._id && !get(this.draggedObject, 'auxiliary._id')
+          const dropToSameDay = toDay.isSame(this.draggedObject.startDate, 'd')
+          if (dropToSameSector && dropToSameDay) return;
         } else { // Update event auxiliary
           if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
             toDay.isSame(this.draggedObject.startDate, 'd')) return;
@@ -285,23 +291,17 @@ export default {
         this.draggedObject = {};
       }
     },
-    createEvent (eventInfo) {
-      let isAllowed = true;
-      if (this.personKey === AUXILIARY && eventInfo.sectorId) { // Unassigned event
-        isAllowed = can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
-      } else if (this.personKey === AUXILIARY) {
-        isAllowed = can({
-          user: this.loggedUser,
-          auxiliaryIdEvent: eventInfo.person._id,
-          permissions: [{ name: 'events:edit', rule: 'canEdit' }],
-        });
-      }
+    createEvent (event) {
+      const isAllowed = this.canEdit({ auxiliaryId: get(event, 'person._id'), sectorId: event.sectorId });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
-      this.$emit('createEvent', eventInfo);
+      this.$emit('createEvent', event);
     },
     editEvent (event) {
       this.$emit('editEvent', event);
+    },
+    canDrag (event) {
+      return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector })
     },
   },
 }
@@ -325,7 +325,7 @@ export default {
       height: 75px;
       z-index: 0;
     .planning-background
-      position: relative;
+      height: 10px;
       margin-top: 2px;
       .line
         width: 1px;
@@ -348,4 +348,6 @@ export default {
   .q-page-sticky
     z-index: 20;
 
+thead
+  vertical-align: baseline;
 </style>

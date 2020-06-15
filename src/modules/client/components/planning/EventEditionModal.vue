@@ -12,7 +12,7 @@
           <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
           <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
-            color="grey" v-if="!isDisabled" />
+            color="grey" v-if="!isDisabled" data-cy="event-deletion-button" />
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
@@ -51,10 +51,10 @@
             :disable-end-date="isHourlyAbsence(editedEvent)" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(editedEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" />
-          <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence"
+          <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence" required-field
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" required-field in-modal
-            @delete="deleteDocument(editedEvent.attachment.driveId)" :disable="!selectedAuxiliary._id" />
+            @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id"
+            :error="validations.attachment.$error" @delete="deleteDocument(editedEvent.attachment.driveId)" in-modal />
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
@@ -88,7 +88,7 @@
         </div>
       </div>
       <q-btn v-if="!isDisabled" class="modal-btn full-width" no-caps color="primary" :loading="loading"
-        label="Editer l'évènement" @click="updateEvent" icon-right="check" :disable="disableEditionButton" />
+        label="Editer l'évènement" @click="updateEvent" icon-right="check" data-cy="event-edition-button" />
     </div>
   </q-dialog>
 </template>

@@ -13,13 +13,13 @@ const routes = [
         if (!['/ad', '/ad/'].includes(to.path)) return next();
 
         const refresh = await alenvi.refreshAlenviCookies();
-        if (refresh) await store.dispatch('main/getLoggedUser', Cookies.get('user_id'));
+        if (refresh) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
 
         const userVendorRole = store.getters['main/vendorRole'];
-        if (!userVendorRole) return next({ name: '404' });
+        if (!userVendorRole) return next({ path: '/' });
 
         if (userVendorRole === TRAINER) return next({ name: 'trainers courses' });
         return next({ name: 'ni management courses' });

@@ -1,15 +1,17 @@
 import { mapState } from 'vuex';
 import omit from 'lodash/omit';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
+import { subject } from '@casl/ability';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { frAddress, validHour } from '@helpers/vuelidateCustomVal.js';
-import { can } from '@helpers/rights';
+import { frAddress } from '@helpers/vuelidateCustomVal.js';
+import { defineAbilitiesFor } from '@helpers/ability';
 import {
   INTERNAL_HOUR,
   ABSENCE,
@@ -23,7 +25,6 @@ import {
   SECTOR,
   CUSTOMER,
   OTHER,
-  HOURLY,
   WORK_ACCIDENT,
 } from '@data/constants';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
@@ -39,17 +40,9 @@ export const planningActionMixin = {
         type: { required },
         dates: {
           startDate: { required },
-          endDate: { required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === DAILY)) },
-          startHour: {
-            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
-            validHour,
-          },
-          endHour: {
-            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
-            validHour,
-          },
+          endDate: { required: requiredIf(() => this.newEvent && (this.newEvent.type !== ABSENCE || this.newEvent.absenceNature === DAILY)) },
         },
-        auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
+        auxiliary: { required: requiredIf((item) => item && (item.type !== INTERVENTION || this.personKey === CUSTOMER)) },
         customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
         internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
@@ -62,11 +55,11 @@ export const planningActionMixin = {
           fullAddress: this.newEvent && this.newEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         repetition: {
-          frequency: { required: requiredIf((item, parent) => parent && parent.type !== ABSENCE) },
+          frequency: { required: requiredIf(() => this.newEvent && this.newEvent.type !== ABSENCE) },
         },
         attachment: {
-          driveId: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
-          link: { required: requiredIf((item, parent) => parent && parent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(parent.absence)) },
+          driveId: { required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)) },
+          link: { required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)) },
         },
         misc: { required: requiredIf(item => item && item.type === ABSENCE && item.absence === OTHER) },
       },
@@ -74,14 +67,6 @@ export const planningActionMixin = {
         dates: {
           startDate: { required },
           endDate: { required },
-          startHour: {
-            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
-            validHour,
-          },
-          endHour: {
-            required: requiredIf((item, parent) => parent && (parent.type !== ABSENCE || parent.absenceNature === HOURLY)),
-            validHour,
-          },
         },
         auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
         sector: { required: requiredIf((item) => item && !item.auxiliary) },
@@ -314,8 +299,9 @@ export const planningActionMixin = {
     },
     // Event edition
     openEditionModal (event) {
-      const can = this.canEditEvent(event);
-      if (!can) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
+      const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
+      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
+
       this.formatEditedEvent(event);
 
       this.editionModal = true;
@@ -374,15 +360,9 @@ export const planningActionMixin = {
       }
     },
     canEditEvent (event) {
-      if (!event.auxiliary) {
-        return can({ user: this.loggedUser, permissions: [{ name: 'events:edit' }] });
-      }
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
-      return can({
-        user: this.loggedUser,
-        auxiliaryIdEvent: event.auxiliary._id,
-        permissions: [{ name: 'events:edit', rule: 'canEdit' }],
-      });
+      return ability.can('edit', subject('Events', event));
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();

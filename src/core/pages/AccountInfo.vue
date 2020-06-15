@@ -44,8 +44,7 @@
         required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
-          :disable="$v.mergedUserProfile.local.password.$invalid || $v.passwordConfirm.$invalid" icon-right="done"
-          @click="submitPasswordChange" />
+          icon-right="done" @click="submitPasswordChange" />
       </template>
     </ni-modal>
 
@@ -179,9 +178,9 @@ export default {
       this.$store.dispatch('course/reset');
       this.$store.dispatch('program/reset');
       this.$store.dispatch('company/reset');
-      this.$store.dispatch('customer/reset');
-      this.$store.dispatch('rh/reset');
-      this.$store.dispatch('planning/reset');
+      this.$store.dispatch('customer/resetCustomer');
+      this.$store.dispatch('rh/resetRh');
+      this.$store.dispatch('planning/resetPlanning');
 
       this.$router.replace('/login');
     },

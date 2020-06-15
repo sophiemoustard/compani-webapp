@@ -33,43 +33,48 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
-      <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
-        required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
-      <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
-        @blur="$v.newUser.identity.lastname.$touch" required-field caption="Nom" />
-      <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
-        caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
-      <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
-        caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
-      <ni-input in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error" caption="Email"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
-      <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
-        @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
-        :error="$v.newUser.contact.address.$error" in-modal />
-      <div class="row margin-input">
-        <div class="col-12">
-          <div class="row justify-between">
-            <p class="input-caption required">Équipe</p>
-            <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
+      <ni-input in-modal :disable="!firstStep" v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
+        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" caption="Email" required-field />
+      <template v-if="!firstStep">
+        <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
+          required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
+        <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
+          @blur="$v.newUser.identity.lastname.$touch" required-field caption="Nom" />
+        <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
+          caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
+        <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
+          caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
+        <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
+          @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
+          :error="$v.newUser.contact.address.$error" in-modal />
+        <div class="row margin-input">
+          <div class="col-12">
+            <div class="row justify-between">
+              <p class="input-caption required">Équipe</p>
+              <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
+            </div>
+            <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
+              :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
           </div>
-          <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
-            :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
         </div>
-      </div>
-      <div class="row margin-input last">
-        <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense />
-      </div>
+        <div class="row margin-input last">
+          <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense />
+        </div>
+      </template>
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
-          :loading="loading" @click="submit" />
+        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
+          :loading="loading" icon-right="add" @click="nextStep" />
+        <q-btn v-else no-caps class="full-width modal-btn" label="Créer la fiche" color="primary"
+          :loading="loading" icon-right="add" @click="submit" />
       </template>
     </ni-modal>
   </q-page>
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
 import Roles from '@api/Roles';
@@ -108,6 +113,8 @@ export default {
       tableLoading: false,
       loading: false,
       auxiliaryCreationModal: false,
+      firstStep: true,
+      fetchedUser: {},
       sendWelcomeMsg: true,
       civilityOptions: CIVILITY_OPTIONS.filter(opt => opt.value !== 'couple'),
       defaultNewUser: {
@@ -210,10 +217,8 @@ export default {
     await this.getUserList();
   },
   computed: {
-    ...mapGetters({
-      company: 'main/company',
-      notifications: 'rh/getNotifications',
-    }),
+    ...mapState('rh', ['notifications']),
+    ...mapGetters({ company: 'main/company' }),
     activeUserList () {
       if (this.activeUsers) return this.userList.filter(user => user.isActive);
       return this.userList.filter(user => !user.isActive);
@@ -256,12 +261,12 @@ export default {
       if (!user.isActive) return formattedUser;
 
       const checkProfileErrors = userProfileValidation(user);
-      this.$store.commit(
-        'rh/saveNotification',
+      this.$store.dispatch(
+        'rh/setNotification',
         { type: 'profiles', _id: user._id, exists: !!checkProfileErrors.error }
       );
       const checkTasks = taskValidation(user);
-      this.$store.commit('rh/saveNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
+      this.$store.dispatch('rh/setNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
 
       return { ...formattedUser, profileErrors: checkProfileErrors.error, tasksErrors: checkTasks };
     },
@@ -282,8 +287,10 @@ export default {
     resetForm () {
       this.$v.newUser.$reset();
       this.newUser = cloneDeep(this.defaultNewUser);
+      this.firstStep = true;
+      this.fetchedUser = {};
     },
-    async formatUserCreationPayload () {
+    async formatUserPayload () {
       const roles = await Roles.list({ name: AUXILIARY });
       if (roles.length === 0) throw new Error('Role not found');
 
@@ -295,16 +302,6 @@ export default {
       if (!get(payload, 'contact.address.fullAddress')) delete payload.contact.address;
 
       return payload;
-    },
-    async createAlenviUser () {
-      const folderId = get(this.company, 'auxiliariesFolderId', null);
-      if (!folderId) throw new Error('No auxiliary folder in company drive');
-
-      const payload = await this.formatUserCreationPayload();
-
-      const newUser = await Users.create(payload);
-      await Users.createDriveFolder(newUser._id, { parentFolderId: folderId });
-      return newUser;
     },
     async sendSMS (user) {
       if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
@@ -319,18 +316,77 @@ export default {
       });
       NotifyPositive('SMS bien envoyé');
     },
+    fillNewUser (user) {
+      const paths = [
+        'identity.lastname',
+        'identity.firstname',
+        'identity.title',
+        'contact.adresse.fullAddress',
+        'contact.phone',
+        'sector',
+      ];
+      paths.forEach(path => {
+        const value = get(user, path)
+        if (value) set(this.newUser, path, value);
+      });
+      if (!user.company) this.newUser.company = this.company._id;
+    },
+    async nextStep () {
+      try {
+        this.$v.newUser.$touch();
+        if (this.$v.newUser.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        this.loading = true;
+        const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
+
+        if (userExistsInfo.exists) {
+          const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
+          const userHasValidCompany =
+            !get(userExistsInfo, 'user.company') ||
+             get(userExistsInfo, 'user.company') === this.company._id;
+          const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
+
+          if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
+            this.fetchedUser = await Users.getById(userExistsInfo.user._id)
+            this.fillNewUser(this.fetchedUser);
+          } else {
+            const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
+            if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
+            else if (userHasClientRole) return NotifyNegative('Email déjà existant.');
+          }
+        }
+
+        this.firstStep = false;
+        this.$v.newUser.$reset();
+      } catch (e) {
+        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+      } finally {
+        this.loading = false;
+      }
+    },
     async submit () {
+      let editedUser = {};
       try {
         this.loading = true;
         this.$v.newUser.$touch();
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        const userCreated = await this.createAlenviUser();
-        if (this.sendWelcomeMsg) await this.sendSMS(userCreated);
-        await this.getUserList();
+        const folderId = get(this.company, 'auxiliariesFolderId', null);
+        if (!folderId) return NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
 
+        const payload = await this.formatUserPayload();
+
+        if (this.fetchedUser._id) {
+          await Users.updateById(this.fetchedUser._id, payload);
+          editedUser = { contact: { phone: get(payload, 'contact.phone') || '' }, ...this.fetchedUser };
+        } else {
+          editedUser = await Users.create(payload);
+        }
+        await Users.createDriveFolder(editedUser._id, { parentFolderId: folderId });
+        await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
+
         this.auxiliaryCreationModal = false;
       } catch (e) {
         console.error(e);
@@ -338,6 +394,13 @@ export default {
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
       } finally {
         this.loading = false;
+      }
+      try {
+        if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
+        NotifyNegative('Erreur lors de l\'envoi de SMS');
       }
     },
     getAvatar (link) {

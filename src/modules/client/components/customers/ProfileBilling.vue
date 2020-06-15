@@ -75,11 +75,10 @@
       <ni-select caption="Année" v-model="taxCertificate.year" :options="yearOptions"
         @blur="$v.taxCertificate.year.$touch" :error="$v.taxCertificate.year.$error" in-modal required-field />
       <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="$v.taxCertificate.file.$error"
-        @blur="$v.taxCertificate.file.$touch" in-modal required-field last />
+        @blur="$v.taxCertificate.file.$touch" in-modal required-field last :error-label="taxCertificateFileError" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
-          :disable="!$v.taxCertificate.$anyDirty || $v.taxCertificate.$invalid" :loading="modalLoading"
-          @click="createTaxCertificate" />
+          :loading="modalLoading" @click="createTaxCertificate" />
       </template>
     </ni-modal>
   </div>
@@ -90,7 +89,6 @@ import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import snakeCase from 'lodash/snakeCase';
-import { required } from 'vuelidate/lib/validators';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import TaxCertificates from '@api/TaxCertificates';
@@ -101,7 +99,6 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { validYear } from '@helpers/vuelidateCustomVal';
 import { formatIdentity } from '@helpers/utils';
 import {
   CREDIT_NOTE,
@@ -188,14 +185,14 @@ export default {
     }
   },
   computed: {
-    ...mapState('main', ['loggedUser']),
+    ...mapState({
+      loggedUser: state => state.main.loggedUser,
+      customer: state => state.customer.customer,
+    }),
     ...mapGetters({
       company: 'main/company',
       clientRole: 'main/clientRole',
     }),
-    customer () {
-      return this.$store.getters['customer/getCustomer'];
-    },
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);
     },
@@ -235,23 +232,6 @@ export default {
     this.setBillingDates();
     await this.refresh();
     await this.getTaxCertificates();
-  },
-  validations: {
-    editedPayment: {
-      netInclTaxes: { required },
-      type: { required },
-      date: { required },
-    },
-    newPayment: {
-      netInclTaxes: { required },
-      type: { required },
-      date: { required },
-    },
-    taxCertificate: {
-      date: { required },
-      year: { required, validYear },
-      file: { required, maxSize: file => !!file && file.size < 5000000 },
-    },
   },
   methods: {
     // Billing dates

@@ -1,4 +1,4 @@
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState } from 'vuex';
 import get from 'lodash/get';
 import Gdrive from '@api/GoogleDrive';
 import SelectSector from '@components/form/SelectSector';
@@ -72,8 +72,8 @@ export const planningModalMixin = {
     };
   },
   computed: {
+    ...mapState('planning', ['filters']),
     ...mapGetters({
-      filters: 'planning/getFilters',
       clientRole: 'main/clientRole',
     }),
     absenceOptions () {
@@ -83,58 +83,6 @@ export const planningModalMixin = {
     },
     isCustomerPlanning () {
       return this.personKey === CUSTOMER;
-    },
-    disableCreationButton () {
-      if (!this.newEvent.type) return true;
-      switch (this.newEvent.type) {
-        case ABSENCE:
-          if (this.newEvent.absenceNature === DAILY) {
-            return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-              !this.newEvent.dates.endDate || !this.newEvent.absenceNature ||
-              (this.newEvent.absence === OTHER && !this.newEvent.misc) ||
-              ([WORK_ACCIDENT, ILLNESS].includes(this.newEvent.absence) && !this.newEvent.attachment.link);
-          }
-
-          return !this.newEvent.auxiliary || !this.newEvent.absence || !this.newEvent.dates.startDate ||
-            !this.newEvent.absenceNature;
-        case INTERVENTION:
-          return (this.isCustomerPlanning && !this.newEvent.auxiliary) || !this.newEvent.customer ||
-            !this.newEvent.subscription || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate;
-        case INTERNAL_HOUR:
-          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate ||
-            !this.newEvent.internalHour;
-        case UNAVAILABILITY:
-        default:
-          return !this.newEvent.auxiliary || !this.newEvent.dates.startDate || !this.newEvent.dates.endDate;
-      }
-    },
-    disableEditionButton () {
-      switch (this.editedEvent.type) {
-        case ABSENCE:
-          if (this.editedEvent.absenceNature === DAILY) {
-            return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-              !this.editedEvent.dates.endDate || !this.editedEvent.absenceNature ||
-              (this.editedEvent.absence === OTHER && !this.editedEvent.misc) ||
-              ([WORK_ACCIDENT, ILLNESS].includes(this.editedEvent.absence) && !this.editedEvent.attachment.link);
-          }
-
-          return !this.editedEvent.auxiliary || !this.editedEvent.absence || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.absenceNature;
-        case INTERVENTION: {
-          const shouldDisableButton = !this.editedEvent.subscription || !this.editedEvent.dates.startDate ||
-            !this.editedEvent.dates.endDate;
-          if (this.editedEvent.isCancelled) {
-            return shouldDisableButton || !this.editedEvent.cancel.condition || !this.editedEvent.cancel.reason ||
-              !this.editedEvent.misc;
-          } else return shouldDisableButton;
-        }
-        case INTERNAL_HOUR:
-          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate ||
-            !this.editedEvent.internalHour;
-        case UNAVAILABILITY:
-        default:
-          return !this.editedEvent.auxiliary || !this.editedEvent.dates.startDate || !this.editedEvent.dates.endDate;
-      }
     },
     eventTypeOptions () {
       if (this.isCustomerPlanning || (this.selectedAuxiliary && !this.selectedAuxiliary._id)) {

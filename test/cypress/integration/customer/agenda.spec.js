@@ -6,6 +6,7 @@ describe('customers agenda tests', () => {
   });
 
   it('should display correctly the agenda page', function () {
+    cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=customer-identity]').should('have.value', 'Romain BARDET');
 
     cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
@@ -22,15 +23,15 @@ describe('customers agenda tests', () => {
   it('should go through agenda and display events', function () {
     cy.get('#q-app').click(500, 500);
     cy.get('.event-intervention').should('have.length', 1);
-    cy.get('[data-cy=event-title]').eq(0).should('contain', 'Auxiliary T.');
+    cy.get('[data-cy=event-title]').eq(0).should('contain', 'Customer referent 1 T.');
     cy.get('[data-cy=event-hours]').eq(0).should('contain', '10:00 - 12:30');
 
     cy.get('[data-cy=planning_before]').click();
     cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'week').subtract(1, 'day').week());
     cy.get('.event-intervention').should('have.length', 2);
-    cy.get('[data-cy=event-title]').eq(0).should('contain', 'PlanningReferent T.');
+    cy.get('[data-cy=event-title]').eq(0).should('contain', 'Customer referent 1 T.');
     cy.get('[data-cy=event-hours]').eq(0).should('contain', '11:15 - 12:30');
-    cy.get('[data-cy=event-title]').eq(1).should('contain', 'Auxiliary T.');
+    cy.get('[data-cy=event-title]').eq(1).should('contain', 'Customer referent 1 T.');
     cy.get('[data-cy=event-hours]').eq(1).should('contain', '18:15 - 20:30');
 
     cy.get('[data-cy=planning_after]').click();

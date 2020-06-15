@@ -17,13 +17,12 @@
       :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary" :loading="loading"
-        @click="createPayment" :disable="validations.$error || disableCreationButton" />
+        @click="createPayment" />
     </template>
   </ni-modal>
 </template>
 
 <script>
-import some from 'lodash/some';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import DateInput from '@components/form/DateInput';
@@ -57,9 +56,6 @@ export default {
     netInclTaxesError () {
       if (!this.validations.netInclTaxes.required) return REQUIRED_LABEL;
       return 'Montant TTC non valide'
-    },
-    disableCreationButton () {
-      return some(this.newPayment, (el) => !el);
     },
     creationModalNature () {
       if (!this.newPayment.nature) return '';

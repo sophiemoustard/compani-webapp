@@ -1,5 +1,6 @@
-import { mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import Customers from '@api/Customers';
 import {
   CLIENT_ADMIN,
@@ -39,7 +40,10 @@ export const menuItemsMixin = {
     }
   },
   computed: {
-    ...mapGetters({ company: 'main/company', clientRole: 'main/clientRole' }),
+    ...mapState('main', ['loggedUser']),
+    clientRole () {
+      return get(this.loggedUser, 'role.client.name')
+    },
     customer () {
       return this.isHelper ? this.$store.getters['customer/getCustomer'] : null;
     },
@@ -67,7 +71,7 @@ export const menuItemsMixin = {
     },
     routes () {
       let routes = [];
-      const ability = defineAbilitiesFor(this.clientRole, null, this.company);
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
 
       if (this.isHelper) routes = this.customerRoutes;
       else if (this.isCoach) routes = this.coachRoutes;
@@ -221,7 +225,7 @@ export const menuItemsMixin = {
     async refreshCustomer () {
       if (this.loggedUser && this.loggedUser.customers) {
         const customer = await Customers.getById(this.loggedUser.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
+        this.$store.dispatch('customer/setCustomer', customer);
       }
     },
   },

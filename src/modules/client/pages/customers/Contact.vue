@@ -37,10 +37,12 @@ export default {
   name: 'Contact',
   metaInfo: { title: 'Contact' },
   computed: {
-    ...mapState({ helper: state => state.main.loggedUser }),
+    ...mapState({
+      helper: state => state.main.loggedUser,
+      customer: state => state.customer.customer,
+    }),
     ...mapGetters({
       company: 'main/company',
-      customer: 'customer/getCustomer',
     }),
     referentAvatar () {
       const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
@@ -67,7 +69,7 @@ export default {
     async refreshCustomer () {
       if (this.helper && this.helper.customers) {
         const customer = await Customers.getById(this.helper.customers[0]._id);
-        this.$store.commit('customer/saveCustomer', customer);
+        this.$store.dispatch('customer/setCustomer', customer);
       }
     },
   },
