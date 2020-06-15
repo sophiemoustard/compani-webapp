@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     vendorRole () {
-      return this.$store.getters['main/vendorRole'];
+      return this.$store.getters['main/getVendorRole'];
     },
   },
   methods: {

@@ -57,7 +57,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ company: 'main/company' }),
+    ...mapGetters({ company: 'main/getCompany' }),
   },
   async mounted () {
     await this.getDirectDebits();

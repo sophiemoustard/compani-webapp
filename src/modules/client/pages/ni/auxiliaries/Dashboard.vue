@@ -151,8 +151,8 @@ export default {
       elementToRemove: state => state.planning.elementToRemove,
     }),
     ...mapGetters({
-      company: 'main/company',
-      clientRole: 'main/clientRole',
+      company: 'main/getCompany',
+      clientRole: 'main/getClientRole',
     }),
     monthsOptions () {
       if (this.firstInterventionStartDate === '') {

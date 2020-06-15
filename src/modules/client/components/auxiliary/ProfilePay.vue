@@ -113,7 +113,7 @@ export default {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({ clientRole: 'main/getClientRole' }),
     documentNatureLabels () {
       const payDocumentNaturesKeyedByValue = keyBy(PAY_DOCUMENT_NATURES, 'value');
 

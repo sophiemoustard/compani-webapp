@@ -70,14 +70,14 @@ export default {
   methods: {
     async refreshCourse () {
       try {
-        await this.$store.dispatch('course/get', { courseId: this.courseId });
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('course/reset');
+    this.$store.dispatch('course/resetCourse');
   },
 
 }

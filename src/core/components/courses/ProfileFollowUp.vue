@@ -261,7 +261,7 @@ export default {
     async refreshCourse () {
       try {
         this.courseLoading = true;
-        await this.$store.dispatch('course/get', { courseId: this.profileId });
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
       } catch (e) {
         console.error(e);
       } finally {

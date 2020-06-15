@@ -31,7 +31,7 @@ Router.beforeEach(async (to, from, next) => {
         const ability = defineAbilitiesFor(pick(loggedUser, ['role', 'company']));
         if (!ability.can('read', to.name)) next('/404');
         else {
-          store.dispatch('main/updateRefreshState', false);
+          store.dispatch('main/setRefreshState', false);
           next();
         }
       } else next({ path: '/login', query: { from: to.fullPath } });
@@ -42,7 +42,7 @@ Router.beforeEach(async (to, from, next) => {
       const ability = defineAbilitiesFor(pick(loggedUser, ['role', 'company']));
       if (!ability.can('read', to.name)) next('/404');
       else {
-        store.dispatch('main/updateRefreshState', false);
+        store.dispatch('main/setRefreshState', false);
         next();
       }
     }

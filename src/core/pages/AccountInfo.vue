@@ -127,7 +127,7 @@ export default {
     }
   },
   async beforeDestroy () {
-    if (this.isLoggingOut) this.$store.dispatch('main/reset');
+    if (this.isLoggingOut) this.$store.dispatch('main/resetMain');
   },
   methods: {
     saveTmp (path) {
@@ -175,9 +175,9 @@ export default {
       this.$q.cookies.remove('user_id', { path: '/' });
       this.$q.localStorage.clear();
 
-      this.$store.dispatch('course/reset');
-      this.$store.dispatch('program/reset');
-      this.$store.dispatch('company/reset');
+      this.$store.dispatch('course/resetCourse');
+      this.$store.dispatch('program/resetProgram');
+      this.$store.dispatch('company/resetCompany');
       this.$store.dispatch('customer/resetCustomer');
       this.$store.dispatch('rh/resetRh');
       this.$store.dispatch('planning/resetPlanning');

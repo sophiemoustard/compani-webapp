@@ -498,7 +498,7 @@ export default {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({ clientRole: 'main/getClientRole' }),
     captionTransportUploader () {
       const coachText = 'Justificatif d\'abonnement';
       const auxiliaryText = 'Merci de nous transmettre ton justificatif d\'abonnement';

@@ -94,8 +94,8 @@ export default {
   computed: {
     ...mapState('planning', ['filters', 'elementToAdd', 'elementToRemove']),
     ...mapGetters({
-      company: 'main/company',
-      clientRole: 'main/clientRole',
+      company: 'main/getCompany',
+      clientRole: 'main/getClientRole',
     }),
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();

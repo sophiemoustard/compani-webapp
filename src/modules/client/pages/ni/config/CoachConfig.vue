@@ -15,7 +15,7 @@ export default {
     'ni-coach-list': CoachList,
   },
   computed: {
-    ...mapGetters({ loggedCompany: 'main/company' }),
+    ...mapGetters({ loggedCompany: 'main/getCompany' }),
   },
 }
 </script>

@@ -175,7 +175,7 @@ export default {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({ clientRole: 'main/getClientRole' }),
     isCoach () {
       return COACH_ROLES.includes(this.clientRole);
     },

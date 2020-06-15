@@ -18,7 +18,7 @@ const routes = [
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
 
-        const userVendorRole = store.getters['main/vendorRole'];
+        const userVendorRole = store.getters['main/getVendorRole'];
         if (!userVendorRole) return next({ path: '/' });
 
         if (userVendorRole === TRAINER) return next({ name: 'trainers courses' });
@@ -119,7 +119,7 @@ const routes = [
         name: 'trainers courses info',
         component: () => import('src/core/pages/courses/CourseProfile'),
         async beforeEnter (to, from, next) {
-          await store.dispatch('course/get', { courseId: to.params.courseId });
+          await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
           const { course } = store.state.course;
 
           return Cookies.get('user_id') === get(course, 'trainer._id') ? next() : next('/404');

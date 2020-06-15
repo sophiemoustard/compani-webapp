@@ -190,8 +190,8 @@ export default {
       customer: state => state.customer.customer,
     }),
     ...mapGetters({
-      company: 'main/company',
-      clientRole: 'main/clientRole',
+      company: 'main/getCompany',
+      clientRole: 'main/getClientRole',
     }),
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);

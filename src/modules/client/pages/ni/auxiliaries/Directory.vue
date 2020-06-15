@@ -218,7 +218,7 @@ export default {
   },
   computed: {
     ...mapState('rh', ['notifications']),
-    ...mapGetters({ company: 'main/company' }),
+    ...mapGetters({ company: 'main/getCompany' }),
     activeUserList () {
       if (this.activeUsers) return this.userList.filter(user => user.isActive);
       return this.userList.filter(user => !user.isActive);
