@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
 import CourseContainer from '@components/courses/CourseContainer';
 
 export default {
@@ -19,16 +20,28 @@ export default {
     courseListForthcoming () {
       return this.courses
         .filter(this.isForthcoming)
+        .map((course) => {
+          course.status = FORTHCOMING;
+          return course;
+        })
         .sort((a, b) => this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b));
     },
     courseListInProgress () {
       return this.courses
         .filter(this.isInProgress)
+        .map((course) => {
+          course.status = IN_PROGRESS;
+          return course;
+        })
         .sort((a, b) => this.getRangeNowToNextSlot(a) - this.getRangeNowToNextSlot(b));
     },
     courseListCompleted () {
       return this.courses
         .filter(this.isCompleted)
+        .map((course) => {
+          course.status = COMPLETED;
+          return course;
+        })
         .sort((a, b) => this.getRangeNowToEndCourse(a) - this.getRangeNowToEndCourse(b));
     },
     trello () {
