@@ -1,13 +1,13 @@
 <template>
   <q-card flat>
     <q-card-section @click="$emit('click', course)">
-      <div class="infos-course-nearest-date">{{ formatNearestDate }}</div>
-      <div class="title-text text-weight-bold">
+      <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
+      <div class="title-text">
         <span v-if="isIntraCourse" >{{ get(course, 'company.name') || '' }} - </span>
         {{ get(course, 'program.name') || '' }} - {{ course.name || '' }}
       </div>
       <div class="items-container">
-        <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container text-weight-bold">
+        <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container">
           <q-item-section side>
             <q-icon size="12px" :name="info.icon" />
           </q-item-section>
@@ -15,13 +15,13 @@
         </q-item>
       </div>
       <div v-if="course.status === FORTHCOMING" class="additional-infos-container">
-        <q-item class="infos-course-container text-weight-bold">
+        <q-item class="infos-course-container">
           <q-item-section class="additional-infos">
             <q-icon size="12px" name="mdi-calendar-range" />
             <q-item-label>{{ formatCourseSlotsInfos }}</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item class="infos-course-container text-weight-bold">
+        <q-item class="infos-course-container">
           <q-item-section class="additional-infos">
             <q-icon size="12px" name="mdi-account-multiple" />
             <q-item-label>({{ traineesCount }})</q-item-label>
@@ -164,8 +164,8 @@ export default {
   .slots
     height: 10px;
     flex: 1;
-    background-color: $primary-light;
-    border: solid 1px $primary;
+    background-color: $primary-lighter;
+    border: solid 1px $primary-light;
     &-happened
       background-color: $primary;
 
@@ -194,7 +194,6 @@ export default {
       margin-left: 1px;
     .additional-infos
       display: flex;
-      font-weight: bold;
       padding-right: 10px;
       justify-content: flex-end;
 </style>
