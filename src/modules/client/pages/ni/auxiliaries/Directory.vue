@@ -15,10 +15,6 @@
           <q-icon v-if="notifications.profiles[props.row.auxiliary._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
         </template>
-        <template v-else-if="col.name === 'tasksErrors'">
-          <q-icon v-if="notifications.tasks[props.row.auxiliary._id] && props.row.isActive" name="error"
-            color="secondary" size="1rem" />
-        </template>
         <template v-else-if="col.name === 'active'">
           <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }"></div>
         </template>
@@ -92,7 +88,6 @@ import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OP
 import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
-import { taskValidation } from 'src/modules/client/helpers/taskValidation';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 
 export default {
@@ -163,13 +158,6 @@ export default {
           align: 'left',
           sortable: true,
           style: 'min-width: 75px; width: 8%',
-        },
-        {
-          name: 'tasksErrors',
-          label: 'Tâches',
-          align: 'left',
-          sortable: true,
-          style: 'min-width: 82px; width: 8%',
         },
         {
           name: 'startDate',
@@ -265,10 +253,8 @@ export default {
         'rh/setNotification',
         { type: 'profiles', _id: user._id, exists: !!checkProfileErrors.error }
       );
-      const checkTasks = taskValidation(user);
-      this.$store.dispatch('rh/setNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
 
-      return { ...formattedUser, profileErrors: checkProfileErrors.error, tasksErrors: checkTasks };
+      return { ...formattedUser, profileErrors: checkProfileErrors.error };
     },
     async getUserList () {
       try {

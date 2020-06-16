@@ -85,13 +85,4 @@ export default {
     const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`, data);
     return driveFolder;
   },
-  // Tasks
-  async updateTask ({ userId, taskId }, data) {
-    const updatedTask = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/tasks/${taskId}`, data)
-    return updatedTask;
-  },
-  async getTasks (userId) {
-    const tasks = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${userId}/tasks`);
-    return tasks.data.data.tasks;
-  },
 }
