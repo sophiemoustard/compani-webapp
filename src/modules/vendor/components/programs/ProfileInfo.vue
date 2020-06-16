@@ -54,7 +54,7 @@ export default {
     },
     async refreshProgram () {
       try {
-        await this.$store.dispatch('program/get', { programId: this.profileId });
+        await this.$store.dispatch('program/fetchProgram', { programId: this.profileId });
       } catch (e) {
         console.error(e);
       }

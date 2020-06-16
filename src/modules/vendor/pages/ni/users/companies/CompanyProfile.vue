@@ -58,14 +58,14 @@ export default {
   methods: {
     async refreshCompany () {
       try {
-        await this.$store.dispatch('company/get', { companyId: this.companyId });
+        await this.$store.dispatch('company/fetchCompany', { companyId: this.companyId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('company/reset');
+    this.$store.dispatch('company/resetCompany');
   },
 }
 </script>

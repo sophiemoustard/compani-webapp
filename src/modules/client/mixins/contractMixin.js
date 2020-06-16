@@ -38,7 +38,7 @@ export const contractMixin = {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({ company: 'main/company' }),
+    ...mapGetters({ company: 'main/getCompany' }),
     isPreviousPayImpacted () {
       const startOfMonth = this.$moment().startOf('M');
       return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)

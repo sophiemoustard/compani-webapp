@@ -14,7 +14,7 @@ export const configMixin = {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({ loggedCompany: 'main/company' }),
+    ...mapGetters({ loggedCompany: 'main/getCompany' }),
   },
   methods: {
     saveTmp (path) {

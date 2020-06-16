@@ -281,7 +281,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({ clientRole: 'main/getClientRole' }),
     canUpdateErpConfig () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
 

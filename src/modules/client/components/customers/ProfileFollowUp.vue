@@ -184,7 +184,7 @@ export default {
   },
   computed: {
     ...mapState('customer', ['customer']),
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({ clientRole: 'main/getClientRole' }),
     auxiliaryAvatar () {
       const auxiliaryPicture = get(this.customer, 'referent.picture') || null;
       return this.getAuxiliaryAvatar(auxiliaryPicture);

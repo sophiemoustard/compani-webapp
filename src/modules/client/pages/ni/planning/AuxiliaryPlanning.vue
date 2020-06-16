@@ -99,8 +99,8 @@ export default {
   computed: {
     ...mapState('planning', ['filters', 'elementToAdd', 'elementToRemove']),
     ...mapGetters({
-      clientRole: 'main/clientRole',
-      company: 'main/company',
+      clientRole: 'main/getClientRole',
+      company: 'main/getCompany',
     }),
     displayedAuxiliaries () {
       return this.auxiliaries

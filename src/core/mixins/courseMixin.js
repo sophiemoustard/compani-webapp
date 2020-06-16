@@ -8,7 +8,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 
 export const courseMixin = {
   computed: {
-    ...mapGetters({ vendorRole: 'main/vendorRole' }),
+    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
     companyName () {
       return get(this.course, 'company.tradeName') || '';
     },

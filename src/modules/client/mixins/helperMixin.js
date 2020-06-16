@@ -53,7 +53,7 @@ export const helperMixin = {
     }
   },
   computed: {
-    ...mapGetters({ company: 'main/company' }),
+    ...mapGetters({ company: 'main/getCompany' }),
     sortedHelpers () {
       return [...this.helpers]
         .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));

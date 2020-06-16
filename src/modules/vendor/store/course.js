@@ -7,20 +7,20 @@ export default {
     course: null,
   },
   mutations: {
-    SAVE: (state, data) => { state.course = !data ? data : Object.assign({}, data) },
+    SET_COURSE: (state, data) => { state.course = !data ? data : Object.assign({}, data) },
   },
   actions: {
-    get: async ({ commit }, params) => {
+    fetchCourse: async ({ commit }, params) => {
       try {
         const course = await Courses.getById(params.courseId);
         if (!get(course, 'trainer._id')) course.trainer = { _id: '' };
 
-        commit('SAVE', course);
+        commit('SET_COURSE', course);
       } catch (e) {
         console.error(e);
       }
     },
-    reset: ({ commit }) => { commit('SAVE', null) },
+    resetCourse: ({ commit }) => { commit('SET_COURSE', null) },
   },
   getters: {},
 };

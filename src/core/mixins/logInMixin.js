@@ -4,8 +4,8 @@ import Users from '@api/Users';
 export const logInMixin = {
   computed: {
     ...mapGetters({
-      clientRole: 'main/clientRole',
-      vendorRole: 'main/vendorRole',
+      clientRole: 'main/getClientRole',
+      vendorRole: 'main/getVendorRole',
     }),
   },
   methods: {

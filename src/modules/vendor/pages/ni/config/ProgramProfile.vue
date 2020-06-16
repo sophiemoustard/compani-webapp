@@ -46,14 +46,14 @@ export default {
   methods: {
     async refreshProgram () {
       try {
-        await this.$store.dispatch('program/get', { programId: this.programId });
+        await this.$store.dispatch('program/fetchProgram', { programId: this.programId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('program/reset');
+    this.$store.dispatch('program/resetProgram');
   },
 
 }

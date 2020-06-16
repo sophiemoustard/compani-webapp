@@ -570,7 +570,7 @@ export default {
       return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
     },
     company () {
-      return this.$store.getters['main/company'];
+      return this.$store.getters['main/getCompany'];
     },
     serviceOptions () {
       if (!this.services) return [];

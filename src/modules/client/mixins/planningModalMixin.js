@@ -74,7 +74,7 @@ export const planningModalMixin = {
   computed: {
     ...mapState('planning', ['filters']),
     ...mapGetters({
-      clientRole: 'main/clientRole',
+      clientRole: 'main/getClientRole',
     }),
     absenceOptions () {
       return this.newEvent && this.newEvent.absenceNature === HOURLY

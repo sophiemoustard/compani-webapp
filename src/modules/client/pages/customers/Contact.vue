@@ -42,7 +42,7 @@ export default {
       customer: state => state.customer.customer,
     }),
     ...mapGetters({
-      company: 'main/company',
+      company: 'main/getCompany',
     }),
     referentAvatar () {
       const auxiliaryPicture = get(this.customer, 'referent.picture') || null;

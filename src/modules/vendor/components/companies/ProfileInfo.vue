@@ -56,7 +56,7 @@ export default {
     },
     async refreshCompany () {
       try {
-        await this.$store.dispatch('company/get', { companyId: this.profileId });
+        await this.$store.dispatch('company/fetchCompany', { companyId: this.profileId });
       } catch (e) {
         console.error(e);
       }

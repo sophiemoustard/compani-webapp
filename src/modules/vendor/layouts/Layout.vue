@@ -55,7 +55,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ vendorRole: 'main/vendorRole' }),
+    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
     isAdmin () {
       return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },

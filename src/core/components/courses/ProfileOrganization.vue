@@ -397,7 +397,7 @@ export default {
     async refreshCourse () {
       try {
         this.courseSlotsLoading = true;
-        await this.$store.dispatch('course/get', { courseId: this.profileId });
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
         this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
       } catch (e) {
         console.error(e);
