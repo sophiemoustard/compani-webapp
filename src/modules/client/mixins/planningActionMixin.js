@@ -170,7 +170,7 @@ export const planningActionMixin = {
     },
     getPayload (event) {
       let payload = { ...omit(event, ['dates', '__v', 'company']) }
-      payload = pickBy(payload);
+      payload = { ...pickBy(payload), ...pick(payload, ['isCancelled']) };
 
       payload.startDate = event.dates.startDate;
       payload.endDate = event.dates.endDate;
