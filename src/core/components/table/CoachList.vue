@@ -87,6 +87,7 @@ import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
 import Roles from '@api/Roles';
+import Email from '@api/Email';
 import Users from '@api/Users';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
@@ -221,9 +222,15 @@ export default {
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Users.create(this.formatUserPayload(this.newUser));
+        NotifyPositive('Utilisateur enregistré.');
+
+        const userRole = this.roles.find((role) => role._id === this.newUser.role);
+        if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
+        await Email.sendWelcome({ email: this.newUser.local.email, type: get(userRole, 'name') });
+        NotifyPositive('Email envoyé.');
+
         this.userCreationModal = false;
         this.getUsers();
-        NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'utilisateur.');
