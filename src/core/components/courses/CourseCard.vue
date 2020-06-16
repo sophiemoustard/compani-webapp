@@ -17,13 +17,13 @@
       <div v-if="course.status === FORTHCOMING" class="additional-infos-container">
         <q-item class="infos-course-container text-weight-bold">
           <q-item-section class="additional-infos">
-            <q-icon size="xs" name="mdi-calendar-range" />
+            <q-icon size="12px" name="mdi-calendar-range" />
             <q-item-label>{{ formatCourseSlotsInfos }}</q-item-label>
           </q-item-section>
         </q-item>
         <q-item class="infos-course-container text-weight-bold">
           <q-item-section class="additional-infos">
-            <q-icon size="xs" name="mdi-account-multiple" />
+            <q-icon size="12px" name="mdi-account-multiple" />
             <q-item-label>({{ traineesCount }})</q-item-label>
           </q-item-section>
         </q-item>
@@ -125,7 +125,6 @@ export default {
 
 <style lang="stylus" scoped>
   .q-card__section
-    font-size: 13px
     height: fit-content
     &:hover
       cursor: pointer
@@ -153,17 +152,15 @@ export default {
       font-size: 14px;
     &-container
       align-items: center;
-      font-size: 14px;
       margin-top: 10px;
       & > .q-item__section
         display: flex;
         justify-content: flex-start;
         flex-direction: row;
-        color: black;
         &.q-item__section--side
           margin-right: 10px
         & > .q-icon
-          margin-right: 10px;
+          margin-right: 5px;
   .slots
     height: 10px;
     flex: 1;
@@ -172,30 +169,32 @@ export default {
     &-happened
       background-color: $primary;
 
-.additional-infos
-  color: $primary !important;
-  &-container
-    display: flex;
-    justify-content: flex-end;
-
-.slots-timeline-container
-  display: flex;
-  flex-direction: column;
-  padding: 0px;
-  overflow: hidden;
-  .q-item
-    margin-right: 0px;
-  .slots-timeline
-    width: 102%;
-    height: 102%;
-    margin-left: 0px;
-  .slots-timeline > :nth-child(1)
-    margin-left: 0px;
-  .slots-timeline > div
-    margin-left: 1px;
   .additional-infos
+    color: $primary !important;
+    font-size: 12px;
+    align-items: flex-end;
+    &-container
+      display: flex;
+      justify-content: flex-end;
+
+  .slots-timeline-container
     display: flex;
-    font-weight: bold;
-    padding-right: 10px;
-    justify-content: flex-end;
+    flex-direction: column;
+    padding: 0px;
+    overflow: hidden;
+    .q-item
+      margin-right: 0px;
+    .slots-timeline
+      width: 102%;
+      height: 102%;
+      margin-left: 0px;
+    .slots-timeline > :nth-child(1)
+      margin-left: 0px;
+    .slots-timeline > div
+      margin-left: 1px;
+    .additional-infos
+      display: flex;
+      font-weight: bold;
+      padding-right: 10px;
+      justify-content: flex-end;
 </style>
