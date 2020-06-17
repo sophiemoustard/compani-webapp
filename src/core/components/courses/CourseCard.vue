@@ -164,10 +164,11 @@ export default {
   .slots
     height: 10px;
     flex: 1;
-    background-color: $primary-lighter;
-    border: solid 1px $primary-light;
+    background-color: $primary-light;
+    border: solid 1px $light-purple;
     &-happened
       background-color: $primary;
+      border: none;
 
   .additional-infos
     color: $primary !important;
@@ -185,9 +186,8 @@ export default {
     .q-item
       margin-right: 0px;
     .slots-timeline
-      width: 102%;
-      height: 102%;
-      margin-left: 0px;
+      width: 104%;
+      margin-left: -2%;
     .slots-timeline > :nth-child(1)
       margin-left: 0px;
     .slots-timeline > div
