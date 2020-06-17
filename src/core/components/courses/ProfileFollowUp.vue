@@ -125,6 +125,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
+import { formatIdentity } from '@helpers/utils.js';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
@@ -160,6 +161,13 @@ export default {
           align: 'left',
           field: 'date',
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+        },
+        {
+          name: 'sender',
+          label: 'Expéditeur',
+          align: 'left',
+          field: row => get(row, 'sender.identity') || '',
+          format: (value) => formatIdentity(value, 'FL'),
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
