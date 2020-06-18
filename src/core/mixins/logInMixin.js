@@ -15,7 +15,12 @@ export const logInMixin = {
       const expiresInDays = parseInt(auth.expiresIn / 3600 / 24, 10) >= 1
         ? parseInt(auth.expiresIn / 3600 / 24, 10)
         : 1;
-      const options = { path: '/', expires: expiresInDays, secure: process.env.NODE_ENV === 'production' };
+      const options = {
+        path: '/',
+        expires: expiresInDays,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'Strict',
+      };
       this.$q.cookies.set('alenvi_token', auth.token, options);
       this.$q.cookies.set('alenvi_token_expires_in', auth.expiresIn, options);
       this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
