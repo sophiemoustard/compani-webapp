@@ -30,8 +30,9 @@ export const courseFiltersMixin = {
         courses = courses.filter(course => course.program._id === this.selectedProgram);
       }
       if (this.selectedTrainer) {
-        courses = courses.filter(course => (this.selectedTrainer === 'without_trainer' && !course.trainer) ||
-          (course.trainer && course.trainer._id === this.selectedTrainer));
+        courses = courses.filter(course => course.trainer
+          ? course.trainer._id === this.selectedTrainer
+          : this.selectedTrainer === 'without_trainer');
       }
       if (this.selectedCompany) {
         courses = courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
