@@ -45,7 +45,7 @@ export const courseFiltersMixin = {
       try {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
         this.trainerOptions = trainers.filter(trainer =>
-          this.coursesFiltered.some(course => course.trainer._id === trainer._id)
+          this.coursesFiltered.some(course => course.trainer && course.trainer._id === trainer._id)
         )
           .map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }));
       } catch (e) {
