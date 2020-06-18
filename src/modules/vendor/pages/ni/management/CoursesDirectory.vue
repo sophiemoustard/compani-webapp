@@ -1,7 +1,20 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
-    <ni-trello :courses="coursesWithGroupedSlot" />
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select class="q-pl-sm" :options="companyFilterOptions" v-model="selectedCompany" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select class="q-pl-sm" :options="trainerFilterOptions" v-model="selectedTrainer" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select class="q-pl-sm" :options="programFilterOptions" v-model="selectedProgram" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
+    </div>
+
+    <ni-trello :courses="coursesFiltered" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="courseCreationModal = true" />
 
@@ -42,10 +55,12 @@ import OptionGroup from '@components/form/OptionGroup';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
+import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
+  mixins: [courseFiltersMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-input': Input,
@@ -67,6 +82,7 @@ export default {
       coursesWithGroupedSlot: [],
       programOptions: [],
       companyOptions: [],
+      trainerOptions: [],
       courseTypes: COURSE_TYPES,
     }
   },
@@ -87,7 +103,7 @@ export default {
     },
   },
   async created () {
-    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies()]);
+    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies(), this.refreshTrainers()]);
   },
   methods: {
     async refreshCourses () {
