@@ -181,7 +181,7 @@ import {
   VENDOR,
   CLIENT,
 } from '@data/constants';
-import { formatIdentity, formatPhone, clear } from '@helpers/utils';
+import { formatIdentity, formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -558,6 +558,7 @@ export default {
         else delete payload.identity.firstname;
       }
       if (get(payload, 'contact.phone') === '') delete payload.contact;
+      else payload.contact.phone = formatPhoneForPayload(payload.contact.phone);
       if (get(payload, 'company') === '') delete payload.company;
 
       return payload;
@@ -602,6 +603,7 @@ export default {
         this.loading = true;
         this.$v.editedTrainee.$touch();
         if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (get(this.editedTrainee, 'contact.phone')) this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
 
         await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
         this.traineeEditionModal = false;
