@@ -216,12 +216,13 @@ export default {
       }
     },
     async createUser () {
+      let newUser;
       try {
         this.loading = true;
         this.$v.newUser.$touch();
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Users.create(this.formatUserPayload(this.newUser));
+        newUser = await Users.create(this.formatUserPayload(this.newUser));
         NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
         console.error(e);
@@ -229,19 +230,22 @@ export default {
         this.loading = false;
       }
 
-      try {
-        const userRole = this.roles.find((role) => role._id === this.newUser.role);
-        if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
-        await Email.sendWelcome({ email: this.newUser.local.email, type: get(userRole, 'name') });
-        NotifyPositive('Email envoyé.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'envoi du mail.');
-      } finally {
-        this.loading = false;
-        this.userCreationModal = false;
+      if (!get(newUser, 'company.subscriptions.erp')) {
+        try {
+          const userRole = this.roles.find((role) => role._id === this.newUser.role);
+          if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
+          await Email.sendWelcome({ email: this.newUser.local.email, type: get(userRole, 'name') });
+          NotifyPositive('Email envoyé.');
+        } catch (e) {
+          console.error(e);
+          NotifyNegative('Erreur lors de l\'envoi du mail.');
+          this.loading = false;
+          this.userCreationModal = false;
+        }
       }
 
+      this.loading = false;
+      this.userCreationModal = false;
       this.getUsers();
     },
     resetUserCreationForm () {
