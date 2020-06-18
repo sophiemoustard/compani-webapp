@@ -2,7 +2,7 @@ import Users from '@api/Users';
 import { INTRA, INTER_B2B, TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 
-export const filtersMixin = {
+export const courseFiltersMixin = {
   data () {
     return {
       selectedProgram: '',
