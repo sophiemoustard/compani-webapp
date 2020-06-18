@@ -45,7 +45,6 @@ import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
-import Users from '@api/Users';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
@@ -55,9 +54,8 @@ import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, INTER_B2B, TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
 import { filtersMixin } from '@mixins/filtersMixin';
-import { formatIdentity } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -118,14 +116,6 @@ export default {
       } catch (e) {
         console.error(e);
         this.coursesWithGroupedSlot = [];
-      }
-    },
-    async refreshTrainers () {
-      try {
-        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }))
-      } catch (e) {
-        console.error(e);
       }
     },
     async refreshPrograms () {

@@ -1,4 +1,6 @@
-import { INTRA, INTER_B2B } from '@data/constants';
+import Users from '@api/Users';
+import { INTRA, INTER_B2B, TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
 
 export const filtersMixin = {
   data () {
@@ -38,6 +40,17 @@ export const filtersMixin = {
       this.selectedTrainer = '';
       this.selectedCompany = '';
       this.selectedProgram = '';
+    },
+    async refreshTrainers () {
+      try {
+        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        this.trainerOptions = trainers.filter(trainer =>
+          this.coursesFiltered.some(course => course.trainer._id === trainer._id)
+        )
+          .map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }));
+      } catch (e) {
+        console.error(e);
+      }
     },
   },
 }
