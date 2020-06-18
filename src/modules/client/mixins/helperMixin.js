@@ -28,8 +28,8 @@ export const helperMixin = {
       },
       helpers: [],
       helpersColumns: [
-        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
         { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
         { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
         {
           name: 'phone',

@@ -7,9 +7,9 @@
       caption="Email" @blur="validations.local.email.$touch" :error-label="emailError" required-field
       :last="firstStep" />
     <template v-if="!firstStep">
+      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
         caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model.trim="newHelper.contact.phone" last :error="validations.contact.phone.$error"
         caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
     </template>
