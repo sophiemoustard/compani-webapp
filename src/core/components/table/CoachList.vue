@@ -223,20 +223,26 @@ export default {
 
         await Users.create(this.formatUserPayload(this.newUser));
         NotifyPositive('Utilisateur enregistré.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de l\'utilisateur.');
+        this.loading = false;
+      }
 
+      try {
         const userRole = this.roles.find((role) => role._id === this.newUser.role);
         if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
         await Email.sendWelcome({ email: this.newUser.local.email, type: get(userRole, 'name') });
         NotifyPositive('Email envoyé.');
-
-        this.userCreationModal = false;
-        this.getUsers();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'utilisateur.');
+        NotifyNegative('Erreur lors de l\'envoi du mail.');
       } finally {
         this.loading = false;
+        this.userCreationModal = false;
       }
+
+      this.getUsers();
     },
     resetUserCreationForm () {
       this.firstStep = true;
@@ -298,6 +304,7 @@ export default {
         this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la récupération des utilisateurs')
         this.users = [];
       } finally {
         this.usersLoading = false;
