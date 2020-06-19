@@ -169,10 +169,12 @@ export default {
     },
     logout () {
       this.isLoggingOut = true;
-      this.$q.cookies.remove('alenvi_token', { path: '/' });
-      this.$q.cookies.remove('alenvi_token_expires_in', { path: '/' });
-      this.$q.cookies.remove('refresh_token', { path: '/' });
-      this.$q.cookies.remove('user_id', { path: '/' });
+
+      const options = { path: '/', sameSite: 'Strict' };
+      this.$q.cookies.remove('alenvi_token', options);
+      this.$q.cookies.remove('alenvi_token_expires_in', options);
+      this.$q.cookies.remove('refresh_token', options);
+      this.$q.cookies.remove('user_id', options);
       this.$q.localStorage.clear();
 
       this.$store.dispatch('course/resetCourse');

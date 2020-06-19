@@ -22,19 +22,20 @@ export default {
 
         return true;
       }
-
-      Cookies.remove('alenvi_token', { path: '/' });
-      Cookies.remove('user_id', { path: '/' });
-      Cookies.remove('alenvi_token_expires_in', { path: '/' });
+      const options = { path: '/', sameSite: 'Strict' }
+      Cookies.remove('alenvi_token', options);
+      Cookies.remove('user_id', options);
+      Cookies.remove('alenvi_token_expires_in', options);
 
       return false;
     } catch (e) {
       console.error(e.response.message);
       if (e.response.status === 404) {
-        Cookies.remove('alenvi_token', { path: '/' });
-        Cookies.remove('refresh_token', { path: '/' });
-        Cookies.remove('user_id', { path: '/' });
-        Cookies.remove('alenvi_token_expires_in', { path: '/' });
+        const options = { path: '/', sameSite: 'Strict' }
+        Cookies.remove('alenvi_token', options);
+        Cookies.remove('refresh_token', options);
+        Cookies.remove('user_id', options);
+        Cookies.remove('alenvi_token_expires_in', options);
       }
 
       return false;
