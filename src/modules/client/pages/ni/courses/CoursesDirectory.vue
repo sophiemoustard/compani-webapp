@@ -1,7 +1,17 @@
 <template>
   <q-page class="client-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
-    <ni-trello :courses="coursesWithGroupedSlot" />
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select class="q-pl-sm" :options="trainerFilterOptions" v-model="selectedTrainer" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select class="q-pl-sm" :options="programFilterOptions" v-model="selectedProgram" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
+    </div>
+
+    <ni-trello :courses="coursesFiltered" />
   </q-page>
 </template>
 
@@ -10,13 +20,18 @@ import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
+import Programs from '@api/Programs';
+import Select from '@components/form/Select';
 import TitleHeader from '@components/TitleHeader';
 import Trello from '@components/courses/Trello';
+import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
+  mixins: [courseFiltersMixin],
   components: {
+    'ni-select': Select,
     'ni-title-header': TitleHeader,
     'ni-trello': Trello,
   },
@@ -29,9 +44,20 @@ export default {
     ...mapState('main', ['loggedUser']),
   },
   async created () {
-    await this.refreshCourses();
+    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshTrainers()]);
   },
   methods: {
+    async refreshPrograms () {
+      try {
+        const programs = await Programs.list();
+        this.programOptions = programs
+          .map(p => ({ label: p.name, value: p._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+      } catch (e) {
+        console.error(e);
+        this.programOptions = [];
+      }
+    },
     async refreshCourses () {
       try {
         const courses = await Courses.list({ company: get(this.loggedUser, 'company._id') || '' });

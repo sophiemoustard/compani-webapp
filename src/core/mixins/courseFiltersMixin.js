@@ -10,6 +10,8 @@ export const courseFiltersMixin = {
       selectedProgram: '',
       selectedTrainer: '',
       selectedCompany: '',
+      trainerOptions: [],
+      programOptions: [],
     }
   },
   computed: {
