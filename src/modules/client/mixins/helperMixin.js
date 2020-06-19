@@ -8,7 +8,7 @@ import Roles from '@api/Roles';
 import Users from '@api/Users';
 import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { clear, formatPhone } from '@helpers/utils';
+import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
 import { HELPER } from '@data/constants';
 
 export const helperMixin = {
@@ -101,8 +101,13 @@ export const helperMixin = {
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };
-      const phone = get(this.newHelper, 'contact.phone', null);
-      if (phone) payload.contact = { phone };
+
+      let phone = get(this.newHelper, 'contact.phone', null);
+      if (phone) {
+        phone = formatPhoneForPayload(phone);
+        payload.contact = { phone };
+        this.newHelper.contact.phone = phone;
+      }
 
       return pickBy(payload);
     },
@@ -167,6 +172,9 @@ export const helperMixin = {
         this.$v.editedHelper.$touch();
         if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
+        if (get(this.editedHelper, 'contact.phone')) {
+          this.editedHelper.contact.phone = formatPhoneForPayload(this.editedHelper.contact.phone)
+        }
         const payload = Object.assign({}, omit(this.editedHelper, ['_id']));
         delete payload.local;
         await Users.updateById(this.editedHelper._id, payload);

@@ -85,7 +85,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
@@ -283,6 +283,7 @@ export default {
       const payload = {
         ...cloneDeep(this.newUser),
         local: { email: this.newUser.local.email },
+        contact: { ...this.newUser.contact, phone: formatPhoneForPayload(get(this.newUser, 'contact.phone')) },
         role: roles[0]._id,
       };
       if (!get(payload, 'contact.address.fullAddress')) delete payload.contact.address;

@@ -95,7 +95,7 @@ import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
-import { formatPhone, clear, removeEmptyProps } from '@helpers/utils';
+import { formatPhone, clear, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { ROLES_TRANSLATION, CLIENT_ADMIN, COACH } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
@@ -189,6 +189,7 @@ export default {
     formatUserPayload (user) {
       const userPayload = removeEmptyProps(user);
       if (this.canSetUserCompany) userPayload.company = this.company._id;
+      if (get(user, 'contact.phone')) userPayload.contact.phone = formatPhoneForPayload(user.contact.phone);
       return userPayload;
     },
     async nextStep () {
@@ -281,9 +282,11 @@ export default {
       this.selectedUser = { identity: {}, local: {}, contact: {} };
     },
     formatUpdatedUserPayload (user) {
-      return pickBy(
+      const userPayload = pickBy(
         pick(user, ['identity.firstname', 'identity.lastname', 'local.email', 'role', 'contact.phone'])
       );
+      if (get(user, 'contact.phone')) userPayload.contact.phone = formatPhoneForPayload(user.contact.phone);
+      return userPayload;
     },
     async updateUser () {
       try {

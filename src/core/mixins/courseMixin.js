@@ -3,7 +3,7 @@ import set from 'lodash/set';
 import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import { INTRA, COURSE_TYPES } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
 export const courseMixin = {
@@ -36,14 +36,18 @@ export const courseMixin = {
     saveTmp (path) {
       this.tmpInput = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
     },
+    formatUpdateCourseValue (path, value) {
+      return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
+    },
     async updateCourse (path) {
       try {
         const value = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
+
         if (this.tmpInput === value) return;
         get(this.$v.course, path).$touch();
         if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        const payload = set({}, path, value);
+        const payload = set({}, path, this.formatUpdateCourseValue(path, value));
         await Courses.update(this.profileId, payload);
         NotifyPositive('Modification enregistrée.');
 
