@@ -46,7 +46,6 @@ import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
-import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -130,17 +129,6 @@ export default {
       } catch (e) {
         console.error(e);
         this.coursesWithGroupedSlot = [];
-      }
-    },
-    async refreshPrograms () {
-      try {
-        const programs = await Programs.list();
-        this.programOptions = programs
-          .map(p => ({ label: p.name, value: p._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-      } catch (e) {
-        console.error(e);
-        this.programOptions = [];
       }
     },
     async refreshCompanies () {

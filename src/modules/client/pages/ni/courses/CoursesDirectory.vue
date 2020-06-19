@@ -20,7 +20,6 @@ import { mapState } from 'vuex';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import Programs from '@api/Programs';
 import Select from '@components/form/Select';
 import TitleHeader from '@components/TitleHeader';
 import Trello from '@components/courses/Trello';
@@ -44,20 +43,10 @@ export default {
     ...mapState('main', ['loggedUser']),
   },
   async created () {
-    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshTrainers()]);
+    await Promise.all([this.refreshCourses(), this.refreshTrainers()]);
+    await this.refreshPrograms();
   },
   methods: {
-    async refreshPrograms () {
-      try {
-        const programs = await Programs.list();
-        this.programOptions = programs
-          .map(p => ({ label: p.name, value: p._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-      } catch (e) {
-        console.error(e);
-        this.programOptions = [];
-      }
-    },
     async refreshCourses () {
       try {
         const courses = await Courses.list({ company: get(this.loggedUser, 'company._id') || '' });
