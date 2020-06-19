@@ -166,6 +166,7 @@ import {
   validSiret,
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
+import { formatPhoneForPayload } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { REQUIRED_LABEL, COMPANY } from '@data/constants';
 import { urssafCodes } from '@data/urssafCodes';
@@ -332,6 +333,8 @@ export default {
         }
 
         this.loading = true;
+        if (this.newEstablishment.phone) this.newEstablishment.phone = formatPhoneForPayload(this.newEstablishment.phone);
+
         await Establishments.create(this.newEstablishment);
         NotifyPositive('Établissement créé.');
         this.establishmentCreationModal = false;
@@ -369,6 +372,8 @@ export default {
 
         this.loading = true;
         const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
+        if (this.editedEstablishment.phone) this.editedEstablishment.phone = formatPhoneForPayload(this.editedEstablishment.phone);
+
         await Establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, fields));
 
         NotifyPositive('Établissement modifié.');

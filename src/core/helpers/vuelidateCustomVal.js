@@ -7,7 +7,7 @@ import { urssafCodes } from '@data/urssafCodes';
 export const frPhoneNumber = (value) => {
   if (!value) return true;
 
-  return value.match(/^[0]{1}[1-9]{1}[0-9]{8}$/) || false;
+  return value.match(/^[0]{1}[1-9]{1}[.\-\s]{0,1}([0-9]{2}[.\-\s]{0,1}){4}$/) || false;
 };
 
 export const frZipCode = (value) => {
