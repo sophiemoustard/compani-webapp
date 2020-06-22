@@ -45,13 +45,6 @@
       </div>
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
-            dense @click="openSmsModal" />
-        </q-item-section>
-        <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section side>
           <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
             type="a" :href="!disabledFollowUp && downloadAttendanceSheet()" target="_blank" />
         </q-item-section>
@@ -67,8 +60,9 @@
       </q-item>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Historique d'envoi</p>
-      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination"
+      <p class="text-weight-bold">Envoi de SMS</p>
+      <p>Historique d'envoi </p>
+      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
         :loading="smsLoading">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
@@ -85,6 +79,13 @@
           </q-tr>
         </template>
       </ni-responsive-table>
+      <q-item>
+        <q-item-section side>
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
+            dense @click="openSmsModal" />
+        </q-item-section>
+        <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
+      </q-item>
     </div>
 
     <!-- Modal envoi message -->
@@ -357,4 +358,6 @@ export default {
       &-disabled
         opacity: 0.7 !important;
         cursor: not-allowed !important
+.q-item
+  padding-left: 0px;
 </style>
