@@ -1,10 +1,13 @@
-import Users from '@api/Users';
-import { INTRA, INTER_B2B, TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
+import uniqBy from 'lodash/uniqBy';
 import { formatIdentity } from '@helpers/utils';
+import { INTER_B2B, INTRA } from '@data/constants';
 
 export const courseFiltersMixin = {
   data () {
     return {
+      programOptions: [],
+      companyOptions: [],
+      trainerOptions: [],
       selectedProgram: '',
       selectedTrainer: '',
       selectedCompany: '',
@@ -12,33 +15,32 @@ export const courseFiltersMixin = {
   },
   computed: {
     companyFilterOptions () {
-      return [{ label: 'Toutes les structures', value: '' }, ...this.companyOptions];
+      const companies = this.companyOptions
+        .filter(company => this.coursesWithGroupedSlot.some(course => {
+          if (course.type === INTRA && company.value === course.company._id) return true;
+
+          if (course.type === INTER_B2B) return course.trainees.some(trainee => trainee.company === company.value)
+        }));
+
+      return [{ label: 'Toutes les structures', value: '' }, ...companies];
     },
     trainerFilterOptions () {
+      const trainers = this.coursesWithGroupedSlot
+        .filter(course => !!course.trainer)
+        .map(course => ({ label: formatIdentity(course.trainer.identity, 'FL'), value: course.trainer._id }));
+
       return [
         { label: 'Tous les intervenants', value: '' },
         { label: 'Sans intervenant', value: 'without_trainer' },
-        ...this.trainerOptions,
+        ...uniqBy(trainers, 'value'),
       ];
     },
     programFilterOptions () {
-      return [{ label: 'Tous les programmes', value: '' }, ...this.programOptions];
-    },
-    coursesFiltered () {
-      let courses = this.coursesWithGroupedSlot;
-      if (this.selectedProgram) {
-        courses = courses.filter(course => course.program._id === this.selectedProgram);
-      }
-      if (this.selectedTrainer) {
-        courses = courses.filter(course => course.trainer
-          ? course.trainer._id === this.selectedTrainer
-          : this.selectedTrainer === 'without_trainer');
-      }
-      if (this.selectedCompany) {
-        courses = courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
-          (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company === this.selectedCompany)));
-      }
-      return courses;
+      const programs = this.coursesWithGroupedSlot
+        .map(course => ({ label: course.program.name, value: course.program._id }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
     },
   },
   methods: {
@@ -46,17 +48,6 @@ export const courseFiltersMixin = {
       this.selectedTrainer = '';
       this.selectedCompany = '';
       this.selectedProgram = '';
-    },
-    async refreshTrainers () {
-      try {
-        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = trainers.filter(trainer =>
-          this.coursesFiltered.some(course => course.trainer && course.trainer._id === trainer._id)
-        )
-          .map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }));
-      } catch (e) {
-        console.error(e);
-      }
     },
   },
 }
