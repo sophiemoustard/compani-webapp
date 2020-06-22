@@ -7,7 +7,6 @@ export const courseFiltersMixin = {
     return {
       programOptions: [],
       companyOptions: [],
-      trainerOptions: [],
       selectedProgram: '',
       selectedTrainer: '',
       selectedCompany: '',
@@ -27,7 +26,8 @@ export const courseFiltersMixin = {
     trainerFilterOptions () {
       const trainers = this.coursesWithGroupedSlot
         .filter(course => !!course.trainer)
-        .map(course => ({ label: formatIdentity(course.trainer.identity, 'FL'), value: course.trainer._id }));
+        .map(course => ({ label: formatIdentity(course.trainer.identity, 'FL'), value: course.trainer._id }))
+        .sort((a, b) => a.label.localeCompare(b.label));
 
       return [
         { label: 'Tous les intervenants', value: '' },
