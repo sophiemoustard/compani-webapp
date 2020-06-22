@@ -1,7 +1,7 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
-      binary-state-sort :visible-columns="visibleColumns" flat :separator="separator" :hide-bottom="!!data.length"
+      binary-state-sort :visible-columns="visibleColumns" flat :separator="separator" :hide-bottom="hideBottom"
       :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm" v-on="$listeners">
       <template v-slot:header="props">
         <slot name="header" :props="props">
@@ -46,6 +46,7 @@ export default {
     visibleColumns: Array,
     separator: { type: String, default: 'horizontal' },
     loading: { type: Boolean, default: false },
+    hideBottom: { type: Boolean, default: true },
   },
 }
 </script>

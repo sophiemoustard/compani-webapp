@@ -63,7 +63,7 @@
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
       <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
-        :loading="smsLoading">
+        :loading="smsLoading" :hide-bottom="!!smsSent.length">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -77,6 +77,12 @@
               <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
+        </template>
+        <template v-slot:no-data="props">
+          <div v-show="!loading" class="full-width row q-gutter-sm">
+            <q-icon :name="props.icon" size="2em" />
+            <span>Pas de données disponibles</span>
+          </div>
         </template>
       </ni-responsive-table>
       <q-item>
