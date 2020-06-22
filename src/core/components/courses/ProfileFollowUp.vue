@@ -62,8 +62,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
-      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
-        :loading="smsLoading" :hide-bottom="!!smsSent.length">
+      <ni-simple-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
+        :loading="smsLoading" :show-bottom="!smsSent.length">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -78,13 +78,7 @@
             </q-td>
           </q-tr>
         </template>
-        <template v-slot:no-data="props">
-          <div v-show="!loading" class="full-width row q-gutter-sm">
-            <q-icon :name="props.icon" size="2em" />
-            <span>Pas de données disponibles</span>
-          </div>
-        </template>
-      </ni-responsive-table>
+      </ni-simple-table>
       <q-item>
         <q-item-section side>
           <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
@@ -128,7 +122,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import Banner from '@components/Banner';
-import ResponsiveTable from '@components/table/ResponsiveTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
@@ -141,7 +135,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
-    'ni-responsive-table': ResponsiveTable,
+    'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
   },
   mixins: [courseMixin],
