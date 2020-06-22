@@ -10,8 +10,6 @@ export const courseFiltersMixin = {
       selectedProgram: '',
       selectedTrainer: '',
       selectedCompany: '',
-      trainerOptions: [],
-      programOptions: [],
     }
   },
   computed: {
@@ -50,6 +48,18 @@ export const courseFiltersMixin = {
       this.selectedTrainer = '';
       this.selectedCompany = '';
       this.selectedProgram = '';
+    },
+    filterCoursesByProgram (courses) {
+      return courses.filter(course => course.program._id === this.selectedProgram);
+    },
+    filterCoursesByTrainer (courses) {
+      return courses.filter(course => course.trainer
+        ? course.trainer._id === this.selectedTrainer
+        : this.selectedTrainer === 'without_trainer');
+    },
+    filterCoursesByCompany (courses) {
+      return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
+      (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company === this.selectedCompany)));
     },
   },
 }

@@ -46,6 +46,7 @@ import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
+import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -99,18 +100,11 @@ export default {
     },
     coursesFiltered () {
       let courses = this.coursesWithGroupedSlot;
-      if (this.selectedProgram) courses = courses.filter(course => course.program._id === this.selectedProgram);
+      if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
 
-      if (this.selectedTrainer) {
-        courses = courses.filter(course => course.trainer
-          ? course.trainer._id === this.selectedTrainer
-          : this.selectedTrainer === 'without_trainer');
-      }
+      if (this.selectedTrainer) courses = this.filterCoursesByTrainer(courses);
 
-      if (this.selectedCompany) {
-        courses = courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
-          (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company === this.selectedCompany)));
-      }
+      if (this.selectedCompany) courses = this.filterCoursesByCompany(courses);
 
       return courses;
     },
@@ -140,6 +134,17 @@ export default {
       } catch (e) {
         console.error(e);
         this.companyOptions = [];
+      }
+    },
+    async refreshPrograms () {
+      try {
+        const programs = await Programs.list();
+        this.programOptions = programs
+          .map(p => ({ label: p.name, value: p._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+      } catch (e) {
+        console.error(e);
+        this.programOptions = [];
       }
     },
     updateCourseCompany () {

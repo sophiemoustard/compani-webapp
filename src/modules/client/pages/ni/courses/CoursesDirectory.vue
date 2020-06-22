@@ -3,7 +3,7 @@
     <ni-title-header title="Formations" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select class="q-pl-sm" :options="trainerFilterOptions" v-model="selectedTrainer" />
+        <ni-select :options="trainerFilterOptions" v-model="selectedTrainer" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select class="q-pl-sm" :options="programFilterOptions" v-model="selectedProgram" />
@@ -41,10 +41,17 @@ export default {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
+    coursesFiltered () {
+      let courses = this.coursesWithGroupedSlot;
+      if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
+
+      if (this.selectedTrainer) courses = this.filterCoursesByTrainer(courses);
+
+      return courses;
+    },
   },
   async created () {
-    await Promise.all([this.refreshCourses(), this.refreshTrainers()]);
-    await this.refreshPrograms();
+    await Promise.all([this.refreshCourses()]);
   },
   methods: {
     async refreshCourses () {
