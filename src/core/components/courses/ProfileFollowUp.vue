@@ -292,10 +292,10 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.course.name}.\nLa première session à ` +
-        `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
-        `formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne formation,` +
-        '\nCompani';
+      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.course.program.name} - ` +
+        `${this.course.name}.\nLa première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+        'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
+        `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
     setReminderMessage () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
@@ -303,10 +303,10 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.course.name}.\nVotre ` +
-      `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
-      `le début de la formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne ` +
-      'formation,\nCompani'
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.course.program.name} - ` +
+      `${this.course.name}.\nVotre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+      'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
+      `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
     async sendMessage () {
       try {
