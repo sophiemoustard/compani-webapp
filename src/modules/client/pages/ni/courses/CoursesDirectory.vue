@@ -52,7 +52,7 @@ export default {
     },
   },
   async created () {
-    await Promise.all([this.refreshCourses()]);
+    await this.refreshCourses();
   },
   methods: {
     async refreshCourses () {
