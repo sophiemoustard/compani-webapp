@@ -14,14 +14,20 @@ export const courseFiltersMixin = {
   },
   computed: {
     companyFilterOptions () {
-      const companies = this.companyOptions
-        .filter(company => this.coursesWithGroupedSlot.some(course => {
-          if (course.type === INTRA && company.value === course.company._id) return true;
+      const companies = [];
 
-          if (course.type === INTER_B2B) return course.trainees.some(trainee => trainee.company === company.value)
-        }));
+      for (const course of this.coursesWithGroupedSlot) {
+        if (course.type === INTRA) companies.push({ label: course.company.name, value: course.company._id });
+        else {
+          for (const trainee of course.trainees) {
+            companies.push({ label: trainee.company.name, value: trainee.company._id });
+          }
+        }
+      }
 
-      return [{ label: 'Toutes les structures', value: '' }, ...companies];
+      const sortedCompanies = uniqBy(companies, 'value').sort((a, b) => a.label.localeCompare(b.label));
+
+      return [{ label: 'Toutes les structures', value: '' }, ...sortedCompanies];
     },
     trainerFilterOptions () {
       const trainers = this.coursesWithGroupedSlot
@@ -59,7 +65,7 @@ export const courseFiltersMixin = {
     },
     filterCoursesByCompany (courses) {
       return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
-      (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company === this.selectedCompany)));
+      (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
     },
   },
 }
