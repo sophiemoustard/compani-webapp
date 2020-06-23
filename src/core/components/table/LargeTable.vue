@@ -17,9 +17,8 @@
       <template v-slot:bottom="props">
         <ni-pagination :props="props" :pagination.sync="pagination" :data="data"/>
       </template>
-      <template v-slot:no-data="props">
+      <template v-slot:no-data>
         <div v-show="!loading" class="full-width row q-gutter-sm">
-          <q-icon :name="props.icon" size="2em" />
           <span>Pas de données disponibles</span>
         </div>
       </template>
