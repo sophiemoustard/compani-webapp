@@ -10,7 +10,7 @@ export const courseMixin = {
   computed: {
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
     companyName () {
-      return get(this.course, 'company.tradeName') || '';
+      return get(this.course, 'company.name') || '';
     },
     programName () {
       return get(this.course, 'program.name') || '';

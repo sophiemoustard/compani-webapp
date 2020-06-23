@@ -296,7 +296,7 @@ export default {
       const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
       await Twilio.sendSMS({
         to: `+33${user.contact.phone.substring(1)}`,
-        body: `${this.company.tradeName}. Bienvenue ! :)\nPour pouvoir ` +
+        body: `${this.company.name}. Bienvenue ! :)\nPour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)\n` +
           `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`,

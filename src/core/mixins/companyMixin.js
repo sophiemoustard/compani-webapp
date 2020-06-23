@@ -15,7 +15,7 @@ export const companyMixin = {
         apeCode: { required, apeCode },
         ics: { required },
         name: { required },
-        tradeName: { required, maxLength: maxLength(11) },
+        tradeName: { maxLength: maxLength(11) },
         type: { required },
         rcs: {
           required: requiredIf(item => item.type === COMPANY),
@@ -78,8 +78,7 @@ export const companyMixin = {
   },
   methods: {
     tradeNameError (validation) {
-      if (!validation.tradeName.required) return REQUIRED_LABEL;
-      else if (!validation.tradeName.maxLength) return 'Doit contenir 11 caractères maximum (espaces inclus).';
+      if (!validation.tradeName.maxLength) return 'Doit contenir 11 caractères maximum (espaces inclus).';
 
       return '';
     },
