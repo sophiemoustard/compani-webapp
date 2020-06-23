@@ -15,7 +15,7 @@
         </q-tr>
       </template>
       <template v-slot:no-data>
-        <div v-show="!loading" class="full-width row q-gutter-sm">
+        <div v-show="!loading" class="full-width row q-gutter-sm grey-text">
           <span>Pas de données disponibles</span>
         </div>
       </template>
