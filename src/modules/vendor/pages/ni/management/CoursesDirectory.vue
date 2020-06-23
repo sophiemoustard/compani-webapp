@@ -6,10 +6,12 @@
         <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select class="q-pl-sm" :options="trainerFilterOptions" v-model="selectedTrainer" />
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
+          v-model="selectedTrainer" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select class="q-pl-sm" :options="programFilterOptions" v-model="selectedProgram" />
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
+          v-model="selectedProgram" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
     </div>
@@ -125,17 +127,6 @@ export default {
         this.coursesWithGroupedSlot = [];
       }
     },
-    async refreshCompanies () {
-      try {
-        const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.tradeName, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
-      } catch (e) {
-        console.error(e);
-        this.companyOptions = [];
-      }
-    },
     async refreshPrograms () {
       try {
         const programs = await Programs.list();
@@ -145,6 +136,17 @@ export default {
       } catch (e) {
         console.error(e);
         this.programOptions = [];
+      }
+    },
+    async refreshCompanies () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = companies
+          .map(c => ({ label: c.tradeName, value: c._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
+      } catch (e) {
+        console.error(e);
+        this.companyOptions = [];
       }
     },
     updateCourseCompany () {

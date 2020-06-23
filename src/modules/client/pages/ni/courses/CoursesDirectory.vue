@@ -6,7 +6,8 @@
         <ni-select :options="trainerFilterOptions" v-model="selectedTrainer" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select class="q-pl-sm" :options="programFilterOptions" v-model="selectedProgram" />
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
+          v-model="selectedProgram" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
     </div>
