@@ -241,7 +241,7 @@ export default {
           name: 'company',
           label: 'Structure',
           align: 'left',
-          field: row => get(row, 'company.tradeName') || '',
+          field: row => get(row, 'company.name') || '',
           classes: 'text-capitalize',
         },
         {
@@ -384,7 +384,7 @@ export default {
       try {
         const companies = await Companies.list();
         this.companyOptions = companies
-          .map(c => ({ label: c.tradeName, value: c._id }))
+          .map(c => ({ label: c.name, value: c._id }))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);

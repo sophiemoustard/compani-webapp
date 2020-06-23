@@ -14,9 +14,6 @@
       </template>
       <ni-input in-modal v-model.trim="newCompany.name" :error="$v.newCompany.name.$error"
         @blur="$v.newCompany.name.$touch" required-field caption="Raison sociale" />
-      <ni-input in-modal v-model.trim="newCompany.tradeName" :error="$v.newCompany.tradeName.$error"
-        caption="Nom commercial" @blur="$v.newCompany.tradeName.$touch" required-field
-        :error-label="tradeNameError($v.newCompany)" />
       <ni-option-group v-model="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
         :error="$v.newCompany.type.$error" required-field />
       <template slot="footer">
@@ -55,14 +52,13 @@ export default {
       companies: [],
       tableLoading: false,
       visibleColumns: ['name'],
-      columns: [{ name: 'tradeName', label: 'Nom', align: 'left', field: 'tradeName', sortable: true }],
+      columns: [{ name: 'name', label: 'Nom', align: 'left', field: 'name', sortable: true }],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
       companyTypeOptions: COMPANY_TYPES,
       companyCreationModal: false,
       newCompany: {
         name: '',
-        tradeName: '',
         type: '',
       },
       modalLoading: false,
@@ -70,7 +66,7 @@ export default {
   },
   validations () {
     return {
-      newCompany: pick(this.companyValidation, ['type', 'name', 'tradeName']),
+      newCompany: pick(this.companyValidation, ['type', 'name']),
     }
   },
   async mounted () {
@@ -101,7 +97,7 @@ export default {
       }
     },
     resetCreationModal () {
-      this.newCompany = { name: '', tradeName: '', type: '' };
+      this.newCompany = { name: '', type: '' };
       this.$v.newCompany.$reset();
     },
     async createCompany () {
