@@ -63,7 +63,7 @@
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
       <ni-simple-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
-        :loading="smsLoading" :show-bottom="!smsSent.length">
+        :loading="smsLoading">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
