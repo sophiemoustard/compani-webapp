@@ -44,9 +44,9 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="history" @click="showHistory(col.value)" />
-                    <q-icon color="grey" name="edit" @click="startSubscriptionEdition(col.value)" />
-                    <q-icon color="grey" name="delete" :disable="props.row.eventCount > 0"
+                    <q-btn flat dense color="grey" icon="history" @click="showHistory(col.value)" />
+                    <q-btn flat dense color="grey" icon="edit" @click="startSubscriptionEdition(col.value)" />
+                    <q-btn flat dense color="grey" icon="delete" :disable="props.row.eventCount > 0"
                       @click="validateSubscriptionsDeletion(col.value)" />
                   </div>
                 </template>
@@ -83,8 +83,8 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="edit" @click="openEditionModalHelper(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="validateHelperDeletion(col.value)" />
+                    <q-btn flat dense color="grey" icon="edit" @click="openEditionModalHelper(col.value)" />
+                    <q-btn flat dense color="grey" icon="delete" @click="validateHelperDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -870,7 +870,8 @@ export default {
         NotifyPositive('Souscription supprimée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la souscitpion.')
+        if (e.status === 403) return NotifyNegative(e.data.message);
+        return NotifyNegative('Erreur lors de la suppression de la souscription.')
       }
     },
     validateSubscriptionsDeletion (subscriptionId) {
@@ -1147,6 +1148,9 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .table-actions > .q-btn__wrapper
+    padding: 0
+
   a
     color: $primary
     text-decoration: none

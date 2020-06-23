@@ -193,22 +193,33 @@ export default {
       this.auxiliaries = auxiliaries;
     },
     async refresh () {
+      const params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
+
+      if (!this.displayAllSectors) {
+        this.updateAuxiliariesList();
+        params.auxiliary = this.auxiliaries.map(aux => aux._id);
+        params.sector = this.filteredSectors.map(sector => sector._id);
+      }
+
+      await Promise.all([
+        this.refreshEvents(params),
+        this.refreshWorkingStats(pick(params, ['startDate', 'endDate', 'auxiliary'])),
+      ]);
+    },
+    async refreshEvents (params) {
       try {
-        const params = { startDate: this.startOfWeek, endDate: this.endOfWeek, groupBy: AUXILIARY };
-
-        if (!this.displayAllSectors) {
-          this.updateAuxiliariesList();
-          params.auxiliary = this.auxiliaries.map(aux => aux._id);
-          params.sector = this.filteredSectors.map(sector => sector._id);
-        }
-
         this.events = await Events.list(params);
-        this.workingStats = await Events.workingStats(pick(params, ['startDate', 'endDate', 'auxiliary']));
-
         if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
         console.error(e);
         this.events = [];
+      }
+    },
+    async refreshWorkingStats (params) {
+      try {
+        this.workingStats = await Events.workingStats(params);
+      } catch (e) {
+        console.error(e);
         this.workingStats = {};
       }
     },
