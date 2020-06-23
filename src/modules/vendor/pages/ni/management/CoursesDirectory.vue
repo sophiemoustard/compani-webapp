@@ -3,7 +3,7 @@
     <ni-title-header title="Formations" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select class="q-pl-sm" :options="companyFilterOptions" v-model="selectedCompany" />
+        <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select class="q-pl-sm" :options="trainerFilterOptions" v-model="selectedTrainer" />
@@ -80,9 +80,6 @@ export default {
       },
       courseCreationModal: false,
       coursesWithGroupedSlot: [],
-      programOptions: [],
-      companyOptions: [],
-      trainerOptions: [],
       courseTypes: COURSE_TYPES,
     }
   },
@@ -101,9 +98,26 @@ export default {
     isIntraCourse () {
       return this.newCourse.type === INTRA;
     },
+    coursesFiltered () {
+      let courses = this.coursesWithGroupedSlot;
+      if (this.selectedProgram) courses = courses.filter(course => course.program._id === this.selectedProgram);
+
+      if (this.selectedTrainer) {
+        courses = courses.filter(course => course.trainer
+          ? course.trainer._id === this.selectedTrainer
+          : this.selectedTrainer === 'without_trainer');
+      }
+
+      if (this.selectedCompany) {
+        courses = courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
+          (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company === this.selectedCompany)));
+      }
+
+      return courses;
+    },
   },
   async created () {
-    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies(), this.refreshTrainers()]);
+    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies()]);
   },
   methods: {
     async refreshCourses () {
