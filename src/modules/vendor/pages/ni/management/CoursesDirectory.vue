@@ -6,10 +6,12 @@
         <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select class="q-pl-sm" :options="trainerFilterOptions" v-model="selectedTrainer" />
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
+          v-model="selectedTrainer" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select class="q-pl-sm" :options="programFilterOptions" v-model="selectedProgram" />
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
+          v-model="selectedProgram" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
     </div>
@@ -100,18 +102,11 @@ export default {
     },
     coursesFiltered () {
       let courses = this.coursesWithGroupedSlot;
-      if (this.selectedProgram) courses = courses.filter(course => course.program._id === this.selectedProgram);
+      if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
 
-      if (this.selectedTrainer) {
-        courses = courses.filter(course => course.trainer
-          ? course.trainer._id === this.selectedTrainer
-          : this.selectedTrainer === 'without_trainer');
-      }
+      if (this.selectedTrainer) courses = this.filterCoursesByTrainer(courses);
 
-      if (this.selectedCompany) {
-        courses = courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
-          (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company === this.selectedCompany)));
-      }
+      if (this.selectedCompany) courses = this.filterCoursesByCompany(courses);
 
       return courses;
     },
