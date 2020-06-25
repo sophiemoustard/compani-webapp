@@ -42,14 +42,6 @@ export default {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    coursesFiltered () {
-      let courses = this.coursesWithGroupedSlot;
-      if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
-
-      if (this.selectedTrainer) courses = this.filterCoursesByTrainer(courses);
-
-      return courses;
-    },
   },
   async created () {
     await this.refreshCourses();

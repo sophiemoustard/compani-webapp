@@ -100,16 +100,6 @@ export default {
     isIntraCourse () {
       return this.newCourse.type === INTRA;
     },
-    coursesFiltered () {
-      let courses = this.coursesWithGroupedSlot;
-      if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
-
-      if (this.selectedTrainer) courses = this.filterCoursesByTrainer(courses);
-
-      if (this.selectedCompany) courses = this.filterCoursesByCompany(courses);
-
-      return courses;
-    },
   },
   async created () {
     await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies()]);
