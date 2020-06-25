@@ -13,15 +13,35 @@ export const courseFiltersMixin = {
     }
   },
   computed: {
+    coursesFiltered () {
+      let courses = this.coursesWithGroupedSlot;
+      if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
+
+      if (this.selectedTrainer) courses = this.filterCoursesByTrainer(courses);
+
+      if (this.selectedCompany) courses = this.filterCoursesByCompany(courses);
+
+      return courses;
+    },
     companyFilterOptions () {
-      const companies = this.companyOptions
-        .filter(company => this.coursesWithGroupedSlot.some(course => {
-          if (course.type === INTRA && company.value === course.company._id) return true;
+      const companies = [];
 
-          if (course.type === INTER_B2B) return course.trainees.some(trainee => trainee.company === company.value)
-        }));
+      for (const course of this.coursesWithGroupedSlot) {
+        if (course.type === INTRA && !companies.some(company => company.value === course.company._id)) {
+          companies.push({ label: course.company.name, value: course.company._id });
+        } else {
+          for (const trainee of course.trainees) {
+            if (!companies.some(company => company.value === trainee.company._id)) {
+              companies.push({ label: trainee.company.name, value: trainee.company._id });
+            }
+          }
+        }
+      }
 
-      return [{ label: 'Toutes les structures', value: '' }, ...companies];
+      return [
+        { label: 'Toutes les structures', value: '' },
+        ...companies.sort((a, b) => a.label.localeCompare(b.label)),
+      ];
     },
     trainerFilterOptions () {
       const trainers = this.coursesWithGroupedSlot
@@ -59,7 +79,7 @@ export const courseFiltersMixin = {
     },
     filterCoursesByCompany (courses) {
       return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
-      (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company === this.selectedCompany)));
+      (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
     },
   },
 }
