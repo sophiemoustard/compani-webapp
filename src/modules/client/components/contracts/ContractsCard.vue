@@ -99,11 +99,10 @@ import { formatIdentity } from '@helpers/utils';
 import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from '@data/constants.js';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
-import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
 
 export default {
   name: 'ContractsCard',
-  mixins: [contractMixin, tableMixin],
+  mixins: [tableMixin],
   components: {
     'ni-responsive-table': ResponsiveTable,
   },

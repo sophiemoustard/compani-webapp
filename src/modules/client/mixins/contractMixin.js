@@ -8,7 +8,7 @@ import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import nationalities from '@data/nationalities.js';
-import { COMPANY_CONTRACT, CUSTOMER_CONTRACT } from '@data/constants';
+import { COMPANY_CONTRACT, CUSTOMER_CONTRACT, REQUIRED_LABEL } from '@data/constants';
 import { translate } from '@data/translate';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields.js';
 
@@ -69,6 +69,18 @@ export const contractMixin = {
     },
   },
   methods: {
+    grossHourlyRateError (validationObj) {
+      if (get(validationObj, 'grossHourlyRate.required', null) === false) return REQUIRED_LABEL;
+      else if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
+      return '';
+    },
+    weeklyHoursError (validationObj) {
+      if (get(validationObj, 'grossHourlyRate.required', null) === false) return REQUIRED_LABEL;
+      else if (get(validationObj, 'grossHourlyRate.minValue', null) === false) {
+        return 'Volume horaire hebdomadaire non valide';
+      }
+      return '';
+    },
     generateContractSigners (signer) {
       const signers = [{
         id: '1',
@@ -149,7 +161,10 @@ export const contractMixin = {
     },
     async editVersion () {
       try {
-        if (!this.isVersionUpdated) return this.resetVersionEditionModal();
+        if (!this.isVersionUpdated) {
+          NotifyPositive('Pas de modification apportée au contrat.')
+          return this.resetVersionEditionModal();
+        }
         if (this.isPreviousPayImpacted) {
           this.$q.dialog({
             title: 'Confirmation',
