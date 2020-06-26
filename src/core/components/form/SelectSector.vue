@@ -1,5 +1,5 @@
 <template>
-  <ni-select :in-modal="inModal" :value="value" @input="updateSector" :options="sectors" :error-label="errorLabel"
+  <ni-select :in-modal="inModal" :value="value" @input="updateSector" :options="sectors" :error-message="errorMessage"
     @blur="blurHandler" @focus="focusHandler" filter-placeholder="Rechercher" :error="error" ref="selectSector" />
 </template>
 
@@ -18,7 +18,7 @@ export default {
     companyId: { type: String, default: '' },
     allowNullOption: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
-    errorLabel: { type: String, default: REQUIRED_LABEL },
+    errorMessage: { type: String, default: REQUIRED_LABEL },
   },
   components: {
     'ni-select': Select,

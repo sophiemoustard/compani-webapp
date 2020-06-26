@@ -36,7 +36,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Taux horaire brut par défaut"
             :error="$v.company.rhConfig.contractWithCompany.grossHourlyRate.$error"
-            :error-label="nbrError('company.rhConfig.contractWithCompany.grossHourlyRate')" type="number"
+            :error-message="nbrError('company.rhConfig.contractWithCompany.grossHourlyRate')" type="number"
             v-model="company.rhConfig.contractWithCompany.grossHourlyRate"
             @focus="saveTmp('rhConfig.contractWithCompany.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.contractWithCompany.grossHourlyRate')" />
@@ -47,7 +47,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Taux horaire brut par défaut"
             :error="$v.company.rhConfig.contractWithCustomer.grossHourlyRate.$error"
-            :error-label="nbrError('company.rhConfig.contractWithCustomer.grossHourlyRate')" type="number"
+            :error-message="nbrError('company.rhConfig.contractWithCustomer.grossHourlyRate')" type="number"
             v-model="company.rhConfig.contractWithCustomer.grossHourlyRate"
             @focus="saveTmp('rhConfig.contractWithCustomer.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.contractWithCustomer.grossHourlyRate')" />
@@ -57,7 +57,7 @@
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
-            :error-label="nbrError('company.rhConfig.feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
+            :error-message="nbrError('company.rhConfig.feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
             @focus="saveTmp('rhConfig.feeAmount')" suffix="€" @blur="updateCompany('rhConfig.feeAmount')" />
         </div>
       </div>
@@ -65,7 +65,7 @@
         <p class="text-weight-bold">Taux kilométrique</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error"
-            :error-label="nbrError('company.rhConfig.amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
+            :error-message="nbrError('company.rhConfig.amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
             @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
       </div>
@@ -77,7 +77,7 @@
               <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
                 type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
                 @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
-                :error-label="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
+                :error-message="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
                 @blur="updateCompanyTransportSubs(index)" />
             </template>
           </template>

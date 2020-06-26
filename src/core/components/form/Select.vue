@@ -6,7 +6,7 @@
     </div>
     <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
-      :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorLabel" use-input
+      :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
       :option-disable="optionDisable" :data-cy="dataCy">
       <template v-if="value && !disable" v-slot:append>
@@ -28,7 +28,7 @@ export default {
     caption: { type: String, default: '' },
     icon: { type: String, default: null },
     error: { type: Boolean, default: false },
-    errorLabel: { type: String, default: REQUIRED_LABEL },
+    errorMessage: { type: String, default: REQUIRED_LABEL },
     options: { type: Array, default: () => [] },
     value: [String, Number, Object],
     requiredField: { type: Boolean, default: false },

@@ -30,7 +30,7 @@
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
       <ni-input in-modal :disable="!firstStep" v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" caption="Email" required-field />
+        @blur="$v.newUser.local.email.$touch" :error-message="emailError($v.newUser)" caption="Email" required-field />
       <template v-if="!firstStep">
         <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
           required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
@@ -39,9 +39,9 @@
         <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
           caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
         <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
-          caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
+          caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-message="mobilePhoneError" />
         <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
-          @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
+          @blur="$v.newUser.contact.address.$touch" error-message="Adresse non valide"
           :error="$v.newUser.contact.address.$error" in-modal />
         <div class="row margin-input">
           <div class="col-12">
@@ -50,7 +50,7 @@
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
-              :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
+              :company-id="company._id" :error="$v.newUser.sector.$error" :error-message="REQUIRED_LABEL"/>
           </div>
         </div>
         <div class="row margin-input last">

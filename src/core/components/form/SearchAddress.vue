@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-field dense :error="error" :error-message="errorLabel" borderless>
+    <q-field dense :error="error" :error-message="errorMessage" borderless>
       <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
         input-debounce="500" :options="options" :class="{ 'borders': inModal }" :disable="disable" behavior="menu"
         @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color">
@@ -25,7 +25,7 @@ export default {
   props: {
     value: { type: Object, default: () => ({ street: '', zipCode: '', city: '', fullAddress: '' }) },
     caption: { type: String, default: 'Adresse' },
-    errorLabel: { type: String, default: REQUIRED_LABEL },
+    errorMessage: { type: String, default: REQUIRED_LABEL },
     error: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },

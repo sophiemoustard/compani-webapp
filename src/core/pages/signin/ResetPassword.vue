@@ -6,10 +6,10 @@
         <p class="q-mb-lg message">Veuillez renseigner un nouveau mot de passe.</p>
         <ni-input caption="Nouveau mot de passe (6 caractères minimum)" :error="$v.password.$error"
           v-model.trim="password" @blur="$v.password.$touch" type="password"
-          :error-label="passwordError($v.password)" required-field />
+          :error-message="passwordError($v.password)" required-field />
         <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
           v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
-          :error-label="passwordConfirmError" />
+          :error-message="passwordConfirmError" />
         <div class="row justify-center">
           <q-btn @click="submit" color="primary" :disable="$v.$invalid">Envoyer</q-btn>
         </div>

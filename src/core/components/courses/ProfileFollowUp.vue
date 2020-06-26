@@ -7,10 +7,10 @@
           @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error"/>
         <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
             @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
-            :error="$v.course.contact.phone.$error" :error-label="phoneNbrErrorcontact" />
+            :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
         <ni-input caption="Email" v-model.trim="course.contact.email"
             @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
-            :error="$v.course.contact.email.$error" :error-label="emailErrorcontact" />
+            :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
       </div>
     </div>
     <div class="q-mb-xl">

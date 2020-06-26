@@ -6,14 +6,14 @@
           <div class="col-11">
             <ni-input ref="userEmail" name="emailInput" caption="Email" type="email" :disable="emailLock"
               :error="$v.mergedUserProfile.local.email.$error" @focus="saveTmp('local.email')" lower-case
-              :error-label="emailError($v.mergedUserProfile)" v-model.trim="mergedUserProfile.local.email" />
+              :error-message="emailError($v.mergedUserProfile)" v-model.trim="mergedUserProfile.local.email" />
           </div>
           <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
             <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
           </div>
         </div>
         <ni-input v-model.trim="mergedUserProfile.contact.phone" @focus="saveTmp('contact.phone')"
-          error-label="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
+          error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="$v.mergedUserProfile.contact.phone.$error" />
       </div>
       <div class="row button">
@@ -37,10 +37,10 @@
         Modifier mon <span class="text-weight-bold">mot de passe</span>
       </template>
       <ni-input in-modal v-model.trim="mergedUserProfile.local.password" type="password"
-        caption="Nouveau mot de passe" :error-label="passwordError($v.mergedUserProfile.local.password)" required-field
+        caption="Nouveau mot de passe" :error-message="passwordError($v.mergedUserProfile.local.password)" required-field
         @blur="$v.mergedUserProfile.local.password.$touch" :error="$v.mergedUserProfile.local.password.$error" />
       <ni-input in-modal v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error" type="password"
-        caption="Confirmation mot de passe" :error-label="passwordConfirmError" @blur="$v.passwordConfirm.$touch"
+        caption="Confirmation mot de passe" :error-message="passwordConfirmError" @blur="$v.passwordConfirm.$touch"
         required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"

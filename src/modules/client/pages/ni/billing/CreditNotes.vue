@@ -79,10 +79,10 @@
           :error="$v.newCreditNote.subscription.$error" @blur="$v.newCreditNote.subscription.$touch" />
         <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
           v-model="newCreditNote.inclTaxesCustomer" required-field :error="$v.newCreditNote.inclTaxesCustomer.$error"
-          @blur="$v.newCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" />
+          @blur="$v.newCreditNote.inclTaxesCustomer.$touch" :error-message="inclTaxesError" />
         <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
           v-model="newCreditNote.inclTaxesTpp" required-field :error="$v.newCreditNote.inclTaxesTpp.$error"
-          @blur="$v.newCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" />
+          @blur="$v.newCreditNote.inclTaxesTpp.$touch" :error-message="inclTaxesError" />
       </template>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
@@ -141,10 +141,10 @@
           :error="$v.editedCreditNote.subscription.$error" @blur="$v.editedCreditNote.subscription.$touch" />
         <ni-input in-modal v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
           v-model="editedCreditNote.inclTaxesCustomer" :error="$v.editedCreditNote.inclTaxesCustomer.$error"
-          @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-label="inclTaxesError" required-field />
+          @blur="$v.editedCreditNote.inclTaxesCustomer.$touch" :error-message="inclTaxesError" required-field />
         <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€"
           v-model="editedCreditNote.inclTaxesTpp" required-field :error="$v.editedCreditNote.inclTaxesTpp.$error"
-          @blur="$v.editedCreditNote.inclTaxesTpp.$touch" :error-label="inclTaxesError" type="number" />
+          @blur="$v.editedCreditNote.inclTaxesTpp.$touch" :error-message="inclTaxesError" type="number" />
       </template>
       <template v-if="editedCreditNote.isEditable" slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"

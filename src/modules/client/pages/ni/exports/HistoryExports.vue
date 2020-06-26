@@ -4,7 +4,7 @@
     <div class="row q-col-gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />
       <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :error="$v.dateRange.$error"
-        @input="input" :error-label="dateRangeErrorLabel" @blur="$v.dateRange.$touch" />
+        @input="input" :error-message="dateRangeErrorMessage" @blur="$v.dateRange.$touch" />
     </div>
     <q-btn label="Exporter" no-caps unelevated text-color="white" color="primary" icon="import_export"
       @click="exportCsv" :disable="loading || $v.dateRange.$error" :loading="loading" />
@@ -49,7 +49,7 @@ export default {
     };
   },
   computed: {
-    dateRangeErrorLabel () {
+    dateRangeErrorMessage () {
       return 'Date(s) invalide(s) : la période maximale est 1 an.';
     },
   },
