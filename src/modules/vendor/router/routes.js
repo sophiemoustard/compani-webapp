@@ -1,6 +1,5 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
-import alenvi from '@helpers/alenvi';
 import { TRAINER } from '@data/constants';
 import store from 'src/store/index';
 
@@ -11,9 +10,6 @@ const routes = [
     beforeEnter: async (to, from, next) => {
       try {
         if (!['/ad', '/ad/'].includes(to.path)) return next();
-
-        const refresh = await alenvi.refreshAlenviCookies();
-        if (refresh) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
