@@ -1,16 +1,6 @@
 
-import { Cookies } from 'quasar';
-
 const routes = [
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('src/core/pages/signin/Authenticate'),
-    beforeEnter: (to, from, next) => {
-      if (Cookies.get('refresh_token')) return next({ path: '/' });
-      return next();
-    },
-  },
+  { path: '/login', name: 'login', component: () => import('src/core/pages/signin/Authenticate') },
   { path: '/forgot-password', component: () => import('src/core/pages/signin/ForgotPassword'), name: 'forgotPassword' },
   { path: '/reset-password/:token', component: () => import('src/core/pages/signin/ResetPassword') },
   { path: '/403-pwd', component: () => import('src/core/pages/signin/403') },

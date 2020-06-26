@@ -17,6 +17,7 @@ export default {
           sameSite: 'Strict',
         };
         Cookies.set('alenvi_token', newToken.token, options);
+        Cookies.set('refresh_token', newToken.refreshToken, { ...options, expires: 365 });
         Cookies.set('alenvi_token_expires_in', newToken.expiresIn, options);
         Cookies.set('user_id', newToken.user._id, options);
 
@@ -29,7 +30,7 @@ export default {
 
       return false;
     } catch (e) {
-      console.error(e.response.message);
+      console.error(e);
       if (e.response.status === 404) {
         const options = { path: '/', sameSite: 'Strict' }
         Cookies.remove('alenvi_token', options);

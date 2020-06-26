@@ -3,12 +3,12 @@ import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
 import { Cookies } from 'quasar';
 import pick from 'lodash/pick';
+import alenvi from '@helpers/alenvi';
+import { defineAbilitiesFor } from '@helpers/ability';
+import routes from 'src/router/routes';
+import store from 'src/store/index';
 import clientRoutes from 'src/modules/client/router/routes';
 import vendorRoutes from 'src/modules/vendor/router/routes';
-import routes from 'src/router/routes';
-import alenvi from '@helpers/alenvi';
-import store from 'src/store/index';
-import { defineAbilitiesFor } from '@helpers/ability';
 
 Vue.use(VueRouter)
 Vue.use(VueMeta);
@@ -46,7 +46,13 @@ Router.beforeEach(async (to, from, next) => {
         next();
       }
     }
-  } else next();
+  } else {
+    if (['/login', '/forgot-password'].includes(to.path) && Cookies.get('refresh_token') && Cookies.get('user_id')) {
+      await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
+      return next({ path: '/' });
+    }
+    next();
+  }
 });
 
 export default Router;
