@@ -5,7 +5,7 @@
     </template>
     <ni-input in-modal caption="Taux horaire"  type="number" suffix="€" required-field
       v-model="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
-      @blur="validations.grossHourlyRate.$touch" />
+      @blur="validations.grossHourlyRate.$touch" :error-label="grossHourlyRateError" />
     <ni-date-input caption="Date d'effet" v-model="editedVersion.startDate" :min="minStartDate"
       in-modal required-field @blur="validations.startDate.$touch" :error="validations.startDate.$error" />
     <div class="margin-input last">
@@ -13,7 +13,7 @@
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
-        :loading="loading" @click="editVersion" :disable="!isVersionUpdated" />
+        :loading="loading" @click="editVersion" />
     </template>
   </ni-modal>
 </template>
@@ -31,8 +31,8 @@ export default {
     validations: { type: Object, default: () => ({}) },
     minStartDate: { type: String, default: '' },
     versionTemplate: { type: String, default: '' },
-    isVersionUpdated: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
+    grossHourlyRateError: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
