@@ -37,7 +37,6 @@ export const courseFiltersMixin = {
           }
         }
       }
-
       return [
         { label: 'Toutes les structures', value: '' },
         ...companies.sort((a, b) => a.label.localeCompare(b.label)),

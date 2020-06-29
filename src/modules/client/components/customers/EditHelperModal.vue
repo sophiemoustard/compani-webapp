@@ -8,7 +8,7 @@
       caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
     <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
     <ni-input in-modal v-model="editedHelper.contact.phone" last :error="validations.contact.phone.$error"
-      caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
+      caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer l'aidant" icon-right="add" color="primary"
         :loading="loading" @click="editHelper" />

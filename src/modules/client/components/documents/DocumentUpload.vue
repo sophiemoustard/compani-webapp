@@ -1,22 +1,21 @@
 <template>
   <div>
     <ni-select :inModal="inModal" caption="Type" required-field :value="formValue.nature" :options="natureOptions"
-      @blur="onBlur('nature')" @input="update('nature', $event)" :error="$v.formValue.nature.$error"
-      :errorLabel="getErrorLabel('nature')" />
+      @blur="onBlur('nature')" @input="update('nature', $event)" :error="$v.formValue.nature.$error" />
     <ni-date-input :inModal="inModal" caption="Date" required-field :value="formValue.date"
       @input="update('date', $event)" />
     <ni-input :inModal="inModal" caption="Document" required-field type="file" :value="formValue.file"
       @input="onBlur('file'); update('file', $event)" :error="$v.formValue.file.$error"
-      :errorLabel="getErrorLabel('file')" last />
+      :errorLabel="fileErrorLabel" last />
   </div>
 </template>
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import find from 'lodash/find';
 import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
+import { REQUIRED_LABEL } from '@data/constants';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 
 export default {
@@ -40,10 +39,30 @@ export default {
         file: null,
       },
       formValue: null,
-      errorLabels: {
-        maxSize: 'Fichier trop volumineux (> 5 Mo)',
+    };
+  },
+  validations () {
+    return {
+      formValue: {
+        nature: { required },
+        file: { required, maxSize: file => !file || file.size < 5000000 },
       },
     };
+  },
+  watch: {
+    value () {
+      if (this.value != null) this.formValue = { ...this.value };
+      else {
+        this.reset();
+        this.$emit('input', this.formValue);
+      }
+    },
+  },
+  computed: {
+    fileErrorLabel () {
+      if (!this.$v.formValue.file.maxSize) return 'Fichier trop volumineux (> 5 Mo)';
+      return REQUIRED_LABEL;
+    },
   },
   created () {
     this.reset();
@@ -66,36 +85,12 @@ export default {
         this.$emit('valid', !this.$v.formValue.$invalid);
       }
     },
-    getErrorLabel (field) {
-      const validation = this.$v.formValue[field];
-      const validatorKeys = Object.keys(validation.$params);
-      const validatorKey = find(validatorKeys, key => !validation[key]);
-      return this.errorLabels[validatorKey];
-    },
     async validate () {
       this.$v.$touch()
       const isValid = await this.waitForFormValidation(this.$v.formValue);
       this.$emit('valid', isValid);
       return isValid;
     },
-  },
-  watch: {
-    value () {
-      if (this.value != null) {
-        this.formValue = { ...this.value };
-      } else {
-        this.reset();
-        this.$emit('input', this.formValue);
-      }
-    },
-  },
-  validations () {
-    return {
-      formValue: {
-        nature: { required },
-        file: { required, maxSize: file => !!file && file.size < 5000000 },
-      },
-    };
   },
 }
 </script>

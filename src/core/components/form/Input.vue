@@ -17,12 +17,12 @@
             @blur="onBlur" >
         </i>
       </div>
-      <div class="file-error" v-if="error">{{errorLabel}}</div>
+      <div class="file-error" v-if="error">{{errorMessage}}</div>
     </template>
     <template v-else>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
-        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup:enter')" :error-message="errorLabel" :mask="mask"
+        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup:enter')" :error-message="errorMessage" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
         :class="{ 'borders': inModal }" :data-cy="dataCy">
         <template v-if="icon" v-slot:prepend>
@@ -45,7 +45,7 @@ export default {
   props: {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
-    errorLabel: { type: String, default: REQUIRED_LABEL },
+    errorMessage: { type: String, default: REQUIRED_LABEL },
     value: [String, Number, File],
     upperCase: { type: Boolean, default: false },
     lowerCase: { type: Boolean, default: false },

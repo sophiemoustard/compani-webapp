@@ -57,10 +57,10 @@
             :error="$v.customer.payment.bankAccountOwner.$error" @focus="saveTmp('payment.bankAccountOwner')"
             @blur="updateCustomer('payment.bankAccountOwner')" data-cy="bank-account-owner" />
           <ni-input caption="IBAN" v-model="customer.payment.iban" :error="$v.customer.payment.iban.$error"
-            :error-label="ibanError" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')"
+            :error-message="ibanError" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')"
             data-cy="iban" />
           <ni-input caption="BIC" v-model="customer.payment.bic" :error="$v.customer.payment.bic.$error" data-cy="bic"
-            :error-label="bicError" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
+            :error-message="bicError" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
         </div>
       </div>
       <div class="q-mb-lg">

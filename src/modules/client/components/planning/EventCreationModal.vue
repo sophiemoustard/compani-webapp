@@ -52,7 +52,7 @@
             :disable="!isRepetitionAllowed" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
-          <ni-search-address v-model="newEvent.address" :error-label="addressError" @blur="validations.address.$touch"
+          <ni-search-address v-model="newEvent.address" :error-message="addressError" @blur="validations.address.$touch"
             :error="validations.address.$error" inModal />
         </template>
         <ni-input in-modal v-model="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"

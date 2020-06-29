@@ -6,7 +6,7 @@
         <div class="q-mb-lg message">Nous allons vous envoyer un email pour réinitialiser votre mot de passe.
           Veuillez renseigner votre adresse email.</div>
         <ni-input caption="Email" :error="$v.email.$error" v-model.trim="email" @blur="$v.email.$touch"
-          error-label="Veuillez rentrer un email valide. (ex: mail@mail.com)" required-field />
+          error-message="Veuillez rentrer un email valide. (ex: mail@mail.com)" required-field />
         <div class="row justify-center">
           <q-btn class="btn-submit" @click="submit" color="primary" :disable="$v.email.$invalid" big>Envoyer</q-btn>
         </div>

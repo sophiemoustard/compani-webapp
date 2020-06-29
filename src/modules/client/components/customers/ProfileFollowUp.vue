@@ -12,7 +12,7 @@
         <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes" @focus="saveTmp('contact.accessCodes')"
           @blur="updateCustomer('contact.accessCodes')" />
         <ni-input v-if="isAuxiliary" type="tel" :error="$v.customer.contact.phone.$error"
-          error-label="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
+          error-message="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
           @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" />

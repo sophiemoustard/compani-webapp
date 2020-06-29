@@ -38,7 +38,7 @@
         Ajouter un <span class="text-weight-bold">utilisateur</span>
       </template>
       <ni-input :disable="!firstStep" in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
-        caption="Email" @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
+        caption="Email" @blur="$v.newUser.local.email.$touch" :error-message="emailError($v.newUser)" required-field />
       <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role"
         :error="$v.newUser.role.$error" @blur="$v.newUser.role.$touch" :last="firstStep" required-field />
       <template v-if="!firstStep">
@@ -46,7 +46,7 @@
         <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
           caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" last
-          caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="phoneNbrError($v.newUser)" />
+          caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-message="phoneNbrError($v.newUser)" />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" icon-right="add" color="primary"
@@ -62,7 +62,7 @@
         Éditer un <span class="text-weight-bold">utilisateur</span>
       </template>
       <ni-input in-modal v-model="selectedUser.local.email" :error="$v.selectedUser.local.email.$error" caption="Email"
-        @blur="$v.selectedUser.local.email.$touch" :error-label="emailError($v.selectedUser)" required-field />
+        @blur="$v.selectedUser.local.email.$touch" :error-message="emailError($v.selectedUser)" required-field />
       <ni-select in-modal caption="Role" :options="roleOptions" v-model="selectedUser.role"
         :error="$v.selectedUser.role.$error" @blur="$v.selectedUser.role.$touch" required-field />
       <ni-input in-modal v-model="selectedUser.identity.firstname" caption="Prénom" />
@@ -70,7 +70,7 @@
         caption="Nom" @blur="$v.selectedUser.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model.trim="selectedUser.contact.phone" :error="$v.selectedUser.contact.phone.$error"
         caption="Téléphone" @blur="$v.selectedUser.contact.phone.$touch" last
-        :error-label="phoneNbrError($v.selectedUser)" />
+        :error-message="phoneNbrError($v.selectedUser)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un utilisateur" icon-right="check" color="primary"
           :loading="loading" @click="updateUser" />

@@ -4,7 +4,7 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-field dense borderless :error="error" :error-message="errorLabel">
+    <q-field dense borderless :error="error" :error-message="errorMessage">
       <div class="date-container justify-center items-center row">
         <ni-date-input data-cy="date-input" :value="value.startDate" @input="update($event, 'startDate')" class="date-item" @blur="blur" />
         <p class="delimiter">-</p>
@@ -36,7 +36,7 @@ export default {
     },
     requiredField: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
-    errorLabel: { type: String, default: REQUIRED_LABEL },
+    errorMessage: { type: String, default: REQUIRED_LABEL },
   },
   methods: {
     update (value, key) {

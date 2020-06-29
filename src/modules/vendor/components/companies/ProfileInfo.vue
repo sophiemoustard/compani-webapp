@@ -6,7 +6,7 @@
           @blur="updateCompany('name')" :error="$v.company.name.$error" />
         <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
           @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
-          :error-label="tradeNameError($v.company)" />
+          :error-message="tradeNameError($v.company)" />
       </div>
     </div>
     <div class="q-mb-xl">
