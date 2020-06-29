@@ -6,7 +6,7 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
-      :error-message="showErrorMessage" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time"
+      :error-message="errorMessage" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time"
       data-cy="time-input">
       <template v-slot:append>
         <q-icon name="far fa-clock" class="cursor-pointer icon-clock" @click.native="selectTime = !selectTime">
@@ -45,10 +45,6 @@ export default {
     requiredField: { type: Boolean, default: false },
   },
   computed: {
-    showErrorMessage () {
-      if (this.error) return this.errorMessage;
-      return '';
-    },
     hoursOptions () {
       const range = this.$moment.range(
         this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
