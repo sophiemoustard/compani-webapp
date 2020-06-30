@@ -6,7 +6,7 @@
       @input="update('date', $event)" />
     <ni-input :inModal="inModal" caption="Document" required-field type="file" :value="formValue.file"
       @input="onBlur('file'); update('file', $event)" :error="$v.formValue.file.$error"
-      :errorLabel="fileErrorLabel" last />
+      :error-message="fileErrorMessage" last />
   </div>
 </template>
 
@@ -59,7 +59,7 @@ export default {
     },
   },
   computed: {
-    fileErrorLabel () {
+    fileErrorMessage () {
       if (!this.$v.formValue.file.maxSize) return 'Fichier trop volumineux (> 5 Mo)';
       return REQUIRED_LABEL;
     },

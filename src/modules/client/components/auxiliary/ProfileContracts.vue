@@ -27,10 +27,10 @@
       <ni-input in-modal v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
         :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
         @blur="$v.newContract.weeklyHours.$touch" suffix="h" required-field
-        :error-label="weeklyHoursError($v.newContract)" />
+        :error-messsage="weeklyHoursError($v.newContract)" />
       <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number"
         v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field
-        :error-label="grossHourlyRateError($v.newContract)" />
+        :error-messsage="grossHourlyRateError($v.newContract)" />
       <ni-date-input caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="companyContractMinStartDate"
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
@@ -52,10 +52,10 @@
       <ni-input in-modal v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
         :error="$v.newVersion.weeklyHours.$error" v-model="newVersion.weeklyHours" type="number"
         @blur="$v.newVersion.weeklyHours.$touch" suffix="h" required-field
-        :error-label="weeklyHoursError($v.newVersion)" />
+        :error-messsage="weeklyHoursError($v.newVersion)" />
       <ni-input in-modal caption="Taux horaire" :error="$v.newVersion.grossHourlyRate.$error"
         v-model="newVersion.grossHourlyRate" type="number" suffix="€" required-field
-        @blur="$v.newVersion.grossHourlyRate.$touch" :error-label="grossHourlyRateError($v.newVersion)" />
+        @blur="$v.newVersion.grossHourlyRate.$touch" :error-messsage="grossHourlyRateError($v.newVersion)" />
       <ni-date-input caption="Date d'effet" :error="$v.newVersion.startDate.$error" v-model="newVersion.startDate"
         :min="newVersionMinStartDate" in-modal required-field />
       <div class="row margin-input last">
