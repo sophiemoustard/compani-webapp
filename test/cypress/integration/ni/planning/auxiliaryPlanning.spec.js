@@ -10,7 +10,7 @@ describe('Auxiliary planning - display', () => {
   it('should display correctly auxiliary planning', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 1{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 1);
     cy.get('[data-cy=planning-event]').should('have.length', 1);
     cy.get('[data-cy=event-title]').should('have.length', 1);
@@ -27,14 +27,14 @@ describe('Auxiliary planning - display', () => {
     cy.get('[data-cy=event-hours]').eq(1).should('contain', '18:15 - 20:30');
 
     cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 2{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent{downarrow}{enter}');
     cy.get('[data-cy=planning-row]').should('have.length', 2);
   });
 });
 
 const loggedUsers = [
   { login: 'planning-referent@alenvi.io', password: '123456!eR', role: PLANNING_REFERENT },
-  { login: 'customer-referent-1@alenvi.io', password: '123456!eR', role: AUXILIARY },
+  { login: 'auxiliary@alenvi.io', password: '123456!eR', role: AUXILIARY },
   { login: 'client-admin@alenvi.io', password: '123456!eR', role: CLIENT_ADMIN },
   { login: 'coach@alenvi.io', password: '123456!eR', role: COACH },
 ];
@@ -49,10 +49,10 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
   it('should create event', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 1{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
     cy.get('[data-cy=planning-event]').should('have.length', 1);
 
-    cy.get('[data-cy=planning-cell]').eq(1).click();
+    cy.get('[data-cy=planning-cell]').eq(0).click();
     cy.get('[data-cy=event-creation-customer]').eq(0).type('Romain{downarrow}{enter}');
     cy.get('[data-cy=event-creation-button]').click();
     cy.get('[data-cy=planning-event]').should('have.length', 2);
@@ -61,7 +61,7 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
   it('should update event', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 1{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
     cy.get('[data-cy=planning-event]').should('have.length', 1);
     cy.get('[data-cy=planning-event]').click();
 
@@ -75,7 +75,7 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
   it('should delete event', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=planning-search]').eq(1).click();
-    cy.get('[data-cy=planning-search]').eq(1).type('Customer referent 1{downarrow}{enter}');
+    cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
     cy.get('[data-cy=planning-event]').should('have.length', 1);
 
     cy.get('[data-cy=planning-event]').click();

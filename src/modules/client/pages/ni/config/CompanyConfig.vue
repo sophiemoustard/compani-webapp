@@ -9,14 +9,14 @@
             @blur="updateCompany('name')"  :error="$v.company.name.$error" />
           <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
             @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
-            :error-label="tradeNameError($v.company)" />
-          <ni-search-address v-model="company.address" color="white" inverted-light :error-label="addressError"
+            :error-message="tradeNameError($v.company)" />
+          <ni-search-address v-model="company.address" color="white" inverted-light :error-message="addressError"
             @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
             :error="$v.company.address.$error" />
           <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
-            @blur="updateCompany('rcs')" :error="$v.company.rcs.$error" :error-label="rcsError" />
+            @blur="updateCompany('rcs')" :error="$v.company.rcs.$error" :error-message="rcsError" />
           <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
-            @blur="updateCompany('rna')" :error="$v.company.rna.$error" :error-label="rcsError" />
+            @blur="updateCompany('rna')" :error="$v.company.rna.$error" :error-message="rcsError" />
         </div>
       </div>
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
@@ -24,33 +24,33 @@
         <div class="row gutter-profile">
           <ni-input caption="Prénom" :error="$v.company.legalRepresentative.firstname.$error"
             v-model="company.legalRepresentative.firstname" @focus="saveTmp('legalRepresentative.firstname')"
-            error-label="Prénom invalide" @blur="updateCompany('legalRepresentative.firstname')" />
-          <ni-input caption="Nom" :error="$v.company.legalRepresentative.lastname.$error" error-label="Nom invalide"
+            error-message="Prénom invalide" @blur="updateCompany('legalRepresentative.firstname')" />
+          <ni-input caption="Nom" :error="$v.company.legalRepresentative.lastname.$error" error-message="Nom invalide"
             v-model="company.legalRepresentative.lastname" @focus="saveTmp('legalRepresentative.lastname')"
             @blur="updateCompany('legalRepresentative.lastname')" />
           <ni-input caption="Fonction" :error="$v.company.legalRepresentative.position.$error"
             v-model="company.legalRepresentative.position" @focus="saveTmp('legalRepresentative.position')"
-            error-label="Fonction invalide" @blur="updateCompany('legalRepresentative.position')" />
+            error-message="Fonction invalide" @blur="updateCompany('legalRepresentative.position')" />
         </div>
       </div>
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Facturation</p>
         <div class="row gutter-profile">
-          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-label="ibanError" v-model.trim="company.iban"
+          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-message="ibanError" v-model.trim="company.iban"
             @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
-          <ni-input caption="BIC" :error="$v.company.bic.$error" :error-label="bicError" upper-case
+          <ni-input caption="BIC" :error="$v.company.bic.$error" :error-message="bicError" upper-case
             v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')"
             :error="$v.company.ics.$error" />
           <ni-input caption="Support facturation" :error="$v.company.billingAssistance.$error"
-            :error-label="billingAssistanceError" v-model.trim="company.billingAssistance"
+            :error-message="billingAssistanceError" v-model.trim="company.billingAssistance"
             @focus="saveTmp('billingAssistance')" @blur="updateCompany('billingAssistance')" />
         </div>
       </div>
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Paie</p>
         <div class="row gutter-profile">
-          <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-label="Code APE/NAF invalide"
+          <ni-input caption="Code APE/NAF" :error="$v.company.apeCode.$error" error-message="Code APE/NAF invalide"
             v-model="company.apeCode" mask="XXXXX" @focus="saveTmp('apeCode')" @blur="updateCompany('apeCode')" />
         </div>
       </div>
@@ -90,23 +90,23 @@
         Ajouter un <span class="text-weight-bold">établissement</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="newEstablishment.name" :error="$v.newEstablishment.name.$error"
-        :error-label="establishmentNameError($v.newEstablishment)" @blur="$v.newEstablishment.name.$touch"
+        :error-message="establishmentNameError($v.newEstablishment)" @blur="$v.newEstablishment.name.$touch"
         required-field />
       <ni-input in-modal caption="SIRET" v-model="newEstablishment.siret" :error="$v.newEstablishment.siret.$error"
-        :error-label="establishmentSiretError($v.newEstablishment)" @blur="$v.newEstablishment.siret.$touch"
+        :error-message="establishmentSiretError($v.newEstablishment)" @blur="$v.newEstablishment.siret.$touch"
         required-field />
       <ni-search-address in-modal v-model="newEstablishment.address" color="white"
-        @blur="$v.newEstablishment.address.$touch" :error-label="establishmentAddressError($v.newEstablishment)"
+        @blur="$v.newEstablishment.address.$touch" :error-message="establishmentAddressError($v.newEstablishment)"
         :error="$v.newEstablishment.address.$error" required-field />
       <ni-input in-modal caption="Téléphone" v-model="newEstablishment.phone" :error="$v.newEstablishment.phone.$error"
-        :error-label="establishmentPhoneError($v.newEstablishment)" @blur="$v.newEstablishment.phone.$touch"
+        :error-message="establishmentPhoneError($v.newEstablishment)" @blur="$v.newEstablishment.phone.$touch"
         required-field />
       <ni-select in-modal caption="Service de santé du travail" v-model="newEstablishment.workHealthService"
         :options="workHealthServices" :error="$v.newEstablishment.workHealthService.$error"
-        :error-label="establishmentWhsError($v.newEstablishment)" @blur="$v.newEstablishment.workHealthService.$touch"
+        :error-message="establishmentWhsError($v.newEstablishment)" @blur="$v.newEstablishment.workHealthService.$touch"
         required-field />
       <ni-select in-modal caption="Code URSSAF" v-model="newEstablishment.urssafCode" :options="urssafCodes"
-        :error="$v.newEstablishment.urssafCode.$error" :error-label="establishmentUrssafCodeError($v.newEstablishment)"
+        :error="$v.newEstablishment.urssafCode.$error" :error-message="establishmentUrssafCodeError($v.newEstablishment)"
         @blur="$v.newEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un établissement" icon-right="add" color="primary"
@@ -120,24 +120,24 @@
         Éditer l'<span class="text-weight-bold">établissement</span>
       </template>
       <ni-input in-modal caption="Nom" v-model="editedEstablishment.name" :error="$v.editedEstablishment.name.$error"
-        :error-label="establishmentNameError($v.editedEstablishment)" @blur="$v.editedEstablishment.name.$touch"
+        :error-message="establishmentNameError($v.editedEstablishment)" @blur="$v.editedEstablishment.name.$touch"
         required-field />
       <ni-input in-modal caption="SIRET" v-model="editedEstablishment.siret"
-        :error="$v.editedEstablishment.siret.$error" :error-label="establishmentSiretError($v.editedEstablishment)"
+        :error="$v.editedEstablishment.siret.$error" :error-message="establishmentSiretError($v.editedEstablishment)"
         @blur="$v.editedEstablishment.siret.$touch" required-field />
       <ni-search-address in-modal v-model="editedEstablishment.address" color="white"
-        @blur="$v.editedEstablishment.address.$touch" :error-label="establishmentAddressError($v.editedEstablishment)"
+        @blur="$v.editedEstablishment.address.$touch" :error-message="establishmentAddressError($v.editedEstablishment)"
         :error="$v.editedEstablishment.address.$error" required-field />
       <ni-input in-modal caption="Téléphone" v-model="editedEstablishment.phone"
-        :error="$v.editedEstablishment.phone.$error" :error-label="establishmentPhoneError($v.editedEstablishment)"
+        :error="$v.editedEstablishment.phone.$error" :error-message="establishmentPhoneError($v.editedEstablishment)"
         @blur="$v.editedEstablishment.phone.$touch" required-field />
       <ni-select in-modal caption="Service de santé du travail" v-model="editedEstablishment.workHealthService"
         :options="workHealthServices" :error="$v.editedEstablishment.workHealthService.$error"
-        :error-label="establishmentWhsError($v.editedEstablishment)"
+        :error-message="establishmentWhsError($v.editedEstablishment)"
         @blur="$v.editedEstablishment.workHealthService.$touch" required-field />
       <ni-select in-modal caption="Code URSSAF" v-model="editedEstablishment.urssafCode" :options="urssafCodes"
         :error="$v.editedEstablishment.urssafCode.$error"
-        :error-label="establishmentUrssafCodeError($v.editedEstablishment)"
+        :error-message="establishmentUrssafCodeError($v.editedEstablishment)"
         @blur="$v.editedEstablishment.urssafCode.$touch" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'établissement" icon-right="add" color="primary"
@@ -166,6 +166,7 @@ import {
   validSiret,
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
+import { formatPhoneForPayload } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { REQUIRED_LABEL, COMPANY } from '@data/constants';
 import { urssafCodes } from '@data/urssafCodes';
@@ -281,7 +282,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters({ clientRole: 'main/clientRole' }),
+    ...mapGetters({ clientRole: 'main/getClientRole' }),
     canUpdateErpConfig () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
 
@@ -332,6 +333,8 @@ export default {
         }
 
         this.loading = true;
+        if (this.newEstablishment.phone) this.newEstablishment.phone = formatPhoneForPayload(this.newEstablishment.phone);
+
         await Establishments.create(this.newEstablishment);
         NotifyPositive('Établissement créé.');
         this.establishmentCreationModal = false;
@@ -369,6 +372,8 @@ export default {
 
         this.loading = true;
         const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
+        if (this.editedEstablishment.phone) this.editedEstablishment.phone = formatPhoneForPayload(this.editedEstablishment.phone);
+
         await Establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, fields));
 
         NotifyPositive('Établissement modifié.');

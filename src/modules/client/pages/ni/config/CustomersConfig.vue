@@ -127,36 +127,36 @@
         @blur="$v.newSurcharge.name.$touch" required-field />
       <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
         :error="$v.newSurcharge.saturday.$error" @blur="$v.newSurcharge.saturday.$touch"
-        :error-label="nbrError('newSurcharge.saturday')" />
+        :error-message="nbrError('newSurcharge.saturday')" />
       <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
         :error="$v.newSurcharge.sunday.$error" @blur="$v.newSurcharge.sunday.$touch"
-        :error-label="nbrError('newSurcharge.sunday')" />
+        :error-message="nbrError('newSurcharge.sunday')" />
       <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
         :error="$v.newSurcharge.publicHoliday.$error" @blur="$v.newSurcharge.publicHoliday.$touch"
-        :error-label="nbrError('newSurcharge.publicHoliday')" />
+        :error-message="nbrError('newSurcharge.publicHoliday')" />
       <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number"
-        v-model="newSurcharge.twentyFifthOfDecember" :error-label="nbrError('newSurcharge.twentyFifthOfDecember')"
+        v-model="newSurcharge.twentyFifthOfDecember" :error-message="nbrError('newSurcharge.twentyFifthOfDecember')"
         @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" :error="$v.newSurcharge.twentyFifthOfDecember.$error" />
       <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
         :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch"
-        :error-label="nbrError('newSurcharge.firstOfMay')" />
+        :error-message="nbrError('newSurcharge.firstOfMay')" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
         :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch"
-        :error-label="nbrError('newSurcharge.evening')" />
+        :error-message="nbrError('newSurcharge.evening')" />
       <ni-time-input in-modal v-model="newSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch"
-        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-label="Heure invalide" />
+        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-message="Heure invalide" />
       <ni-time-input in-modal v-model="newSurcharge.eveningEndTime" caption="Fin soirée"
         :error="$v.newSurcharge.eveningEndTime.$error" @blur="$v.newSurcharge.eveningEndTime.$touch"
-        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-label="Heure invalide" />
+        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-message="Heure invalide" />
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
         :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
       <ni-time-input in-modal v-model="newSurcharge.customStartTime" caption="Début personnalisé"
         :error="$v.newSurcharge.customStartTime.$error" @blur="$v.newSurcharge.customStartTime.$touch"
-        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
+        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-message="Heure invalide" />
       <ni-time-input in-modal v-model="newSurcharge.customEndTime" caption="Fin personnalisée"
         :error="$v.newSurcharge.customEndTime.$error" @blur="$v.newSurcharge.customEndTime.$touch"
-        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-label="Heure invalide" />
+        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-message="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
           :loading="loading" @click="createNewSurcharge" />
@@ -172,36 +172,36 @@
         @blur="$v.editedSurcharge.name.$touch" required-field />
       <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
         :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch"
-        :error-label="nbrError('editedSurcharge.saturday')" />
+        :error-message="nbrError('editedSurcharge.saturday')" />
       <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
         :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch"
-        :error-label="nbrError('editedSurcharge.sunday')" />
+        :error-message="nbrError('editedSurcharge.sunday')" />
       <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number"
         v-model="editedSurcharge.publicHoliday" :error="$v.editedSurcharge.publicHoliday.$error"
-        @blur="$v.editedSurcharge.publicHoliday.$touch" :error-label="nbrError('editedSurcharge.publicHoliday')" />
+        @blur="$v.editedSurcharge.publicHoliday.$touch" :error-message="nbrError('editedSurcharge.publicHoliday')" />
       <ni-input in-modal caption="Majoration 25 décembre" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
-        v-model="editedSurcharge.twentyFifthOfDecember" :error-label="nbrError('editedSurcharge.twentyFifthOfDecember')"
+        v-model="editedSurcharge.twentyFifthOfDecember" :error-message="nbrError('editedSurcharge.twentyFifthOfDecember')"
         @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch" suffix="%" type="number" />
       <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
         :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch"
-        :error-label="nbrError('editedSurcharge.firstOfMay')" />
+        :error-message="nbrError('editedSurcharge.firstOfMay')" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
         :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch"
-        :error-label="nbrError('editedSurcharge.evening')" firstOfMay />
+        :error-message="nbrError('editedSurcharge.evening')" firstOfMay />
       <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
-        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-label="Heure invalide" />
+        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-message="Heure invalide" />
       <ni-time-input in-modal v-model="editedSurcharge.eveningEndTime" caption="Fin soirée"
         :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch"
-        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-label="Heure invalide" />
+        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-message="Heure invalide" />
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
         :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
       <ni-time-input in-modal v-model="editedSurcharge.customStartTime" caption="Début personnalisé"
         :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch"
-        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide" />
+        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-message="Heure invalide" />
       <ni-time-input in-modal v-model="editedSurcharge.customEndTime" caption="Fin personnalisée"
         :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch"
-        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-label="Heure invalide" />
+        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-message="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
           color="primary" :loading="loading" @click="updateSurcharge" />
@@ -221,10 +221,10 @@
         @blur="$v.newService.nature.$touch" :options="natureOptions" required-field />
       <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
         v-model="newService.defaultUnitAmount" :error="$v.newService.defaultUnitAmount.$error" required-field
-        @blur="$v.newService.defaultUnitAmount.$touch" :error-label="nbrError('newService.defaultUnitAmount')" />
+        @blur="$v.newService.defaultUnitAmount.$touch" :error-message="nbrError('newService.defaultUnitAmount')" />
       <ni-input in-modal caption="TVA" suffix="%" v-model="newService.vat" type="number"
         :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
-        error-label="La TVA doit être positive ou nulle" />
+        error-message="La TVA doit être positive ou nulle" />
       <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge"
         :options="surchargesOptions" clearable />
       <div class="row q-mb-md">
@@ -247,10 +247,10 @@
         @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
       <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
         v-model="editedService.defaultUnitAmount" :error="$v.editedService.defaultUnitAmount.$error" required-field
-        @blur="$v.editedService.defaultUnitAmount.$touch" :error-label="nbrError('editedService.defaultUnitAmount')" />
+        @blur="$v.editedService.defaultUnitAmount.$touch" :error-message="nbrError('editedService.defaultUnitAmount')" />
       <ni-input in-modal caption="TVA" suffix="%" v-model="editedService.vat" type="number"
         :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
-        error-label="La TVA doit être positive ou nulle" />
+        error-message="La TVA doit être positive ou nulle" />
       <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration"
         v-model="editedService.surcharge" :options="surchargesOptions" clearable />
       <div class="row q-mb-md">
@@ -278,12 +278,12 @@
       </template>
       <ni-input in-modal caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error"
         @blur="$v.newThirdPartyPayer.name.$touch" required-field />
-      <ni-search-address v-model="newThirdPartyPayer.address" error-label="Adresse invalide" in-modal
+      <ni-search-address v-model="newThirdPartyPayer.address" error-message="Adresse invalide" in-modal
         @blur="$v.newThirdPartyPayer.address.$touch" :error="$v.newThirdPartyPayer.address.$error" />
       <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
         v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
-        :error-label="nbrError('newThirdPartyPayer.unitTTCRate')" />
+        :error-message="nbrError('newThirdPartyPayer.unitTTCRate')" />
       <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
         :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
         @blur="$v.newThirdPartyPayer.billingMode.$touch" />
@@ -303,12 +303,12 @@
       </template>
       <ni-input in-modal caption="Nom" v-model="editedThirdPartyPayer.name"
         :error="$v.editedThirdPartyPayer.name.$error" @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
-      <ni-search-address v-model="editedThirdPartyPayer.address" error-label="Adresse invalide"
+      <ni-search-address v-model="editedThirdPartyPayer.address" error-message="Adresse invalide"
         @blur="$v.editedThirdPartyPayer.address.$touch" :error="$v.editedThirdPartyPayer.address.$error" in-modal />
       <ni-input in-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
         v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
-        :error-label="nbrError('editedThirdPartyPayer.unitTTCRate')" />
+        :error-message="nbrError('editedThirdPartyPayer.unitTTCRate')" />
       <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
         caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
         @blur="$v.editedThirdPartyPayer.billingMode.$touch" />

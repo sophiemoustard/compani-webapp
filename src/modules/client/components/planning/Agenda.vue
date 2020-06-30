@@ -14,7 +14,8 @@
       </thead>
       <tbody>
         <tr>
-          <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top" @click="createEvent(dayIndex)">
+          <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top" @click="createEvent(dayIndex)"
+            data-cy="agenda-cell">
             <div class="planning-background">
               <template v-if="dayIndex === 0">
                 <template v-for="(hour, hourIndex) in hours">
@@ -22,31 +23,31 @@
                     :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
                 </template>
               </template>
-              <template v-for="(event, eventId) in getOneDayEvents(days[dayIndex])">
-                <div :style="getEventStyle(event)" :key="eventId" @click.stop="editEvent(event)"
-                :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
-                  <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
-                    <div class="col-12 event-title">
-                      <p data-cy="event-title" v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
-                        {{ eventTitle(event) }}
-                      </p>
-                      <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
-                        {{ displayAbsenceType(event.absence) }}
-                      </p>
-                      <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">
-                        Indispo.
-                      </p>
-                      <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">
-                        {{ event.internalHour.name }}
-                      </p>
-                    </div>
-                    <p data-cy="event-hours" class="no-margin event-subtitle overflow-hidden-nowrap">
-                      {{ getEventHours(event) }}
+              <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)"
+                :key="eventId" @click.stop="editEvent(event)" class="event"
+                :class="[!isCustomerPlanning && 'cursor-pointer', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
+                data-cy="agenda-event" >
+                <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
+                  <div class="col-12 event-title">
+                    <p data-cy="event-title" v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                      {{ eventTitle(event) }}
                     </p>
-                    <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
+                    <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
+                      {{ displayAbsenceType(event.absence) }}
+                    </p>
+                    <p v-if="event.type === UNAVAILABILITY" class="no-margin overflow-hidden-nowrap">
+                      Indispo.
+                    </p>
+                    <p v-if="event.type === INTERNAL_HOUR" class="no-margin overflow-hidden-nowrap">
+                      {{ event.internalHour.name }}
+                    </p>
                   </div>
+                  <p data-cy="event-hours" class="no-margin event-subtitle overflow-hidden-nowrap">
+                    {{ getEventHours(event) }}
+                  </p>
+                  <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
-              </template>
+              </div>
             </div>
           </td>
         </tr>

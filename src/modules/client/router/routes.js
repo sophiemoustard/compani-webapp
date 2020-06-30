@@ -23,12 +23,12 @@ const routes = [
         const loggedUser = store.state.main.loggedUser;
         if (!loggedUser) return next({ path: '/login' });
 
-        const userVendorRole = store.getters['main/vendorRole'];
-        const userClientRole = store.getters['main/clientRole'];
+        const userVendorRole = store.getters['main/getVendorRole'];
+        const userClientRole = store.getters['main/getClientRole'];
         if (!userClientRole && !userVendorRole) return next({ name: 'account client', params: { id: loggedUser._id } });
         if (!userClientRole) return next({ path: '/ad' });
 
-        const company = store.getters['main/company'];
+        const company = store.getters['main/getCompany'];
         if (userClientRole === HELPER) return next({ name: 'customers agenda' });
         if (userClientRole === AUXILIARY_WITHOUT_COMPANY) {
           return next({ name: 'account client', params: { id: loggedUser._id } });

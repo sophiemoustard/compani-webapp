@@ -5,7 +5,7 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input borderless dense :value="inputDate" bg-color="white" @input="input" placeholder="jj/mm/yyyy" :error="error"
-      :disable="disable" :class="{ 'borders': inModal }" :error-message="errorLabel" @blur="blur" ref="dateInput"
+      :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage" @blur="blur" ref="dateInput"
       @focus="focus">
       <template v-slot:append>
         <q-icon name="event" class="cursor-pointer" @click="focus">
@@ -25,7 +25,7 @@ export default {
   props: {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
-    errorLabel: { type: String, default: REQUIRED_LABEL },
+    errorMessage: { type: String, default: REQUIRED_LABEL },
     value: { type: String, default: '' },
     min: { type: String, default: '' },
     max: { type: String, default: '' },

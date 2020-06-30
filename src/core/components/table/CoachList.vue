@@ -38,7 +38,7 @@
         Ajouter un <span class="text-weight-bold">utilisateur</span>
       </template>
       <ni-input :disable="!firstStep" in-modal v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
-        caption="Email" @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" required-field />
+        caption="Email" @blur="$v.newUser.local.email.$touch" :error-message="emailError($v.newUser)" required-field />
       <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role"
         :error="$v.newUser.role.$error" @blur="$v.newUser.role.$touch" :last="firstStep" required-field />
       <template v-if="!firstStep">
@@ -46,7 +46,7 @@
         <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
           caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
         <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" last
-          caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="phoneNbrError($v.newUser)" />
+          caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-message="phoneNbrError($v.newUser)" />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" icon-right="add" color="primary"
@@ -62,7 +62,7 @@
         Éditer un <span class="text-weight-bold">utilisateur</span>
       </template>
       <ni-input in-modal v-model="selectedUser.local.email" :error="$v.selectedUser.local.email.$error" caption="Email"
-        @blur="$v.selectedUser.local.email.$touch" :error-label="emailError($v.selectedUser)" required-field />
+        @blur="$v.selectedUser.local.email.$touch" :error-message="emailError($v.selectedUser)" required-field />
       <ni-select in-modal caption="Role" :options="roleOptions" v-model="selectedUser.role"
         :error="$v.selectedUser.role.$error" @blur="$v.selectedUser.role.$touch" required-field />
       <ni-input in-modal v-model="selectedUser.identity.firstname" caption="Prénom" />
@@ -70,7 +70,7 @@
         caption="Nom" @blur="$v.selectedUser.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model.trim="selectedUser.contact.phone" :error="$v.selectedUser.contact.phone.$error"
         caption="Téléphone" @blur="$v.selectedUser.contact.phone.$touch" last
-        :error-label="phoneNbrError($v.selectedUser)" />
+        :error-message="phoneNbrError($v.selectedUser)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un utilisateur" icon-right="check" color="primary"
           :loading="loading" @click="updateUser" />
@@ -87,6 +87,7 @@ import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
 import Roles from '@api/Roles';
+import Email from '@api/Email';
 import Users from '@api/Users';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
@@ -94,7 +95,7 @@ import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
-import { formatPhone, clear, removeEmptyProps } from '@helpers/utils';
+import { formatPhone, clear, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { ROLES_TRANSLATION, CLIENT_ADMIN, COACH } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
@@ -188,6 +189,7 @@ export default {
     formatUserPayload (user) {
       const userPayload = removeEmptyProps(user);
       if (this.canSetUserCompany) userPayload.company = this.company._id;
+      if (get(user, 'contact.phone')) userPayload.contact.phone = formatPhoneForPayload(user.contact.phone);
       return userPayload;
     },
     async nextStep () {
@@ -215,21 +217,37 @@ export default {
       }
     },
     async createUser () {
+      let newUser;
       try {
         this.loading = true;
         this.$v.newUser.$touch();
         if (this.$v.newUser.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Users.create(this.formatUserPayload(this.newUser));
-        this.userCreationModal = false;
-        this.getUsers();
+        newUser = await Users.create(this.formatUserPayload(this.newUser));
         NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'utilisateur.');
-      } finally {
         this.loading = false;
       }
+
+      if (!get(newUser, 'company.subscriptions.erp')) {
+        try {
+          const userRole = this.roles.find((role) => role._id === this.newUser.role);
+          if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
+          await Email.sendWelcome({ email: this.newUser.local.email, type: get(userRole, 'name') });
+          NotifyPositive('Email envoyé.');
+        } catch (e) {
+          console.error(e);
+          NotifyNegative('Erreur lors de l\'envoi du mail.');
+          this.loading = false;
+          this.userCreationModal = false;
+        }
+      }
+
+      this.loading = false;
+      this.userCreationModal = false;
+      this.getUsers();
     },
     resetUserCreationForm () {
       this.firstStep = true;
@@ -264,9 +282,11 @@ export default {
       this.selectedUser = { identity: {}, local: {}, contact: {} };
     },
     formatUpdatedUserPayload (user) {
-      return pickBy(
+      const userPayload = pickBy(
         pick(user, ['identity.firstname', 'identity.lastname', 'local.email', 'role', 'contact.phone'])
       );
+      if (get(user, 'contact.phone')) userPayload.contact.phone = formatPhoneForPayload(user.contact.phone);
+      return userPayload;
     },
     async updateUser () {
       try {
@@ -291,6 +311,7 @@ export default {
         this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la récupération des utilisateurs')
         this.users = [];
       } finally {
         this.usersLoading = false;

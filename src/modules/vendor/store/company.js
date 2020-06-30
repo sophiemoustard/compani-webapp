@@ -6,17 +6,17 @@ export default {
     company: null,
   },
   mutations: {
-    SAVE: (state, data) => { state.company = !data ? data : Object.assign({}, data) },
+    SET_COMPANY: (state, data) => { state.company = !data ? data : Object.assign({}, data) },
   },
   actions: {
-    get: async ({ commit }, params) => {
+    fetchCompany: async ({ commit }, params) => {
       try {
         const company = await Company.getById(params.companyId);
-        commit('SAVE', company);
+        commit('SET_COMPANY', company);
       } catch (e) {
         console.error(e);
       }
     },
-    reset: ({ commit }) => { commit('SAVE', null) },
+    resetCompany: ({ commit }) => { commit('SET_COMPANY', null) },
   },
 }

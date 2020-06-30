@@ -4,14 +4,14 @@
       Ajouter un <span class="text-weight-bold">aidant</span>
     </template>
     <ni-input :disable="!firstStep" in-modal v-model="newHelper.local.email" :error="validations.local.email.$error"
-      caption="Email" @blur="validations.local.email.$touch" :error-label="emailError" required-field
+      caption="Email" @blur="validations.local.email.$touch" :error-message="emailError" required-field
       :last="firstStep" />
     <template v-if="!firstStep">
+      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
         caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
       <ni-input in-modal v-model.trim="newHelper.contact.phone" last :error="validations.contact.phone.$error"
-        caption="Téléphone" @blur="validations.contact.phone.$touch" :error-label="phoneNbrError" />
+        caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError" />
     </template>
     <template slot="footer">
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary" @click="nextStep"

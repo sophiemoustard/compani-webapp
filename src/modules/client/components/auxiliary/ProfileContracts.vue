@@ -6,8 +6,8 @@
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
         @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
         @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
-      <q-btn :disable="disableContractCreation || contractsLoading" class="fixed fab-custom" no-caps rounded color="primary" icon="add"
-        label="Créer un nouveau contrat" @click="openCreationModal" />
+      <q-btn :disable="disableContractCreation || contractsLoading" class="fixed fab-custom" no-caps rounded
+        color="primary" icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
       <ni-banner v-if="disableContractCreation">
         <template v-slot:message>{{ creationMissingInfo }}</template>
       </ni-banner>
@@ -26,9 +26,11 @@
         @blur="$v.newContract.customer.$touch" separator required-field />
       <ni-input in-modal v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
         :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
-        @blur="$v.newContract.weeklyHours.$touch" suffix="h" required-field />
+        @blur="$v.newContract.weeklyHours.$touch" suffix="h" required-field
+        :error-messsage="weeklyHoursError($v.newContract)" />
       <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number"
-        v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field />
+        v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field
+        :error-messsage="grossHourlyRateError($v.newContract)" />
       <ni-date-input caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="companyContractMinStartDate"
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
@@ -49,10 +51,11 @@
       </template>
       <ni-input in-modal v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
         :error="$v.newVersion.weeklyHours.$error" v-model="newVersion.weeklyHours" type="number"
-        @blur="$v.newVersion.weeklyHours.$touch" suffix="h" required-field />
+        @blur="$v.newVersion.weeklyHours.$touch" suffix="h" required-field
+        :error-messsage="weeklyHoursError($v.newVersion)" />
       <ni-input in-modal caption="Taux horaire" :error="$v.newVersion.grossHourlyRate.$error"
         v-model="newVersion.grossHourlyRate" type="number" suffix="€" required-field
-        @blur="$v.newVersion.grossHourlyRate.$touch" />
+        @blur="$v.newVersion.grossHourlyRate.$touch" :error-messsage="grossHourlyRateError($v.newVersion)" />
       <ni-date-input caption="Date d'effet" :error="$v.newVersion.startDate.$error" v-model="newVersion.startDate"
         :min="newVersionMinStartDate" in-modal required-field />
       <div class="row margin-input last">
@@ -69,7 +72,8 @@
     <!-- Edition modal -->
     <version-edition-modal v-model="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @editVersion="editVersion"/>
+      @hide="resetVersionEditionModal" @editVersion="editVersion"
+      :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"/>
 
     <!-- End contract modal -->
     <ni-modal v-model="endContractModal" @hide="resetEndContractModal">
@@ -150,7 +154,16 @@ export default {
         contractCreationMissingInfo: [],
       },
       customers: [],
-      contractsVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractEmpty', 'contractSigned', 'archives', 'actions'],
+      contractsVisibleColumns: [
+        'weeklyHours',
+        'startDate',
+        'endDate',
+        'grossHourlyRate',
+        'contractEmpty',
+        'contractSigned',
+        'archives',
+        'actions',
+      ],
       // New contract
       newContractModal: false,
       newContract: {
@@ -186,14 +199,14 @@ export default {
       newContract: {
         status: { required },
         customer: { required: requiredIf((item) => item.status === CUSTOMER_CONTRACT) },
-        weeklyHours: { required: requiredIf((item) => item.status === COMPANY_CONTRACT) },
+        weeklyHours: { required: requiredIf((item) => item.status === COMPANY_CONTRACT), minValue: minValue(0) },
         startDate: { required },
-        grossHourlyRate: { required },
+        grossHourlyRate: { required, minValue: minValue(0) },
       },
       newVersion: {
-        weeklyHours: this.selectedContract.status === CUSTOMER_CONTRACT ? {} : { required },
+        weeklyHours: this.selectedContract.status === CUSTOMER_CONTRACT ? {} : { required, minValue: minValue(0) },
         startDate: { required },
-        grossHourlyRate: { required },
+        grossHourlyRate: { required, minValue: minValue(0) },
       },
       editedVersion: {
         grossHourlyRate: { required, minValue: minValue(0) },
@@ -522,9 +535,6 @@ export default {
         this.loading = false;
       }
     },
-  },
-  beforeDestroy () {
-    clearTimeout(this.timeout);
   },
 };
 </script>

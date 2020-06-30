@@ -7,7 +7,7 @@
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
     <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
       v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
-      @blur="validations.netInclTaxes.$touch" :error-label="netInclTaxesError" />
+      @blur="validations.netInclTaxes.$touch" :error-message="netInclTaxesError" />
     <ni-select in-modal :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type"
       :options="paymentOptions" required-field @blur="validations.type.$touch" :error="validations.type.$error" />
     <ni-date-input :caption="`Date du ${editionModalNature}`" v-model="editedPayment.date"

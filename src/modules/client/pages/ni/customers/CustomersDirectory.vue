@@ -32,7 +32,7 @@
       <ni-input in-modal v-model.trim="newCustomer.identity.firstname" caption="Prénom" />
       <div class="row margin-input last">
         <ni-search-address v-model="newCustomer.contact.primaryAddress" in-modal required-field
-          :error="$v.newCustomer.contact.primaryAddress.$error" :error-label="primaryAddressError"
+          :error="$v.newCustomer.contact.primaryAddress.$error" :error-message="primaryAddressError"
           @blur="$v.newCustomer.contact.primaryAddress.$touch" />
       </div>
       <template slot="footer">

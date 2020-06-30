@@ -5,7 +5,7 @@
         <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
         <q-icon v-if="error" name="error_outline" color="secondary" />
       </div>
-      <q-field dense borderless :error="error" :error-message="errorLabel" class="col-12">
+      <q-field dense borderless :error="error" :error-message="errorMessage" class="col-12">
         <q-option-group :value="value" :options="options" :readonly="readOnly" :type="type" :inline="inline" dense
           :disable="disable" v-on="$listeners" />
       </q-field>
@@ -21,7 +21,7 @@ export default {
   props: {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
-    errorLabel: { type: String, default: REQUIRED_LABEL },
+    errorMessage: { type: String, default: REQUIRED_LABEL },
     value: [String, Array, Boolean],
     last: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },

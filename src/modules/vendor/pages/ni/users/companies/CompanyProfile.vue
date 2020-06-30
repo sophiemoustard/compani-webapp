@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="vendor-background">
-    <ni-profile-header :title="companyTradeName">
+    <ni-profile-header :title="companyName">
       <template v-slot:body>
         <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
           <q-item>
@@ -35,7 +35,7 @@ export default {
   },
   data () {
     return {
-      companyTradeName: '',
+      companyName: '',
       tabsContent: [{ label: 'Infos', name: 'infos', default: this.defaultTab === 'infos', component: ProfileInfo }],
     }
   },
@@ -48,24 +48,24 @@ export default {
   },
   watch: {
     company () {
-      this.companyTradeName = get(this.company, 'tradeName') || '';
+      this.companyName = get(this.company, 'name') || '';
     },
   },
   async created () {
     if (!this.company) await this.refreshCompany();
-    this.companyTradeName = get(this.company, 'tradeName') || '';
+    this.companyName = get(this.company, 'name') || '';
   },
   methods: {
     async refreshCompany () {
       try {
-        await this.$store.dispatch('company/get', { companyId: this.companyId });
+        await this.$store.dispatch('company/fetchCompany', { companyId: this.companyId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('company/reset');
+    this.$store.dispatch('company/resetCompany');
   },
 }
 </script>

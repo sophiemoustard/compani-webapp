@@ -15,10 +15,6 @@
           <q-icon v-if="notifications.profiles[props.row.auxiliary._id] && props.row.isActive" name="error"
             color="secondary" size="1rem" />
         </template>
-        <template v-else-if="col.name === 'tasksErrors'">
-          <q-icon v-if="notifications.tasks[props.row.auxiliary._id] && props.row.isActive" name="error"
-            color="secondary" size="1rem" />
-        </template>
         <template v-else-if="col.name === 'active'">
           <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }"></div>
         </template>
@@ -34,7 +30,7 @@
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
       <ni-input in-modal :disable="!firstStep" v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
-        @blur="$v.newUser.local.email.$touch" :error-label="emailError($v.newUser)" caption="Email" required-field />
+        @blur="$v.newUser.local.email.$touch" :error-message="emailError($v.newUser)" caption="Email" required-field />
       <template v-if="!firstStep">
         <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
           required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
@@ -43,9 +39,9 @@
         <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
           caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
         <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
-          caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-label="mobilePhoneError" />
+          caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-message="mobilePhoneError" />
         <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
-          @blur="$v.newUser.contact.address.$touch" error-label="Adresse non valide"
+          @blur="$v.newUser.contact.address.$touch" error-message="Adresse non valide"
           :error="$v.newUser.contact.address.$error" in-modal />
         <div class="row margin-input">
           <div class="col-12">
@@ -54,7 +50,7 @@
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
-              :company-id="company._id" :error="$v.newUser.sector.$error" :error-label="REQUIRED_LABEL"/>
+              :company-id="company._id" :error="$v.newUser.sector.$error" :error-message="REQUIRED_LABEL"/>
           </div>
         </div>
         <div class="row margin-input last">
@@ -89,10 +85,9 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify.js';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
-import { taskValidation } from 'src/modules/client/helpers/taskValidation';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
 
 export default {
@@ -165,13 +160,6 @@ export default {
           style: 'min-width: 75px; width: 8%',
         },
         {
-          name: 'tasksErrors',
-          label: 'Tâches',
-          align: 'left',
-          sortable: true,
-          style: 'min-width: 82px; width: 8%',
-        },
-        {
           name: 'startDate',
           label: 'Depuis le...',
           field: 'startDate',
@@ -218,7 +206,7 @@ export default {
   },
   computed: {
     ...mapState('rh', ['notifications']),
-    ...mapGetters({ company: 'main/company' }),
+    ...mapGetters({ company: 'main/getCompany' }),
     activeUserList () {
       if (this.activeUsers) return this.userList.filter(user => user.isActive);
       return this.userList.filter(user => !user.isActive);
@@ -265,10 +253,8 @@ export default {
         'rh/setNotification',
         { type: 'profiles', _id: user._id, exists: !!checkProfileErrors.error }
       );
-      const checkTasks = taskValidation(user);
-      this.$store.dispatch('rh/setNotification', { type: 'tasks', _id: user._id, exists: checkTasks });
 
-      return { ...formattedUser, profileErrors: checkProfileErrors.error, tasksErrors: checkTasks };
+      return { ...formattedUser, profileErrors: checkProfileErrors.error };
     },
     async getUserList () {
       try {
@@ -297,6 +283,7 @@ export default {
       const payload = {
         ...cloneDeep(this.newUser),
         local: { email: this.newUser.local.email },
+        contact: { ...this.newUser.contact, phone: formatPhoneForPayload(get(this.newUser, 'contact.phone')) },
         role: roles[0]._id,
       };
       if (!get(payload, 'contact.address.fullAddress')) delete payload.contact.address;
@@ -309,7 +296,7 @@ export default {
       const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
       await Twilio.sendSMS({
         to: `+33${user.contact.phone.substring(1)}`,
-        body: `${this.company.tradeName}. Bienvenue ! :)\nPour pouvoir ` +
+        body: `${this.company.name}. Bienvenue ! :)\nPour pouvoir ` +
           'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
           `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)\n` +
           `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`,

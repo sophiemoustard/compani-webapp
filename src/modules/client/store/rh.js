@@ -1,6 +1,5 @@
 import Users from '@api/Users';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
-import { taskValidation } from 'src/modules/client/helpers/taskValidation';
 
 export default {
   namespaced: true,
@@ -8,7 +7,6 @@ export default {
     userProfile: null,
     notifications: {
       profiles: {},
-      tasks: {},
     },
   },
   mutations: {
@@ -37,11 +35,6 @@ export default {
       const user = state.userProfile;
       const validation = userProfileValidation(user);
       commit('SET_NOTIFICATION', { type: 'profiles', _id: user._id, exists: !!validation.error });
-
-      if (user.procedure) {
-        const checkTasks = taskValidation(user);
-        commit('SET_NOTIFICATION', { type: 'tasks', _id: user._id, exists: checkTasks });
-      }
     },
     setNotification: ({ commit }, data) => commit('SET_NOTIFICATION', data),
     resetRh: ({ commit }) => {

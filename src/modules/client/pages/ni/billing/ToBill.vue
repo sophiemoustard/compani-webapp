@@ -110,7 +110,7 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ company: 'main/company' }),
+    ...mapGetters({ company: 'main/getCompany' }),
     hasSelectedRows () {
       return this.selected.length > 0;
     },

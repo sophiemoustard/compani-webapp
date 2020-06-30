@@ -2,7 +2,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Customers from '@api/Customers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 
 export const customerMixin = {
   computed: {
@@ -23,6 +23,7 @@ export const customerMixin = {
   methods: {
     async updateCustomer (path) {
       try {
+        if (path === 'contact.phone') this.customer.contact.phone = formatPhoneForPayload(this.customer.contact.phone);
         let value = path === 'referent' ? get(this.customer, 'referent._id', '') : get(this.customer, path);
         if (this.tmpInput === value) return;
         if (get(this.$v.customer, path)) {
@@ -30,6 +31,7 @@ export const customerMixin = {
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (path === 'payment.iban') value = value.split(' ').join('');
+
         const payload = set({}, path, value);
         await Customers.updateById(this.customer._id, payload);
 

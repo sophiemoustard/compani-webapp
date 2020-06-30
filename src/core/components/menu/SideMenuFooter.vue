@@ -46,8 +46,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      clientRole: 'main/clientRole',
-      vendorRole: 'main/vendorRole',
+      clientRole: 'main/getClientRole',
+      vendorRole: 'main/getVendorRole',
     }),
     isAuxiliaryWithCompany () {
       return [AUXILIARY, PLANNING_REFERENT].includes(this.clientRole);

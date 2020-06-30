@@ -21,14 +21,14 @@
         <p class="text-weight-bold">Contact</p>
       </div>
       <div class="row gutter-profile">
-        <ni-search-address v-model="customer.contact.primaryAddress" :error-label="primaryAddressError"
+        <ni-search-address v-model="customer.contact.primaryAddress" :error-message="primaryAddressError"
           :error="$v.customer.contact.primaryAddress.$error" caption="Adresse principale"
           @focus="saveTmp('contact.primaryAddress.fullAddress')" @blur="updateCustomer('contact.primaryAddress')" />
         <ni-search-address v-model="customer.contact.secondaryAddress" caption="Adresse secondaire"
-          error-label="Adresse non valide" :error="$v.customer.contact.secondaryAddress.$error"
+          error-message="Adresse non valide" :error="$v.customer.contact.secondaryAddress.$error"
           @focus="saveTmp('contact.secondaryAddress.fullAddress')" @blur="updateCustomer('contact.secondaryAddress')" />
         <ni-input caption="Téléphone" type="tel" :error="$v.customer.contact.phone.$error"
-          :error-label="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
+          :error-message="'Numéro de téléphone non valide'" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-input caption="Compléments" v-model="customer.contact.others" @blur="updateCustomer('contact.others')"
           @focus="saveTmp('contact.others')" />
@@ -106,9 +106,9 @@
         <ni-input caption="Nom associé au compte bancaire" :error="$v.customer.payment.bankAccountOwner.$error"
           v-model="customer.payment.bankAccountOwner" @focus="saveTmp('payment.bankAccountOwner')"
           @blur="updateCustomer('payment.bankAccountOwner')" />
-        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" :error-label="ibanError"
+        <ni-input caption="IBAN" :error="$v.customer.payment.iban.$error" :error-message="ibanError"
           v-model="customer.payment.iban" @focus="saveTmp('payment.iban')" @blur="updateCustomer('payment.iban')" />
-        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" :error-label="bicError"
+        <ni-input caption="BIC" :error="$v.customer.payment.bic.$error" :error-message="bicError"
           v-model="customer.payment.bic" @focus="saveTmp('payment.bic')" @blur="updateCustomer('payment.bic')" />
       </div>
     </div>
@@ -570,7 +570,7 @@ export default {
       return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
     },
     company () {
-      return this.$store.getters['main/company'];
+      return this.$store.getters['main/getCompany'];
     },
     serviceOptions () {
       if (!this.services) return [];

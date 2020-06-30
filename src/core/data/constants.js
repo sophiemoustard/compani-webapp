@@ -310,3 +310,6 @@ export const COURSE_TYPES = [
   { label: 'Intra', value: INTRA },
   { label: 'Inter B2B', value: INTER_B2B },
 ]
+export const FORTHCOMING = 'forthcoming';
+export const IN_PROGRESS = 'inProgress';
+export const COMPLETED = 'completed';

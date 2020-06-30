@@ -1,7 +1,22 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
-    <ni-trello :courses="coursesWithGroupedSlot" />
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
+          v-model="selectedTrainer" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3">
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
+          v-model="selectedProgram" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
+    </div>
+
+    <ni-trello :courses="coursesFiltered" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="courseCreationModal = true" />
 
@@ -42,10 +57,12 @@ import OptionGroup from '@components/form/OptionGroup';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
+import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'CoursesDirectory',
+  mixins: [courseFiltersMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-input': Input,
@@ -65,8 +82,6 @@ export default {
       },
       courseCreationModal: false,
       coursesWithGroupedSlot: [],
-      programOptions: [],
-      companyOptions: [],
       courseTypes: COURSE_TYPES,
     }
   },
@@ -117,7 +132,7 @@ export default {
       try {
         const companies = await Companies.list();
         this.companyOptions = companies
-          .map(c => ({ label: c.tradeName, value: c._id }))
+          .map(c => ({ label: c.name, value: c._id }))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);

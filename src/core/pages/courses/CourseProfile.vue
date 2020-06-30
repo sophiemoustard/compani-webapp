@@ -5,7 +5,7 @@
         <div class="row profile-info q-pl-lg">
           <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
             <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
-            <q-item-section class="text-capitalize">{{ info.label }}</q-item-section>
+            <q-item-section>{{ info.label }}</q-item-section>
           </q-item>
         </div>
       </template>
@@ -57,6 +57,16 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    headerInfo () {
+      const infos = [
+        { icon: 'library_books', label: this.programName },
+        { icon: 'bookmark_border', label: this.courseType },
+        { icon: 'emoji_people', label: this.trainerName },
+      ]
+      if (this.isIntraCourse) infos.push({ icon: 'apartment', label: this.companyName });
+
+      return infos;
+    },
   },
   watch: {
     course () {
@@ -70,14 +80,14 @@ export default {
   methods: {
     async refreshCourse () {
       try {
-        await this.$store.dispatch('course/get', { courseId: this.courseId });
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
       } catch (e) {
         console.error(e);
       }
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('course/reset');
+    this.$store.dispatch('course/resetCourse');
   },
 
 }

@@ -98,7 +98,7 @@ export default {
       return !this.userProfile.contracts || !this.userProfile.contracts.length;
     },
     companyName () {
-      return get(this.loggedUser, 'company.tradeName');
+      return get(this.loggedUser, 'company.name');
     },
     userActivity () {
       return {

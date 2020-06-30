@@ -29,7 +29,7 @@ export default {
   },
   computed: {
     vendorRole () {
-      return this.$store.getters['main/vendorRole'];
+      return this.$store.getters['main/getVendorRole'];
     },
   },
   methods: {
@@ -49,7 +49,7 @@ export default {
 <style lang="stylus" scoped>
 .course-container
   padding: 10px
-  border-radius: 2%
+  border-radius: 3px
   &:not(:first-child)
     margin-left: 10px;
   &:not(:last-child)

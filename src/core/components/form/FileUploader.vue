@@ -14,7 +14,7 @@
       </div>
     </div>
     <q-field borderless v-if="(!document || !document.driveId)" :error="error"
-      :error-message="errorLabel">
+      :error-message="errorMessage">
       <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
         text-color="black" @failed="failMsg" :form-fields="additionalFields"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"/>
@@ -41,7 +41,7 @@ export default {
     additionalValue: { type: String, default: '' },
     entity: { type: Object, default: () => {} },
     url: { type: String, default: '' },
-    errorLabel: { type: String, default: 'Document requis' },
+    errorMessage: { type: String, default: 'Document requis' },
     displayCaption: { type: Boolean, default: true },
     disable: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },

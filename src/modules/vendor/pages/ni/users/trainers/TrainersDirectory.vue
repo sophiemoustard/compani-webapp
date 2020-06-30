@@ -14,7 +14,7 @@
       </template>
       <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainer.local.email" required-field
         @blur="$v.newTrainer.local.email.$touch" caption="Email" :error="$v.newTrainer.local.email.$error"
-        :error-label="emailError($v.newTrainer)" :last="firstStep" />
+        :error-message="emailError($v.newTrainer)" :last="firstStep" />
       <template v-if="!firstStep">
         <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
         <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="$v.newTrainer.identity.lastname.$error"

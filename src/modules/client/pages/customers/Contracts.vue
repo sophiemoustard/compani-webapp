@@ -51,8 +51,5 @@ export default {
       }
     },
   },
-  beforeDestroy () {
-    clearTimeout(this.timeout);
-  },
 }
 </script>

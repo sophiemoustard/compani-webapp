@@ -11,32 +11,32 @@ export default {
     drawer: !!Platform.is.desktop,
   },
   mutations: {
-    REFRESH_STATE: (state, refresh) => { state.refreshState = refresh },
-    DRAWER: (state, toggle) => { state.drawer = toggle },
-    LOGGED_USER: (state, user) => { state.loggedUser = user },
+    SET_REFRESH_STATE: (state, refresh) => { state.refreshState = refresh },
+    SET_DRAWER: (state, toggle) => { state.drawer = toggle },
+    SET_LOGGED_USER: (state, user) => { state.loggedUser = user },
   },
   actions: {
-    updateRefreshState: ({ commit }, refresh) => { commit('REFRESH_STATE', refresh) },
-    setDrawer: ({ commit }, toggle) => { commit('DRAWER', toggle) },
+    setRefreshState: ({ commit }, refresh) => { commit('SET_REFRESH_STATE', refresh) },
+    setDrawer: ({ commit }, toggle) => { commit('SET_DRAWER', toggle) },
     fetchLoggedUser: async ({ commit }, userId) => {
       try {
         const user = await users.getById(userId);
-        commit('LOGGED_USER', user);
+        commit('SET_LOGGED_USER', user);
       } catch (e) {
         console.error(e);
         if (e.status === 401) redirect.redirectToLogin();
       }
     },
-    reset: ({ commit }) => {
-      commit('LOGGED_USER', null);
-      commit('REFRESH_STATE', true);
-      commit('DRAWER', !!Platform.is.desktop);
+    resetMain: ({ commit }) => {
+      commit('SET_LOGGED_USER', null);
+      commit('SET_REFRESH_STATE', true);
+      commit('SET_DRAWER', !!Platform.is.desktop);
     },
   },
   getters: {
     getLoggedUser: (state) => state.loggedUser,
-    company: (state) => state.loggedUser.company,
-    clientRole: (state) => get(state, 'loggedUser.role.client.name'),
-    vendorRole: (state) => get(state, 'loggedUser.role.vendor.name'),
+    getCompany: (state) => state.loggedUser.company,
+    getClientRole: (state) => get(state, 'loggedUser.role.client.name'),
+    getVendorRole: (state) => get(state, 'loggedUser.role.vendor.name'),
   },
 };

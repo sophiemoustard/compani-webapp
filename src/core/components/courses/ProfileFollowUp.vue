@@ -7,10 +7,10 @@
           @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error"/>
         <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
             @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
-            :error="$v.course.contact.phone.$error" :error-label="phoneNbrErrorcontact" />
+            :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
         <ni-input caption="Email" v-model.trim="course.contact.email"
             @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
-            :error="$v.course.contact.email.$error" :error-label="emailErrorcontact" />
+            :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -45,13 +45,6 @@
       </div>
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
-            dense @click="openSmsModal" />
-        </q-item-section>
-        <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
-      </q-item>
-      <q-item>
-        <q-item-section side>
           <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
             type="a" :href="!disabledFollowUp && downloadAttendanceSheet()" target="_blank" />
         </q-item-section>
@@ -67,8 +60,9 @@
       </q-item>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Historique d'envoi</p>
-      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination"
+      <p class="text-weight-bold">Envoi de SMS</p>
+      <p>Historique d'envoi </p>
+      <ni-simple-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
         :loading="smsLoading">
         <template v-slot:body="{ props }">
           <q-tr :props="props">
@@ -84,7 +78,14 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-responsive-table>
+      </ni-simple-table>
+      <q-item>
+        <q-item-section side>
+          <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
+            dense @click="openSmsModal" />
+        </q-item-section>
+        <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
+      </q-item>
     </div>
 
     <!-- Modal envoi message -->
@@ -121,10 +122,11 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import Banner from '@components/Banner';
-import ResponsiveTable from '@components/table/ResponsiveTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
+import { formatIdentity } from '@helpers/utils.js';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
@@ -133,7 +135,7 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-modal': Modal,
-    'ni-responsive-table': ResponsiveTable,
+    'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
   },
   mixins: [courseMixin],
@@ -160,6 +162,13 @@ export default {
           align: 'left',
           field: 'date',
           format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+        },
+        {
+          name: 'sender',
+          label: 'Expéditeur',
+          align: 'left',
+          field: row => get(row, 'sender.identity') || '',
+          format: (value) => formatIdentity(value, 'FL'),
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -261,7 +270,7 @@ export default {
     async refreshCourse () {
       try {
         this.courseLoading = true;
-        await this.$store.dispatch('course/get', { courseId: this.profileId });
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
       } catch (e) {
         console.error(e);
       } finally {
@@ -284,10 +293,10 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.course.name}.\nLa première session à ` +
-        `lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant le début de la ` +
-        `formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne formation,` +
-        '\nCompani';
+      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.course.program.name} - ` +
+        `${this.course.name}.\nLa première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+        'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
+        `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
     setReminderMessage () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
@@ -295,10 +304,10 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.course.name}.\nVotre ` +
-      `prochaine session à lieu le ${date} à partir de ${hour}.\nMerci de vous présenter au moins 15 minutes avant ` +
-      `le début de la formation.\nToutes les informations sur : ${this.courseLink}\nNous vous souhaitons une bonne ` +
-      'formation,\nCompani'
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.course.program.name} - ` +
+      `${this.course.name}.\nVotre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+      'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
+      `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
     async sendMessage () {
       try {
@@ -349,4 +358,6 @@ export default {
       &-disabled
         opacity: 0.7 !important;
         cursor: not-allowed !important
+.q-item
+  padding-left: 0px;
 </style>

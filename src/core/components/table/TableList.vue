@@ -14,9 +14,8 @@
           </q-td>
         </q-tr>
       </template>
-      <template v-slot:no-data="props">
-        <div v-show="!loading" class="full-width row q-gutter-sm">
-          <q-icon :name="props.icon" size="2em" />
+      <template v-slot:no-data>
+        <div v-show="!loading" class="full-width row q-gutter-sm grey-text">
           <span>Pas de données disponibles</span>
         </div>
       </template>

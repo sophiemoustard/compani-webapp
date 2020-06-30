@@ -6,17 +6,17 @@ export default {
     program: null,
   },
   mutations: {
-    SAVE: (state, data) => { state.program = !data ? data : Object.assign({}, data); },
+    SET_PROGRAM: (state, data) => { state.program = !data ? data : Object.assign({}, data); },
   },
   actions: {
-    get: async ({ commit }, params) => {
+    fetchProgram: async ({ commit }, params) => {
       try {
         const program = await Programs.getById(params.programId);
-        commit('SAVE', program);
+        commit('SET_PROGRAM', program);
       } catch (e) {
         console.error(e);
       }
     },
-    reset: ({ commit }) => { commit('SAVE', null) },
+    resetProgram: ({ commit }) => { commit('SET_PROGRAM', null) },
   },
 }

@@ -82,7 +82,7 @@
       </template>
       <ni-datetime-range caption="Dates et heures" v-model="newCourseSlot.dates" required-field disable-end-date
         :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
-      <ni-search-address v-model="newCourseSlot.address" :error-label="addressError"
+      <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
         @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
@@ -97,7 +97,7 @@
       </template>
       <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
         :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
-      <ni-search-address v-model="editedCourseSlot.address" :error-label="addressError"
+      <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
         @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
@@ -111,7 +111,7 @@
         Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
       </template>
       <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field :last="firstStep"
-        @blur="$v.newTrainee.local.email.$touch" caption="Email" :error-label="emailError($v.newTrainee)"
+        @blur="$v.newTrainee.local.email.$touch" caption="Email" :error-message="emailError($v.newTrainee)"
         :error="$v.newTrainee.local.email.$error" />
       <template v-if="!firstStep">
         <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model="newTrainee.identity.firstname" caption="Prénom" />
@@ -119,7 +119,7 @@
           required-field v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" />
         <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model.trim="newTrainee.contact.phone"
           caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error="$v.newTrainee.contact.phone.$error"
-          :error-label="phoneNbrError($v.newTrainee)" :last="isIntraCourse" />
+          :error-message="phoneNbrError($v.newTrainee)" :last="isIntraCourse" />
         <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" required-field caption="Structure"
           @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions"
           :last="!isIntraCourse" />
@@ -144,7 +144,7 @@
         caption="Nom" @blur="$v.editedTrainee.identity.lastname.$touch" required-field />
       <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
         caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
-        :error-label="phoneNbrError($v.editedTrainee)" />
+        :error-message="phoneNbrError($v.editedTrainee)" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
           :loading="loading" @click="updateTrainee" />
@@ -181,7 +181,7 @@ import {
   VENDOR,
   CLIENT,
 } from '@data/constants';
-import { formatIdentity, formatPhone, clear } from '@helpers/utils';
+import { formatIdentity, formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
 import { frAddress, frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -241,7 +241,7 @@ export default {
           name: 'company',
           label: 'Structure',
           align: 'left',
-          field: row => get(row, 'company.tradeName') || '',
+          field: row => get(row, 'company.name') || '',
           classes: 'text-capitalize',
         },
         {
@@ -384,20 +384,17 @@ export default {
       try {
         const companies = await Companies.list();
         this.companyOptions = companies
-          .map(c => ({ label: c.tradeName, value: c._id }))
+          .map(c => ({ label: c.name, value: c._id }))
           .sort((a, b) => a.label.localeCompare(b.label));
       } catch (e) {
         console.error(e);
         this.companyOptions = [];
       }
     },
-    padMinutes (minutes) {
-      return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
-    },
     async refreshCourse () {
       try {
         this.courseSlotsLoading = true;
-        await this.$store.dispatch('course/get', { courseId: this.profileId });
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
         this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
       } catch (e) {
         console.error(e);
@@ -561,6 +558,7 @@ export default {
         else delete payload.identity.firstname;
       }
       if (get(payload, 'contact.phone') === '') delete payload.contact;
+      else payload.contact.phone = formatPhoneForPayload(payload.contact.phone);
       if (get(payload, 'company') === '') delete payload.company;
 
       return payload;
@@ -605,6 +603,7 @@ export default {
         this.loading = true;
         this.$v.editedTrainee.$touch();
         if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (get(this.editedTrainee, 'contact.phone')) this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
 
         await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
         this.traineeEditionModal = false;

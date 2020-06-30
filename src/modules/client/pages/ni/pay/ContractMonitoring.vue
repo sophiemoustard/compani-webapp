@@ -29,8 +29,8 @@
 
     <!-- Edition modal -->
     <version-edition-modal v-model="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
-      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @editVersion="editVersion"/>
+      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" @hide="resetVersionEditionModal"
+      @editVersion="editVersion" :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"/>
 
   </q-page>
 </template>

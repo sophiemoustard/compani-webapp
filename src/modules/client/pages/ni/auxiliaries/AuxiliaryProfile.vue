@@ -12,7 +12,6 @@ import { mapState } from 'vuex';
 import AuxiliaryProfileHeader from 'src/modules/client/components/auxiliary/AuxiliaryProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
-import ProfileTasks from 'src/modules/client/components/auxiliary/ProfileTasks';
 import ProfileContracts from 'src/modules/client/components/auxiliary/ProfileContracts';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
@@ -37,25 +36,8 @@ export default {
           component: ProfileInfo,
           notification: 'profiles',
         },
-        {
-          label: 'Tâches',
-          name: 'tasks',
-          default: this.defaultTab === 'tasks',
-          component: ProfileTasks,
-          notification: 'tasks',
-        },
-        {
-          label: 'Contrats',
-          name: 'contracts',
-          default: this.defaultTab === 'contracts',
-          component: ProfileContracts,
-        },
-        {
-          label: 'Paie',
-          name: 'pays',
-          default: this.defaultTab === 'pays',
-          component: ProfilePay,
-        },
+        { label: 'Contrats', name: 'contracts', default: this.defaultTab === 'contracts', component: ProfileContracts },
+        { label: 'Paie', name: 'pays', default: this.defaultTab === 'pays', component: ProfilePay },
       ],
     }
   },

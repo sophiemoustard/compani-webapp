@@ -71,11 +71,11 @@
         Ajouter une <span class="text-weight-bold">attestation fiscale</span>
       </template>
       <ni-date-input caption="Date" v-model="taxCertificate.date" @blur="$v.taxCertificate.date.$touch"
-        :error-label="REQUIRED_LABEL" in-modal required-field />
+        :error-message="REQUIRED_LABEL" in-modal required-field />
       <ni-select caption="Année" v-model="taxCertificate.year" :options="yearOptions"
         @blur="$v.taxCertificate.year.$touch" :error="$v.taxCertificate.year.$error" in-modal required-field />
       <ni-input caption="Attestation" type="file" v-model="taxCertificate.file" :error="$v.taxCertificate.file.$error"
-        @blur="$v.taxCertificate.file.$touch" in-modal required-field last :error-label="taxCertificateFileError" />
+        @blur="$v.taxCertificate.file.$touch" in-modal required-field last :error-message="taxCertificateFileError" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter l'attestation" icon-right="add" color="primary"
           :loading="modalLoading" @click="createTaxCertificate" />
@@ -190,8 +190,8 @@ export default {
       customer: state => state.customer.customer,
     }),
     ...mapGetters({
-      company: 'main/company',
-      clientRole: 'main/clientRole',
+      company: 'main/getCompany',
+      clientRole: 'main/getClientRole',
     }),
     customerFolder () {
       return get(this.customer, 'driveFolder.driveId', null);

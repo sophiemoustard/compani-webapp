@@ -170,7 +170,7 @@ export const planningActionMixin = {
     },
     getPayload (event) {
       let payload = { ...omit(event, ['dates', '__v', 'company']) }
-      payload = pickBy(payload);
+      payload = { ...pickBy(payload), ...pick(payload, ['isCancelled']) };
 
       payload.startDate = event.dates.startDate;
       payload.endDate = event.dates.endDate;
@@ -243,7 +243,7 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('La création de cet évènement n\'est pas autorisée.');
+        if (e.data && e.data.statusCode === 409) return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       } finally {
         this.loading = false;
@@ -293,7 +293,7 @@ export const planningActionMixin = {
         }
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('La création de cet évènement n\'est pas autorisée.');
+        if (e.data && e.data.statusCode === 409) return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       }
     },
@@ -411,9 +411,9 @@ export const planningActionMixin = {
         NotifyPositive('Évènement modifié.');
       } catch (e) {
         console.error(e)
-        if (e.data && e.data.statusCode === 422) {
+        if (e.data && e.data.statusCode === 409) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Cette modification n\'est pas autorisée.');
+          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
         }
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       } finally {
@@ -464,7 +464,8 @@ export const planningActionMixin = {
 
         NotifyPositive('Évènement modifié.');
       } catch (e) {
-        if (e.data && e.data.statusCode === 422) return NotifyNegative('Cette modification n\'est pas autorisée.');
+        if (e.data && e.data.statusCode === 409) return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+        NotifyNegative('Erreur lors de la création de l\'évènement.');
       }
     },
     // Event files

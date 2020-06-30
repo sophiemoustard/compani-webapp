@@ -7,7 +7,7 @@ describe('Customer contact tests', () => {
 
   it('should display correctly customer contact page', () => {
     cy.get('#q-app').click(500, 500);
-    cy.get('[data-cy=referent-identity]').should('contain', 'Customer referent 2 TEST');
+    cy.get('[data-cy=referent-identity]').should('contain', 'Customer referent');
     cy.get('[data-cy=referent-phone]').should('contain', '0987654321');
     cy.get('[data-cy=billing-asssistance-email]').should('contain', 'assistance@billing.eu');
   });
