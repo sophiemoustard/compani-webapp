@@ -23,8 +23,9 @@
                     :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
                 </template>
               </template>
-              <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)" :key="eventId" @click.stop="editEvent(event)"
-                :class="[!isCustomerPlanning && 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
+              <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)"
+                :key="eventId" @click.stop="editEvent(event)" class="event"
+                :class="[!isCustomerPlanning && 'cursor-pointer', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
                 data-cy="agenda-event" >
                 <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                   <div class="col-12 event-title">
