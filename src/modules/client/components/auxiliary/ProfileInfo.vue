@@ -21,31 +21,7 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <div class="row" style="background: white">
-            <div class="row justify-center col-xs-12" style="padding: 12px 0px;">
-              <croppa v-model="croppa" canvas-color="#EEE" accept="image/*" :initial-image="pictureLink"
-                :prevent-white-space="true" placeholder="Clique ici pour choisir ta photo" placeholder-color="black"
-                :placeholder-font-size="10" :show-remove-button="false" :disable-drag-and-drop="disablePictureEdition"
-                :disable-drag-to-move="disablePictureEdition" :disable-scroll-to-zoom="disablePictureEdition"
-                :disable-pinch-to-zoom="disablePictureEdition" @file-choose="choosePicture" />
-            </div>
-            <div class="row justify-center col-xs-12">
-              <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat
-                icon="mdi-square-edit-outline" size="1rem" @click="disablePictureEdition = false" />
-              <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem"
-                @click="validateImageDeletion" />
-              <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
-                size="1rem" />
-              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_left" @click="croppa.rotate(-1)" round
-                flat size="1rem" />
-              <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_right" @click="croppa.rotate(1)" round
-                flat size="1rem" />
-              <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
-                @click="uploadImage" round flat size="1rem" />
-              <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem"
-                type="a" :href="pictureDlLink(pictureLink)" target="_blank" />
-            </div>
-          </div>
+          <ni-picture-uploader :user-profile="mergedUserProfile" :refresh-picture="() => refreshUser(false)"/>
         </div>
       </div>
     </div>
@@ -273,7 +249,6 @@
 <script>
 import 'vue-croppa/dist/vue-croppa.css'
 import { mapState, mapGetters } from 'vuex';
-import { Cookies } from 'quasar';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -282,7 +257,6 @@ import Roles from '@api/Roles';
 import Establishments from '@api/Establishments';
 import Users from '@api/Users';
 import gdrive from '@api/GoogleDrive';
-import cloudinary from '@api/Cloudinary';
 import SelectSector from '@components/form/SelectSector';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -292,8 +266,9 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
 import DateInput from '@components/form/DateInput.vue';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import PictureUploader from '@components/PictureUploader.vue';
 import { frPhoneNumber, iban, frAddress, bic } from '@helpers/vuelidateCustomVal';
-import { extend, removeDiacritics } from '@helpers/utils';
+import { extend } from '@helpers/utils';
 import {
   AUXILIARY,
   PLANNING_REFERENT,
@@ -319,6 +294,7 @@ export default {
     'ni-date-input': DateInput,
     'ni-search-address': SearchAddress,
     'ni-option-group': OptionGroup,
+    'ni-picture-uploader': PictureUploader,
   },
   data () {
     return {
@@ -326,11 +302,7 @@ export default {
       transportOptions: TRANSPORT_OPTIONS,
       requiredLabel: REQUIRED_LABEL,
       requiredDoc: 'Document requis',
-      disablePictureEdition: true,
       docsThmbnails: {},
-      croppa: {},
-      loadingImage: false,
-      fileChosen: false,
       isLoaded: false,
       tmpInput: '',
       identityType: '',
@@ -522,15 +494,6 @@ export default {
 
       return `${process.env.API_HOSTNAME}/users/${this.mergedUserProfile._id}/gdrive/${driveId}/upload`;
     },
-    pictureUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.mergedUserProfile._id}/cloudinary/upload`;
-    },
-    hasPicture () {
-      return !!this.pictureLink;
-    },
-    pictureLink () {
-      return get(this.mergedUserProfile, 'picture.link') || null;
-    },
     birthStateError () {
       const { required, minLength, maxLength, numeric } = this.$v.mergedUserProfile.identity.birthState
       if (!required) return REQUIRED_LABEL;
@@ -630,35 +593,6 @@ export default {
       await Users.updateById(this.mergedUserProfile._id, payload);
       this.$store.dispatch('rh/setUserProfile', this.mergedUserProfile);
     },
-    async uploadImage () {
-      try {
-        if (this.hasPicture && !this.fileChosen) {
-          await cloudinary.deleteImageById({ id: this.mergedUserProfile.picture.publicId });
-        }
-        this.loadingImage = true;
-        const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
-        const data = new FormData();
-        data.append('_id', this.mergedUserProfile._id);
-        data.append('role', this.mergedUserProfile.role.client.name);
-        data.append('fileName', `photo_${this.mergedUserProfile.identity.firstname}_${this.mergedUserProfile.identity.lastname}`);
-        data.append('Content-Type', blob.type || 'application/octet-stream');
-        data.append('picture', blob);
-
-        await this.$axios.post(
-          this.pictureUploadUrl,
-          data,
-          { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } }
-        );
-        await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
-        this.closePictureEdition();
-        NotifyPositive('Modification enregistrée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification.');
-      } finally {
-        this.loadingImage = false;
-      }
-    },
     documentTitle (path) {
       return `${path}_${this.mergedUserProfile.identity.firstname}_${this.mergedUserProfile.identity.lastname}`;
     },
@@ -705,33 +639,9 @@ export default {
       }).onOk(() => this.deleteCertificate(driveId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
-    async deleteImage () {
-      try {
-        if (this.mergedUserProfile.picture && this.mergedUserProfile.picture.publicId) {
-          await cloudinary.deleteImageById({ id: this.mergedUserProfile.picture.publicId });
-          this.croppa.remove();
-        }
-        await Users.updateById(this.mergedUserProfile._id, { picture: { link: null, publicId: null } });
-        await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
-        NotifyPositive('Photo supprimée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la photo.');
-      }
-    },
-    validateImageDeletion () {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
-        ok: true,
-        cancel: 'Annuler',
-      })
-        .onOk(this.deleteImage)
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async refreshUser () {
+    async refreshUser (notify = true) {
       await this.$store.dispatch('rh/fetchUserProfile', { userId: this.mergedUserProfile._id });
-      NotifyPositive('Document envoyé');
+      if (notify) NotifyPositive('Document envoyé');
     },
     groupErrors (group) {
       let j = 0;
@@ -744,23 +654,6 @@ export default {
     },
     groupErrorsClass (group) {
       return this.groupErrors(group).errors > 0 ? 'group-error' : 'group-error-ok';
-    },
-    choosePicture () {
-      this.fileChosen = true;
-      this.disablePictureEdition = false;
-      this.croppa.chooseFile();
-    },
-    closePictureEdition () {
-      this.disablePictureEdition = true;
-      this.fileChosen = false;
-      if (!this.hasPicture && !this.fileChosen) this.croppa.remove();
-      if (this.hasPicture && !this.fileChosen) this.croppa.refresh();
-    },
-    pictureDlLink (link) {
-      const lastname = removeDiacritics(get(this.mergedUserProfile, 'identity.lastname'));
-      const firstname = removeDiacritics(get(this.mergedUserProfile, 'identity.firstname'));
-
-      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${firstname}_${lastname}`) : '';
     },
     async getAuxiliaryRoles () {
       try {
