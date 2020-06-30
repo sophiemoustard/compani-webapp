@@ -5,7 +5,7 @@
     </template>
     <ni-input in-modal caption="Taux horaire"  type="number" suffix="€" required-field
       v-model="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
-      @blur="validations.grossHourlyRate.$touch" :error-label="grossHourlyRateError" />
+      @blur="validations.grossHourlyRate.$touch" :error-message="grossHourlyRateError" />
     <ni-date-input caption="Date d'effet" v-model="editedVersion.startDate" :min="minStartDate"
       in-modal required-field @blur="validations.startDate.$touch" :error="validations.startDate.$error" />
     <div class="margin-input last">
