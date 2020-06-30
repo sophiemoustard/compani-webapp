@@ -52,7 +52,7 @@ loggedUsers.forEach(user => describe(`Auxiliary planning - actions - ${user.role
     cy.get('[data-cy=planning-search]').eq(1).type('{backspace}Auxiliary TEST{downarrow}{enter}');
     cy.get('[data-cy=planning-event]').should('have.length', 1);
 
-    cy.get('[data-cy=planning-cell]').eq(1).click();
+    cy.get('[data-cy=planning-cell]').eq(0).click();
     cy.get('[data-cy=event-creation-customer]').eq(0).type('Romain{downarrow}{enter}');
     cy.get('[data-cy=event-creation-button]').click();
     cy.get('[data-cy=planning-event]').should('have.length', 2);
