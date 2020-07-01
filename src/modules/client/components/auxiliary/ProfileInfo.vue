@@ -21,7 +21,7 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-picture-uploader :user-profile="mergedUserProfile" :refresh-picture="() => refreshUser(false)"/>
+          <ni-picture-uploader :user="mergedUserProfile" :refresh-picture="() => refreshUser(false)"/>
         </div>
       </div>
     </div>
@@ -247,7 +247,6 @@
 </template>
 
 <script>
-import 'vue-croppa/dist/vue-croppa.css'
 import { mapState, mapGetters } from 'vuex';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';

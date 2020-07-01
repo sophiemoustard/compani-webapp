@@ -1,13 +1,12 @@
 <template>
   <q-page :class="backgroundClass" padding>
-    <div>
+    <div v-if="mergedUserProfile._id">
       <h4>Mon compte</h4>
       <div class="q-mb-xl">
         <div class="photo-caption">Photo</div>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <ni-picture-uploader :user-profile="mergedUserProfile" :background="backgroundClass"
-              :refresh-picture="refreshUser" :key="pictureRenderTimes" />
+            <ni-picture-uploader :user="mergedUserProfile" :refresh-picture="refreshUser" />
           </div>
         </div>
       </div>
@@ -74,7 +73,6 @@
 </template>
 
 <script>
-import 'vue-croppa/dist/vue-croppa.css'
 import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
@@ -111,7 +109,10 @@ export default {
         },
         local: { email: '', password: '' },
         contact: { phone: '' },
-        picture: { link: '' },
+        picture: {
+          link: '',
+          publicId: '',
+        },
       },
       tmpInput: '',
       emailLock: true,
@@ -124,7 +125,6 @@ export default {
       cguCompani,
       backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
-      pictureRenderTimes: 0,
     }
   },
   validations () {
@@ -160,16 +160,11 @@ export default {
         const user = await Users.getById(this.$route.params.id);
         this.mergedUserProfile = {
           contact: {},
-          ...pick(user,
-            ['_id', 'identity.firstname', 'identity.lastname', 'picture.link', 'local.email', 'contact', 'role']),
+          ...pick(user, ['_id', 'identity', 'picture', 'local', 'contact']),
         };
-        if (!get(this.mergedUserProfile, 'picture.link')) this.forcePictureNewRender();
       } catch (e) {
         console.error(e);
       }
-    },
-    forcePictureNewRender () {
-      this.pictureRenderTimes += 1;
     },
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);

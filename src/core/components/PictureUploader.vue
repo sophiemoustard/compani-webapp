@@ -12,6 +12,8 @@
         icon="mdi-square-edit-outline" size="1rem" @click="disablePictureEdition = false" />
       <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="delete" size="1rem"
         @click="validateImageDeletion" />
+      <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="save_alt" size="1rem"
+        type="a" :href="pictureDlLink(pictureLink)" target="_blank" />
       <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
         size="1rem" />
       <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_left" @click="croppa.rotate(-1)" round
@@ -20,13 +22,12 @@
         flat size="1rem" />
       <q-btn v-if="!disablePictureEdition" :loading="loadingImage" color="primary" icon="done"
         @click="uploadImage" round flat size="1rem" />
-      <q-btn v-if="hasPicture && disablePictureEdition" color="primary" round flat icon="save_alt" size="1rem"
-        type="a" :href="pictureDlLink(pictureLink)" target="_blank" />
     </div>
     </div>
 </template>
 
 <script>
+import 'vue-croppa/dist/vue-croppa.css'
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import Users from '@api/Users';
@@ -37,8 +38,7 @@ import { removeDiacritics } from '@helpers/utils';
 export default {
   name: 'PictureUploader',
   props: {
-    userProfile: { type: Object, default: () => {} },
-    background: { type: String, default: 'client-background' },
+    user: { type: Object, default: () => {} },
     refreshPicture: { type: Function, default: () => {} },
   },
   data () {
@@ -54,32 +54,26 @@ export default {
       return !!this.pictureLink;
     },
     pictureUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/cloudinary/upload`;
+      return `${process.env.API_HOSTNAME}/users/${this.user._id}/cloudinary/upload`;
     },
     pictureLink () {
-      return get(this.userProfile, 'picture.link') || null;
+      return get(this.user, 'picture.link') || null;
     },
     canvasColor () {
-      return this.background === 'client-background' ? '#EEE' : '#FFEDDA';
-    },
-    userRole () {
-      if (get(this.userProfile, 'role.client')) return this.userProfile.role.client.name;
-      else if (get(this.userProfile, 'role.vendor')) return this.userProfile.role.vendor.name;
-      return 'no_role';
+      return /\/ad\//.test(this.$router.currentRoute.path) ? '#FFEDDA' : '#EEE';
     },
   },
   methods: {
     async uploadImage () {
       try {
         if (this.hasPicture && !this.fileChosen) {
-          await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
+          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
         }
         this.loadingImage = true;
         const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         const data = new FormData();
-        data.append('_id', this.userProfile._id);
-        data.append('role', this.userRole);
-        data.append('fileName', `photo_${this.userProfile.identity.firstname}_${this.userProfile.identity.lastname}`);
+        data.append('_id', this.user._id);
+        data.append('fileName', `photo_${this.user.identity.firstname}_${this.user.identity.lastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
 
@@ -100,11 +94,11 @@ export default {
     },
     async deleteImage () {
       try {
-        if (this.userProfile.picture && this.userProfile.picture.publicId) {
-          await cloudinary.deleteImageById({ id: this.userProfile.picture.publicId });
+        if (get(this.user, 'picture.publicId')) {
+          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
           this.croppa.remove();
         }
-        await Users.updateById(this.userProfile._id, { picture: { link: null, publicId: null } });
+        await Users.updateById(this.user._id, { picture: { link: null, publicId: null } });
         await this.refreshPicture();
         NotifyPositive('Photo supprimée');
       } catch (e) {
@@ -134,15 +128,11 @@ export default {
       if (this.hasPicture && !this.fileChosen) this.croppa.refresh();
     },
     pictureDlLink (link) {
-      const lastname = removeDiacritics(get(this.userProfile, 'identity.lastname'));
-      const firstname = removeDiacritics(get(this.userProfile, 'identity.firstname'));
+      const lastname = removeDiacritics(get(this.user, 'identity.lastname'));
+      const firstname = removeDiacritics(get(this.user, 'identity.firstname'));
 
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${firstname}_${lastname}`) : '';
     },
   },
 }
 </script>
-
-<style lang="stylus" scoped>
-
-</style>
