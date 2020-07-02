@@ -2,7 +2,6 @@ import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import store from 'src/store/index';
-import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import {
   HELPER,
   AUXILIARY_ROLES,
@@ -19,7 +18,7 @@ const routes = [
         if (to.path !== '/') return next();
 
         const loggedUser = store.state.main.loggedUser;
-        if (!loggedUser) return logOutAndRedirectToLogin();
+        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
         const userVendorRole = store.getters['main/getVendorRole'];
         const userClientRole = store.getters['main/getClientRole'];
