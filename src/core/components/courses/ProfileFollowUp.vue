@@ -79,10 +79,9 @@
           </q-tr>
         </template>
       </ni-simple-table>
-      <ni-banner v-if="missingTraineesPhone.length">
-        <template v-slot:icon><q-icon size="sm" name="info" /></template>
+      <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
         <template v-slot:message>
-          Il manque le(s) numéro(s) de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur {{course.trainees.length}}:
+          Il manque le(s) numéro(s) de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur {{course.trainees.length}} :
           {{ missingTraineesPhone.join(', ') }}.
         </template>
       </ni-banner>
