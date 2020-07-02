@@ -145,15 +145,15 @@ export default {
   },
   methods: {
     async refreshUser () {
-      await this.$store.dispatch('rh/fetchLoggedUser', { userId: this.userProfile._id });
+      await this.$store.dispatch('main/fetchLoggedUser', this.userProfile._id);
     },
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
     },
     async updateAlenviUser (path) {
       const value = get(this.userProfile, path);
-      const payload = set({}, path, value);
-      await Users.updateById(this.$route.params.id, payload);
+      const payload = set({}, path, value)
+      await Users.updateById(this.userProfile._id, payload);
       await this.refreshUser();
     },
     async submitPasswordChange () {
@@ -168,7 +168,7 @@ export default {
 
         const value = get(this.userProfile, 'local.password');
         const payload = set({}, 'local.password', value);
-        await Users.updatePassword(this.$route.params.id, payload);
+        await Users.updatePassword(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée.');
         this.newPasswordModal = false;
