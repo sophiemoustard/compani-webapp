@@ -47,23 +47,22 @@ export const userMixin = {
     },
     async updateUser (path) {
       try {
-        if (this.tmpInput === get(this.mergedUserProfile, path)) {
+        if (this.tmpInput === get(this.userProfile, path)) {
           if (path === 'local.email' && this.tmpInput !== '') this.emailLock = true;
           return;
         }
 
-        if (get(this.$v.mergedUserProfile, path)) {
-          get(this.$v.mergedUserProfile, path).$touch();
-          const isValid = await this.waitForValidation(this.$v.mergedUserProfile, path);
+        if (get(this.$v.userProfile, path)) {
+          get(this.$v.userProfile, path).$touch();
+          const isValid = await this.waitForValidation(this.$v.userProfile, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
         if (path === 'contact.phone') {
-          this.mergedUserProfile.contact.phone = formatPhoneForPayload(this.mergedUserProfile.contact.phone)
+          this.userProfile.contact.phone = formatPhoneForPayload(this.userProfile.contact.phone)
         }
 
         await this.updateAlenviUser(path);
-
-        if (path === 'local.email') this.emailLock = true;
+        this.emailLock = true;
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
@@ -86,7 +85,7 @@ export const userMixin = {
     async emailErrorHandler (path) {
       try {
         NotifyNegative('Email déjà existant.');
-        this.mergedUserProfile.local.email = this.tmpInput;
+        this.userProfile.local.email = this.tmpInput;
         await this.$nextTick();
         this.$refs.userEmail.select();
       } catch (e) {
