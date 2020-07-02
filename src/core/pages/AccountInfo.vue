@@ -70,6 +70,7 @@ import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 import { userMixin } from '@mixins/userMixin';
+import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
 
@@ -169,22 +170,7 @@ export default {
     },
     logout () {
       this.isLoggingOut = true;
-
-      const options = { path: '/', sameSite: 'Strict' };
-      this.$q.cookies.remove('alenvi_token', options);
-      this.$q.cookies.remove('alenvi_token_expires_in', options);
-      this.$q.cookies.remove('refresh_token', options);
-      this.$q.cookies.remove('user_id', options);
-      this.$q.localStorage.clear();
-
-      this.$store.dispatch('course/resetCourse');
-      this.$store.dispatch('program/resetProgram');
-      this.$store.dispatch('company/resetCompany');
-      this.$store.dispatch('customer/resetCustomer');
-      this.$store.dispatch('rh/resetRh');
-      this.$store.dispatch('planning/resetPlanning');
-
-      this.$router.replace('/login');
+      logOutAndRedirectToLogin();
     },
   },
 }
