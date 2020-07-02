@@ -79,6 +79,13 @@
           </q-tr>
         </template>
       </ni-simple-table>
+      <ni-banner v-if="missingTraineesPhone.length">
+        <template v-slot:icon><q-icon size="sm" name="info" /></template>
+        <template v-slot:message>
+          Il manque le(s) numéro(s) de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur {{course.trainees.length}}:
+          {{ missingTraineesPhone.join(', ') }}.
+        </template>
+      </ni-banner>
       <q-item>
         <q-item-section side>
           <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
@@ -236,6 +243,10 @@ export default {
       return this.courseNotStartedYet
         ? this.messageTypeOptions
         : this.messageTypeOptions.filter(t => t.value === REMINDER);
+    },
+    missingTraineesPhone () {
+      return this.course.trainees.filter(trainee => !get(trainee, 'contact.phone'))
+        .map(trainee => formatIdentity(trainee.identity, 'FL'));
     },
   },
   methods: {
