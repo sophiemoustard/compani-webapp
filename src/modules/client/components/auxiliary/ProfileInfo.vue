@@ -643,4 +643,7 @@ export default {
     &-ok
       font-size: 12px
       color: $accent
+  /deep/ .q-field--standard.q-field--focused
+    .q-field__control:after
+      display: none;
 </style>
