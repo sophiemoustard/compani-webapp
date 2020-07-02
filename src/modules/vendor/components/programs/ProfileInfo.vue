@@ -1,6 +1,7 @@
 <template>
   <div v-if="program">
     <div class="q-mb-xl">
+      <p class="text-weight-bold">Informations générales</p>
       <div class="row gutter-profile">
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
           :error="$v.program.name.$error" required-field />
@@ -14,14 +15,16 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Modules</p>
       <div v-for="(module, index) of program.modules" :key="index">
-          {{module.title}}
+        <q-card flat class="module-card">
+          <q-card-section>{{module.title}}</q-card-section>
+        </q-card>
       </div>
       <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un module"
         @click="moduleCreationModal = true" />
     </div>
 
     <!-- Module creation modal -->
-    <ni-modal v-model="moduleCreationModal" @hide="resetCreationModal">
+    <ni-modal v-model="moduleCreationModal" @hide="resetModuleCreationModal">
       <template slot="title">
         Créer un nouveau <span class="text-weight-bold">module</span>
       </template>
@@ -115,7 +118,7 @@ export default {
         NotifyPositive('Module créé.');
 
         await this.refreshProgram();
-        this.moduleCreationModal = false;
+        this.resetModuleCreationModal();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du module.');
@@ -123,9 +126,16 @@ export default {
         this.modalLoading = false;
       }
     },
-    resetCreationModal () {
+    resetModuleCreationModal () {
       this.newModule.title = '';
+      this.$v.newModule.$reset();
+      this.moduleCreationModal = false;
     },
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.module-card
+  margin-bottom: 10px;
+</style>
