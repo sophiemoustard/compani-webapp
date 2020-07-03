@@ -1,5 +1,5 @@
 export const userModel = {
-  mentorId: '',
+  mentor: '',
   local: { email: '' },
   picture: { link: '' },
   identity: {
