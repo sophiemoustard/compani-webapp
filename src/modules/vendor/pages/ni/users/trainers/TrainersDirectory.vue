@@ -150,8 +150,7 @@ export default {
         this.trainerCreationModal = false;
         NotifyPositive('Formateur créé.')
 
-        await Email.sendWelcome({ email: this.newTrainer.local.email, type: TRAINER });
-        NotifyPositive('Email envoyé');
+        this.sendWelcome();
         await this.refreshTrainers();
       } catch (e) {
         console.error(e);
@@ -159,6 +158,15 @@ export default {
         NotifyNegative('Erreur lors de la création du formateur.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    async sendWelcome () {
+      try {
+        await Email.sendWelcome({ email: this.newTrainer.local.email, type: TRAINER });
+        NotifyPositive('Email envoyé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'envoi du mail.');
       }
     },
   },
