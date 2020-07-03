@@ -1,3 +1,4 @@
+import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import store from 'src/store/index';
