@@ -1,6 +1,8 @@
 import { Platform } from 'quasar';
 import get from 'lodash/get';
 import users from '@api/Users';
+import { userModel } from '@data/user';
+import { extend } from '@helpers/utils';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 export default {
@@ -21,7 +23,8 @@ export default {
     fetchLoggedUser: async ({ commit }, userId) => {
       try {
         const user = await users.getById(userId);
-        commit('SET_LOGGED_USER', user);
+
+        commit('SET_LOGGED_USER', Object.assign({}, extend(userModel, user)));
       } catch (e) {
         console.error(e);
         commit('SET_LOGGED_USER', null);

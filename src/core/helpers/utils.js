@@ -5,14 +5,8 @@ import diacriticsMap from '@data/diacritics';
 
 export const extend = (...sources) => {
   const extended = {};
-  let deep = false;
+  const deep = sources[0];
   let i = 0;
-
-  // Check if a deep merge
-  if (typeof (sources[0]) === 'boolean') {
-    deep = sources[0];
-    i++;
-  }
 
   // Merge the object into the extended object
   const merge = (obj) => {
@@ -20,7 +14,7 @@ export const extend = (...sources) => {
       if (Object.prototype.hasOwnProperty.call(obj, prop)) {
         if (deep && Object.prototype.toString.call(obj[prop]) === '[object Object]') {
           // If we're doing a deep merge and the property is an object
-          extended[prop] = extend(true, extended[prop], obj[prop]);
+          extended[prop] = extend(extended[prop], obj[prop]);
         } else {
           // Otherwise, do a regular merge
           extended[prop] = obj[prop];
