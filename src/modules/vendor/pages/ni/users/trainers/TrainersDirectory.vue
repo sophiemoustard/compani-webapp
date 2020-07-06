@@ -150,7 +150,7 @@ export default {
         this.trainerCreationModal = false;
         NotifyPositive('Formateur créé.')
 
-        this.sendWelcome();
+        await this.sendWelcome();
         await this.refreshTrainers();
       } catch (e) {
         console.error(e);
