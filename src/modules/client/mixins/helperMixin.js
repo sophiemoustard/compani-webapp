@@ -120,17 +120,24 @@ export const helperMixin = {
         const payload = await this.formatHelper();
         await Users.create(pickBy(payload));
         NotifyPositive('Aidant créé');
-
-        await Email.sendWelcome({ email: this.newHelper.local.email, type: HELPER });
-        NotifyPositive('Email envoyé');
-
         await this.getUserHelpers();
         this.openNewHelperModal = false;
+
+        await this.sendWelcome();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'aidant.');
       } finally {
         this.loading = false;
+      }
+    },
+    async sendWelcome () {
+      try {
+        await Email.sendWelcome({ email: this.newHelper.local.email, type: HELPER });
+        NotifyPositive('Email envoyé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'envoi du mail.');
       }
     },
     async nextStep () {
