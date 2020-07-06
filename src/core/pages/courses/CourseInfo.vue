@@ -113,9 +113,9 @@ export default {
       return get(this.course, 'program.name') || '';
     },
   },
-  async mounted () {
+  async created () {
     try {
-      this.course = await Courses.getById(this.$route.params.courseId);
+      this.course = await Courses.getPublicInfosById(this.$route.params.courseId);
     } catch (e) {
       console.error(e);
       this.course = {};
