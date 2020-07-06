@@ -196,21 +196,8 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    disabledFollowUp () {
-      return this.followUpMissingInfo.length > 0;
-    },
     disableDownloadCompletionCertificates () {
       return this.disabledFollowUp || !get(this.course, 'program.learningGoals');
-    },
-    followUpMissingInfo () {
-      const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('l\'intervenant');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
-      if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
-      if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du contact pour la formation');
-
-      return missingInfo;
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))

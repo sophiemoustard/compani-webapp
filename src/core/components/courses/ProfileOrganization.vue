@@ -3,9 +3,10 @@
     <div class="q-mb-xl">
       <div v-if="isClientInterface && isCourseInter" class="q-mb-xl">
         <p class="text-weight-bold">Informations pratiques</p>
-        <ni-banner v-if="disabledInfoLink">
+        <ni-banner v-if="disabledFollowUp">
           <template v-slot:message>
-            Le lien vers la page sera disponible dès que l'équipe aura rentré toutes les informations
+            Le lien vers la page sera disponible dès que l'équipe aura rentré la ou les information(s) suivante(s) :
+            {{ followUpMissingInfo.join(', ') }}.
           </template>
         </ni-banner>
         <ni-course-info-link />
@@ -86,13 +87,6 @@ export default {
     },
     isCourseInter () {
       return this.course.type === INTER_B2B;
-    },
-    disabledInfoLink () {
-      return !this.course.trainer ||
-        !this.course.trainees || !this.course.trainees.length ||
-        !this.course.slots || !this.course.slots.length ||
-        !get(this.course, 'contact.name') ||
-        !get(this.course, 'contact.phone');
     },
     canEdit () {
       return !(this.isClientInterface && this.isCourseInter);
