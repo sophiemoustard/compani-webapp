@@ -6,11 +6,11 @@
         <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
           @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error"/>
         <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
-            @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
-            :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
+          @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
+          :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
         <ni-input caption="Email" v-model.trim="course.contact.email"
-            @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
-            :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
+          @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
+          :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -23,7 +23,8 @@
       </ni-banner>
       <ni-banner v-if="!get(this.course, 'program.learningGoals')">
         <template v-slot:message>
-          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger les attestations de fin de formation.
+          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
+          les attestations de fin de formation.
         </template>
       </ni-banner>
       <div class="course-link">
@@ -81,8 +82,8 @@
       </ni-simple-table>
       <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
         <template v-slot:message>
-          Il manque le(s) numéro(s) de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur {{course.trainees.length}} :
-          {{ missingTraineesPhone.join(', ') }}.
+          Il manque le numéro de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur
+          {{course.trainees.length}} : {{ missingTraineesPhone.join(', ') }}.
         </template>
       </ni-banner>
       <q-item>
@@ -113,6 +114,11 @@
       <template slot="title">
         Message envoyé le <span class="text-weight-bold">{{$moment(smsHistory.date).format('DD/MM/YYYY')}}</span>
       </template>
+      <ni-banner v-if="missingTraineesPhoneHistory" icon="info_outline">
+        <template v-slot:message>
+          Pour cet envoi, il manquait le numéro des stagiaires suivants : {{ missingTraineesPhoneHistory.join(', ') }}.
+        </template>
+      </ni-banner>
       <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="smsHistory.type" disable />
       <ni-input in-modal caption="Message" v-model="smsHistory.message" type="textarea" :rows="7" disable />
     </ni-modal>
@@ -181,7 +187,7 @@ export default {
       pagination: { rowsPerPage: 0 },
       smsLoading: false,
       smsHistoriesModal: false,
-      smsHistory: {},
+      smsHistory: { missingPhones: [] },
     };
   },
   async created () {
@@ -247,6 +253,11 @@ export default {
       return this.course.trainees.filter(trainee => !get(trainee, 'contact.phone'))
         .map(trainee => formatIdentity(trainee.identity, 'FL'));
     },
+    missingTraineesPhoneHistory () {
+      if (!this.smsHistory.missingPhones.length) return '';
+
+      return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
+    },
   },
   methods: {
     get,
@@ -292,7 +303,7 @@ export default {
       this.smsHistory = this.smsSent.find(sms => sms._id === smsId);
     },
     resetSmsHistoryModal () {
-      this.smsHistory = {};
+      this.smsHistory = { missingPhones: [] };
     },
     updateMessage () {
       if (this.messageType === CONVOCATION) this.setConvocationMessage();
@@ -366,8 +377,8 @@ export default {
       @media screen and (max-width: 767px)
         font-size: 12px
       &-disabled
-        opacity: 0.7 !important;
+        opacity: 0.7 !important
         cursor: not-allowed !important
 .q-item
-  padding-left: 0px;
+  padding-left: 0px
 </style>
