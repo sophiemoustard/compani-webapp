@@ -116,7 +116,8 @@
       </template>
       <ni-banner v-if="missingTraineesPhoneHistory" icon="info_outline">
         <template v-slot:message>
-          Pour cet envoi, il manquait le numéro des stagiaires suivants : {{ missingTraineesPhoneHistory.join(', ') }}.
+          Pour cet envoi, il manquait le numéro du ou des stagiaire(s) suivant(s) :
+          {{ missingTraineesPhoneHistory.join(', ') }}.
         </template>
       </ni-banner>
       <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="smsHistory.type" disable />
