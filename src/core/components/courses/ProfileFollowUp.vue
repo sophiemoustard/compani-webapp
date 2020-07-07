@@ -27,23 +27,9 @@
           les attestations de fin de formation.
         </template>
       </ni-banner>
-      <div class="course-link">
-        <q-item>
-          <q-item-section side>
-            <q-btn :disable="disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
-              target="_blank" :href="!disabledFollowUp && courseLink" />
-          </q-item-section>
-          <q-item-section class="course-link">Page info formation</q-item-section>
-        </q-item>
-        <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink"
-          v-clipboard:success="handleCopySuccess">
-          <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
-          <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
-            color="primary">
-            Obtenir un lien de partage
-          </div>
-        </div>
-      </div>
+
+      <ni-course-info-link />
+
       <q-item>
         <q-item-section side>
           <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
@@ -136,6 +122,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import Banner from '@components/Banner';
 import SimpleTable from '@components/table/SimpleTable';
+import CourseInfoLink from './CourseInfoLink';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
@@ -150,6 +137,7 @@ export default {
     'ni-modal': Modal,
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
+    'ni-course-info-link': CourseInfoLink,
   },
   mixins: [courseMixin],
   props: {
@@ -208,21 +196,8 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    disabledFollowUp () {
-      return this.followUpMissingInfo.length > 0;
-    },
     disableDownloadCompletionCertificates () {
       return this.disabledFollowUp || !get(this.course, 'program.learningGoals');
-    },
-    followUpMissingInfo () {
-      const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('l\'intervenant');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
-      if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
-      if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du contact pour la formation');
-
-      return missingInfo;
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
@@ -281,9 +256,6 @@ export default {
       } finally {
         this.smsLoading = false;
       }
-    },
-    handleCopySuccess () {
-      return NotifyPositive('Lien copié !');
     },
     openSmsModal () {
       this.updateMessage();
@@ -358,28 +330,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.course-link
-  @media screen and (min-width: 1025px)
-    display: flex
-    flex-direction: row
-    align-items: center
-    justify-content: left
-  &-share
-    display: flex
-    flex-direction: row
-    align-items: center
-    @media screen and (max-width: 1024px)
-      padding: 0 0 10px 55px
-    &-label
-      cursor: pointer
-      color: $primary
-      text-decoration underline
-      font-size: 14px
-      @media screen and (max-width: 767px)
-        font-size: 12px
-      &-disabled
-        opacity: 0.7 !important
-        cursor: not-allowed !important
 .q-item
   padding-left: 0px
 </style>
