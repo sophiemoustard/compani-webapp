@@ -15,7 +15,7 @@
         <ni-input caption="Nom de la formation" v-model.trim="course.name"
           @blur="updateCourse('name')" :error="$v.course.name.$error" @focus="saveTmp('name')" />
         <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
-            :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
+          :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
       </div>
     </div>
     <ni-slot-container :canEdit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
@@ -94,7 +94,7 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    if (this.isAdmin) await Promise.all([this.refreshTrainers()]);
+    if (this.isAdmin) await this.refreshTrainers();
   },
   methods: {
     get,

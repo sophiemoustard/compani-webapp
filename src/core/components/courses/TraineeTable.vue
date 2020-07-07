@@ -9,13 +9,13 @@
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template v-if="col.name !== 'actions'" >{{ col.value }}</template>
-                <template v-else-if="canEdit">
+                <template v-if="col.name === 'actions'" >
                   <div class="row no-wrap table-actions">
                     <q-icon color="grey" name="edit" @click.native="openEditionModal(props.row)" />
                     <q-icon color="grey" name="close" @click.native="validateTraineeDeletion(col.value)" />
                   </div>
                 </template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </template>
@@ -192,8 +192,9 @@ export default {
         : `Participants de votre structure (${this.traineesNumber})`
     },
     traineesVisibleColumns () {
-      const visibleColumns = ['firstname', 'lastname', 'email', 'phone', 'actions'];
-      if (this.isIntraCourse || !this.canEdit) return visibleColumns;
+      const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
+      if (this.canEdit) visibleColumns.push('actions');
+      if (this.isIntraCourse) return visibleColumns;
       return ['company', ...visibleColumns];
     },
   },
