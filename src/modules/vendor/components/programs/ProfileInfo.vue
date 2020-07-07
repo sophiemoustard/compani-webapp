@@ -14,20 +14,18 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Modules</p>
-      <div v-for="(module, index) of program.modules" :key="index">
-        <q-card flat class="module-card">
-          <q-card-section class="cursor-pointer" @click.native="showActivities(module._id)">
-            {{module.title}}
-          </q-card-section>
-          <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
-            <q-card  v-for="(activity, index) of module.activities" :key="index">
-              <q-card-section>{{activity.title}}</q-card-section>
-            </q-card>
-            <q-btn flat no-caps color="primary" icon="add" label="Ajouter une activité"
-              @click="openActivityModal(module._id)" />
-          </div>
-        </q-card>
-      </div>
+      <q-card v-for="(module, index) of program.modules" :key="index" flat class="module-card">
+        <q-card-section class="cursor-pointer text-weight-bold" @click.native="showActivities(module._id)">
+          {{module.title}}
+        </q-card-section>
+        <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
+          <q-card v-for="(activity, index) of module.activities" :key="index" flat>
+            <q-card-section>{{activity.title}}</q-card-section>
+          </q-card>
+          <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Ajouter une activité"
+            @click="openActivityModal(module._id)" />
+        </div>
+      </q-card>
       <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un module"
         @click="moduleCreationModal = true" />
     </div>
