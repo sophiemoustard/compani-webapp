@@ -2,15 +2,15 @@
   <div class="course-link">
     <q-item>
       <q-item-section side>
-        <q-btn :disable="disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
-          target="_blank" :href="!disabledFollowUp && courseLink" />
+        <q-btn :disable="disableLink" color="primary" size="sm" icon="info" flat dense type="a"
+          target="_blank" :href="!disableLink && courseLink" />
       </q-item-section>
       <q-item-section class="course-link">Page info formation</q-item-section>
     </q-item>
-    <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink"
+    <div class="course-link-share" v-clipboard:copy="!disableLink && courseLink"
       v-clipboard:success="handleCopySuccess">
-      <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
-      <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
+      <q-btn color="primary" size="xs" :disable="disableLink" icon="link" flat dense />
+      <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disableLink }"
         color="primary">
         Obtenir un lien de partage
       </div>
@@ -21,27 +21,17 @@
 <script>
 import { mapState } from 'vuex';
 import { NotifyPositive } from '@components/popup/notify';
-import get from 'lodash/get'
 
 export default {
   name: 'CourseInfoLink',
-  data () {
-    return {
-      isClientInterface: !/\/ad\//.test(this.$router.currentRoute.path),
-    }
+  props: {
+    disableLink: { type: Boolean, default: true },
   },
   computed: {
     ...mapState('course', ['course']),
     courseLink () {
       return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
         `trainees/courses/${this.course._id}`;
-    },
-    disabledFollowUp () {
-      return !this.course.trainer ||
-        !this.course.trainees || !this.course.trainees.length ||
-        !this.course.slots || !this.course.slots.length ||
-        !get(this.course, 'contact.name') ||
-        !get(this.course, 'contact.phone');
     },
   },
   methods: {

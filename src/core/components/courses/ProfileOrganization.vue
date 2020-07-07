@@ -9,7 +9,7 @@
             {{ followUpMissingInfo.join(', ') }}.
           </template>
         </ni-banner>
-        <ni-course-info-link />
+        <ni-course-info-link :disable-link="disabledFollowUp" />
       </div>
       <div v-else class="row gutter-profile">
         <ni-input caption="Nom de la formation" v-model.trim="course.name"
@@ -101,8 +101,7 @@ export default {
     async refreshCourse () {
       try {
         this.courseLoading = true;
-        await this.$store.dispatch('course/fetchCourse',
-          { courseId: this.profileId, isClientInterface: this.isClientInterface });
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
       } catch (e) {
         console.error(e);
       } finally {

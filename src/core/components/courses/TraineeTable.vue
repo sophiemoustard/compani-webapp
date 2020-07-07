@@ -198,7 +198,7 @@ export default {
     },
   },
   async created () {
-    if (this.canEdit) await Promise.all([this.refreshCompanies()]);
+    if (!this.isIntraCourse && this.canEdit) await Promise.all([this.refreshCompanies()]);
   },
   methods: {
     async refreshCompanies () {
