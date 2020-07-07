@@ -3,8 +3,8 @@
     <template slot="title">
       Ajouter un <span class="text-weight-bold">aidant</span>
     </template>
-    <ni-input :disable="!firstStep" in-modal v-model="newHelper.local.email" :error="validations.local.email.$error"
-      caption="Email" @blur="validations.local.email.$touch" :error-message="emailError" required-field
+    <ni-input :disable="!firstStep" in-modal v-model.trim="newHelper.local.email" caption="Email" required-field
+      :error="validations.local.email.$error" @blur="validations.local.email.$touch" :error-message="emailError"
       :last="firstStep" />
     <template v-if="!firstStep">
       <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />

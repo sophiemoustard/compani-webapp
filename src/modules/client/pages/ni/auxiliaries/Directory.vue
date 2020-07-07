@@ -29,8 +29,9 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
       </template>
-      <ni-input in-modal :disable="!firstStep" v-model="newUser.local.email" :error="$v.newUser.local.email.$error"
-        @blur="$v.newUser.local.email.$touch" :error-message="emailError($v.newUser)" caption="Email" required-field />
+      <ni-input in-modal :disable="!firstStep" v-model.trim="newUser.local.email" caption="Email"
+        :error="$v.newUser.local.email.$error" @blur="$v.newUser.local.email.$touch" required-field
+        :error-message="emailError($v.newUser)"  />
       <template v-if="!firstStep">
         <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
           required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
