@@ -11,7 +11,11 @@ export default {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses`, payload);
   },
   async getById (courseId) {
-    const course = await axios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
+    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
+    return course.data.data.course;
+  },
+  async getPublicInfosById (courseId) {
+    const course = await axios.get(`${process.env.API_HOSTNAME}/courses/${courseId}/public-infos`);
     return course.data.data.course;
   },
   async update (courseId, payload) {
