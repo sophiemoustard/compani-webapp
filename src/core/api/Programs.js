@@ -17,7 +17,7 @@ export default {
     return program.data.data.program;
   },
   async addModule (programId, payload) {
-    const program = await alenviAxios.put(`${process.env.API_HOSTNAME}/programs/${programId}/module`, payload);
+    const program = await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/module`, payload);
     return program.data.data.program;
   },
 };
