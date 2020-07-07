@@ -20,9 +20,9 @@
             {{module.title}}
           </q-card-section>
           <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
-            <div v-for="(activity, index) of module.activities" :key="index">
-              <q-card><q-card-section>{{activity.title}}</q-card-section></q-card>
-            </div>
+            <q-card  v-for="(activity, index) of module.activities" :key="index">
+              <q-card-section>{{activity.title}}</q-card-section>
+            </q-card>
             <q-btn flat no-caps color="primary" icon="add" label="Ajouter une activité"
               @click="openActivityModal(module._id)" />
           </div>
@@ -172,7 +172,7 @@ export default {
         this.$v.newActivity.$touch();
         if (this.$v.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
         await Modules.addActivity(this.currentModuleId, this.newActivity);
-        NotifyPositive('Activité créé.');
+        NotifyPositive('Activitée créé.');
 
         await this.refreshProgram();
         this.resetActivityCreationModal();
@@ -200,10 +200,9 @@ export default {
   display: flex
   flex-direction: column
   align-items: flex-end
-  div
+  .q-card
     width: -webkit-fill-available
-    .q-card
-      margin: 10px 10px 0px 50px
+    margin: 10px 10px 0px 50px
   .q-btn
     width: fit-content
 </style>
