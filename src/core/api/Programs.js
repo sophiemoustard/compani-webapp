@@ -20,8 +20,4 @@ export default {
     const program = await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/module`, payload);
     return program.data.data.program;
   },
-  async addActivity (programId, moduleId, payload) {
-    const program = await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/module/${moduleId}/activity`, payload);
-    return program.data.data.program;
-  },
 };

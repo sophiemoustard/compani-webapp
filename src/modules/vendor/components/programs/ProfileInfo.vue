@@ -66,6 +66,7 @@ import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Programs from '@api/Programs';
+import Modules from '@api/Modules';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -170,8 +171,8 @@ export default {
         this.modalLoading = true;
         this.$v.newActivity.$touch();
         if (this.$v.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Programs.addActivity(this.profileId, this.currentModuleId, this.newActivity);
-        NotifyPositive('Activitée créé.');
+        await Modules.addActivity(this.currentModuleId, this.newActivity);
+        NotifyPositive('Activité créé.');
 
         await this.refreshProgram();
         this.resetActivityCreationModal();
