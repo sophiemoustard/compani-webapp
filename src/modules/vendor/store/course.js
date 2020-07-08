@@ -16,6 +16,8 @@ export default {
       try {
         const course = await Courses.getById(params.courseId);
         if (!get(course, 'trainer._id')) course.trainer = { _id: '' };
+
+        // Coachs and client admins with vendor role only see trainees from their companies on client interface
         if (!/\/ad\//.test(router.currentRoute.path)) {
           const loggedUserCompany = store.getters['main/getCompany'];
           course.trainees = course.trainees.filter(t => t.company._id === loggedUserCompany._id);
