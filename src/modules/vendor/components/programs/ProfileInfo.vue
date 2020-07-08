@@ -15,8 +15,9 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Modules</p>
       <q-card v-for="(module, index) of program.modules" :key="index" flat class="module-card">
-        <q-card-section class="cursor-pointer text-weight-bold" @click.native="showActivities(module._id)">
-          {{module.title}}
+        <q-card-section class="module-card-head cursor-pointer row" @click.native="showActivities(module._id)">
+          <div class="text-weight-bold">{{module.title}}</div>
+          <q-btn flat small color="grey" icon="edit" @click.native="openModuleEditionModal(module)" />
         </q-card-section>
         <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
           <q-card v-for="(activity, index) of module.activities" :key="index" flat>
@@ -43,6 +44,19 @@
       </template>
     </ni-modal>
 
+    <!-- Module edition modal -->
+    <ni-modal v-model="moduleEditionModal" @hide="resetModuleEditionModal">
+      <template slot="title">
+        Éditer un <span class="text-weight-bold">module</span>
+      </template>
+      <ni-input in-modal v-model.trim="editedModule.title" :error="$v.editedModule.title.$error"
+        @blur="$v.editedModule.title.$touch" required-field caption="Titre" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Éditer un module" color="primary" :loading="modalLoading"
+          icon-right="add" @click="editModule" />
+      </template>
+    </ni-modal>
+
     <!-- Activity creation modal -->
     <ni-modal v-model="activityCreationModal" @hide="resetActivityCreationModal">
       <template slot="title">
@@ -63,6 +77,7 @@ import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import pick from 'lodash/pick';
 import Programs from '@api/Programs';
 import Modules from '@api/Modules';
 import Input from '@components/form/Input';
@@ -84,6 +99,8 @@ export default {
       modalLoading: false,
       moduleCreationModal: false,
       newModule: { title: '' },
+      moduleEditionModal: false,
+      editedModule: { title: '' },
       activityCreationModal: false,
       newActivity: { title: '' },
       isActivitiesShown: {},
@@ -94,6 +111,7 @@ export default {
     return {
       program: { name: { required }, learningGoals: { required } },
       newModule: { title: { required } },
+      editedModule: { title: { required } },
       newActivity: { title: { required } },
     }
   },
@@ -160,6 +178,32 @@ export default {
       this.$v.newModule.$reset();
       this.moduleCreationModal = false;
     },
+    async openModuleEditionModal (module) {
+      this.editedModule = pick(module, ['_id', 'title']);
+      this.moduleEditionModal = true;
+    },
+    async editModule () {
+      try {
+        this.modalLoading = true;
+        this.$v.editedModule.$touch();
+        if (this.$v.editedModule.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Modules.updateById(this.editedModule._id, pick(this.editedModule, ['title']));
+        this.resetModuleEditionModal();
+        await this.refreshProgram();
+        NotifyPositive('Module modifié.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification du module.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetModuleEditionModal () {
+      this.editedModule = { title: {} };
+      this.$v.editedModule.$reset();
+      this.moduleEditionModal = false;
+    },
     openActivityModal (moduleId) {
       this.activityCreationModal = true;
       this.currentModuleId = moduleId;
@@ -193,6 +237,8 @@ export default {
 <style lang="stylus" scoped>
 .module-card
   margin-bottom: 10px
+  &-head
+    justify-content: space-between
 
 .activities
   display: flex
