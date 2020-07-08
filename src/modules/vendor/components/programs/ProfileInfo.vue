@@ -15,9 +15,9 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Modules</p>
       <q-card v-for="(module, index) of program.modules" :key="index" flat class="module-card">
-        <q-card-section class="module-card-head cursor-pointer row" @click.native="showActivities(module._id)">
+        <q-card-section class="module-card-head cursor-pointer row" @click="showActivities(module._id)">
           <div class="text-weight-bold">{{module.title}}</div>
-          <q-btn flat small color="grey" icon="edit" @click.native="openModuleEditionModal(module)" />
+          <q-btn flat small color="grey" icon="edit" @click.stop="openModuleEditionModal(module)" />
         </q-card-section>
         <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
           <q-card v-for="(activity, index) of module.activities" :key="index" flat>
@@ -52,7 +52,7 @@
       <ni-input in-modal v-model.trim="editedModule.title" :error="$v.editedModule.title.$error"
         @blur="$v.editedModule.title.$touch" required-field caption="Titre" />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer un module" color="primary" :loading="modalLoading"
+        <q-btn no-caps class="full-width modal-btn" label="Éditer le module" color="primary" :loading="modalLoading"
           icon-right="add" @click="editModule" />
       </template>
     </ni-modal>
@@ -165,7 +165,7 @@ export default {
         NotifyPositive('Module créé.');
 
         await this.refreshProgram();
-        this.resetModuleCreationModal();
+        this.moduleCreationModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du module.');
@@ -176,7 +176,6 @@ export default {
     resetModuleCreationModal () {
       this.newModule.title = '';
       this.$v.newModule.$reset();
-      this.moduleCreationModal = false;
     },
     async openModuleEditionModal (module) {
       this.editedModule = pick(module, ['_id', 'title']);
@@ -189,7 +188,7 @@ export default {
         if (this.$v.editedModule.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Modules.updateById(this.editedModule._id, pick(this.editedModule, ['title']));
-        this.resetModuleEditionModal();
+        this.moduleEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Module modifié.');
       } catch (e) {
@@ -202,7 +201,6 @@ export default {
     resetModuleEditionModal () {
       this.editedModule = { title: {} };
       this.$v.editedModule.$reset();
-      this.moduleEditionModal = false;
     },
     openActivityModal (moduleId) {
       this.activityCreationModal = true;
@@ -217,7 +215,7 @@ export default {
         NotifyPositive('Activitée créé.');
 
         await this.refreshProgram();
-        this.resetActivityCreationModal();
+        this.activityCreationModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'activité.');
@@ -228,7 +226,6 @@ export default {
     resetActivityCreationModal () {
       this.newActivity.title = '';
       this.$v.newActivity.$reset();
-      this.activityCreationModal = false;
     },
   },
 }
