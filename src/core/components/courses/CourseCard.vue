@@ -3,8 +3,8 @@
     <q-card-section @click="$emit('click', course)">
       <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
       <div class="title-text">
-        <span v-if="isIntraCourse" >{{ get(course, 'company.name') || '' }} - </span>
-        {{ get(course, 'program.name') || '' }} - {{ course.name || '' }}
+        <span v-if="isIntraCourse" >{{ companyName }} - </span>
+        {{ programName }} - {{ course.name || '' }}
       </div>
       <div class="items-container">
         <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container">
