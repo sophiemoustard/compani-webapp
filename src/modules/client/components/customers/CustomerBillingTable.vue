@@ -1,5 +1,5 @@
 <template>
-  <ni-simple-table :data="documents" :columns="columns" :loading="loading" :responsive="false">
+  <ni-simple-table :data="documents" :columns="columns" :loading="loading" :responsive="false" hide-bottom>
     <template v-slot:top-row="{ props }">
       <q-tr data-cy="start-period" :props="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
