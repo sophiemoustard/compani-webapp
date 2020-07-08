@@ -1,5 +1,7 @@
 import get from 'lodash/get';
 import Courses from '@api/Courses';
+import router from 'src/router/index';
+import store from 'src/store/index';
 
 export default {
   namespaced: true,
@@ -14,6 +16,10 @@ export default {
       try {
         const course = await Courses.getById(params.courseId);
         if (!get(course, 'trainer._id')) course.trainer = { _id: '' };
+        if (!/\/ad\//.test(router.currentRoute.path)) {
+          const loggedUserCompany = store.getters['main/getCompany'];
+          course.trainees = course.trainees.filter(t => t.company._id === loggedUserCompany._id);
+        }
 
         commit('SET_COURSE', course);
       } catch (e) {
