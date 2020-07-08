@@ -13,17 +13,17 @@
       <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
         @openEditionModal="openEditionModal" :type="CUSTOMER" :startBalance="getStartBalance()"
         :endBalance="getEndBalance(customerDocuments)" :loading="tableLoading" />
-      <div v-if="isCoach" class="q-mt-md" align="right">
+      <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
           color="white" icon="add" />
       </div>
     </div>
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
       <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
-      <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :displayActions="isCoach"
+      <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :display-actions="isAdmin"
         @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
         :endBalance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
-      <div v-if="isCoach" class="q-mt-md" align="right">
+      <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
       </div>
