@@ -21,10 +21,13 @@
         </q-card-section>
         <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
           <q-card v-for="(activity, index) of module.activities" :key="index" flat>
-            <q-card-section>{{activity.title}}</q-card-section>
+            <q-card-section class="row">
+              <div>{{activity.title}}</div>
+              <q-btn flat small color="grey" icon="edit" @click="openActivityEditionModal(activity)" />
+            </q-card-section>
           </q-card>
           <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Ajouter une activité"
-            @click="openActivityModal(module._id)" />
+            @click="openActivityCreationModal(module._id)" />
         </div>
       </q-card>
       <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un module"
@@ -69,6 +72,19 @@
           icon-right="add" @click="createActivity" />
       </template>
     </ni-modal>
+
+    <!-- Activity edition modal -->
+    <ni-modal v-model="activityEditionModal" @hide="resetActivityEditionModal">
+      <template slot="title">
+        Éditer une <span class="text-weight-bold">activité</span>
+      </template>
+      <ni-input in-modal v-model.trim="editedActivity.title" :error="$v.editedActivity.title.$error"
+        @blur="$v.editedActivity.title.$touch" required-field caption="Titre" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="modalLoading"
+          icon-right="add" @click="editActivity" />
+      </template>
+    </ni-modal>
   </div>
 </template>
 
@@ -80,6 +96,7 @@ import set from 'lodash/set';
 import pick from 'lodash/pick';
 import Programs from '@api/Programs';
 import Modules from '@api/Modules';
+import Activities from '@api/Activities';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -103,6 +120,8 @@ export default {
       editedModule: { title: '' },
       activityCreationModal: false,
       newActivity: { title: '' },
+      activityEditionModal: false,
+      editedActivity: { title: '' },
       isActivitiesShown: {},
       currentModuleId: '',
     }
@@ -113,6 +132,7 @@ export default {
       newModule: { title: { required } },
       editedModule: { title: { required } },
       newActivity: { title: { required } },
+      editedActivity: { title: { required } },
     }
   },
   computed: {
@@ -202,7 +222,7 @@ export default {
       this.editedModule = { title: {} };
       this.$v.editedModule.$reset();
     },
-    openActivityModal (moduleId) {
+    openActivityCreationModal (moduleId) {
       this.activityCreationModal = true;
       this.currentModuleId = moduleId;
     },
@@ -226,6 +246,31 @@ export default {
     resetActivityCreationModal () {
       this.newActivity.title = '';
       this.$v.newActivity.$reset();
+    },
+    async openActivityEditionModal (activity) {
+      this.editedActivity = pick(activity, ['_id', 'title']);
+      this.activityEditionModal = true;
+    },
+    async editActivity () {
+      try {
+        this.modalLoading = true;
+        this.$v.editedActivity.$touch();
+        if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Activities.updateById(this.editedActivity._id, pick(this.editedActivity, ['title']));
+        this.activityEditionModal = false;
+        await this.refreshProgram();
+        NotifyPositive('Activité modifiée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative("Erreur lors de la modification de l'activité.");
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetActivityEditionModal () {
+      this.editedActivity = { title: {} };
+      this.$v.editedActivity.$reset();
     },
   },
 }
