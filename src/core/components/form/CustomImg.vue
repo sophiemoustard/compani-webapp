@@ -36,9 +36,7 @@ export default {
         if (!this.cloudinaryStorage) {
           const file = await gdrive.getFileById({ id: this.imageSource });
           this.link = file.data.data.file.thumbnailLink;
-        } else {
-          this.link = this.imageSource;
-        }
+        } else this.link = this.imageSource;
       } catch (e) {
         console.error(e);
       }

@@ -11,7 +11,7 @@
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
           :error="$v.program.learningGoals.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image titre program"
-          name="programImage" :url="programsUploadUrl" @delete="validateProgramImageDeletion()"
+          name="programImage" :url="programsUploadUrl" @delete="validateProgramImageDeletion"
           @uploaded="programImageUploaded" :additional-value="`image_program_${program._id}`" cloudinaryStorage/>
       </div>
     </div>
