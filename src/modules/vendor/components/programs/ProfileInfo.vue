@@ -14,18 +14,18 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Modules</p>
-      <q-card v-for="(module, index) of program.modules" :key="index" flat class="modules">
-        <q-card-section class="modules-head cursor-pointer row" @click="showActivities(module._id)">
+      <q-card v-for="(module, index) of program.modules" :key="index" flat class="module">
+        <q-card-section class="module-head cursor-pointer row" @click="showActivities(module._id)">
           <div>
             <div class="text-weight-bold">{{module.title}}</div>
-            <div class="modules-subtitle">{{module.activities.length}} activité(s)</div>
+            <div class="module-subtitle">{{module.activities.length}} activité(s)</div>
           </div>
           <q-btn flat small color="grey" icon="edit" @click.stop="openModuleEditionModal(module)" />
         </q-card-section>
         <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
           <q-card v-for="(activity, index) of module.activities" :key="index" flat>
             <q-card-section class="activities-content">
-              <div class="activities">{{activity.title}}</div>
+              <div>{{activity.title}}</div>
               <q-btn flat small color="grey" icon="edit" @click="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
@@ -280,7 +280,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.modules
+.module
   margin-bottom: 10px
   &-head
     justify-content: space-between
