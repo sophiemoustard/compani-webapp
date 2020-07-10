@@ -72,7 +72,9 @@ export default {
   },
   computed: {
     additionalFields () {
-      return [{ name: 'fileName', value: this.additionalValue }, { name: 'type', value: this.name }];
+      const fields = [{ name: 'fileName', value: this.additionalValue }];
+      if (!this.cloudinaryStorage) fields.push({ name: 'type', value: this.name });
+      return fields;
     },
     document () {
       return get(this.entity, this.path);
