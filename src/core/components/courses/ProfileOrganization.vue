@@ -12,8 +12,8 @@
         <ni-course-info-link :disable-link="disabledFollowUp" />
       </div>
       <div v-else class="row gutter-profile">
-        <ni-input caption="Nom de la formation" v-model.trim="course.name"
-          @blur="updateCourse('name')" :error="$v.course.name.$error" @focus="saveTmp('name')" />
+        <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
+          @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
         <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
           :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
       </div>
@@ -73,7 +73,6 @@ export default {
   validations () {
     return {
       course: {
-        name: { required },
         trainer: { required },
       },
       newTrainee: this.traineeValidations,

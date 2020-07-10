@@ -356,7 +356,6 @@ export default {
           link: { required },
         },
         sector: { required },
-        mentor: { required },
         identity: {
           firstname: { required },
           lastname: { required },
