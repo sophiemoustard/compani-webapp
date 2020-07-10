@@ -10,6 +10,9 @@
         <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
           :error="$v.program.learningGoals.$error" />
+        <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinaryStorage
+          :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
+          :additional-value="imageFileName" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -100,8 +103,10 @@ import pick from 'lodash/pick';
 import Programs from '@api/Programs';
 import Modules from '@api/Modules';
 import Activities from '@api/Activities';
+import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
+import FileUploader from '@components/form/FileUploader.vue';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
 export default {
@@ -112,6 +117,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'ni-file-uploader': FileUploader,
   },
   data () {
     return {
@@ -140,6 +146,12 @@ export default {
   },
   computed: {
     ...mapState('program', ['program']),
+    programsUploadUrl () {
+      return `${process.env.API_HOSTNAME}/programs/${this.program._id}/cloudinary/upload`;
+    },
+    imageFileName () {
+      return 'Image-' + this.program.name.replace(/ /g, '_');
+    },
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
@@ -177,6 +189,33 @@ export default {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
+      }
+    },
+    programImageUploaded () {
+      NotifyPositive('Image envoyée');
+      this.refreshProgram();
+    },
+    validateProgramImageDeletion () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer l\'image ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteProgramImage())
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteProgramImage () {
+      try {
+        if (get(this.program, 'image')) {
+          await Cloudinary.deleteImageById({ id: this.program.image.publicId });
+        }
+        await Programs.update(this.program._id, { image: { link: null, publicId: null } });
+
+        this.refreshProgram();
+        NotifyPositive('Document supprimé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
     async createModule () {

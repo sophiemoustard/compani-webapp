@@ -4,17 +4,16 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <div v-if="document && document.driveId" class="row justify-between" style="background: white">
+    <div v-if="document && imageSource" class="row justify-between" style="background: white">
       <div class="doc-thumbnail">
-        <ni-custom-img :driveId="document.driveId" :alt="alt" />
+        <ni-custom-img :cloudinary-storage="cloudinaryStorage" :image-source="imageSource" :alt="alt" />
       </div>
       <div class="self-end doc-delete">
         <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument" />
         <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
       </div>
     </div>
-    <q-field borderless v-if="(!document || !document.driveId)" :error="error"
-      :error-message="errorMessage">
+    <q-field borderless v-else :error="error" :error-message="errorMessage">
       <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
         text-color="black" @failed="failMsg" :form-fields="additionalFields"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"/>
@@ -49,6 +48,7 @@ export default {
     requiredField: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
     label: { type: String, default: 'Pas de document' },
+    cloudinaryStorage: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -63,7 +63,7 @@ export default {
       this.$emit('uploaded', { file, xhr });
     },
     goToUrl (url) {
-      url = `${url}?usp=sharing`
+      if (!this.cloudinaryStorage) url = `${url}?usp=sharing`;
       openURL(url);
     },
     failMsg () {
@@ -72,10 +72,15 @@ export default {
   },
   computed: {
     additionalFields () {
-      return [{ name: 'fileName', value: this.additionalValue }, { name: 'type', value: this.name }];
+      const fields = [{ name: 'fileName', value: this.additionalValue }];
+      if (!this.cloudinaryStorage) fields.push({ name: 'type', value: this.name });
+      return fields;
     },
     document () {
       return get(this.entity, this.path);
+    },
+    imageSource () {
+      return this.cloudinaryStorage ? this.document.link : this.document.driveId;
     },
   },
 };
