@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <ni-profile-header :title="programName" />
-    <profile-info-program :profile-id="programId" />
+    <profile-info :profile-id="programId" />
   </q-page>
 </template>
 
@@ -20,7 +20,7 @@ export default {
   },
   components: {
     'ni-profile-header': ProfileHeader,
-    'profile-info-program': ProfileInfo,
+    'profile-info': ProfileInfo,
   },
   data () {
     return {

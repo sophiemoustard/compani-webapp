@@ -10,9 +10,9 @@
         <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
           :error="$v.program.learningGoals.$error" />
-        <ni-file-uploader caption="Image" path="image" :entity="program" alt="image titre program"
+        <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinaryStorage
           name="programImage" :url="programsUploadUrl" @delete="validateProgramImageDeletion"
-          @uploaded="programImageUploaded" :additional-value="`image_program_${program._id}`" cloudinaryStorage/>
+          @uploaded="programImageUploaded" :additional-value="imageFileName" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -149,6 +149,9 @@ export default {
     programsUploadUrl () {
       return `${process.env.API_HOSTNAME}/programs/${this.program._id}/cloudinary/upload`;
     },
+    imageFileName () {
+      return 'Image-' + this.program.name.replace(/ /g, '_');
+    },
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
@@ -189,7 +192,7 @@ export default {
       }
     },
     programImageUploaded () {
-      NotifyPositive('Image envoyé');
+      NotifyPositive('Image envoyée');
       this.refreshProgram();
     },
     validateProgramImageDeletion () {

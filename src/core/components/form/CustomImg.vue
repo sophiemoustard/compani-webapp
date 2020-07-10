@@ -9,18 +9,9 @@ import gdrive from '@api/GoogleDrive';
 export default {
   name: 'custom-img',
   props: {
-    imageSource: {
-      type: String,
-      required: true,
-    },
-    alt: {
-      type: String,
-      required: true,
-    },
-    cloudinaryStorage: {
-      type: Boolean,
-      default: false,
-    },
+    imageSource: { type: String, required: true },
+    alt: { type: String, required: true },
+    cloudinaryStorage: { type: Boolean, default: false },
   },
   data () {
     return {
