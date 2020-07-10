@@ -58,9 +58,10 @@ export const courseMixin = {
 
         if (this.tmpInput === value) return;
 
-        if (get(this.$v.course, path)) {
-          get(this.$v.course, path).$touch();
-          if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
+        const vAttribute = get(this.$v.course, path)
+        if (vAttribute) {
+          vAttribute.$touch();
+          if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
         }
 
         const payload = set({}, path, this.formatUpdateCourseValue(path, value));
