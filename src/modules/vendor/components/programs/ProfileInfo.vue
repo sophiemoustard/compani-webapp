@@ -22,9 +22,9 @@
           </div>
           <q-btn flat small color="grey" icon="edit" @click.stop="openModuleEditionModal(module)" />
         </q-card-section>
-        <div class="beige-background activities" v-if="isActivitiesShown[module._id]">
-          <q-card v-for="(activity, index) of module.activities" :key="index" flat>
-            <q-card-section class="activities-content">
+        <div class="beige-background activity-container" v-if="isActivitiesShown[module._id]">
+          <q-card v-for="(activity, index) of module.activities" :key="index" flat class="activity">
+            <q-card-section>
               <div>{{activity.title}}</div>
               <q-btn flat small color="grey" icon="edit" @click="openActivityEditionModal(activity)" />
             </q-card-section>
@@ -287,20 +287,20 @@ export default {
   &-subtitle
     font-size: 13px
 
-.activities
+.activity-container
   display: flex
   flex-direction: column
   align-items: flex-end
-  &-content
+.activity
+  width: -moz-available
+  width: -webkit-fill-available
+  margin: 10px 10px 0px 50px
+  .q-card__section
     display: flex
     justify-content: space-between
     align-items: center
-  .q-card
-    width: -moz-available
-    width: -webkit-fill-available
-    margin: 10px 10px 0px 50px
-    .q-card__section--vert
-      padding: 3px 3px 3px 10px
-  .q-btn
+  .q-card__section--vert
+    padding: 3px 3px 3px 10px
+.q-btn
     width: fit-content
 </style>
