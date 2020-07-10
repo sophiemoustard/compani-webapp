@@ -28,7 +28,7 @@
         </template>
       </ni-banner>
 
-      <ni-course-info-link />
+      <ni-course-info-link :disable-link="disabledFollowUp" />
 
       <q-item>
         <q-item-section side>
