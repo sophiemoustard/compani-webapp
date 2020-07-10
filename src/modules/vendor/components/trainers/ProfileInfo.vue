@@ -2,15 +2,15 @@
   <div>
     <p class="text-weight-bold">Identité</p>
     <div class="row gutter-profile q-mb-lg">
-      <ni-input v-model.trim="mergedUserProfile.identity.firstname" caption="Prénom"
+      <ni-input v-model.trim="userProfile.identity.firstname" caption="Prénom"
         @focus="saveTmp('identity.firstname')" @blur="updateUser('identity.firstname')" />
-      <ni-input v-model.trim="mergedUserProfile.identity.lastname" caption="Nom" @focus="saveTmp('identity.lastname')"
-        @blur="updateUser('identity.lastname')" :error="$v.mergedUserProfile.identity.lastname.$error" />
+      <ni-input v-model.trim="userProfile.identity.lastname" caption="Nom" @focus="saveTmp('identity.lastname')"
+        @blur="updateUser('identity.lastname')" :error="$v.userProfile.identity.lastname.$error" />
       <div class="col-12 col-md-6 row items-center">
         <div class="col-xs-11">
           <ni-input ref="userEmail" name="emailInput" caption="Adresse email" type="email" lower-case
-            :error="$v.mergedUserProfile.local.email.$error" :error-message="emailError($v.mergedUserProfile)"
-            :disable="emailLock" v-model.trim="mergedUserProfile.local.email" @focus="saveTmp('local.email')" />
+            :error="$v.userProfile.local.email.$error" :error-message="emailError($v.userProfile)"
+            :disable="emailLock" v-model.trim="userProfile.local.email" @focus="saveTmp('local.email')" />
         </div>
         <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
           <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
@@ -18,7 +18,7 @@
       </div>
     </div>
     <div class="row gutter-profile q-mb-xl">
-      <ni-input caption="Biographie du formateur" v-model="mergedUserProfile.biography" type="textarea"
+      <ni-input caption="Biographie du formateur" v-model="userProfile.biography" type="textarea"
         @blur="updateUser('biography')" @focus="saveTmp('biography')" />
     </div>
   </div>
@@ -48,29 +48,29 @@ export default {
   },
   validations () {
     return {
-      mergedUserProfile: {
+      userProfile: {
         identity: { lastname: { required } },
         local: { email: { required, email } },
       },
     }
   },
   computed: {
-    ...mapState({ mergedUserProfile: state => state.rh.userProfile }),
+    ...mapState({ userProfile: state => state.rh.userProfile }),
   },
   async mounted () {
-    this.$v.mergedUserProfile.$touch();
+    this.$v.userProfile.$touch();
     this.isLoaded = true;
   },
   methods: {
     saveTmp (path) {
-      if (this.tmpInput === '') this.tmpInput = get(this.mergedUserProfile, path);
+      if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
     },
     async updateAlenviUser (path) {
-      const value = get(this.mergedUserProfile, path);
+      const value = get(this.userProfile, path);
       const payload = set({}, path, value);
 
-      await Users.updateById(this.mergedUserProfile._id, payload);
-      this.$store.dispatch('rh/setUserProfile', this.mergedUserProfile);
+      await Users.updateById(this.userProfile._id, payload);
+      this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });
     },
   },
 };

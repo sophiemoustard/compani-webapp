@@ -1,6 +1,5 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
-import alenvi from '@helpers/alenvi';
 import { TRAINER } from '@data/constants';
 import store from 'src/store/index';
 
@@ -12,11 +11,8 @@ const routes = [
       try {
         if (!['/ad', '/ad/'].includes(to.path)) return next();
 
-        const refresh = await alenvi.refreshAlenviCookies();
-        if (refresh) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
-
         const loggedUser = store.state.main.loggedUser;
-        if (!loggedUser) return next({ path: '/login' });
+        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
         const userVendorRole = store.getters['main/getVendorRole'];
         if (!userVendorRole) return next({ path: '/' });
@@ -144,12 +140,9 @@ const routes = [
         },
       },
       {
-        path: ':id/account',
+        path: 'account',
         name: 'account vendor',
         component: () => import('src/core/pages/AccountInfo'),
-        beforeEnter (to, from, next) {
-          return to.params.id === Cookies.get('user_id') ? next() : next('/404');
-        },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
         },

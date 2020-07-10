@@ -6,11 +6,11 @@
         <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
           @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error"/>
         <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
-            @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
-            :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
+          @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
+          :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
         <ni-input caption="Email" v-model.trim="course.contact.email"
-            @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
-            :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
+          @focus="saveTmp('contact.email')" @blur="updateCourse('contact.email')"
+          :error="$v.course.contact.email.$error" :error-message="emailErrorcontact" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -23,26 +23,13 @@
       </ni-banner>
       <ni-banner v-if="!get(this.course, 'program.learningGoals')">
         <template v-slot:message>
-          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger les attestations de fin de formation.
+          Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
+          les attestations de fin de formation.
         </template>
       </ni-banner>
-      <div class="course-link">
-        <q-item>
-          <q-item-section side>
-            <q-btn :disable="disabledFollowUp" color="primary" size="sm" icon="info" flat dense type="a"
-              target="_blank" :href="!disabledFollowUp && courseLink" />
-          </q-item-section>
-          <q-item-section class="course-link">Page info formation</q-item-section>
-        </q-item>
-        <div class="course-link-share" v-clipboard:copy="!disabledFollowUp && courseLink"
-          v-clipboard:success="handleCopySuccess">
-          <q-btn color="primary" size="xs" :disable="disabledFollowUp" icon="link" flat dense />
-          <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disabledFollowUp }"
-            color="primary">
-            Obtenir un lien de partage
-          </div>
-        </div>
-      </div>
+
+      <ni-course-info-link :disable-link="disabledFollowUp" />
+
       <q-item>
         <q-item-section side>
           <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
@@ -79,6 +66,12 @@
           </q-tr>
         </template>
       </ni-simple-table>
+      <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
+        <template v-slot:message>
+          Il manque le numéro de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur
+          {{course.trainees.length}} : {{ missingTraineesPhone.join(', ') }}.
+        </template>
+      </ni-banner>
       <q-item>
         <q-item-section side>
           <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
@@ -107,6 +100,12 @@
       <template slot="title">
         Message envoyé le <span class="text-weight-bold">{{$moment(smsHistory.date).format('DD/MM/YYYY')}}</span>
       </template>
+      <ni-banner v-if="missingTraineesPhoneHistory" icon="info_outline">
+        <template v-slot:message>
+          Pour cet envoi, il manquait le numéro du ou des stagiaire(s) suivant(s) :
+          {{ missingTraineesPhoneHistory.join(', ') }}.
+        </template>
+      </ni-banner>
       <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="smsHistory.type" disable />
       <ni-input in-modal caption="Message" v-model="smsHistory.message" type="textarea" :rows="7" disable />
     </ni-modal>
@@ -123,6 +122,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import Banner from '@components/Banner';
 import SimpleTable from '@components/table/SimpleTable';
+import CourseInfoLink from './CourseInfoLink';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
@@ -137,6 +137,7 @@ export default {
     'ni-modal': Modal,
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
+    'ni-course-info-link': CourseInfoLink,
   },
   mixins: [courseMixin],
   props: {
@@ -175,7 +176,7 @@ export default {
       pagination: { rowsPerPage: 0 },
       smsLoading: false,
       smsHistoriesModal: false,
-      smsHistory: {},
+      smsHistory: { missingPhones: [] },
     };
   },
   async created () {
@@ -195,21 +196,8 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    disabledFollowUp () {
-      return this.followUpMissingInfo.length > 0;
-    },
     disableDownloadCompletionCertificates () {
       return this.disabledFollowUp || !get(this.course, 'program.learningGoals');
-    },
-    followUpMissingInfo () {
-      const missingInfo = [];
-      if (!this.course.trainer) missingInfo.push('l\'intervenant');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
-      if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
-      if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du contact pour la formation');
-
-      return missingInfo;
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
@@ -237,6 +225,15 @@ export default {
         ? this.messageTypeOptions
         : this.messageTypeOptions.filter(t => t.value === REMINDER);
     },
+    missingTraineesPhone () {
+      return this.course.trainees.filter(trainee => !get(trainee, 'contact.phone'))
+        .map(trainee => formatIdentity(trainee.identity, 'FL'));
+    },
+    missingTraineesPhoneHistory () {
+      if (!this.smsHistory.missingPhones.length) return '';
+
+      return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
+    },
   },
   methods: {
     get,
@@ -260,9 +257,6 @@ export default {
         this.smsLoading = false;
       }
     },
-    handleCopySuccess () {
-      return NotifyPositive('Lien copié !');
-    },
     openSmsModal () {
       this.updateMessage();
       this.smsModal = true;
@@ -282,7 +276,7 @@ export default {
       this.smsHistory = this.smsSent.find(sms => sms._id === smsId);
     },
     resetSmsHistoryModal () {
-      this.smsHistory = {};
+      this.smsHistory = { missingPhones: [] };
     },
     updateMessage () {
       if (this.messageType === CONVOCATION) this.setConvocationMessage();
@@ -293,7 +287,7 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.course.program.name} - ` +
+      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.programName} - ` +
         `${this.course.name}.\nLa première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
         'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
         `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
@@ -304,7 +298,7 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.course.program.name} - ` +
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.programName} - ` +
       `${this.course.name}.\nVotre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
       'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
       `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
@@ -336,28 +330,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.course-link
-  @media screen and (min-width: 1025px)
-    display: flex
-    flex-direction: row
-    align-items: center
-    justify-content: left
-  &-share
-    display: flex
-    flex-direction: row
-    align-items: center
-    @media screen and (max-width: 1024px)
-      padding: 0 0 10px 55px
-    &-label
-      cursor: pointer
-      color: $primary
-      text-decoration underline
-      font-size: 14px
-      @media screen and (max-width: 767px)
-        font-size: 12px
-      &-disabled
-        opacity: 0.7 !important;
-        cursor: not-allowed !important
 .q-item
-  padding-left: 0px;
+  padding-left: 0px
 </style>

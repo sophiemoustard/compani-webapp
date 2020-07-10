@@ -26,6 +26,7 @@ import Users from '@api/Users'
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { logInMixin } from '@mixins/logInMixin';
+import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 export default {
   components: {
@@ -49,12 +50,12 @@ export default {
         const checkToken = await Users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
-        next({ path: '/login' });
+        logOutAndRedirectToLogin();
       }
     } catch (e) {
       if (e.response) console.error(e.response);
       else console.error(e);
-      next({ path: '/login' });
+      logOutAndRedirectToLogin();
     }
   },
   validations () {

@@ -1,5 +1,5 @@
 <template>
-  <q-page padding :class="backgroundClass">
+  <q-page padding :class="backgroundClass" v-if="course">
     <ni-profile-header :title="courseName">
       <template v-slot:body>
         <div class="row profile-info q-pl-lg">
@@ -10,7 +10,12 @@
         </div>
       </template>
     </ni-profile-header>
-    <profile-tabs :profile-id="courseId" :tabsContent="tabsContent" />
+    <div v-if="isClientInterface && isCourseInter">
+      <ni-profile-organization :profile-id="courseId" />
+    </div>
+    <div v-else>
+      <profile-tabs :profile-id="courseId" :tabsContent="tabsContent" />
+    </div>
   </q-page>
 </template>
 
@@ -21,6 +26,7 @@ import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
+import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
@@ -34,8 +40,11 @@ export default {
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
+    'ni-profile-organization': ProfileOrganization,
   },
   data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+
     return {
       courseName: '',
       tabsContent: [
@@ -52,11 +61,15 @@ export default {
           component: ProfileFollowUp,
         },
       ],
-      backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
+      isClientInterface,
+      backgroundClass: isClientInterface ? 'client-background' : 'vendor-background',
     }
   },
   computed: {
     ...mapState('course', ['course']),
+    isCourseInter () {
+      return this.course.type === INTER_B2B;
+    },
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.programName },

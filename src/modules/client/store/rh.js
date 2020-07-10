@@ -1,4 +1,6 @@
 import Users from '@api/Users';
+import { userModel } from '@data/user';
+import { extend } from '@helpers/utils';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 
 export default {
@@ -25,7 +27,8 @@ export default {
     fetchUserProfile: async ({ commit }, params) => {
       try {
         const user = await Users.getById(params.userId);
-        commit('SET_USER_PROFILE', user);
+
+        commit('SET_USER_PROFILE', Object.assign({}, extend(userModel, user)));
       } catch (e) {
         console.error(e);
       }

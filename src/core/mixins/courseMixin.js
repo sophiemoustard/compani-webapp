@@ -25,6 +25,19 @@ export const courseMixin = {
     trainerName () {
       return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
     },
+    disabledFollowUp () {
+      return this.followUpMissingInfo.length > 0;
+    },
+    followUpMissingInfo () {
+      const missingInfo = [];
+      if (!this.course.trainer) missingInfo.push('l\'intervenant');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
+      if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
+      if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
+      if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du contact pour la formation');
+
+      return missingInfo;
+    },
   },
   methods: {
     happened (sameDaySlots) {

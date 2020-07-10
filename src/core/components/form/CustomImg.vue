@@ -9,14 +9,9 @@ import gdrive from '@api/GoogleDrive';
 export default {
   name: 'custom-img',
   props: {
-    driveId: {
-      type: String,
-      required: true,
-    },
-    alt: {
-      type: String,
-      required: true,
-    },
+    imageSource: { type: String, required: true },
+    alt: { type: String, required: true },
+    cloudinaryStorage: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -29,8 +24,10 @@ export default {
   methods: {
     async getThumbnailUrl () {
       try {
-        const file = await gdrive.getFileById({ id: this.driveId });
-        this.link = file.data.data.file.thumbnailLink;
+        if (!this.cloudinaryStorage) {
+          const file = await gdrive.getFileById({ id: this.imageSource });
+          this.link = file.data.data.file.thumbnailLink;
+        } else this.link = this.imageSource;
       } catch (e) {
         console.error(e);
       }

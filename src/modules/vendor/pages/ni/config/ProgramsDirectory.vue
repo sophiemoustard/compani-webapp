@@ -43,7 +43,16 @@ export default {
   data () {
     return {
       tableLoading: false,
-      columns: [{ name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true }],
+      columns: [
+        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
+        {
+          name: 'modulesCount',
+          label: 'Nombre de modules',
+          field: 'modules',
+          format: value => value ? `${value.length}` : '0',
+          align: 'center',
+        },
+      ],
       programs: [],
       modalLoading: false,
       programCreationModal: false,
