@@ -8,7 +8,7 @@
         src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/aux-pouce.png">
       <div class="course-title-text">
         <div class="text-weight-bold">Vous êtes convoqué(e) à la formation</div>
-        <h5>{{ programName }}<br>{{ course.name }}</h5>
+        <h5>{{ programName }}<br>{{ course.misc }}</h5>
       </div>
     </div>
     <div class="course-container course-stepper q-mx-sm q-my-lg">

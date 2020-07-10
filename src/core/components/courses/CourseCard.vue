@@ -4,7 +4,7 @@
       <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
       <div class="title-text">
         <span v-if="isIntraCourse" >{{ companyName }} - </span>
-        {{ programName }} - {{ course.name || '' }}
+        {{ programName }} - {{ course.misc || '' }}
       </div>
       <div class="items-container">
         <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container">

@@ -57,8 +57,12 @@ export const courseMixin = {
         const value = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
 
         if (this.tmpInput === value) return;
-        get(this.$v.course, path).$touch();
-        if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        const vAttribute = get(this.$v.course, path)
+        if (vAttribute) {
+          vAttribute.$touch();
+          if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
+        }
 
         const payload = set({}, path, this.formatUpdateCourseValue(path, value));
         await Courses.update(this.profileId, payload);

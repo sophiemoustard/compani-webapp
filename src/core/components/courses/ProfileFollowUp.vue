@@ -288,7 +288,7 @@ export default {
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
       this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.programName} - ` +
-        `${this.course.name}.\nLa première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+        `${this.course.misc}.\nLa première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
         'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
         `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
@@ -299,7 +299,7 @@ export default {
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
       this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.programName} - ` +
-      `${this.course.name}.\nVotre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+      `${this.course.misc}.\nVotre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
       'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
       `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },

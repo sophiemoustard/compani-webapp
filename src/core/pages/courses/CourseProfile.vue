@@ -1,6 +1,6 @@
 <template>
   <q-page padding :class="backgroundClass" v-if="course">
-    <ni-profile-header :title="courseName">
+    <ni-profile-header :title="courseMisc">
       <template v-slot:body>
         <div class="row profile-info q-pl-lg">
           <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
@@ -83,12 +83,12 @@ export default {
   },
   watch: {
     course () {
-      this.courseName = get(this.course, 'name') || '';
+      this.courseMisc = get(this.course, 'misc') || '';
     },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    this.courseName = get(this.course, 'name') || '';
+    this.courseMisc = get(this.course, 'misc') || '';
   },
   methods: {
     async refreshCourse () {
