@@ -26,8 +26,6 @@ import {
   HOURLY,
   ILLNESS,
   WORK_ACCIDENT,
-  CUSTOMER_CONTRACT,
-  COMPANY_CONTRACT,
   COACH_ROLES,
   EVENT_TYPES,
   CUSTOMER,
@@ -154,17 +152,7 @@ export const planningModalMixin = {
       if (!this.selectedCustomer || !this.selectedCustomer.subscriptions ||
         this.selectedCustomer.subscriptions.length === 0) return [];
 
-      let subscriptions = this.selectedCustomer.subscriptions;
-      if (this.selectedAuxiliary._id) {
-        if (!this.selectedAuxiliary.hasCustomerContractOnEvent) {
-          subscriptions = subscriptions.filter(sub => get(sub, 'service.type') !== CUSTOMER_CONTRACT);
-        }
-        if (!this.selectedAuxiliary.hasCompanyContractOnEvent) {
-          subscriptions = subscriptions.filter(sub => get(sub, 'service.type') !== COMPANY_CONTRACT);
-        }
-      }
-
-      return subscriptions.map(sub => ({ label: get(sub, 'service.name'), value: sub._id }));
+      return this.selectedCustomer.subscriptions.map(sub => ({ label: get(sub, 'service.name'), value: sub._id }));
     },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;
@@ -178,24 +166,10 @@ export const planningModalMixin = {
     deleteClassFocus () {
       this.$refs.addressSelect.$el.className = this.$refs.addressSelect.$el.className.replace('q-if-focused ', '');
     },
-    hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
-      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-
-      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
-
-      return customerContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(startDate));
-      });
-    },
     hasCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
 
-      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
-
-      return companyContracts.some(contract => {
+      return auxiliary.contracts.some(contract => {
         return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
           (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
       });

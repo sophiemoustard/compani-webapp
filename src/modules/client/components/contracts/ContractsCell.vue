@@ -4,15 +4,6 @@
       <q-card-section class="cell-title" :style="{ color: cellTitle(contract.endDate).color }">
         {{ cellTitle(contract.endDate).msg }}
       </q-card-section>
-      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="cell-subtitle">
-        Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity | formatIdentity('FL') }}
-      </p>
-      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="cell-subtitle">
-        Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity | formatIdentity('FL') }}
-      </p>
-      <p v-if="contract.status === COMPANY_CONTRACT" class="cell-subtitle">
-        Statut : {{ getContractStatus(contract) }}
-      </p>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name" :loading="contractsLoading"
         :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
         <template v-slot:body="{ props }" >
@@ -22,11 +13,11 @@
               <template v-if="col.name === 'contractEmpty'">
                 <div class="row justify-center table-actions">
                   <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract, contractIndex)" icon="file_download"
-                    :disable="!canDownload(props.row, contract.status, contractIndex)" />
+                    :disable="!canDownload(props.row, contractIndex)" />
                 </div>
               </template>
               <template v-if="col.name === 'contractSigned'">
-                <div v-if="hasToBeSignedOnline(props.row) && shouldSignDocument(contract.status, props.row.signature)">
+                <div v-if="hasToBeSignedOnline(props.row) && shouldSignContract(props.row.signature)">
                   <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer"
                   @click="openSignatureModal(props.row.signature.eversignId)" />
                 </div>
@@ -96,7 +87,7 @@ import { NotifyNegative } from '@components/popup/notify.js';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { CONTRACT_STATUS_OPTIONS, CUSTOMER_CONTRACT, COACH, CUSTOMER, AUXILIARY, COMPANY_CONTRACT } from '@data/constants.js';
+import { COACH, CUSTOMER, AUXILIARY } from '@data/constants.js';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
 
@@ -117,8 +108,6 @@ export default {
   },
   data () {
     return {
-      CUSTOMER_CONTRACT,
-      COMPANY_CONTRACT,
       CUSTOMER,
       esignModal: false,
       embeddedUrl: '',
@@ -182,27 +171,18 @@ export default {
       NotifyNegative('Echec de l\'envoi du document.');
     },
     getFormFields (contract, version) {
-      const formFields = [
+      return [
         { name: 'fileName', value: `contrat_signe_${this.user.identity.firstname}_${this.user.identity.lastname}` },
         { name: 'contractId', value: contract._id },
         { name: 'versionId', value: version._id },
-        { name: 'status', value: contract.status },
         { name: 'type', value: 'signedContract' },
       ];
-
-      if (contract.status === CUSTOMER_CONTRACT) formFields.push({ name: 'customer', value: contract.customer._id });
-
-      return formFields;
     },
     getLastVersion (contract) {
       return orderBy(contract.versions, ['startDate'], ['desc'])[0];
     },
     visibleColumns (contract) {
-      if (contract.status === CUSTOMER_CONTRACT) return this.columns.filter(col => col !== 'weeklyHours');
       return this.columns;
-    },
-    getContractStatus (contract) {
-      return CONTRACT_STATUS_OPTIONS.find(status => status.value === contract.status).label;
     },
     openVersionCreation (contract) {
       this.$emit('openVersionCreation', contract);
@@ -226,18 +206,14 @@ export default {
       return archive.link || false;
     },
     // Documents
-    canDownload (version, status, contractIndex) {
-      if (!this.user.company || !this.user.company.rhConfig || !this.user.company.rhConfig.templates) return false;
+    canDownload (version, contractIndex) {
+      const templates = get(this.user, 'company.rhConfig.templates');
+      if (!templates) return false;
 
-      const templates = this.user.company.rhConfig.templates;
       const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, version);
-      if (status === COMPANY_CONTRACT) {
-        if (versionIndex === 0) return !!templates.contractWithCompany && !!templates.contractWithCompany.driveId;
-        return !!templates.contractWithCompanyVersion && !!templates.contractWithCompanyVersion.driveId;
-      }
+      if (versionIndex === 0) return !!templates.contractWithCompany && !!templates.contractWithCompany.driveId;
 
-      if (versionIndex === 0) return !!templates.contractWithCustomer && !!templates.contractWithCustomer.driveId;
-      return !!templates.contractWithCustomerVersion && !!templates.contractWithCustomerVersion.driveId;
+      return !!templates.contractWithCompanyVersion && !!templates.contractWithCompanyVersion.driveId;
     },
     docsUploadUrl (contractId) {
       const driveId = get(this.user, 'administrative.driveFolder.driveId');
@@ -247,8 +223,8 @@ export default {
     },
     async dlTemplate (contractVersion, parentContract, contractIndex) {
       try {
-        const data = generateContractFields(parentContract.status, { user: this.user, contract: contractVersion, initialContractStartDate: parentContract.startDate });
-        if (!this.canDownload(contractVersion, parentContract.status, contractIndex)) return NotifyNegative('Impossible de télécharger le contrat.');
+        const data = generateContractFields({ user: this.user, contract: contractVersion, initialContractStartDate: parentContract.startDate });
+        if (!this.canDownload(contractVersion, contractIndex)) return NotifyNegative('Impossible de télécharger le contrat.');
 
         const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contractVersion);
         const params = {
@@ -281,16 +257,14 @@ export default {
     hasToBeSignedOnline (contract) {
       return !!(contract.signature && contract.signature.eversignId);
     },
-    shouldSignDocument (contractStatus, contractSignature) {
-      if (!contractSignature.signedBy) return true;
+    shouldSignContract (signature) {
+      if (!signature.signedBy) return true;
 
       switch (this.personKey) {
         case COACH:
-          return contractStatus === COMPANY_CONTRACT && !contractSignature.signedBy.other;
+          return !signature.signedBy.other;
         case AUXILIARY:
-          return !contractSignature.signedBy.auxiliary;
-        case CUSTOMER:
-          return contractStatus === CUSTOMER_CONTRACT && !contractSignature.signedBy.other;
+          return !signature.signedBy.auxiliary;
       }
     },
     getContractLink (contract) {

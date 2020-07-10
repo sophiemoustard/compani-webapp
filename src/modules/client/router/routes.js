@@ -407,14 +407,6 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
         },
       },
-      {
-        path: 'customers/contracts',
-        name: 'customers contracts',
-        component: () => import('src/modules/client/pages/customers/Contracts'),
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
       // All profiles
       {
         path: 'account',

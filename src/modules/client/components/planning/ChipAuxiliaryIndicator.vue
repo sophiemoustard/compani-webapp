@@ -52,7 +52,6 @@ import {
   MONTH_STATS,
   LOW,
   EXTREME,
-  COMPANY_CONTRACT,
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
 } from '@data/constants';
@@ -109,10 +108,8 @@ export default {
     },
     hasCompanyContractOnEvent () {
       if (!this.person.contracts || this.person.contracts.length === 0) return false;
-      if (!this.person.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      const companyContracts = this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
 
-      return companyContracts.some(contract => {
+      return this.person.contracts.some(contract => {
         return (this.$moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
           (!contract.endDate || this.$moment(contract.endDate).isAfter(this.endOfWeek))) ||
           (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
@@ -120,7 +117,7 @@ export default {
       });
     },
     companyContracts () {
-      return this.person.contracts ? this.person.contracts.filter(contract => contract.status === COMPANY_CONTRACT) : [];
+      return this.person.contracts;
     },
   },
   methods: {
