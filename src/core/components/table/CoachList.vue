@@ -201,7 +201,7 @@ export default {
         const user = userInfo.user;
 
         const sameOrNoCompany = !user.company || user.company === this.company._id;
-        if (userInfo.exists && !sameOrNoCompany) return NotifyNegative('Impossible de créer cet utilisateur');
+        if (userInfo.exists && !sameOrNoCompany) return NotifyNegative('Cet utilisateur n\'est pas relié à cette structure');
         else if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
         else if (userInfo.exists) {
           await Users.updateById(userInfo.user._id, { role: this.newUser.role, company: this.company._id });
