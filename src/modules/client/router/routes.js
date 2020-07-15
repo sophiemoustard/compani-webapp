@@ -8,6 +8,7 @@ import {
   COACH_ROLES,
   AUXILIARY_WITHOUT_COMPANY,
 } from 'src/core/data/constants';
+import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 const routes = [
   {
@@ -18,7 +19,9 @@ const routes = [
         if (to.path !== '/') return next();
 
         const loggedUser = store.state.main.loggedUser;
-        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
+        const userId = Cookies.get('user_id');
+        if (!loggedUser && !userId) return logOutAndRedirectToLogin();
+        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', userId);
 
         const userVendorRole = store.getters['main/getVendorRole'];
         const userClientRole = store.getters['main/getClientRole'];
