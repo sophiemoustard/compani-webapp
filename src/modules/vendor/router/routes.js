@@ -2,6 +2,7 @@ import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import { TRAINER } from '@data/constants';
 import store from 'src/store/index';
+import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 const routes = [
   {
@@ -12,7 +13,9 @@ const routes = [
         if (!['/ad', '/ad/'].includes(to.path)) return next();
 
         const loggedUser = store.state.main.loggedUser;
-        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
+        const userId = Cookies.get('user_id');
+        if (!loggedUser && !userId) return logOutAndRedirectToLogin();
+        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', userId);
 
         const userVendorRole = store.getters['main/getVendorRole'];
         if (!userVendorRole) return next({ path: '/' });
