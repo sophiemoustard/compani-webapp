@@ -53,30 +53,4 @@ describe('Login page tests', () => {
       cy.getCookie('user_id').should('exist');
     });
   })
-
-  it('the url for account info should include the user id', () => {
-    const user = {
-      _id: '1234567ujhgfds2345',
-      role: { client: { name: 'auxiliary_without_company' } },
-      identity: { firstname: 'Auxiliary', lastname: 'Test', title: 'mr' },
-      local: { email: 'auxiliary@alenvi.io', password: '123456' },
-      refreshToken: 'token',
-      company: { _id: '987765uyt654321', subscriptions: { erp: false } },
-    }
-    cy.server()
-    cy.route('post', '/users/authenticate', {
-      data: { token: 'token', refreshToken: 'token', expiresIn: 3600 * 24, user },
-    });
-
-    cy.route('get', `/users/${user._id}`, { data: { user } }).as('user')
-    cy.route('post', '/users/refreshToken', { data: { token: 'token', refreshToken: 'token', expiresIn: 3600 * 24, user } })
-
-    cy.get('[data-cy=email]').type('auxiliary-without-company@alenvi.io');
-    cy.get('[data-cy=password]').type('123456');
-    cy.get('[data-cy=login]').click();
-
-    cy.window().then(win => {
-      cy.wait('@user').url().should('include', `${user._id}/account`)
-    })
-  });
 });
