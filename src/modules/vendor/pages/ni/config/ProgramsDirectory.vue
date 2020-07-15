@@ -46,9 +46,9 @@ export default {
       columns: [
         { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
         {
-          name: 'modulesCount',
-          label: 'Nombre de modules',
-          field: 'modules',
+          name: 'stepsCount',
+          label: 'Nombre d\'étapes',
+          field: 'steps',
           format: value => value ? `${value.length}` : '0',
           align: 'center',
         },
