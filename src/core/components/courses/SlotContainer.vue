@@ -33,8 +33,8 @@
             </div>
           </div>
         </q-card>
-        <q-card class="slots-cells" v-for="(value, key, index) in courseSlotsWithoutDates"
-          :key="Object.keys(courseSlots).length + index + 1" flat>
+        <q-card class="slots-cells cursor-pointer" v-for="(value, key, index) in courseSlotsWithoutDates"
+          :key="Object.keys(courseSlots).length + index + 1" flat @click="openEditionModal(value)">
           <div class="slots-cells-title">
             <div class="slots-cells-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
             <div class="slots-cells-date text-weight-bold">Date à planifier</div>
@@ -87,6 +87,7 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import has from 'lodash/has';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
@@ -249,9 +250,13 @@ export default {
       return payload;
     },
     openEditionModal (slot) {
+      const defaultDate = {
+        startDate: this.$moment().startOf('d').hours(9).toISOString(),
+        endDate: this.$moment().startOf('d').hours(12).toISOString(),
+      };
       this.editedCourseSlot = {
         _id: slot._id,
-        dates: pick(slot, ['startDate', 'endDate']),
+        dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
       }
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
