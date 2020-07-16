@@ -9,12 +9,6 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 export const courseMixin = {
   computed: {
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
-    companyName () {
-      return get(this.course, 'company.name') || '';
-    },
-    programName () {
-      return get(this.course, 'program.name') || '';
-    },
     isIntraCourse () {
       return get(this.course, 'type') === INTRA;
     },
@@ -51,6 +45,11 @@ export const courseMixin = {
     },
     formatUpdateCourseValue (path, value) {
       return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
+    },
+    composeCourseName (c) {
+      const possiblyCompanyName = c.company ? `${c.company.name} - ` : '';
+      const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
+      return possiblyCompanyName + c.program.name + possiblyMisc;
     },
     async updateCourse (path) {
       try {

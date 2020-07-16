@@ -8,7 +8,7 @@
         src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/aux-pouce.png">
       <div class="course-title-text">
         <div class="text-weight-bold">Vous êtes convoqué(e) à la formation</div>
-        <h5>{{ programName }}<br>{{ course.misc }}</h5>
+        <h5>{{ programName }}<div v-if="misc">{{ misc }}</div></h5>
       </div>
     </div>
     <div class="course-container course-stepper q-mx-sm q-my-lg">
@@ -102,6 +102,12 @@ export default {
     };
   },
   computed: {
+    programName () {
+      return get(this.course, 'program.name') || '';
+    },
+    misc () {
+      return this.course.misc || '';
+    },
     courseSlots () {
       return this.course.slots ? groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')) : {};
     },

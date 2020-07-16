@@ -1,6 +1,6 @@
 <template>
   <q-page padding :class="backgroundClass" v-if="course">
-    <ni-profile-header :title="courseMisc">
+    <ni-profile-header :title="courseName">
       <template v-slot:body>
         <div class="row profile-info q-pl-lg">
           <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
@@ -20,7 +20,6 @@
 </template>
 
 <script>
-import get from 'lodash/get';
 import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -72,23 +71,21 @@ export default {
     },
     headerInfo () {
       const infos = [
-        { icon: 'library_books', label: this.programName },
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
       ]
-      if (this.isIntraCourse) infos.push({ icon: 'apartment', label: this.companyName });
 
       return infos;
     },
   },
   watch: {
     course () {
-      this.courseMisc = get(this.course, 'misc') || '';
+      this.courseName = this.composeCourseName(this.course);
     },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    this.courseMisc = get(this.course, 'misc') || '';
+    this.courseName = this.composeCourseName(this.course);
   },
   methods: {
     async refreshCourse () {
