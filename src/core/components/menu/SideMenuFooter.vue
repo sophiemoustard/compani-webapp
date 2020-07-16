@@ -24,7 +24,6 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import get from 'lodash/get';
 import {
   COACH_ROLES,
   AUXILIARY,
@@ -64,7 +63,7 @@ export default {
           '/favicon-32x32.png';
     },
     accessBothInterface () {
-      return get(this.loggedUser, 'role.client.name') && get(this.loggedUser, 'role.vendor.name');
+      return this.clientRole && this.vendorRole;
     },
   },
   methods: {
