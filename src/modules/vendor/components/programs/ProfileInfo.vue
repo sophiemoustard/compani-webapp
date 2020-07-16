@@ -16,7 +16,7 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Étapes</p>
+      <p class="text-weight-bold">Étapes ({{ program.steps.length }})</p>
       <q-card v-for="(step, index) of program.steps" :key="index" flat class="step">
         <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
           <div>
