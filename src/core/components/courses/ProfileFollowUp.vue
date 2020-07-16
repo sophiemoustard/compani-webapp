@@ -234,9 +234,8 @@ export default {
 
       return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
     },
-    programNameAndMisc () {
-      const possiblyMisc = this.course.misc ? ` - ${this.course.misc}` : '';
-      return this.course.program.name + possiblyMisc;
+    courseName () {
+      return this.composeCourseName(this.course);
     },
   },
   methods: {
@@ -291,7 +290,7 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.programNameAndMisc}.\n` +
+      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n` +
       `La première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
       'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
       `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
@@ -302,7 +301,7 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.programNameAndMisc}.\n` +
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n` +
       `Votre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
       'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
       `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;

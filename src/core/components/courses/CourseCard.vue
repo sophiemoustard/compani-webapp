@@ -52,11 +52,17 @@ export default {
     course: { type: Object, default: () => ({}) },
   },
   data () {
-    return { INTRA, FORTHCOMING, IN_PROGRESS, COMPLETED };
+    return {
+      INTRA,
+      FORTHCOMING,
+      IN_PROGRESS,
+      COMPLETED,
+      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
+    };
   },
   computed: {
     courseName () {
-      return this.composeCourseName(this.course);
+      return this.composeCourseName(this.course, this.isVendorInterface);
     },
     headerInfo () {
       const infos = [

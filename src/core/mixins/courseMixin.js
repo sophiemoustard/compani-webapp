@@ -46,8 +46,8 @@ export const courseMixin = {
     formatUpdateCourseValue (path, value) {
       return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
     },
-    composeCourseName (c) {
-      const possiblyCompanyName = c.company ? `${c.company.name} - ` : '';
+    composeCourseName (c, attachCompany = false) {
+      const possiblyCompanyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
       const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
       return possiblyCompanyName + c.program.name + possiblyMisc;
     },

@@ -80,12 +80,12 @@ export default {
   },
   watch: {
     course () {
-      this.courseName = this.composeCourseName(this.course);
+      this.courseName = this.composeCourseName(this.course, !this.isClientInterface);
     },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    this.courseName = this.composeCourseName(this.course);
+    this.courseName = this.composeCourseName(this.course, !this.isClientInterface);
   },
   methods: {
     async refreshCourse () {
