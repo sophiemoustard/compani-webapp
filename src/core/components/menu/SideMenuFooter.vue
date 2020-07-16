@@ -64,7 +64,7 @@ export default {
           '/favicon-32x32.png';
     },
     accessBothInterface () {
-      return get(this.loggedUser, 'role.client') && get(this.loggedUser, 'role.vendor');
+      return get(this.loggedUser, 'role.client.name') && get(this.loggedUser, 'role.vendor.name');
     },
   },
   methods: {
