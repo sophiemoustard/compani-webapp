@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="row">
-      <ni-contracts-card v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
+      <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
         :personKey="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
         @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
@@ -114,7 +114,7 @@ import DateInput from '@components/form/DateInput';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
-import ContractsCard from 'src/modules/client/components/contracts/ContractsCard';
+import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal.vue';
 import {
   END_CONTRACT_REASONS,
@@ -138,7 +138,7 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
-    'ni-contracts-card': ContractsCard,
+    'ni-contracts-cell': ContractsCell,
     'ni-modal': Modal,
     'version-edition-modal': VersionEditionModal,
     'ni-banner': Banner,

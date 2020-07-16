@@ -1,14 +1,14 @@
 <template>
   <div :class="`course-container ${backgroundClass}`">
     <div class="text-weight-bold q-mb-sm">{{ title }}</div>
-    <course-card class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course"
+    <course-cell class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course"
       @click="goToCourseProfile" />
   </div>
 </template>
 
 <script>
 import { TRAINER, CLIENT, VENDOR } from '@data/constants';
-import CourseCard from '@components/courses/CourseCard';
+import CourseCell from '@components/courses/CourseCell';
 
 export default {
   name: 'CourseContainer',
@@ -17,7 +17,7 @@ export default {
     courses: { type: Array, default: () => [] },
   },
   components: {
-    'course-card': CourseCard,
+    'course-cell': CourseCell,
   },
   data () {
     const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
