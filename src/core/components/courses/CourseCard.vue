@@ -2,10 +2,7 @@
   <q-card flat>
     <q-card-section @click="$emit('click', course)">
       <div class="infos-course-nearest-date text-weight-bold">{{ formatNearestDate }}</div>
-      <div class="title-text">
-        <span v-if="isIntraCourse" >{{ companyName }} - </span>
-        {{ programName }} - {{ course.misc || '' }}
-      </div>
+      <div class="title-text">{{ courseName }}</div>
       <div class="items-container">
         <q-item v-for="info in headerInfo" :key="info.icon" class="item-section-container">
           <q-item-section side>
@@ -55,9 +52,18 @@ export default {
     course: { type: Object, default: () => ({}) },
   },
   data () {
-    return { INTRA, FORTHCOMING, IN_PROGRESS, COMPLETED };
+    return {
+      INTRA,
+      FORTHCOMING,
+      IN_PROGRESS,
+      COMPLETED,
+      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
+    };
   },
   computed: {
+    courseName () {
+      return this.composeCourseName(this.course, this.isVendorInterface);
+    },
     headerInfo () {
       const infos = [
         { icon: 'bookmark_border', label: this.courseType },

@@ -1,6 +1,6 @@
 <template>
   <div class="header">
-    <div class="row col-xs-12 q-mb-md items-center">
+    <div class="arrow-title q-mb-md items-center">
       <q-icon class="on-left cursor-pointer" size="1rem" name="arrow_back" color="primary"
         @click.native="$router.go(-1)" />
       <h4>{{ title }}</h4>
@@ -19,6 +19,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .arrow-title
+    display: flex
   h4
     margin: 0
 </style>
