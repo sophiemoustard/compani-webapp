@@ -49,7 +49,10 @@ export default {
         const courses = await Courses.list({ trainer: this.loggedUser._id });
         this.coursesWithGroupedSlot = courses.map(course => ({
           ...course,
-          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
+          slots: Object.values(groupBy(
+            course.slots.filter(slot => !!slot.startDate),
+            s => this.$moment(s.startDate).format('DD/MM/YYYY')
+          )),
         }));
       } catch (e) {
         console.error(e);
