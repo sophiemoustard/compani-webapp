@@ -60,17 +60,12 @@ export default {
       return noSlot || noSlotHappened;
     },
     isInProgress (course) {
-      const atLeastOneSlot = course.slots.length;
-      const atLeastOneSlothappened = course.slots.some(this.happened);
       const notEverySlotsHappened = course.slots.some((sameDaySlots) => !this.happened(sameDaySlots));
 
-      return atLeastOneSlot && atLeastOneSlothappened && notEverySlotsHappened;
+      return !this.isForthcoming(course) && notEverySlotsHappened;
     },
     isCompleted (course) {
-      const atLeastOneSlot = course.slots.length;
-      const everySlotsHappened = course.slots.every(this.happened);
-
-      return atLeastOneSlot && everySlotsHappened;
+      return !this.isForthcoming(course) && !this.isInProgress(course);
     },
     getRangeNowToStartCourse (course) {
       if (course.slots.length === 0) return Number.MAX_SAFE_INTEGER;

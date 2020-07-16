@@ -33,10 +33,20 @@
             </div>
           </div>
         </q-card>
+        <q-card class="slots-cards" v-for="(value, key, index) in courseSlotsWithoutDates"
+          :key="Object.keys(courseSlots).length + index + 1" flat>
+          <div class="slots-cards-title">
+            <div class="slots-cards-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
+            <div class="slots-cards-date text-weight-bold">Date à planifier</div>
+          </div>
+          <div class="to-plan-text">Créneau à planifier</div>
+        </q-card>
       </div>
       <div class="q-mt-md" v-if="canEdit" align="right">
         <q-btn class="add-slot" label="Ajouter un créneau" no-caps flat color="white" icon="add"
-          :disable="loading" @click="creationModal = true" />
+          :disable="loading || addDateToPlanloading" @click="creationModal = true" />
+        <q-btn class="add-slot" label="Ajouter une date à planifier" no-caps flat color="white" icon="add"
+          :disable="addDateToPlanloading" @click="addDateToPlan" />
       </div>
     </div>
 
@@ -105,6 +115,8 @@ export default {
   data () {
     return {
       courseSlots: {},
+      courseSlotsWithoutDates: {},
+      addDateToPlanloading: false,
       modalLoading: false,
       creationModal: false,
       newCourseSlot: {
@@ -191,14 +203,22 @@ export default {
   },
   watch: {
     course () {
-      this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
+      this.groupByCourses();
     },
   },
   async created () {
     if (!this.course) this.$emit('refresh');
-    else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
+    else this.groupByCourses();
   },
   methods: {
+    groupByCourses () {
+      this.courseSlots = groupBy(
+        this.course.slots.filter(slot => !!slot.startDate),
+        s => this.$moment(s.startDate).format('DD/MM/YYYY')
+      );
+
+      this.courseSlotsWithoutDates = Object.assign({}, this.course.slots.filter(slot => !slot.startDate));
+    },
     getSlotDuration (slot) {
       const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
 
@@ -264,6 +284,20 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    async addDateToPlan () {
+      try {
+        this.addDateToPlanloading = true;
+        await CourseSlots.create(this.formatCreationPayload({}));
+        NotifyPositive('Date à planifier ajoutée.');
+
+        this.$emit('refresh');
+      } catch (e) {
+        console.error(e)
+        NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
+      } finally {
+        this.addDateToPlanloading = false;
       }
     },
     async updateCourseSlot () {
@@ -349,6 +383,8 @@ export default {
 
 .add-slot
   background: $primary
+  margin-left: 10px
+  margin-top: 10px
 .slot-section-title
   padding: 0;
   margin: 10px 0px
@@ -357,4 +393,8 @@ export default {
      font-size: 16px
      @media (max-width: 767px)
       font-size: 13px
+
+.to-plan-text
+  text-decoration: underline
+  color: $warning
 </style>
