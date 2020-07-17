@@ -179,30 +179,24 @@ export default {
     },
     formatSlotTitle () {
       const slotsToPlanLength = this.courseSlotsToPlan.length;
+      const slotList = Object.values(this.courseSlots);
+      const totalDate = this.courseSlotsToPlan.length + slotList.length;
+      if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
+
       const slotsToPlanTitle = slotsToPlanLength
-        ? ` - ${slotsToPlanLength} date${slotsToPlanLength > 1 ? 's' : ''} à planifier`
+        ? ` dont ${slotsToPlanLength} à planifier, `
         : '';
 
-      const slotList = Object.values(this.courseSlots);
-
-      if (!slotList.length) {
-        return { title: `Pas de date prévue${slotsToPlanTitle}`, subtitle: '', icon: 'mdi-calendar-remove' };
+      let subtitle = '';
+      if (slotList.length) {
+        const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
+        const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+        subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
-      const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
-
-      if (slotList.length === 1) {
-        return {
-          title: `1 date, ${this.slotsDurationTitle}${slotsToPlanTitle}`,
-          subtitle: `le ${firstSlot}`,
-          icon: 'mdi-calendar-range',
-        };
-      }
-
-      const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
       return {
-        title: `${slotList.length} dates, ${this.slotsDurationTitle}${slotsToPlanTitle}`,
-        subtitle: `du ${firstSlot} au ${lastSlot}`,
+        title: `${totalDate} date${totalDate > 1 ? 's' : ''}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
+        subtitle,
         icon: 'mdi-calendar-range',
       };
     },

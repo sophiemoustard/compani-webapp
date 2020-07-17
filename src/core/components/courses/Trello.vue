@@ -24,7 +24,11 @@ export default {
           course.status = FORTHCOMING;
           return course;
         })
-        .sort((a, b) => this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b));
+        .sort((a, b) => {
+          if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
+          if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
+          return this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b)
+        });
     },
     courseListInProgress () {
       return this.courses
@@ -33,7 +37,11 @@ export default {
           course.status = IN_PROGRESS;
           return course;
         })
-        .sort((a, b) => this.getRangeNowToNextSlot(a) - this.getRangeNowToNextSlot(b));
+        .sort((a, b) => {
+          if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
+          if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
+          return this.getRangeNowToNextSlot(a) - this.getRangeNowToNextSlot(b)
+        });
     },
     courseListCompleted () {
       return this.courses
@@ -69,16 +77,15 @@ export default {
       return !this.isForthcoming(course) && !this.isInProgress(course);
     },
     getRangeNowToStartCourse (course) {
-      if (!course.slots.length && !course.slotsToPlan.length) return Number.MAX_SAFE_INTEGER;
-      else if (!course.slots.length) return 0;
+      if (!course.slots.length) return Number.MAX_SAFE_INTEGER;
 
       const firstSlot = course.slots[0];
       return this.$moment(firstSlot[0].startDate).diff(this.$moment(), 'd', true);
     },
     getRangeNowToNextSlot (course) {
       const nextSlot = course.slots.filter((daySlots) => !this.happened(daySlots))[0];
-
       if (!nextSlot) return 0;
+
       return this.$moment(nextSlot[0].startDate).diff(this.$moment(), 'd', true);
     },
     getRangeNowToEndCourse (course) {
