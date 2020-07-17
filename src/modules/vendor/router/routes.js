@@ -67,7 +67,7 @@ const routes = [
       },
       {
         path: 'ni/config/programs',
-        name: 'ni users programs',
+        name: 'ni config programs',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -76,8 +76,18 @@ const routes = [
       },
       {
         path: 'ni/config/programs/:programId',
-        name: 'ni users programs info',
+        name: 'ni config programs info',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'configuration',
+        },
+      },
+      {
+        path: 'ni/config/programs/:programId/activity/:activityId',
+        name: 'ni config programs activity info',
+        component: () => import('src/modules/vendor/pages/ni/config/ActivityProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

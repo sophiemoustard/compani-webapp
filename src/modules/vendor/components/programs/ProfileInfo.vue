@@ -27,9 +27,9 @@
         </q-card-section>
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
           <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
-            <q-card-section>
+            <q-card-section class="cursor-pointer" @click="goToActivityProfile(step, activity)">
               <div>{{activity.title}}</div>
-              <q-btn flat small color="grey" icon="edit" @click="openActivityEditionModal(activity)" />
+              <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
           <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Ajouter une activité"
@@ -263,6 +263,12 @@ export default {
     resetStepEditionModal () {
       this.editedStep = { title: {} };
       this.$v.editedStep.$reset();
+    },
+    goToActivityProfile (step, activity) {
+      this.$router.push({
+        name: 'ni config programs activity info',
+        params: { activityId: activity._id, programName: this.program.name, stepTitle: step.title },
+      });
     },
     openActivityCreationModal (stepId) {
       this.activityCreationModal = true;
