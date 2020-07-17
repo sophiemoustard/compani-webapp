@@ -39,7 +39,7 @@
           <div class="row slots-timeline">
             <div v-for="(slot, index) in course.slots" :key="index"
               :class="['col-3', 'slots', { 'slots-happened': happened(slot) }]" />
-            <div v-for="(slot, index) in course.slotsToPlan" :key="index"
+            <div v-for="(slot, index) in course.slotsToPlan" :key="course.slots.length + index + 1"
               class="col-3 slots slots-to-plan" />
           </div>
         </q-item-section>
