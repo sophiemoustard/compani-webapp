@@ -33,7 +33,7 @@
             </div>
           </div>
         </q-card>
-        <q-card class="slots-cells cursor-pointer" v-for="(value, index) in courseSlotsToPlan"
+        <q-card :class="['slots-cells', { 'cursor-pointer' : canEdit }]" v-for="(value, index) in courseSlotsToPlan"
           :key="Object.keys(courseSlots).length + index + 1" flat @click="openEditionModal(value)">
           <div class="slots-cells-title">
             <div class="slots-cells-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
@@ -255,6 +255,7 @@ export default {
       return payload;
     },
     openEditionModal (slot) {
+      if (!this.canEdit) return;
       const defaultDate = {
         startDate: this.$moment().startOf('d').hours(9).toISOString(),
         endDate: this.$moment().startOf('d').hours(12).toISOString(),
@@ -406,5 +407,5 @@ export default {
 
 .to-plan-text
   text-decoration: underline
-  color: $warning
+  color: $secondary
 </style>

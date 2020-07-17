@@ -13,9 +13,12 @@
       </div>
       <div v-if="course.status === FORTHCOMING" class="additional-infos-container">
         <q-item class="infos-course-container">
-          <q-item-section class="additional-infos">
+          <q-item-section :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
             <q-icon size="12px" name="mdi-calendar-range" />
-            <q-item-label>{{ formatCourseSlotsInfos }}</q-item-label>
+            <q-item-label>
+              {{ formatCourseSlotsInfos }}
+              {{ course.slotsToPlan.length ? ` - ${course.slotsToPlan.length} à planifier` : '' }}
+            </q-item-label>
           </q-item-section>
         </q-item>
         <q-item class="infos-course-container">
@@ -27,12 +30,17 @@
       </div>
     </q-card-section>
     <q-card-section v-if="course.status === IN_PROGRESS" class="slots-timeline-container">
-      <div class="additional-infos"> {{ slotsHappened }} / {{ course.slots.length }} </div>
+      <div :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
+        {{ slotsHappened }} / {{ course.slots.length + course.slotsToPlan.length }}
+        {{ course.slotsToPlan.length ? ` - ${course.slotsToPlan.length} à planifier` : '' }}
+      </div>
       <q-item>
         <q-item-section>
           <div class="row slots-timeline">
             <div v-for="(slot, index) in course.slots" :key="index"
               :class="['col-3', 'slots', { 'slots-happened': happened(slot) }]" />
+            <div v-for="(slot, index) in course.slotsToPlan" :key="course.slots.length + index + 1"
+              class="col-3 slots slots-to-plan" />
           </div>
         </q-item-section>
       </q-item>
@@ -177,14 +185,20 @@ export default {
     &-happened
       background-color: $primary;
       border: none;
+    &-to-plan
+      background-color: $secondary;
+      border: none;
 
   .additional-infos
-    color: $primary !important;
+    color: $primary;
     font-size: 12px;
     align-items: flex-end;
     &-container
       display: flex;
       justify-content: flex-end;
+
+  .to-plan
+    color: $secondary
 
   .slots-timeline-container
     display: flex;
