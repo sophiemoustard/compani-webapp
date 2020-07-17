@@ -1,16 +1,16 @@
 <template>
-  <div class="card-container">
-    <q-card v-for="(contract, contractIndex) in sortedContracts" :key="contractIndex" class="contract-card">
-      <q-card-section class="card-title" :style="{ color: cardTitle(contract.endDate).color }">
-        {{ cardTitle(contract.endDate).msg }}
+  <div class="cell-container">
+    <q-card v-for="(contract, contractIndex) in sortedContracts" :key="contractIndex" class="contract-cell">
+      <q-card-section class="cell-title" :style="{ color: cellTitle(contract.endDate).color }">
+        {{ cellTitle(contract.endDate).msg }}
       </q-card-section>
-      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="card-subtitle">
+      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey !== CUSTOMER" class="cell-subtitle">
         Statut : {{ getContractStatus(contract) }} - Bénéficiaire : {{ contract.customer.identity | formatIdentity('FL') }}
       </p>
-      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="card-subtitle">
+      <p v-if="contract.status === CUSTOMER_CONTRACT && personKey === CUSTOMER" class="cell-subtitle">
         Statut : {{ getContractStatus(contract) }} - Auxiliaire : {{ contract.user.identity | formatIdentity('FL') }}
       </p>
-      <p v-if="contract.status === COMPANY_CONTRACT" class="card-subtitle">
+      <p v-if="contract.status === COMPANY_CONTRACT" class="cell-subtitle">
         Statut : {{ getContractStatus(contract) }}
       </p>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name" :loading="contractsLoading"
@@ -101,7 +101,7 @@ import { generateContractFields } from 'src/modules/client/helpers/generateContr
 import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
 
 export default {
-  name: 'ContractsCard',
+  name: 'ContractsCell',
   mixins: [tableMixin],
   components: {
     'ni-responsive-table': ResponsiveTable,
@@ -163,7 +163,7 @@ export default {
     },
   },
   methods: {
-    cardTitle (contractEndDate) {
+    cellTitle (contractEndDate) {
       if (!contractEndDate) return { msg: 'Contrat en cours', color: 'green' };
 
       if (this.$moment().isBefore(contractEndDate)) {
@@ -307,19 +307,19 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .card-container
+  .cell-container
     width: 100%
 
-  .contract-card
+  .contract-cell
     background: white
     width: 100%
     margin-bottom: 20px
 
-  .card-title
+  .cell-title
     font-size: 18px
     padding: 16px 10px
 
-  .card-subtitle
+  .cell-subtitle
     margin:  0 10px 10px
     font-size: 14px
 

@@ -10,13 +10,13 @@
           <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
         </q-item-section>
       </q-item>
-      <div class="slots-cards-container row">
-        <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index" flat>
-          <div class="slots-cards-title">
-            <div class="slots-cards-number">{{ index + 1 }}</div>
-            <div class="slots-cards-date text-weight-bold">{{ key }}</div>
+      <div class="slots-cells-container row">
+        <q-card class="slots-cells" v-for="(value, key, index) in courseSlots" :key="index" flat>
+          <div class="slots-cells-title">
+            <div class="slots-cells-number">{{ index + 1 }}</div>
+            <div class="slots-cells-date text-weight-bold">{{ key }}</div>
           </div>
-          <div class="slots-cards-content" v-for="slot in value" :key="slot._id">
+          <div class="slots-cells-content" v-for="slot in value" :key="slot._id">
             <div>
               <q-item>
                 <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
@@ -33,11 +33,11 @@
             </div>
           </div>
         </q-card>
-        <q-card class="slots-cards" v-for="(value, key, index) in courseSlotsWithoutDates"
+        <q-card class="slots-cells" v-for="(value, key, index) in courseSlotsWithoutDates"
           :key="Object.keys(courseSlots).length + index + 1" flat>
-          <div class="slots-cards-title">
-            <div class="slots-cards-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
-            <div class="slots-cards-date text-weight-bold">Date à planifier</div>
+          <div class="slots-cells-title">
+            <div class="slots-cells-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
+            <div class="slots-cells-date text-weight-bold">Date à planifier</div>
           </div>
           <div class="to-plan-text">Créneau à planifier</div>
         </q-card>
@@ -345,7 +345,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.slots-cards
+.slots-cells
   padding: 10px
   &-container
     grid-auto-rows: 1fr
