@@ -19,10 +19,14 @@
       <p class="text-weight-bold">Étapes ({{ program.steps.length }})</p>
       <q-card v-for="(step, index) of program.steps" :key="index" flat class="step">
         <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
-          <div>
+          <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
+          <q-item-section>
             <div class="text-weight-bold">{{step.title}}</div>
-            <div class="step-subtitle">{{step.activities.length}} activité(s)</div>
-          </div>
+            <div class="step-subtitle">
+              {{ getStepTypeLabel(step.type) }} -
+              {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+            </div>
+          </q-item-section>
           <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
         </q-card-section>
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
@@ -45,6 +49,7 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">étape</span>
       </template>
+      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="newStep.type" required-field />
       <ni-input in-modal v-model.trim="newStep.title" :error="$v.newStep.title.$error"
         @blur="$v.newStep.title.$touch" required-field caption="Titre" />
       <template slot="footer">
@@ -58,6 +63,7 @@
       <template slot="title">
         Éditer une <span class="text-weight-bold">étape</span>
       </template>
+      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="editedStep.type" disable />
       <ni-input in-modal v-model.trim="editedStep.title" :error="$v.editedStep.title.$error"
         @blur="$v.editedStep.title.$touch" required-field caption="Titre" />
       <template slot="footer">
@@ -106,8 +112,10 @@ import Activities from '@api/Activities';
 import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
+import Select from '@components/form/Select';
 import FileUploader from '@components/form/FileUploader.vue';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { E_LEARNING, ON_SITE } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -117,6 +125,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'ni-select': Select,
     'ni-file-uploader': FileUploader,
   },
   data () {
@@ -124,21 +133,25 @@ export default {
       tmpInput: '',
       modalLoading: false,
       stepCreationModal: false,
-      newStep: { title: '' },
+      newStep: { title: '', type: E_LEARNING },
       stepEditionModal: false,
-      editedStep: { title: '' },
+      editedStep: { title: '', type: E_LEARNING },
       activityCreationModal: false,
       newActivity: { title: '' },
       activityEditionModal: false,
       editedActivity: { title: '' },
       isActivitiesShown: {},
       currentStepId: '',
+      stepTypeOptions: [
+        { label: 'eLearning', value: E_LEARNING },
+        { label: 'Présentiel', value: ON_SITE },
+      ],
     }
   },
   validations () {
     return {
       program: { name: { required }, learningGoals: { required } },
-      newStep: { title: { required } },
+      newStep: { title: { required }, type: { required } },
       editedStep: { title: { required } },
       newActivity: { title: { required } },
       editedActivity: { title: { required } },
@@ -158,6 +171,13 @@ export default {
     this.$v.program.$touch();
   },
   methods: {
+    getStepTypeLabel (value) {
+      const type = this.stepTypeOptions.find(type => type.value === value);
+      return type ? type.label : '';
+    },
+    getStepTypeIcon (type) {
+      return type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach';
+    },
     showActivities (stepId) {
       this.$set(this.isActivitiesShown, stepId, !this.isActivitiesShown[stepId]);
     },
@@ -240,7 +260,7 @@ export default {
       this.$v.newStep.$reset();
     },
     async openStepEditionModal (step) {
-      this.editedStep = pick(step, ['_id', 'title']);
+      this.editedStep = pick(step, ['_id', 'title', 'type']);
       this.stepEditionModal = true;
     },
     async editStep () {
@@ -348,4 +368,9 @@ export default {
     padding: 3px 3px 3px 10px
 .q-btn
     width: fit-content
+
+.q-card
+  .q-card__section
+    .q-item__section--side
+      padding-right: 10px
 </style>
