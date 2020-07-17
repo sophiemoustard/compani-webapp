@@ -266,7 +266,7 @@ export default {
     },
     goToActivityProfile (step, activity) {
       this.$router.push({
-        name: 'ni config programs step activity info',
+        name: 'ni config activity info',
         params: { programId: this.program._id, stepId: step._id, activityId: activity._id },
       });
     },

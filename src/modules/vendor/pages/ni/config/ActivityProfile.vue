@@ -52,10 +52,10 @@ export default {
       this.activity = await Activities.getById(this.activityId);
 
       const program = await Programs.getById(this.programId);
-      this.programName = get(program, 'name');
+      this.programName = get(program, 'name') || '';
 
       const step = program.steps.find(s => s._id === this.stepId);
-      this.stepTitle = get(step, 'title');
+      this.stepTitle = get(step, 'title') || '';
     } catch (e) {
       console.error(e);
     }
