@@ -101,7 +101,8 @@ export default {
       return !this.courseSlotsCount ? '0 date' : `${this.courseSlotsCount} dates (${this.slotsDurationTitle})`;
     },
     formatNearestDate () {
-      if (this.courseSlotsCount === 0) return 'Pas de date prévue';
+      if (!this.courseSlotsCount && !this.course.slotsToPlan.length) return 'Pas de date prévue';
+      if (!this.courseSlotsCount) return 'Prochaine date à planifier';
 
       if (this.course.status === FORTHCOMING) {
         const firstSlot = this.course.slots[0];
@@ -118,6 +119,7 @@ export default {
       }
 
       const nextSlot = this.course.slots.filter((daySlots) => !this.happened(daySlots))[0];
+      if (!nextSlot) return 'Prochaine date à planifier';
       const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
       return rangeToNextDate ? `Prochaine date dans ${rangeToNextDate} jour(s)` : 'Prochaine date aujourd’hui'

@@ -43,7 +43,6 @@
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
-import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
@@ -106,13 +105,7 @@ export default {
     async refreshCourses () {
       try {
         const courses = await Courses.list();
-        this.coursesWithGroupedSlot = courses.map(course => ({
-          ...course,
-          slots: Object.values(groupBy(
-            course.slots.filter(slot => !!slot.startDate),
-            s => this.$moment(s.startDate).format('DD/MM/YYYY')
-          )),
-        }));
+        this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
         this.coursesWithGroupedSlot = [];
