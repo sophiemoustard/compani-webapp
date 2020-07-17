@@ -313,3 +313,5 @@ export const COURSE_TYPES = [
 export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
+export const E_LEARNING = 'e_learning';
+export const ON_SITE = 'on_site';
