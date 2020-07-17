@@ -85,8 +85,8 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/programs/:programId/activity/:activityId',
-        name: 'ni config programs activity info',
+        path: 'ni/config/programs/:programId/step/:stepId/activity/:activityId',
+        name: 'ni config activity info',
         component: () => import('src/modules/vendor/pages/ni/config/ActivityProfile'),
         props: true,
         meta: {

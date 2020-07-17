@@ -14,16 +14,18 @@
 </template>
 
 <script>
+import get from 'lodash/get'
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import Activities from '@api/Activities';
+import Programs from '@api/Programs';
 
 export default {
   name: 'ActivityProfile',
   metadata: { title: 'Fiche activité' },
   props: {
     activityId: { type: String },
-    programName: { type: String },
-    stepTitle: { type: String },
+    programId: { type: String },
+    stepId: { type: String },
   },
   components: {
     'ni-profile-header': ProfileHeader,
@@ -31,6 +33,8 @@ export default {
   data () {
     return {
       activity: {},
+      programName: '',
+      stepTitle: '',
     };
   },
   computed: {
@@ -44,7 +48,17 @@ export default {
     },
   },
   async created () {
-    this.activity = await Activities.getById(this.activityId);
+    try {
+      this.activity = await Activities.getById(this.activityId);
+
+      const program = await Programs.getById(this.programId);
+      this.programName = get(program, 'name') || '';
+
+      const step = program.steps.find(s => s._id === this.stepId);
+      this.stepTitle = get(step, 'title') || '';
+    } catch (e) {
+      console.error(e);
+    }
   },
 }
 </script>
