@@ -33,8 +33,8 @@
             </div>
           </div>
         </q-card>
-        <q-card class="slots-cells" v-for="(value, key, index) in courseSlotsWithoutDates"
-          :key="Object.keys(courseSlots).length + index + 1" flat>
+        <q-card class="slots-cells cursor-pointer" v-for="(value, index) in courseSlotsToPlan"
+          :key="Object.keys(courseSlots).length + index + 1" flat @click="openEditionModal(value)">
           <div class="slots-cells-title">
             <div class="slots-cells-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
             <div class="slots-cells-date text-weight-bold">Date à planifier</div>
@@ -87,6 +87,7 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import has from 'lodash/has';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
@@ -115,7 +116,7 @@ export default {
   data () {
     return {
       courseSlots: {},
-      courseSlotsWithoutDates: {},
+      courseSlotsToPlan: [],
       addDateToPlanloading: false,
       modalLoading: false,
       creationModal: false,
@@ -177,17 +178,22 @@ export default {
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
     formatSlotTitle () {
+      const slotsToPlanLength = this.courseSlotsToPlan.length;
+      const slotsToPlanTitle = slotsToPlanLength
+        ? ` - ${slotsToPlanLength} date${slotsToPlanLength > 1 ? 's' : ''} à planifier`
+        : '';
+
       const slotList = Object.values(this.courseSlots);
 
       if (!slotList.length) {
-        return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
+        return { title: `Pas de date prévue${slotsToPlanTitle}`, subtitle: '', icon: 'mdi-calendar-remove' };
       }
 
       const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
 
       if (slotList.length === 1) {
         return {
-          title: `1 date, ${this.slotsDurationTitle}`,
+          title: `1 date, ${this.slotsDurationTitle}${slotsToPlanTitle}`,
           subtitle: `le ${firstSlot}`,
           icon: 'mdi-calendar-range',
         };
@@ -195,7 +201,7 @@ export default {
 
       const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
       return {
-        title: `${slotList.length} dates, ${this.slotsDurationTitle}`,
+        title: `${slotList.length} dates, ${this.slotsDurationTitle}${slotsToPlanTitle}`,
         subtitle: `du ${firstSlot} au ${lastSlot}`,
         icon: 'mdi-calendar-range',
       };
@@ -217,7 +223,7 @@ export default {
         s => this.$moment(s.startDate).format('DD/MM/YYYY')
       );
 
-      this.courseSlotsWithoutDates = Object.assign({}, this.course.slots.filter(slot => !slot.startDate));
+      this.courseSlotsToPlan = this.course.slots.filter(slot => !slot.startDate);
     },
     getSlotDuration (slot) {
       const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
@@ -249,9 +255,13 @@ export default {
       return payload;
     },
     openEditionModal (slot) {
+      const defaultDate = {
+        startDate: this.$moment().startOf('d').hours(9).toISOString(),
+        endDate: this.$moment().startOf('d').hours(12).toISOString(),
+      };
       this.editedCourseSlot = {
         _id: slot._id,
-        dates: pick(slot, ['startDate', 'endDate']),
+        dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
       }
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };

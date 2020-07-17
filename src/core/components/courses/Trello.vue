@@ -61,20 +61,24 @@ export default {
     },
     isInProgress (course) {
       const notEverySlotsHappened = course.slots.some((sameDaySlots) => !this.happened(sameDaySlots));
+      const slotsToPlan = course.slotsToPlan.length;
 
-      return !this.isForthcoming(course) && notEverySlotsHappened;
+      return !this.isForthcoming(course) && (notEverySlotsHappened || slotsToPlan);
     },
     isCompleted (course) {
       return !this.isForthcoming(course) && !this.isInProgress(course);
     },
     getRangeNowToStartCourse (course) {
-      if (course.slots.length === 0) return Number.MAX_SAFE_INTEGER;
+      if (!course.slots.length && !course.slotsToPlan.length) return Number.MAX_SAFE_INTEGER;
+      else if (!course.slots.length) return 0;
 
       const firstSlot = course.slots[0];
       return this.$moment(firstSlot[0].startDate).diff(this.$moment(), 'd', true);
     },
     getRangeNowToNextSlot (course) {
       const nextSlot = course.slots.filter((daySlots) => !this.happened(daySlots))[0];
+
+      if (!nextSlot) return 0;
       return this.$moment(nextSlot[0].startDate).diff(this.$moment(), 'd', true);
     },
     getRangeNowToEndCourse (course) {
