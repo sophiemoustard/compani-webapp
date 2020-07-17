@@ -406,5 +406,5 @@ export default {
 
 .to-plan-text
   text-decoration: underline
-  color: $warning
+  color: $secondary
 </style>
