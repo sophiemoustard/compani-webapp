@@ -16,14 +16,14 @@
       </div>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Étape{{ program.steps.length > 1 ? 's' : '' }} ({{ program.steps.length }})</p>
+      <p class="text-weight-bold">Étapes ({{ program.steps.length }})</p>
       <q-card v-for="(step, index) of program.steps" :key="index" flat class="step">
         <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
           <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
           <q-item-section>
             <div class="text-weight-bold">{{step.title}}</div>
             <div class="step-subtitle">
-              {{ getStepType(step.type) }} -
+              {{ getStepTypeLabel(step.type) }} -
               {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
             </div>
           </q-item-section>
@@ -171,7 +171,7 @@ export default {
     this.$v.program.$touch();
   },
   methods: {
-    getStepType (value) {
+    getStepTypeLabel (value) {
       const type = this.stepTypeOptions.find(type => type.value === value);
       return type ? type.label : '';
     },
