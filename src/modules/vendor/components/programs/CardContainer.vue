@@ -1,6 +1,6 @@
 <template>
   <div class="card-container">
-    <div class="test-square" v-for="(card, index) in cards" :key="index" >toto</div>
+    <div class="card-cell" v-for="(card, index) in cards" :key="index" >Transition</div>
     <q-icon name="add" size="35px" color="primary" @click="openCreationModal"/>
   </div>
 </template>
@@ -27,14 +27,10 @@ export default {
   display: flex;
   flex-direction: column
   align-items: center;
-  @media screen and (min-width: 768px)
-    width: 33%
-  @media screen and (max-width: 767px)
-    min-width: 250px
 
-.test-square
-  background-color: $green;
+.card-cell
+  background-color: $primary-light;
   height: 150px
-  width: 200px
+  width: 100%
   margin: 4px
 </style>

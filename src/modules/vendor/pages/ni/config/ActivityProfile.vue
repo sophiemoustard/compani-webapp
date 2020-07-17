@@ -10,7 +10,9 @@
         </div>
       </template>
     </ni-profile-header>
-    <ni-card-container :cards="activity.cards" @openCreationModal="openCardCreationModal"/>
+    <div class="row">
+      <ni-card-container class="col-md-4 col-xs-3" :cards="activity.cards" @openCreationModal="openCardCreationModal"/>
+    </div>
 
     <!-- Card creation modal -->
     <ni-modal v-model="cardCreationModal" @hide="resetCardCreationModal">
@@ -102,8 +104,8 @@ export default {
         this.modalLoading = true;
         this.$v.newCard.$touch();
         if (this.$v.newCard.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Activities.addActivity(this.activityId, this.newCard);
-        NotifyPositive('Carte créé.');
+        await Activities.addCard(this.activityId, this.newCard);
+        NotifyPositive('Carte créée.');
 
         this.refreshActivity();
         this.cardCreationModal = false;
