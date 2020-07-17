@@ -10,12 +10,31 @@
         </div>
       </template>
     </ni-profile-header>
+    <ni-card-container :cards="activity.cards" @openCreationModal="openCardCreationModal"/>
+
+    <!-- Card creation modal -->
+    <ni-modal v-model="cardCreationModal" @hide="resetCardCreationModal">
+      <template slot="title">
+        Créer une nouvelle <span class="text-weight-bold">carte</span>
+      </template>
+      <ni-input in-modal v-model.trim="newCard.type" :error="$v.newCard.type.$error"
+        @blur="$v.newCard.type.$touch" required-field caption="Template" />
+      <template slot="footer">
+        <q-btn no-caps class="full-width modal-btn" label="Créer la carte" color="primary" :loading="modalLoading"
+          icon-right="add" @click="createCard" />
+      </template>
+    </ni-modal>
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get'
+import { required } from 'vuelidate/lib/validators';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
+import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
+import Input from '@components/form/Input';
+import Modal from '@components/modal/Modal';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import Activities from '@api/Activities';
 import Programs from '@api/Programs';
 
@@ -29,12 +48,23 @@ export default {
   },
   components: {
     'ni-profile-header': ProfileHeader,
+    'ni-card-container': CardContainer,
+    'ni-input': Input,
+    'ni-modal': Modal,
   },
   data () {
     return {
       activity: {},
       programName: '',
       stepTitle: '',
+      modalLoading: false,
+      cardCreationModal: false,
+      newCard: { type: 'transition' },
+    };
+  },
+  validations () {
+    return {
+      newCard: { type: { required } },
     };
   },
   computed: {
@@ -49,7 +79,7 @@ export default {
   },
   async created () {
     try {
-      this.activity = await Activities.getById(this.activityId);
+      await this.refreshActivity()
 
       const program = await Programs.getById(this.programId);
       this.programName = get(program, 'name') || '';
@@ -59,6 +89,35 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  methods: {
+    async refreshActivity () {
+      this.activity = await Activities.getById(this.activityId);
+    },
+    openCardCreationModal (stepId) {
+      this.cardCreationModal = true;
+    },
+    async createCard () {
+      try {
+        this.modalLoading = true;
+        this.$v.newCard.$touch();
+        if (this.$v.newCard.$error) return NotifyWarning('Champ(s) invalide(s)');
+        await Activities.addActivity(this.activityId, this.newCard);
+        NotifyPositive('Carte créé.');
+
+        this.refreshActivity();
+        this.cardCreationModal = false;
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la carte.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetCardCreationModal () {
+      this.newCard = { type: 'transition' };
+      this.$v.newCard.$reset();
+    },
   },
 }
 </script>
