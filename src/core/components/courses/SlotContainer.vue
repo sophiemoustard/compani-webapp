@@ -408,4 +408,5 @@ export default {
 .to-plan-text
   text-decoration: underline
   color: $secondary
+  font-size: 14px
 </style>
