@@ -30,6 +30,7 @@ import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { ON_SITE, E_LEARNING } from '@data/constants';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -46,10 +47,17 @@ export default {
       columns: [
         { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
         {
-          name: 'stepsCount',
-          label: 'Nombre d\'étapes',
+          name: 'eLearningStepsCount',
+          label: 'Étapes e-learning',
           field: 'steps',
-          format: value => value ? `${value.length}` : '0',
+          format: value => this.countStepsByType(E_LEARNING, value),
+          align: 'center',
+        },
+        {
+          name: 'onSiteStepsCount',
+          label: 'Étapes présentielles',
+          field: 'steps',
+          format: value => this.countStepsByType(ON_SITE, value),
           align: 'center',
         },
       ],
@@ -82,6 +90,11 @@ export default {
     },
     goToProgramProfile (row) {
       this.$router.push({ name: 'ni config programs info', params: { programId: row._id } });
+    },
+    countStepsByType (filterType, value) {
+      if (!value) return '';
+      const stepsByType = value.filter(s => s.type === filterType);
+      return stepsByType.length ? `${stepsByType.length}` : '';
     },
     async refreshProgram () {
       try {
