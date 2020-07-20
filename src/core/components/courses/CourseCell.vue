@@ -15,10 +15,7 @@
         <q-item class="infos-course-container">
           <q-item-section :class="['additional-infos', { 'to-plan' : course.slotsToPlan.length }]">
             <q-icon size="12px" name="mdi-calendar-range" />
-            <q-item-label>
-              {{ formatCourseSlotsInfos }}
-              {{ course.slotsToPlan.length ? ` - ${course.slotsToPlan.length} à planifier` : '' }}
-            </q-item-label>
+            <q-item-label>{{ formatCourseSlotsInfos }}</q-item-label>
           </q-item-section>
         </q-item>
         <q-item class="infos-course-container">
@@ -106,7 +103,13 @@ export default {
       return this.course.slots.length;
     },
     formatCourseSlotsInfos () {
-      return !this.courseSlotsCount ? '0 date' : `${this.courseSlotsCount} dates (${this.slotsDurationTitle})`;
+      const slotsToPlanLength = this.course.slotsToPlan.length;
+      const totalDates = this.courseSlotsCount + slotsToPlanLength;
+
+      return !totalDates
+        ? '0 date'
+        : `${totalDates} date${totalDates > 1 ? 's' : ''},
+          ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${this.slotsDurationTitle}`;
     },
     formatNearestDate () {
       if (!this.courseSlotsCount && !this.course.slotsToPlan.length) return 'Pas de date prévue';
@@ -196,6 +199,7 @@ export default {
     &-container
       display: flex;
       justify-content: flex-end;
+      flex-wrap: wrap;
 
   .to-plan
     color: $secondary

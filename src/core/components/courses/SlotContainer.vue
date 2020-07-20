@@ -116,7 +116,6 @@ export default {
   data () {
     return {
       courseSlots: {},
-      courseSlotsToPlan: [],
       addDateToPlanloading: false,
       modalLoading: false,
       creationModal: false,
@@ -179,30 +178,22 @@ export default {
     },
     formatSlotTitle () {
       const slotsToPlanLength = this.courseSlotsToPlan.length;
-      const slotsToPlanTitle = slotsToPlanLength
-        ? ` - ${slotsToPlanLength} date${slotsToPlanLength > 1 ? 's' : ''} à planifier`
-        : '';
-
       const slotList = Object.values(this.courseSlots);
+      const totalDate = slotsToPlanLength + slotList.length;
+      if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
-      if (!slotList.length) {
-        return { title: `Pas de date prévue${slotsToPlanTitle}`, subtitle: '', icon: 'mdi-calendar-remove' };
+      const slotsToPlanTitle = slotsToPlanLength ? ` dont ${slotsToPlanLength} à planifier, ` : '';
+
+      let subtitle = '';
+      if (slotList.length) {
+        const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
+        const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+        subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
-      const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
-
-      if (slotList.length === 1) {
-        return {
-          title: `1 date, ${this.slotsDurationTitle}${slotsToPlanTitle}`,
-          subtitle: `le ${firstSlot}`,
-          icon: 'mdi-calendar-range',
-        };
-      }
-
-      const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
       return {
-        title: `${slotList.length} dates, ${this.slotsDurationTitle}${slotsToPlanTitle}`,
-        subtitle: `du ${firstSlot} au ${lastSlot}`,
+        title: `${totalDate} date${totalDate > 1 ? 's' : ''}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
+        subtitle,
         icon: 'mdi-calendar-range',
       };
     },
@@ -222,8 +213,7 @@ export default {
         this.course.slots.filter(slot => !!slot.startDate),
         s => this.$moment(s.startDate).format('DD/MM/YYYY')
       );
-
-      this.courseSlotsToPlan = this.course.slots.filter(slot => !slot.startDate);
+      this.courseSlotsToPlan = this.course.slotsToPlan || [];
     },
     getSlotDuration (slot) {
       const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
@@ -408,4 +398,5 @@ export default {
 .to-plan-text
   text-decoration: underline
   color: $secondary
+  font-size: 14px
 </style>

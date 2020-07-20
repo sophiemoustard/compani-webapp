@@ -29,6 +29,9 @@
           </div>
         </q-step>
       </q-stepper>
+      <div class="slots-to-plan" v-if="courseSlotsToPlanLength">
+        Il reste {{courseSlotsToPlanLength}} créneau{{courseSlotsToPlanLength > 1 ? 'x' : ''}} à planifier
+      </div>
     </div>
     <div class="course-container">
       <div>
@@ -114,6 +117,9 @@ export default {
     contactPhoneLink () {
       const phoneNumber = get(this.course, 'contact.phone');
       return phoneNumber ? `tel:+33${phoneNumber.substring(1)}` : '';
+    },
+    courseSlotsToPlanLength () {
+      return this.course.slotsToPlan.length;
     },
   },
   async created () {
@@ -252,4 +258,7 @@ export default {
 .description
   white-space: break-spaces;
   font-style: italic;
+
+.slots-to-plan
+  color: $primary
 </style>

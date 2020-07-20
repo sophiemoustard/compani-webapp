@@ -66,6 +66,11 @@
           </q-tr>
         </template>
       </ni-simple-table>
+      <ni-banner v-if="isFinished">
+        <template v-slot:message>
+          Impossible d'envoyer un sms pour une formation qui est finie.
+        </template>
+      </ni-banner>
       <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
         <template v-slot:message>
           Il manque le numéro de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur
@@ -201,7 +206,7 @@ export default {
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
-      return !slots.length;
+      return !slots.length && !this.course.slotsToPlan.length;
     },
     courseNotStartedYet () {
       const slots = this.course.slots.filter(slot => this.$moment().isAfter(slot.endDate))
