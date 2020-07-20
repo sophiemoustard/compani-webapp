@@ -116,7 +116,6 @@ export default {
   data () {
     return {
       courseSlots: {},
-      courseSlotsToPlan: [],
       addDateToPlanloading: false,
       modalLoading: false,
       creationModal: false,
@@ -180,12 +179,10 @@ export default {
     formatSlotTitle () {
       const slotsToPlanLength = this.courseSlotsToPlan.length;
       const slotList = Object.values(this.courseSlots);
-      const totalDate = this.courseSlotsToPlan.length + slotList.length;
+      const totalDate = slotsToPlanLength + slotList.length;
       if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
-      const slotsToPlanTitle = slotsToPlanLength
-        ? ` dont ${slotsToPlanLength} à planifier, `
-        : '';
+      const slotsToPlanTitle = slotsToPlanLength ? ` dont ${slotsToPlanLength} à planifier, ` : '';
 
       let subtitle = '';
       if (slotList.length) {
@@ -216,8 +213,7 @@ export default {
         this.course.slots.filter(slot => !!slot.startDate),
         s => this.$moment(s.startDate).format('DD/MM/YYYY')
       );
-
-      this.courseSlotsToPlan = this.course.slots.filter(slot => !slot.startDate);
+      this.courseSlotsToPlan = this.course.slotsToPlan || [];
     },
     getSlotDuration (slot) {
       const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
@@ -402,4 +398,5 @@ export default {
 .to-plan-text
   text-decoration: underline
   color: $secondary
+  font-size: 14px
 </style>

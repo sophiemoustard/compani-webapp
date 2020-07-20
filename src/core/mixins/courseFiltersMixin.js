@@ -83,13 +83,12 @@ export const courseFiltersMixin = {
     },
     groupByCourses (courses) {
       return courses.map((course) => {
-        const slotsWithDates = course.slots.filter(slot => !!slot.startDate);
         return {
           ...course,
-          slots: slotsWithDates.length
-            ? Object.values(groupBy(slotsWithDates, s => this.$moment(s.startDate).format('DD/MM/YYYY')))
+          slots: course.slots.length
+            ? Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')))
             : [],
-          slotsToPlan: course.slots.filter(slot => !slot.startDate),
+          slotsToPlan: course.slotsToPlan || [],
         }
       });
     },

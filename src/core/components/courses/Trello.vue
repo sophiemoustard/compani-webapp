@@ -77,6 +77,7 @@ export default {
       return !this.isForthcoming(course) && !this.isInProgress(course);
     },
     getRangeNowToStartCourse (course) {
+      if (!course.slots.length && course.slotsToPlan.length) return 0;
       if (!course.slots.length) return Number.MAX_SAFE_INTEGER;
 
       const firstSlot = course.slots[0];
