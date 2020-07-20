@@ -300,7 +300,7 @@ export default {
         this.$v.newActivity.$touch();
         if (this.$v.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
         await Steps.addActivity(this.currentStepId, this.newActivity);
-        NotifyPositive('Activitée créé.');
+        NotifyPositive('Activitée créée.');
 
         await this.refreshProgram();
         this.activityCreationModal = false;
