@@ -11,7 +11,7 @@
       </template>
     </ni-profile-header>
     <div class="row">
-      <ni-card-container class="col-md-4 col-xs-3" :cards="activity.cards" @openCreationModal="openCardCreationModal"/>
+      <ni-card-container class="col-md-4 col-xs-3" :cards="activity.cards" @add="openCardCreationModal"/>
     </div>
 
     <!-- Card creation modal -->
@@ -66,7 +66,7 @@ export default {
   },
   validations () {
     return {
-      newCard: { type: { required } },
+      newCard: { template: { required } },
     };
   },
   computed: {
@@ -81,7 +81,7 @@ export default {
   },
   async created () {
     try {
-      await this.refreshActivity()
+      await this.refreshActivity();
 
       const program = await Programs.getById(this.programId);
       this.programName = get(program, 'name') || '';
@@ -94,7 +94,12 @@ export default {
   },
   methods: {
     async refreshActivity () {
-      this.activity = await Activities.getById(this.activityId);
+      try {
+        this.activity = await Activities.getById(this.activityId);
+      } catch (e) {
+        this.activity = {};
+        console.error(e);
+      }
     },
     openCardCreationModal (stepId) {
       this.cardCreationModal = true;

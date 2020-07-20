@@ -13,7 +13,7 @@ export default {
   },
   methods: {
     openCreationModal () {
-      this.$emit('openCreationModal');
+      this.$emit('add');
     },
   },
 }
@@ -26,10 +26,10 @@ export default {
   background-color: $white
   display: flex;
   flex-direction: column
-  align-items: center;
+  align-items: center
 
 .card-cell
-  background-color: $primary-light;
+  background-color: $primary-light
   height: 150px
   width: 100%
   margin: 4px
