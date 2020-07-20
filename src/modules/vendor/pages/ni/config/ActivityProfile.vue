@@ -19,8 +19,8 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">carte</span>
       </template>
-      <ni-input in-modal v-model.trim="newCard.type" :error="$v.newCard.type.$error"
-        @blur="$v.newCard.type.$touch" required-field caption="Template" />
+      <ni-input in-modal v-model.trim="newCard.template" :error="$v.newCard.template.$error"
+        @blur="$v.newCard.template.$touch" required-field caption="Template" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la carte" color="primary" :loading="modalLoading"
           icon-right="add" @click="createCard" />
@@ -61,7 +61,7 @@ export default {
       stepTitle: '',
       modalLoading: false,
       cardCreationModal: false,
-      newCard: { type: 'transition' },
+      newCard: { template: 'transition' },
     };
   },
   validations () {
@@ -117,7 +117,7 @@ export default {
       }
     },
     resetCardCreationModal () {
-      this.newCard = { type: 'transition' };
+      this.newCard = { template: 'transition' };
       this.$v.newCard.$reset();
     },
   },
