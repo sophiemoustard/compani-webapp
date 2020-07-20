@@ -108,7 +108,8 @@ export default {
 
       return !totalDates
         ? '0 date'
-        : `${totalDates} dates, ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${this.slotsDurationTitle}`;
+        : `${totalDates} date${totalDates > 1 ? 's' : ''},
+          ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${this.slotsDurationTitle}`;
     },
     formatNearestDate () {
       if (!this.courseSlotsCount && !this.course.slotsToPlan.length) return 'Pas de date prévue';
