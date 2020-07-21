@@ -94,7 +94,7 @@ export default {
     countStepsByType (filterType, value) {
       if (!value) return '';
       const stepsByType = value.filter(s => s.type === filterType);
-      return stepsByType.length ? `${stepsByType.length}` : '';
+      return stepsByType.length || '0';
     },
     async refreshProgram () {
       try {
