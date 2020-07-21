@@ -61,6 +61,10 @@
       <template slot="title">
         Editer un <span class="text-weight-bold">créneau</span>
       </template>
+      <div class="modal-icon">
+        <q-icon class="cursor-pointer" color="grey" size="sm" name="delete"
+          @click="validateDeletion(editedCourseSlot._id)" />
+      </div>
       <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
         :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
@@ -337,12 +341,16 @@ export default {
     },
     async deleteCourseSlot (slotId) {
       try {
+        this.modalLoading = true;
         await CourseSlots.delete(slotId);
         this.$emit('refresh');
         NotifyPositive('Créneau supprimé');
+        this.editionModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du créneau.')
+      } finally {
+        this.modalLoading = false;
       }
     },
   },
@@ -404,4 +412,8 @@ export default {
   text-decoration: underline
   color: $secondary
   font-size: 14px
+
+.modal-icon
+  display: flex;
+  justify-content: flex-end
 </style>
