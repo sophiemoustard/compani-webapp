@@ -21,7 +21,7 @@
         <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
           <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
           <q-item-section>
-            <div class="text-weight-bold">{{step.title}}</div>
+            <div class="text-weight-bold">{{step.name}}</div>
             <div class="step-subtitle">
               {{ getStepTypeLabel(step.type) }} -
               {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
@@ -32,7 +32,7 @@
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
           <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
             <q-card-section class="cursor-pointer" @click="goToActivityProfile(step, activity)">
-              <div>{{activity.title}}</div>
+              <div>{{activity.name}}</div>
               <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
@@ -50,8 +50,8 @@
         Créer une nouvelle <span class="text-weight-bold">étape</span>
       </template>
       <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="newStep.type" required-field />
-      <ni-input in-modal v-model.trim="newStep.title" :error="$v.newStep.title.$error"
-        @blur="$v.newStep.title.$touch" required-field caption="Titre" />
+      <ni-input in-modal v-model.trim="newStep.name" :error="$v.newStep.name.$error"
+        @blur="$v.newStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'étape" color="primary" :loading="modalLoading"
           icon-right="add" @click="createStep" />
@@ -64,8 +64,8 @@
         Éditer une <span class="text-weight-bold">étape</span>
       </template>
       <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="editedStep.type" disable />
-      <ni-input in-modal v-model.trim="editedStep.title" :error="$v.editedStep.title.$error"
-        @blur="$v.editedStep.title.$touch" required-field caption="Titre" />
+      <ni-input in-modal v-model.trim="editedStep.name" :error="$v.editedStep.name.$error"
+        @blur="$v.editedStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="modalLoading"
           icon-right="add" @click="editStep" />
@@ -77,8 +77,8 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">activité</span>
       </template>
-      <ni-input in-modal v-model.trim="newActivity.title" :error="$v.newActivity.title.$error"
-        @blur="$v.newActivity.title.$touch" required-field caption="Titre" />
+      <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
+        @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
           icon-right="add" @click="createActivity" />
@@ -90,8 +90,8 @@
       <template slot="title">
         Éditer une <span class="text-weight-bold">activité</span>
       </template>
-      <ni-input in-modal v-model.trim="editedActivity.title" :error="$v.editedActivity.title.$error"
-        @blur="$v.editedActivity.title.$touch" required-field caption="Titre" />
+      <ni-input in-modal v-model.trim="editedActivity.name" :error="$v.editedActivity.name.$error"
+        @blur="$v.editedActivity.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="modalLoading"
           icon-right="add" @click="editActivity" />
@@ -133,13 +133,13 @@ export default {
       tmpInput: '',
       modalLoading: false,
       stepCreationModal: false,
-      newStep: { title: '', type: E_LEARNING },
+      newStep: { name: '', type: E_LEARNING },
       stepEditionModal: false,
-      editedStep: { title: '', type: E_LEARNING },
+      editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
-      newActivity: { title: '' },
+      newActivity: { name: '' },
       activityEditionModal: false,
-      editedActivity: { title: '' },
+      editedActivity: { name: '' },
       isActivitiesShown: {},
       currentStepId: '',
       stepTypeOptions: [
@@ -151,10 +151,10 @@ export default {
   validations () {
     return {
       program: { name: { required }, learningGoals: { required } },
-      newStep: { title: { required }, type: { required } },
-      editedStep: { title: { required } },
-      newActivity: { title: { required } },
-      editedActivity: { title: { required } },
+      newStep: { name: { required }, type: { required } },
+      editedStep: { name: { required } },
+      newActivity: { name: { required } },
+      editedActivity: { name: { required } },
     }
   },
   computed: {
@@ -256,11 +256,11 @@ export default {
       }
     },
     resetStepCreationModal () {
-      this.newStep.title = '';
+      this.newStep.name = '';
       this.$v.newStep.$reset();
     },
     async openStepEditionModal (step) {
-      this.editedStep = pick(step, ['_id', 'title', 'type']);
+      this.editedStep = pick(step, ['_id', 'name', 'type']);
       this.stepEditionModal = true;
     },
     async editStep () {
@@ -269,7 +269,7 @@ export default {
         this.$v.editedStep.$touch();
         if (this.$v.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['title']));
+        await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['name']));
         this.stepEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Étape modifiée.');
@@ -281,7 +281,7 @@ export default {
       }
     },
     resetStepEditionModal () {
-      this.editedStep = { title: {} };
+      this.editedStep = { name: '' };
       this.$v.editedStep.$reset();
     },
     goToActivityProfile (step, activity) {
@@ -312,11 +312,11 @@ export default {
       }
     },
     resetActivityCreationModal () {
-      this.newActivity.title = '';
+      this.newActivity.name = '';
       this.$v.newActivity.$reset();
     },
     async openActivityEditionModal (activity) {
-      this.editedActivity = pick(activity, ['_id', 'title']);
+      this.editedActivity = pick(activity, ['_id', 'name']);
       this.activityEditionModal = true;
     },
     async editActivity () {
@@ -325,7 +325,7 @@ export default {
         this.$v.editedActivity.$touch();
         if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Activities.updateById(this.editedActivity._id, pick(this.editedActivity, ['title']));
+        await Activities.updateById(this.editedActivity._id, pick(this.editedActivity, ['name']));
         this.activityEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité modifiée.');
@@ -337,7 +337,7 @@ export default {
       }
     },
     resetActivityEditionModal () {
-      this.editedActivity = { title: {} };
+      this.editedActivity = { name: '' };
       this.$v.editedActivity.$reset();
     },
   },
