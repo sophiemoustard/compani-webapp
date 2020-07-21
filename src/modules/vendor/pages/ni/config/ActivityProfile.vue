@@ -11,7 +11,7 @@
       </template>
     </ni-profile-header>
     <div class="row">
-      <ni-card-container class="col-md-4 col-xs-3" :cards="activity.cards" @add="openCardCreationModal"/>
+      <ni-card-container class="col-md-3 col-sm-4 col-xs-6" :cards="activity.cards" @add="openCardCreationModal"/>
     </div>
 
     <!-- Card creation modal -->
@@ -19,8 +19,13 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">carte</span>
       </template>
-      <ni-input in-modal v-model.trim="newCard.template" :error="$v.newCard.template.$error"
-        @blur="$v.newCard.template.$touch" required-field caption="Template" />
+      <h6 class="text-weight-bold">Cours</h6>
+      <div class="row q-mb-xl">
+        <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
+          :class="getClassForTemplateInModal(template.value)">
+          <div class="text-weight-bold card-button-content">{{ template.label }}</div>
+        </div>
+      </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la carte" color="primary" :loading="modalLoading"
           icon-right="add" @click="createCard" />
@@ -34,12 +39,11 @@ import get from 'lodash/get'
 import { required } from 'vuelidate/lib/validators';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
-import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import Activities from '@api/Activities';
 import Programs from '@api/Programs';
-
+import { TEMPLATE_TYPES } from '@data/constants';
 export default {
   name: 'ActivityProfile',
   metadata: { title: 'Fiche activité' },
@@ -51,7 +55,6 @@ export default {
   components: {
     'ni-profile-header': ProfileHeader,
     'ni-card-container': CardContainer,
-    'ni-input': Input,
     'ni-modal': Modal,
   },
   data () {
@@ -61,7 +64,8 @@ export default {
       stepTitle: '',
       modalLoading: false,
       cardCreationModal: false,
-      newCard: { template: 'transition' },
+      templateTypes: TEMPLATE_TYPES,
+      newCard: { template: '' },
     };
   },
   validations () {
@@ -104,6 +108,12 @@ export default {
     openCardCreationModal (stepId) {
       this.cardCreationModal = true;
     },
+    getClassForTemplateInModal (template) {
+      return ['card-button', 'cursor-pointer', { 'card-button-selected': this.newCard.template === template }]
+    },
+    selectTemplateInModal (template) {
+      this.newCard.template = template;
+    },
     async createCard () {
       try {
         this.modalLoading = true;
@@ -122,7 +132,7 @@ export default {
       }
     },
     resetCardCreationModal () {
-      this.newCard = { template: 'transition' };
+      this.newCard = { template: '' };
       this.$v.newCard.$reset();
     },
   },
@@ -133,4 +143,24 @@ export default {
 .q-item
   padding: 0
   min-height: 0
+
+h6
+  margin-bottom: 3px
+
+.card-button
+  background-color: $light-grey
+  color: $dark-grey
+  border-radius: 10px
+  height: 130px
+  width: 100px
+  display: flex
+  align-items: center
+  justify-content: center
+  margin: 3px 7px
+  &-selected
+    background-color: $dark-grey
+    color: $light-grey
+  &-content
+    text-align: center
+    flex-wrap: wrap
 </style>
