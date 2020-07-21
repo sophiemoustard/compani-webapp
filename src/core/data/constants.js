@@ -318,8 +318,8 @@ export const ON_SITE = 'on_site';
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
-export const TITLE_TEXT_MEDIA = 'titreTextMedia';
+export const TITLE_TEXT_MEDIA = 'title_text_media';
 export const TEMPLATE_TYPES = [
   { label: 'Transition', value: TRANSITION },
-  { label: 'Titre/Texte/Média', value: TITLE_TEXT_MEDIA },
+  { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA },
 ]

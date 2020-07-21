@@ -20,17 +20,12 @@
         Créer une nouvelle <span class="text-weight-bold">carte</span>
       </template>
       <h6 class="text-weight-bold">Cours</h6>
-      <div class="row">
+      <div class="row q-mb-xl">
         <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
           :class="getClassForTemplateInModal(template.value)">
-          <div class="text-weight-bold">{{ template.label }}</div>
+          <div class="text-weight-bold card-button-content">{{ template.label }}</div>
         </div>
       </div>
-      <br>
-      <h6 class="text-weight-bold">Quiz</h6>
-      <div class="row">
-      </div>
-      <br><br>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la carte" color="primary" :loading="modalLoading"
           icon-right="add" @click="createCard" />
@@ -161,11 +156,11 @@ h6
   display: flex
   align-items: center
   justify-content: center
-  &:not(:first-child)
-    margin-left: 7px;
-  &:not(:last-child)
-    margin-right: 7px;
+  margin: 3px 7px
   &-selected
     background-color: $dark-grey
     color: $light-grey
+  &-content
+    text-align: center
+    flex-wrap: wrap
 </style>
