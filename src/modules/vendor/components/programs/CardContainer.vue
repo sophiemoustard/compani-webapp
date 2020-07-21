@@ -1,7 +1,7 @@
 <template>
   <div class="card-container">
     <q-scroll-area ref="cardContainer">
-      <div class="card-cell" v-for="(card, index) in cards" :key="index" >
+      <div class="card-cell" v-for="(card, index) in cards" :key="index" @click="selectCard(card)">
         <div class="card-cell-title text-weight-bold">
           {{ index + 1 }}.
         </div>
@@ -35,6 +35,9 @@ export default {
       const duration = 300;
       scrollArea.setScrollPosition(scrollTarget.scrollHeight, duration);
     },
+    selectCard (card) {
+      this.$store.dispatch('program/fetchCard', card);
+    },
   },
 }
 </script>
@@ -46,6 +49,13 @@ export default {
   background-color: $white
   display: flex
   flex-direction: column
+
+.q-scrollarea
+  height: 100%
+
+/deep/.q-scrollarea__thumb
+  width: 6px
+  border-radius: 10px
 
 .card-cell
   background-color: $primary-light
@@ -62,11 +72,4 @@ export default {
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
-
-.q-scrollarea
-  height: 100%
-
-/deep/.q-scrollarea__thumb
-  width: 6px
-  border-radius: 10px
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="vendor-background" v-if="this.activity">
+  <q-page padding class="vendor-background" v-if="activity">
     <ni-profile-header :title="activity.name">
       <template v-slot:body>
         <div class="row profile-info q-pl-lg">
@@ -13,6 +13,7 @@
     <div class="row body">
       <ni-card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" :cards="activity.cards"
         @add="openCardCreationModal" />
+      <ni-card-edition class="col-md-9 col-sm-8 col-xs-6" />
     </div>
 
     <!-- Card creation modal -->
@@ -36,10 +37,12 @@
 </template>
 
 <script>
-import get from 'lodash/get'
+import { mapState } from 'vuex';
+import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
+import CardEdition from 'src/modules/vendor/components/programs/CardEdition';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import Activities from '@api/Activities';
@@ -56,11 +59,11 @@ export default {
   components: {
     'ni-profile-header': ProfileHeader,
     'ni-card-container': CardContainer,
+    'ni-card-edition': CardEdition,
     'ni-modal': Modal,
   },
   data () {
     return {
-      activity: {},
       programName: '',
       stepName: '',
       modalLoading: false,
@@ -75,6 +78,7 @@ export default {
     };
   },
   computed: {
+    ...mapState('program', ['activity']),
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.programName },
@@ -100,9 +104,8 @@ export default {
   methods: {
     async refreshActivity () {
       try {
-        this.activity = await Activities.getById(this.activityId);
+        await this.$store.dispatch('program/fetchActivity', { activityId: this.activityId });
       } catch (e) {
-        this.activity = {};
         console.error(e);
       }
     },
@@ -155,6 +158,13 @@ export default {
 
 h6
   margin-bottom: 3px
+
+.q-page
+  display: flex
+  flex-direction: column
+
+.cards-container
+  flex: 1
 
 .card-button
   background-color: $light-grey
