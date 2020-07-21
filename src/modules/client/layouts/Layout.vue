@@ -63,6 +63,12 @@ export default {
   mounted () {
     this.collapsibleOpening();
   },
+  computed: {
+    footerLabel () {
+      if (this.isCoach || this.isAuxiliary) return this.userFirstname;
+      else return this.loggedUser.identity.lastname;
+    },
+  },
   methods: {
     connectToBotMessenger () {
       const token = Cookies.get('alenvi_token');

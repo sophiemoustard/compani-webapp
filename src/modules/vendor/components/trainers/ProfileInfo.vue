@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
@@ -33,6 +33,7 @@ import Input from '@components/form/Input';
 import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { TRAINER } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -55,7 +56,12 @@ export default {
     }
   },
   computed: {
-    ...mapState({ userProfile: state => state.rh.userProfile }),
+    ...mapState({
+      userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
+        ? state.main.loggedUser
+        : state.rh.userProfile,
+    }),
+    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
   },
   async mounted () {
     this.$v.userProfile.$touch();
@@ -70,7 +76,13 @@ export default {
       const payload = set({}, path, value);
 
       await Users.updateById(this.userProfile._id, payload);
-      this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });
+
+      await this.refreshUser();
+    },
+    async refreshUser () {
+      TRAINER === this.vendorRole
+        ? await this.$store.dispatch('main/fetchLoggedUser', this.userProfile._id)
+        : await this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });
     },
   },
 };
