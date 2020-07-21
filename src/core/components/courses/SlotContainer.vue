@@ -60,6 +60,7 @@
         :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
       <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
         @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
           :loading="modalLoading" @click="addCourseSlot" />
@@ -75,6 +76,7 @@
         :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
         @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
           :loading="modalLoading" @click="updateCourseSlot" />
@@ -92,11 +94,12 @@ import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import CourseSlots from '@api/CourseSlots';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, E_LEARNING } from '@data/constants';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
 import SearchAddress from '@components/form/SearchAddress';
 import DateTimeRange from '@components/form/DatetimeRange';
 import Modal from '@components/modal/Modal';
+import Select from '@components/form/Select';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -112,6 +115,7 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-datetime-range': DateTimeRange,
     'ni-modal': Modal,
+    'ni-select': Select,
   },
   data () {
     return {
@@ -125,6 +129,7 @@ export default {
           endDate: this.$moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
+        step: '',
       },
       editedCourseSlot: {},
       editionModal: false,
@@ -197,6 +202,13 @@ export default {
         icon: 'mdi-calendar-range',
       };
     },
+    stepOptions () {
+      return this.course.program.steps.map((step, index) => ({
+        label: `${index + 1} - step.name${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
+        value: step._id,
+        disable: step.type === E_LEARNING,
+      }));
+    },
   },
   watch: {
     course () {
@@ -235,12 +247,14 @@ export default {
           endDate: this.$moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
+        step: '',
       };
       this.$v.newCourseSlot.$reset();
     },
     formatCreationPayload (courseSlot) {
       const payload = { ...courseSlot.dates, courseId: this.course._id };
       if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
+      if (courseSlot.step) payload.step = courseSlot.step;
 
       return payload;
     },
@@ -254,6 +268,7 @@ export default {
         _id: slot._id,
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
+        step: slot.step || '',
       }
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
@@ -265,6 +280,7 @@ export default {
     formatEditionPayload (courseSlot) {
       const payload = { ...courseSlot.dates, address: {} };
       if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
+      if (courseSlot.step) payload.step = courseSlot.step;
 
       return payload;
     },
