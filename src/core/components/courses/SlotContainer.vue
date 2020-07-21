@@ -16,21 +16,10 @@
             <div class="slots-cells-number">{{ index + 1 }}</div>
             <div class="slots-cells-date text-weight-bold">{{ key }}</div>
           </div>
-          <div class="slots-cells-content" v-for="slot in value" :key="slot._id">
-            <div>
-              <q-item>
-                <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
-                <q-item-section>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section side><q-icon name="location_on" flat dense size="xs" /></q-item-section>
-                <q-item-section>{{ getSlotAddress(slot) }}</q-item-section>
-              </q-item>
-            </div>
-            <div class="row no-wrap" v-if="canEdit">
-              <q-icon color="grey" size="sm" name="edit" @click="openEditionModal(slot)" />
-              <q-icon color="grey" size="sm" name="delete" @click="validateDeletion(slot._id)" />
-            </div>
+          <div :class="['slots-cells-content', { 'cursor-pointer': canEdit }]" v-for="slot in value" :key="slot._id" @click="openEditionModal(slot)">
+              <q-item class="text-weight-bold">{{ slot.step ? slot.step.name : '' }}</q-item>
+              <q-item>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item>
+              <q-item>{{ getSlotAddress(slot) }}</q-item>
           </div>
         </q-card>
         <q-card :class="['slots-cells', { 'cursor-pointer' : canEdit }]" v-for="(value, index) in courseSlotsToPlan"
@@ -390,13 +379,13 @@ export default {
   &-content
     margin: 5px 10px
     display: flex
-    justify-content: space-between
-  &-content > div > .q-item
+    background-color: $primary-light
+    flex-direction: column
+  &-content > .q-item
     font-size: 14px
     padding: 0px
     min-height: auto
-  &-content > div > .q-icon
-    cursor: pointer
+    margin: 0px 10px
 
 .add-slot
   background: $primary
