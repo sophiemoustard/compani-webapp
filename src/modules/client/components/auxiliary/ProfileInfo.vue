@@ -531,7 +531,7 @@ export default {
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
     },
-    async refreshUser (notify = true) {
+    async refreshUser () {
       AUXILIARY_ROLES.includes(this.clientRole)
         ? await this.$store.dispatch('main/fetchLoggedUser', this.userProfile._id)
         : await this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });
