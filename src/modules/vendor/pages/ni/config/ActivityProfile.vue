@@ -21,15 +21,9 @@
       </template>
       <h6 class="text-weight-bold">Cours</h6>
       <div class="row">
-        <div @click="selectTemplateInModal(templateTypes[0].value)"
-          :class="getClassForTemplateInModal(templateTypes[0].value)">
-          <div class="text-weight-bold">Transition</div>
-        </div>
-        <div @click="selectTemplateInModal(templateTypes[1].value)"
-          :class="getClassForTemplateInModal(templateTypes[1].value)">
-          <div class="text-weight-bold">Titre</div>
-          <div>Text</div>
-          <div>Média</div>
+        <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
+          :class="getClassForTemplateInModal(template.value)">
+          <div class="text-weight-bold">{{ template.label }}</div>
         </div>
       </div>
       <br>

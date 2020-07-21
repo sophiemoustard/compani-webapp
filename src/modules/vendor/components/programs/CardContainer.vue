@@ -2,7 +2,7 @@
   <div class="card-container">
     <div class="card-cell" v-for="(card, index) in cards" :key="index" >
       <div class="card-cell-title text-weight-bold">
-        {{ index + 1 }}. Pour l'instant ya pas le titre de carte ou de debut de texte à mettre ici
+        {{ index + 1 }}.
       </div>
       <div>{{ getTemplateName(card.template) }}</div>
     </div>
