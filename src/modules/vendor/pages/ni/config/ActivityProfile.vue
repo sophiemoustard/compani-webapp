@@ -124,11 +124,15 @@ export default {
         this.$v.newCard.$touch();
         if (this.$v.newCard.$error) return NotifyWarning('Champ(s) invalide(s)');
         await Activities.addCard(this.activityId, this.newCard);
+
         NotifyPositive('Carte créée.');
+        this.cardCreationModal = false;
+
         this.$refs.cardContainer.scrollDown();
 
-        this.refreshActivity();
-        this.cardCreationModal = false;
+        await this.refreshActivity();
+        const cardCreated = this.activity.cards[this.activity.cards.length - 1];
+        this.$store.dispatch('program/fetchCard', cardCreated);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la carte.');
