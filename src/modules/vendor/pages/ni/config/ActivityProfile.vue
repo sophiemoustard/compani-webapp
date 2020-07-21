@@ -141,6 +141,10 @@ export default {
       this.$v.newCard.$reset();
     },
   },
+  beforeDestroy () {
+    this.$store.dispatch('program/resetActivity');
+    this.$store.dispatch('program/resetCard');
+  },
 }
 </script>
 
@@ -163,7 +167,7 @@ h6
   display: flex
   flex-direction: column
 
-.cards-container
+.body
   flex: 1
 
 .card-button

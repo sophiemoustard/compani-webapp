@@ -3,7 +3,7 @@
     <q-scroll-area ref="cardContainer">
       <div class="card-cell" v-for="(card, index) in cards" :key="index" @click="selectCard(card)">
         <div class="card-cell-title text-weight-bold">
-          {{ index + 1 }}.
+          {{ index + 1 }}. {{ card.title }}
         </div>
         <div>{{ getTemplateName(card.template) }}</div>
       </div>
