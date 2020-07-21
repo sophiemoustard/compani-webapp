@@ -10,8 +10,9 @@
         </div>
       </template>
     </ni-profile-header>
-    <div class="row">
-      <ni-card-container class="col-md-3 col-sm-4 col-xs-6" :cards="activity.cards" @add="openCardCreationModal"/>
+    <div class="row body">
+      <ni-card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" :cards="activity.cards"
+        @add="openCardCreationModal" />
     </div>
 
     <!-- Card creation modal -->
@@ -121,6 +122,7 @@ export default {
         if (this.$v.newCard.$error) return NotifyWarning('Champ(s) invalide(s)');
         await Activities.addCard(this.activityId, this.newCard);
         NotifyPositive('Carte créée.');
+        this.$refs.cardContainer.scrollDown();
 
         this.refreshActivity();
         this.cardCreationModal = false;
@@ -140,6 +142,13 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.q-page
+  display: flex
+  flex-direction: column
+
+.body
+  flex: 1
+
 .q-item
   padding: 0
   min-height: 0
