@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="vendor-background" v-if="this.activity">
-    <ni-profile-header :title="activity.title">
+    <ni-profile-header :title="activity.name">
       <template v-slot:body>
         <div class="row profile-info q-pl-lg">
           <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
@@ -61,7 +61,7 @@ export default {
     return {
       activity: {},
       programName: '',
-      stepTitle: '',
+      stepName: '',
       modalLoading: false,
       cardCreationModal: false,
       templateTypes: TEMPLATE_TYPES,
@@ -77,7 +77,7 @@ export default {
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.programName },
-        { icon: 'book', label: this.stepTitle },
+        { icon: 'book', label: this.stepName },
       ]
 
       return infos;
@@ -91,7 +91,7 @@ export default {
       this.programName = get(program, 'name') || '';
 
       const step = program.steps.find(s => s._id === this.stepId);
-      this.stepTitle = get(step, 'title') || '';
+      this.stepName = get(step, 'name') || '';
     } catch (e) {
       console.error(e);
     }
