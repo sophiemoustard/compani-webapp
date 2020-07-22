@@ -8,7 +8,7 @@
         <div>{{ getTemplateName(card.template) }}</div>
       </div>
     </q-scroll-area>
-    <q-btn no-caps flat class="q-my-sm" label="Ajouter une carte" color="primary" icon-right="add"
+    <q-btn no-caps flat class="q-my-xs" label="Ajouter une carte" color="primary" icon-right="add"
       @click="openCreationModal" />
   </div>
 </template>
@@ -62,14 +62,14 @@ export default {
   background-color: $primary-light
   border-radius: 4px
   @media screen and (min-width: 768px)
-    height: 110px
-  @media screen and (max-width: 767px)
     height: 90px
+  @media screen and (max-width: 767px)
+    height: 80px
   width: 85%
   margin: 4px
   padding: 7px
   &-title
-    margin-bottom: 10px
+    margin-bottom: 5px
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
