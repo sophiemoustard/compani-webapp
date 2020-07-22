@@ -145,7 +145,8 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
         props: true,
         beforeEnter (to, from, next) {
-          return to.params.trainerId === Cookies.get('user_id') ? next() : next('/404');
+          to.params.trainerId = Cookies.get('user_id');
+          return to.params.trainerId ? next() : next('/404');
         },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

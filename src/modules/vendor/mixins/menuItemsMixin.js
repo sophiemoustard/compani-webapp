@@ -62,7 +62,6 @@ export const menuItemsMixin = {
               name: 'trainers info',
               icon: 'person',
               label: 'Infos personnelles',
-              params: { trainerId: this.loggedUser._id },
             },
           ],
         },
