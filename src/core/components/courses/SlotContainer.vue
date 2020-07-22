@@ -18,7 +18,7 @@
           </div>
           <div :class="['slots-cells-content', { 'cursor-pointer': canEdit }]" v-for="slot in value" :key="slot._id"
             @click="openEditionModal(slot)">
-              <q-item class="text-weight-bold">{{ slot.step ? slot.step.name : '' }}</q-item>
+              <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
               <q-item>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item>
               <q-item>{{ getSlotAddress(slot) }}</q-item>
           </div>
@@ -362,6 +362,11 @@ export default {
       } finally {
         this.modalLoading = false;
       }
+    },
+    getStepTitle (slot) {
+      if (!slot.step) return '';
+      const step = this.stepOptions.find(option => option.value === slot.step._id);
+      return step ? step.label : '';
     },
   },
 
