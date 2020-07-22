@@ -1,9 +1,9 @@
 <template>
   <div class="card-container">
     <q-scroll-area ref="cardContainer">
-      <div class="card-cell" v-for="(card, index) in cards" :key="index" >
+      <div class="card-cell cursor-pointer" v-for="(card, index) in cards" :key="index" @click="selectCard(card)">
         <div class="card-cell-title text-weight-bold">
-          {{ index + 1 }}.
+          {{ index + 1 }}. {{ card.title }}
         </div>
         <div>{{ getTemplateName(card.template) }}</div>
       </div>
@@ -14,12 +14,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { TEMPLATE_TYPES } from '@data/constants';
 
 export default {
   name: 'CardContainer',
-  props: {
-    cards: { type: Array, default: () => [] },
+  computed: {
+    ...mapGetters({ cards: 'program/getCards' }),
   },
   methods: {
     openCreationModal () {
@@ -35,6 +36,9 @@ export default {
       const duration = 300;
       scrollArea.setScrollPosition(scrollTarget.scrollHeight, duration);
     },
+    selectCard (card) {
+      this.$store.dispatch('program/fetchCard', card);
+    },
   },
 }
 </script>
@@ -46,6 +50,13 @@ export default {
   background-color: $white
   display: flex
   flex-direction: column
+
+.q-scrollarea
+  height: 100%
+
+/deep/.q-scrollarea__thumb
+  width: 6px
+  border-radius: 10px
 
 .card-cell
   background-color: $primary-light
@@ -62,11 +73,4 @@ export default {
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
-
-.q-scrollarea
-  height: 100%
-
-/deep/.q-scrollarea__thumb
-  width: 6px
-  border-radius: 10px
 </style>
