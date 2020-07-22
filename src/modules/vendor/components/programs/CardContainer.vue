@@ -1,7 +1,8 @@
 <template>
   <div class="card-container">
     <q-scroll-area ref="cardContainer">
-      <div class="card-cell cursor-pointer" v-for="(card, index) in cards" :key="index" @click="selectCard(card)">
+      <div :class="['card-cell', 'cursor-pointer', { 'card-cell-selected': isSelected(card) }]"
+        v-for="(card, index) in cards" :key="index" @click="selectCard(card)">
         <div class="card-cell-title text-weight-bold">
           {{ index + 1 }}. {{ card.title }}
         </div>
@@ -14,15 +15,20 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { TEMPLATE_TYPES } from '@data/constants';
 
 export default {
   name: 'CardContainer',
   computed: {
+    ...mapState('program', ['card']),
     ...mapGetters({ cards: 'program/getCards' }),
   },
   methods: {
+    isSelected (card) {
+      if (!this.card) return false;
+      return card._id === this.card._id;
+    },
     openCreationModal () {
       this.$emit('add');
     },
@@ -68,6 +74,8 @@ export default {
   width: 85%
   margin: 4px
   padding: 7px
+  &-selected
+    background-color: $light-purple
   &-title
     margin-bottom: 10px
     white-space: nowrap
