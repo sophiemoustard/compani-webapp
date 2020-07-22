@@ -1,13 +1,17 @@
 <template>
-  <div class="card-container">
+  <div class="card-list">
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
-      :content-style="{ display:'flex', 'flex-direction': 'column' }" :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <div :class="['card-cell', 'cursor-pointer', { 'card-cell-selected': isSelected(card) }]"
-        v-for="(card, index) in cards" :key="index" @click="selectCard(card)">
-        <div class="card-cell-title text-weight-bold">
-          {{ index + 1 }}. {{ card.title }}
+      :content-style="{ display:'flex', 'flex-direction': 'column' }"
+      :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
+      <div v-for="(card, index) in cards" :key="index" :class="['card-row', { 'card-row-selected': isSelected(card) }]">
+        <div :class="['card-cell', 'cursor-pointer', { 'card-cell-selected': isSelected(card) }]"
+           @click="selectCard(card)">
+          <div class="card-cell-title text-weight-bold">
+            {{ index + 1 }}. {{ card.title }}
+          </div>
+          <div>{{ getTemplateName(card.template) }}</div>
         </div>
-        <div>{{ getTemplateName(card.template) }}</div>
+        <div v-if="!isSelected(card) && cardValidation(card).error" :class="{ 'dot dot-error': true }" />
       </div>
     </q-scroll-area>
     <q-btn no-caps flat class="q-my-sm" label="Ajouter une carte" color="primary" icon-right="add"
@@ -18,6 +22,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import { TEMPLATE_TYPES } from '@data/constants';
+import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
 
 export default {
   name: 'CardContainer',
@@ -26,6 +31,7 @@ export default {
     ...mapGetters({ cards: 'program/getCards' }),
   },
   methods: {
+    cardValidation,
     isSelected (card) {
       if (!this.card) return false;
       return card._id === this.card._id;
@@ -51,7 +57,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.card-container
+.card-list
   padding: 5px 5px 0 5px
   border-radius: 3px
   background-color: $white
@@ -61,6 +67,18 @@ export default {
 .q-scrollarea
   height: 100%
 
+.card-row
+  margin: 4px
+  display: flex
+  align-items: center
+  justify-content: flex-start
+  &-selected
+    justify-content: flex-end
+    .card-cell
+      background-color: $light-purple
+  .dot
+    margin: 0 0 0 3px
+
 .card-cell
   background-color: $primary-light
   border-radius: 4px
@@ -69,11 +87,7 @@ export default {
   @media screen and (max-width: 767px)
     height: 90px
   width: 85%
-  margin: 4px
   padding: 7px
-  &-selected
-    align-self: flex-end
-    background-color: $light-purple
   &-title
     margin-bottom: 10px
     white-space: nowrap
