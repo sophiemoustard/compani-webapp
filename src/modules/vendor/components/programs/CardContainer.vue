@@ -1,6 +1,7 @@
 <template>
   <div class="card-container">
-    <q-scroll-area ref="cardContainer">
+    <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
+      :content-style="{ display:'flex', 'flex-direction': 'column' }" :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
       <div :class="['card-cell', 'cursor-pointer', { 'card-cell-selected': isSelected(card) }]"
         v-for="(card, index) in cards" :key="index" @click="selectCard(card)">
         <div class="card-cell-title text-weight-bold">
@@ -60,10 +61,6 @@ export default {
 .q-scrollarea
   height: 100%
 
-/deep/.q-scrollarea__thumb
-  width: 6px
-  border-radius: 10px
-
 .card-cell
   background-color: $primary-light
   border-radius: 4px
@@ -75,6 +72,7 @@ export default {
   margin: 4px
   padding: 7px
   &-selected
+    align-self: flex-end
     background-color: $light-purple
   &-title
     margin-bottom: 10px
