@@ -7,9 +7,10 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 
 export default {
   name: 'Transition',
@@ -21,19 +22,29 @@ export default {
       tmpInput: '',
     };
   },
+  validations () {
+    return {
+      card: {
+        title: { required },
+      },
+    };
+  },
   computed: {
     ...mapState('program', ['card', 'activity']),
   },
   methods: {
     saveTmp (path) {
-      if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
+      if (this.tmpInput === '') this.tmpInput = get(this.card, path);
     },
     async updateCard (path) {
       try {
         const value = get(this.card, path);
-        const payload = set({}, path, value);
+        if (this.tmpInput === value) return;
 
-        await Cards.updateById(this.card._id, payload);
+        get(this.$v.card, path).$touch();
+        if (get(this.$v.card, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Cards.updateById(this.card._id, set({}, path, value));
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

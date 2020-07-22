@@ -1,19 +1,21 @@
 <template>
-  <q-page padding class="vendor-background" v-if="activity">
-    <ni-profile-header :title="activity.name">
-      <template v-slot:body>
-        <div class="row profile-info q-pl-lg">
-          <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-            <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
-            <q-item-section>{{ info.label }}</q-item-section>
-          </q-item>
-        </div>
-      </template>
-    </ni-profile-header>
-    <div class="row body">
-      <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
-      <card-edition />
-    </div>
+  <q-page padding class="vendor-background">
+    <template v-if="activity">
+      <ni-profile-header :title="activity.name">
+        <template v-slot:body>
+          <div class="row profile-info q-pl-lg">
+            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
+              <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
+              <q-item-section>{{ info.label }}</q-item-section>
+            </q-item>
+          </div>
+        </template>
+      </ni-profile-header>
+      <div class="row body">
+        <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
+        <card-edition />
+      </div>
+    </template>
 
     <!-- Card creation modal -->
     <ni-modal v-model="cardCreationModal" @hide="resetCardCreationModal">
