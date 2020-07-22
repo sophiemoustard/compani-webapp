@@ -16,7 +16,8 @@
             <div class="slots-cells-number">{{ index + 1 }}</div>
             <div class="slots-cells-date text-weight-bold">{{ key }}</div>
           </div>
-          <div :class="['slots-cells-content', { 'cursor-pointer': canEdit }]" v-for="slot in value" :key="slot._id" @click="openEditionModal(slot)">
+          <div :class="['slots-cells-content', { 'cursor-pointer': canEdit }]" v-for="slot in value" :key="slot._id"
+            @click="openEditionModal(slot)">
               <q-item class="text-weight-bold">{{ slot.step ? slot.step.name : '' }}</q-item>
               <q-item>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item>
               <q-item>{{ getSlotAddress(slot) }}</q-item>
@@ -49,7 +50,8 @@
         :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
       <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
         @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" required-field />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" required-field
+        :disable="!stepsLength" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
           :loading="modalLoading" @click="addCourseSlot" />
@@ -69,7 +71,8 @@
         :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
         @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" required-field />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" required-field
+        :disable="!stepsLength" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
           :loading="modalLoading" @click="updateCourseSlot" />
@@ -195,12 +198,19 @@ export default {
         icon: 'mdi-calendar-range',
       };
     },
+    stepsLength () {
+      return this.course.program.steps.length;
+    },
     stepOptions () {
-      return this.course.program.steps.map((step, index) => ({
-        label: `${index + 1} - step.name${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
-        value: step._id,
-        disable: step.type === E_LEARNING,
-      }));
+      if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
+      return [
+        { label: 'Pas d\'étape spécifiée', value: '' },
+        ...this.course.program.steps.map((step, index) => ({
+          label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
+          value: step._id,
+          disable: step.type === E_LEARNING,
+        })),
+      ];
     },
   },
   watch: {
@@ -261,7 +271,7 @@ export default {
         _id: slot._id,
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
-        step: slot.step || '',
+        step: get(slot, 'step._id') || '',
       }
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
