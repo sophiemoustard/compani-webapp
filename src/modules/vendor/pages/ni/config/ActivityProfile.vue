@@ -26,7 +26,14 @@
       <div class="row q-mb-xl">
         <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
           :class="getClassForTemplateInModal(template.value)">
-          <div class="text-weight-bold card-button-content">{{ template.label }}</div>
+          <div class="text-weight-bold card-button-content">
+            <template v-if="template.value === TITLE_TEXT_MEDIA">
+              <div>Titre</div>
+              <div>Texte</div>
+              <q-icon name="image" size="sm" />
+            </template>
+            <template v-else>{{ template.label }}</template>
+          </div>
         </div>
       </div>
       <template slot="footer">
@@ -44,7 +51,7 @@ import { required } from 'vuelidate/lib/validators';
 import Activities from '@api/Activities';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TEMPLATE_TYPES } from '@data/constants';
+import { TEMPLATE_TYPES, TITLE_TEXT_MEDIA } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/CardEdition';
@@ -71,6 +78,7 @@ export default {
       cardCreationModal: false,
       templateTypes: TEMPLATE_TYPES,
       newCard: { template: '' },
+      TITLE_TEXT_MEDIA,
     };
   },
   validations () {
