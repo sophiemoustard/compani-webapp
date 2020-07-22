@@ -11,8 +11,8 @@
       </template>
     </ni-profile-header>
     <div class="row body">
-      <ni-card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
-      <ni-card-edition />
+      <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
+      <card-edition />
     </div>
 
     <!-- Card creation modal -->
@@ -58,8 +58,8 @@ export default {
   },
   components: {
     'ni-profile-header': ProfileHeader,
-    'ni-card-container': CardContainer,
-    'ni-card-edition': CardEdition,
+    'card-container': CardContainer,
+    'card-edition': CardEdition,
     'ni-modal': Modal,
   },
   data () {
