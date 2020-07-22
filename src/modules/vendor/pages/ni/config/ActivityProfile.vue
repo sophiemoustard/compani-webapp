@@ -42,7 +42,6 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
 import Activities from '@api/Activities';
-import Programs from '@api/Programs';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { TEMPLATE_TYPES } from '@data/constants';
@@ -94,10 +93,10 @@ export default {
     try {
       await this.refreshActivity();
 
-      const program = await Programs.getById(this.programId);
-      this.programName = get(program, 'name') || '';
+      if (!this.progam) await this.$store.dispatch('program/fetchProgram', { programId: this.programId });
+      this.programName = get(this.program, 'name') || '';
 
-      const step = program.steps.find(s => s._id === this.stepId);
+      const step = this.program.steps.find(s => s._id === this.stepId);
       this.stepName = get(step, 'name') || '';
     } catch (e) {
       console.error(e);
