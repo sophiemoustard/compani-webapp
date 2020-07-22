@@ -19,7 +19,7 @@
           <div :class="['slots-cells-content', { 'cursor-pointer': canEdit }]" v-for="slot in value" :key="slot._id"
             @click="openEditionModal(slot)">
               <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
-              <q-item>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item>
+              <q-item>{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</q-item>
               <q-item>{{ getSlotAddress(slot) }}</q-item>
           </div>
         </q-card>
@@ -50,8 +50,7 @@
         :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
       <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
         @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" required-field
-        :disable="!stepsLength" />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" :disable="!stepsLength" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
           :loading="modalLoading" @click="addCourseSlot" />
@@ -71,7 +70,7 @@
         :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
         @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" required-field
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step"
         :disable="!stepsLength" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
@@ -125,7 +124,7 @@ export default {
           endDate: this.$moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
-        step: '',
+        step: null,
       },
       editedCourseSlot: {},
       editionModal: false,
@@ -204,7 +203,7 @@ export default {
     stepOptions () {
       if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
       return [
-        { label: 'Pas d\'étape spécifiée', value: '' },
+        { label: 'Pas d\'étape spécifiée', value: null },
         ...this.course.program.steps.map((step, index) => ({
           label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
           value: step._id,
@@ -250,7 +249,7 @@ export default {
           endDate: this.$moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
-        step: '',
+        step: null,
       };
       this.$v.newCourseSlot.$reset();
     },
@@ -271,7 +270,7 @@ export default {
         _id: slot._id,
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
-        step: get(slot, 'step._id') || '',
+        step: get(slot, 'step._id') || null,
       }
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
@@ -281,10 +280,8 @@ export default {
       this.$v.editedCourseSlot.$reset();
     },
     formatEditionPayload (courseSlot) {
-      const payload = { ...courseSlot.dates, address: {} };
+      const payload = { ...courseSlot.dates, address: {}, step: courseSlot.step };
       if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
-      if (courseSlot.step) payload.step = courseSlot.step;
-
       return payload;
     },
     async addCourseSlot () {
@@ -404,6 +401,7 @@ export default {
     display: flex
     background-color: $primary-light
     flex-direction: column
+    border-radius: 4px !important
   &-content > .q-item
     font-size: 14px
     padding: 0px
