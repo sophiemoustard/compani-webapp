@@ -1,8 +1,6 @@
 <template>
-  <div>
-    <ni-input caption="Titre" v-model.trim="card.title" required-field @focus="saveTmp('title')"
-      @blur="updateCard('title')" />
-  </div>
+  <ni-input caption="Titre" v-model.trim="card.title" required-field @focus="saveTmp('title')"
+    @blur="updateCard('title')" />
 </template>
 
 <script>

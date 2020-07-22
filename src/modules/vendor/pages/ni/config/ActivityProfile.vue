@@ -13,7 +13,7 @@
     <div class="row body">
       <ni-card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" :cards="activity.cards"
         @add="openCardCreationModal" />
-      <ni-card-edition class="col-md-9 col-sm-8 col-xs-6" />
+      <ni-card-edition />
     </div>
 
     <!-- Card creation modal -->
@@ -40,14 +40,15 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
+import Activities from '@api/Activities';
+import Programs from '@api/Programs';
+import Modal from '@components/modal/Modal';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { TEMPLATE_TYPES } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/CardEdition';
-import Modal from '@components/modal/Modal';
-import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import Activities from '@api/Activities';
-import Programs from '@api/Programs';
-import { TEMPLATE_TYPES } from '@data/constants';
+
 export default {
   name: 'ActivityProfile',
   metadata: { title: 'Fiche activité' },
