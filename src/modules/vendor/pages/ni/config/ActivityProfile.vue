@@ -11,8 +11,7 @@
       </template>
     </ni-profile-header>
     <div class="row body">
-      <ni-card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" :cards="activity.cards"
-        @add="openCardCreationModal" />
+      <ni-card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
       <ni-card-edition />
     </div>
 
@@ -79,7 +78,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('program', ['activity']),
+    ...mapState('program', ['program', 'activity']),
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.programName },
@@ -149,6 +148,9 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
     this.$store.dispatch('program/resetCard');
+    if (!(new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
+      this.$store.dispatch('program/resetProgram');
+    }
   },
 }
 </script>

@@ -14,12 +14,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import { TEMPLATE_TYPES } from '@data/constants';
 
 export default {
   name: 'CardContainer',
-  props: {
-    cards: { type: Array, default: () => [] },
+  computed: {
+    ...mapGetters({ cards: 'program/getCards' }),
   },
   methods: {
     openCreationModal () {
