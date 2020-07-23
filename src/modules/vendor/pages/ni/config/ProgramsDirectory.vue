@@ -48,7 +48,7 @@ export default {
         { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
         {
           name: 'eLearningStepsCount',
-          label: 'Étapes e-learning',
+          label: 'Étapes eLearning',
           field: 'steps',
           format: value => this.countStepsByType(E_LEARNING, value),
           align: 'center',
