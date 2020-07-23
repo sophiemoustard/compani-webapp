@@ -4,9 +4,10 @@
       @blur="updateCard('title')" :error="$v.card.title.$error" />
     <ni-input caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" />
-    <ni-file-uploader caption="Média" path="media" alt="media" :entity="card" name="media" :url="mediaUploadUrl"
+    <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="documentUploaded()" @delete="validateDocumentDeletion()" :error="$v.card.media.$error"
-      :extensions="extensions" cloudinaryStorage :additional-value="imageFileName" required-field />
+      :extensions="extensions" cloudinaryStorage :additional-value="imageFileName" required-field
+      :url="mediaUploadUrl"/>
   </div>
 </template>
 
@@ -33,7 +34,7 @@ export default {
   mixins: [templateMixin],
   computed: {
     imageFileName () {
-      return 'Image-' + this.card.title.replace(/ /g, '_');
+      return this.card.title ? this.card.title.replace(/ /g, '_') : this.activity.name.replace(/ /g, '_');
     },
     mediaUploadUrl () {
       return `${process.env.API_HOSTNAME}/cards/${this.card._id}/cloudinary/upload`;
@@ -74,3 +75,8 @@ export default {
   },
 }
 </script>
+
+<style lang="stylus" scoped>
+.file-uploader
+  width: fit-content
+</style>
