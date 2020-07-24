@@ -228,11 +228,11 @@ export default {
       try {
         if (get(this.program, 'image')) {
           await Cloudinary.deleteImageById({ id: this.program.image.publicId });
-        }
-        await Programs.update(this.program._id, { image: { link: null, publicId: null } });
+          await Programs.update(this.program._id, { image: { link: null, publicId: null } });
 
-        this.refreshProgram();
-        NotifyPositive('Document supprimé');
+          this.refreshProgram();
+          NotifyPositive('Document supprimé');
+        } else NotifyNegative('Erreur lors de la suppression du document.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document.');

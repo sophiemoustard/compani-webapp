@@ -28,7 +28,7 @@ export default {
   },
   data () {
     return {
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      extensions: 'image/jpg, image/jpeg,, image/png',
     }
   },
   mixins: [templateMixin],
@@ -41,23 +41,23 @@ export default {
     },
   },
   methods: {
-    documentUploaded () {
+    async documentUploaded () {
       try {
-        this.refreshCard();
+        await this.refreshCard();
         NotifyPositive('Document envoyé');
       } catch (e) {
-        NotifyNegative('Erreur lors de la récupératino des informations');
+        NotifyNegative('Erreur lors de l\'envoi du document');
       }
     },
     async deleteDocument () {
       try {
         if (get(this.card, 'media')) {
           await Cloudinary.deleteImageById({ id: this.card.media.publicId });
-        }
-        await Cards.updateById(this.card._id, { media: { link: null, publicId: null } });
+          await Cards.updateById(this.card._id, { media: { link: null, publicId: null } });
 
-        this.refreshCard();
-        NotifyPositive('Document supprimé');
+          await this.refreshCard();
+          NotifyPositive('Document supprimé');
+        } else NotifyNegative('Erreur lors de la suppression du document.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du document.');
@@ -77,6 +77,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.file-uploader
-  width: fit-content
+@media (max-width: 767px)
+  .file-uploader
+    width: fit-content
 </style>
