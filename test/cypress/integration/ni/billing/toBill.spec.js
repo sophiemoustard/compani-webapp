@@ -63,10 +63,10 @@ describe('ToBill', () => {
     });
 
     cy.get('[data-cy=to-bill-button]').click();
-    cy.get('div.q-dialog__title').eq(0).should('contain', 'Confirmation');
-    cy.get('div.q-checkbox__label').eq(0).should('contain', 'Envoyer par email');
-    cy.get('div.q-card__actions').within(() => {
-      cy.get('span.q-btn__content').eq(0).click();
+    cy.get('.q-dialog__title').eq(0).should('contain', 'Confirmation');
+    cy.get('.q-checkbox__label').eq(0).should('contain', 'Envoyer par email');
+    cy.get('.q-card__actions').within(() => {
+      cy.get('.q-btn__content').eq(0).click();
     });
     cy.get('[data-cy=bill-row]').should('have.length', 1);
 
@@ -94,8 +94,8 @@ describe('ToBill', () => {
       .get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
 
     cy.get('[data-cy=to-bill-button]').click();
-    cy.get('div.q-card__actions').within(() => {
-      cy.get('span.q-btn__content').eq(1).click();
+    cy.get('.q-card__actions').within(() => {
+      cy.get('.q-btn__content').eq(1).click();
     });
 
     cy.get('[data-cy=bill-row]').should('have.length', 1);
