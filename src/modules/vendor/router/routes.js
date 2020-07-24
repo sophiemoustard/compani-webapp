@@ -13,7 +13,7 @@ const routes = [
       try {
         if (!['/ad', '/ad/'].includes(to.path)) return next();
 
-        if (!canNavigate()) return logOutAndRedirectToLogin();
+        if (!(await canNavigate())) return logOutAndRedirectToLogin();
 
         const userVendorRole = store.getters['main/getVendorRole'];
         if (!userVendorRole) return next({ path: '/' });
