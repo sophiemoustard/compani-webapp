@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="client-background">
+  <q-page padding class="vendor-background">
     <div v-if="loggedUser">
       <h4>Informations personnelles</h4>
       <profile-info />
@@ -9,7 +9,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
+import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
 
 export default {
   components: {

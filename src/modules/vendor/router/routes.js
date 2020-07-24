@@ -142,12 +142,7 @@ const routes = [
       {
         path: 'trainers/info',
         name: 'trainers info',
-        component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
-        props: true,
-        beforeEnter (to, from, next) {
-          to.params.trainerId = Cookies.get('user_id');
-          return to.params.trainerId ? next() : next('/404');
-        },
+        component: () => import('src/modules/vendor/pages/trainers/administrative/Info'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'administrative',
