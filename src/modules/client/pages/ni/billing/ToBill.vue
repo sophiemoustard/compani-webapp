@@ -3,7 +3,7 @@
     <ni-title-header title="À facturer" padding>
       <template slot="content">
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-5 on-left selects">
-          <ni-select :options="toBillOptions" v-model="toBillOption" separator />
+          <ni-select :options="toBillOptions" v-model="toBillOption" separator data-cy="select-tpp" />
         </div>
         <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 selects">
           <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
@@ -11,7 +11,8 @@
       </template>
     </ni-title-header>
     <ni-large-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
-      :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected" separator="none">
+      :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected"
+      data-cy="client-table" separator="none">
       <template v-slot:header="{ props }" >
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
@@ -24,7 +25,7 @@
         <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
           @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
           @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
-          display-checkbox />
+          display-checkbox data-cy="bill-row" />
         <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
           <q-td colspan="10">
             <div class="text-right">Total :</div>
@@ -36,13 +37,13 @@
           <template v-for="tpp in props.row.thirdPartyPayerBills">
             <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" :bill.sync="bill"
               @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
-              @discount:input="computeTotalAmount(tpp)" display-checkbox :index="index" />
+              @discount:input="computeTotalAmount(tpp)" display-checkbox :index="index" data-cy="bill-row" />
           </template>
         </template>
       </template>
     </ni-large-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
-      :label="totalToBillLabel" @click="validateBillListCreation" />
+      :label="totalToBillLabel" @click="validateBillListCreation" data-cy="to-bill-button" />
   </q-page>
 </template>
 

@@ -1,6 +1,6 @@
 <template>
   <q-tr :props="props" :class="{'border-top': index === 0 }">
-    <q-td v-for="col in props.cols" :key="col.name" :props="props"
+    <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-cy="`col-${col.name}`"
       :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
       <template v-if="index === 0 && col.name === 'externalBilling' && bill.thirdPartyPayer">
         <q-checkbox v-model="bill.externalBilling" color="grey" dense />
@@ -39,7 +39,7 @@
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
-    <q-td>
+    <q-td data-cy="col-tick-bill">
       <q-checkbox v-if="index === 0 && displayCheckbox" v-model="props.selected" dense />
     </q-td>
   </q-tr>
