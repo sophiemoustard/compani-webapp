@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
 import { Cookies } from 'quasar';
 import pick from 'lodash/pick';
-import alenvi from '@helpers/alenvi';
+import { refreshAlenviCookies } from '@helpers/alenvi';
 import { defineAbilitiesFor } from '@helpers/ability';
 import routes from 'src/router/routes';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
@@ -24,7 +24,7 @@ const Router = new VueRouter({
 Router.beforeEach(async (to, from, next) => {
   if (to.meta.cookies) {
     if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
-      const refresh = await alenvi.refreshAlenviCookies();
+      const refresh = await refreshAlenviCookies();
       if (refresh) {
         if (store.state.main.refreshState) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
