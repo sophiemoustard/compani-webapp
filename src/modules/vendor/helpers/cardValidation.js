@@ -14,7 +14,7 @@ const cardSchema = (card) => {
         media: Joi.object().keys({
           publicId: Joi.string().required(),
           link: Joi.string().required(),
-        }),
+        }).required(),
       });
     default:
       return Joi.object().keys();
