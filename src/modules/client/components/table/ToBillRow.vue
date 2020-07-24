@@ -39,7 +39,7 @@
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
-    <q-td data-cy="col-tick-bill">
+    <q-td data-cy="col-selected-bill">
       <q-checkbox v-if="index === 0 && displayCheckbox" v-model="props.selected" dense />
     </q-td>
   </q-tr>

@@ -57,15 +57,15 @@ describe('ToBill', () => {
     cy.get('[data-cy=date-input]  input').eq(1).clear().type('17/01/2019');
     cy.get('[data-cy=bill-row]').should('have.length', 1);
     cy.get('[data-cy=col-customer]').should('contain', 'AUFRAY H.');
-    cy.get('[data-cy=col-tick-bill]').within(() => {
+    cy.get('[data-cy=col-selected-bill]').within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
       cy.get('.q-checkbox').click();
     });
 
     cy.get('[data-cy=to-bill-button]').click();
-    cy.get('.q-dialog__title').eq(0).should('contain', 'Confirmation');
-    cy.get('.q-checkbox__label').eq(0).should('contain', 'Envoyer par email');
-    cy.get('.q-card__actions').within(() => {
+    cy.get('div.q-dialog__title').eq(0).should('contain', 'Confirmation');
+    cy.get('div.q-checkbox__label').eq(0).should('contain', 'Envoyer par email');
+    cy.get('div.q-card__actions').within(() => {
       cy.get('.q-btn__content').eq(0).click();
     });
     cy.get('[data-cy=bill-row]').should('have.length', 1);
@@ -83,22 +83,41 @@ describe('ToBill', () => {
       });
     });
 
-    cy.get('[data-cy=col-tick-bill]').eq(0).within(() => {
+    cy.get('[data-cy=col-selected-bill]').eq(0).within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
       cy.get('.q-checkbox').click();
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
     });
-    cy.get('[data-cy=col-tick-bill]').eq(1)
+    cy.get('[data-cy=col-selected-bill]').eq(1)
       .get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
-    cy.get('[data-cy=col-tick-bill]').eq(2)
+    cy.get('[data-cy=col-selected-bill]').eq(2)
       .get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--truthy');
 
     cy.get('[data-cy=to-bill-button]').click();
-    cy.get('.q-card__actions').within(() => {
+    cy.get('div.q-card__actions').within(() => {
       cy.get('.q-btn__content').eq(1).click();
     });
 
     cy.get('[data-cy=bill-row]').should('have.length', 1);
     cy.get('[data-cy=col-customer]').should('contain', 'ANDTHEQUEENS C.');
+  });
+
+  it('should bill a ttp customer with external option', () => {
+    cy.get('[data-cy=bill-row]').should('have.length', 3);
+    cy.get('[data-cy=col-externalBilling]').within(() => {
+      cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
+      cy.get('.q-checkbox').click();
+    });
+    cy.get('[data-cy=col-selected-bill]').eq(2).within(() => {
+      cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
+      cy.get('.q-checkbox').click();
+    });
+
+    cy.get('[data-cy=to-bill-button]').click();
+    cy.get('div.q-card__actions').within(() => {
+      cy.get('.q-btn__content').eq(1).click();
+    });
+
+    cy.get('[data-cy=bill-row]').should('have.length', 2);
   });
 });
