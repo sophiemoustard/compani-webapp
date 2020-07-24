@@ -18,7 +18,7 @@ const routes = [
       try {
         if (to.path !== '/') return next();
 
-        if (!canNavigate()) return logOutAndRedirectToLogin();
+        if (!(await canNavigate())) return logOutAndRedirectToLogin();
 
         const loggedUser = store.state.main.loggedUser;
         const userVendorRole = store.getters['main/getVendorRole'];
