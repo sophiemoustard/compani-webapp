@@ -26,6 +26,7 @@ export default {
 
         commit('SET_LOGGED_USER', Object.assign({}, extend(userModel, user)));
       } catch (e) {
+        if (!e) return; // If the api does not respond anything
         console.error(e);
         commit('SET_LOGGED_USER', null);
         logOutAndRedirectToLogin();
