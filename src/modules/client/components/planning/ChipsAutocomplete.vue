@@ -38,7 +38,7 @@ export default {
       this.$emit('input', el);
     },
     removeEvent (el) {
-      this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value[0]));
+      this.$store.dispatch('planning/setElementToRemove', this.filters.find(elem => elem.value === el.value));
     },
     async search (terms, done) {
       try {
