@@ -1,6 +1,6 @@
-import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
+import { canNavigate } from '@helpers/alenvi';
 import store from 'src/store/index';
 import {
   HELPER,
@@ -18,11 +18,9 @@ const routes = [
       try {
         if (to.path !== '/') return next();
 
-        const loggedUser = store.state.main.loggedUser;
-        const userId = Cookies.get('user_id');
-        if (!loggedUser && !userId) return logOutAndRedirectToLogin();
-        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', userId);
+        if (!canNavigate()) return logOutAndRedirectToLogin();
 
+        const loggedUser = store.state.main.loggedUser;
         const userVendorRole = store.getters['main/getVendorRole'];
         const userClientRole = store.getters['main/getClientRole'];
         if (!userClientRole && !userVendorRole) return next({ name: 'account client', params: { id: loggedUser._id } });
