@@ -12,7 +12,7 @@
           :error="$v.program.learningGoals.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinaryStorage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
-          :additional-value="imageFileName" />
+          :additional-value="imageFileName" label="Pas d'image" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -231,11 +231,11 @@ export default {
           await Programs.update(this.program._id, { image: { link: null, publicId: null } });
 
           this.refreshProgram();
-          NotifyPositive('Document supprimé');
-        } else NotifyNegative('Erreur lors de la suppression du document.');
+          NotifyPositive('Image supprimée');
+        } else NotifyNegative('Erreur lors de la suppression de l\'image.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document.');
+        NotifyNegative('Erreur lors de la suppression de l\'image.');
       }
     },
     async createStep () {
