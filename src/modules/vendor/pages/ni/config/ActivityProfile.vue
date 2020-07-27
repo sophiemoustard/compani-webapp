@@ -32,7 +32,7 @@
               <div>Texte</div>
               <q-icon name="image" size="sm" />
             </template>
-            <template v-else>{{ template.label }}</template>
+            <template v-else>{{ formatButtonLabel(template.label) }}</template>
           </div>
         </div>
       </div>
@@ -153,6 +153,9 @@ export default {
       this.newCard = { template: '' };
       this.$v.newCard.$reset();
     },
+    formatButtonLabel (label) {
+      return label.replace(/ /g, '\n');
+    },
   },
   beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
@@ -202,4 +205,5 @@ h6
   &-content
     text-align: center
     flex-wrap: wrap
+    white-space: pre-line
 </style>
