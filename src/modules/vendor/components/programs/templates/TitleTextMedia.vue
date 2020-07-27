@@ -5,9 +5,9 @@
     <ni-input caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
-      @uploaded="documentUploaded()" @delete="validateDocumentDeletion()" :error="$v.card.media.$error"
+      @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
       :extensions="extensions" cloudinaryStorage :additional-value="imageFileName" required-field
-      :url="mediaUploadUrl"/>
+      :url="mediaUploadUrl" label="Pas de média" />
   </div>
 </template>
 
@@ -41,35 +41,35 @@ export default {
     },
   },
   methods: {
-    async documentUploaded () {
+    async mediaUploaded () {
       try {
         await this.refreshCard();
-        NotifyPositive('Document envoyé');
+        NotifyPositive('Média envoyé');
       } catch (e) {
-        NotifyNegative('Erreur lors de l\'envoi du document');
+        NotifyNegative('Erreur lors de l\'envoi du média');
       }
     },
-    async deleteDocument () {
+    async deleteMedia () {
       try {
         if (get(this.card, 'media')) {
           await Cloudinary.deleteImageById({ id: this.card.media.publicId });
           await Cards.updateById(this.card._id, { media: { link: null, publicId: null } });
 
           await this.refreshCard();
-          NotifyPositive('Document supprimé');
-        } else NotifyNegative('Erreur lors de la suppression du document.');
+          NotifyPositive('Média supprimé');
+        } else NotifyNegative('Erreur lors de la suppression du média.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document.');
+        NotifyNegative('Erreur lors de la suppression du média.');
       }
     },
-    validateDocumentDeletion (path) {
+    validateMediaDeletion (path) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce média ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.deleteDocument(path))
+      }).onOk(() => this.deleteMedia(path))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
