@@ -195,6 +195,9 @@ h6
   border-radius: 10px
   height: 130px
   width: 100px
+  @media (max-width: 767px)
+      width: 65px
+      height: 90px
   display: flex
   align-items: center
   justify-content: center
