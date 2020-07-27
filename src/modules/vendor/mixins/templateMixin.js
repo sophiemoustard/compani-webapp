@@ -4,7 +4,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { TRANSITION } from '@data/constants';
+import { TRANSITION, TITLE_TEXT_MEDIA } from '@data/constants';
 
 export const templateMixin = {
   data () {
@@ -17,6 +17,10 @@ export const templateMixin = {
       case TRANSITION:
         return {
           card: { title: { required } },
+        };
+      case TITLE_TEXT_MEDIA:
+        return {
+          card: { title: { required }, text: { required }, media: { publicId: required, link: required } },
         };
       default:
         return {};
