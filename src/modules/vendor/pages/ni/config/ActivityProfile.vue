@@ -23,7 +23,7 @@
         Créer une nouvelle <span class="text-weight-bold">carte</span>
       </template>
       <h6 class="text-weight-bold">Cours</h6>
-      <div class="row q-mb-xl">
+      <div class="row q-mb-xl justify-evenly">
         <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
           :class="getClassForTemplateInModal(template.value)">
           <div class="text-weight-bold card-button-content">
@@ -32,7 +32,7 @@
               <div>Texte</div>
               <q-icon name="image" size="sm" />
             </template>
-            <template v-else>{{ template.label }}</template>
+            <template v-else>{{ formatButtonLabel(template.label) }}</template>
           </div>
         </div>
       </div>
@@ -153,6 +153,9 @@ export default {
       this.newCard = { template: '' };
       this.$v.newCard.$reset();
     },
+    formatButtonLabel (label) {
+      return label.replace(/ /g, '\n');
+    },
   },
   beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
@@ -192,6 +195,9 @@ h6
   border-radius: 10px
   height: 130px
   width: 100px
+  @media (max-width: 767px)
+      width: 65px
+      height: 90px
   display: flex
   align-items: center
   justify-content: center
@@ -202,4 +208,5 @@ h6
   &-content
     text-align: center
     flex-wrap: wrap
+    white-space: pre-line
 </style>
