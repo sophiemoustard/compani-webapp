@@ -1,4 +1,5 @@
 import uniqBy from 'lodash/uniqBy';
+import groupBy from 'lodash/groupBy';
 import { formatIdentity } from '@helpers/utils';
 import { INTER_B2B, INTRA } from '@data/constants';
 
@@ -79,6 +80,17 @@ export const courseFiltersMixin = {
     filterCoursesByCompany (courses) {
       return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
       (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
+    },
+    groupByCourses (courses) {
+      return courses.map((course) => {
+        return {
+          ...course,
+          slots: course.slots.length
+            ? Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')))
+            : [],
+          slotsToPlan: course.slotsToPlan || [],
+        }
+      });
     },
   },
 }

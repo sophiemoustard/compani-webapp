@@ -66,6 +66,11 @@
           </q-tr>
         </template>
       </ni-simple-table>
+      <ni-banner v-if="isFinished">
+        <template v-slot:message>
+          Impossible d'envoyer un sms pour une formation qui est finie.
+        </template>
+      </ni-banner>
       <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
         <template v-slot:message>
           Il manque le numéro de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur
@@ -201,7 +206,7 @@ export default {
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
-      return !slots.length;
+      return !slots.length && !this.course.slotsToPlan.length;
     },
     courseNotStartedYet () {
       const slots = this.course.slots.filter(slot => this.$moment().isAfter(slot.endDate))
@@ -233,6 +238,9 @@ export default {
       if (!this.smsHistory.missingPhones.length) return '';
 
       return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
+    },
+    courseName () {
+      return this.composeCourseName(this.course);
     },
   },
   methods: {
@@ -287,10 +295,10 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.programName} - ` +
-        `${this.course.name}.\nLa première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
-        'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
-        `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n` +
+      `La première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+      'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
+      `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
     setReminderMessage () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
@@ -298,8 +306,8 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.programName} - ` +
-      `${this.course.name}.\nVotre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
+      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n` +
+      `Votre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
       'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
       `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },

@@ -97,10 +97,10 @@ export default {
         if (get(this.user, 'picture.publicId')) {
           await cloudinary.deleteImageById({ id: this.user.picture.publicId });
           this.croppa.remove();
-        }
-        await Users.updateById(this.user._id, { picture: { link: null, publicId: null } });
-        await this.refreshPicture();
-        NotifyPositive('Photo supprimée');
+          await Users.updateById(this.user._id, { picture: { link: null, publicId: null } });
+          await this.refreshPicture();
+          NotifyPositive('Photo supprimée');
+        } else NotifyNegative('Erreur lors de la suppression de la photo.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la photo.');

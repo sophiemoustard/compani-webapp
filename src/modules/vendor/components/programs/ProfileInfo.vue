@@ -12,57 +12,63 @@
           :error="$v.program.learningGoals.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinaryStorage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
-          :additional-value="imageFileName" />
+          :additional-value="imageFileName" label="Pas d'image" />
       </div>
     </div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Modules</p>
-      <q-card v-for="(module, index) of program.modules" :key="index" flat class="module">
-        <q-card-section class="module-head cursor-pointer row" @click="showActivities(module._id)">
-          <div>
-            <div class="text-weight-bold">{{module.title}}</div>
-            <div class="module-subtitle">{{module.activities.length}} activité(s)</div>
-          </div>
-          <q-btn flat small color="grey" icon="edit" @click.stop="openModuleEditionModal(module)" />
+      <p class="text-weight-bold">Étapes ({{ program.steps.length }})</p>
+      <q-card v-for="(step, index) of program.steps" :key="index" flat class="step">
+        <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
+          <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
+          <q-item-section>
+            <div class="text-weight-bold">{{step.name}}</div>
+            <div class="step-subtitle">
+              {{ getStepTypeLabel(step.type) }} -
+              {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+            </div>
+          </q-item-section>
+          <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
         </q-card-section>
-        <div class="beige-background activity-container" v-if="isActivitiesShown[module._id]">
-          <q-card v-for="(activity, index) of module.activities" :key="index" flat class="activity">
-            <q-card-section>
-              <div>{{activity.title}}</div>
-              <q-btn flat small color="grey" icon="edit" @click="openActivityEditionModal(activity)" />
+        <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
+          <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
+            <q-card-section class="cursor-pointer" @click="goToActivityProfile(step, activity)">
+              <div>{{activity.name}}</div>
+              <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
           <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Ajouter une activité"
-            @click="openActivityCreationModal(module._id)" />
+            @click="openActivityCreationModal(step._id)" />
         </div>
       </q-card>
-      <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un module"
-        @click="moduleCreationModal = true" />
+      <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une étape"
+        @click="stepCreationModal = true" />
     </div>
 
-    <!-- Module creation modal -->
-    <ni-modal v-model="moduleCreationModal" @hide="resetModuleCreationModal">
+    <!-- Step creation modal -->
+    <ni-modal v-model="stepCreationModal" @hide="resetStepCreationModal">
       <template slot="title">
-        Créer un nouveau <span class="text-weight-bold">module</span>
+        Créer une nouvelle <span class="text-weight-bold">étape</span>
       </template>
-      <ni-input in-modal v-model.trim="newModule.title" :error="$v.newModule.title.$error"
-        @blur="$v.newModule.title.$touch" required-field caption="Titre" />
+      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="newStep.type" required-field />
+      <ni-input in-modal v-model.trim="newStep.name" :error="$v.newStep.name.$error"
+        @blur="$v.newStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le module" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createModule" />
+        <q-btn no-caps class="full-width modal-btn" label="Créer l'étape" color="primary" :loading="modalLoading"
+          icon-right="add" @click="createStep" />
       </template>
     </ni-modal>
 
-    <!-- Module edition modal -->
-    <ni-modal v-model="moduleEditionModal" @hide="resetModuleEditionModal">
+    <!-- Step edition modal -->
+    <ni-modal v-model="stepEditionModal" @hide="resetStepEditionModal">
       <template slot="title">
-        Éditer un <span class="text-weight-bold">module</span>
+        Éditer une <span class="text-weight-bold">étape</span>
       </template>
-      <ni-input in-modal v-model.trim="editedModule.title" :error="$v.editedModule.title.$error"
-        @blur="$v.editedModule.title.$touch" required-field caption="Titre" />
+      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="editedStep.type" disable />
+      <ni-input in-modal v-model.trim="editedStep.name" :error="$v.editedStep.name.$error"
+        @blur="$v.editedStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer le module" color="primary" :loading="modalLoading"
-          icon-right="add" @click="editModule" />
+        <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="modalLoading"
+          icon-right="add" @click="editStep" />
       </template>
     </ni-modal>
 
@@ -71,8 +77,8 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">activité</span>
       </template>
-      <ni-input in-modal v-model.trim="newActivity.title" :error="$v.newActivity.title.$error"
-        @blur="$v.newActivity.title.$touch" required-field caption="Titre" />
+      <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
+        @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
           icon-right="add" @click="createActivity" />
@@ -84,8 +90,8 @@
       <template slot="title">
         Éditer une <span class="text-weight-bold">activité</span>
       </template>
-      <ni-input in-modal v-model.trim="editedActivity.title" :error="$v.editedActivity.title.$error"
-        @blur="$v.editedActivity.title.$touch" required-field caption="Titre" />
+      <ni-input in-modal v-model.trim="editedActivity.name" :error="$v.editedActivity.name.$error"
+        @blur="$v.editedActivity.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="modalLoading"
           icon-right="add" @click="editActivity" />
@@ -101,13 +107,15 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import pick from 'lodash/pick';
 import Programs from '@api/Programs';
-import Modules from '@api/Modules';
+import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
+import Select from '@components/form/Select';
 import FileUploader from '@components/form/FileUploader.vue';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { E_LEARNING, ON_SITE } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -117,31 +125,36 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'ni-select': Select,
     'ni-file-uploader': FileUploader,
   },
   data () {
     return {
       tmpInput: '',
       modalLoading: false,
-      moduleCreationModal: false,
-      newModule: { title: '' },
-      moduleEditionModal: false,
-      editedModule: { title: '' },
+      stepCreationModal: false,
+      newStep: { name: '', type: E_LEARNING },
+      stepEditionModal: false,
+      editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
-      newActivity: { title: '' },
+      newActivity: { name: '' },
       activityEditionModal: false,
-      editedActivity: { title: '' },
+      editedActivity: { name: '' },
       isActivitiesShown: {},
-      currentModuleId: '',
+      currentStepId: '',
+      stepTypeOptions: [
+        { label: 'eLearning', value: E_LEARNING },
+        { label: 'Présentiel', value: ON_SITE },
+      ],
     }
   },
   validations () {
     return {
       program: { name: { required }, learningGoals: { required } },
-      newModule: { title: { required } },
-      editedModule: { title: { required } },
-      newActivity: { title: { required } },
-      editedActivity: { title: { required } },
+      newStep: { name: { required }, type: { required } },
+      editedStep: { name: { required } },
+      newActivity: { name: { required } },
+      editedActivity: { name: { required } },
     }
   },
   computed: {
@@ -158,8 +171,15 @@ export default {
     this.$v.program.$touch();
   },
   methods: {
-    showActivities (moduleId) {
-      this.$set(this.isActivitiesShown, moduleId, !this.isActivitiesShown[moduleId]);
+    getStepTypeLabel (value) {
+      const type = this.stepTypeOptions.find(type => type.value === value);
+      return type ? type.label : '';
+    },
+    getStepTypeIcon (type) {
+      return type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach';
+    },
+    showActivities (stepId) {
+      this.$set(this.isActivitiesShown, stepId, !this.isActivitiesShown[stepId]);
     },
     saveTmp (path) {
       this.tmpInput = get(this.program, path)
@@ -208,73 +228,79 @@ export default {
       try {
         if (get(this.program, 'image')) {
           await Cloudinary.deleteImageById({ id: this.program.image.publicId });
-        }
-        await Programs.update(this.program._id, { image: { link: null, publicId: null } });
+          await Programs.update(this.program._id, { image: { link: null, publicId: null } });
 
-        this.refreshProgram();
-        NotifyPositive('Document supprimé');
+          this.refreshProgram();
+          NotifyPositive('Image supprimée');
+        } else NotifyNegative('Erreur lors de la suppression de l\'image.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document.');
+        NotifyNegative('Erreur lors de la suppression de l\'image.');
       }
     },
-    async createModule () {
+    async createStep () {
       try {
         this.modalLoading = true;
-        this.$v.newModule.$touch();
-        if (this.$v.newModule.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Programs.addModule(this.profileId, this.newModule);
-        NotifyPositive('Module créé.');
+        this.$v.newStep.$touch();
+        if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
+        await Programs.addStep(this.profileId, this.newStep);
+        NotifyPositive('Étape créée.');
 
         await this.refreshProgram();
-        this.moduleCreationModal = false;
+        this.stepCreationModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du module.');
+        NotifyNegative('Erreur lors de la création de l\'étape.');
       } finally {
         this.modalLoading = false;
       }
     },
-    resetModuleCreationModal () {
-      this.newModule.title = '';
-      this.$v.newModule.$reset();
+    resetStepCreationModal () {
+      this.newStep.name = '';
+      this.$v.newStep.$reset();
     },
-    async openModuleEditionModal (module) {
-      this.editedModule = pick(module, ['_id', 'title']);
-      this.moduleEditionModal = true;
+    async openStepEditionModal (step) {
+      this.editedStep = pick(step, ['_id', 'name', 'type']);
+      this.stepEditionModal = true;
     },
-    async editModule () {
+    async editStep () {
       try {
         this.modalLoading = true;
-        this.$v.editedModule.$touch();
-        if (this.$v.editedModule.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.editedStep.$touch();
+        if (this.$v.editedStep.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Modules.updateById(this.editedModule._id, pick(this.editedModule, ['title']));
-        this.moduleEditionModal = false;
+        await Steps.updateById(this.editedStep._id, pick(this.editedStep, ['name']));
+        this.stepEditionModal = false;
         await this.refreshProgram();
-        NotifyPositive('Module modifié.');
+        NotifyPositive('Étape modifiée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification du module.');
+        NotifyNegative('Erreur lors de la modification de l\'étape.');
       } finally {
         this.modalLoading = false;
       }
     },
-    resetModuleEditionModal () {
-      this.editedModule = { title: {} };
-      this.$v.editedModule.$reset();
+    resetStepEditionModal () {
+      this.editedStep = { name: '' };
+      this.$v.editedStep.$reset();
     },
-    openActivityCreationModal (moduleId) {
+    goToActivityProfile (step, activity) {
+      this.$router.push({
+        name: 'ni config activity info',
+        params: { programId: this.program._id, stepId: step._id, activityId: activity._id },
+      });
+    },
+    openActivityCreationModal (stepId) {
       this.activityCreationModal = true;
-      this.currentModuleId = moduleId;
+      this.currentStepId = stepId;
     },
     async createActivity () {
       try {
         this.modalLoading = true;
         this.$v.newActivity.$touch();
         if (this.$v.newActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Modules.addActivity(this.currentModuleId, this.newActivity);
-        NotifyPositive('Activitée créé.');
+        await Steps.addActivity(this.currentStepId, this.newActivity);
+        NotifyPositive('Activitée créée.');
 
         await this.refreshProgram();
         this.activityCreationModal = false;
@@ -286,11 +312,11 @@ export default {
       }
     },
     resetActivityCreationModal () {
-      this.newActivity.title = '';
+      this.newActivity.name = '';
       this.$v.newActivity.$reset();
     },
     async openActivityEditionModal (activity) {
-      this.editedActivity = pick(activity, ['_id', 'title']);
+      this.editedActivity = pick(activity, ['_id', 'name']);
       this.activityEditionModal = true;
     },
     async editActivity () {
@@ -299,7 +325,7 @@ export default {
         this.$v.editedActivity.$touch();
         if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Activities.updateById(this.editedActivity._id, pick(this.editedActivity, ['title']));
+        await Activities.updateById(this.editedActivity._id, pick(this.editedActivity, ['name']));
         this.activityEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité modifiée.');
@@ -311,7 +337,7 @@ export default {
       }
     },
     resetActivityEditionModal () {
-      this.editedActivity = { title: {} };
+      this.editedActivity = { name: '' };
       this.$v.editedActivity.$reset();
     },
   },
@@ -319,7 +345,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.module
+.step
   margin-bottom: 10px
   &-head
     justify-content: space-between
@@ -342,4 +368,9 @@ export default {
     padding: 3px 3px 3px 10px
 .q-btn
     width: fit-content
+
+.q-card
+  .q-card__section
+    .q-item__section--side
+      padding-right: 10px
 </style>

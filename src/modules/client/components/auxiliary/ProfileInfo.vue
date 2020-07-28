@@ -174,7 +174,7 @@
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
-            alt="facture téléphone" @delete="validateCertificateDeletion" name="certificates"
+            alt="diplome" @delete="validateCertificateDeletion" name="certificates"
             collapsible-label="Ajouter un diplôme" :user-profile="userProfile" :url="docsUploadUrl"
             additional-fields-name="diplomes" @uploaded="documentUploaded" :extensions="extensions" />
         </div>
@@ -356,7 +356,6 @@ export default {
           link: { required },
         },
         sector: { required },
-        mentor: { required },
         identity: {
           firstname: { required },
           lastname: { required },
@@ -532,7 +531,7 @@ export default {
     saveTmp (path) {
       if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
     },
-    async refreshUser (notify = true) {
+    async refreshUser () {
       AUXILIARY_ROLES.includes(this.clientRole)
         ? await this.$store.dispatch('main/fetchLoggedUser', this.userProfile._id)
         : await this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });

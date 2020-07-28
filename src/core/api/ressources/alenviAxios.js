@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Cookies } from 'quasar';
 import qs from 'qs';
-import alenvi from '@helpers/alenvi';
+import { refreshAlenviCookies } from '@helpers/alenvi';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 const instance = axios.create({
@@ -10,7 +10,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(async function (config) {
   if (!Cookies.get('alenvi_token')) {
-    const refresh = await alenvi.refreshAlenviCookies();
+    const refresh = await refreshAlenviCookies();
     if (!refresh) {
       logOutAndRedirectToLogin();
       return config;

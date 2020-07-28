@@ -1,26 +1,27 @@
 <template>
-  <q-page padding :class="backgroundClass" v-if="course">
-    <ni-profile-header :title="courseName">
-      <template v-slot:body>
-        <div class="row profile-info q-pl-lg">
-          <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-            <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
-            <q-item-section>{{ info.label }}</q-item-section>
-          </q-item>
-        </div>
-      </template>
-    </ni-profile-header>
-    <div v-if="isClientInterface && isCourseInter">
-      <ni-profile-organization :profile-id="courseId" />
-    </div>
-    <div v-else>
-      <profile-tabs :profile-id="courseId" :tabsContent="tabsContent" />
-    </div>
+  <q-page padding :class="backgroundClass">
+    <template v-if="course">
+      <ni-profile-header :title="courseName">
+        <template v-slot:body>
+          <div class="row profile-info q-pl-lg">
+            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
+              <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
+              <q-item-section>{{ info.label }}</q-item-section>
+            </q-item>
+          </div>
+        </template>
+      </ni-profile-header>
+      <div v-if="isClientInterface && isCourseInter">
+        <ni-profile-organization :profile-id="courseId" />
+      </div>
+      <div v-else>
+        <profile-tabs :profile-id="courseId" :tabsContent="tabsContent" />
+      </div>
+    </template>
   </q-page>
 </template>
 
 <script>
-import get from 'lodash/get';
 import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -72,23 +73,21 @@ export default {
     },
     headerInfo () {
       const infos = [
-        { icon: 'library_books', label: this.programName },
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
       ]
-      if (this.isIntraCourse) infos.push({ icon: 'apartment', label: this.companyName });
 
       return infos;
     },
   },
   watch: {
     course () {
-      this.courseName = get(this.course, 'name') || '';
+      this.courseName = this.composeCourseName(this.course, !this.isClientInterface);
     },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    this.courseName = get(this.course, 'name') || '';
+    this.courseName = this.composeCourseName(this.course, !this.isClientInterface);
   },
   methods: {
     async refreshCourse () {

@@ -27,12 +27,11 @@
       </template>
       <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="$v.newCourse.type.$error"
         caption="Type" required-field inline @input="updateCourseCompany" />
-      <ni-input in-modal v-model.trim="newCourse.name" :error="$v.newCourse.name.$error"
-        @blur="$v.newCourse.name.$touch" required-field caption="Nom" />
       <ni-select in-modal v-model.trim="newCourse.program" :error="$v.newCourse.program.$error"
         @blur="$v.newCourse.program.$touch" required-field caption="Programme" :options="programOptions" />
       <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="$v.newCourse.company.$error"
         @blur="$v.newCourse.company.$touch" required-field caption="Structure" :options="companyOptions" />
+      <ni-input in-modal v-model.trim="newCourse.misc" caption="Informations Complémentaires" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
           icon-right="add" @click="createCourse" />
@@ -44,7 +43,6 @@
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
-import groupBy from 'lodash/groupBy';
 import pickBy from 'lodash/pickBy';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
@@ -77,7 +75,7 @@ export default {
       newCourse: {
         program: '',
         company: '',
-        name: '',
+        misc: '',
         type: INTRA,
       },
       courseCreationModal: false,
@@ -90,7 +88,6 @@ export default {
       newCourse: {
         program: { required },
         company: { required: requiredIf((item) => { return item.type === INTRA; }) },
-        name: { required },
         type: { required },
       },
     }
@@ -108,10 +105,7 @@ export default {
     async refreshCourses () {
       try {
         const courses = await Courses.list();
-        this.coursesWithGroupedSlot = courses.map(course => ({
-          ...course,
-          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
-        }));
+        this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
         this.coursesWithGroupedSlot = [];
