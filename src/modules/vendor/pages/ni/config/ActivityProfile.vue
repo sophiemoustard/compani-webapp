@@ -23,7 +23,7 @@
         Créer une nouvelle <span class="text-weight-bold">carte</span>
       </template>
       <h6 class="text-weight-bold">Cours</h6>
-      <div class="row q-mb-xl">
+      <div class="row q-mb-xl justify-evenly">
         <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
           :class="getClassForTemplateInModal(template.value)">
           <div class="text-weight-bold card-button-content">
