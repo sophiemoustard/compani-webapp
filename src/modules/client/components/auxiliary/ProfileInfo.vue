@@ -174,7 +174,7 @@
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
-            alt="facture téléphone" @delete="validateCertificateDeletion" name="certificates"
+            alt="diplome" @delete="validateCertificateDeletion" name="certificates"
             collapsible-label="Ajouter un diplôme" :user-profile="userProfile" :url="docsUploadUrl"
             additional-fields-name="diplomes" @uploaded="documentUploaded" :extensions="extensions" />
         </div>
