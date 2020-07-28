@@ -10,33 +10,33 @@
           <div class="slot-section-title-subtitle">{{ formatSlotTitle.subtitle }}</div>
         </q-item-section>
       </q-item>
-      <div class="slots-cards-container row">
-        <q-card class="slots-cards" v-for="(value, key, index) in courseSlots" :key="index" flat>
-          <div class="slots-cards-title">
-            <div class="slots-cards-number">{{ index + 1 }}</div>
-            <div class="slots-cards-date text-weight-bold">{{ key }}</div>
+      <div class="slots-cells-container row">
+        <q-card class="slots-cells" v-for="(value, key, index) in courseSlots" :key="index" flat>
+          <div class="slots-cells-title">
+            <div class="slots-cells-number">{{ index + 1 }}</div>
+            <div class="slots-cells-date text-weight-bold">{{ key }}</div>
           </div>
-          <div class="slots-cards-content" v-for="slot in value" :key="slot._id">
-            <div>
-              <q-item>
-                <q-item-section side><q-icon name="access_time" flat dense size="xs" /></q-item-section>
-                <q-item-section>{{ formatSlotHour(slot) }} ({{getSlotDuration(slot)}})</q-item-section>
-              </q-item>
-              <q-item>
-                <q-item-section side><q-icon name="location_on" flat dense size="xs" /></q-item-section>
-                <q-item-section>{{ getSlotAddress(slot) }}</q-item-section>
-              </q-item>
-            </div>
-            <div class="row no-wrap" v-if="canEdit">
-              <q-icon color="grey" size="sm" name="edit" @click="openEditionModal(slot)" />
-              <q-icon color="grey" size="sm" name="delete" @click="validateDeletion(slot._id)" />
-            </div>
+          <div :class="['slots-cells-content', { 'cursor-pointer': canEdit }]" v-for="slot in value" :key="slot._id"
+            @click="openEditionModal(slot)">
+              <q-item class="text-weight-bold">{{ getStepTitle(slot) }}</q-item>
+              <q-item>{{ formatSlotHour(slot) }} ({{ getSlotDuration(slot) }})</q-item>
+              <q-item>{{ getSlotAddress(slot) }}</q-item>
           </div>
+        </q-card>
+        <q-card :class="['slots-cells', { 'cursor-pointer' : canEdit }]" v-for="(value, index) in courseSlotsToPlan"
+          :key="Object.keys(courseSlots).length + index + 1" flat @click="openEditionModal(value)">
+          <div class="slots-cells-title">
+            <div class="slots-cells-number">{{ Object.keys(courseSlots).length + index + 1 }}</div>
+            <div class="slots-cells-date text-weight-bold">Date à planifier</div>
+          </div>
+          <div class="to-plan-text">Créneau à planifier</div>
         </q-card>
       </div>
       <div class="q-mt-md" v-if="canEdit" align="right">
         <q-btn class="add-slot" label="Ajouter un créneau" no-caps flat color="white" icon="add"
-          :disable="loading" @click="creationModal = true" />
+          :disable="loading || addDateToPlanloading" @click="creationModal = true" />
+        <q-btn class="add-slot" label="Ajouter une date à planifier" no-caps flat color="white" icon="add"
+          :disable="addDateToPlanloading" @click="addDateToPlan" />
       </div>
     </div>
 
@@ -50,6 +50,7 @@
         :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
       <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
         @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" :disable="!stepsLength" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
           :loading="modalLoading" @click="addCourseSlot" />
@@ -61,10 +62,16 @@
       <template slot="title">
         Editer un <span class="text-weight-bold">créneau</span>
       </template>
+      <div class="modal-icon">
+        <q-icon class="cursor-pointer" color="grey" size="sm" name="delete"
+          @click="validateDeletion(editedCourseSlot._id)" />
+      </div>
       <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
         :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
         @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step"
+        :disable="!stepsLength" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
           :loading="modalLoading" @click="updateCourseSlot" />
@@ -77,15 +84,17 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import has from 'lodash/has';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import CourseSlots from '@api/CourseSlots';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, E_LEARNING } from '@data/constants';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
 import SearchAddress from '@components/form/SearchAddress';
 import DateTimeRange from '@components/form/DatetimeRange';
 import Modal from '@components/modal/Modal';
+import Select from '@components/form/Select';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -101,10 +110,12 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-datetime-range': DateTimeRange,
     'ni-modal': Modal,
+    'ni-select': Select,
   },
   data () {
     return {
       courseSlots: {},
+      addDateToPlanloading: false,
       modalLoading: false,
       creationModal: false,
       newCourseSlot: {
@@ -113,6 +124,7 @@ export default {
           endDate: this.$moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
+        step: null,
       },
       editedCourseSlot: {},
       editionModal: false,
@@ -165,40 +177,58 @@ export default {
       return paddedMinutes ? `${hours}h${paddedMinutes}` : `${hours}h`;
     },
     formatSlotTitle () {
+      const slotsToPlanLength = this.courseSlotsToPlan.length;
       const slotList = Object.values(this.courseSlots);
+      const totalDate = slotsToPlanLength + slotList.length;
+      if (!totalDate) return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
 
-      if (!slotList.length) {
-        return { title: 'Pas de date prévue', subtitle: '', icon: 'mdi-calendar-remove' };
+      const slotsToPlanTitle = slotsToPlanLength ? ` dont ${slotsToPlanLength} à planifier, ` : '';
+
+      let subtitle = '';
+      if (slotList.length) {
+        const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
+        const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+        subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
-      const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
-
-      if (slotList.length === 1) {
-        return {
-          title: `1 date, ${this.slotsDurationTitle}`,
-          subtitle: `le ${firstSlot}`,
-          icon: 'mdi-calendar-range',
-        };
-      }
-
-      const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
       return {
-        title: `${slotList.length} dates, ${this.slotsDurationTitle}`,
-        subtitle: `du ${firstSlot} au ${lastSlot}`,
+        title: `${totalDate} date${totalDate > 1 ? 's' : ''}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
+        subtitle,
         icon: 'mdi-calendar-range',
       };
+    },
+    stepsLength () {
+      return this.course.program.steps.length;
+    },
+    stepOptions () {
+      if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
+      return [
+        { label: 'Pas d\'étape spécifiée', value: null },
+        ...this.course.program.steps.map((step, index) => ({
+          label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
+          value: step._id,
+          disable: step.type === E_LEARNING,
+        })),
+      ];
     },
   },
   watch: {
     course () {
-      this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
+      this.groupByCourses();
     },
   },
   async created () {
     if (!this.course) this.$emit('refresh');
-    else this.courseSlots = groupBy(this.course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'));
+    else this.groupByCourses();
   },
   methods: {
+    groupByCourses () {
+      this.courseSlots = groupBy(
+        this.course.slots.filter(slot => !!slot.startDate),
+        s => this.$moment(s.startDate).format('DD/MM/YYYY')
+      );
+      this.courseSlotsToPlan = this.course.slotsToPlan || [];
+    },
     getSlotDuration (slot) {
       const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
 
@@ -219,20 +249,28 @@ export default {
           endDate: this.$moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
+        step: null,
       };
       this.$v.newCourseSlot.$reset();
     },
     formatCreationPayload (courseSlot) {
       const payload = { ...courseSlot.dates, courseId: this.course._id };
       if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
+      if (courseSlot.step) payload.step = courseSlot.step;
 
       return payload;
     },
     openEditionModal (slot) {
+      if (!this.canEdit) return;
+      const defaultDate = {
+        startDate: this.$moment().startOf('d').hours(9).toISOString(),
+        endDate: this.$moment().startOf('d').hours(12).toISOString(),
+      };
       this.editedCourseSlot = {
         _id: slot._id,
-        dates: pick(slot, ['startDate', 'endDate']),
+        dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
+        step: get(slot, 'step._id') || null,
       }
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
@@ -242,9 +280,8 @@ export default {
       this.$v.editedCourseSlot.$reset();
     },
     formatEditionPayload (courseSlot) {
-      const payload = { ...courseSlot.dates, address: {} };
+      const payload = { ...courseSlot.dates, address: {}, step: courseSlot.step };
       if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
-
       return payload;
     },
     async addCourseSlot () {
@@ -264,6 +301,20 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    async addDateToPlan () {
+      try {
+        this.addDateToPlanloading = true;
+        await CourseSlots.create(this.formatCreationPayload({}));
+        NotifyPositive('Date à planifier ajoutée.');
+
+        this.$emit('refresh');
+      } catch (e) {
+        console.error(e)
+        NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
+      } finally {
+        this.addDateToPlanloading = false;
       }
     },
     async updateCourseSlot () {
@@ -297,13 +348,22 @@ export default {
     },
     async deleteCourseSlot (slotId) {
       try {
+        this.modalLoading = true;
         await CourseSlots.delete(slotId);
         this.$emit('refresh');
         NotifyPositive('Créneau supprimé');
+        this.editionModal = false;
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du créneau.')
+      } finally {
+        this.modalLoading = false;
       }
+    },
+    getStepTitle (slot) {
+      if (!slot.step) return '';
+      const step = this.stepOptions.find(option => option.value === slot.step._id);
+      return step ? step.label : '';
     },
   },
 
@@ -311,7 +371,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.slots-cards
+.slots-cells
   padding: 10px
   &-container
     grid-auto-rows: 1fr
@@ -339,16 +399,19 @@ export default {
   &-content
     margin: 5px 10px
     display: flex
-    justify-content: space-between
-  &-content > div > .q-item
+    background-color: $primary-light
+    flex-direction: column
+    border-radius: 4px !important
+  &-content > .q-item
     font-size: 14px
     padding: 0px
     min-height: auto
-  &-content > div > .q-icon
-    cursor: pointer
+    margin: 0px 10px
 
 .add-slot
   background: $primary
+  margin-left: 10px
+  margin-top: 10px
 .slot-section-title
   padding: 0;
   margin: 10px 0px
@@ -357,4 +420,13 @@ export default {
      font-size: 16px
      @media (max-width: 767px)
       font-size: 13px
+
+.to-plan-text
+  text-decoration: underline
+  color: $secondary
+  font-size: 14px
+
+.modal-icon
+  display: flex;
+  justify-content: flex-end
 </style>

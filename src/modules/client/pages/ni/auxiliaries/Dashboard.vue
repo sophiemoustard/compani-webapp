@@ -17,7 +17,7 @@
         </q-btn>
       </div>
     </div>
-    <q-card v-for="sector of filteredSectors" :key="sector" class="sector-card row">
+    <q-card v-for="sector of filteredSectors" :key="sector" class="sector-cell row">
       <q-card-section class="full-width" :class="{ 'card-height': displayStats[sector].loading }">
         <div v-if="!displayStats[sector].loading" class="row justify-between">
           <div class="col-md-6 col-xs-12">
@@ -86,9 +86,9 @@
         </div>
         <q-slide-transition>
           <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
-            class="auxiliary-card-container row">
+            class="auxiliary-cell-container row">
             <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
-              class="col-md-6 col-xs-12 auxiliary-card q-mb-lg">
+              class="col-md-6 col-xs-12 auxiliary-cell q-mb-lg">
               <div class="row person-name q-mb-md">
                 <img :src="getAvatar(auxiliary.picture)" class="avatar">
                 <div class="q-pl-md">
@@ -372,7 +372,7 @@ export default {
     border-bottom: 1px solid $middle-grey
   div
     padding: 5px
-  &-card
+  &-cell
     display: flex
     flex-direction: column
     &:not(:nth-last-child(-n+2))
@@ -389,7 +389,7 @@ export default {
   justify-content: flex-end
   display: flex
 
-.sector-card
+.sector-cell
   margin: 0 16px 16px
   @media screen and (max-width: 767px)
     font-size: 12px

@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <h4>Contrats</h4>
-    <ni-contracts-card v-if="contracts" :contracts="contracts" :user="customer" :columns="contractsVisibleColumns"
+    <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="customer" :columns="contractsVisibleColumns"
       @refresh="refreshContracts" :person-key="CUSTOMER" @refreshWithTimeout="refreshContractsWithTimeout"
       :loading-contracts="loading" />
   </q-page>
@@ -11,14 +11,14 @@
 import Contracts from '@api/Contracts';
 import { CUSTOMER } from '@data/constants';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
-import ContractsCard from 'src/modules/client/components/contracts/ContractsCard';
+import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
 
 export default {
   name: 'CustomerContracts',
   metaInfo: { title: 'Contracts' },
   mixins: [contractMixin],
   components: {
-    'ni-contracts-card': ContractsCard,
+    'ni-contracts-cell': ContractsCell,
   },
   data () {
     return {

@@ -16,7 +16,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import groupBy from 'lodash/groupBy';
 import Courses from '@api/Courses';
 import TitleHeader from '@components/TitleHeader';
 import Trello from '@components/courses/Trello';
@@ -47,10 +46,7 @@ export default {
     async refreshCourses () {
       try {
         const courses = await Courses.list({ trainer: this.loggedUser._id });
-        this.coursesWithGroupedSlot = courses.map(course => ({
-          ...course,
-          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
-        }));
+        this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
         this.coursesWithGroupedSlot = [];

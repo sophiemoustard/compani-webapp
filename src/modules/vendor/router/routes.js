@@ -1,6 +1,7 @@
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import { TRAINER } from '@data/constants';
+import { canNavigate } from '@helpers/alenvi';
 import store from 'src/store/index';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
@@ -12,10 +13,7 @@ const routes = [
       try {
         if (!['/ad', '/ad/'].includes(to.path)) return next();
 
-        const loggedUser = store.state.main.loggedUser;
-        const userId = Cookies.get('user_id');
-        if (!loggedUser && !userId) return logOutAndRedirectToLogin();
-        if (!loggedUser) await store.dispatch('main/fetchLoggedUser', userId);
+        if (!(await canNavigate())) return logOutAndRedirectToLogin();
 
         const userVendorRole = store.getters['main/getVendorRole'];
         if (!userVendorRole) return next({ path: '/' });
@@ -67,7 +65,7 @@ const routes = [
       },
       {
         path: 'ni/config/programs',
-        name: 'ni users programs',
+        name: 'ni config programs',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -76,8 +74,18 @@ const routes = [
       },
       {
         path: 'ni/config/programs/:programId',
-        name: 'ni users programs info',
+        name: 'ni config programs info',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'configuration',
+        },
+      },
+      {
+        path: 'ni/config/programs/:programId/step/:stepId/activity/:activityId',
+        name: 'ni config activity info',
+        component: () => import('src/modules/vendor/pages/ni/config/ActivityProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -132,11 +140,7 @@ const routes = [
       {
         path: 'trainers/info',
         name: 'trainers info',
-        component: () => import('src/modules/vendor/pages/ni/users/trainers/TrainerProfile'),
-        props: true,
-        beforeEnter (to, from, next) {
-          return to.params.trainerId === Cookies.get('user_id') ? next() : next('/404');
-        },
+        component: () => import('src/modules/vendor/pages/trainers/administrative/Info'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'administrative',

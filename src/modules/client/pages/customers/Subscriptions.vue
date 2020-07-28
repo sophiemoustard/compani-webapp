@@ -5,7 +5,7 @@
         <h4>Abonnement</h4>
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
-        <q-card v-if="subscriptions.length > 0" class="contract-card">
+        <q-card v-if="subscriptions.length > 0" class="contract-cell">
           <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading"
             data-cy="subscriptions-table">
             <template v-slot:body="{ props }">
@@ -66,7 +66,7 @@
       <div class="q-mb-lg">
         <p class="title">Mandats de prélèvement</p>
         <p v-if="customer.payment.mandates.length === 0 || !isValidPayment">Aucun mandat.</p>
-        <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-card">
+        <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-cell">
           <ni-responsive-table :data="customer.payment.mandates" :columns="mandatesColumns" :loading="mandatesLoading"
             :pagination.sync="pagination" :visible-columns="mandatesVisibleColumns" data-cy="mandate-table">
             <template v-slot:body="{ props }">
@@ -441,7 +441,7 @@ export default {
   .nota-bene
     font-size: 0.8em
     margin-bottom: 20px
-  .contract-card
+  .contract-cell
     background: white
     width: 100%
     margin-bottom: 10px

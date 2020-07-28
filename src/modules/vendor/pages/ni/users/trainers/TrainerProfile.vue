@@ -8,12 +8,13 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
 import { formatIdentity } from '@helpers/utils';
+import { TRAINER } from '@data/constants';
 
 export default {
   name: 'TrainerProfile',
@@ -41,16 +42,21 @@ export default {
     }
   },
   async created () {
-    await this.$store.dispatch('rh/fetchUserProfile', { userId: this.trainerId });
+    if (this.vendorRole !== TRAINER) await this.$store.dispatch('rh/fetchUserProfile', { userId: this.trainerId });
     this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
   },
   computed: {
-    ...mapState('rh', ['userProfile']),
+    ...mapState({
+      userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
+        ? state.main.loggedUser
+        : state.rh.userProfile,
+    }),
+    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
   },
   watch: {
     async userProfile () {
       this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
-      await this.$store.dispatch('rh/updateNotifications');
+      if (this.vendorRole !== TRAINER) await this.$store.dispatch('rh/updateNotifications');
     },
   },
   beforeDestroy () {

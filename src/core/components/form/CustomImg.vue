@@ -19,7 +19,10 @@ export default {
     }
   },
   mounted () {
-    this.getThumbnailUrl()
+    this.getThumbnailUrl();
+  },
+  watch: {
+    imageSource () { this.getThumbnailUrl(); },
   },
   methods: {
     async getThumbnailUrl () {

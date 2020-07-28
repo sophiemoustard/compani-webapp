@@ -87,10 +87,6 @@ export const menuItemsMixin = {
       else if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
       else return {};
     },
-    footerLabel () {
-      if (this.isCoach || this.isAuxiliary) return this.userFirstnameUpper;
-      else return this.loggedUser.identity.lastname;
-    },
     customerRoutes () {
       return [
         { name: 'customers agenda', icon: 'date_range', label: 'Planning', condition: true },

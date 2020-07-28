@@ -9,12 +9,6 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 export const courseMixin = {
   computed: {
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
-    companyName () {
-      return get(this.course, 'company.name') || '';
-    },
-    programName () {
-      return get(this.course, 'program.name') || '';
-    },
     isIntraCourse () {
       return get(this.course, 'type') === INTRA;
     },
@@ -52,13 +46,22 @@ export const courseMixin = {
     formatUpdateCourseValue (path, value) {
       return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
     },
+    composeCourseName (c, attachCompany = false) {
+      const possiblyCompanyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
+      const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
+      return possiblyCompanyName + c.program.name + possiblyMisc;
+    },
     async updateCourse (path) {
       try {
         const value = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
 
         if (this.tmpInput === value) return;
-        get(this.$v.course, path).$touch();
-        if (get(this.$v.course, path).$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        const vAttribute = get(this.$v.course, path)
+        if (vAttribute) {
+          vAttribute.$touch();
+          if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
+        }
 
         const payload = set({}, path, this.formatUpdateCourseValue(path, value));
         await Courses.update(this.profileId, payload);

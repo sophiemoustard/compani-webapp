@@ -18,7 +18,6 @@
 
 <script>
 import { mapState } from 'vuex';
-import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import Select from '@components/form/Select';
@@ -50,10 +49,7 @@ export default {
     async refreshCourses () {
       try {
         const courses = await Courses.list({ company: get(this.loggedUser, 'company._id') || '' });
-        this.coursesWithGroupedSlot = courses.map(course => ({
-          ...course,
-          slots: Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY'))),
-        }));
+        this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
         this.coursesWithGroupedSlot = [];
