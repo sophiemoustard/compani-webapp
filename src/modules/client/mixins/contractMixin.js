@@ -80,20 +80,17 @@ export const contractMixin = {
       return '';
     },
     generateContractSigners (signer) {
-      const signers = [{
-        id: '1',
-        name: this.userFullName,
-        email: this.auxiliary.local.email,
-      }];
-      signers.push({ id: `${signers.length + 1}`, name: signer.name, email: signer.email });
-      return signers;
+      return [
+        { id: '1', name: this.userFullName, email: this.auxiliary.local.email },
+        { id: '2', name: signer.name, email: signer.email },
+      ];
     },
     resetVersionEditionModal () {
       this.versionEditionModal = false;
       this.editedVersion = {};
       this.$v.editedVersion.$reset();
     },
-    async getSignaturePayload (contract, title, template) {
+    getSignaturePayload (contract, title, template) {
       return {
         ...this.esignRedirection,
         templateId: template.driveId,
@@ -120,7 +117,7 @@ export const contractMixin = {
         const versionMix = { ...this.selectedContract, ...this.editedVersion };
         const isContract = this.selectedContract.versions[0]._id === this.editedVersion.versionId;
         const template = isContract ? this.getContractTemplate(versionMix) : this.getVersionTemplate(versionMix);
-        payload.signature = await this.getSignaturePayload(versionMix, isContract ? '' : 'Avenant au ', template);
+        payload.signature = this.getSignaturePayload(versionMix, isContract ? '' : 'Avenant au ', template);
       }
 
       return pickBy(payload);
@@ -154,17 +151,17 @@ export const contractMixin = {
         NotifyPositive('Pas de modification apportée au contrat.')
         return this.resetVersionEditionModal();
       }
-      if (this.isPreviousPayImpacted) {
-        this.$q.dialog({
-          title: 'Confirmation',
-          message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant prenant effet ce mois-ci. Confirmez-vous ce changement ?',
-          ok: true,
-          cancel: 'Annuler',
-        }).onOk(this.saveVersion)
-          .onCancel(() => NotifyPositive('Modification annulée'));
-      } else {
-        await this.saveVersion();
-      }
+
+      if (!this.isPreviousPayImpacted) return this.saveVersion();
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant ' +
+          'prenant effet ce mois-ci. Confirmez-vous ce changement ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(this.saveVersion)
+        .onCancel(() => NotifyPositive('Modification annulée'));
     },
     getFullNationality (nationality) {
       return nationalities[nationality];

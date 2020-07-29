@@ -39,7 +39,7 @@
                 <div class="row archives justify-center">
                   <div v-for="archive in col.value" :key="archive._id">
                     <q-btn flat round small color="primary" type="a" :href="getArchiveLink(archive)" target="_blank"
-                      icon="file_download" :disable="getArchiveLink(archive)" />
+                      icon="file_download" :disable="!getArchiveLink(archive)" />
                   </div>
                 </div>
               </template>
@@ -268,9 +268,6 @@ export default {
       }
     },
     getContractLink (contract) {
-      if (this.personKey === CUSTOMER) {
-        return contract.customerDoc ? contract.customerDoc.link : false;
-      }
       return contract.auxiliaryDoc ? contract.auxiliaryDoc.link : false;
     },
   },
