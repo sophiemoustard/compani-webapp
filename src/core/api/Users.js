@@ -34,6 +34,14 @@ export default {
       console.error(e.response);
     }
   },
+  async learnerList () {
+    try {
+      const learners = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/learners`, {});
+      return learners.data.data.learners;
+    } catch (e) {
+      console.error(e.response);
+    }
+  },
   async getById (id) {
     const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
     return userRaw.data.data.user;

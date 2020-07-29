@@ -64,6 +64,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/users/learners',
+        name: 'ni users learners',
+        component: () => import('src/modules/vendor/pages/ni/users/learners/LearnersDirectory.vue'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
         path: 'ni/config/programs',
         name: 'ni config programs',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
