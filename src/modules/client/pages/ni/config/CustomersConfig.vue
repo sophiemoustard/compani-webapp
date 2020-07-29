@@ -1023,17 +1023,22 @@ export default {
       };
       this.$v.editedService.$reset();
     },
+    formatEditedService () {
+      const payload = pickBy(this.editedService);
+      delete payload._id;
+      delete payload.nature;
+
+      return payload;
+    },
     async updateService () {
       try {
         this.$v.editedService.$touch();
         if (this.$v.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const serviceId = this.editedService._id;
-        const payload = pickBy(this.editedService);
-        delete payload._id;
-        delete payload.nature;
-        await Services.updateById(serviceId, payload);
+        const payload = this.formatEditedService();
+        await Services.updateById(this.editedService._id, payload);
+
         NotifyPositive('Service modifié');
         this.resetEditionServiceData();
         await this.refreshServices();
