@@ -97,9 +97,10 @@ export default {
       try {
         this.tableLoading = true;
         const learners = await Users.learnerList();
-        this.learnerList = Object.freeze(learners.map(this.formatRow));
+        this.learnerList = learners.map(this.formatRow);
       } catch (e) {
         console.error(e);
+        this.learnerList = [];
       } finally {
         this.tableLoading = false;
       }
