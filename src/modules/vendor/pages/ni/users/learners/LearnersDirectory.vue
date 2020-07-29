@@ -16,7 +16,6 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
 import Users from '@api/Users';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -64,7 +63,7 @@ export default {
         {
           name: 'followingCourses',
           label: 'Formations suivies',
-          field: 'followingCourses',
+          field: 'coursesCount',
           align: 'center',
           style: 'min-width: 110px; width: 15%',
         },
@@ -72,7 +71,6 @@ export default {
     }
   },
   computed: {
-    ...mapGetters({ company: 'main/getCompany' }),
     filteredLearners () {
       return this.learnerList.filter(user => user.profile.name.match(new RegExp(this.searchStr, 'i')));
     },
@@ -92,7 +90,7 @@ export default {
           picture: user.picture ? user.picture.link : null,
         },
         company: user.company ? user.company.name : 'N/A',
-        followingCourses: user.followingCourses,
+        coursesCount: user.coursesCount,
       };
     },
     async getLearnerList () {
