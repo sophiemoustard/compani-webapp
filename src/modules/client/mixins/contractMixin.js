@@ -8,7 +8,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { minDate } from '@helpers/vuelidateCustomVal';
 import nationalities from '@data/nationalities.js';
 import { REQUIRED_LABEL } from '@data/constants';
-import { generateContractFields } from 'src/modules/client/helpers/generateContractFields.js';
+import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 
 export const contractMixin = {
   data () {

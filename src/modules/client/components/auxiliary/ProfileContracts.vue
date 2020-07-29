@@ -256,10 +256,10 @@ export default {
     }
   },
   methods: {
-    getContractTemplate (contract) {
+    getContractTemplate () {
       return get(this.userCompany, 'rhConfig.templates.contractWithCompany');
     },
-    getVersionTemplate (contract) {
+    getVersionTemplate () {
       return get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion');
     },
     async refreshUser () {
@@ -324,7 +324,7 @@ export default {
       };
 
       if (this.newContract.shouldBeSigned) {
-        const template = this.getContractTemplate(this.newContract);
+        const template = this.getContractTemplate();
         payload.versions[0].signature = await this.getSignaturePayload(this.newContract, '', template);
       }
 
@@ -332,7 +332,7 @@ export default {
     },
     async createContract () {
       try {
-        const template = this.getContractTemplate(this.newContract);
+        const template = this.getContractTemplate();
         if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
         this.$v.newContract.$touch();
@@ -361,19 +361,14 @@ export default {
     },
     resetVersionCreationModal () {
       this.newVersionModal = false;
-      this.newVersion = {
-        weeklyHours: '',
-        startDate: '',
-        grossHourlyRate: '',
-        shouldBeSigned: true,
-      };
+      this.newVersion = { weeklyHours: '', startDate: '', grossHourlyRate: '', shouldBeSigned: true };
       this.$v.newVersion.$reset();
     },
     async getVersionCreationPayload () {
       const payload = pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
       if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
-        const template = this.getVersionTemplate(versionMix);
+        const template = this.getVersionTemplate();
         payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 
@@ -381,7 +376,7 @@ export default {
     },
     async createVersion () {
       try {
-        const template = this.getVersionTemplate(this.selectedContract);
+        const template = this.getVersionTemplate();
         if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
         this.$v.newVersion.$touch();
