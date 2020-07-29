@@ -956,8 +956,11 @@ export default {
           startDate: this.$moment('1970-01-01').startOf('d').toISOString(), // first version does not have actual start date
         }],
       };
-      if (this.newService.surcharge && this.newService.surcharge !== '') formattedService.versions[0].surcharge = this.newService.surcharge;
+      if (this.newService.surcharge && this.newService.surcharge !== '') {
+        formattedService.versions[0].surcharge = this.newService.surcharge;
+      }
       if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;
+
       return formattedService;
     },
     resetCreationServiceData () {
@@ -980,6 +983,7 @@ export default {
         this.loading = true;
         const payload = this.formatCreatedService();
         await Services.create(payload);
+
         NotifyPositive('Service créé.');
         this.resetCreationServiceData();
         await this.refreshServices();
