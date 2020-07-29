@@ -23,12 +23,16 @@
         Créer une nouvelle <span class="text-weight-bold">carte</span>
       </template>
       <h6 class="text-weight-bold">Cours</h6>
-      <div class="row q-mb-xl justify-evenly">
+      <div class="row q-mb-xl justify-between">
         <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
           :class="getClassForTemplateInModal(template.value)">
           <div class="text-weight-bold card-button-content">
             <template v-if="template.value === TITLE_TEXT_MEDIA">
               <div>Titre</div>
+              <div>Texte</div>
+              <q-icon name="image" size="sm" />
+            </template>
+            <template v-else-if="template.value === TEXT_MEDIA">
               <div>Texte</div>
               <q-icon name="image" size="sm" />
             </template>
@@ -51,7 +55,7 @@ import { required } from 'vuelidate/lib/validators';
 import Activities from '@api/Activities';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TEMPLATE_TYPES, TITLE_TEXT_MEDIA } from '@data/constants';
+import { TEMPLATE_TYPES, TITLE_TEXT_MEDIA, TEXT_MEDIA } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/CardEdition';
@@ -79,6 +83,7 @@ export default {
       templateTypes: TEMPLATE_TYPES,
       newCard: { template: '' },
       TITLE_TEXT_MEDIA,
+      TEXT_MEDIA,
     };
   },
   validations () {
@@ -201,7 +206,7 @@ h6
   display: flex
   align-items: center
   justify-content: center
-  margin: 3px 7px
+  margin: 10px 7px
   &-selected
     background-color: $dark-grey
     color: $light-grey

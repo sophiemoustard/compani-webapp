@@ -7,7 +7,7 @@
         <div :class="['card-cell', 'cursor-pointer', { 'card-cell-selected': isSelected(card) }]"
            @click="selectCard(card)">
           <div class="card-cell-title text-weight-bold">
-            {{ index + 1 }}. {{ card.title }}
+            {{ index + 1 }}. {{ getHeading(card) }}
           </div>
           <div>{{ getTemplateName(card.template) }}</div>
         </div>
@@ -38,6 +38,10 @@ export default {
     },
     openCreationModal () {
       this.$emit('add');
+    },
+    getHeading (card) {
+      if (card.title) return card.title;
+      return card.text;
     },
     getTemplateName (value) {
       const template = TEMPLATE_TYPES.find(t => t.value === value);
