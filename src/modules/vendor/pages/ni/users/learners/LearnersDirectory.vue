@@ -7,7 +7,7 @@
           <q-item-section avatar>
             <img class="avatar" :src="getAvatar(col.value.picture)">
           </q-item-section>
-          <q-item-section>{{ col.value.name }}</q-item-section>
+          <q-item-section>{{ col.value.fullName }}</q-item-section>
         </q-item>
         <template v-else>{{ col.value }}</template>
       </template>
@@ -42,14 +42,10 @@ export default {
         {
           name: 'name',
           label: 'Nom',
-          field: row => row.profile,
+          field: row => row.learner,
           align: 'left',
           sortable: true,
-          sort: (a, b) => {
-            const aArr = a.name.split(' ');
-            const bArr = b.name.split(' ');
-            return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
-          },
+          sort: (a, b) => { return a.lastname.toLowerCase() < b.lastname.toLowerCase() ? -1 : 1 },
           style: 'min-width: 200px; width: 35%',
         },
         {
@@ -61,7 +57,7 @@ export default {
           style: 'min-width: 100px; width: 15%',
         },
         {
-          name: 'followingCourses',
+          name: 'coursesCount',
           label: 'Formations suivies',
           field: 'coursesCount',
           align: 'center',
@@ -72,7 +68,7 @@ export default {
   },
   computed: {
     filteredLearners () {
-      return this.learnerList.filter(user => user.profile.name.match(new RegExp(this.searchStr, 'i')));
+      return this.learnerList.filter(user => user.learner.fullName.match(new RegExp(this.searchStr, 'i')));
     },
   },
   async created () {
@@ -84,9 +80,9 @@ export default {
     },
     formatRow (user) {
       return {
-        profile: {
-          _id: user._id,
-          name: formatIdentity(user.identity, 'FL'),
+        learner: {
+          fullName: formatIdentity(user.identity, 'FL'),
+          lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
         },
         company: user.company ? user.company.name : 'N/A',
@@ -97,7 +93,7 @@ export default {
       try {
         this.tableLoading = true;
         const learners = await Users.learnerList();
-        this.learnerList = learners.map(this.formatRow);
+        this.learnerList = Object.freeze(learners.map(this.formatRow));
       } catch (e) {
         console.error(e);
         this.learnerList = [];
