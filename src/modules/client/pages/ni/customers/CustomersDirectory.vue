@@ -47,6 +47,7 @@
 import { required, email } from 'vuelidate/lib/validators';
 import pickBy from 'lodash/pickBy';
 import get from 'lodash/get';
+import escapeRegExp from 'lodash/escapeRegExp'
 import Customers from '@api/Customers';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
 import SearchAddress from '@components/form/SearchAddress';
@@ -178,7 +179,8 @@ export default {
   computed: {
     filteredCustomers () {
       const customers = this.onlyClients ? this.customers.filter(customer => customer.firstIntervention) : this.customers;
-      return customers.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return customers.filter(customer => customer.identity.fullName.match(new RegExp(escapedString, 'i')));
     },
     primaryAddressError () {
       return !this.$v.newCustomer.contact.primaryAddress.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';

@@ -17,6 +17,7 @@
 
 <script>
 import Users from '@api/Users';
+import escapeRegExp from 'lodash/escapeRegExp'
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { DEFAULT_AVATAR } from '@data/constants';
@@ -72,7 +73,8 @@ export default {
   },
   computed: {
     filteredLearners () {
-      return this.learnerList.filter(user => user.learner.fullName.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return this.learnerList.filter(user => user.learner.fullName.match(new RegExp(escapedString, 'i')));
     },
   },
   async created () {

@@ -24,6 +24,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
+import escapeRegExp from 'lodash/escapeRegExp'
 import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
@@ -78,7 +79,8 @@ export default {
   },
   computed: {
     filteredPrograms () {
-      return this.programs.filter(program => program.name.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return this.programs.filter(program => program.name.match(new RegExp(escapedString, 'i')));
     },
   },
   async mounted () {
