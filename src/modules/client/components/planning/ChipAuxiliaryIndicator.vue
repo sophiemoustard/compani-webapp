@@ -116,9 +116,6 @@ export default {
           (!contract.endDate || this.$moment(contract.endDate).isAfter(this.startOfWeek)));
       });
     },
-    companyContracts () {
-      return this.person.contracts;
-    },
   },
   methods: {
     getAvatar (picture) {
