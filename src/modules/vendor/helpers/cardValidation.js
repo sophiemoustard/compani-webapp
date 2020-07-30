@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { TRANSITION, TITLE_TEXT_MEDIA } from '@data/constants';
+import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT } from '@data/constants';
 
 const cardSchema = (card) => {
   switch (card.template) {
@@ -15,6 +15,11 @@ const cardSchema = (card) => {
           publicId: Joi.string().required(),
           link: Joi.string().required(),
         }).required(),
+      });
+    case TITLE_TEXT:
+      return Joi.object().keys({
+        title: Joi.string().required(),
+        text: Joi.string().required(),
       });
     default:
       return Joi.object().keys();
