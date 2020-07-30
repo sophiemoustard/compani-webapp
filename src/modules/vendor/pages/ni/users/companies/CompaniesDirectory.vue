@@ -27,6 +27,7 @@
 <script>
 import pick from 'lodash/pick';
 import Companies from '@api/Companies';
+import escapeRegExp from 'lodash/escapeRegExp'
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
@@ -74,7 +75,8 @@ export default {
   },
   computed: {
     filteredCompanies () {
-      return this.companies.filter(company => company.name.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return this.companies.filter(company => company.name.match(new RegExp(escapedString, 'i')));
     },
   },
   methods: {

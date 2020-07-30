@@ -74,6 +74,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
+import escapeRegExp from 'lodash/escapeRegExp'
 import Roles from '@api/Roles';
 import Twilio from '@api/Twilio';
 import Users from '@api/Users';
@@ -213,7 +214,8 @@ export default {
       return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
-      return this.activeUserList.filter(user => user.auxiliary.fullName.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return this.activeUserList.filter(user => user.auxiliary.fullName.match(new RegExp(escapedString, 'i')));
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
