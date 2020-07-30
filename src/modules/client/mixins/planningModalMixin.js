@@ -111,17 +111,7 @@ export const planningModalMixin = {
       if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
       if (!this.selectedAuxiliary.contracts) return [];
 
-      let customers = this.customers;
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasCompanyContractOnEvent) {
-        const auxiliaryCustomers = [];
-        for (const contract of this.selectedAuxiliary.contracts) {
-          if (contract.customer && !auxiliaryCustomers.includes(contract.customer)) auxiliaryCustomers.push(contract.customer);
-        }
-
-        customers = this.customers.filter(cus => auxiliaryCustomers.includes(cus._id));
-      }
-
-      return customers.map(cus => this.formatPersonOptions(cus));
+      return this.customers.map(cus => this.formatPersonOptions(cus));
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
