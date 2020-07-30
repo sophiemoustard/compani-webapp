@@ -19,9 +19,3 @@ export default {
   mixins: [templateMixin],
 }
 </script>
-
-<style lang="stylus" scoped>
-@media (max-width: 767px)
-  .file-uploader
-    width: fit-content
-</style>
