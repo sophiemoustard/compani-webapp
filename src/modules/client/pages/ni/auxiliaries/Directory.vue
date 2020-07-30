@@ -9,7 +9,7 @@
           <q-item-section avatar>
             <img class="avatar" :src="getAvatar(col.value.picture)">
           </q-item-section>
-          <q-item-section>{{ col.value.name }}</q-item-section>
+          <q-item-section>{{ col.value.fullName }}</q-item-section>
         </q-item>
         <template v-else-if="col.name === 'profileErrors'">
           <q-icon v-if="notifications.profiles[props.row.auxiliary._id] && props.row.isActive" name="error"
@@ -147,9 +147,9 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => {
-            const aArr = a.name.split(' ');
-            const bArr = b.name.split(' ');
-            return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
+            const aLastnameLower = a.lastname.toLowerCase();
+            const bLastnameLower = b.lastname.toLowerCase();
+            return aLastnameLower.localeCompare(bLastnameLower);
           },
           style: 'min-width: 200px; width: 35%',
         },
@@ -213,7 +213,7 @@ export default {
       return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
-      return this.activeUserList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
+      return this.activeUserList.filter(user => user.auxiliary.fullName.match(new RegExp(this.searchStr, 'i')));
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
@@ -238,7 +238,8 @@ export default {
       const formattedUser = {
         auxiliary: {
           _id: user._id,
-          name: formatIdentity(user.identity, 'FL'),
+          fullName: formatIdentity(user.identity, 'FL'),
+          lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
         },
         startDate: user.createdAt,
@@ -261,7 +262,7 @@ export default {
       try {
         this.tableLoading = true;
         const users = await Users.list({ role: AUXILIARY_ROLES, company: this.company._id });
-        this.userList = Object.freeze(users.map(this.formatUser));
+        this.userList = Object.freeze(users.map(this.formatUser)); // for perf
       } catch (e) {
         console.error(e);
       } finally {
