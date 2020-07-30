@@ -116,7 +116,7 @@ export const contractMixin = {
       if (this.editedVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.editedVersion };
         const isContract = this.selectedContract.versions[0]._id === this.editedVersion.versionId;
-        const template = isContract ? this.getContractTemplate(versionMix) : this.getVersionTemplate(versionMix);
+        const template = isContract ? this.getContractTemplate() : this.getVersionTemplate();
         payload.signature = this.getSignaturePayload(versionMix, isContract ? '' : 'Avenant au ', template);
       }
 

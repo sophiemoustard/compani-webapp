@@ -204,9 +204,6 @@ export default {
     inProgressContract () {
       return this.contracts.some(c => !c.endDate);
     },
-    userCompany () {
-      return this.auxiliary.company;
-    },
     missingInfoForCreation () {
       return this.auxiliary.contractCreationMissingInfo.length !== 0;
     },
@@ -256,12 +253,6 @@ export default {
     }
   },
   methods: {
-    getContractTemplate () {
-      return get(this.userCompany, 'rhConfig.templates.contractWithCompany');
-    },
-    getVersionTemplate () {
-      return get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion');
-    },
     async refreshUser () {
       try {
         this.auxiliary = await Users.getById(this.profileId);
