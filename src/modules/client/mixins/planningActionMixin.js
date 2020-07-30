@@ -150,18 +150,11 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
-      let payload = { ...omit(event, ['dates', '__v', 'company']) }
-      payload = { ...pickBy(payload), ...pick(payload, ['isCancelled']) };
-
-      payload.startDate = event.dates.startDate;
-      payload.endDate = event.dates.endDate;
-
-      if (event.type === INTERVENTION) {
-        const customer = this.customers.find(cus => cus._id === event.customer);
-        if (customer) {
-          const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
-          if (subscription && subscription.service) payload.status = subscription.service.type;
-        }
+      const payload = {
+        ...pickBy(omit(event, ['dates', '__v', 'company'])),
+        ...pick(event, ['isCancelled']), // pickBy removes isCancelled: false
+        startDate: event.dates.startDate,
+        endDate: event.dates.endDate,
       }
 
       if (event.auxiliary) delete payload.sector;
