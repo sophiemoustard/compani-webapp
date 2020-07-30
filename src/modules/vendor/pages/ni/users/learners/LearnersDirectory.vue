@@ -45,7 +45,11 @@ export default {
           field: row => row.learner,
           align: 'left',
           sortable: true,
-          sort: (a, b) => { return a.lastname.toLowerCase() < b.lastname.toLowerCase() ? -1 : 1 },
+          sort: (a, b) => {
+            const aLastnameLower = a.lastname.toLowerCase();
+            const bLastnameLower = b.lastname.toLowerCase();
+            return aLastnameLower.localeCompare(bLastnameLower);
+          },
           style: 'min-width: 200px; width: 35%',
         },
         {

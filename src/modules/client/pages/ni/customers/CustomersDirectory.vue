@@ -110,9 +110,9 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => {
-            const aLastname = a.lastname;
-            const bLastname = b.lastname;
-            return aLastname.toLowerCase() < bLastname.toLowerCase() ? -1 : 1
+            const aLastnameLower = a.lastname.toLowerCase();
+            const bLastnameLower = b.lastname.toLowerCase();
+            return aLastnameLower.localeCompare(bLastnameLower);
           },
           style: 'width: 350px',
         },
