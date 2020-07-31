@@ -36,6 +36,13 @@
               <div>Texte</div>
               <q-icon name="image" size="sm" />
             </template>
+            <template v-else-if="template.value === FLASHCARD">
+              <div>Flashcard</div>
+              <div class="row card-button-flashcard">
+                <div class="flashcard-left" />
+                <div class="flashcard-right" />
+              </div>
+            </template>
             <template v-else>{{ formatButtonLabel(template.label) }}</template>
           </div>
         </div>
@@ -55,7 +62,7 @@ import { required } from 'vuelidate/lib/validators';
 import Activities from '@api/Activities';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TEMPLATE_TYPES, TITLE_TEXT_MEDIA, TEXT_MEDIA } from '@data/constants';
+import { TEMPLATE_TYPES, TITLE_TEXT_MEDIA, TEXT_MEDIA, FLASHCARD } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/CardEdition';
@@ -84,6 +91,7 @@ export default {
       newCard: { template: '' },
       TITLE_TEXT_MEDIA,
       TEXT_MEDIA,
+      FLASHCARD,
     };
   },
   validations () {
@@ -214,4 +222,18 @@ h6
     text-align: center
     flex-wrap: wrap
     white-space: pre-line
+  &-flashcard
+    justify-content: center
+    & > div
+      width: 40%
+      height: 42px
+      margin: 8px 3px
+      border-radius: 3px
+      @media (max-width: 767px)
+        width: 30%
+        height: 30px
+    .flashcard-right
+      background-color: $grey
+    .flashcard-left
+      background-color: $middle-grey
 </style>
