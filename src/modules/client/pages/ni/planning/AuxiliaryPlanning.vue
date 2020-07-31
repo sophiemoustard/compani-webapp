@@ -104,7 +104,7 @@ export default {
     }),
     displayedAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => aux.sector && this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+        .filter(aux => aux.sector && this.hasContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
@@ -112,12 +112,12 @@ export default {
     activeAuxiliaries () {
       return this.filters
         .filter(f => f.type === PERSON)
-        .filter(aux => this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+        .filter(aux => this.hasContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
     activeFilters () {
       return this.filters
         .filter(f => f.type === SECTOR ||
-          this.hasCompanyContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
           (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id)); // add targeted auxiliary even if not active on strat of week to display future events
     },
   },

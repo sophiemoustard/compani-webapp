@@ -108,7 +108,7 @@ export const planningActionMixin = {
         this.internalHours = [];
       }
     },
-    hasCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
+    hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
       return auxiliary.contracts.some(contract => {
@@ -123,7 +123,7 @@ export const planningActionMixin = {
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
-      return this.hasCompanyContractOnEvent(person, selectedDay);
+      return this.hasContractOnEvent(person, selectedDay);
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
