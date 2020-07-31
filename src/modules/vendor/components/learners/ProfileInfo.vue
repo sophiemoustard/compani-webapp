@@ -24,7 +24,7 @@
         </div>
       </div>
       <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
-          error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
+          :error-message="phoneNbrError($v.userProfile)" @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="$v.userProfile.contact.phone.$error" />
     </div>
   </div>
@@ -38,7 +38,8 @@ import Users from '@api/Users';
 import Input from '@components/form/Input';
 import PictureUploader from '@components/PictureUploader.vue';
 import { userMixin } from '@mixins/userMixin';
-import { required, email } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { AUXILIARY_ROLES } from '@data/constants.js';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
@@ -63,13 +64,16 @@ export default {
           email: { required, email },
         },
         contact: {
-          phone: { frPhoneNumber },
+          phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
         },
       },
     }
   },
   computed: {
     ...mapState('userProfile', ['userProfile']),
+    isAuxiliary () {
+      return AUXILIARY_ROLES.includes(get(this.userProfile, 'role.client.name'));
+    },
   },
   async mounted () {
     this.$v.userProfile.$touch();
