@@ -32,6 +32,7 @@ import {
   CLIENT_ADMIN,
   VENDOR_ADMIN,
   TRAINING_ORGANISATION_MANAGER,
+  TRAINER,
 } from '@data/constants.js';
 
 export default {
@@ -66,9 +67,7 @@ export default {
   computed: {
     ...mapState('userProfile', ['userProfile']),
     userProfileRole () {
-      return get(this.userProfile, 'role.client.name')
-        ? get(this.userProfile, 'role.client.name')
-        : (get(this.userProfile, 'role.vendor.name') || '');
+      return get(this.userProfile, 'role.client.name') || get(this.userProfile, 'role.vendor.name') || '';
     },
     headerInfo () {
       const infos = [
@@ -76,9 +75,7 @@ export default {
       ]
 
       const role = this.userProfileRole;
-      if (role) {
-        infos.push({ icon: 'person', label: this.getRoleLabel(role) });
-      }
+      if (role) infos.push({ icon: 'person', label: this.getRoleLabel(role) });
 
       return infos;
     },
@@ -105,6 +102,8 @@ export default {
           return 'Coach';
         case TRAINING_ORGANISATION_MANAGER:
           return 'Responsable Formation';
+        case TRAINER:
+          return 'Formateur'
       }
       return '';
     },

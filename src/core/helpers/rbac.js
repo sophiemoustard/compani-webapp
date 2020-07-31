@@ -92,7 +92,7 @@ const trainingOrgnaisationManagerRoutes = [
   { name: 'ni users trainers' },
   { name: 'ni users trainers info' },
   { name: 'ni users learners' },
-  { name: 'ni users learners' },
+  { name: 'ni users learners info' },
   { name: 'ni config programs' },
   { name: 'ni config programs info' },
   { name: 'ni config activity info' },
