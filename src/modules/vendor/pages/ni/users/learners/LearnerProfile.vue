@@ -23,6 +23,16 @@ import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/learners/ProfileInfo';
 import { formatIdentity } from '@helpers/utils';
+import {
+  AUXILIARY,
+  HELPER,
+  COACH,
+  PLANNING_REFERENT,
+  AUXILIARY_WITHOUT_COMPANY,
+  CLIENT_ADMIN,
+  VENDOR_ADMIN,
+  TRAINING_ORGANISATION_MANAGER,
+} from '@data/constants.js';
 
 export default {
   name: 'LearnerProfile',
@@ -55,10 +65,20 @@ export default {
   },
   computed: {
     ...mapState('userProfile', ['userProfile']),
+    userProfileRole () {
+      return get(this.userProfile, 'role.client.name')
+        ? get(this.userProfile, 'role.client.name')
+        : (get(this.userProfile, 'role.vendor.name') || '');
+    },
     headerInfo () {
       const infos = [
-        { icon: 'library_books', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' },
+        { icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' },
       ]
+
+      const role = this.userProfileRole;
+      if (role) {
+        infos.push({ icon: 'person', label: this.getRoleLabel(role) });
+      }
 
       return infos;
     },
@@ -67,6 +87,26 @@ export default {
     async userProfile () {
       this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
       await this.$store.dispatch('userProfile/updateNotifications');
+    },
+  },
+  methods: {
+    getRoleLabel (role) {
+      switch (role) {
+        case HELPER:
+          return 'Aidant';
+        case AUXILIARY:
+        case PLANNING_REFERENT:
+        case AUXILIARY_WITHOUT_COMPANY:
+          return 'Auxiliaire';
+        case CLIENT_ADMIN:
+        case VENDOR_ADMIN:
+          return 'Administateur';
+        case COACH:
+          return 'Coach';
+        case TRAINING_ORGANISATION_MANAGER:
+          return 'Responsable Formation';
+      }
+      return '';
     },
   },
   beforeDestroy () {
