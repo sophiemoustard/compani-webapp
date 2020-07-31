@@ -43,17 +43,6 @@
         </div>
       </div>
       <div class="q-mb-xl">
-        <p class="text-weight-bold">Contrats mandataires</p>
-        <div class="row gutter-profile">
-          <ni-input caption="Taux horaire brut par défaut"
-            :error="$v.company.rhConfig.contractWithCustomer.grossHourlyRate.$error"
-            :error-message="nbrError('company.rhConfig.contractWithCustomer.grossHourlyRate')" type="number"
-            v-model="company.rhConfig.contractWithCustomer.grossHourlyRate"
-            @focus="saveTmp('rhConfig.contractWithCustomer.grossHourlyRate')" suffix="€"
-            @blur="updateCompany('rhConfig.contractWithCustomer.grossHourlyRate')" />
-        </div>
-      </div>
-      <div class="q-mb-xl">
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
@@ -98,19 +87,6 @@
               name="contractWithCompanyVersion" :url="docsUploadUrl"
               @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`" />
-          </div>
-          <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle de contrat mandataire" path="rhConfig.templates.contractWithCustomer"
-              :entity="company" alt="template contrat mandataire" name="contractWithCustomer" :url="docsUploadUrl"
-              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCustomer.driveId, 'contractWithCustomer', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_contrat_mandataire_${company.name}`" />
-          </div>
-          <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle d'avenant au contrat mandataire"
-              path="rhConfig.templates.contractWithCustomerVersion" :entity="company" alt="template avenant mandataire"
-              name="contractWithCustomerVersion" :url="docsUploadUrl"
-              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCustomerVersion.driveId, 'contractWithCustomerVersion', 'rhConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_avenant_mandataire_${company.name}`" />
           </div>
         </div>
       </div>
@@ -304,7 +280,6 @@ export default {
       company: {
         rhConfig: {
           contractWithCompany: { grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) } },
-          contractWithCustomer: { grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) } },
           feeAmount: { required, positiveNumber, maxValue: maxValue(999) },
           amountPerKm: { required, positiveNumber, maxValue: maxValue(999) },
           transportSubs: { $each: { price: { required, positiveNumber, maxValue: maxValue(999) } } },
