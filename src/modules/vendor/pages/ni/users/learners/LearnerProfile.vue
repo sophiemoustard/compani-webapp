@@ -21,6 +21,7 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
+import ProfileInfo from 'src/modules/vendor/components/learners/ProfileInfo';
 import { formatIdentity } from '@helpers/utils';
 
 export default {
@@ -42,6 +43,7 @@ export default {
           label: 'Infos personnelles',
           name: 'info',
           default: this.defaultTab === 'info',
+          component: ProfileInfo,
           notification: 'profiles',
         },
       ],
