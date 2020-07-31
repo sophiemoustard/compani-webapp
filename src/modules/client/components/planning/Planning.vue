@@ -45,7 +45,7 @@
                   <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
                     <img :src="UNKNOWN_AVATAR" class="avatar" >
                     <q-chip small text-color="white">
-                      <span class="chip-indicator">{{ unassignedHourCount(sectorId) }}h</span>
+                      <span class="chip-indicator">{{ Math.round(unassignedHourCount(sectorId)) }}h</span>
                     </q-chip>
                   </div>
                   <div class="person-name overflow-hidden">{{ getSector(sectorId).label }}</div>
