@@ -40,7 +40,7 @@ export default {
       this.$emit('add');
     },
     getHeading (card) {
-      if (card.title) return card.title;
+      if (card.title !== null) return card.title;
       return card.text;
     },
     getTemplateName (value) {
