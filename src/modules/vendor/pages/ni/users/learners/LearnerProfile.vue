@@ -50,11 +50,11 @@ export default {
     }
   },
   async created () {
-    await this.$store.dispatch('rh/fetchUserProfile', { userId: this.learnerId });
+    await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.learnerId });
     this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
   },
   computed: {
-    ...mapState('rh', ['userProfile']),
+    ...mapState('userProfile', ['userProfile']),
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' },
@@ -66,11 +66,11 @@ export default {
   watch: {
     async userProfile () {
       this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
-      await this.$store.dispatch('rh/updateNotifications');
+      await this.$store.dispatch('userProfile/updateNotifications');
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('rh/resetRh');
+    this.$store.dispatch('userProfile/resetUserProfile');
   },
 }
 </script>

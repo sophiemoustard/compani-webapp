@@ -92,7 +92,7 @@ export default {
   computed: {
     ...mapState({
       loggedUser: state => state.main.loggedUser,
-      userProfile: state => state.rh.userProfile,
+      userProfile: state => state.userProfile.userProfile,
     }),
     isPlanningRouterDisable () {
       return !this.userProfile.contracts || !this.userProfile.contracts.length;

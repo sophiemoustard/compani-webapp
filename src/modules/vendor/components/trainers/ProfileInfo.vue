@@ -59,7 +59,7 @@ export default {
     ...mapState({
       userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
         ? state.main.loggedUser
-        : state.rh.userProfile,
+        : state.userProfile.userProfile,
     }),
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
   },
@@ -82,7 +82,7 @@ export default {
     async refreshUser () {
       TRAINER === this.vendorRole
         ? await this.$store.dispatch('main/fetchLoggedUser', this.userProfile._id)
-        : await this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });
+        : await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });
     },
   },
 };

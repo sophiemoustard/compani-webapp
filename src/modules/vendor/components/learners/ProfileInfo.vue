@@ -69,7 +69,7 @@ export default {
     }
   },
   computed: {
-    ...mapState('rh', ['userProfile']),
+    ...mapState('userProfile', ['userProfile']),
   },
   async mounted () {
     this.$v.userProfile.$touch();
@@ -88,7 +88,7 @@ export default {
       await this.refreshUser();
     },
     async refreshUser () {
-      await this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });
+      await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });
     },
   },
 };

@@ -433,7 +433,7 @@ export default {
     ...mapState({
       userProfile: state => AUXILIARY_ROLES.includes(get(state.main.loggedUser, 'role.client.name'))
         ? state.main.loggedUser
-        : state.rh.userProfile,
+        : state.userProfile.userProfile,
     }),
     ...mapGetters({ clientRole: 'main/getClientRole' }),
     captionTransportUploader () {
@@ -534,7 +534,7 @@ export default {
     async refreshUser () {
       AUXILIARY_ROLES.includes(this.clientRole)
         ? await this.$store.dispatch('main/fetchLoggedUser', this.userProfile._id)
-        : await this.$store.dispatch('rh/fetchUserProfile', { userId: this.userProfile._id });
+        : await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });
     },
     async updateAlenviUser (path) {
       let value = get(this.userProfile, path);
