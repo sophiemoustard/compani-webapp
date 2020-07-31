@@ -537,15 +537,20 @@ export default {
         : await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });
     },
     async updateAlenviUser (path) {
-      let value = get(this.userProfile, path);
-      if (path.match(/iban/i)) value = value.split(' ').join('');
+      try {
+        let value = get(this.userProfile, path);
+        if (path.match(/iban/i)) value = value.split(' ').join('');
 
-      const payload = set({}, path, value);
-      if (path === 'role.client._id') payload.role = value;
-      if (path.match(/birthCountry/i) && value !== 'FR') payload.identity.birthState = '99';
+        const payload = set({}, path, value);
+        if (path === 'role.client._id') payload.role = value;
+        if (path.match(/birthCountry/i) && value !== 'FR') payload.identity.birthState = '99';
 
-      await Users.updateById(this.userProfile._id, payload);
-      await this.refreshUser();
+        await Users.updateById(this.userProfile._id, payload);
+        await this.refreshUser();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modifiation de l\'auxiliaire');
+      }
     },
     documentTitle (path) {
       return `${path}_${this.userProfile.identity.firstname}_${this.userProfile.identity.lastname}`;

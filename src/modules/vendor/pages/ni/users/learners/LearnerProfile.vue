@@ -74,8 +74,7 @@ export default {
         { icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' },
       ]
 
-      const role = this.userProfileRole;
-      if (role) infos.push({ icon: 'person', label: this.getRoleLabel(role) });
+      if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
 
       return infos;
     },
@@ -96,8 +95,9 @@ export default {
         case AUXILIARY_WITHOUT_COMPANY:
           return 'Auxiliaire';
         case CLIENT_ADMIN:
-        case VENDOR_ADMIN:
           return 'Administateur';
+        case VENDOR_ADMIN:
+          return 'Administateur Vendeur';
         case COACH:
           return 'Coach';
         case TRAINING_ORGANISATION_MANAGER:

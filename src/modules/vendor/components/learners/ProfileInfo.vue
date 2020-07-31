@@ -37,6 +37,7 @@ import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
 import PictureUploader from '@components/PictureUploader.vue';
+import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import { AUXILIARY_ROLES } from '@data/constants.js';
@@ -84,12 +85,16 @@ export default {
       if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
     },
     async updateAlenviUser (path) {
-      const value = get(this.userProfile, path);
-      const payload = set({}, path, value);
+      try {
+        const value = get(this.userProfile, path);
+        const payload = set({}, path, value);
 
-      await Users.updateById(this.userProfile._id, payload);
-
-      await this.refreshUser();
+        await Users.updateById(this.userProfile._id, payload);
+        await this.refreshUser();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modifiation de l\'apprenant');
+      }
     },
     async refreshUser () {
       await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });

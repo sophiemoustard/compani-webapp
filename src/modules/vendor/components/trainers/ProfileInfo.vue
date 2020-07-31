@@ -30,6 +30,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
+import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
@@ -72,12 +73,16 @@ export default {
       if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
     },
     async updateAlenviUser (path) {
-      const value = get(this.userProfile, path);
-      const payload = set({}, path, value);
+      try {
+        const value = get(this.userProfile, path);
+        const payload = set({}, path, value);
 
-      await Users.updateById(this.userProfile._id, payload);
-
-      await this.refreshUser();
+        await Users.updateById(this.userProfile._id, payload);
+        await this.refreshUser();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modifiation du formateur');
+      }
     },
     async refreshUser () {
       TRAINER === this.vendorRole
