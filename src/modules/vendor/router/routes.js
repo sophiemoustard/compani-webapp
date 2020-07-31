@@ -66,7 +66,17 @@ const routes = [
       {
         path: 'ni/users/learners',
         name: 'ni users learners',
-        component: () => import('src/modules/vendor/pages/ni/users/learners/LearnersDirectory.vue'),
+        component: () => import('src/modules/vendor/pages/ni/users/learners/LearnersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
+        path: 'ni/users/learners/:learnerId',
+        name: 'ni users learners info',
+        component: () => import('src/modules/vendor/pages/ni/users/learners/LearnerProfile'),
+        props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'users',
