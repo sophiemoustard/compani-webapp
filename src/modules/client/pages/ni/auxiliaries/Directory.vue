@@ -207,7 +207,7 @@ export default {
     await this.getUserList();
   },
   computed: {
-    ...mapState('rh', ['notifications']),
+    ...mapState('userProfile', ['notifications']),
     ...mapGetters({ company: 'main/getCompany' }),
     activeUserList () {
       if (this.activeUsers) return this.userList.filter(user => user.isActive);
@@ -254,7 +254,7 @@ export default {
 
       const checkProfileErrors = userProfileValidation(user);
       this.$store.dispatch(
-        'rh/setNotification',
+        'userProfile/setNotification',
         { type: 'profiles', _id: user._id, exists: !!checkProfileErrors.error }
       );
 

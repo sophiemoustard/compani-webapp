@@ -42,18 +42,18 @@ export default {
     }
   },
   async created () {
-    await this.$store.dispatch('rh/fetchUserProfile', { userId: this.auxiliaryId });
+    await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.auxiliaryId });
   },
   computed: {
-    ...mapState('rh', ['userProfile', 'notifications']),
+    ...mapState('userProfile', ['userProfile', 'notifications']),
   },
   watch: {
     async userProfile () {
-      await this.$store.dispatch('rh/updateNotifications');
+      await this.$store.dispatch('userProfile/updateNotifications');
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('rh/resetRh');
+    this.$store.dispatch('userProfile/resetUserProfile');
   },
 }
 </script>

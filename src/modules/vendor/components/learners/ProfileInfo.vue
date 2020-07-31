@@ -1,6 +1,13 @@
 <template>
   <div>
-    <p class="text-weight-bold">Identité</p>
+    <div class="q-mb-xl">
+      <div class="photo-caption">Photo</div>
+      <div class="row gutter-profile">
+        <div class="col-xs-12 col-md-6">
+          <ni-picture-uploader :user="userProfile" :refresh-picture="refreshUser" />
+        </div>
+      </div>
+    </div>
     <div class="row gutter-profile q-mb-lg">
       <ni-input v-model.trim="userProfile.identity.firstname" caption="Prénom"
         @focus="saveTmp('identity.firstname')" @blur="updateUser('identity.firstname')" />
@@ -16,31 +23,33 @@
           <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
         </div>
       </div>
-    </div>
-    <div class="row gutter-profile q-mb-xl">
-      <ni-input caption="Biographie du formateur" v-model="userProfile.biography" type="textarea"
-        @blur="updateUser('biography')" @focus="saveTmp('biography')" />
+      <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
+          :error-message="phoneNbrError($v.userProfile)" @blur="updateUser('contact.phone')" caption="Téléphone"
+          :error="$v.userProfile.contact.phone.$error" />
     </div>
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
+import PictureUploader from '@components/PictureUploader.vue';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
-import { required, email } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { AUXILIARY_ROLES } from '@data/constants.js';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
-import { TRAINER } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
   mixins: [validationMixin, userMixin],
   components: {
     'ni-input': Input,
+    'ni-picture-uploader': PictureUploader,
   },
   data () {
     return {
@@ -52,17 +61,20 @@ export default {
     return {
       userProfile: {
         identity: { lastname: { required } },
-        local: { email: { required, email } },
+        local: {
+          email: { required, email },
+        },
+        contact: {
+          phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
+        },
       },
     }
   },
   computed: {
-    ...mapState({
-      userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
-        ? state.main.loggedUser
-        : state.userProfile.userProfile,
-    }),
-    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
+    ...mapState('userProfile', ['userProfile']),
+    isAuxiliary () {
+      return AUXILIARY_ROLES.includes(get(this.userProfile, 'role.client.name'));
+    },
   },
   async mounted () {
     this.$v.userProfile.$touch();
@@ -81,14 +93,20 @@ export default {
         await this.refreshUser();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modifiation du formateur');
+        NotifyNegative('Erreur lors de la modifiation de l\'apprenant');
       }
     },
     async refreshUser () {
-      TRAINER === this.vendorRole
-        ? await this.$store.dispatch('main/fetchLoggedUser', this.userProfile._id)
-        : await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });
+      await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.userProfile._id });
     },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+
+.photo-caption
+  font-size: 12px
+  margin: 0 0 4px 0
+
+</style>

@@ -1,7 +1,8 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire apprenants" @updateSearch="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      @goTo="goToLearnerProfile">
       <template v-slot:body="{ props, col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
@@ -81,12 +82,16 @@ export default {
     await this.getLearnerList();
   },
   methods: {
+    goToLearnerProfile (row) {
+      this.$router.push({ name: 'ni users learners info', params: { learnerId: row.learner._id } });
+    },
     updateSearch (value) {
       this.searchStr = value;
     },
     formatRow (user) {
       return {
         learner: {
+          _id: user._id,
           fullName: formatIdentity(user.identity, 'FL'),
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,

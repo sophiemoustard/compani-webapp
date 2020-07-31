@@ -14,7 +14,7 @@ export const logOutAndRedirectToLogin = (params) => {
   store.dispatch('program/resetProgram');
   store.dispatch('company/resetCompany');
   store.dispatch('customer/resetCustomer');
-  store.dispatch('rh/resetRh');
+  store.dispatch('userProfile/resetUserProfile');
   store.dispatch('planning/resetPlanning');
 
   if (params && params.to) return router.replace({ path: '/login', query: { from: params.to.fullPath } });
