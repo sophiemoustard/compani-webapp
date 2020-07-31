@@ -17,6 +17,7 @@ export const logOutAndRedirectToLogin = (params) => {
   store.dispatch('rh/resetRh');
   store.dispatch('planning/resetPlanning');
 
+  if (router.currentRoute.path === '/login') return;
   if (params && params.to) return router.replace({ path: '/login', query: { from: params.to.fullPath } });
   return router.replace('/login');
 };
