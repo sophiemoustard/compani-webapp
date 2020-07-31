@@ -70,7 +70,6 @@ const helperRoutes = [
   { name: 'customers contact', subscription: ERP },
   { name: 'customers documents', subscription: ERP },
   { name: 'customers subscription', subscription: ERP },
-  { name: 'customers contracts', subscription: ERP },
   { name: 'account client' },
 ];
 const vendorAdminRoutes = [

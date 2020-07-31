@@ -86,8 +86,7 @@ export default {
       return formatIdentity(this.selectedAuxiliary.identity, 'FL');
     },
     activeAuxiliaries () {
-      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0], this.days[6]) ||
-        this.hasCustomerContractOnEvent(aux, this.days[0], this.days[6]));
+      return this.auxiliaries.filter(aux => this.hasCompanyContractOnEvent(aux, this.days[0], this.days[6]));
     },
     auxiliariesOptions () {
       return this.activeAuxiliaries.length === 0
@@ -177,7 +176,6 @@ export default {
         },
       };
 
-      this.selectedAuxiliary.hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(this.selectedAuxiliary, selectedDay);
       this.selectedAuxiliary.hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(this.selectedAuxiliary, selectedDay);
 
       this.creationModal = true;

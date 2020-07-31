@@ -82,8 +82,6 @@ import {
   INTERNAL_HOUR,
   HOURLY,
   UNJUSTIFIED,
-  CUSTOMER_CONTRACT,
-  COMPANY_CONTRACT,
   INTERVENTION,
   NEVER,
 } from '@data/constants';
@@ -110,19 +108,8 @@ export default {
     },
     isCompanyContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
-      if (!this.selectedAuxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
-      const companyContracts = this.selectedAuxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
-      if (!companyContracts || companyContracts.length === 0) return false;
 
-      return companyContracts.some(contract => !contract.endDate);
-    },
-    isCustomerContractValidForRepetition () {
-      if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
-      if (!this.selectedAuxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-      const correspContracts = this.selectedAuxiliary.contracts.find(ctr => ctr.customer === this.newEvent.customer);
-      if (!correspContracts) return false;
-
-      return correspContracts.some(contract => !contract.endDate);
+      return this.selectedAuxiliary.contracts.some(contract => !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
@@ -131,8 +118,8 @@ export default {
 
         const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
         if (!selectedSubscription) return true;
-        if (get(selectedSubscription, 'service.type') === COMPANY_CONTRACT) return this.isCompanyContractValidForRepetition;
-        if (get(selectedSubscription, 'service.type') === CUSTOMER_CONTRACT) return this.isCustomerContractValidForRepetition;
+
+        return this.isCompanyContractValidForRepetition;
       }
 
       return true;
@@ -144,10 +131,9 @@ export default {
     selectedAuxiliary () {
       if (!this.newEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
       const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-      const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.newEvent.dates.startDate);
       const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
 
-      return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
+      return { ...aux, hasCompanyContractOnEvent };
     },
   },
   watch: {

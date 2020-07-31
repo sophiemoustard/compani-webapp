@@ -213,8 +213,6 @@
       <template slot="title">
         Créer un <span class="text-weight-bold">service</span>
       </template>
-      <ni-select in-modal caption="Type" v-model="newService.type" :error="$v.newService.type.$error"
-        @blur="$v.newService.type.$touch" :options="serviceTypeOptions" required-field />
       <ni-input in-modal caption="Nom" v-model="newService.name" :error="$v.newService.name.$error"
         @blur="$v.newService.name.$touch" required-field />
       <ni-select in-modal caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error"
@@ -346,7 +344,6 @@ import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import {
   BILLING_DIRECT,
   BILLING_INDIRECT,
-  CONTRACT_STATUS_OPTIONS,
   TWO_WEEKS,
   MONTH,
   NATURE_OPTIONS,
@@ -521,7 +518,6 @@ export default {
       selectedService: {},
       newService: {
         name: '',
-        type: '',
         nature: '',
         defaultUnitAmount: '',
         vat: '',
@@ -538,7 +534,6 @@ export default {
         exemptFromCharges: false,
       },
       natureOptions: NATURE_OPTIONS,
-      serviceTypeOptions: CONTRACT_STATUS_OPTIONS,
       servicesVisibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges', 'actions'],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
       serviceColumns: [
@@ -689,7 +684,6 @@ export default {
     },
     newService: {
       name: { required },
-      type: { required },
       nature: { required },
       defaultUnitAmount: { required, positiveNumber },
       vat: { positiveNumber },
@@ -834,19 +828,19 @@ export default {
       };
       this.$v.newSurcharge.$reset();
     },
-    getSurchargePayload (surchargeType) {
-      const payload = cloneDeep(surchargeType);
-      if (surchargeType.eveningStartTime) {
-        payload.eveningStartTime = this.$moment(surchargeType.eveningStartTime, 'HH:mm').format('HH:mm');
+    getSurchargePayload (surcharge) {
+      const payload = cloneDeep(surcharge);
+      if (surcharge.eveningStartTime) {
+        payload.eveningStartTime = this.$moment(surcharge.eveningStartTime, 'HH:mm').format('HH:mm');
       }
-      if (surchargeType.eveningEndTime) {
-        payload.eveningEndTime = this.$moment(surchargeType.eveningEndTime, 'HH:mm').format('HH:mm');
+      if (surcharge.eveningEndTime) {
+        payload.eveningEndTime = this.$moment(surcharge.eveningEndTime, 'HH:mm').format('HH:mm');
       }
-      if (surchargeType.customStartTime) {
-        payload.customStartTime = this.$moment(surchargeType.customStartTime, 'HH:mm').format('HH:mm');
+      if (surcharge.customStartTime) {
+        payload.customStartTime = this.$moment(surcharge.customStartTime, 'HH:mm').format('HH:mm');
       }
-      if (surchargeType.customEndTime) {
-        payload.customEndTime = this.$moment(surchargeType.customEndTime, 'HH:mm').format('HH:mm');
+      if (surcharge.customEndTime) {
+        payload.customEndTime = this.$moment(surcharge.customEndTime, 'HH:mm').format('HH:mm');
       }
 
       return payload;
@@ -952,7 +946,7 @@ export default {
     },
     // Services
     formatCreatedService () {
-      const { nature, name, defaultUnitAmount, type, exemptFromCharges } = this.newService;
+      const { nature, name, defaultUnitAmount, exemptFromCharges } = this.newService;
       const formattedService = {
         nature,
         versions: [{
@@ -961,10 +955,12 @@ export default {
           exemptFromCharges,
           startDate: this.$moment('1970-01-01').startOf('d').toISOString(), // first version does not have actual start date
         }],
-        type,
       };
-      if (this.newService.surcharge && this.newService.surcharge !== '') formattedService.versions[0].surcharge = this.newService.surcharge;
+      if (this.newService.surcharge && this.newService.surcharge !== '') {
+        formattedService.versions[0].surcharge = this.newService.surcharge;
+      }
       if (this.newService.vat && this.newService.vat !== '') formattedService.versions[0].vat = this.newService.vat;
+
       return formattedService;
     },
     resetCreationServiceData () {
@@ -987,6 +983,7 @@ export default {
         this.loading = true;
         const payload = this.formatCreatedService();
         await Services.create(payload);
+
         NotifyPositive('Service créé.');
         this.resetCreationServiceData();
         await this.refreshServices();
@@ -1026,17 +1023,22 @@ export default {
       };
       this.$v.editedService.$reset();
     },
+    formatEditedService () {
+      const payload = pickBy(this.editedService);
+      delete payload._id;
+      delete payload.nature;
+
+      return payload;
+    },
     async updateService () {
       try {
         this.$v.editedService.$touch();
         if (this.$v.editedService.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const serviceId = this.editedService._id;
-        const payload = pickBy(this.editedService);
-        delete payload._id;
-        delete payload.nature;
-        await Services.updateById(serviceId, payload);
+        const payload = this.formatEditedService();
+        await Services.updateById(this.editedService._id, payload);
+
         NotifyPositive('Service modifié');
         this.resetEditionServiceData();
         await this.refreshServices();

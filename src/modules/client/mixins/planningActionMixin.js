@@ -19,8 +19,6 @@ import {
   NEVER,
   UNAVAILABILITY,
   ILLNESS,
-  CUSTOMER_CONTRACT,
-  COMPANY_CONTRACT,
   DAILY,
   SECTOR,
   CUSTOMER,
@@ -110,24 +108,10 @@ export const planningActionMixin = {
         this.internalHours = [];
       }
     },
-    hasCustomerContractOnEvent (auxiliary, startDate, endDate = startDate) {
-      if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === CUSTOMER_CONTRACT)) return false;
-
-      const customerContracts = auxiliary.contracts.filter(contract => contract.status === CUSTOMER_CONTRACT);
-
-      return customerContracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          (!contract.endDate || this.$moment(contract.endDate).isSameOrAfter(startDate));
-      });
-    },
     hasCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
-      if (!auxiliary.contracts.some(contract => contract.status === COMPANY_CONTRACT)) return false;
 
-      const companyContracts = auxiliary.contracts.filter(contract => contract.status === COMPANY_CONTRACT);
-
-      return companyContracts.some(contract => {
+      return auxiliary.contracts.some(contract => {
         return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
           (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
       });
@@ -139,10 +123,7 @@ export const planningActionMixin = {
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
-      const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(person, selectedDay);
-      const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(person, selectedDay);
-
-      return hasCustomerContractOnEvent || hasCompanyContractOnEvent;
+      return this.hasCompanyContractOnEvent(person, selectedDay);
     },
     resetCreationForm ({ partialReset, type = INTERVENTION }) {
       this.$v.newEvent.$reset();
@@ -169,18 +150,11 @@ export const planningActionMixin = {
       this.creationModal = false;
     },
     getPayload (event) {
-      let payload = { ...omit(event, ['dates', '__v', 'company']) }
-      payload = { ...pickBy(payload), ...pick(payload, ['isCancelled']) };
-
-      payload.startDate = event.dates.startDate;
-      payload.endDate = event.dates.endDate;
-
-      if (event.type === INTERVENTION) {
-        const customer = this.customers.find(cus => cus._id === event.customer);
-        if (customer) {
-          const subscription = customer.subscriptions.find(sub => sub._id === event.subscription);
-          if (subscription && subscription.service) payload.status = subscription.service.type;
-        }
+      const payload = {
+        ...pickBy(omit(event, ['dates', '__v', 'company'])),
+        ...pick(event, ['isCancelled']), // pickBy removes isCancelled: false
+        startDate: event.dates.startDate,
+        endDate: event.dates.endDate,
       }
 
       if (event.auxiliary) delete payload.sector;

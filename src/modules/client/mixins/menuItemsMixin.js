@@ -98,7 +98,6 @@ export const menuItemsMixin = {
         },
         { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
         { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement', condition: true },
-        { name: 'customers contracts', icon: 'description', label: 'Contrats', condition: this.hasContracts },
       ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs)
     },
     coachRoutes () {
