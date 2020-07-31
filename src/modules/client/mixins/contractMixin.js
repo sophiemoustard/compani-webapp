@@ -106,10 +106,10 @@ export const contractMixin = {
       };
     },
     getContractTemplate () {
-      return get(this.company, 'rhConfig.templates.contractWithCompany');
+      return get(this.company, 'rhConfig.templates.contract');
     },
     getVersionTemplate () {
-      return get(this.company, 'rhConfig.templates.contractWithCompanyVersion');
+      return get(this.company, 'rhConfig.templates.contractVersion');
     },
     async getVersionEditionPayload () {
       const payload = pick(this.editedVersion, ['startDate', 'grossHourlyRate']);

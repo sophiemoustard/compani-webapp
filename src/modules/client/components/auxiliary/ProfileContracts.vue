@@ -290,7 +290,7 @@ export default {
     // Contract creation
     openCreationModal () {
       this.newContract.user = this.auxiliary._id;
-      this.newContract.grossHourlyRate = get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate');
+      this.newContract.grossHourlyRate = get(this.auxiliary, 'company.rhConfig.grossHourlyRate');
       this.newContractModal = true;
     },
     resetContractCreationModal () {
@@ -345,7 +345,7 @@ export default {
     },
     // Version creation
     openVersionCreationModal (contract) {
-      this.newVersion.grossHourlyRate = get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate');
+      this.newVersion.grossHourlyRate = get(this.auxiliary, 'company.rhConfig.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
       this.newVersionModal = true;

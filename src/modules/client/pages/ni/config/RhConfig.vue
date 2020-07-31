@@ -34,12 +34,10 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
-          <ni-input caption="Taux horaire brut par défaut"
-            :error="$v.company.rhConfig.contractWithCompany.grossHourlyRate.$error"
-            :error-message="nbrError('company.rhConfig.contractWithCompany.grossHourlyRate')" type="number"
-            v-model="company.rhConfig.contractWithCompany.grossHourlyRate"
-            @focus="saveTmp('rhConfig.contractWithCompany.grossHourlyRate')" suffix="€"
-            @blur="updateCompany('rhConfig.contractWithCompany.grossHourlyRate')" />
+          <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.grossHourlyRate.$error"
+            :error-message="nbrError('company.rhConfig.grossHourlyRate')" type="number"
+            v-model="company.rhConfig.grossHourlyRate" @focus="saveTmp('rhConfig.grossHourlyRate')" suffix="€"
+            @blur="updateCompany('rhConfig.grossHourlyRate')" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -76,16 +74,16 @@
         <p class="text-weight-bold">Modèles contrat</p>
         <div class="row gutter-profile">
           <div class="col-xs-12 col-md-6">
-            <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contractWithCompany"
-              :entity="company" alt="template contrat prestataire" name="contractWithCompany" :url="docsUploadUrl"
-              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCompany.driveId, 'contractWithCompany', 'rhConfig')"
+            <ni-file-uploader caption="Modèle de contrat prestataire" path="rhConfig.templates.contract"
+              :entity="company" alt="template contrat prestataire" name="contract" :url="docsUploadUrl"
+              @delete="validateDocumentDeletion(company.rhConfig.templates.contract.driveId, 'contract', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_contrat_prestataire_${company.name}`" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Modèle d'avenant au contrat prestataire"
-              path="rhConfig.templates.contractWithCompanyVersion" :entity="company" alt="template avenant prestataire"
-              name="contractWithCompanyVersion" :url="docsUploadUrl"
-              @delete="validateDocumentDeletion(company.rhConfig.templates.contractWithCompanyVersion.driveId, 'contractWithCompanyVersion', 'rhConfig')"
+              path="rhConfig.templates.contractVersion" :entity="company" alt="template avenant prestataire"
+              name="contractVersion" :url="docsUploadUrl"
+              @delete="validateDocumentDeletion(company.rhConfig.templates.contractVersion.driveId, 'contractVersion', 'rhConfig')"
               @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`" />
           </div>
         </div>
@@ -279,7 +277,7 @@ export default {
     return {
       company: {
         rhConfig: {
-          contractWithCompany: { grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) } },
+          grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) },
           feeAmount: { required, positiveNumber, maxValue: maxValue(999) },
           amountPerKm: { required, positiveNumber, maxValue: maxValue(999) },
           transportSubs: { $each: { price: { required, positiveNumber, maxValue: maxValue(999) } } },
