@@ -18,12 +18,12 @@
     </template>
 
     <!-- Card creation modal -->
-    <ni-modal v-model="cardCreationModal" @hide="resetCardCreationModal">
+    <ni-modal v-model="cardCreationModal" @hide="resetCardCreationModal" container-class="modal-container-md">
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">carte</span>
       </template>
       <h6 class="text-weight-bold">Cours</h6>
-      <div class="row q-mb-xl justify-between">
+      <div class="row q-mb-xl button-container">
         <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
           :class="getClassForTemplateInModal(template.value)">
           <div class="text-weight-bold card-button-content">
@@ -201,6 +201,13 @@ h6
 
 .body
   flex: 1
+
+.button-container
+  display: grid
+  grid-template-columns: repeat(auto-fill, 114px)
+  justify-content: center
+  @media (max-width: 767px)
+    grid-template-columns: repeat(auto-fill, 79px)
 
 .card-button
   background-color: $light-grey
