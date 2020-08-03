@@ -211,9 +211,9 @@ export default {
       if (!templates) return false;
 
       const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, version);
-      if (versionIndex === 0) return !!templates.contractWithCompany && !!templates.contractWithCompany.driveId;
+      if (versionIndex === 0) return !!templates.contract && !!templates.contract.driveId;
 
-      return !!templates.contractWithCompanyVersion && !!templates.contractWithCompanyVersion.driveId;
+      return !!templates.contractVersion && !!templates.contractVersion.driveId;
     },
     docsUploadUrl (contractId) {
       const driveId = get(this.user, 'administrative.driveFolder.driveId');
@@ -228,7 +228,9 @@ export default {
 
         const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contractVersion);
         const params = {
-          driveId: versionIndex === 0 ? this.user.company.rhConfig.templates.contractWithCompany.driveId : this.user.company.rhConfig.templates.contractWithCompanyVersion.driveId,
+          driveId: versionIndex === 0
+            ? this.user.company.rhConfig.templates.contract.driveId
+            : this.user.company.rhConfig.templates.contractVersion.driveId,
         };
 
         await downloadDocxFile(params, data, 'contrat.docx');
