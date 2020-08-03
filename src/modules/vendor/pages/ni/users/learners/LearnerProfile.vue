@@ -22,6 +22,7 @@ import get from 'lodash/get';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/learners/ProfileInfo';
+import ProfileCourses from 'src/modules/vendor/components/learners/ProfileCourses';
 import { formatIdentity } from '@helpers/utils';
 import {
   AUXILIARY,
@@ -56,6 +57,12 @@ export default {
           default: this.defaultTab === 'info',
           component: ProfileInfo,
           notification: 'profiles',
+        },
+        {
+          label: 'Formations',
+          name: 'courses',
+          default: this.defaultTab === 'courses',
+          component: ProfileCourses,
         },
       ],
     }
