@@ -21,7 +21,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { TEMPLATE_TYPES } from '@data/constants';
+import { TEMPLATE_TYPES, TRANSITION, TITLE_TEXT, TITLE_TEXT_MEDIA, TEXT_MEDIA, FLASHCARD } from '@data/constants';
 import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
 
 export default {
@@ -40,8 +40,9 @@ export default {
       this.$emit('add');
     },
     getHeading (card) {
-      if (card.title) return card.title;
-      return card.text;
+      if ([TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT].includes(card.template)) return card.title || '';
+      if ([FLASHCARD, TEXT_MEDIA].includes(card.template)) return card.text || '';
+      return '';
     },
     getTemplateName (value) {
       const template = TEMPLATE_TYPES.find(t => t.value === value);
