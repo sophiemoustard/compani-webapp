@@ -12,7 +12,7 @@
           :error="$v.program.learningGoals.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinaryStorage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
-          :additional-value="imageFileName" label="Pas d'image" />
+          :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :maxFileSize="500000" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -146,6 +146,7 @@ export default {
         { label: 'eLearning', value: E_LEARNING },
         { label: 'Présentiel', value: ON_SITE },
       ],
+      extensions: 'image/jpg, image/jpeg',
     }
   },
   validations () {

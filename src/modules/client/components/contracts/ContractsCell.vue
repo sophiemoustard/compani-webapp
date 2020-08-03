@@ -139,7 +139,7 @@ export default {
         { name: 'archives', label: 'Archives', align: 'center', field: 'auxiliaryArchives' },
         { name: 'actions', align: 'center', field: '_id' },
       ],
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
     }
   },
   computed: {

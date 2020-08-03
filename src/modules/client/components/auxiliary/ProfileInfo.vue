@@ -333,7 +333,7 @@ export default {
         'administrative.transportInvoice.transportType',
         'administrative.transportInvoice.driveId',
       ],
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
       auxiliaryRolesOptions: [],
       identityDocsOptions: [
         { label: 'Carte Nationale d\'Identité', value: 'cni' },

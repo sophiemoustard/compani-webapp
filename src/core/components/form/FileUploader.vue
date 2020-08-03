@@ -15,8 +15,9 @@
     </div>
     <q-field borderless v-else :error="error" :error-message="errorMessage">
       <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
-        text-color="black" @failed="failMsg" :form-fields="additionalFields"
-        @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"/>
+        text-color="black" @failed="failMsg" :form-fields="additionalFields" :max-file-size="maxFileSize"
+        @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"
+        @rejected="rejected" />
     </q-field>
   </div>
 </template>
@@ -49,11 +50,25 @@ export default {
     multiple: { type: Boolean, default: false },
     label: { type: String, default: 'Pas de document' },
     cloudinaryStorage: { type: Boolean, default: false },
+    maxFileSize: { type: Number, default: 1000000 },
   },
   data () {
     return {
       headers: [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }],
     }
+  },
+  computed: {
+    additionalFields () {
+      const fields = [{ name: 'fileName', value: this.additionalValue }];
+      if (!this.cloudinaryStorage) fields.push({ name: 'type', value: this.name });
+      return fields;
+    },
+    document () {
+      return get(this.entity, this.path);
+    },
+    imageSource () {
+      return this.cloudinaryStorage ? this.document.link : this.document.driveId;
+    },
   },
   methods: {
     deleteDocument () {
@@ -69,18 +84,10 @@ export default {
     failMsg () {
       return NotifyNegative('Echec de l\'envoi du document.');
     },
-  },
-  computed: {
-    additionalFields () {
-      const fields = [{ name: 'fileName', value: this.additionalValue }];
-      if (!this.cloudinaryStorage) fields.push({ name: 'type', value: this.name });
-      return fields;
-    },
-    document () {
-      return get(this.entity, this.path);
-    },
-    imageSource () {
-      return this.cloudinaryStorage ? this.document.link : this.document.driveId;
+    rejected (errors) {
+      for (const error of errors) {
+        if (error.failedPropValidation === 'max-file-size') NotifyNegative('Fichier trop volumineux.');
+      };
     },
   },
 };
