@@ -3,7 +3,7 @@
     <div :class="[!staffingView && 'q-mb-sm']">
       <div class="chip-container" @click="openIndicatorsModal">
         <img :src="getAvatar(person.picture)" class="avatar">
-        <q-chip v-if="hasCompanyContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
+        <q-chip v-if="hasContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
           <q-spinner-dots v-if="loading" />
           <span v-else class="chip-indicator">
             {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
@@ -106,7 +106,7 @@ export default {
     endOfWeek () {
       return this.$moment(this.startOfWeek).endOf('w').toISOString();
     },
-    hasCompanyContractOnEvent () {
+    hasContractOnEvent () {
       if (!this.person.contracts || this.person.contracts.length === 0) return false;
 
       return this.person.contracts.some(contract => {
@@ -122,7 +122,7 @@ export default {
       return (!picture || !picture.link) ? DEFAULT_AVATAR : picture.link;
     },
     async openIndicatorsModal () {
-      if (!this.hasCompanyContractOnEvent) return;
+      if (!this.hasContractOnEvent) return;
       await Promise.all([this.getMonthDetails(), this.getPrevMonthDetails()]);
 
       this.indicatorsModal = true;

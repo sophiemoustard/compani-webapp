@@ -106,21 +106,14 @@ export default {
 
       return this.$moment(this.newEvent.dates.endDate).isAfter(this.$moment(this.newEvent.dates.startDate));
     },
-    isCompanyContractValidForRepetition () {
+    isContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
 
       return this.selectedAuxiliary.contracts.some(contract => !contract.endDate);
     },
     isRepetitionAllowed () {
       if (!this.newEvent.auxiliary) return true;
-      if (this.newEvent.subscription !== '' && this.newEvent.customer !== '' && this.newEvent.auxiliary !== '') {
-        if (!this.selectedCustomer.subscriptions) return true;
-
-        const selectedSubscription = this.selectedCustomer.subscriptions.find(sub => sub._id === this.newEvent.subscription);
-        if (!selectedSubscription) return true;
-
-        return this.isCompanyContractValidForRepetition;
-      }
+      if (this.newEvent.auxiliary !== '') return this.isContractValidForRepetition;
 
       return true;
     },
@@ -131,14 +124,14 @@ export default {
     selectedAuxiliary () {
       if (!this.newEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
       const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
-      const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.newEvent.dates.startDate);
+      const hasContractOnEvent = this.hasContractOnEvent(aux, this.newEvent.dates.startDate);
 
-      return { ...aux, hasCompanyContractOnEvent };
+      return { ...aux, hasContractOnEvent };
     },
   },
   watch: {
     selectedAuxiliary (value) {
-      if (!this.selectedAuxiliary.hasCompanyContractOnEvent && this.newEvent.type === INTERNAL_HOUR) {
+      if (!this.selectedAuxiliary.hasContractOnEvent && this.newEvent.type === INTERNAL_HOUR) {
         this.$emit('update:newEvent', { ...this.newEvent, type: INTERVENTION });
       }
     },

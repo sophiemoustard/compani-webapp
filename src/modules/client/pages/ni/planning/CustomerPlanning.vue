@@ -102,7 +102,7 @@ export default {
     },
     activeAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => this.hasCompanyContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+        .filter(aux => this.hasContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
     },
   },
   methods: {

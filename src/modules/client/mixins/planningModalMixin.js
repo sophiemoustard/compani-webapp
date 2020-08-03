@@ -87,10 +87,6 @@ export const planningModalMixin = {
         return EVENT_TYPES.filter(type => type.value === INTERVENTION);
       }
 
-      if (this.selectedAuxiliary && !this.selectedAuxiliary.hasCompanyContractOnEvent) {
-        return EVENT_TYPES.filter(type => type.value !== INTERNAL_HOUR);
-      }
-
       return EVENT_TYPES;
     },
     auxiliariesOptions () {
@@ -156,7 +152,7 @@ export const planningModalMixin = {
     deleteClassFocus () {
       this.$refs.addressSelect.$el.className = this.$refs.addressSelect.$el.className.replace('q-if-focused ', '');
     },
-    hasCompanyContractOnEvent (auxiliary, startDate, endDate = startDate) {
+    hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
       return auxiliary.contracts.some(contract => {
