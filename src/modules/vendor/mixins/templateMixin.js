@@ -52,7 +52,7 @@ export const templateMixin = {
   },
   methods: {
     saveTmp (path) {
-      if (this.tmpInput === '') this.tmpInput = get(this.card, path);
+      this.tmpInput = get(this.card, path);
     },
     async updateCard (path) {
       try {
