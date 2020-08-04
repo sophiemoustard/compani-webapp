@@ -1,18 +1,14 @@
 <template>
   <div class="q-mb-xl">
-    <p class="text-weight-bold">Formations suivies</p>
-    <q-card v-for="(course, index) of orderedCourses" :key="index" flat class="q-mb-sm">
-      <q-card-section class="row">
-        <q-item-section class="col-8 head">{{ course.title }}</q-item-section>
-        <q-item-section class="col-2">{{ course.status }}</q-item-section>
-      </q-card-section>
-    </q-card>
+    <p class="text-weight-bold q-mb-none">Formations suivies</p>
+    <ni-table-list :data="orderedCourses" :columns="columns" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
+import TableList from '@components/table/TableList';
 import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
@@ -20,6 +16,9 @@ import { courseTimelineMixin } from '@mixins/courseTimeline';
 
 export default {
   name: 'ProfileCourses',
+  components: {
+    'ni-table-list': TableList,
+  },
   mixins: [userMixin, courseTimelineMixin, courseFiltersMixin],
   data () {
     return {
@@ -29,42 +28,37 @@ export default {
         [IN_PROGRESS]: 'En cours',
         [COMPLETED]: 'Terminée',
       },
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          field: row => row,
+          align: 'left',
+          sortable: false,
+          format: (value) => value.program.name + (value.misc ? ` - ${value.misc}` : ''),
+          style: 'min-width: 200px; width: 65%',
+        },
+        {
+          name: 'status',
+          label: 'Progression',
+          field: 'status',
+          align: 'left',
+          sortable: false,
+          format: (value) => this.statusTranslation[value],
+          style: 'min-width: 110px; width: 35%',
+        },
+      ],
     };
   },
   computed: {
     ...mapState('userProfile', ['userProfile']),
     orderedCourses () {
       return [...this.courseListForthcoming, ...this.courseListInProgress, ...this.courseListCompleted]
-        .map(course => { return this.formatRowDisplay(course) })
     },
   },
   async created () {
     this.courses = await Courses.list({ trainees: this.userProfile._id });
     this.courses = this.groupByCourses(this.courses);
   },
-  methods: {
-    formatCourseName (course) {
-      const possiblyMisc = course.misc ? ` - ${course.misc}` : '';
-      return course.program.name + possiblyMisc;
-    },
-    formatRowDisplay (course) {
-      const possibleMisc = course.misc ? ` - ${course.misc}` : '';
-
-      return {
-        title: course.program.name + possibleMisc,
-        status: this.statusTranslation[course.status],
-      }
-    },
-  },
 };
 </script>
-
-<style lang="stylus" scoped>
-
-.head
-  margin-right: 8%
-
-.q-card
-  border-radius: 0px
-
-</style>
