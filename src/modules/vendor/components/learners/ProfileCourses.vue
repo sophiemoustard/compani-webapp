@@ -24,11 +24,11 @@ export default {
   data () {
     return {
       courses: [],
-      statusTranslation: [
-        { status: FORTHCOMING, label: 'À venir' },
-        { status: IN_PROGRESS, label: 'En cours' },
-        { status: COMPLETED, label: 'Terminée' },
-      ],
+      statusTranslation: {
+        [FORTHCOMING]: 'À venir',
+        [IN_PROGRESS]: 'En cours',
+        [COMPLETED]: 'Terminée',
+      },
     };
   },
   computed: {
@@ -48,11 +48,11 @@ export default {
       return course.program.name + possiblyMisc;
     },
     formatRowDisplay (course) {
-      const possiblyMisc = course.misc ? ` - ${course.misc}` : '';
+      const possibleMisc = course.misc ? ` - ${course.misc}` : '';
 
       return {
-        title: course.program.name + possiblyMisc,
-        status: this.statusTranslation.find(t => t.status === course.status).label,
+        title: course.program.name + possibleMisc,
+        status: this.statusTranslation[course.status],
       }
     },
   },
