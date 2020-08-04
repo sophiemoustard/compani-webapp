@@ -6,6 +6,7 @@ import { required, minValue } from 'vuelidate/lib/validators';
 import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
+import { formatIdentity } from '@helpers/utils';
 import nationalities from '@data/nationalities.js';
 import { REQUIRED_LABEL } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
@@ -79,12 +80,6 @@ export const contractMixin = {
       }
       return '';
     },
-    generateContractSigners (signer) {
-      return [
-        { id: '1', name: this.userFullName, email: this.auxiliary.local.email },
-        { id: '2', name: signer.name, email: signer.email },
-      ];
-    },
     resetVersionEditionModal () {
       this.versionEditionModal = false;
       this.editedVersion = {};
@@ -98,10 +93,10 @@ export const contractMixin = {
         fields: generateContractFields(
           { user: this.auxiliary, contract: contract, initialContractStartDate: this.selectedContract.startDate }
         ),
-        signers: this.generateContractSigners({
-          name: `${this.loggedUser.identity.firstname} ${this.loggedUser.identity.lastname}`,
-          email: this.loggedUser.local.email,
-        }),
+        signers: [
+          { id: '1', name: this.userFullName, email: this.auxiliary.local.email },
+          { id: '2', name: formatIdentity(this.loggedUser.identity, 'FL'), email: this.loggedUser.local.email },
+        ],
         title: `${title}Contrat Prestataire - ${this.userFullName}`,
       };
     },
