@@ -12,6 +12,7 @@ export const templateMixin = {
     return {
       tmpInput: '',
       extensions: 'image/jpg, image/jpeg, image/png',
+      maxFileSize: 2000000,
     };
   },
   validations () {

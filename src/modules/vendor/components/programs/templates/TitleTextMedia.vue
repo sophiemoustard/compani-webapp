@@ -7,7 +7,7 @@
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
       :extensions="extensions" cloudinaryStorage :additional-value="imageFileName" required-field
-      :url="mediaUploadUrl" label="Pas de média" :maxFileSize="200000" />
+      :url="mediaUploadUrl" label="Pas de média" :maxFileSize="maxFileSize" />
   </div>
 </template>
 
