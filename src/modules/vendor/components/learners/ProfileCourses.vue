@@ -57,8 +57,8 @@ export default {
     },
   },
   async created () {
-    this.courses = await Courses.list({ trainees: this.userProfile._id });
-    this.courses = this.groupByCourses(this.courses);
+    const courses = await Courses.list({ trainees: this.userProfile._id });
+    this.courses = this.groupByCourses(courses);
   },
 };
 </script>

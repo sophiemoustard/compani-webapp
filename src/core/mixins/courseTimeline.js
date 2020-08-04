@@ -5,10 +5,7 @@ export const courseTimelineMixin = {
     courseListForthcoming () {
       return this.courses
         .filter(this.isForthcoming)
-        .map((course) => {
-          course.status = FORTHCOMING;
-          return course;
-        })
+        .map(course => ({ ...course, status: FORTHCOMING }))
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
@@ -18,10 +15,7 @@ export const courseTimelineMixin = {
     courseListInProgress () {
       return this.courses
         .filter(this.isInProgress)
-        .map((course) => {
-          course.status = IN_PROGRESS;
-          return course;
-        })
+        .map(course => ({ ...course, status: IN_PROGRESS }))
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
@@ -31,10 +25,7 @@ export const courseTimelineMixin = {
     courseListCompleted () {
       return this.courses
         .filter(this.isCompleted)
-        .map((course) => {
-          course.status = COMPLETED;
-          return course;
-        })
+        .map(course => ({ ...course, status: COMPLETED }))
         .sort((a, b) => this.getRangeNowToEndCourse(a) - this.getRangeNowToEndCourse(b));
     },
   },
