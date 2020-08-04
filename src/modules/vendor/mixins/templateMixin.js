@@ -5,7 +5,7 @@ import set from 'lodash/set';
 import Cards from '@api/Cards';
 import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA } from '@data/constants';
+import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD } from '@data/constants';
 
 export const templateMixin = {
   data () {
@@ -32,6 +32,10 @@ export const templateMixin = {
       case TEXT_MEDIA:
         return {
           card: { text: { required }, media: { publicId: required, link: required } },
+        };
+      case FLASHCARD:
+        return {
+          card: { text: { required }, backText: { required } },
         };
       default:
         return {};
