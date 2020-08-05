@@ -67,7 +67,9 @@ export default {
           label: 'Formations suivies',
           field: 'coursesCount',
           align: 'center',
+          sortable: true,
           style: 'min-width: 110px; width: 15%',
+          sort: (a, b) => b - a,
         },
       ],
     }
