@@ -77,6 +77,16 @@ const routes = [
         name: 'ni users learners info',
         component: () => import('src/modules/vendor/pages/ni/users/learners/LearnerProfile'),
         props: true,
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni management courses info' && from.params.defaultTab === 'followUp') {
+              to.params.defaultTab = 'courses';
+            }
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'users',
