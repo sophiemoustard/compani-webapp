@@ -170,6 +170,7 @@ export default {
         endDate: '',
         endNotificationDate: '',
         endReason: '',
+        otherMisc: '',
         contract: {},
       },
       endContractReasons: END_CONTRACT_REASONS,
@@ -437,17 +438,22 @@ export default {
         this.$v.endContract.otherMisc.$reset();
       }
     },
+    formatEndContractPayload () {
+      const omittedField = ['contract', 'endDate'];
+      if (this.endContract.endReason !== OTHER) omittedField.push('otherMisc');
+
+      return {
+        ...omit(this.endContract, omittedField),
+        endDate: this.$moment(this.endContract.endDate).endOf('day').toISOString(),
+      };
+    },
     async endExistingContract () {
       try {
         this.$v.endContract.$touch();
         if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = {
-          ...omit(this.endContract, ['contract']),
-          endDate: this.$moment(this.endContract.endDate).endOf('day').toISOString(),
-        };
-        await Contracts.update(this.endContract.contract._id, payload);
+        await Contracts.update(this.endContract.contract._id, this.formatEndContractPayload());
         await this.refreshContracts();
         this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
