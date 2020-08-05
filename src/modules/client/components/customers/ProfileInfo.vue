@@ -561,6 +561,11 @@ export default {
   },
   computed: {
     ...mapState('customer', ['customer']),
+    customerIdentity () {
+      const firstname = get(this.customer, 'identity.firstname');
+      const lastname = get(this.customer, 'identity.lastname');
+      return firstname ? `${firstname}_${lastname}` : lastname
+    },
     docsUploadUrl () {
       if (!this.customer.driveFolder) return '';
 
@@ -708,12 +713,6 @@ export default {
     this.isLoaded = true;
   },
   methods: {
-    customerIdentity () {
-      const firstname = get(this.customer, 'identity.firstname');
-      const lastname = get(this.customer, 'identity.last');
-
-      return firstname ? `${firstname}_${lastname}` : lastname
-    },
     mandateFormFields (row) {
       return [
         { name: 'mandateId', value: row._id },
