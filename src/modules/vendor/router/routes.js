@@ -79,9 +79,8 @@ const routes = [
         props: true,
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni management courses info' && from.params.defaultTab === 'followUp') {
-              to.params.defaultTab = 'courses';
-            }
+            if (from.name === 'ni management courses info') to.params.defaultTab = 'courses';
+
             return next();
           } catch (e) {
             console.error(e);
