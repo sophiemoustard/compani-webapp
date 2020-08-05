@@ -1,7 +1,7 @@
 <template>
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
-    <ni-table-list :data="orderedCourses" :columns="columns" />
+    <ni-table-list :data="orderedCourses" :columns="columns" @goTo="goToCourseProfileFollowUp"/>
   </div>
 </template>
 
@@ -59,6 +59,14 @@ export default {
   async created () {
     const courses = await Courses.list({ trainees: this.userProfile._id });
     this.courses = this.groupByCourses(courses);
+  },
+  methods: {
+    goToCourseProfileFollowUp (row) {
+      this.$router.push({
+        name: 'ni management courses info',
+        params: { courseId: row._id, defaultTab: 'followUp' },
+      });
+    },
   },
 };
 </script>
