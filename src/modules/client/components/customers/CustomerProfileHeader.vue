@@ -32,7 +32,7 @@ export default {
   computed: {
     ...mapState('customer', ['customer']),
     deletionDisabled () {
-      return !!this.customer.firstIntervention || (this.customer.contracts && !!this.customer.contracts.length);
+      return !!this.customer.firstIntervention;
     },
     isPlanningRouterDisable () {
       return !this.customer.firstIntervention;

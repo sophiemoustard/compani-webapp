@@ -47,10 +47,6 @@ export const menuItemsMixin = {
     customer () {
       return this.isHelper ? this.$store.getters['customer/getCustomer'] : null;
     },
-    hasContracts () {
-      return this.loggedUser && this.loggedUser.customers && this.loggedUser.customers.length > 0 &&
-        this.loggedUser.customers[0].contracts && this.loggedUser.customers[0].contracts.length > 0;
-    },
     hasBillingAssistance () {
       return get(this.loggedUser, 'company.billingAssistance');
     },
