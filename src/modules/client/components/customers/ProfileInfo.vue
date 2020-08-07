@@ -530,14 +530,14 @@ export default {
         sortBy: 'createdAt',
         descending: true,
       },
-      fundingTppOptions: [],
+      thirdPartyPayers: [],
       newFunding: {
         thirdPartyPayer: '',
         folderNumber: '',
         startDate: '',
         frequency: '',
         endDate: '',
-        nature: '',
+        nature: HOURLY,
         amountTTC: '',
         unitTTCRate: '',
         customerParticipationRate: 0,
@@ -624,6 +624,9 @@ export default {
     isOneTimeEditedFundingNature () {
       return this.editedFunding.nature === FIXED;
     },
+    fundingTppOptions () {
+      return this.thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
+    },
     fundingFreqOptions () {
       if ((this.fundingCreationModal && this.newFunding.nature === FIXED) ||
         (this.fundingEditionModal && this.editedFunding.nature === FIXED)) {
@@ -708,6 +711,14 @@ export default {
       },
     };
   },
+  watch: {
+    'newFunding.thirdPartyPayer' () {
+      this.setUnitUTTRate();
+    },
+    'newFunding.nature' () {
+      this.setUnitUTTRate();
+    },
+  },
   async mounted () {
     await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices()]);
     this.isLoaded = true;
@@ -737,6 +748,14 @@ export default {
     },
     saveTmpSignedAt (index) {
       this.tmpInput = this.customer.payment.mandates[index].signedAt;
+    },
+    setUnitUTTRate () {
+      if (this.newFunding.nature === HOURLY) {
+        const ttp = this.thirdPartyPayers.find(p => p._id === this.newFunding.thirdPartyPayer);
+        this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
+      } else {
+        this.newFunding.unitTTCRate = '';
+      }
     },
     // Refresh data
     async getServices () {
@@ -999,17 +1018,16 @@ export default {
       }
     },
     // Fundings
-    async getThirdPartyPayersOptions () {
+    async getThirdPartyPayers () {
       try {
-        const thirdPartyPayers = await ThirdPartyPayers.list();
-        this.fundingTppOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
+        this.thirdPartyPayers = await ThirdPartyPayers.list();
       } catch (e) {
         this.fundingTppOptions = [];
         console.error(e);
       }
     },
     async openFundingCreationModal () {
-      await this.getThirdPartyPayersOptions();
+      await this.getThirdPartyPayers();
       this.fundingCreationModal = true;
     },
     resetFundingFrequency () {
@@ -1037,7 +1055,7 @@ export default {
         startDate: '',
         frequency: '',
         endDate: '',
-        nature: '',
+        nature: HOURLY,
         amountTTC: '',
         unitTTCRate: '',
         customerParticipationRate: 0,
