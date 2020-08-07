@@ -49,7 +49,7 @@ import OptionGroup from '@components/form/OptionGroup';
 import { HOURLY, FUNDING_FREQ_OPTIONS, FIXED, ONCE, NATURE_OPTIONS } from '@data/constants.js';
 
 export default {
-  name: 'AddHelperModal',
+  name: 'AddFundingModal',
   props: {
     value: { type: Boolean, default: false },
     newFunding: { type: Object, default: () => ({}) },
@@ -58,7 +58,6 @@ export default {
     fundingSubscriptionsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-
   },
   components: {
     'ni-input': Input,

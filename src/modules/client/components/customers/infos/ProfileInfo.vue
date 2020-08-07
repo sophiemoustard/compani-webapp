@@ -328,38 +328,10 @@
       :fundingSubscriptionsOptions="fundingSubscriptionsOptions" :daysOptions="daysOptions"/>
 
     <!-- Funding edition modal -->
-    <ni-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal"
-      @hide="resetEditionFundingData">
-      <template slot="title">
-        Éditer le <span class="text-weight-bold">financement</span>
-      </template>
-      <ni-date-input v-model="editedFunding.startDate" caption="Date de début de prise en charge"
-        :max="editedFundingMaxStartDate" class="last" in-modal @blur="$v.editedFunding.startDate.$touch"
-        :error="$v.editedFunding.startDate.$error" required-field />
-      <ni-date-input v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
-        :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
-      <ni-input in-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
-      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate"
-        caption="Prix unitaire TTC" type="number" @blur="$v.editedFunding.unitTTCRate.$touch"
-        :error="$v.editedFunding.unitTTCRate.$error" required-field />
-      <ni-input in-modal v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC"
-        caption="Montant forfaitaire TTC" type="number" @blur="$v.editedFunding.amountTTC.$touch"
-        :error="$v.editedFunding.amountTTC.$error" required-field />
-      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours"
-        caption="Nb. heures prises en charge" type="number" @blur="$v.editedFunding.careHours.$touch"
-        :error="$v.editedFunding.careHours.$error" required-field suffix="h" />
-      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.customerParticipationRate"
-        caption="Taux de participation du bénéficiaire" type="number" suffix="%"
-        @blur="$v.editedFunding.customerParticipationRate.$touch"
-        :error="$v.editedFunding.customerParticipationRate.$error" required-field />
-      <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
-        type="checkbox" inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error"
-        required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
-          :loading="loading" @click="editFunding" />
-      </template>
-    </ni-modal>
+    <edit-funding-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
+      :editedFunding="editedFunding" @editFunding="editFunding" :daysOptions="daysOptions"
+      :validations="$v.editedFunding" />
+
   </div>
 </template>
 
@@ -377,7 +349,6 @@ import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import OptionGroup from '@components/form/OptionGroup';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
@@ -397,6 +368,7 @@ import { userMixin } from '@mixins/userMixin';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import EditHelperModal from 'src/modules/client/components/customers/infos/EditHelperModal.vue';
 import AddHelperModal from 'src/modules/client/components/customers/infos/AddHelperModal.vue';
+import EditFundingModal from 'src/modules/client/components/customers/infos/EditFundingModal.vue';
 import AddFundingModal from 'src/modules/client/components/customers/infos/AddFundingModal.vue';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin.js';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin.js';
@@ -413,12 +385,12 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-date-input': DateInput,
-    'ni-option-group': OptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
     'add-funding-modal': AddFundingModal,
+    'edit-funding-modal': EditFundingModal,
     'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
   },
@@ -581,9 +553,6 @@ export default {
         ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
         : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
     },
-    isOneTimeEditedFundingNature () {
-      return this.editedFunding.nature === FIXED;
-    },
     fundingSubscriptionsOptions () {
       return this.subscriptions
         .filter(sub => get(sub, 'service.nature') !== FIXED)
@@ -591,11 +560,6 @@ export default {
     },
     daysOptions () {
       return days.map((day, i) => ({ label: day !== 'Jours fériés' ? day.slice(0, 2) : day, value: i }));
-    },
-    editedFundingMaxStartDate () {
-      return this.editedFunding && this.editedFunding.endDate
-        ? this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString()
-        : '';
     },
   },
   validations () {
