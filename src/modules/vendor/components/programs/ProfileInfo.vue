@@ -351,6 +351,7 @@ export default {
 <style lang="stylus" scoped>
 .step
   margin-bottom: 10px
+  border-radius: 0
   &-head
     justify-content: space-between
   &-subtitle
@@ -364,6 +365,7 @@ export default {
   width: -moz-available
   width: -webkit-fill-available
   margin: 10px 10px 0px 50px
+  border-radius: 0
   .q-card__section
     display: flex
     justify-content: space-between
