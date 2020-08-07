@@ -68,7 +68,6 @@ export default {
     nextStep () {
       this.$emit('nextStep');
     },
-
   },
 }
 </script>
