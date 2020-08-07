@@ -433,8 +433,8 @@ import {
 } from '@data/constants.js';
 import { userMixin } from '@mixins/userMixin';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
-import EditHelperModal from 'src/modules/client/components/customers/EditHelperModal.vue';
-import AddHelperModal from 'src/modules/client/components/customers/AddHelperModal.vue';
+import EditHelperModal from 'src/modules/client/components/customers/infos/EditHelperModal.vue';
+import AddHelperModal from 'src/modules/client/components/customers/infos/AddHelperModal.vue';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin.js';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin.js';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';

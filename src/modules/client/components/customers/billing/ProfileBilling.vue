@@ -115,9 +115,9 @@ import {
   HELPER,
   REQUIRED_LABEL,
 } from '@data/constants';
-import CustomerBillingTable from 'src/modules/client/components/customers/CustomerBillingTable';
-import PaymentCreationModal from 'src/modules/client/components/customers/PaymentCreationModal';
-import PaymentEditionModal from 'src/modules/client/components/customers/PaymentEditionModal';
+import CustomerBillingTable from 'src/modules/client/components/customers/billing/CustomerBillingTable';
+import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
+import PaymentEditionModal from 'src/modules/client/components/customers/billing/PaymentEditionModal';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import { paymentMixin } from 'src/modules/client/mixins/paymentMixin.js';
 
