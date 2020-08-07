@@ -49,7 +49,8 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">étape</span>
       </template>
-      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="newStep.type" required-field />
+      <ni-option-group inline caption="Type" v-model="newStep.type" type="radio" :options="stepTypeOptions"
+        required-field />
       <ni-input in-modal v-model.trim="newStep.name" :error="$v.newStep.name.$error"
         @blur="$v.newStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
@@ -113,6 +114,7 @@ import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import OptionGroup from '@components/form/OptionGroup';
 import FileUploader from '@components/form/FileUploader.vue';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE } from '@data/constants';
@@ -124,6 +126,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-option-group': OptionGroup,
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-file-uploader': FileUploader,
