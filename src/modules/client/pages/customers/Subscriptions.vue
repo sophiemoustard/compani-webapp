@@ -263,7 +263,7 @@ export default {
     async refreshCustomer () {
       try {
         this.mandatesLoading = true;
-        const customer = await Customers.getById(this.helper.customers[0]._id);
+        const customer = await Customers.getById(this.helper.customers[0]);
         this.$store.dispatch('customer/setCustomer', customer);
 
         this.refreshSubscriptions(this.customer);
