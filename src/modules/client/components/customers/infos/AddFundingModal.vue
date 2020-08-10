@@ -18,15 +18,15 @@
       <ni-select in-modal caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature"
         :error="validations.nature.$error" @blur="validations.nature.$touch" required-field
         @input="resetFundingFrequency" />
-      <ni-input in-modal v-if="isHourlyFunding" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
+      <ni-input in-modal v-if="!isFixedFunding" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
         type="number" @blur="validations.unitTTCRate.$touch" :error="validations.unitTTCRate.$error"
         required-field />
-      <ni-input in-modal v-if="!isHourlyFunding" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
+      <ni-input in-modal v-if="isFixedFunding" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
         type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field />
-      <ni-input in-modal v-if="isHourlyFunding" v-model="newFunding.careHours"
+      <ni-input in-modal v-if="!isFixedFunding" v-model="newFunding.careHours"
         caption="Nb. heures prises en charge" type="number" suffix="h" @blur="validations.careHours.$touch"
         :error="validations.careHours.$error" required-field />
-      <ni-input in-modal v-if="isHourlyFunding" v-model="newFunding.customerParticipationRate"
+      <ni-input in-modal v-if="!isFixedFunding" v-model="newFunding.customerParticipationRate"
         caption="Taux de participation du bénéficiaire" type="number" suffix="%"
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
         required-field />
@@ -46,7 +46,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
-import { HOURLY, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants.js';
+import { FIXED, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants.js';
 
 export default {
   name: 'AddFundingModal',
@@ -72,14 +72,14 @@ export default {
     }
   },
   computed: {
-    isHourlyFunding () {
-      return this.newFunding.nature === HOURLY;
+    isFixedFunding () {
+      return this.newFunding.nature === FIXED;
     },
     fundingTppOptions () {
       return this.thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
     },
     fundingFreqOptions () {
-      if (!this.isHourlyFunding) {
+      if (this.isFixedFunding) {
         return FUNDING_FREQ_OPTIONS.filter(option => option.value === ONCE);
       }
 
@@ -99,15 +99,15 @@ export default {
   },
   methods: {
     setUnitUTTRate () {
-      if (this.isHourlyFunding) {
+      if (this.isFixedFunding) {
+        this.newFunding.unitTTCRate = 0;
+      } else {
         const ttp = this.thirdPartyPayers.find(p => p._id === this.newFunding.thirdPartyPayer);
         this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
-      } else {
-        this.newFunding.unitTTCRate = 0;
       }
     },
     resetFundingFrequency () {
-      if (!this.isHourlyFunding && this.newFunding.frequency !== ONCE) this.newFunding.frequency = '';
+      if (this.isFixedFunding && this.newFunding.frequency !== ONCE) this.newFunding.frequency = '';
     },
     hide () {
       this.$emit('hide');

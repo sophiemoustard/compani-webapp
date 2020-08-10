@@ -926,7 +926,7 @@ export default {
       try {
         this.ttpList = await ThirdPartyPayers.list();
       } catch (e) {
-        this.fundingTppOptions = [];
+        this.ttpList = [];
         console.error(e);
       }
     },
