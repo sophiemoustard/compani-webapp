@@ -633,7 +633,7 @@ export default {
         name: '',
         email: '',
         address: { fullAddress: '' },
-        unitTTCRate: '',
+        unitTTCRate: 0,
         billingMode: '',
         isApa: false,
       },
@@ -1098,7 +1098,7 @@ export default {
         name: '',
         email: '',
         address: {},
-        unitTTCRate: '',
+        unitTTCRate: 0,
         billingMode: '',
         isApa: false,
       }

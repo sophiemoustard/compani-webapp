@@ -179,7 +179,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="fundingSubscriptionsOptions().length === 0 || fundingsLoading" flat no-caps color="primary" icon="add"
+          <q-btn :disable="fundingSubscriptionsOptions.length === 0 || fundingsLoading" flat no-caps color="primary" icon="add"
             label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
@@ -323,79 +323,15 @@
     </ni-modal>
 
     <!-- Funding creation modal -->
-    <ni-modal v-model="fundingCreationModal" @hide="resetCreationFundingData">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">financement</span>
-      </template>
-      <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
-        :error="$v.newFunding.thirdPartyPayer.$error" @blur="$v.newFunding.thirdPartyPayer.$touch" required-field />
-      <ni-select in-modal v-model="newFunding.subscription" :options="fundingSubscriptionsOptions()"
-        caption="Souscription" @blur="$v.newFunding.subscription.$touch" :error="$v.newFunding.subscription.$error"
-        required-field />
-      <ni-date-input v-model="newFunding.startDate" caption="Date de début de prise en charge" in-modal
-        @blur="$v.newFunding.startDate.$touch" :error="$v.newFunding.startDate.$error" required-field />
-      <ni-date-input v-model="newFunding.endDate" :min="$moment(newFunding.startDate).add(1, 'day').toISOString()"
-        in-modal caption="Date de fin de prise en charge" />
-      <ni-input in-modal v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-      <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency"
-        @blur="$v.newFunding.frequency.$touch" :error="$v.newFunding.frequency.$error" required-field />
-      <ni-select in-modal caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature"
-        :error="$v.newFunding.nature.$error" @blur="$v.newFunding.nature.$touch" required-field
-        @input="resetFundingFrequency" />
-      <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
-        type="number" @blur="$v.newFunding.unitTTCRate.$touch" :error="$v.newFunding.unitTTCRate.$error"
-        required-field />
-      <ni-input in-modal v-if="isOneTimeFundingNature" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
-        type="number" @blur="$v.newFunding.amountTTC.$touch" :error="$v.newFunding.amountTTC.$error" required-field />
-      <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.careHours"
-        caption="Nb. heures prises en charge" type="number" suffix="h" @blur="$v.newFunding.careHours.$touch"
-        :error="$v.newFunding.careHours.$error" required-field />
-      <ni-input in-modal v-if="!isOneTimeFundingNature" v-model="newFunding.customerParticipationRate"
-        caption="Taux de participation du bénéficiaire" type="number" suffix="%"
-        @blur="$v.newFunding.customerParticipationRate.$touch" :error="$v.newFunding.customerParticipationRate.$error"
-        required-field />
-      <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
-        type="checkbox" inline @blur="$v.newFunding.careDays.$touch" :error="$v.newFunding.careDays.$error"
-        required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary"
-          :loading="loading" @click="submitFunding" />
-      </template>
-    </ni-modal>
+    <add-funding-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
+      :newFunding="newFunding" :thirdPartyPayers="ttpList" @submit="submitFunding" :validations="$v.newFunding"
+      :fundingSubscriptionsOptions="fundingSubscriptionsOptions" :daysOptions="daysOptions"/>
 
     <!-- Funding edition modal -->
-    <ni-modal v-if="Object.keys(editedFunding).length > 0" v-model="fundingEditionModal"
-      @hide="resetEditionFundingData">
-      <template slot="title">
-        Éditer le <span class="text-weight-bold">financement</span>
-      </template>
-      <ni-date-input v-model="editedFunding.startDate" caption="Date de début de prise en charge"
-        :max="editedFundingMaxStartDate" class="last" in-modal @blur="$v.editedFunding.startDate.$touch"
-        :error="$v.editedFunding.startDate.$error" required-field />
-      <ni-date-input v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
-        :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
-      <ni-input in-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
-      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.unitTTCRate"
-        caption="Prix unitaire TTC" type="number" @blur="$v.editedFunding.unitTTCRate.$touch"
-        :error="$v.editedFunding.unitTTCRate.$error" required-field />
-      <ni-input in-modal v-if="isOneTimeEditedFundingNature" v-model="editedFunding.amountTTC"
-        caption="Montant forfaitaire TTC" type="number" @blur="$v.editedFunding.amountTTC.$touch"
-        :error="$v.editedFunding.amountTTC.$error" required-field />
-      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.careHours"
-        caption="Nb. heures prises en charge" type="number" @blur="$v.editedFunding.careHours.$touch"
-        :error="$v.editedFunding.careHours.$error" required-field suffix="h" />
-      <ni-input in-modal v-if="!isOneTimeEditedFundingNature" v-model="editedFunding.customerParticipationRate"
-        caption="Taux de participation du bénéficiaire" type="number" suffix="%"
-        @blur="$v.editedFunding.customerParticipationRate.$touch"
-        :error="$v.editedFunding.customerParticipationRate.$error" required-field />
-      <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
-        type="checkbox" inline @blur="$v.editedFunding.careDays.$touch" :error="$v.editedFunding.careDays.$error"
-        required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
-          :loading="loading" @click="editFunding" />
-      </template>
-    </ni-modal>
+    <edit-funding-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
+      :editedFunding="editedFunding" @editFunding="editFunding" :daysOptions="daysOptions"
+      :validations="$v.editedFunding" />
+
   </div>
 </template>
 
@@ -413,35 +349,35 @@ import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import OptionGroup from '@components/form/OptionGroup';
-import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
+import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
-import { days } from '@data/days.js';
+import { days } from '@data/days';
 import {
-  FUNDING_FREQ_OPTIONS,
   NATURE_OPTIONS,
   FIXED,
   HOURLY,
+  MONTHLY,
   REQUIRED_LABEL,
-  ONCE,
   CIVILITY_OPTIONS,
-} from '@data/constants.js';
+} from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
-import EditHelperModal from 'src/modules/client/components/customers/EditHelperModal.vue';
-import AddHelperModal from 'src/modules/client/components/customers/AddHelperModal.vue';
-import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin.js';
-import { fundingMixin } from 'src/modules/client/mixins/fundingMixin.js';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
-import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
-import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin.js';
-import { helperMixin } from 'src/modules/client/mixins/helperMixin.js';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
+import EditHelperModal from 'src/modules/client/components/customers/infos/EditHelperModal';
+import AddHelperModal from 'src/modules/client/components/customers/infos/AddHelperModal';
+import EditFundingModal from 'src/modules/client/components/customers/infos/EditFundingModal';
+import AddFundingModal from 'src/modules/client/components/customers/infos/AddFundingModal';
+import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
+import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
+import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
+import { helperMixin } from 'src/modules/client/mixins/helperMixin';
+import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -450,11 +386,12 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-date-input': DateInput,
-    'ni-option-group': OptionGroup,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
     'add-helper-modal': AddHelperModal,
     'edit-helper-modal': EditHelperModal,
+    'add-funding-modal': AddFundingModal,
+    'edit-funding-modal': EditFundingModal,
     'ni-responsive-table': ResponsiveTable,
     'ni-funding-grid-table': FundingGridTable,
   },
@@ -501,7 +438,7 @@ export default {
       quotesLoading: false,
       newSubscription: {
         service: '',
-        unitTTCRate: '',
+        unitTTCRate: 0,
         estimatedWeeklyVolume: '',
       },
       editedSubscription: {},
@@ -530,21 +467,21 @@ export default {
         sortBy: 'createdAt',
         descending: true,
       },
-      fundingTppOptions: [],
+      ttpList: [],
       newFunding: {
         thirdPartyPayer: '',
         folderNumber: '',
         startDate: '',
-        frequency: '',
+        frequency: MONTHLY,
         endDate: '',
-        nature: '',
-        amountTTC: '',
-        unitTTCRate: '',
+        nature: HOURLY,
+        amountTTC: 0,
+        unitTTCRate: 0,
+        careHours: 0,
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
       },
-      fundingNatureOptions: NATURE_OPTIONS,
       fundingCreationModal: false,
       fundingEditionModal: false,
       fundingDetailsModal: false,
@@ -618,27 +555,13 @@ export default {
         ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
         : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
     },
-    isOneTimeFundingNature () {
-      return this.newFunding.nature === FIXED;
-    },
-    isOneTimeEditedFundingNature () {
-      return this.editedFunding.nature === FIXED;
-    },
-    fundingFreqOptions () {
-      if ((this.fundingCreationModal && this.newFunding.nature === FIXED) ||
-        (this.fundingEditionModal && this.editedFunding.nature === FIXED)) {
-        return FUNDING_FREQ_OPTIONS.filter(option => option.value === ONCE);
-      }
-
-      return FUNDING_FREQ_OPTIONS;
+    fundingSubscriptionsOptions () {
+      return this.subscriptions
+        .filter(sub => get(sub, 'service.nature') !== FIXED)
+        .map(sub => ({ label: get(sub, 'service.name'), value: sub._id }));
     },
     daysOptions () {
       return days.map((day, i) => ({ label: day !== 'Jours fériés' ? day.slice(0, 2) : day, value: i }));
-    },
-    editedFundingMaxStartDate () {
-      return this.editedFunding && this.editedFunding.endDate
-        ? this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString()
-        : '';
     },
   },
   validations () {
@@ -801,7 +724,7 @@ export default {
       this.$v.newSubscription.$reset();
       this.newSubscription = {
         service: '',
-        unitTTCRate: '',
+        unitTTCRate: 0,
         estimatedWeeklyVolume: '',
       };
     },
@@ -999,26 +922,17 @@ export default {
       }
     },
     // Fundings
-    async getThirdPartyPayersOptions () {
+    async getThirdPartyPayers () {
       try {
-        const thirdPartyPayers = await ThirdPartyPayers.list();
-        this.fundingTppOptions = thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
+        this.ttpList = await ThirdPartyPayers.list();
       } catch (e) {
-        this.fundingTppOptions = [];
+        this.ttpList = [];
         console.error(e);
       }
     },
     async openFundingCreationModal () {
-      await this.getThirdPartyPayersOptions();
+      await this.getThirdPartyPayers();
       this.fundingCreationModal = true;
-    },
-    resetFundingFrequency () {
-      if (this.newFunding.nature === FIXED && this.newFunding.frequency !== ONCE) this.newFunding.frequency = '';
-    },
-    fundingSubscriptionsOptions () {
-      return this.subscriptions
-        .filter(sub => get(sub, 'service.nature') !== FIXED)
-        .map(sub => ({ label: get(sub, 'service.name'), value: sub._id }));
     },
     showFundingHistory (id) {
       this.selectedFunding = this.fundings.find(sub => sub._id === id);
@@ -1035,11 +949,12 @@ export default {
         thirdPartyPayer: '',
         folderNumber: '',
         startDate: '',
-        frequency: '',
+        frequency: MONTHLY,
         endDate: '',
-        nature: '',
-        amountTTC: '',
-        unitTTCRate: '',
+        nature: HOURLY,
+        amountTTC: 0,
+        unitTTCRate: 0,
+        careHours: 0,
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
