@@ -68,7 +68,7 @@ export default {
   methods: {
     async refreshCustomer () {
       if (this.helper && this.helper.customers) {
-        const customer = await Customers.getById(this.helper.customers[0]._id);
+        const customer = await Customers.getById(this.helper.customers[0]);
         this.$store.dispatch('customer/setCustomer', customer);
       }
     },
