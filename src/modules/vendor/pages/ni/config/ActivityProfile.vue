@@ -24,7 +24,7 @@
       </template>
       <h6 class="text-weight-bold">Cours</h6>
       <div class="row q-mb-xl button-container">
-        <div v-for="template in templateTypes" :key="template.value" @click="selectTemplateInModal(template.value)"
+        <div v-for="template in COURSE_TEMPLATE_TYPES" :key="template.value" @click="selectTemplateInModal(template.value)"
           :class="getClassForTemplateInModal(template.value)">
           <div class="text-weight-bold card-button-content">
             <template v-if="template.value === TITLE_TEXT_MEDIA">
@@ -38,12 +38,36 @@
             </template>
             <template v-else-if="template.value === FLASHCARD">
               <div>Flashcard</div>
-              <div class="row card-button-flashcard">
+              <div class="row flashcard">
                 <div class="flashcard-left" />
                 <div class="flashcard-right" />
               </div>
             </template>
             <template v-else>{{ formatButtonLabel(template.label) }}</template>
+          </div>
+        </div>
+      </div>
+      <h6 class="text-weight-bold">Cours</h6>
+      <div class="row q-mb-xl button-container">
+        <div v-for="template in QUIZ_TEMPLATE_TYPES" :key="template.value" @click="selectTemplateInModal(template.value)"
+          :class="getClassForTemplateInModal(template.value)">
+          <div class="text-weight-bold card-button-content">
+            <template v-if="template.value === FILL_THE_GAPS">
+              <div class="q-mb-sm">Texte à trou</div>
+              <div class="fill-the-gaps">Ceci est un ____</div>
+            </template>
+            <template v-else-if="template.value === MULTIPLE_CHOICE_QUESTION">
+              <div class="q-mb-sm">QCM</div>
+              <q-icon name="fas fa-list" size="1.6rem" />
+            </template>
+            <template v-else-if="template.value === SINGLE_CHOICE_QUESTION">
+              <div class="q-mb-sm">QCU</div>
+              <q-icon name="fas fa-list-ul" size="1.6rem" />
+            </template>
+            <template v-else-if="template.value === ORDER_THE_SEQUENCE">
+              <div class="q-mb-sm order-the-sequence">Mettre dans l'ordre</div>
+              <q-icon name="fas fa-list-ol" size="1.6rem" />
+            </template>
           </div>
         </div>
       </div>
@@ -64,10 +88,15 @@ import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
   ACTIVITY_TYPES,
-  TEMPLATE_TYPES,
+  COURSE_TEMPLATE_TYPES,
+  QUIZ_TEMPLATE_TYPES,
   TITLE_TEXT_MEDIA,
   TEXT_MEDIA,
   FLASHCARD,
+  FILL_THE_GAPS,
+  MULTIPLE_CHOICE_QUESTION,
+  SINGLE_CHOICE_QUESTION,
+  ORDER_THE_SEQUENCE,
 } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
@@ -93,11 +122,16 @@ export default {
       stepName: '',
       modalLoading: false,
       cardCreationModal: false,
-      templateTypes: TEMPLATE_TYPES,
+      COURSE_TEMPLATE_TYPES,
+      QUIZ_TEMPLATE_TYPES,
       newCard: { template: '' },
       TITLE_TEXT_MEDIA,
       TEXT_MEDIA,
       FLASHCARD,
+      FILL_THE_GAPS,
+      MULTIPLE_CHOICE_QUESTION,
+      SINGLE_CHOICE_QUESTION,
+      ORDER_THE_SEQUENCE,
     };
   },
   validations () {
@@ -241,7 +275,7 @@ h6
     text-align: center
     flex-wrap: wrap
     white-space: pre-line
-  &-flashcard
+  .flashcard
     justify-content: center
     & > div
       width: 40%
@@ -255,4 +289,10 @@ h6
       background-color: $grey
     .flashcard-left
       background-color: $middle-grey
+  .fill-the-gaps
+    font-size: 10px
+  .order-the-sequence
+    font-size: 15px
+    @media (max-width: 767px)
+      font-size: 11px
 </style>
