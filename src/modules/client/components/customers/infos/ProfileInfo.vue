@@ -324,7 +324,7 @@
 
     <!-- Funding creation modal -->
     <add-funding-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :newFunding="newFunding" :thirdPartyPayers="thirdPartyPayers" @submit="submitFunding" :validations="$v.newFunding"
+      :newFunding="newFunding" :thirdPartyPayers="ttpList" @submit="submitFunding" :validations="$v.newFunding"
       :fundingSubscriptionsOptions="fundingSubscriptionsOptions" :daysOptions="daysOptions"/>
 
     <!-- Funding edition modal -->
@@ -349,34 +349,35 @@ import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
+import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
-import { days } from '@data/days.js';
+import { days } from '@data/days';
 import {
   NATURE_OPTIONS,
   FIXED,
   HOURLY,
+  MONTHLY,
   REQUIRED_LABEL,
   CIVILITY_OPTIONS,
-} from '@data/constants.js';
+} from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
-import EditHelperModal from 'src/modules/client/components/customers/infos/EditHelperModal.vue';
-import AddHelperModal from 'src/modules/client/components/customers/infos/AddHelperModal.vue';
-import EditFundingModal from 'src/modules/client/components/customers/infos/EditFundingModal.vue';
-import AddFundingModal from 'src/modules/client/components/customers/infos/AddFundingModal.vue';
-import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin.js';
-import { fundingMixin } from 'src/modules/client/mixins/fundingMixin.js';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
-import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
-import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin.js';
-import { helperMixin } from 'src/modules/client/mixins/helperMixin.js';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
+import EditHelperModal from 'src/modules/client/components/customers/infos/EditHelperModal';
+import AddHelperModal from 'src/modules/client/components/customers/infos/AddHelperModal';
+import EditFundingModal from 'src/modules/client/components/customers/infos/EditFundingModal';
+import AddFundingModal from 'src/modules/client/components/customers/infos/AddFundingModal';
+import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
+import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
+import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
+import { helperMixin } from 'src/modules/client/mixins/helperMixin';
+import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -437,7 +438,7 @@ export default {
       quotesLoading: false,
       newSubscription: {
         service: '',
-        unitTTCRate: '',
+        unitTTCRate: 0,
         estimatedWeeklyVolume: '',
       },
       editedSubscription: {},
@@ -466,16 +467,17 @@ export default {
         sortBy: 'createdAt',
         descending: true,
       },
-      thirdPartyPayers: [],
+      ttpList: [],
       newFunding: {
         thirdPartyPayer: '',
         folderNumber: '',
         startDate: '',
-        frequency: '',
+        frequency: MONTHLY,
         endDate: '',
         nature: HOURLY,
-        amountTTC: '',
-        unitTTCRate: '',
+        amountTTC: 0,
+        unitTTCRate: 0,
+        careHours: 0,
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
@@ -722,7 +724,7 @@ export default {
       this.$v.newSubscription.$reset();
       this.newSubscription = {
         service: '',
-        unitTTCRate: '',
+        unitTTCRate: 0,
         estimatedWeeklyVolume: '',
       };
     },
@@ -922,7 +924,7 @@ export default {
     // Fundings
     async getThirdPartyPayers () {
       try {
-        this.thirdPartyPayers = await ThirdPartyPayers.list();
+        this.ttpList = await ThirdPartyPayers.list();
       } catch (e) {
         this.fundingTppOptions = [];
         console.error(e);
@@ -947,11 +949,12 @@ export default {
         thirdPartyPayer: '',
         folderNumber: '',
         startDate: '',
-        frequency: '',
+        frequency: MONTHLY,
         endDate: '',
         nature: HOURLY,
-        amountTTC: '',
-        unitTTCRate: '',
+        amountTTC: 0,
+        unitTTCRate: 0,
+        careHours: 0,
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
