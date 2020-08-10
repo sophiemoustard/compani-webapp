@@ -9,7 +9,7 @@
           <q-item-section avatar>
             <img class="avatar" :src="getAvatar(col.value.picture)">
           </q-item-section>
-          <q-item-section>{{ col.value.name }}</q-item-section>
+          <q-item-section>{{ col.value.fullName }}</q-item-section>
         </q-item>
         <template v-else-if="col.name === 'profileErrors'">
           <q-icon v-if="notifications.profiles[props.row.auxiliary._id] && props.row.isActive" name="error"
@@ -74,6 +74,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
+import escapeRegExp from 'lodash/escapeRegExp'
 import Roles from '@api/Roles';
 import Twilio from '@api/Twilio';
 import Users from '@api/Users';
@@ -147,9 +148,9 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => {
-            const aArr = a.name.split(' ');
-            const bArr = b.name.split(' ');
-            return aArr[aArr.length - 1].toLowerCase() < bArr[bArr.length - 1].toLowerCase() ? -1 : 1
+            const aLastnameLower = a.lastname.toLowerCase();
+            const bLastnameLower = b.lastname.toLowerCase();
+            return aLastnameLower.localeCompare(bLastnameLower);
           },
           style: 'min-width: 200px; width: 35%',
         },
@@ -206,14 +207,15 @@ export default {
     await this.getUserList();
   },
   computed: {
-    ...mapState('rh', ['notifications']),
+    ...mapState('userProfile', ['notifications']),
     ...mapGetters({ company: 'main/getCompany' }),
     activeUserList () {
       if (this.activeUsers) return this.userList.filter(user => user.isActive);
       return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
-      return this.activeUserList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return this.activeUserList.filter(user => user.auxiliary.fullName.match(new RegExp(escapedString, 'i')));
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
@@ -238,7 +240,8 @@ export default {
       const formattedUser = {
         auxiliary: {
           _id: user._id,
-          name: formatIdentity(user.identity, 'FL'),
+          fullName: formatIdentity(user.identity, 'FL'),
+          lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
         },
         startDate: user.createdAt,
@@ -251,7 +254,7 @@ export default {
 
       const checkProfileErrors = userProfileValidation(user);
       this.$store.dispatch(
-        'rh/setNotification',
+        'userProfile/setNotification',
         { type: 'profiles', _id: user._id, exists: !!checkProfileErrors.error }
       );
 
@@ -261,7 +264,7 @@ export default {
       try {
         this.tableLoading = true;
         const users = await Users.list({ role: AUXILIARY_ROLES, company: this.company._id });
-        this.userList = Object.freeze(users.map(this.formatUser));
+        this.userList = Object.freeze(users.map(this.formatUser)); // for perf
       } catch (e) {
         console.error(e);
       } finally {

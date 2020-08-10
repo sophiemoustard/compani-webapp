@@ -33,6 +33,7 @@
 <script>
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import escapeRegExp from 'lodash/escapeRegExp'
 import Users from '@api/Users';
 import Roles from '@api/Roles';
 import Email from '@api/Email';
@@ -76,7 +77,8 @@ export default {
   },
   computed: {
     filteredTrainers () {
-      return this.trainers.filter(trainer => trainer.name.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return this.trainers.filter(trainer => trainer.name.match(new RegExp(escapedString, 'i')));
     },
   },
   methods: {

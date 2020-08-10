@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import main from 'src/store/main';
-import rh from 'src/modules/client/store/rh';
+import userProfile from 'src/store/userProfile';
 import planning from 'src/modules/client/store/planning';
 import program from 'src/modules/vendor/store/program';
 import customer from 'src/modules/client/store/customer';
@@ -13,7 +13,7 @@ Vue.use(Vuex);
 const store = new Vuex.Store({
   modules: {
     main,
-    rh,
+    userProfile,
     planning,
     customer,
     program,

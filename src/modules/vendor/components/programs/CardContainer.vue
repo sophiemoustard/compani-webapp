@@ -7,7 +7,7 @@
         <div :class="['card-cell', 'cursor-pointer', { 'card-cell-selected': isSelected(card) }]"
            @click="selectCard(card)">
           <div class="card-cell-title text-weight-bold">
-            {{ index + 1 }}. {{ card.title }}
+            {{ index + 1 }}. {{ getHeading(card) }}
           </div>
           <div>{{ getTemplateName(card.template) }}</div>
         </div>
@@ -21,7 +21,7 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { TEMPLATE_TYPES } from '@data/constants';
+import { TEMPLATE_TYPES, TRANSITION, TITLE_TEXT, TITLE_TEXT_MEDIA, TEXT_MEDIA, FLASHCARD } from '@data/constants';
 import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
 
 export default {
@@ -38,6 +38,11 @@ export default {
     },
     openCreationModal () {
       this.$emit('add');
+    },
+    getHeading (card) {
+      if ([TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT].includes(card.template)) return card.title || '';
+      if ([FLASHCARD, TEXT_MEDIA].includes(card.template)) return card.text || '';
+      return '';
     },
     getTemplateName (value) {
       const template = TEMPLATE_TYPES.find(t => t.value === value);

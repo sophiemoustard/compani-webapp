@@ -42,25 +42,25 @@ export default {
     }
   },
   async created () {
-    if (this.vendorRole !== TRAINER) await this.$store.dispatch('rh/fetchUserProfile', { userId: this.trainerId });
+    if (this.vendorRole !== TRAINER) await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.trainerId });
     this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
   },
   computed: {
     ...mapState({
       userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
         ? state.main.loggedUser
-        : state.rh.userProfile,
+        : state.userProfile.userProfile,
     }),
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
   },
   watch: {
     async userProfile () {
       this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
-      if (this.vendorRole !== TRAINER) await this.$store.dispatch('rh/updateNotifications');
+      if (this.vendorRole !== TRAINER) await this.$store.dispatch('userProfile/updateNotifications');
     },
   },
   beforeDestroy () {
-    this.$store.dispatch('rh/resetRh');
+    this.$store.dispatch('userProfile/resetUserProfile');
   },
 }
 </script>

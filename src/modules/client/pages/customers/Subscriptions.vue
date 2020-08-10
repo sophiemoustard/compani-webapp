@@ -193,7 +193,7 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
-      extensions: 'image/jpg, image/jpeg, image/gif, image/png, application/pdf',
+      extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
     };
   },
   validations: {

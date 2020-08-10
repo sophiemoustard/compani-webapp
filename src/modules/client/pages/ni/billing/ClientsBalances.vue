@@ -65,7 +65,7 @@ import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPercentage } from '@helpers/utils.js';
-import PaymentCreationModal from 'src/modules/client/components/customers/PaymentCreationModal';
+import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
 import { paymentMixin } from 'src/modules/client/mixins/paymentMixin.js';
 
 export default {

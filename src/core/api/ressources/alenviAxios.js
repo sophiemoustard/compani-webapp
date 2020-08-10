@@ -9,17 +9,19 @@ const instance = axios.create({
 });
 
 instance.interceptors.request.use(async function (config) {
+  if (!Cookies.get('refresh_token')) {
+    logOutAndRedirectToLogin();
+    throw new Error('No refresh token');
+  }
+
   if (!Cookies.get('alenvi_token')) {
     const refresh = await refreshAlenviCookies();
     if (!refresh) {
       logOutAndRedirectToLogin();
-      return config;
+      throw new Error('No alenvi token');
     }
   }
-  if (!Cookies.get('refresh_token')) {
-    logOutAndRedirectToLogin();
-    return config;
-  }
+
   // Headers for request only to API (alenvi)
   config.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   return config;

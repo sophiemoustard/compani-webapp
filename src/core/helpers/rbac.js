@@ -70,7 +70,6 @@ const helperRoutes = [
   { name: 'customers contact', subscription: ERP },
   { name: 'customers documents', subscription: ERP },
   { name: 'customers subscription', subscription: ERP },
-  { name: 'customers contracts', subscription: ERP },
   { name: 'account client' },
 ];
 const vendorAdminRoutes = [
@@ -78,6 +77,8 @@ const vendorAdminRoutes = [
   { name: 'ni users companies info' },
   { name: 'ni users trainers' },
   { name: 'ni users trainers info' },
+  { name: 'ni users learners' },
+  { name: 'ni users learners info' },
   { name: 'ni config programs' },
   { name: 'ni config programs info' },
   { name: 'ni config activity info' },
@@ -90,6 +91,8 @@ const trainingOrgnaisationManagerRoutes = [
   { name: 'ni users companies info' },
   { name: 'ni users trainers' },
   { name: 'ni users trainers info' },
+  { name: 'ni users learners' },
+  { name: 'ni users learners info' },
   { name: 'ni config programs' },
   { name: 'ni config programs info' },
   { name: 'ni config activity info' },

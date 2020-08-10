@@ -1,7 +1,7 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" flat :row-key="rowKey" binary-state-sort
-      :pagination="pagination" class="table-list" :hide-bottom="pagination.rowsPerPage === 0"
+      :pagination="pagination" class="table-list" :hide-bottom="(!!data.length && pagination.rowsPerPage === 0)"
       :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
       :visible-columns="formattedVisibleColumns">
       <template v-slot:body="props">

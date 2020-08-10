@@ -210,12 +210,6 @@ export const TRANSIT = 'transit';
 export const DRIVING = 'driving';
 
 export const REQUIRED_LABEL = 'Champ requis';
-export const CUSTOMER_CONTRACT = 'contract_with_customer';
-export const COMPANY_CONTRACT = 'contract_with_company';
-export const CONTRACT_STATUS_OPTIONS = [
-  { label: 'Prestataire', value: COMPANY_CONTRACT },
-  { label: 'Mandataire', value: CUSTOMER_CONTRACT },
-];
 
 // BILLING
 
@@ -319,7 +313,13 @@ export const ON_SITE = 'on_site';
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
 export const TITLE_TEXT_MEDIA = 'title_text_media';
+export const TITLE_TEXT = 'title_text';
+export const TEXT_MEDIA = 'text_media';
+export const FLASHCARD = 'flashcard';
 export const TEMPLATE_TYPES = [
   { label: 'Transition', value: TRANSITION },
   { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA },
+  { label: 'Titre Texte', value: TITLE_TEXT },
+  { label: 'Texte Média', value: TEXT_MEDIA },
+  { label: 'Flashcard', value: FLASHCARD },
 ]

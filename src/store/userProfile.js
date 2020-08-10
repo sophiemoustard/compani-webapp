@@ -40,7 +40,7 @@ export default {
       commit('SET_NOTIFICATION', { type: 'profiles', _id: user._id, exists: !!validation.error });
     },
     setNotification: ({ commit }, data) => commit('SET_NOTIFICATION', data),
-    resetRh: ({ commit }) => {
+    resetUserProfile: ({ commit }) => {
       commit('SET_NOTIFICATION', null);
       commit('SET_USER_PROFILE', null);
     },

@@ -6,9 +6,9 @@
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
         @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
         @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
-      <q-btn :disable="disableContractCreation || contractsLoading" class="fixed fab-custom" no-caps rounded
-        color="primary" icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
-      <ni-banner v-if="disableContractCreation">
+      <q-btn :disable="missingInfoForCreation || contractsLoading || inProgressContract" class="fixed fab-custom"
+        no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
+      <ni-banner v-if="missingInfoForCreation">
         <template v-slot:message>{{ creationMissingInfo }}</template>
       </ni-banner>
     </div>
@@ -18,20 +18,13 @@
       <template slot="title">
         Créer un <span class="text-weight-bold">nouveau contrat</span>
       </template>
-      <ni-select in-modal caption="Statut" :error="$v.newContract.status.$error" :options="statusOptions"
-        v-model="newContract.status" separator required-field @blur="$v.newContract.status.$touch"
-        @input="resetContract" />
-      <ni-select v-if="newContract.status === CUSTOMER_CONTRACT" in-modal caption="Bénéficiaire"
-        :error="$v.newContract.customer.$error" :options="customerOptions" v-model="newContract.customer"
-        @blur="$v.newContract.customer.$touch" separator required-field />
-      <ni-input in-modal v-if="newContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
-        :error="$v.newContract.weeklyHours.$error" type="number" v-model="newContract.weeklyHours"
-        @blur="$v.newContract.weeklyHours.$touch" suffix="h" required-field
-        :error-messsage="weeklyHoursError($v.newContract)" />
+      <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" v-model="newContract.weeklyHours"
+        :error="$v.newContract.weeklyHours.$error" :error-messsage="weeklyHoursError($v.newContract)"
+        @blur="$v.newContract.weeklyHours.$touch" suffix="h" required-field />
       <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number"
         v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field
         :error-messsage="grossHourlyRateError($v.newContract)" />
-      <ni-date-input caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="companyContractMinStartDate"
+      <ni-date-input caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="contractMinStartDate"
         v-model="newContract.startDate" in-modal required-field />
       <div class="row margin-input last">
         <div class="col-12">
@@ -49,10 +42,9 @@
       <template slot="title">
         Créer une <span class="text-weight-bold">version</span>
       </template>
-      <ni-input in-modal v-if="selectedContract.status === COMPANY_CONTRACT" caption="Volume horaire hebdomadaire"
-        :error="$v.newVersion.weeklyHours.$error" v-model="newVersion.weeklyHours" type="number"
-        @blur="$v.newVersion.weeklyHours.$touch" suffix="h" required-field
-        :error-messsage="weeklyHoursError($v.newVersion)" />
+      <ni-input in-modal caption="Volume horaire hebdomadaire" v-model="newVersion.weeklyHours" type="number"
+        :error="$v.newVersion.weeklyHours.$error" :error-messsage="weeklyHoursError($v.newVersion)"
+        @blur="$v.newVersion.weeklyHours.$touch" suffix="h" required-field />
       <ni-input in-modal caption="Taux horaire" :error="$v.newVersion.grossHourlyRate.$error"
         v-model="newVersion.grossHourlyRate" type="number" suffix="€" required-field
         @blur="$v.newVersion.grossHourlyRate.$touch" :error-messsage="grossHourlyRateError($v.newVersion)" />
@@ -104,7 +96,6 @@ import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
 import Users from '@api/Users';
-import Customers from '@api/Customers';
 import Events from '@api/Events';
 import Contracts from '@api/Contracts';
 import Select from '@components/form/Select';
@@ -119,14 +110,10 @@ import VersionEditionModal from 'src/modules/client/components/contracts/Version
 import {
   END_CONTRACT_REASONS,
   OTHER,
-  CONTRACT_STATUS_OPTIONS,
-  CUSTOMER_CONTRACT,
-  COMPANY_CONTRACT,
   COACH,
   CONTRACT_CREATION_MANDATORY_INFO,
 } from '@data/constants';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
-import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'ProfileContracts',
@@ -148,12 +135,9 @@ export default {
       OTHER,
       COACH,
       contracts: [],
-      CUSTOMER_CONTRACT,
-      COMPANY_CONTRACT,
       auxiliary: {
         contractCreationMissingInfo: [],
       },
-      customers: [],
       contractsVisibleColumns: [
         'weeklyHours',
         'startDate',
@@ -167,8 +151,6 @@ export default {
       // New contract
       newContractModal: false,
       newContract: {
-        status: '',
-        customer: '',
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
@@ -188,6 +170,7 @@ export default {
         endDate: '',
         endNotificationDate: '',
         endReason: '',
+        otherMisc: '',
         contract: {},
       },
       endContractReasons: END_CONTRACT_REASONS,
@@ -197,14 +180,12 @@ export default {
   validations () {
     return {
       newContract: {
-        status: { required },
-        customer: { required: requiredIf((item) => item.status === CUSTOMER_CONTRACT) },
-        weeklyHours: { required: requiredIf((item) => item.status === COMPANY_CONTRACT), minValue: minValue(0) },
+        weeklyHours: { required, minValue: minValue(0) },
         startDate: { required },
         grossHourlyRate: { required, minValue: minValue(0) },
       },
       newVersion: {
-        weeklyHours: this.selectedContract.status === CUSTOMER_CONTRACT ? {} : { required, minValue: minValue(0) },
+        weeklyHours: { required, minValue: minValue(0) },
         startDate: { required },
         grossHourlyRate: { required, minValue: minValue(0) },
       },
@@ -221,10 +202,10 @@ export default {
     }
   },
   computed: {
-    userCompany () {
-      return this.auxiliary.company;
+    inProgressContract () {
+      return this.contracts.some(c => !c.endDate);
     },
-    disableContractCreation () {
+    missingInfoForCreation () {
       return this.auxiliary.contractCreationMissingInfo.length !== 0;
     },
     creationMissingInfo () {
@@ -241,28 +222,14 @@ export default {
 
       return `Il manque les informations suivantes dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfoList.join(', ')}.`;
     },
-    hasCompanyContract () {
-      if (this.contracts.length === 0) return false;
-      for (let i = 0; i < this.contracts.length; i++) {
-        if (this.contracts[i].status === COMPANY_CONTRACT && !this.contracts[i].endDate) return true;
-      }
-
-      return false;
-    },
-    statusOptions () {
-      if (!this.hasCompanyContract) return CONTRACT_STATUS_OPTIONS;
-
-      return CONTRACT_STATUS_OPTIONS.filter(option => option.value === CUSTOMER_CONTRACT);
-    },
-    companyContractMinStartDate () {
+    contractMinStartDate () {
       if (this.contracts.length === 0) return '';
-      const endedCompanyContract = this.contracts
-        .filter(contract => contract.status === COMPANY_CONTRACT && contract.endDate)
+      const endedContracts = this.contracts.filter(contract => contract.endDate)
         .sort((a, b) => b.startDate - a.startDate);
 
-      if (endedCompanyContract.length === 0) return '';
+      if (endedContracts.length === 0) return '';
 
-      return this.$moment(endedCompanyContract[0].endDate).add(1, 'd').toISOString();
+      return this.$moment(endedContracts[0].endDate).add(1, 'd').toISOString();
     },
     contractMinEndDate () {
       if (this.endContractModal) {
@@ -270,12 +237,6 @@ export default {
         return this.$moment(lastVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
-    },
-    customerOptions () {
-      return this.customers.map(cus => ({
-        label: formatIdentity(cus.identity, 'FL'),
-        value: cus._id,
-      }));
     },
     newVersionMinStartDate () {
       const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
@@ -285,11 +246,7 @@ export default {
   async mounted () {
     try {
       this.contractsLoading = true;
-      await this.refreshUser();
-      await Promise.all([
-        this.refreshContracts(),
-        this.getCustomersWithCustomerContractSubscriptions(),
-      ]);
+      await Promise.all([this.refreshUser(), this.refreshContracts()]);
     } catch (e) {
       console.error(e);
     } finally {
@@ -297,24 +254,6 @@ export default {
     }
   },
   methods: {
-    getContractTemplate (contract) {
-      return contract.status === COMPANY_CONTRACT
-        ? get(this.userCompany, 'rhConfig.templates.contractWithCompany')
-        : get(this.userCompany, 'rhConfig.templates.contractWithCustomer');
-    },
-    getVersionTemplate (contract) {
-      return contract.status === COMPANY_CONTRACT
-        ? get(this.userCompany, 'rhConfig.templates.contractWithCompanyVersion')
-        : get(this.userCompany, 'rhConfig.templates.contractWithCustomerVersion');
-    },
-    async getCustomersWithCustomerContractSubscriptions () {
-      try {
-        this.customers = await Customers.listWithCustomerContractSubscriptions();
-      } catch (e) {
-        this.customers = [];
-        console.error(e);
-      }
-    },
     async refreshUser () {
       try {
         this.auxiliary = await Users.getById(this.profileId);
@@ -331,7 +270,7 @@ export default {
         const promises = [];
         for (const contract of this.contracts) {
           const version = contract.versions[contract.versions.length - 1];
-          promises.push(Events.list({ status: contract.status, auxiliary: contract.user._id, startDate: version.startDate }));
+          promises.push(Events.list({ auxiliary: contract.user._id, startDate: version.startDate }));
         }
 
         const events = await Promise.all(promises);
@@ -350,22 +289,14 @@ export default {
       }
     },
     // Contract creation
-    resetContract (val) {
-      this.newContract.customer = '';
-      this.newContract.grossHourlyRate = val === COMPANY_CONTRACT
-        ? get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : get(this.auxiliary, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
-      this.$v.newContract.customer.$reset();
-    },
     openCreationModal () {
       this.newContract.user = this.auxiliary._id;
+      this.newContract.grossHourlyRate = get(this.auxiliary, 'company.rhConfig.grossHourlyRate');
       this.newContractModal = true;
     },
     resetContractCreationModal () {
       this.newContractModal = false;
       this.newContract = {
-        status: '',
-        customer: '',
         weeklyHours: '',
         startDate: '',
         grossHourlyRate: '',
@@ -376,18 +307,16 @@ export default {
     async getContractCreationPayload () {
       const payload = {
         startDate: this.newContract.startDate,
-        status: this.newContract.status,
         user: this.newContract.user,
         versions: [{
           startDate: this.newContract.startDate,
           grossHourlyRate: this.newContract.grossHourlyRate,
+          weeklyHours: this.newContract.weeklyHours,
         }],
       };
-      if (this.newContract.status === CUSTOMER_CONTRACT) payload.customer = this.newContract.customer;
-      if (this.newContract.status === COMPANY_CONTRACT) payload.versions[0].weeklyHours = this.newContract.weeklyHours;
 
       if (this.newContract.shouldBeSigned) {
-        const template = this.getContractTemplate(this.newContract);
+        const template = this.getContractTemplate();
         payload.versions[0].signature = await this.getSignaturePayload(this.newContract, '', template);
       }
 
@@ -395,7 +324,7 @@ export default {
     },
     async createContract () {
       try {
-        const template = this.getContractTemplate(this.newContract);
+        const template = this.getContractTemplate();
         if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
         this.$v.newContract.$touch();
@@ -417,28 +346,21 @@ export default {
     },
     // Version creation
     openVersionCreationModal (contract) {
-      this.newVersion.grossHourlyRate = contract.status === COMPANY_CONTRACT
-        ? get(this.auxiliary, 'company.rhConfig.contractWithCompany.grossHourlyRate')
-        : get(this.auxiliary, 'company.rhConfig.contractWithCustomer.grossHourlyRate');
+      this.newVersion.grossHourlyRate = get(this.auxiliary, 'company.rhConfig.grossHourlyRate');
       this.newVersion.contractId = contract._id;
       this.selectedContract = contract;
       this.newVersionModal = true;
     },
     resetVersionCreationModal () {
       this.newVersionModal = false;
-      this.newVersion = {
-        weeklyHours: '',
-        startDate: '',
-        grossHourlyRate: '',
-        shouldBeSigned: true,
-      };
+      this.newVersion = { weeklyHours: '', startDate: '', grossHourlyRate: '', shouldBeSigned: true };
       this.$v.newVersion.$reset();
     },
     async getVersionCreationPayload () {
       const payload = pick(this.newVersion, ['startDate', 'grossHourlyRate', 'weeklyHours']);
       if (this.newVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.newVersion };
-        const template = this.getVersionTemplate(versionMix);
+        const template = this.getVersionTemplate();
         payload.signature = await this.getSignaturePayload(versionMix, 'Avenant au ', template);
       }
 
@@ -446,7 +368,7 @@ export default {
     },
     async createVersion () {
       try {
-        const template = this.getVersionTemplate(this.selectedContract);
+        const template = this.getVersionTemplate();
         if (!template || !template.driveId) return NotifyWarning('Template manquant');
 
         this.$v.newVersion.$touch();
@@ -516,15 +438,22 @@ export default {
         this.$v.endContract.otherMisc.$reset();
       }
     },
+    formatEndContractPayload () {
+      const omittedField = ['contract', 'endDate'];
+      if (this.endContract.endReason !== OTHER) omittedField.push('otherMisc');
+
+      return {
+        ...omit(this.endContract, omittedField),
+        endDate: this.$moment(this.endContract.endDate).endOf('day').toISOString(),
+      };
+    },
     async endExistingContract () {
       try {
         this.$v.endContract.$touch();
         if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        const payload = { ...omit(this.endContract, ['contract']) };
-        payload.endDate = this.$moment(payload.endDate).endOf('day').toISOString();
-        await Contracts.update(this.endContract.contract._id, payload);
+        await Contracts.update(this.endContract.contract._id, this.formatEndContractPayload());
         await this.refreshContracts();
         this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
