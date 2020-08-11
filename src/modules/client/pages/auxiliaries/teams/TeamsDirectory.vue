@@ -19,6 +19,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
+import escapeRegExp from 'lodash/escapeRegExp'
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
@@ -72,7 +73,8 @@ export default {
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
     filteredUsers () {
-      return this.userList.filter(user => user.auxiliary.name.match(new RegExp(this.searchStr, 'i')));
+      const escapedString = escapeRegExp(this.searchStr);
+      return this.userList.filter(user => user.auxiliary.name.match(new RegExp(escapedString, 'i')));
     },
   },
   methods: {

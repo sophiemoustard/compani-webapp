@@ -58,7 +58,7 @@ export default {
         {
           label: 'Suivi',
           name: 'followUp',
-          default: this.defaultTab === 'course',
+          default: this.defaultTab === 'followUp',
           component: ProfileFollowUp,
         },
       ],

@@ -151,10 +151,16 @@ export default {
       if (this.tmpInput === '') this.tmpInput = get(this.userProfile, path);
     },
     async updateAlenviUser (path) {
-      const value = get(this.userProfile, path);
-      const payload = set({}, path, value)
-      await Users.updateById(this.userProfile._id, payload);
-      await this.refreshUser();
+      try {
+        const value = get(this.userProfile, path);
+        const payload = set({}, path, value);
+
+        await Users.updateById(this.userProfile._id, payload);
+        await this.refreshUser();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modifiation du profil');
+      }
     },
     async submitPasswordChange () {
       try {

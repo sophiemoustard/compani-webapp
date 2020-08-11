@@ -1,7 +1,5 @@
 <template>
   <div>
-    <ni-input caption="Titre" v-model.trim="card.title" required-field @focus="saveTmp('title')"
-      @blur="updateCard('title')" :error="$v.card.title.$error" />
     <ni-input caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"

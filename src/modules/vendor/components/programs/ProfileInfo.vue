@@ -12,7 +12,7 @@
           :error="$v.program.learningGoals.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinaryStorage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
-          :additional-value="imageFileName" label="Pas d'image" />
+          :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :maxFileSize="500000" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -49,7 +49,8 @@
       <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">étape</span>
       </template>
-      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="newStep.type" required-field />
+      <ni-option-group inline caption="Type" v-model="newStep.type" type="radio" :options="stepTypeOptions"
+        required-field />
       <ni-input in-modal v-model.trim="newStep.name" :error="$v.newStep.name.$error"
         @blur="$v.newStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
@@ -113,6 +114,7 @@ import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import OptionGroup from '@components/form/OptionGroup';
 import FileUploader from '@components/form/FileUploader.vue';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE } from '@data/constants';
@@ -124,6 +126,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-option-group': OptionGroup,
     'ni-modal': Modal,
     'ni-select': Select,
     'ni-file-uploader': FileUploader,
@@ -146,6 +149,7 @@ export default {
         { label: 'eLearning', value: E_LEARNING },
         { label: 'Présentiel', value: ON_SITE },
       ],
+      extensions: 'image/jpg, image/jpeg',
     }
   },
   validations () {
@@ -347,6 +351,7 @@ export default {
 <style lang="stylus" scoped>
 .step
   margin-bottom: 10px
+  border-radius: 0
   &-head
     justify-content: space-between
   &-subtitle
@@ -360,6 +365,7 @@ export default {
   width: -moz-available
   width: -webkit-fill-available
   margin: 10px 10px 0px 50px
+  border-radius: 0
   .q-card__section
     display: flex
     justify-content: space-between

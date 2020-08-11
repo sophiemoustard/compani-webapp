@@ -7,7 +7,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import ProfileBilling from 'src/modules/client/components/customers/ProfileBilling.vue';
+import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling.vue';
 import Customers from '@api/Customers';
 
 export default {
@@ -28,7 +28,7 @@ export default {
   methods: {
     async refreshCustomer () {
       try {
-        const customer = await Customers.getById(this.helper.customers[0]._id);
+        const customer = await Customers.getById(this.helper.customers[0]);
         this.$store.dispatch('customer/setCustomer', customer);
       } catch (e) {
         console.error(e);

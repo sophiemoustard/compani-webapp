@@ -64,6 +64,34 @@ const routes = [
         },
       },
       {
+        path: 'ni/users/learners',
+        name: 'ni users learners',
+        component: () => import('src/modules/vendor/pages/ni/users/learners/LearnersDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
+        path: 'ni/users/learners/:learnerId',
+        name: 'ni users learners info',
+        component: () => import('src/modules/vendor/pages/ni/users/learners/LearnerProfile'),
+        props: true,
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni management courses info') to.params.defaultTab = 'courses';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'users',
+        },
+      },
+      {
         path: 'ni/config/programs',
         name: 'ni config programs',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),

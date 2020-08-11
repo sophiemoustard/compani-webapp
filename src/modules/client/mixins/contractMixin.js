@@ -3,14 +3,13 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import { required, minValue } from 'vuelidate/lib/validators';
-import Users from '@api/Users';
 import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
+import { formatIdentity } from '@helpers/utils';
 import nationalities from '@data/nationalities.js';
-import { COMPANY_CONTRACT, CUSTOMER_CONTRACT, REQUIRED_LABEL } from '@data/constants';
-import { translate } from '@data/translate';
-import { generateContractFields } from 'src/modules/client/helpers/generateContractFields.js';
+import { REQUIRED_LABEL } from '@data/constants';
+import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 
 export const contractMixin = {
   data () {
@@ -81,101 +80,56 @@ export const contractMixin = {
       }
       return '';
     },
-    generateContractSigners (signer) {
-      const signers = [{
-        id: '1',
-        name: this.userFullName,
-        email: this.auxiliary.local.email,
-      }];
-      signers.push({ id: `${signers.length + 1}`, name: signer.name, email: signer.email });
-      return signers;
-    },
     resetVersionEditionModal () {
       this.versionEditionModal = false;
       this.editedVersion = {};
       this.$v.editedVersion.$reset();
     },
-    async getSignaturePayload (contract, title, template) {
-      const signature = {
+    getSignaturePayload (contract, title, template) {
+      return {
         ...this.esignRedirection,
         templateId: template.driveId,
-        meta: { status: contract.status, auxiliaryDriveId: this.auxiliary.administrative.driveFolder.driveId },
+        meta: { auxiliaryDriveId: this.auxiliary.administrative.driveFolder.driveId },
         fields: generateContractFields(
-          contract.status,
           { user: this.auxiliary, contract: contract, initialContractStartDate: this.selectedContract.startDate }
         ),
-      }
-
-      if (contract.status === CUSTOMER_CONTRACT) {
-        const params = { customers: contract.customer };
-        const companyId = get(this.company, '_id', null);
-        if (companyId) params.company = companyId;
-        const helpers = await Users.list(params);
-        const currentCustomer = helpers[0].customers.find(cus => cus._id === contract.customer);
-        signature.signers = this.generateContractSigners({ name: helpers[0].identity.lastname, email: helpers[0].local.email });
-        signature.title = `${translate[contract.status]} - ${currentCustomer.identity.lastname}`;
-        signature.meta.customerDriveId = currentCustomer.driveFolder.driveId;
-      } else {
-        signature.signers = this.generateContractSigners({
-          name: `${this.loggedUser.identity.firstname} ${this.loggedUser.identity.lastname}`,
-          email: this.loggedUser.local.email,
-        });
-        signature.title = `${title}${translate[contract.status]} - ${this.userFullName}`;
-      }
-
-      return signature;
+        signers: [
+          { id: '1', name: this.userFullName, email: this.auxiliary.local.email },
+          { id: '2', name: formatIdentity(this.loggedUser.identity, 'FL'), email: this.loggedUser.local.email },
+        ],
+        title: `${title}Contrat Prestataire - ${this.userFullName}`,
+      };
     },
-    getContractTemplate (contract) {
-      return contract.status === COMPANY_CONTRACT
-        ? get(this.company, 'rhConfig.templates.contractWithCompany')
-        : get(this.company, 'rhConfig.templates.contractWithCustomer');
+    getContractTemplate () {
+      return get(this.company, 'rhConfig.templates.contract');
     },
-    getVersionTemplate (contract) {
-      return contract.status === COMPANY_CONTRACT
-        ? get(this.company, 'rhConfig.templates.contractWithCompanyVersion')
-        : get(this.company, 'rhConfig.templates.contractWithCustomerVersion');
+    getVersionTemplate () {
+      return get(this.company, 'rhConfig.templates.contractVersion');
     },
     async getVersionEditionPayload () {
       const payload = pick(this.editedVersion, ['startDate', 'grossHourlyRate']);
       if (this.editedVersion.shouldBeSigned) {
         const versionMix = { ...this.selectedContract, ...this.editedVersion };
         const isContract = this.selectedContract.versions[0]._id === this.editedVersion.versionId;
-        const template = isContract ? this.getContractTemplate(versionMix) : this.getVersionTemplate(versionMix);
-        payload.signature = await this.getSignaturePayload(versionMix, isContract ? '' : 'Avenant au ', template);
+        const template = isContract ? this.getContractTemplate() : this.getVersionTemplate();
+        payload.signature = this.getSignaturePayload(versionMix, isContract ? '' : 'Avenant au ', template);
       }
 
       return pickBy(payload);
     },
     async saveVersion () {
-      this.$v.editedVersion.$touch();
-      if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-      this.loading = true;
-      const payload = await this.getVersionEditionPayload();
-      const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
-      await Contracts.updateVersion(params, payload);
-      await this.refreshContracts();
-
-      this.resetVersionEditionModal();
-      NotifyPositive('Contrat modifié.');
-    },
-    async editVersion () {
       try {
-        if (!this.isVersionUpdated) {
-          NotifyPositive('Pas de modification apportée au contrat.')
-          return this.resetVersionEditionModal();
-        }
-        if (this.isPreviousPayImpacted) {
-          this.$q.dialog({
-            title: 'Confirmation',
-            message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant prenant effet ce mois-ci. Confirmez-vous ce changement ?',
-            ok: true,
-            cancel: 'Annuler',
-          }).onOk(this.saveVersion)
-            .onCancel(() => NotifyPositive('Modification annulée'));
-        } else {
-          await this.saveVersion();
-        }
+        this.$v.editedVersion.$touch();
+        if (this.$v.editedVersion.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        const payload = await this.getVersionEditionPayload();
+        const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
+        await Contracts.updateVersion(params, payload);
+        await this.refreshContracts();
+
+        this.resetVersionEditionModal();
+        NotifyPositive('Contrat modifié.');
       } catch (e) {
         console.error(e);
         if (e.data && e.data.statusCode === 422) {
@@ -186,6 +140,23 @@ export const contractMixin = {
       } finally {
         this.loading = false;
       }
+    },
+    async editVersion () {
+      if (!this.isVersionUpdated) {
+        NotifyPositive('Pas de modification apportée au contrat.')
+        return this.resetVersionEditionModal();
+      }
+
+      if (!this.isPreviousPayImpacted) return this.saveVersion();
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant ' +
+          'prenant effet ce mois-ci. Confirmez-vous ce changement ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(this.saveVersion)
+        .onCancel(() => NotifyPositive('Modification annulée'));
     },
     getFullNationality (nationality) {
       return nationalities[nationality];

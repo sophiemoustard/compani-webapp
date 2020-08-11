@@ -119,10 +119,9 @@ export default {
     selectedAuxiliary () {
       if (!this.editedEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
       const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
-      const hasCustomerContractOnEvent = this.hasCustomerContractOnEvent(aux, this.editedEvent.dates.startDate);
-      const hasCompanyContractOnEvent = this.hasCompanyContractOnEvent(aux, this.editedEvent.dates.startDate);
+      const hasContractOnEvent = this.hasContractOnEvent(aux, this.editedEvent.dates.startDate);
 
-      return { ...aux, hasCustomerContractOnEvent, hasCompanyContractOnEvent };
+      return { ...aux, hasContractOnEvent };
     },
     eventType () {
       return this.eventTypeOptions.filter(option => option.value === this.editedEvent.type);

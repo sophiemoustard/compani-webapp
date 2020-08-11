@@ -120,7 +120,7 @@ export default {
       return mapValues(payDocumentNaturesKeyedByValue, 'label');
     },
     userProfile () {
-      return this.$store.getters['rh/getUserProfile'] || this.loggedUser;
+      return this.$store.getters['userProfile/getUserProfile'] || this.loggedUser;
     },
     isCoach () {
       return COACH_ROLES.includes(this.clientRole);

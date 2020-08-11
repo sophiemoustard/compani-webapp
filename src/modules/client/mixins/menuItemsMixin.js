@@ -47,10 +47,6 @@ export const menuItemsMixin = {
     customer () {
       return this.isHelper ? this.$store.getters['customer/getCustomer'] : null;
     },
-    hasContracts () {
-      return this.loggedUser && this.loggedUser.customers && this.loggedUser.customers.length > 0 &&
-        this.loggedUser.customers[0].contracts && this.loggedUser.customers[0].contracts.length > 0;
-    },
     hasBillingAssistance () {
       return get(this.loggedUser, 'company.billingAssistance');
     },
@@ -98,7 +94,6 @@ export const menuItemsMixin = {
         },
         { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
         { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement', condition: true },
-        { name: 'customers contracts', icon: 'description', label: 'Contrats', condition: this.hasContracts },
       ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs)
     },
     coachRoutes () {
@@ -220,7 +215,7 @@ export const menuItemsMixin = {
   methods: {
     async refreshCustomer () {
       if (this.loggedUser && this.loggedUser.customers) {
-        const customer = await Customers.getById(this.loggedUser.customers[0]._id);
+        const customer = await Customers.getById(this.loggedUser.customers[0]);
         this.$store.dispatch('customer/setCustomer', customer);
       }
     },

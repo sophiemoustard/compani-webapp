@@ -24,6 +24,7 @@ export const menuItemsMixin = {
           children: [
             { name: 'ni users companies', icon: 'apartment', label: 'Structures' },
             { name: 'ni users trainers', icon: 'contacts', label: 'Formateurs' },
+            { name: 'ni users learners', icon: 'contacts', label: 'Apprenants' },
           ],
         },
         {

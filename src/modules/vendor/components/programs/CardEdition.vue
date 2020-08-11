@@ -5,7 +5,10 @@
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
         <div v-if="card && Object.values(card).length">
           <transition v-if="card.template === TRANSITION" class="q-mx-lg" :card="card" />
-          <title-text-media v-if="card.template === TITLE_TEXT_MEDIA" class="q-mx-lg" :card="card" />
+          <title-text-media v-else-if="card.template === TITLE_TEXT_MEDIA" class="q-mx-lg" :card="card" />
+          <title-text v-else-if="card.template === TITLE_TEXT" class="q-mx-lg" :card="card" />
+          <text-media v-else-if="card.template === TEXT_MEDIA" class="q-mx-lg" :card="card" />
+          <flashcard v-else-if="card.template === FLASHCARD" class="q-mx-lg" :card="card" />
         </div>
     </q-scroll-area>
   </div>
@@ -13,20 +16,29 @@
 
 <script>
 import { mapState } from 'vuex';
-import { TRANSITION, TITLE_TEXT_MEDIA } from '@data/constants';
+import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD } from '@data/constants';
 import Transition from 'src/modules/vendor/components/programs/templates/Transition';
 import TitleTextMedia from 'src/modules/vendor/components/programs/templates/TitleTextMedia';
+import TitleText from 'src/modules/vendor/components/programs/templates/TitleText';
+import TextMedia from 'src/modules/vendor/components/programs/templates/TextMedia'
+import Flashcard from 'src/modules/vendor/components/programs/templates/Flashcard';
 
 export default {
   name: 'CardEdition',
   components: {
     transition: Transition,
     'title-text-media': TitleTextMedia,
+    'title-text': TitleText,
+    'text-media': TextMedia,
+    flashcard: Flashcard,
   },
   data () {
     return {
       TRANSITION,
       TITLE_TEXT_MEDIA,
+      TITLE_TEXT,
+      TEXT_MEDIA,
+      FLASHCARD,
     };
   },
   computed: {
