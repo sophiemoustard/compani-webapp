@@ -215,7 +215,7 @@ export const menuItemsMixin = {
   methods: {
     async refreshCustomer () {
       if (this.loggedUser && this.loggedUser.customers) {
-        const customer = await Customers.getById(this.loggedUser.customers[0]._id);
+        const customer = await Customers.getById(this.loggedUser.customers[0]);
         this.$store.dispatch('customer/setCustomer', customer);
       }
     },

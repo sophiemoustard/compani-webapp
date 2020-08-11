@@ -382,7 +382,7 @@ const routes = [
         component: () => import('src/modules/client/pages/customers/Contact'),
         async beforeEnter (to, from, next) {
           const loggedUser = store.state.main.loggedUser;
-          const customer = await Customers.getById(loggedUser.customers[0]._id);
+          const customer = await Customers.getById(loggedUser.customers[0]);
           return get(loggedUser, 'company.billingAssistance') || customer.referent
             ? next()
             : next('/404');
