@@ -27,7 +27,6 @@ describe('ToBill', () => {
     cy.get('[data-cy=col-customer]').should('contain', 'ANDTHEQUEENS C.')
     cy.get('[data-cy=col-client]').should('contain', 'ANDTHEQUEENS C.')
     cy.get('[data-cy=col-startDate]').should('contain', '19/01/19')
-    cy.get('[data-cy=col-endDate]').should('contain', '15/07/20')
     cy.get('[data-cy=col-service]').should('contain', 'Service 2')
     cy.get('[data-cy=col-hours]').should('contain', '5.00h')
     cy.get('[data-cy=col-unitExclTaxes]').should('contain', '10,71')
@@ -57,6 +56,7 @@ describe('ToBill', () => {
     cy.get('[data-cy=date-input]  input').eq(1).clear().type('17/01/2019');
     cy.get('[data-cy=bill-row]').should('have.length', 1);
     cy.get('[data-cy=col-customer]').should('contain', 'AUFRAY H.');
+    cy.get('[data-cy=col-endDate]').should('contain', '17/01/19')
     cy.get('[data-cy=col-selected-bill]').within(() => {
       cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
       cy.get('.q-checkbox').click();
