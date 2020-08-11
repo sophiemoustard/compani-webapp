@@ -317,6 +317,12 @@ export const LESSON = 'lesson';
 export const QUIZ = 'quiz';
 export const SHARING_EXPERIENCE = 'sharing_experience';
 export const VIDEO = 'video';
+export const ACTIVITY_TYPES = [
+  { label: 'Cours', value: LESSON },
+  { label: 'Quiz', value: QUIZ },
+  { label: 'Témoignage', value: SHARING_EXPERIENCE },
+  { label: 'Vidéo', value: VIDEO },
+];
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
@@ -330,4 +336,4 @@ export const TEMPLATE_TYPES = [
   { label: 'Titre Texte', value: TITLE_TEXT },
   { label: 'Texte Média', value: TEXT_MEDIA },
   { label: 'Flashcard', value: FLASHCARD },
-]
+];

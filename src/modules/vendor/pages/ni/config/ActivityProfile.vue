@@ -62,7 +62,13 @@ import { required } from 'vuelidate/lib/validators';
 import Activities from '@api/Activities';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { TEMPLATE_TYPES, TITLE_TEXT_MEDIA, TEXT_MEDIA, FLASHCARD } from '@data/constants';
+import {
+  ACTIVITY_TYPES,
+  TEMPLATE_TYPES,
+  TITLE_TEXT_MEDIA,
+  TEXT_MEDIA,
+  FLASHCARD,
+} from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/CardEdition';
@@ -101,11 +107,15 @@ export default {
   },
   computed: {
     ...mapState('program', ['program', 'activity']),
+    activityType () {
+      return ACTIVITY_TYPES.find(type => type.value === this.activity.type).label || '';
+    },
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.programName },
         { icon: 'book', label: this.stepName },
-      ]
+        { icon: 'bookmark_border', label: this.activityType },
+      ];
 
       return infos;
     },

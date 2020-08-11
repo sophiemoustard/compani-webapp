@@ -15,95 +15,6 @@
           :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :maxFileSize="500000" />
       </div>
     </div>
-<<<<<<< HEAD
-=======
-    <div class="q-mb-xl">
-      <p class="text-weight-bold">Étapes ({{ program.steps.length }})</p>
-      <q-card v-for="(step, index) of program.steps" :key="index" flat class="step">
-        <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
-          <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
-          <q-item-section>
-            <div class="text-weight-bold">{{step.name}}</div>
-            <div class="step-subtitle">
-              {{ getStepTypeLabel(step.type) }} -
-              {{ printAmountOf('activité', step.activities.length) }}
-            </div>
-          </q-item-section>
-          <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
-        </q-card-section>
-        <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-          <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
-            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
-              <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
-              <div class="gt-xs col-sm-2">{{ getActivityTypeLabel(activity.type) }}</div>
-              <div class="gt-xs col-sm-2"> {{ printAmountOf('carte', activity.cards.length) }}</div>
-              <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-            </q-card-section>
-          </q-card>
-          <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Ajouter une activité"
-            @click="openActivityCreationModal(step._id)" />
-        </div>
-      </q-card>
-      <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une étape"
-        @click="stepCreationModal = true" />
-    </div>
-
-    <!-- Step creation modal -->
-    <ni-modal v-model="stepCreationModal" @hide="resetStepCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">étape</span>
-      </template>
-      <ni-option-group inline caption="Type" v-model="newStep.type" type="radio" :options="stepTypeOptions"
-        required-field />
-      <ni-input in-modal v-model.trim="newStep.name" :error="$v.newStep.name.$error"
-        @blur="$v.newStep.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'étape" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createStep" />
-      </template>
-    </ni-modal>
-
-    <!-- Step edition modal -->
-    <ni-modal v-model="stepEditionModal" @hide="resetStepEditionModal">
-      <template slot="title">
-        Éditer une <span class="text-weight-bold">étape</span>
-      </template>
-      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="editedStep.type" disable />
-      <ni-input in-modal v-model.trim="editedStep.name" :error="$v.editedStep.name.$error"
-        @blur="$v.editedStep.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="modalLoading"
-          icon-right="add" @click="editStep" />
-      </template>
-    </ni-modal>
-
-    <!-- Activity creation modal -->
-    <ni-modal v-model="activityCreationModal" @hide="resetActivityCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">activité</span>
-      </template>
-      <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
-        @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
-      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createActivity" />
-      </template>
-    </ni-modal>
-
-    <!-- Activity edition modal -->
-    <ni-modal v-model="activityEditionModal" @hide="resetActivityEditionModal">
-      <template slot="title">
-        Éditer une <span class="text-weight-bold">activité</span>
-      </template>
-      <ni-input in-modal v-model.trim="editedActivity.name" :error="$v.editedActivity.name.$error"
-        @blur="$v.editedActivity.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="modalLoading"
-          icon-right="add" @click="editActivity" />
-      </template>
-    </ni-modal>
->>>>>>> 6db4f8fa... COM-1413 add util fct 'printAmountOf'
   </div>
 </template>
 
@@ -112,11 +23,7 @@ import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-<<<<<<< HEAD
-=======
-import pick from 'lodash/pick';
 import { printAmountOf } from '@helpers/utils';
->>>>>>> 6db4f8fa... COM-1413 add util fct 'printAmountOf'
 import Programs from '@api/Programs';
 import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
