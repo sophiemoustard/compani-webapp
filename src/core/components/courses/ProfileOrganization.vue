@@ -4,10 +4,7 @@
       <div v-if="isClientInterface && isCourseInter" class="q-mb-xl">
         <p class="text-weight-bold">Informations pratiques</p>
         <ni-banner v-if="disabledFollowUp">
-          <template v-slot:message>
-            Le lien vers la page sera disponible dès que l'équipe aura rentré la ou les information(s) suivante(s) :
-            {{ followUpMissingInfo.join(', ') }}.
-          </template>
+          <template v-slot:message>{{ missingInfoMsg }}</template>
         </ni-banner>
         <ni-course-info-link :disable-link="disabledFollowUp" />
       </div>
@@ -89,6 +86,11 @@ export default {
     },
     canEdit () {
       return !(this.isClientInterface && this.isCourseInter);
+    },
+    missingInfoMsg () {
+      return 'Le lien vers la page sera disponible dès que l\'équipe aura rentré ' +
+        (this.followUpMissingInfo.length > 1 ? 'les informations manquantes : ' : 'l\'information manquante : ') +
+        this.followUpMissingInfo.join(', ');
     },
   },
   async created () {
