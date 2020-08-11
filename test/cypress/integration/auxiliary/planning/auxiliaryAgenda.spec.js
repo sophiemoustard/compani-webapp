@@ -22,7 +22,6 @@ describe('Auxiliary agenda - display', () => {
     cy.get('[data-cy=event-title]').eq(1).should('contain', 'R. BARDET');
     cy.get('[data-cy=event-hours]').eq(1).should('contain', '18:15 - 20:30');
 
-
     cy.get('[data-cy=agenda-search]').eq(1).click();
     cy.get('[data-cy=agenda-search]').eq(1).type('Customer referent{downarrow}{enter}');
     cy.get('[data-cy=agenda-event]').should('have.length', 1);
