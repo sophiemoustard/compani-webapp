@@ -7,7 +7,7 @@ export const canNavigate = async () => {
   if (!loggedUser && !Cookies.get('user_id') && !Cookies.get('refresh_token')) return false;
 
   if (!loggedUser && !Cookies.get('user_id')) {
-    const refresh = refreshAlenviCookies(); // refresh Cookies.get('user_id')
+    const refresh = await refreshAlenviCookies(); // refresh Cookies.get('user_id')
     if (!refresh) return false;
   }
 
