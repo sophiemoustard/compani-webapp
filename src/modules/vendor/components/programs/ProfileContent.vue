@@ -18,8 +18,8 @@
           <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
             <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
               <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
-              <div class="gt-xs col-sm-2">{{ getActivityTypeLabel(activity.type) }}</div>
-              <div class="gt-xs col-sm-2"> {{ formatQuantity('carte', activity.cards.length) }}</div>
+              <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
+              <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
               <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
@@ -67,7 +67,7 @@
       </template>
       <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
         @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
-      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required />
+      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
           icon-right="add" @click="createActivity" />
@@ -307,6 +307,9 @@ export default {
     align-items: center
   .q-card__section--vert
     padding: 3px 3px 3px 10px
+  .activity-content
+    font-size: 12px
+
 .q-btn
     width: fit-content
 

@@ -23,7 +23,6 @@ import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import { formatQuantity } from '@helpers/utils';
 import Programs from '@api/Programs';
 import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
@@ -43,7 +42,6 @@ export default {
     return {
       tmpInput: '',
       extensions: 'image/jpg, image/jpeg',
-      formatQuantity,
     }
   },
   validations () {
