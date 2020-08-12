@@ -104,6 +104,15 @@ const routes = [
         path: 'ni/config/programs/:programId',
         name: 'ni config programs info',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni config activity info') to.params.defaultTab = 'content';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
