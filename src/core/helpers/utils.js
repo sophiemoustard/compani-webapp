@@ -126,4 +126,4 @@ export const upperCaseFirstLetter = (str) => str.charAt(0).toUpperCase() + str.s
 
 export const truncate = (string, limit = 30) => string.length > limit ? `${string.slice(0, limit)}...` : string;
 
-export const printAmountOf = (itemLabel, quantity) => `${quantity} ${itemLabel}${quantity > 1 ? 's' : ''}`;
+export const formatQuantity = (itemLabel, quantity) => `${quantity} ${itemLabel}${quantity > 1 ? 's' : ''}`;

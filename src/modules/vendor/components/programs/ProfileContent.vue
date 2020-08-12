@@ -19,7 +19,7 @@
             <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
               <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
               <div class="gt-xs col-sm-2">{{ getActivityTypeLabel(activity.type) }}</div>
-              <div class="gt-xs col-sm-2"> {{ printAmountOf('carte', activity.cards.length) }}</div>
+              <div class="gt-xs col-sm-2"> {{ formatQuantity('carte', activity.cards.length) }}</div>
               <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
@@ -96,7 +96,7 @@ import pick from 'lodash/pick';
 import Programs from '@api/Programs';
 import Steps from '@api/Steps';
 import Activities from '@api/Activities';
-import { printAmountOf } from '@helpers/utils';
+import { formatQuantity } from '@helpers/utils';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
@@ -138,7 +138,7 @@ export default {
         { label: 'Témoignage', value: SHARING_EXPERIENCE },
         { label: 'Vidéo', value: VIDEO },
       ],
-      printAmountOf,
+      formatQuantity,
     }
   },
   validations () {

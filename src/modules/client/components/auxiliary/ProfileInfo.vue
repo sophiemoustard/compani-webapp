@@ -255,7 +255,7 @@ import Roles from '@api/Roles';
 import Establishments from '@api/Establishments';
 import Users from '@api/Users';
 import gdrive from '@api/GoogleDrive';
-import { printAmountOf } from '@helpers/utils';
+import { formatQuantity } from '@helpers/utils';
 import SelectSector from '@components/form/SelectSector';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -612,7 +612,7 @@ export default {
 
       return {
         errors: j,
-        msg: j > 0 ? `${printAmountOf('information', j)} manquante${j > 1 ? 's' : ''}` : 'Informations complètes',
+        msg: j > 0 ? `${formatQuantity('information', j)} manquante${j > 1 ? 's' : ''}` : 'Informations complètes',
       };
     },
     groupErrorsClass (group) {

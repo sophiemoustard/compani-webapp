@@ -48,7 +48,7 @@
 <script>
 import get from 'lodash/get';
 import { FORTHCOMING, COMPLETED, IN_PROGRESS, INTRA } from '@data/constants';
-import { printAmountOf } from '@helpers/utils';
+import { formatQuantity } from '@helpers/utils';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
@@ -64,7 +64,7 @@ export default {
       IN_PROGRESS,
       COMPLETED,
       isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
-      printAmountOf,
+      formatQuantity,
     };
   },
   computed: {
@@ -110,7 +110,7 @@ export default {
 
       return !totalDates
         ? '0 date'
-        : `${printAmountOf('date', totalDates)},
+        : `${formatQuantity('date', totalDates)},
           ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${this.slotsDurationTitle}`;
     },
     formatNearestDate () {
@@ -121,7 +121,7 @@ export default {
         const firstSlot = this.course.slots[0];
         const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
-        return rangeToNextDate ? `Commence dans ${printAmountOf('jour', rangeToNextDate)}` : 'Commence aujourd’hui';
+        return rangeToNextDate ? `Commence dans ${formatQuantity('jour', rangeToNextDate)}` : 'Commence aujourd’hui';
       }
 
       if (this.course.status === COMPLETED) {
@@ -129,7 +129,7 @@ export default {
         const rangeToLastDate = this.$moment().endOf('day').diff(this.$moment(lastSlot[0].startDate), 'd');
 
         return rangeToLastDate
-          ? `Dernière date il y a ${printAmountOf('jour', rangeToLastDate)}`
+          ? `Dernière date il y a ${formatQuantity('jour', rangeToLastDate)}`
           : 'Dernière date aujourd’hui';
       }
 
@@ -138,7 +138,7 @@ export default {
       const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
       return rangeToNextDate
-        ? `Prochaine date dans ${printAmountOf('jour', rangeToNextDate)}`
+        ? `Prochaine date dans ${formatQuantity('jour', rangeToNextDate)}`
         : 'Prochaine date aujourd’hui';
     },
   },
