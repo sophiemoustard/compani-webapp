@@ -16,8 +16,10 @@
         </q-card-section>
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
           <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
-            <q-card-section class="cursor-pointer" @click="goToActivityProfile(step, activity)">
-              <div>{{activity.name}}</div>
+            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
+              <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
+              <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
+              <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
               <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
@@ -65,6 +67,7 @@
       </template>
       <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
         @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
+      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
           icon-right="add" @click="createActivity" />
@@ -93,12 +96,13 @@ import pick from 'lodash/pick';
 import Programs from '@api/Programs';
 import Steps from '@api/Steps';
 import Activities from '@api/Activities';
+import { formatQuantity } from '@helpers/utils';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE } from '@data/constants';
+import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -128,6 +132,13 @@ export default {
         { label: 'eLearning', value: E_LEARNING },
         { label: 'Présentiel', value: ON_SITE },
       ],
+      activityTypeOptions: [
+        { label: 'Cours', value: LESSON },
+        { label: 'Quiz', value: QUIZ },
+        { label: 'Témoignage', value: SHARING_EXPERIENCE },
+        { label: 'Vidéo', value: VIDEO },
+      ],
+      formatQuantity,
     }
   },
   validations () {
@@ -151,6 +162,10 @@ export default {
     },
     getStepTypeIcon (type) {
       return type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach';
+    },
+    getActivityTypeLabel (value) {
+      const type = this.activityTypeOptions.find(type => type.value === value);
+      return type ? type.label : '';
     },
     showActivities (stepId) {
       this.$set(this.isActivitiesShown, stepId, !this.isActivitiesShown[stepId]);
@@ -292,6 +307,9 @@ export default {
     align-items: center
   .q-card__section--vert
     padding: 3px 3px 3px 10px
+  .activity-content
+    font-size: 12px
+
 .q-btn
     width: fit-content
 

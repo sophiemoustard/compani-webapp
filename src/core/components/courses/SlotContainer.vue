@@ -88,6 +88,7 @@ import has from 'lodash/has';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
+import { formatQuantity } from '@helpers/utils';
 import CourseSlots from '@api/CourseSlots';
 import { REQUIRED_LABEL, E_LEARNING } from '@data/constants';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
@@ -147,6 +148,7 @@ export default {
           fullAddress: { frAddress },
         },
       },
+      formatQuantity,
     }
   },
   validations () {
@@ -192,7 +194,7 @@ export default {
       }
 
       return {
-        title: `${totalDate} date${totalDate > 1 ? 's' : ''}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
+        title: `${formatQuantity('date', totalDate)}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
         subtitle,
         icon: 'mdi-calendar-range',
       };

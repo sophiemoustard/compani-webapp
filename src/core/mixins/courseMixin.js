@@ -25,8 +25,8 @@ export const courseMixin = {
     followUpMissingInfo () {
       const missingInfo = [];
       if (!this.course.trainer) missingInfo.push('l\'intervenant');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
+      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
       if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
       if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du contact pour la formation');
 

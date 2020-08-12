@@ -255,6 +255,7 @@ import Roles from '@api/Roles';
 import Establishments from '@api/Establishments';
 import Users from '@api/Users';
 import gdrive from '@api/GoogleDrive';
+import { formatQuantity } from '@helpers/utils';
 import SelectSector from '@components/form/SelectSector';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -609,7 +610,10 @@ export default {
         if (this.$v[groupName][`userProfile.${this[groupName][i]}`].$error) j++;
       }
 
-      return { errors: j, msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes' };
+      return {
+        errors: j,
+        msg: j > 0 ? formatQuantity('information manquante', j) : 'Informations complètes',
+      };
     },
     groupErrorsClass (group) {
       return this.groupErrors(group).errors > 0 ? 'group-error' : 'group-error-ok';

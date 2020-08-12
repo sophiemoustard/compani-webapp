@@ -17,8 +17,8 @@
       <p class="text-weight-bold">Actions utiles</p>
       <ni-banner v-if="disabledFollowUp">
         <template v-slot:message>
-          Il manque la ou les information(s) suivante(s) pour assurer le suivi de la formation :
-          {{ followUpMissingInfo.join(', ') }}.
+          Il manque {{ formatQuantity('information', followUpMissingInfo.length )}}
+          pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
       <ni-banner v-if="!get(this.course, 'program.learningGoals')">
@@ -73,7 +73,7 @@
       </ni-banner>
       <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
         <template v-slot:message>
-          Il manque le numéro de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur
+          Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
           {{course.trainees.length}} : {{ missingTraineesPhone.join(', ') }}.
         </template>
       </ni-banner>
@@ -107,7 +107,8 @@
       </template>
       <ni-banner v-if="missingTraineesPhoneHistory" icon="info_outline">
         <template v-slot:message>
-          Pour cet envoi, il manquait le numéro du ou des stagiaire(s) suivant(s) :
+          Pour cet envoi, il manquait le numéro de téléphone de
+          {{ formatQuantity('stagiaire', missingTraineesPhoneHistory.length) }} :
           {{ missingTraineesPhoneHistory.join(', ') }}.
         </template>
       </ni-banner>
@@ -122,6 +123,7 @@ import { mapState } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
+import { formatQuantity } from '@helpers/utils';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
@@ -182,6 +184,7 @@ export default {
       smsLoading: false,
       smsHistoriesModal: false,
       smsHistory: { missingPhones: [] },
+      formatQuantity,
     };
   },
   async created () {

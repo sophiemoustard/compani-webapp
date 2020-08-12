@@ -307,8 +307,22 @@ export const COURSE_TYPES = [
 export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
+
+// STEP
 export const E_LEARNING = 'e_learning';
 export const ON_SITE = 'on_site';
+
+// ACTIVITY
+export const LESSON = 'lesson';
+export const QUIZ = 'quiz';
+export const SHARING_EXPERIENCE = 'sharing_experience';
+export const VIDEO = 'video';
+export const ACTIVITY_TYPES = [
+  { label: 'Cours', value: LESSON },
+  { label: 'Quiz', value: QUIZ },
+  { label: 'Témoignage', value: SHARING_EXPERIENCE },
+  { label: 'Vidéo', value: VIDEO },
+];
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
@@ -322,4 +336,4 @@ export const TEMPLATE_TYPES = [
   { label: 'Titre Texte', value: TITLE_TEXT },
   { label: 'Texte Média', value: TEXT_MEDIA },
   { label: 'Flashcard', value: FLASHCARD },
-]
+];

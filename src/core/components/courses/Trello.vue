@@ -22,7 +22,7 @@ export default {
       return [
         { title: 'À venir', courses: this.courseListForthcoming },
         { title: 'En cours', courses: this.courseListInProgress },
-        { title: 'Terminée(s)', courses: this.courseListCompleted },
+        { title: 'Terminées', courses: this.courseListCompleted },
       ]
     },
   },
