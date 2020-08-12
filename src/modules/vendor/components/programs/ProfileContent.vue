@@ -17,7 +17,6 @@
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
           <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
             <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
-              <div>{{activity.name}}</div>
               <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
               <div class="gt-xs col-sm-2">{{ getActivityTypeLabel(activity.type) }}</div>
               <div class="gt-xs col-sm-2"> {{ printAmountOf('carte', activity.cards.length) }}</div>
@@ -97,6 +96,7 @@ import pick from 'lodash/pick';
 import Programs from '@api/Programs';
 import Steps from '@api/Steps';
 import Activities from '@api/Activities';
+import { printAmountOf } from '@helpers/utils';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
@@ -138,6 +138,7 @@ export default {
         { label: 'Témoignage', value: SHARING_EXPERIENCE },
         { label: 'Vidéo', value: VIDEO },
       ],
+      printAmountOf,
     }
   },
   validations () {
