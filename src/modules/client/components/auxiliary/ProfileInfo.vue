@@ -612,7 +612,7 @@ export default {
 
       return {
         errors: j,
-        msg: j > 0 ? `${formatQuantity('information', j)} manquante${j > 1 ? 's' : ''}` : 'Informations complètes',
+        msg: j > 0 ? formatQuantity('information manquante', j) : 'Informations complètes',
       };
     },
     groupErrorsClass (group) {
