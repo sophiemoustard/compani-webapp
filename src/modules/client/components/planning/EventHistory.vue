@@ -63,7 +63,8 @@ export default {
         : 'À affecter';
     },
     customerName () {
-      return !!get(this.history, 'event.customer.identity') && formatIdentity(this.history.event.customer.identity, 'fL');
+      return !!get(this.history, 'event.customer.identity') &&
+        formatIdentity(this.history.event.customer.identity, 'fL');
     },
     startDate () {
       return this.$moment(this.history.event.startDate).format('DD/MM');
@@ -110,11 +111,10 @@ export default {
 
       const { type } = this.history.event;
       if (this.isRepetition && type === INTERVENTION) return 'répétition';
-      else if (type === INTERNAL_HOUR) return 'heure interne';
-      else {
-        const eventType = EVENT_TYPES.find(t => t.value === type);
-        return eventType ? eventType.label.toLowerCase() : '';
-      }
+      if (type === INTERNAL_HOUR) return 'heure interne';
+
+      const eventType = EVENT_TYPES.find(t => t.value === type);
+      return eventType ? eventType.label.toLowerCase() : '';
     },
     eventName () {
       const { type, internalHour, absence } = this.history.event;
@@ -144,7 +144,7 @@ export default {
           return {
             title: this.getEventUpdateTitle(),
             details: this.getEventUpdateDetails(),
-          }
+          };
         case EVENT_CREATION:
         default:
           return {
@@ -155,7 +155,8 @@ export default {
     },
     historySignature () {
       const date = this.$moment(this.history.createdAt).format('DD/MM');
-      const hour = `${this.$moment(this.history.createdAt).hour()}h${this.$moment(this.history.createdAt).format('mm')}`;
+      const hour = `${this.$moment(this.history.createdAt).hour()}h`
+        + `${this.$moment(this.history.createdAt).format('mm')}`;
       const user = formatIdentity(this.history.createdBy.identity, 'Fl');
 
       return `${user} le ${date} à ${hour}.`;
@@ -184,8 +185,10 @@ export default {
       if (!this.isOneDayEvent) return `${this.eventName} planifié(e) du ${this.startDate} au ${this.endDate}.`;
 
       let details;
-      if (this.isRepetition) details = `${this.eventName}s planifié(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
-      else details = `${this.eventName} planifié(e) le ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
+      if (this.isRepetition) {
+        details = `${this.eventName}s planifié(e)s de ${this.startHour} à ${this.endHour} `
+          + `à partir du ${this.startDate}.`;
+      } else details = `${this.eventName} planifié(e) le ${this.startDate} de ${this.startHour} à ${this.endHour}.`;
 
       const { address } = this.history.event;
 
@@ -206,8 +209,10 @@ export default {
       if (this.history.event.type === ABSENCE) return;
 
       let details;
-      if (this.isRepetition) details = `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} à partir du ${this.startDate}.`;
-      else details = `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
+      if (this.isRepetition) {
+        details = `${this.eventName}s initialement prévu(e)s de ${this.startHour} à ${this.endHour} `
+        + `à partir du ${this.startDate}.`;
+      } else details = `${this.eventName} initialement prévu(e) de ${this.startHour} à ${this.endHour}.`;
 
       const { address } = this.history.event;
 
@@ -222,7 +227,7 @@ export default {
       if (startHour) return this.formatHoursUpdateTitle();
     },
     formatAuxiliaryUpdateTitle () { // Auxiliary update : only for intervention and internal hour.
-      const { from, to } = this.history.update.auxiliary
+      const { from, to } = this.history.update.auxiliary;
       const toAuxiliary = to && to.identity ? formatIdentity(to.identity, 'Fl') : 'À affecter';
       const fromAuxiliary = from && from.identity ? formatIdentity(from.identity, 'Fl') : 'À affecter';
 
@@ -269,7 +274,9 @@ export default {
       if (startDate) return this.formatDatesUpdateDetails();
       if (cancel) {
         const condition = CANCELLATION_OPTIONS.find(opt => opt.value === cancel.condition);
-        return condition ? `${this.getEventDeletionDetails()} ${condition.label}.` : `${this.getEventDeletionDetails()}`;
+        return condition
+          ? `${this.getEventDeletionDetails()} ${condition.label}.`
+          : `${this.getEventDeletionDetails()}`;
       }
       if (startHour) return this.formatHoursUpdateDetails();
     },
@@ -279,8 +286,9 @@ export default {
       const endDateFrom = endDate && this.$moment(endDate.from).format('DD/MM');
 
       let details;
-      if (!this.isOneDayEvent) details = `${this.eventName}s initialement prévu(e)s du ${startDateFrom} au ${endDateFrom}.`;
-      else details = `${this.eventName} initialement prévu(e) le ${startDateFrom}.`;
+      if (!this.isOneDayEvent) {
+        details = `${this.eventName}s initialement prévu(e)s du ${startDateFrom} au ${endDateFrom}.`;
+      } else details = `${this.eventName} initialement prévu(e) le ${startDateFrom}.`;
 
       const { address } = this.history.event;
 
@@ -292,15 +300,17 @@ export default {
       const endHourFrom = formatHoursWithMinutes(endHour.from);
 
       let details;
-      if (this.isRepetition) details = `${this.eventName}s initialement prévu(e)s de ${startHourFrom} à ${endHourFrom} à partir du ${this.startDate}.`;
-      else details = `${this.eventName} initialement prévu(e) de ${startHourFrom} à ${endHourFrom}.`;
+      if (this.isRepetition) {
+        details = `${this.eventName}s initialement prévu(e)s de ${startHourFrom} à ${endHourFrom} `
+          + `à partir du ${this.startDate}.`;
+      } else details = `${this.eventName} initialement prévu(e) de ${startHourFrom} à ${endHourFrom}.`;
 
       const { address } = this.history.event;
 
       return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

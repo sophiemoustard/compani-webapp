@@ -5,12 +5,12 @@
         <p class="text-weight-bold">Pratique</p>
       </div>
       <div class="row gutter-profile">
-        <ni-search-address v-if="isAuxiliary" caption='Adresse principale' v-model="customer.contact.primaryAddress"
+        <ni-search-address v-if="isAuxiliary" caption="Adresse principale" v-model="customer.contact.primaryAddress"
           color="white" disable />
-        <ni-search-address v-if="isAuxiliary && hasSecondaryAddress" caption='Adresse secondaire'
+        <ni-search-address v-if="isAuxiliary && hasSecondaryAddress" caption="Adresse secondaire"
           v-model="customer.contact.secondaryAddress" color="white" disable />
-        <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes" @focus="saveTmp('contact.accessCodes')"
-          @blur="updateCustomer('contact.accessCodes')" />
+        <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes"
+          @focus="saveTmp('contact.accessCodes')" @blur="updateCustomer('contact.accessCodes')" />
         <ni-input v-if="isAuxiliary" type="tel" :error="$v.customer.contact.phone.$error"
           error-message="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
@@ -24,7 +24,7 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-md-6 col-xs-12 referent items-center">
-          <img :src="auxiliaryAvatar" class="avatar q-mr-sm" />
+          <img :src="auxiliaryAvatar" class="avatar q-mr-sm">
           <ni-select v-model="customer.referent._id" :options="auxiliariesOptions" no-error icon="swap_vert"
             @focus="saveTmp('referent')" @input="updateCustomer('referent')" bg-color="neutral-grey" />
         </div>
@@ -51,12 +51,12 @@
       </div>
       <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
         :loading="helpersLoading">
-        <template v-slot:body="{ props }" >
+        <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'phone'">
-                <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
+                <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{ col.value }}</a>
                 <div v-else>{{ col.value }}</div>
               </template>
              <template v-else>{{ col.value }}</template>
@@ -78,17 +78,19 @@
       </div>
       <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
         :loading="followUpLoading" :responsive="false">
-        <template v-slot:body="{ props }" >
+        <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'identity'">
                 <q-item>
                   <q-item-section avatar>
-                    <img :src="getAvatar(col.value)" class="avatar" />
+                    <img :src="getAvatar(col.value)" class="avatar">
                   </q-item-section>
                   <q-item-section>
-                    <span class="identity-block q-mr-sm">{{ col.value.identity | formatIdentity('Fl') }} ({{ col.value.sector.name }})</span>
+                    <span class="identity-block q-mr-sm">
+                      {{ col.value.identity | formatIdentity('Fl') }} ({{ col.value.sector.name }})
+                    </span>
                   </q-item-section>
                 </q-item>
               </template>
@@ -163,7 +165,7 @@ export default {
           name: 'prevMonthCareHours',
           align: 'center',
           label: 'Mois dernier',
-          field: row => row.prevMonthCareHours === -1 ? 'N/A' : formatHours(row.prevMonthCareHours, 1),
+          field: row => (row.prevMonthCareHours === -1 ? 'N/A' : formatHours(row.prevMonthCareHours, 1)),
         },
         {
           name: 'currentMonthCareHours',
@@ -290,7 +292,7 @@ export default {
   filters: {
     formatIdentity,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

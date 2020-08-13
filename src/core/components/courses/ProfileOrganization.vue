@@ -15,8 +15,8 @@
           :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
       </div>
     </div>
-    <ni-slot-container :canEdit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
-    <ni-trainee-table :canEdit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-slot-container :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
   </div>
 </template>
 
@@ -31,7 +31,6 @@ import Select from '@components/form/Select';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
 import Banner from '@components/Banner';
-import CourseInfoLink from './CourseInfoLink';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -41,6 +40,7 @@ import {
 import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
+import CourseInfoLink from './CourseInfoLink';
 
 export default {
   name: 'ProfileOrganization',
@@ -65,7 +65,7 @@ export default {
       courseSlotsLoading: false,
       tmpInput: '',
       isClientInterface,
-    }
+    };
   },
   validations () {
     return {
@@ -74,7 +74,7 @@ export default {
       },
       newTrainee: this.traineeValidations,
       editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
-    }
+    };
   },
   computed: {
     ...mapState('course', ['course']),
@@ -88,9 +88,9 @@ export default {
       return !(this.isClientInterface && this.isCourseInter);
     },
     missingInfoMsg () {
-      return 'Le lien vers la page sera disponible dès que l\'équipe aura rentré ' +
-        (this.followUpMissingInfo.length > 1 ? 'les informations manquantes : ' : 'l\'information manquante : ') +
-        this.followUpMissingInfo.join(', ');
+      return `Le lien vers la page sera disponible dès que l'équipe aura rentré ${
+        this.followUpMissingInfo.length > 1 ? 'les informations manquantes : ' : 'l\'information manquante : '
+      }${this.followUpMissingInfo.join(', ')}`;
     },
   },
   async created () {
@@ -112,11 +112,11 @@ export default {
     async refreshTrainers () {
       try {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }))
+        this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }));
       } catch (e) {
         console.error(e);
       }
     },
   },
-}
+};
 </script>

@@ -11,15 +11,13 @@ export default {
     },
   },
   mutations: {
-    SET_CUSTOMER: (state, data) => { state.customer = !data ? data : Object.assign({}, data); },
+    SET_CUSTOMER: (state, data) => { state.customer = !data ? data : ({ ...data }); },
     SET_NOTIFICATION: (state, notification) => {
       if (!notification) {
         state.notifications = {};
         return;
       }
-      state.notifications[notification.type] = Object.assign({}, state.notifications[notification.type], {
-        [notification._id]: notification.exists,
-      });
+      state.notifications[notification.type] = { ...state.notifications[notification.type], [notification._id]: notification.exists };
     },
   },
   actions: {
@@ -37,7 +35,7 @@ export default {
     },
     setCustomer: ({ commit }, data) => commit('SET_CUSTOMER', data),
     updateNotifications: async ({ commit, state }) => {
-      const customer = state.customer;
+      const { customer } = state;
       const validation = customerProfileValidation(customer);
       commit('SET_NOTIFICATION', { type: 'profiles', _id: customer._id, exists: !!validation.error });
     },

@@ -59,7 +59,7 @@ export default {
         : `1-${this.data.length} de ${this.data.length}`;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <div v-if="loggedUser">
       <h4>Documents de paie</h4>
-      <profile-pay/>
+      <profile-pay />
     </div>
   </q-page>
 </template>
@@ -20,5 +20,5 @@ export default {
   computed: {
     ...mapState('main', ['loggedUser']),
   },
-}
+};
 </script>

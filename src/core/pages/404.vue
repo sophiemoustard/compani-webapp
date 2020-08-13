@@ -15,7 +15,7 @@ export default {
   data () {
     return {
       canGoBack: window.history.length > 1,
-    }
+    };
   },
   methods: {
     goBack () {
@@ -23,11 +23,11 @@ export default {
     },
     goTo () {
       return /\/ad\//.test(this.$router.currentRoute.path)
-        ? this.$router.replace('/ad').catch(e => {})
-        : this.$router.replace('/').catch(e => {});
+        ? this.$router.replace('/ad').catch((e) => {})
+        : this.$router.replace('/').catch((e) => {});
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

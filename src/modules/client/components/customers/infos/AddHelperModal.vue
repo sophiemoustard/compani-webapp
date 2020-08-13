@@ -46,7 +46,7 @@ export default {
     emailError () {
       if (!this.validations.local.email.required) {
         return REQUIRED_LABEL;
-      } else if (!this.validations.local.email.email) {
+      } if (!this.validations.local.email.email) {
         return 'Email non valide';
       }
       return '';
@@ -69,5 +69,5 @@ export default {
       this.$emit('nextStep');
     },
   },
-}
+};
 </script>

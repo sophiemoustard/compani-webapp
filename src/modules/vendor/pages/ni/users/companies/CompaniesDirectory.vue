@@ -27,7 +27,7 @@
 <script>
 import pick from 'lodash/pick';
 import Companies from '@api/Companies';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
@@ -63,12 +63,12 @@ export default {
         type: '',
       },
       modalLoading: false,
-    }
+    };
   },
   validations () {
     return {
       newCompany: pick(this.companyValidation, ['type', 'name']),
-    }
+    };
   },
   async mounted () {
     await this.refreshCompanies();
@@ -110,7 +110,7 @@ export default {
         await Companies.create({ ...this.newCompany });
 
         this.companyCreationModal = false;
-        NotifyPositive('Structure créée.')
+        NotifyPositive('Structure créée.');
         await this.refreshCompanies();
       } catch (e) {
         console.error(e);
@@ -121,5 +121,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

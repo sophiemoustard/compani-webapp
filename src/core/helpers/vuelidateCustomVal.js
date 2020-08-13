@@ -1,9 +1,11 @@
 /* eslint-disable import/first */
+import { workHealthServices } from '@data/workHealthServices';
+
+import { urssafCodes } from '@data/urssafCodes';
+
 const ibantools = require('ibantools');
 const axios = require('axios');
 const moment = require('moment');
-import { workHealthServices } from '@data/workHealthServices';
-import { urssafCodes } from '@data/urssafCodes';
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;
@@ -56,17 +58,11 @@ export const strictPositiveNumber = (value) => {
   return value > 0;
 };
 
-export const validHour = (value) => {
-  return !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
-};
+export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
-export const minDate = (min) => {
-  return value => moment(min).isSameOrBefore(value);
-};
+export const minDate = min => value => moment(min).isSameOrBefore(value);
 
-export const maxDate = (max) => {
-  return value => moment(max).isSameOrAfter(value);
-};
+export const maxDate = max => value => moment(max).isSameOrAfter(value);
 
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
 

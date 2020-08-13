@@ -89,7 +89,7 @@ export default {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => row.thirdPartyPayer ? row.thirdPartyPayer.name : formatIdentity(row.customer.identity, 'Lf'),
+          field: row => (row.thirdPartyPayer ? row.thirdPartyPayer.name : formatIdentity(row.customer.identity, 'Lf')),
           format: val => truncate(val),
           classes: 'uppercase text-weight-bold',
         },
@@ -105,8 +105,8 @@ export default {
           name: 'participationRate',
           label: 'Taux de participation',
           align: 'center',
-          field: row => row.thirdPartyPayer ? '' : row.participationRate,
-          format: (value, row) => row.thirdPartyPayer ? '' : roundFrenchPercentage(value),
+          field: row => (row.thirdPartyPayer ? '' : row.participationRate),
+          format: (value, row) => (row.thirdPartyPayer ? '' : roundFrenchPercentage(value)),
           sortable: true,
         },
         {
@@ -152,16 +152,20 @@ export default {
         { label: 'Tiers payeurs', value: 2 },
       ],
       balancesOption: 0,
-    }
+    };
   },
   computed: {
     filteredBalances () {
-      const orderedByCustomerBalances = orderBy(this.balances, (row) => get(row, 'customer.identity.lastname', '').toLowerCase(), ['asc']);
+      const orderedByCustomerBalances = orderBy(
+        this.balances,
+        row => get(row, 'customer.identity.lastname', '').toLowerCase(),
+        ['asc']
+      );
       if (this.balancesOption === 1) return orderedByCustomerBalances.filter(balance => !balance.thirdPartyPayer);
       if (this.balancesOption === 2) {
         return orderBy(
           orderedByCustomerBalances.filter(balance => balance.thirdPartyPayer),
-          (row) => get(row, 'thirdPartyPayer.name', '').toLowerCase(),
+          row => get(row, 'thirdPartyPayer.name', '').toLowerCase(),
           ['asc']
         );
       }
@@ -176,7 +180,7 @@ export default {
       this.selected = [];
     },
     goToCustomerBillingPage (customerId) {
-      this.$router.push({ name: 'ni customers info', params: { customerId: customerId, defaultTab: 'billing' } });
+      this.$router.push({ name: 'ni customers info', params: { customerId, defaultTab: 'billing' } });
     },
     selectRows (oldValue) {
       if (oldValue) this.selected = [];
@@ -187,7 +191,7 @@ export default {
       try {
         this.tableLoading = true;
         this.balances = await Balances.list();
-        this.balances = this.balances.map(balance => ({ ...balance, rowId: uniqueId() }))
+        this.balances = this.balances.map(balance => ({ ...balance, rowId: uniqueId() }));
       } catch (e) {
         this.balances = [];
         console.error(e);
@@ -197,17 +201,15 @@ export default {
     },
     async createPaymentList () {
       try {
-        const payload = this.selected.map((row) => {
-          return {
-            nature: this.PAYMENT,
-            customer: row._id.customer,
-            customerInfo: row.customer,
-            netInclTaxes: row.toPay,
-            type: this.PAYMENT_OPTIONS[0].value,
-            date: this.$moment().toDate(),
-            rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
-          }
-        });
+        const payload = this.selected.map(row => ({
+          nature: this.PAYMENT,
+          customer: row._id.customer,
+          customerInfo: row.customer,
+          netInclTaxes: row.toPay,
+          type: this.PAYMENT_OPTIONS[0].value,
+          date: this.$moment().toDate(),
+          rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
+        }));
         await Payments.createList(payload);
         NotifyPositive('Règlement(s) créé(s)');
         await this.refresh();
@@ -228,5 +230,5 @@ export default {
         .onCancel(() => NotifyPositive('Création des règlements annulée'));
     },
   },
-}
+};
 </script>

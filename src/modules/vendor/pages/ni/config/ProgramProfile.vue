@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <ni-profile-header :title="programName" />
-    <profile-tabs :profile-id="programId" :tabsContent="tabsContent" />
+    <profile-tabs :profile-id="programId" :tabs-content="tabsContent" />
   </q-page>
 </template>
 
@@ -41,7 +41,7 @@ export default {
           component: ProfileContent,
         },
       ],
-    }
+    };
   },
   computed: {
     ...mapState('program', ['program']),
@@ -71,5 +71,5 @@ export default {
     }
   },
 
-}
+};
 </script>

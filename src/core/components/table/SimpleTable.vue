@@ -45,5 +45,5 @@ export default {
     responsive: { type: Boolean, default: true },
     hideBottom: { type: Boolean, default: false },
   },
-}
+};
 </script>

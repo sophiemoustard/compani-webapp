@@ -18,13 +18,11 @@ export const planningEventMixin = {
   computed: {
     daysHeader () {
       if (!this.days) return [];
-      return this.days.map((day) => {
-        return {
-          name: this.$moment(day).format('dd'),
-          number: this.$moment(day).format('DD'),
-          moment: day,
-        };
-      });
+      return this.days.map(day => ({
+        name: this.$moment(day).format('dd'),
+        number: this.$moment(day).format('DD'),
+        moment: day,
+      }));
     },
     isCustomerPlanning () {
       return this.personKey === 'customer';

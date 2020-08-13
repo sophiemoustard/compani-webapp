@@ -12,11 +12,9 @@ import {
   ERP,
 } from '@data/constants';
 
-const getClientAbilities = (role, subscriptions) => {
-  return roleBasedAccessControl[role]
-    .filter(r => !r.subscription || subscriptions.includes(r.subscription))
-    .map(r => r.name);
-};
+const getClientAbilities = (role, subscriptions) => roleBasedAccessControl[role]
+  .filter(r => !r.subscription || subscriptions.includes(r.subscription))
+  .map(r => r.name);
 
 const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 

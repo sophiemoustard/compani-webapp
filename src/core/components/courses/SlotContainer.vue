@@ -3,7 +3,7 @@
     <div class="q-mb-xl">
       <q-item class="slot-section-title">
         <q-item-section side>
-          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense/>
+          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense />
         </q-item-section>
         <q-item-section>
           <div class="text-weight-bold">{{ formatSlotTitle.title }}</div>
@@ -49,7 +49,7 @@
       <ni-datetime-range caption="Dates et heures" v-model="newCourseSlot.dates" required-field disable-end-date
         :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
       <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
-        @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
+        @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" in-modal last />
       <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" :disable="!stepsLength" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
@@ -69,7 +69,7 @@
       <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
         :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
-        @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
+        @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" in-modal last />
       <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step"
         :disable="!stepsLength" />
       <template slot="footer">
@@ -77,8 +77,7 @@
           :loading="modalLoading" @click="updateCourseSlot" />
       </template>
     </ni-modal>
-
-  </div>
+</div>
 </template>
 
 <script>
@@ -149,13 +148,13 @@ export default {
         },
       },
       formatQuantity,
-    }
+    };
   },
   validations () {
     return {
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
-    }
+    };
   },
   computed: {
     ...mapState('course', ['course']),
@@ -273,7 +272,7 @@ export default {
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
         step: get(slot, 'step._id') || null,
-      }
+      };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
     },
@@ -298,7 +297,7 @@ export default {
         this.creationModal = false;
         this.$emit('refresh');
       } catch (e) {
-        console.error(e)
+        console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
@@ -313,7 +312,7 @@ export default {
 
         this.$emit('refresh');
       } catch (e) {
-        console.error(e)
+        console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       } finally {
         this.addDateToPlanloading = false;
@@ -332,7 +331,7 @@ export default {
         this.editionModal = false;
         this.$emit('refresh');
       } catch (e) {
-        console.error(e)
+        console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification du créneau.');
       } finally {
@@ -357,7 +356,7 @@ export default {
         this.editionModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du créneau.')
+        NotifyNegative('Erreur lors de la suppression du créneau.');
       } finally {
         this.modalLoading = false;
       }
@@ -369,7 +368,7 @@ export default {
     },
   },
 
-}
+};
 </script>
 
 <style lang="stylus" scoped>

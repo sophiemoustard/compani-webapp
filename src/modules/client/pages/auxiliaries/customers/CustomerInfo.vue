@@ -36,5 +36,5 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('customer/resetCustomer');
   },
-}
+};
 </script>

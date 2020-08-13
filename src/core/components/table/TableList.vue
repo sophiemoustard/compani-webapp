@@ -43,5 +43,5 @@ export default {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
     },
   },
-}
+};
 </script>

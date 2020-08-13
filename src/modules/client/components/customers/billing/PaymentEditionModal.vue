@@ -76,5 +76,5 @@ export default {
       this.$emit('updatePayment', value);
     },
   },
-}
+};
 </script>

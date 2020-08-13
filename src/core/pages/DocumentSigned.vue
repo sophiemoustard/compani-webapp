@@ -1,30 +1,33 @@
 <template>
   <div class="signed">
-    <p>
-      <img src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose_1000.png" alt="Logo Compani" style="max-width: 250px">
-    </p>
+    <p><img :src="PINK_LOGO" alt="Logo Compani" style="max-width: 250px"></p>
     <p>{{ acknowledgement }}</p>
     <p><q-btn v-if="$q.platform.is.mobile" color="primary" label="Accueil" icon="home" @click="$router.push('/')" /></p>
   </div>
 </template>
 
 <script>
+import { PINK_LOGO } from '@data/constants';
+
 export default {
   name: 'DocumentSigned',
   props: {
     signed: { type: String, default: 'false' },
   },
+  data () {
+    return { PINK_LOGO };
+  },
   computed: {
     acknowledgement () {
       if (this.$q.platform.is.desktop) {
-        if (this.signed === 'true') return "Merci d'avoir signé ! Vous pouvez à présent fermer la fenêtre.";
+        if (this.signed === 'true') return 'Merci d\'avoir signé ! Vous pouvez à présent fermer la fenêtre.';
         return 'Vous pouvez à présent fermer la fenêtre.';
       }
-      if (this.signed === 'true') return "Merci d'avoir signé ! Vous pouvez à présent revenir à l'accueil";
-      return "Vous pouvez à présent revenir à l'accueil";
+      if (this.signed === 'true') return 'Merci d\'avoir signé ! Vous pouvez à présent revenir à l\'accueil';
+      return 'Vous pouvez à présent revenir à l\'accueil';
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

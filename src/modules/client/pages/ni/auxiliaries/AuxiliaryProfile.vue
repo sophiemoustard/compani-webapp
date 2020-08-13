@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <div v-if="userProfile">
       <auxiliary-profile-header :profile-id="auxiliaryId" />
-      <profile-tabs :profile-id="auxiliaryId" :tabsContent="tabsContent" :notifications="notifications" />
+      <profile-tabs :profile-id="auxiliaryId" :tabs-content="tabsContent" :notifications="notifications" />
     </div>
   </q-page>
 </template>
@@ -39,7 +39,7 @@ export default {
         { label: 'Contrats', name: 'contracts', default: this.defaultTab === 'contracts', component: ProfileContracts },
         { label: 'Paie', name: 'pays', default: this.defaultTab === 'pays', component: ProfilePay },
       ],
-    }
+    };
   },
   async created () {
     await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.auxiliaryId });
@@ -55,5 +55,5 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
-}
+};
 </script>

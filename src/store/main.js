@@ -24,7 +24,7 @@ export default {
       try {
         const user = await users.getById(userId);
 
-        commit('SET_LOGGED_USER', Object.assign({}, extend(userModel, user)));
+        commit('SET_LOGGED_USER', { ...extend(userModel, user) });
       } catch (e) {
         if (!e) return; // If the api does not respond anything
         console.error(e);

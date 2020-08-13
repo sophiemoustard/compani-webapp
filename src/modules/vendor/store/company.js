@@ -6,7 +6,7 @@ export default {
     company: null,
   },
   mutations: {
-    SET_COMPANY: (state, data) => { state.company = !data ? data : Object.assign({}, data); },
+    SET_COMPANY: (state, data) => { state.company = !data ? data : ({ ...data }); },
   },
   actions: {
     fetchCompany: async ({ commit }, params) => {

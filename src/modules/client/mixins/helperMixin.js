@@ -83,12 +83,12 @@ export const helperMixin = {
     // Creation
     resetAddHelperForm () {
       this.$v.newHelper.$reset();
-      this.newHelper = Object.assign({}, clear(this.newHelper));
+      this.newHelper = { ...clear(this.newHelper) };
       this.firstStep = true;
     },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
-      this.editedHelper = Object.assign({}, clear(this.editedHelper));
+      this.editedHelper = { ...clear(this.editedHelper) };
       this.openEditedHelperModal = false;
     },
     async formatHelper () {
@@ -147,7 +147,7 @@ export const helperMixin = {
         if (this.$v.newHelper.local.email.$error) return NotifyWarning('Champs invalides');
 
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
-        const user = userInfo.user;
+        const { user } = userInfo;
 
         const sameOrNoCompany = !user.company || user.company === this.company._id;
         if (userInfo.exists && (get(user, 'role.client') || !sameOrNoCompany)) {
@@ -182,7 +182,7 @@ export const helperMixin = {
         if (get(this.editedHelper, 'contact.phone')) {
           this.editedHelper.contact.phone = formatPhoneForPayload(this.editedHelper.contact.phone);
         }
-        const payload = Object.assign({}, omit(this.editedHelper, ['_id']));
+        const payload = { ...omit(this.editedHelper, ['_id']) };
         delete payload.local;
         await Users.updateById(this.editedHelper._id, payload);
         NotifyPositive('Aidant modifié');

@@ -3,7 +3,7 @@
     <template slot="title">
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
-    <ni-input in-modal caption="Taux horaire"  type="number" suffix="€" required-field
+    <ni-input in-modal caption="Taux horaire" type="number" suffix="€" required-field
       v-model="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
       @blur="validations.grossHourlyRate.$touch" :error-message="grossHourlyRateError" />
     <ni-date-input caption="Date d'effet" v-model="editedVersion.startDate" :min="minStartDate"
@@ -47,5 +47,5 @@ export default {
       this.$emit('hide');
     },
   },
-}
+};
 </script>

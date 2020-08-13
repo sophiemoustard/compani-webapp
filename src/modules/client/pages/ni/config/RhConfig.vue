@@ -51,8 +51,8 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Taux kilométrique</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error"
-            :error-message="nbrError('company.rhConfig.amountPerKm')" type="number" v-model="company.rhConfig.amountPerKm"
+          <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error" type="number"
+            :error-message="nbrError('company.rhConfig.amountPerKm')" v-model="company.rhConfig.amountPerKm"
             @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
       </div>
@@ -61,8 +61,8 @@
         <div class="row gutter-profile">
           <template v-if="company.rhConfig.transportSubs">
             <template v-for="(transportSub, index) in company.rhConfig.transportSubs">
-              <ni-input :caption="transportSub.department" :error="$v.company.rhConfig.transportSubs.$each[index].$error"
-                type="number" v-model="company.rhConfig.transportSubs[index].price" :key="index"
+              <ni-input :caption="transportSub.department" v-model="company.rhConfig.transportSubs[index].price"
+                :error="$v.company.rhConfig.transportSubs.$each[index].$error" type="number" :key="index"
                 @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
                 :error-message="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
                 @blur="updateCompanyTransportSubs(index)" />
@@ -83,7 +83,11 @@
             <ni-file-uploader caption="Modèle d'avenant au contrat prestataire"
               path="rhConfig.templates.contractVersion" :entity="company" alt="template avenant prestataire"
               name="contractVersion" :url="docsUploadUrl"
-              @delete="validateDocumentDeletion(company.rhConfig.templates.contractVersion.driveId, 'contractVersion', 'rhConfig')"
+              @delete="validateDocumentDeletion(
+                company.rhConfig.templates.contractVersion.driveId,
+                'contractVersion',
+                'rhConfig'
+              )"
               @uploaded="documentUploaded" :additional-value="`modele_avenant_prestataire_${company.name}`" />
           </div>
         </div>
@@ -266,7 +270,7 @@ export default {
       newSector: { name: '' },
       sectorEditionModal: false,
       editedSector: { name: '' },
-    }
+    };
   },
   computed: {
     docsUploadUrl () {
@@ -287,7 +291,7 @@ export default {
       newAdministrativeDocument: { name: { required }, file: { required } },
       newSector: { name: { required } },
       editedSector: { name: { required } },
-    }
+    };
   },
   async mounted () {
     this.company = cloneDeep(this.loggedCompany);
@@ -397,10 +401,10 @@ export default {
         await this.refreshInternalHours();
         await this.refreshCompany();
 
-        NotifyPositive('Heures internes mises à jour')
+        NotifyPositive('Heures internes mises à jour');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour des heures internes.')
+        NotifyNegative('Erreur lors de la mise à jour des heures internes.');
       }
     },
     // Sectors
@@ -410,7 +414,7 @@ export default {
         this.sectors = await Sectors.list();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des équipes.')
+        NotifyNegative('Erreur lors de la récupération des équipes.');
       } finally {
         this.sectorsLoading = false;
       }
@@ -428,13 +432,13 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de la création de l'équipe.");
+        NotifyNegative('Erreur lors de la création de l\'équipe.');
       } finally {
         this.loading = false;
       }
     },
     resetCreationSectorData () {
-      this.sectorCreationModal = false
+      this.sectorCreationModal = false;
       this.newSector = { name: '' };
       this.$v.newSector.$reset();
     },
@@ -457,7 +461,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de la modification de l'équipe.");
+        NotifyNegative('Erreur lors de la modification de l\'équipe.');
       } finally {
         this.loading = false;
       }
@@ -476,7 +480,7 @@ export default {
         NotifyPositive('Équipe supprimée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'équipe.");
+        NotifyNegative('Erreur lors de la suppression de l\'équipe.');
       }
     },
     validateSectorDeletion (sector) {
@@ -499,7 +503,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.administrativeDocuments = [];
-        NotifyNegative('Erreur lors de la récupération des documents.')
+        NotifyNegative('Erreur lors de la récupération des documents.');
       } finally {
         this.administrativeDocumentsLoading = false;
       }
@@ -528,7 +532,7 @@ export default {
         await this.getAdministrativeDocuments();
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de l'envoi du document.");
+        NotifyNegative('Erreur lors de l\'envoi du document.');
       } finally {
         this.loading = false;
       }
@@ -555,5 +559,5 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
-}
+};
 </script>

@@ -5,12 +5,12 @@
     </div>
     <ni-large-table :data="staffRegister" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="_id">
-      <template v-slot:body="{ props }" >
+      <template v-slot:body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">
             <template v-if="col.name.match('idCardOrResidencePermit') && col.value !==''">
-                <div  class="row justify-center table-actions">
+                <div class="row justify-center table-actions">
                   <q-btn flat round small color="primary" type="a" :href="col.value" target="_blank"
                     icon="file_download" />
                 </div>
@@ -62,9 +62,9 @@ export default {
         {
           name: 'gender',
           label: 'Civilité',
-          field: row => {
+          field: (row) => {
             const option = CIVILITY_OPTIONS.find(opt => opt.value === get(row, 'user.identity.title'));
-            return option ? option.label : ''
+            return option ? option.label : '';
           },
           align: 'left',
         },
@@ -73,7 +73,7 @@ export default {
           label: 'Date de naissance',
           field: row => get(row, 'user.identity.birthDate') || '',
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'nationality',
@@ -98,14 +98,14 @@ export default {
           label: 'Date de début',
           field: 'startDate',
           align: 'left',
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'endDate',
           label: 'Date de fin',
           field: 'endDate',
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'idCardOrResidencePermitRecto',
@@ -124,7 +124,7 @@ export default {
           style: 'width: 105px',
         },
       ],
-    }
+    };
   },
   async mounted () {
     await this.getStaffRegister();
@@ -142,5 +142,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

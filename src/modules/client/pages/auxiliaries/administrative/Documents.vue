@@ -25,8 +25,8 @@
 </template>
 
 <script>
-import get from 'lodash/get'
-import AdministrativeDocument from '@api/AdministrativeDocuments'
+import get from 'lodash/get';
+import AdministrativeDocument from '@api/AdministrativeDocuments';
 import LargeTable from '@components/table/LargeTable';
 
 export default {
@@ -67,7 +67,7 @@ export default {
         },
       ],
       documents: [],
-    }
+    };
   },
-}
+};
 </script>

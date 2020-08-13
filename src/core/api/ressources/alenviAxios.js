@@ -8,7 +8,7 @@ const instance = axios.create({
   paramsSerializer: params => qs.stringify(params, { indices: false }),
 });
 
-instance.interceptors.request.use(async function (config) {
+instance.interceptors.request.use(async (config) => {
   if (!Cookies.get('refresh_token')) {
     logOutAndRedirectToLogin();
     throw new Error('No refresh token');
@@ -25,14 +25,8 @@ instance.interceptors.request.use(async function (config) {
   // Headers for request only to API (alenvi)
   config.headers.common['x-access-token'] = Cookies.get('alenvi_token');
   return config;
-}, function (err) {
-  return Promise.reject(err);
-});
+}, err => Promise.reject(err));
 
-instance.interceptors.response.use(function (response) {
-  return response;
-}, function (error) {
-  return Promise.reject(error.response);
-});
+instance.interceptors.response.use(response => response, error => Promise.reject(error.response));
 
 export const alenviAxios = instance;

@@ -75,13 +75,13 @@ export const menuItemsMixin = {
 
       return routes
         .map(r => (this.isHelper ? r : { ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
-        .filter(r => r.children ? r.children.length : ability.can('read', r.name));
+        .filter(r => (r.children ? r.children.length : ability.can('read', r.name)));
     },
     activeRoutes () {
       if (this.isHelper) return this.customerActiveRoutes;
-      else if (this.isCoach) return this.coachActiveRoutes;
-      else if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
-      else return {};
+      if (this.isCoach) return this.coachActiveRoutes;
+      if (this.isAuxiliary) return this.auxiliaryActiveRoutes;
+      return {};
     },
     customerRoutes () {
       return [

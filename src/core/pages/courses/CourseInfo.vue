@@ -30,7 +30,7 @@
         </q-step>
       </q-stepper>
       <div class="slots-to-plan" v-if="courseSlotsToPlanLength">
-        Il reste {{courseSlotsToPlanLength}} créneau{{courseSlotsToPlanLength > 1 ? 'x' : ''}} à planifier
+        Il reste {{ courseSlotsToPlanLength }} créneau{{ courseSlotsToPlanLength > 1 ? 'x' : '' }} à planifier
       </div>
     </div>
     <div class="course-container">
@@ -38,7 +38,7 @@
         <q-item v-if="course.program" class="row">
           <q-item-section side class="course-img-container">
               <img class="course-img course-img-explanation"
-              src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-explication.png" />
+              src="">
           </q-item-section>
           <q-item-section class="course-item-container">
             <div class="text-weight-bold">Programme de la formation</div>
@@ -47,8 +47,7 @@
         </q-item>
         <q-item v-if="course.trainer" class="row">
           <q-item-section side class="course-img-container">
-              <img class="course-img course-img-explanation"
-              src="https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/doct-quizz.png" />
+              <img class="course-img course-img-explanation" :src="biographyImg">
           </q-item-section>
           <q-item-section class="course-item-container">
             <div class="text-weight-bold">Intervenant(e)</div>
@@ -59,19 +58,19 @@
         <q-item v-if="course.contact" class="row">
           <q-item-section side class="course-img-container">
             <img class="course-img course-img-contact"
-              src="https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/aux-perplexite.png" />
+              src="">
           </q-item-section>
           <div class="course-item-container">
             <div class="text-weight-bold">Votre contact pour la formation</div>
             <div>{{ course.contact.name }}</div>
             <div><a :href="contactPhoneLink">{{ formatPhone(course.contact.phone) }}</a></div>
             <div>
-              <a v-if="course.contact.email" :href="'mailto:' + course.contact.email" >{{ course.contact.email }}</a>
+              <a v-if="course.contact.email" :href="'mailto:' + course.contact.email">{{ course.contact.email }}</a>
             </div>
           </div>
         </q-item>
         <q-item class="course-link-container">
-          <a class="cursor-pointer" @click.prevent="rulesModal = true" >Règlement intérieur</a>
+          <a class="cursor-pointer" @click.prevent="rulesModal = true">Règlement intérieur</a>
         </q-item>
       </div>
     </div>
@@ -102,6 +101,12 @@ export default {
       course: {},
       rulesModal: false,
       rules,
+      programImg: 'https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/'
+        + 'doct-explication.png',
+      biographyImg: 'https://res.cloudinary.com/alenvi/image/upload/v1587048743/images/business/Compani/'
+        + 'doct-quizz.png',
+      contactImg: 'https://res.cloudinary.com/alenvi/image/upload/v1587373654/images/business/Compani/'
+        + 'aux-perplexite.png',
     };
   },
   computed: {
@@ -141,8 +146,8 @@ export default {
       return this.happened(slot) ? 'grey' : 'primary';
     },
     formatSlotTitle (slot, index) {
-      return `${this.$moment(slot[0].startDate).format('DD MMM YYYY')}` +
-        ` - (${index + 1} / ${Object.values(this.courseSlots).length})`;
+      return `${this.$moment(slot[0].startDate).format('DD MMM YYYY')}`
+        + ` - (${index + 1} / ${Object.values(this.courseSlots).length})`;
     },
     formatSlotHour (slot) {
       return `${this.$moment(slot.startDate).format('HH:mm')} - ${this.$moment(slot.endDate).format('HH:mm')}`;

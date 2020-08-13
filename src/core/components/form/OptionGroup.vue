@@ -32,7 +32,7 @@ export default {
     displayCaption: { type: Boolean, default: true },
     disable: { type: Boolean, default: false },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

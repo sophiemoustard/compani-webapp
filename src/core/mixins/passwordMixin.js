@@ -10,7 +10,7 @@ export const passwordMixin = {
   computed: {
     passwordConfirmError () {
       if (!this.$v.passwordConfirm.required) return REQUIRED_LABEL;
-      else if (!this.$v.passwordConfirm.sameAs) return 'Le mot de passe doit être identique.';
+      if (!this.$v.passwordConfirm.sameAs) return 'Le mot de passe doit être identique.';
       return 'Mot de passe invalide.';
     },
   },

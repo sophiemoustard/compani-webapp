@@ -63,18 +63,18 @@ export default {
   },
   methods: {
     goToNextWeek (value) {
-      this.$emit('goToNextWeek', value)
+      this.$emit('goToNextWeek', value);
     },
     goToPreviousWeek (value) {
-      this.$emit('goToPreviousWeek', value)
+      this.$emit('goToPreviousWeek', value);
     },
     goToWeek (value) {
-      const momentValue = this.$moment(value, 'YYYY/MM/DD', true)
+      const momentValue = this.$moment(value, 'YYYY/MM/DD', true);
       if (!momentValue.isValid()) return;
-      this.$emit('goToWeek', momentValue.toISOString())
+      this.$emit('goToWeek', momentValue.toISOString());
     },
     goToToday (value) {
-      this.$emit('goToToday', value)
+      this.$emit('goToToday', value);
     },
     updateViewMode (value) {
       this.$emit('updateViewMode', value);
@@ -86,7 +86,7 @@ export default {
       this.$emit('toggleHistory', value);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

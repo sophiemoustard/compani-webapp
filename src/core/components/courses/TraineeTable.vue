@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">{{tableTitle}}</p>
+      <p class="text-weight-bold">{{ tableTitle }}</p>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
           :visible-columns="traineesVisibleColumns">
@@ -9,7 +9,7 @@
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template v-if="col.name === 'actions'" >
+                <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-icon color="grey" name="edit" @click.native="openEditionModal(props.row)" />
                     <q-icon color="grey" name="close" @click.native="validateTraineeDeletion(col.value)" />
@@ -71,8 +71,7 @@
           :loading="editionModalLoading" @click="updateTrainee" />
       </template>
     </ni-modal>
-
-  </div>
+</div>
 </template>
 
 <script>
@@ -139,7 +138,7 @@ export default {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: (value) => formatPhone(value),
+          format: value => formatPhone(value),
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
@@ -165,7 +164,7 @@ export default {
         identity: { lastname: { required } },
         local: { email: { required, email } },
         contact: { phone: { frPhoneNumber } },
-        company: { required: requiredIf(() => { return this.course.type === INTER_B2B; }) },
+        company: { required: requiredIf(() => this.course.type === INTER_B2B) },
       },
       editionModal: false,
       editionModalLoading: false,
@@ -174,13 +173,13 @@ export default {
         contact: {},
         local: {},
       },
-    }
+    };
   },
   validations () {
     return {
       newTrainee: this.traineeValidations,
       editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
-    }
+    };
   },
   computed: {
     ...mapState('course', ['course']),
@@ -189,7 +188,7 @@ export default {
     },
     tableTitle () {
       return this.canEdit ? `Participants (${this.traineesNumber})`
-        : `Participants de votre structure (${this.traineesNumber})`
+        : `Participants de votre structure (${this.traineesNumber})`;
     },
     traineesVisibleColumns () {
       const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
@@ -216,7 +215,7 @@ export default {
     resetAddTraineeForm () {
       this.firstStep = true;
       this.addNewTraineeCompanyStep = false;
-      this.newTrainee = Object.assign({}, clear(this.newTrainee));
+      this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
     },
     async nextStepAdditionModal () {
@@ -233,12 +232,10 @@ export default {
           this.newTrainee.company = this.course.company._id;
           if (userInfo.exists) this.addTrainee();
           else this.firstStep = false;
-        } else {
-          if (userInfo.exists && userInfo.user.company) this.addTrainee();
-          else {
-            if (userInfo.exists) this.addNewTraineeCompanyStep = true;
-            this.firstStep = false;
-          }
+        } else if (userInfo.exists && userInfo.user.company) this.addTrainee();
+        else {
+          if (userInfo.exists) this.addNewTraineeCompanyStep = true;
+          this.firstStep = false;
         }
         this.$v.newTrainee.$reset();
       } catch (e) {
@@ -299,7 +296,9 @@ export default {
         this.editionModalLoading = true;
         this.$v.editedTrainee.$touch();
         if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
-        if (get(this.editedTrainee, 'contact.phone')) this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
+        if (get(this.editedTrainee, 'contact.phone')) {
+          this.editedTrainee.contact.phone = formatPhoneForPayload(this.editedTrainee.contact.phone);
+        }
 
         await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
         this.editionModal = false;
@@ -332,5 +331,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

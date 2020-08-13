@@ -16,8 +16,8 @@
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)"
                         data-cy="show-subscription-history" />
-                      <q-btn :disable="!getFunding(col.value).length" flat round small color="grey" icon="mdi-calculator"
-                        @click="showFunding(col.value)" data-cy="show-fundings-history" />
+                      <q-btn :disable="!getFunding(col.value).length" flat round small color="grey"
+                        icon="mdi-calculator" @click="showFunding(col.value)" data-cy="show-fundings-history" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -26,8 +26,10 @@
             </template>
           </ni-responsive-table>
         </q-card>
-        <p v-if="subscriptions.length > 0" class="nota-bene">* intègre les éventuelles majorations
-          soir / dimanche</p>
+        <p v-if="subscriptions.length > 0" class="nota-bene">
+* intègre les éventuelles majorations
+          soir / dimanche
+</p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
@@ -42,11 +44,10 @@
         <p class="title">Justificatifs APA ou autres financements</p>
         <div class="row gutter-profile">
           <div class="col-xs-12">
-            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement"
-              @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates"
-              collapsibleLabel="Ajouter un justificatif" :user-profile="customer" :url="docsUploadUrl"
-              @delete="validateFinancialCertifDeletion($event)" multiple additional-fields-name="justificatif_financement"
-              :extensions="extensions" />
+            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement" multiple
+              @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates" :url="docsUploadUrl"
+              collapsible-label="Ajouter un justificatif" :user-profile="customer" :extensions="extensions"
+              @delete="validateFinancialCertifDeletion($event)" additional-fields-name="justificatif_financement" />
           </div>
         </div>
       </div>
@@ -74,10 +75,12 @@
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
                   <template v-if="col.name === 'sign'">
-                    <p class="no-margin" v-if="props.row.signedAt">Mandat signé le
-                      {{$moment(props.row.signedAt).format('DD/MM/YYYY')}}</p>
+                    <p class="no-margin" v-if="props.row.signedAt">
+Mandat signé le
+                      {{ $moment(props.row.signedAt).format('DD/MM/YYYY') }}
+</p>
                     <q-btn color="primary" @click="preOpenESignModal(props.row)" data-cy="open-mandate"
-                      v-else-if="getRowIndex(customer.payment.mandates, props.row) === customer.payment.mandates.length - 1">
+                      v-else-if="displaySignButton(props.row)">
                       Signer
                     </q-btn>
                   </template>
@@ -100,7 +103,7 @@
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
-          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -112,8 +115,8 @@
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
       <template slot="title" data-cy="service-name">
-        Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
-          selectedSubscription.service.name}}</span>
+        Historique de la souscription <span class="text-weight-bold">{{ selectedSubscription.service &&
+          selectedSubscription.service.name }}</span>
       </template>
       <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
         :pagination.sync="paginationHistory" data-cy="subscriptions-history" />
@@ -180,7 +183,7 @@ export default {
           align: 'left',
           field: 'createdAt',
           sortable: true,
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
         { name: '_id', field: '_id' },
@@ -196,14 +199,16 @@ export default {
       extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
     };
   },
-  validations: {
-    customer: {
-      payment: {
-        bankAccountOwner: { required },
-        bic: { required, bic },
-        iban: { required, iban },
+  validations () {
+    return {
+      customer: {
+        payment: {
+          bankAccountOwner: { required },
+          bic: { required, bic },
+          iban: { required, iban },
+        },
       },
-    },
+    };
   },
   computed: {
     ...mapState({
@@ -212,17 +217,18 @@ export default {
     }),
     ibanError () {
       if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
-      else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
+      if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
       return '';
     },
     bicError () {
       if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
-      else if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
+      if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
       return '';
     },
     agreement () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy})`;
+        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
+          + `par ${this.acceptedBy})`;
       }
       return '';
     },
@@ -231,19 +237,20 @@ export default {
         return {
           redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
           redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
-        }
+        };
       }
       return {
         redirect: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
         redirectDecline: `${process.env.COMPANI_HOSTNAME}/customers/subscriptions`,
-      }
+      };
     },
     isValidPayment () {
       return this.$v.customer.payment.bic.bic && this.$v.customer.payment.iban.iban;
     },
     docsUploadUrl () {
       return this.customer.driveFolder
-        ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`
+        ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}`
+          + '/upload'
         : '';
     },
   },
@@ -257,6 +264,9 @@ export default {
     }
   },
   methods: {
+    displaySignButton (mandate) {
+      return this.getRowIndex(this.customer.payment.mandates, mandate) === this.customer.payment.mandates.length - 1;
+    },
     documentUploadedForFinancialCertificates () {
       this.refreshCustomer();
     },
@@ -273,7 +283,7 @@ export default {
       } catch (e) {
         console.error(e);
       } finally {
-        this.mandatesLoading = false
+        this.mandatesLoading = false;
       }
     },
     saveTmp (path) {
@@ -301,7 +311,7 @@ export default {
         }
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
@@ -311,7 +321,7 @@ export default {
     async confirmAgreement () {
       try {
         if (this.customer.subscriptionsAccepted) {
-          const subscriptions = this.customer.subscriptions.map(subscription => {
+          const subscriptions = this.customer.subscriptions.map((subscription) => {
             const lastVersion = getLastVersion(subscription.versions, 'createdAt');
             const obj = {
               service: subscription.service.name,
@@ -338,32 +348,35 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la validation de votre abonnement.');
-        this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted
+        this.customer.subscriptionsAccepted = !this.customer.subscriptionsAccepted;
       }
     },
     // Mandate
     async preOpenESignModal (data) {
       try {
         this.$q.loading.show({ message: 'Contact du support de signature en ligne...' });
-        const signatureRequest = await Customers.generateMandateSignatureRequest({ mandateId: data._id, _id: this.customer._id }, {
-          customer: {
-            name: this.customer.identity.lastname,
-            email: this.helper.local.email,
-          },
-          fileId: this.helper.company.customersConfig.templates.debitMandate.driveId,
-          fields: {
-            bankAccountOwner: this.customer.payment.bankAccountOwner || '',
-            customerAddress: this.customer.contact.primaryAddress.fullAddress || '',
-            ics: this.helper.company.ics || '',
-            rum: data.rum || '',
-            bic: this.customer.payment.bic || '',
-            iban: this.customer.payment.iban || '',
-            companyName: this.helper.company.name || '',
-            companyAddress: this.helper.company.address.fullAddress || '',
-            downloadDate: this.$moment().format('DD/MM/YYYY'),
-          },
-          ...this.esignRedirection,
-        });
+        const signatureRequest = await Customers.generateMandateSignatureRequest(
+          { mandateId: data._id, _id: this.customer._id },
+          {
+            customer: {
+              name: this.customer.identity.lastname,
+              email: this.helper.local.email,
+            },
+            fileId: this.helper.company.customersConfig.templates.debitMandate.driveId,
+            fields: {
+              bankAccountOwner: this.customer.payment.bankAccountOwner || '',
+              customerAddress: this.customer.contact.primaryAddress.fullAddress || '',
+              ics: this.helper.company.ics || '',
+              rum: data.rum || '',
+              bic: this.customer.payment.bic || '',
+              iban: this.customer.payment.iban || '',
+              companyName: this.helper.company.name || '',
+              companyAddress: this.helper.company.address.fullAddress || '',
+              downloadDate: this.$moment().format('DD/MM/YYYY'),
+            },
+            ...this.esignRedirection,
+          }
+        );
         await this.refreshCustomer();
         this.embeddedUrl = signatureRequest.embeddedUrl;
         if (this.$q.platform.is.mobile) {
@@ -431,7 +444,7 @@ export default {
       this.cgs = null;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

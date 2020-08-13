@@ -53,7 +53,7 @@ export default {
   filters: {
     formatIdentity,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

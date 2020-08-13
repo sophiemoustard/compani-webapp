@@ -69,7 +69,7 @@ export default {
     },
     formatHours,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

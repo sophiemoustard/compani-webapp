@@ -2,13 +2,13 @@
   <div v-if="program">
     <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
       <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
-      <ni-input v-model.trim="program.subPrograms[index].name"  required-field caption="Nom" @focus="saveTmpName(index)"
+      <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
       <q-card v-for="(step, index) of subProgram.steps" :key="index" flat class="step">
         <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
           <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
           <q-item-section>
-            <div class="text-weight-bold">{{step.name}}</div>
+            <div class="text-weight-bold">{{ step.name }}</div>
             <div class="step-subtitle">
               {{ getStepTypeLabel(step.type) }} -
               {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
@@ -111,7 +111,7 @@
 import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
-import get from 'lodash/get'
+import get from 'lodash/get';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
@@ -162,7 +162,7 @@ export default {
         { label: 'Vidéo', value: VIDEO },
       ],
       formatQuantity,
-    }
+    };
   },
   validations () {
     return {
@@ -172,7 +172,7 @@ export default {
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
       editedActivity: { name: { required } },
-    }
+    };
   },
   computed: {
     ...mapState('program', ['program']),
@@ -220,7 +220,7 @@ export default {
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification du sous-programme.');
       } finally {
         this.tmpInput = null;
@@ -340,7 +340,7 @@ export default {
         NotifyPositive('Activité modifiée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la modification de l'activité.");
+        NotifyNegative('Erreur lors de la modification de l\'activité.');
       } finally {
         this.modalLoading = false;
       }
@@ -350,7 +350,7 @@ export default {
       this.$v.editedActivity.$reset();
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

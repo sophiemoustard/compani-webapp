@@ -53,19 +53,19 @@ export const companyMixin = {
     },
     ibanError () {
       if (!this.$v.company.iban.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.iban.iban) return 'IBAN non valide';
+      if (!this.$v.company.iban.iban) return 'IBAN non valide';
 
       return '';
     },
     bicError () {
       if (!this.$v.company.bic.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.bic.bic) return 'BIC non valide';
+      if (!this.$v.company.bic.bic) return 'BIC non valide';
 
       return '';
     },
     rcsError () {
       if (!this.$v.company.rcs.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.rcs.maxLength || !this.$v.company.rcs.minLength) {
+      if (!this.$v.company.rcs.maxLength || !this.$v.company.rcs.minLength) {
         return 'Doit contenir 9 caractères (espaces inclus).';
       }
 

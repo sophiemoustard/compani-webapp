@@ -14,7 +14,7 @@ export const payMixin = {
           label: 'Auxiliaire',
           align: 'left',
           field: 'auxiliary',
-          format: value => value ? formatIdentity(value.identity, 'LF') : '',
+          format: value => (value ? formatIdentity(value.identity, 'LF') : ''),
           sort: (a, b) => formatIdentity(a.identity, 'LF').localeCompare(formatIdentity(b.identity, 'LF')),
         },
         {
@@ -22,7 +22,7 @@ export const payMixin = {
           label: 'Équipe',
           align: 'left',
           field: 'auxiliary',
-          format: value => value && value.sector ? value.sector.name : '',
+          format: value => (value && value.sector ? value.sector.name : ''),
           sort: (a, b) => get(a, 'sector.name', '').localeCompare(get(b, 'sector.name', '')),
         },
         {
@@ -30,7 +30,7 @@ export const payMixin = {
           label: 'Début',
           align: 'left',
           field: 'startDate',
-          format: value => value ? this.$moment(value).format('DD/MM') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
           sort: (a, b) => new Date(a) - new Date(b),
         },
         {
@@ -38,7 +38,7 @@ export const payMixin = {
           label: 'Date de notif',
           align: 'left',
           field: 'endNotificationDate',
-          format: value => value ? this.$moment(value).format('DD/MM') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
         },
         {
           name: 'endReason',
@@ -55,7 +55,7 @@ export const payMixin = {
           label: 'Fin',
           align: 'left',
           field: 'endDate',
-          format: value => value ? this.$moment(value).format('DD/MM') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
         },
         {
           name: 'contractHours',
@@ -153,8 +153,8 @@ export const payMixin = {
           label: 'Mutuelle',
           align: 'center',
           field: 'mutual',
-          format: value => value ? 'Oui' : 'Non',
-          sort: (a, b) => a === b ? 0 : a ? -1 : 1,
+          format: value => (value ? 'Oui' : 'Non'),
+          sort: (a, b) => (a === b ? 0 : a ? -1 : 1),
         },
         {
           name: 'transport',

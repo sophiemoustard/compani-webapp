@@ -25,7 +25,7 @@ export default {
     return {
       interfaceType,
       backgroundClass: interfaceType === CLIENT ? 'grey-background' : 'beige-background',
-    }
+    };
   },
   computed: {
     vendorRole () {
@@ -43,7 +43,7 @@ export default {
       this.$router.push({ name, params: { courseId: course._id } });
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>
@@ -59,3 +59,8 @@ export default {
   @media screen and (max-width: 767px)
     min-width: 250px
 </style>
+;;
++;+
+++ +
++
++;

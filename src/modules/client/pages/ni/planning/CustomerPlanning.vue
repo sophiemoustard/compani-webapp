@@ -1,17 +1,17 @@
 <template>
   <q-page class="client-background">
-    <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
+    <ni-planning-manager :events="events" :persons="customers" :person-key="personKey" :can-edit="canEditEvent"
       @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
       @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent"  :newEvent.sync="newEvent" :personKey="personKey"
-      :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
+    <ni-event-creation-modal :validations="$v.newEvent" :new-event.sync="newEvent" :person-key="personKey"
+      :creation-modal="creationModal" :active-auxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
       @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
-      :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers" :personKey="personKey"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+      :edition-modal="editionModal" :active-auxiliaries="activeAuxiliaries" :customers="customers" :person-key="personKey"
       @resetForm="resetEditionForm" @updateEvent="updateEvent" @close="closeEditionModal"
       @deleteEventRepetition="validationDeletionEventRepetition" @deleteEvent="validateEventDeletion" />
   </q-page>
@@ -136,7 +136,7 @@ export default {
       try {
         this.sectorCustomers = await this.getSectorCustomers(this.filteredSectors);
       } catch (e) {
-        this.sectorCustomers = []
+        this.sectorCustomers = [];
       }
 
       for (let i = 0, l = this.sectorCustomers.length; i < l; i++) {
@@ -235,5 +235,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

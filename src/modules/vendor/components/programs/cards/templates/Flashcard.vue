@@ -17,5 +17,5 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin],
-}
+};
 </script>

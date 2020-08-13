@@ -2,8 +2,7 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Bénéficiaires" @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
-      @goTo="goToCustomerProfile">
-    </ni-table-list>
+      @goTo="goToCustomerProfile" />
   </q-page>
 </template>
 
@@ -37,17 +36,17 @@ export default {
           name: 'name',
           label: 'Nom',
           field: 'identity',
-          format: value => value ? value.fullName : '',
+          format: value => (value ? value.fullName : ''),
           align: 'left',
           sortable: true,
           sort: (a, b) => {
             const aLastname = a.lastname;
             const bLastname = b.lastname;
-            return aLastname.toLowerCase() < bLastname.toLowerCase() ? -1 : 1
+            return aLastname.toLowerCase() < bLastname.toLowerCase() ? -1 : 1;
           },
         },
       ],
-    }
+    };
   },
   async mounted () {
     await this.getCustomersList();
@@ -79,5 +78,5 @@ export default {
       this.$router.push({ name: 'auxiliaries customers info', params: { customerId: row.customerId } });
     },
   },
-}
+};
 </script>

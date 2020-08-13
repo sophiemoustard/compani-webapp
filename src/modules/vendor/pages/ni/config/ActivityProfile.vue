@@ -138,7 +138,7 @@ export default {
       this.$store.dispatch('program/resetProgram');
     }
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

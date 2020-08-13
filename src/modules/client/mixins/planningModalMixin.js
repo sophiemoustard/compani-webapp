@@ -158,10 +158,8 @@ export const planningModalMixin = {
     hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
-      return auxiliary.contracts.some((contract) => {
-        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
-      });
+      return auxiliary.contracts.some(contract => this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate)));
     },
     customerAddressList (event) {
       const addresses = [];

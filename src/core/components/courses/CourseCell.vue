@@ -75,7 +75,7 @@ export default {
       const infos = [
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
-      ]
+      ];
 
       return infos;
     },
@@ -133,7 +133,7 @@ export default {
           : 'Dernière date aujourd’hui';
       }
 
-      const nextSlot = this.course.slots.filter((daySlots) => !this.happened(daySlots))[0];
+      const nextSlot = this.course.slots.filter(daySlots => !this.happened(daySlots))[0];
       if (!nextSlot) return 'Prochaine date à planifier';
       const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
@@ -145,7 +145,7 @@ export default {
   methods: {
     get,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

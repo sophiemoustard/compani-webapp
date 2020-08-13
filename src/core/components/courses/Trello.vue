@@ -23,10 +23,10 @@ export default {
         { title: 'À venir', courses: this.courseListForthcoming },
         { title: 'En cours', courses: this.courseListInProgress },
         { title: 'Terminées', courses: this.courseListCompleted },
-      ]
+      ];
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

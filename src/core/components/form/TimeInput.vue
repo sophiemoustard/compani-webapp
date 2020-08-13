@@ -32,7 +32,7 @@ export default {
   data () {
     return {
       selectTime: false,
-    }
+    };
   },
   props: {
     value: { type: String, default: '' },
@@ -81,7 +81,7 @@ export default {
       this.$emit('blur');
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

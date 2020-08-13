@@ -70,12 +70,12 @@ export const contractMixin = {
   methods: {
     grossHourlyRateError (validationObj) {
       if (get(validationObj, 'grossHourlyRate.required', null) === false) return REQUIRED_LABEL;
-      else if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
+      if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
       return '';
     },
     weeklyHoursError (validationObj) {
       if (get(validationObj, 'weeklyHours.required', null) === false) return REQUIRED_LABEL;
-      else if (get(validationObj, 'weeklyHours.minValue', null) === false) {
+      if (get(validationObj, 'weeklyHours.minValue', null) === false) {
         return 'Volume horaire hebdomadaire non valide';
       }
       return '';
@@ -91,7 +91,7 @@ export const contractMixin = {
         templateId: template.driveId,
         meta: { auxiliaryDriveId: this.auxiliary.administrative.driveFolder.driveId },
         fields: generateContractFields(
-          { user: this.auxiliary, contract: contract, initialContractStartDate: this.selectedContract.startDate }
+          { user: this.auxiliary, contract, initialContractStartDate: this.selectedContract.startDate }
         ),
         signers: [
           { id: '1', name: this.userFullName, email: this.auxiliary.local.email },

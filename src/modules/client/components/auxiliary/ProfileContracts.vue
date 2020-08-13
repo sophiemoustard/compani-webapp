@@ -2,7 +2,7 @@
   <div>
     <div class="row">
       <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
-        :personKey="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
+        :person-key="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
         @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
         @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
         @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
@@ -62,10 +62,10 @@
     </ni-modal>
 
     <!-- Edition modal -->
-    <version-edition-modal v-model="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
-      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated"
+    <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
+      :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
       @hide="resetVersionEditionModal" @editVersion="editVersion"
-      :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"/>
+      :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
     <!-- End contract modal -->
     <ni-modal v-model="endContractModal" @hide="resetEndContractModal">
@@ -175,7 +175,7 @@ export default {
       },
       endContractReasons: END_CONTRACT_REASONS,
       contractsLoading: false,
-    }
+    };
   },
   validations () {
     return {
@@ -197,9 +197,9 @@ export default {
         endNotificationDate: { required },
         endDate: { required },
         endReason: { required },
-        otherMisc: { required: requiredIf((item) => item.endReason === OTHER) },
+        otherMisc: { required: requiredIf(item => item.endReason === OTHER) },
       },
-    }
+    };
   },
   computed: {
     inProgressContract () {
@@ -212,7 +212,8 @@ export default {
       const userMissingInfo = this.auxiliary.contractCreationMissingInfo;
       if (userMissingInfo.length === 1) {
         const missingInfo = CONTRACT_CREATION_MANDATORY_INFO[userMissingInfo[0]];
-        return `Il manque l'information suivante dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfo}.`;
+        return 'Il manque l\'information suivante dans la fiche de l\'auxiliaire pour créer un nouveau contrat :'
+          + `${missingInfo}.`;
       }
 
       const missingInfoList = [];
@@ -220,7 +221,8 @@ export default {
         missingInfoList.push([CONTRACT_CREATION_MANDATORY_INFO[info]]);
       }
 
-      return `Il manque les informations suivantes dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfoList.join(', ')}.`;
+      return 'Il manque les informations suivantes dans la fiche de l\'auxiliaire pour créer un nouveau contrat : '
+        + `${missingInfoList.join(', ')}.`;
     },
     contractMinStartDate () {
       if (this.contracts.length === 0) return '';
@@ -278,7 +280,7 @@ export default {
           this.contracts[i].versions = this.contracts[i].versions.map((version, index) => {
             if (index !== this.contracts[i].versions.length - 1) return { ...version, canBeDeleted: false };
             return { ...version, canBeDeleted: index !== 0 || events[i].length === 0 };
-          })
+          });
         }
       } catch (e) {
         this.contracts = [];
@@ -425,7 +427,7 @@ export default {
     // End contract
     async openEndContractModal (contract) {
       this.endContract.contract = contract;
-      this.endContractModal = true
+      this.endContractModal = true;
     },
     resetEndContractModal () {
       this.endContractModal = false;

@@ -92,7 +92,7 @@ export default {
     occupationLevel () {
       if (this.workingStats.hoursToWork !== 0 && this.workingStats.workedHours < this.workingStats.hoursToWork) {
         return LOW;
-      } else if (this.workingStats.workedHours < MAX_WEEKLY_OCCUPATION_LEVEL) {
+      } if (this.workingStats.workedHours < MAX_WEEKLY_OCCUPATION_LEVEL) {
         return HIGH;
       }
       return EXTREME;
@@ -109,12 +109,10 @@ export default {
     hasContractOnEvent () {
       if (!this.person.contracts || this.person.contracts.length === 0) return false;
 
-      return this.person.contracts.some(contract => {
-        return (this.$moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
+      return this.person.contracts.some(contract => (this.$moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
           (!contract.endDate || this.$moment(contract.endDate).isAfter(this.endOfWeek))) ||
           (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.startOfWeek)));
-      });
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.startOfWeek))));
     },
   },
   methods: {
@@ -141,7 +139,7 @@ export default {
     async getPrevMonthDetails () {
       const month = this.$moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
       try {
-        this.prevMonthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month })
+        this.prevMonthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
         const prevMonthCustomersDetails = await Stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
         this.prevMonthCustomersDetails = prevMonthCustomersDetails[0];
       } catch (e) {
@@ -153,7 +151,7 @@ export default {
   filters: {
     formatIdentity,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

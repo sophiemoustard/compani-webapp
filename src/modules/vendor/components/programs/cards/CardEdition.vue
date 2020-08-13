@@ -20,7 +20,7 @@ import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD } from 
 import Transition from 'src/modules/vendor/components/programs/cards/templates/Transition';
 import TitleTextMedia from 'src/modules/vendor/components/programs/cards/templates/TitleTextMedia';
 import TitleText from 'src/modules/vendor/components/programs/cards/templates/TitleText';
-import TextMedia from 'src/modules/vendor/components/programs/cards/templates/TextMedia'
+import TextMedia from 'src/modules/vendor/components/programs/cards/templates/TextMedia';
 import Flashcard from 'src/modules/vendor/components/programs/cards/templates/Flashcard';
 
 export default {
@@ -44,7 +44,7 @@ export default {
   computed: {
     ...mapState('program', ['card']),
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

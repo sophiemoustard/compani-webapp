@@ -114,7 +114,7 @@ export default {
       cguCompani,
       backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
-    }
+    };
   },
   validations () {
     return {
@@ -132,10 +132,10 @@ export default {
         },
       },
       passwordConfirm: {
-        required: requiredIf((item) => !!item.userProfile.local.password),
-        sameAsPassword: sameAs((item) => item.userProfile.local.password),
+        required: requiredIf(item => !!item.userProfile.local.password),
+        sameAsPassword: sameAs(item => item.userProfile.local.password),
       },
-    }
+    };
   },
   async beforeDestroy () {
     if (this.isLoggingOut) this.$store.dispatch('main/resetMain');
@@ -196,7 +196,7 @@ export default {
       logOutAndRedirectToLogin();
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

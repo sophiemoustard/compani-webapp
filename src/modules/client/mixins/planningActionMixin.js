@@ -135,10 +135,8 @@ export const planningActionMixin = {
     hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
-      return auxiliary.contracts.some((contract) => {
-        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
-      });
+      return auxiliary.contracts.some(contract => this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate)));
     },
     getRowEvents (rowId) {
       const rowEvents = this.events.find(group => group._id === rowId);
@@ -225,11 +223,9 @@ export const planningActionMixin = {
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate, type) {
       return this.getRowEvents(auxiliaryId)
-        .filter((event) => {
-          return (this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
+        .filter(event => (this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')) &&
-            (!type || type === event.type);
-        });
+            (!type || type === event.type));
     },
     async createEvent () {
       try {
@@ -441,7 +437,8 @@ export const planningActionMixin = {
         startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
           .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
         endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-          .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+          .minutes(this.$moment(draggedObject.endDate).minutes())
+          .toISOString(),
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
@@ -462,13 +459,12 @@ export const planningActionMixin = {
 
         if (this.personKey === CUSTOMER && target._id !== draggedObject.customer._id) {
           return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention.');
-        } else {
-          if (target.type === SECTOR && draggedObject.type !== INTERVENTION) {
-            return NotifyNegative('Cette modification n\'est pas autorisée.');
-          }
-          if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
-            return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
-          }
+        }
+        if (target.type === SECTOR && draggedObject.type !== INTERVENTION) {
+          return NotifyNegative('Cette modification n\'est pas autorisée.');
+        }
+        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
+          return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
         }
 
         const payload = this.getDragAndDropPayload(toDay, target, draggedObject);

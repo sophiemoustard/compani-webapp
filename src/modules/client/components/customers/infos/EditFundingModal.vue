@@ -56,7 +56,7 @@ export default {
   },
   data () {
     return {
-    }
+    };
   },
   computed: {
     editedFundingMaxStartDate () {
@@ -76,5 +76,5 @@ export default {
       this.$emit('editFunding');
     },
   },
-}
+};
 </script>

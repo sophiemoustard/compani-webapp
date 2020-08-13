@@ -47,7 +47,7 @@ export default {
         'careHours',
         'customerParticipationRate',
       ],
-    }
+    };
   },
   methods: {
     filterCols (cols) {
@@ -65,7 +65,7 @@ export default {
       return cols;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

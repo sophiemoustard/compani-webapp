@@ -6,9 +6,12 @@
         <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions" v-model="selectedProgram" />
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
+          v-model="selectedProgram" />
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
+      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
+        <span>Effacer les filtres</span>
+      </div>
     </div>
     <ni-trello :courses="coursesFiltered" />
   </q-page>
@@ -34,7 +37,7 @@ export default {
   data () {
     return {
       coursesWithGroupedSlot: [],
-    }
+    };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
@@ -53,5 +56,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

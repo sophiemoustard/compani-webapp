@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background">
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity" />
-      <profile-tabs :profile-id="trainerId" :tabsContent="tabsContent" />
+      <profile-tabs :profile-id="trainerId" :tabs-content="tabsContent" />
     </div>
   </q-page>
 </template>
@@ -39,17 +39,19 @@ export default {
           notification: 'profiles',
         },
       ],
-    }
+    };
   },
   async created () {
-    if (this.vendorRole !== TRAINER) await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.trainerId });
+    if (this.vendorRole !== TRAINER) {
+      await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.trainerId });
+    }
     this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
   },
   computed: {
     ...mapState({
-      userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
+      userProfile: state => (TRAINER === get(state.main.loggedUser, 'role.vendor.name')
         ? state.main.loggedUser
-        : state.userProfile.userProfile,
+        : state.userProfile.userProfile),
     }),
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
   },
@@ -62,5 +64,5 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
-}
+};
 </script>

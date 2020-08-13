@@ -8,7 +8,7 @@
       </template>
     </ni-title-header>
     <ni-large-table :data="absences" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
-      <template v-slot:body="{ props }" >
+      <template v-slot:body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
             :style="col.style">
@@ -30,8 +30,8 @@
     </ni-large-table>
 
     <!-- Absence edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
-      :editionModal="editionModal" :personKey="personKey" :activeAuxiliaries="activeAuxiliaries"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+      :edition-modal="editionModal" :person-key="personKey" :active-auxiliaries="activeAuxiliaries"
       @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded"
       @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="validateEventDeletion" />
   </q-page>
@@ -85,7 +85,7 @@ export default {
         {
           name: 'nature',
           label: 'Nature',
-          field: row => {
+          field: (row) => {
             const nature = ABSENCE_NATURES.find(abs => abs.value === row.absenceNature);
             return nature ? nature.label : '';
           },
@@ -131,7 +131,7 @@ export default {
         {
           name: 'type',
           label: 'Type',
-          field: row => {
+          field: (row) => {
             const type = ABSENCE_TYPES.find(abs => abs.value === row.absence);
             return type ? type.label : '';
           },
@@ -166,11 +166,12 @@ export default {
         const range = Array.from(this.$moment().range(absence.startDate, absence.endDate).by('days'));
         let count = 0;
         for (const day of range) {
-          if (day.startOf('d').isBusinessDay()) count += 1; // startOf('day') is necessery to check fr holidays in business day
+          // startOf('day') is necessery to check fr holidays in business day
+          if (day.startOf('d').isBusinessDay()) count += 1;
         }
 
         return `${count}j`;
-      };
+      }
 
       const duration = this.$moment(absence.endDate).diff(absence.startDate, 'm') / 60;
       return formatHours(duration);
@@ -179,7 +180,11 @@ export default {
       try {
         this.tableLoading = true;
         if (this.datesHasError) return;
-        this.absences = await Events.list({ type: ABSENCE, startDate: this.dates.startDate, endDate: this.dates.endDate });
+        this.absences = await Events.list({
+          type: ABSENCE,
+          startDate: this.dates.startDate,
+          endDate: this.dates.endDate,
+        });
       } catch (e) {
         this.absences = [];
         console.error(e);
@@ -195,8 +200,8 @@ export default {
       this.selectedAuxiliary = event.auxiliary ? event.auxiliary : { picture: {}, identity: { lastname: '' } };
       this.formatEditedEvent(event);
 
-      this.editionModal = true
+      this.editionModal = true;
     },
   },
-}
+};
 </script>

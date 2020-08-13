@@ -1,3 +1,7 @@
+// IMAGES
+export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
+  + 'compani_texte_rose_1000.png';
+
 // CUSTOMER
 export const CIVILITY_OPTIONS = [
   { label: 'Monsieur', value: 'mr' },

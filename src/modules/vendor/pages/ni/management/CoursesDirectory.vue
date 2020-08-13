@@ -13,7 +13,9 @@
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
           v-model="selectedProgram" />
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
+      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
+        <span>Effacer les filtres</span>
+      </div>
     </div>
 
     <ni-trello :courses="coursesFiltered" />
@@ -81,16 +83,16 @@ export default {
       courseCreationModal: false,
       coursesWithGroupedSlot: [],
       courseTypes: COURSE_TYPES,
-    }
+    };
   },
   validations () {
     return {
       newCourse: {
         program: { required },
-        company: { required: requiredIf((item) => { return item.type === INTRA; }) },
+        company: { required: requiredIf(item => item.type === INTRA) },
         type: { required },
       },
-    }
+    };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
@@ -149,7 +151,7 @@ export default {
         await Courses.create(pickBy(this.newCourse));
 
         this.courseCreationModal = false;
-        NotifyPositive('Formation créée.')
+        NotifyPositive('Formation créée.');
         await this.refreshCourses();
       } catch (e) {
         console.error(e);
@@ -159,5 +161,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

@@ -16,7 +16,7 @@
             color="secondary" size="1rem" />
         </template>
         <template v-else-if="col.name === 'active'">
-          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }"></div>
+          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }" />
         </template>
         <template v-else>{{ col.value }}</template>
       </template>
@@ -31,7 +31,7 @@
       </template>
       <ni-input in-modal :disable="!firstStep" v-model.trim="newUser.local.email" caption="Email"
         :error="$v.newUser.local.email.$error" @blur="$v.newUser.local.email.$touch" required-field
-        :error-message="emailError($v.newUser)"  />
+        :error-message="emailError($v.newUser)" />
       <template v-if="!firstStep">
         <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
           required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
@@ -51,7 +51,7 @@
               <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
             </div>
             <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
-              :company-id="company._id" :error="$v.newUser.sector.$error" :error-message="REQUIRED_LABEL"/>
+              :company-id="company._id" :error="$v.newUser.sector.$error" :error-message="REQUIRED_LABEL" />
           </div>
         </div>
         <div class="row margin-input last">
@@ -74,7 +74,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import Roles from '@api/Roles';
 import Twilio from '@api/Twilio';
 import Users from '@api/Users';
@@ -167,7 +167,7 @@ export default {
           field: 'startDate',
           align: 'left',
           sortable: true,
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
           style: 'min-width: 110px; width: 15%',
         },
@@ -177,7 +177,7 @@ export default {
           field: 'hiringDate',
           align: 'left',
           sortable: true,
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : null,
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : null),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
           style: 'min-width: 110px; width: 15%',
         },
@@ -199,9 +199,9 @@ export default {
         },
       ],
       REQUIRED_LABEL,
-    }
+    };
   },
-  validations () { return { newUser: this.userValidation } },
+  validations () { return { newUser: this.userValidation }; },
   async created () {
     this.newUser = cloneDeep(this.defaultNewUser);
     await this.getUserList();
@@ -220,7 +220,7 @@ export default {
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
         return REQUIRED_LABEL;
-      } else if (!this.$v.newUser.contact.phone.frPhoneNumber || !this.$v.newUser.contact.phone.maxLength) {
+      } if (!this.$v.newUser.contact.phone.frPhoneNumber || !this.$v.newUser.contact.phone.maxLength) {
         return 'Numéro de téléphone non valide';
       }
       return '';
@@ -295,15 +295,19 @@ export default {
       return payload;
     },
     async sendSMS (user) {
-      if (!this.company.tradeName) return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
+      if (!this.company.tradeName) {
+        return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
+      }
 
       const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
       await Twilio.sendSMS({
         to: `+33${user.contact.phone.substring(1)}`,
-        body: `${this.company.name}. Bienvenue ! :)\nPour pouvoir ` +
-          'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${passwordToken.token} :-)\n` +
-          `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`,
+        body: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
+          + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '
+          + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
+          + `/reset-password/${passwordToken.token} :-)\n`
+          + 'Par la suite pour te connecter suis ce lien: '
+          + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`,
       });
       NotifyPositive('SMS bien envoyé');
     },
@@ -316,8 +320,8 @@ export default {
         'contact.phone',
         'sector',
       ];
-      paths.forEach(path => {
-        const value = get(user, path)
+      paths.forEach((path) => {
+        const value = get(user, path);
         if (value) set(this.newUser, path, value);
       });
       if (!user.company) this.newUser.company = this.company._id;
@@ -338,12 +342,12 @@ export default {
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 
           if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
-            this.fetchedUser = await Users.getById(userExistsInfo.user._id)
+            this.fetchedUser = await Users.getById(userExistsInfo.user._id);
             this.fillNewUser(this.fetchedUser);
           } else {
             const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
             if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
-            else if (userHasClientRole) return NotifyNegative('Email déjà existant.');
+            if (userHasClientRole) return NotifyNegative('Email déjà existant.');
           }
         }
 
@@ -398,5 +402,5 @@ export default {
       return link || DEFAULT_AVATAR;
     },
   },
-}
+};
 </script>

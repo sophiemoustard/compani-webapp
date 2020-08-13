@@ -41,5 +41,5 @@ export default {
     separator: { type: String, default: 'horizontal' },
     loading: { type: Boolean, default: false },
   },
-}
+};
 </script>

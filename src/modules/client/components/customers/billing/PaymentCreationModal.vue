@@ -55,7 +55,7 @@ export default {
   computed: {
     netInclTaxesError () {
       if (!this.validations.netInclTaxes.required) return REQUIRED_LABEL;
-      return 'Montant TTC non valide'
+      return 'Montant TTC non valide';
     },
     creationModalNature () {
       if (!this.newPayment.nature) return '';
@@ -79,7 +79,7 @@ export default {
       this.$emit('createPayment', value);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

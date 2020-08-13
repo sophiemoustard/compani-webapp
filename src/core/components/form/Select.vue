@@ -9,11 +9,10 @@
       :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
       :option-disable="optionDisable" :data-cy="dataCy">
-      <template v-if="value && !disable" v-slot:append>
-        <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
-      </template>
-      <template v-if="icon" v-slot:append>
-        <q-icon :name="icon" class="select-icon pink-icon cursor-pointer" @click="$refs['selectInput'].showPopup()" />
+      <template v-slot:append>
+        <q-icon v-if="value && !disable" name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
+        <q-icon v-if="icon" :name="icon" class="select-icon pink-icon cursor-pointer"
+          @click="$refs['selectInput'].showPopup()" />
       </template>
     </q-select>
   </div>
@@ -80,7 +79,7 @@ export default {
       this.onInput(null);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

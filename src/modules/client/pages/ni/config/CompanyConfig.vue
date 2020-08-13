@@ -6,7 +6,7 @@
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
           <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
-            @blur="updateCompany('name')"  :error="$v.company.name.$error" />
+            @blur="updateCompany('name')" :error="$v.company.name.$error" />
           <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
             @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
             :error-message="tradeNameError($v.company)" />
@@ -36,8 +36,8 @@
       <div class="q-mb-xl" v-if="canUpdateErpConfig">
         <p class="text-weight-bold">Facturation</p>
         <div class="row gutter-profile">
-          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-message="ibanError" v-model.trim="company.iban"
-            @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
+          <ni-input caption="IBAN" :error="$v.company.iban.$error" :error-message="ibanError"
+            v-model.trim="company.iban" @focus="saveTmp('iban')" upper-case @blur="updateCompany('iban')" />
           <ni-input caption="BIC" :error="$v.company.bic.$error" :error-message="bicError" upper-case
             v-model.trim="company.bic" @focus="saveTmp('bic')" @blur="updateCompany('bic')" />
           <ni-input caption="Numéro ICS" v-model="company.ics" @focus="saveTmp('ics')" @blur="updateCompany('ics')"
@@ -106,8 +106,8 @@
         :error-message="establishmentWhsError($v.newEstablishment)" @blur="$v.newEstablishment.workHealthService.$touch"
         required-field />
       <ni-select in-modal caption="Code URSSAF" v-model="newEstablishment.urssafCode" :options="urssafCodes"
-        :error="$v.newEstablishment.urssafCode.$error" :error-message="establishmentUrssafCodeError($v.newEstablishment)"
-        @blur="$v.newEstablishment.urssafCode.$touch" required-field />
+        :error="$v.newEstablishment.urssafCode.$error" @blur="$v.newEstablishment.urssafCode.$touch"
+        :error-message="establishmentUrssafCodeError($v.newEstablishment)" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un établissement" icon-right="add" color="primary"
           :loading="loading" @click="createNewEstablishment" />
@@ -227,14 +227,14 @@ export default {
           label: 'Service de santé du travail',
           align: 'left',
           field: 'workHealthService',
-          format: value => value ? get(workHealthServices.find(whs => whs.value === value), 'label', '') : '',
+          format: value => (value ? get(workHealthServices.find(whs => whs.value === value), 'label', '') : ''),
         },
         {
           name: 'urssafCode',
           label: 'Code URSSAF',
           align: 'left',
           field: 'urssafCode',
-          format: value => value ? get(urssafCodes.find(code => code.value === value), 'label', '') : '',
+          format: value => (value ? get(urssafCodes.find(code => code.value === value), 'label', '') : ''),
         },
         {
           name: 'actions',
@@ -309,7 +309,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.establishments = [];
-        NotifyNegative('Erreur lors de la récupération des établissements.')
+        NotifyNegative('Erreur lors de la récupération des établissements.');
       } finally {
         this.establishmentsLoading = false;
       }
@@ -333,7 +333,9 @@ export default {
         }
 
         this.loading = true;
-        if (this.newEstablishment.phone) this.newEstablishment.phone = formatPhoneForPayload(this.newEstablishment.phone);
+        if (this.newEstablishment.phone) {
+          this.newEstablishment.phone = formatPhoneForPayload(this.newEstablishment.phone);
+        }
 
         await Establishments.create(this.newEstablishment);
         NotifyPositive('Établissement créé.');
@@ -342,7 +344,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        return NotifyNegative("Erreur lors de la création de l'établissement.");
+        return NotifyNegative('Erreur lors de la création de l\'établissement.');
       } finally {
         this.loading = false;
       }
@@ -372,7 +374,9 @@ export default {
 
         this.loading = true;
         const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];
-        if (this.editedEstablishment.phone) this.editedEstablishment.phone = formatPhoneForPayload(this.editedEstablishment.phone);
+        if (this.editedEstablishment.phone) {
+          this.editedEstablishment.phone = formatPhoneForPayload(this.editedEstablishment.phone);
+        }
 
         await Establishments.update(this.editedEstablishment._id, pick(this.editedEstablishment, fields));
 
@@ -382,7 +386,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        return NotifyNegative("Erreur lors de la modification de l'établissement");
+        return NotifyNegative('Erreur lors de la modification de l\'établissement');
       } finally {
         this.loading = false;
       }
@@ -394,7 +398,7 @@ export default {
         NotifyPositive('Établissement supprimé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'établissement.");
+        NotifyNegative('Erreur lors de la suppression de l\'établissement.');
       }
     },
     validateEstablishmentDeletion (sectorId) {
@@ -408,34 +412,34 @@ export default {
     },
     establishmentNameError (validationObj) {
       if (!validationObj.name.required) return REQUIRED_LABEL;
-      else if (!validationObj.name.maxLength) return '32 caractères maximimum';
+      if (!validationObj.name.maxLength) return '32 caractères maximimum';
       return '';
     },
     establishmentSiretError (validationObj) {
       if (!validationObj.siret.required) return REQUIRED_LABEL;
-      else if (!validationObj.siret.validSiret) return 'Siret non valide';
+      if (!validationObj.siret.validSiret) return 'Siret non valide';
       return '';
     },
     establishmentAddressError (validationObj) {
       if (!validationObj.address.required) return REQUIRED_LABEL;
-      else if (!validationObj.address.frAddress) return 'Adresse invalide';
+      if (!validationObj.address.frAddress) return 'Adresse invalide';
       return '';
     },
     establishmentPhoneError (validationObj) {
       if (!validationObj.phone.required) return REQUIRED_LABEL;
-      else if (!validationObj.phone.frPhoneNumber) return 'Numéro de téléphone invalide';
+      if (!validationObj.phone.frPhoneNumber) return 'Numéro de téléphone invalide';
       return '';
     },
     establishmentWhsError (validationObj) {
       if (!validationObj.workHealthService.required) return REQUIRED_LABEL;
-      else if (!validationObj.workHealthService.validWorkHealthService) return 'Service de santé du travail invalide';
+      if (!validationObj.workHealthService.validWorkHealthService) return 'Service de santé du travail invalide';
       return '';
     },
     establishmentUrssafCodeError (validationObj) {
       if (!validationObj.urssafCode.required) return REQUIRED_LABEL;
-      else if (!validationObj.urssafCode.validUrssafCode) return 'Code URSSAF invalide';
+      if (!validationObj.urssafCode.validUrssafCode) return 'Code URSSAF invalide';
       return '';
     },
   },
-}
+};
 </script>

@@ -13,5 +13,5 @@ export default {
     fileName: String,
     blobUrl: String,
   },
-}
+};
 </script>

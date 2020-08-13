@@ -14,10 +14,10 @@
         <i aria-hidden="true" class="q-icon on-right material-icons self-center relative-position">
           add
           <input ref="inputFile" type="file" @input="updateInputFile" class="input-file absolute-full cursor-pointer"
-            @blur="onBlur" >
+            @blur="onBlur">
         </i>
       </div>
-      <div class="file-error" v-if="error">{{errorMessage}}</div>
+      <div class="file-error" v-if="error">{{ errorMessage }}</div>
     </template>
     <template v-else>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
@@ -26,7 +26,7 @@
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
         :class="{ 'borders': inModal }" :data-cy="dataCy">
         <template v-if="icon" v-slot:prepend>
-          <q-icon size="xs" :name="icon" ></q-icon>
+          <q-icon size="xs" :name="icon" />
         </template>
         <template v-if="isPassword" v-slot:append>
           <q-icon :name="isPassword && showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" size="xs"
@@ -69,7 +69,7 @@ export default {
   data () {
     return {
       showPassword: false,
-    }
+    };
   },
   computed: {
     isPassword () {
@@ -105,7 +105,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

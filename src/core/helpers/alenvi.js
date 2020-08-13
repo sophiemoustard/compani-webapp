@@ -3,7 +3,7 @@ import User from '@api/Users';
 import store from 'src/store/index';
 
 export const canNavigate = async () => {
-  const loggedUser = store.state.main.loggedUser;
+  const { loggedUser } = store.state.main;
   if (!loggedUser && !Cookies.get('user_id') && !Cookies.get('refresh_token')) return false;
 
   if (!loggedUser && !Cookies.get('user_id')) {

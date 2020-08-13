@@ -27,7 +27,7 @@ import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import CoachList from '@components/table/CoachList';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { companyMixin } from '@mixins/companyMixin'
+import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     saveTmp (path) {
-      this.tmpInput = get(this.company, path)
+      this.tmpInput = get(this.company, path);
     },
     async refreshCompany () {
       try {
@@ -75,12 +75,12 @@ export default {
         await this.refreshCompany();
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
       }
     },
   },
-}
+};
 </script>

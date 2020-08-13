@@ -9,7 +9,7 @@ export default {
     course: null,
   },
   mutations: {
-    SET_COURSE: (state, data) => { state.course = !data ? data : Object.assign({}, data); },
+    SET_COURSE: (state, data) => { state.course = !data ? data : ({ ...data }); },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {

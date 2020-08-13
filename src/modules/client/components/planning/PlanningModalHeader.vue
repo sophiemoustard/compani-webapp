@@ -39,7 +39,7 @@ export default {
         : get(this.selectedPerson, 'picture.link') || DEFAULT_AVATAR;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

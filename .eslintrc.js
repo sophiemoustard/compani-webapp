@@ -4,7 +4,7 @@ module.exports = {
     parser: 'babel-eslint',
     sourceType: 'module'
   },
-  env: { browser: true},
+  env: { browser: true },
   extends: ['plugin:vue/essential', 'plugin:cypress/recommended', 'standard' ],
   plugins: ['vue', 'cypress'],
   globals: {

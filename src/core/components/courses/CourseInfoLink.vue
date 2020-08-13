@@ -30,8 +30,8 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     courseLink () {
-      return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
-        `trainees/courses/${this.course._id}`;
+      return `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/`
+        + `trainees/courses/${this.course._id}`;
     },
   },
   methods: {
@@ -39,7 +39,7 @@ export default {
       return NotifyPositive('Lien copié !');
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

@@ -23,7 +23,7 @@ export default {
     'ni-file-uploader': FileUploader,
   },
   mixins: [templateMixin],
-}
+};
 </script>
 
 <style lang="stylus" scoped>
