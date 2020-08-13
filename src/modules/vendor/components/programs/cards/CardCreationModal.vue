@@ -40,24 +40,22 @@
           <template v-else-if="template.value === MULTIPLE_CHOICE_QUESTION">
             <div class="q-mb-sm">QCU</div>
             <div class="choices-question">
-              <q-radio dense v-model="radio" val="1" color="grey" disable size="20px" />
-              <q-radio dense v-model="radio" val="2" color="grey" disable size="20px" />
-              <q-radio dense v-model="radio" val="3" color="grey" disable size="20px" />
+              <q-icon name="radio_button_unchecked" size="16px" />
+              <q-icon name="radio_button_checked" size="16px" />
+              <q-icon name="radio_button_unchecked" size="16px" />
             </div>
           </template>
           <template v-else-if="template.value === SINGLE_CHOICE_QUESTION">
             <div class="q-mb-sm">QCM</div>
             <div class="choices-question">
-              <q-checkbox dense :value="false" color="grey" disable size="20px" />
-              <q-checkbox dense :value="true" color="grey" disable size="20px" />
-              <q-checkbox dense :value="true" color="grey" disable size="20px" />
+              <q-icon name="check_box_outline_blank" size="16px" />
+              <q-icon name="check_box" size="16px" />
+              <q-icon name="check_box" size="16px" />
             </div>
           </template>
           <template v-else-if="template.value === ORDER_THE_SEQUENCE">
             <div class="q-mb-sm order-the-sequence">Mettre dans l'ordre</div>
-            <div class="fill-the-gaps">1</div>
-            <div class="fill-the-gaps">2</div>
-            <div class="fill-the-gaps">3</div>
+            <q-icon name="fa fa-list-ol" size="20px" />
           </template>
         </div>
       </div>
