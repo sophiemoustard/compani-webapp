@@ -1,6 +1,6 @@
 <template>
   <div v-if="program">
-    <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl" :key="index">
+    <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
       <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
       <ni-input v-model.trim="program.subPrograms[index].name"  required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
@@ -29,8 +29,8 @@
             @click="openActivityCreationModal(step._id)" />
         </div>
       </q-card>
-        <q-btn class="q-my-sm float-right" flat no-caps color="primary" icon="add" label="Ajouter une étape"
-          @click="stepCreationModal = true" />
+      <q-btn class="q-my-sm add-step-button" flat no-caps color="primary" icon="add" label="Ajouter une étape"
+        @click="stepCreationModal = true" />
     </div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
@@ -111,7 +111,7 @@
 import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
-import has from 'lodash/has'
+import get from 'lodash/get'
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
@@ -137,7 +137,7 @@ export default {
   },
   data () {
     return {
-      tmpInputSubProgramName: '',
+      tmpInput: '',
       modalLoading: false,
       subProgramCreationModal: false,
       newSubProgram: { name: '' },
@@ -182,7 +182,7 @@ export default {
   },
   methods: {
     saveTmpName (index) {
-      this.tmpInputName = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
+      this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
     },
     getStepTypeLabel (value) {
       const type = this.stepTypeOptions.find(type => type.value === value);
@@ -207,22 +207,21 @@ export default {
     },
     async updateSubProgramName (index) {
       try {
-        const subProgram = this.program.subPrograms[index];
-        if (!subProgram || !has(subProgram, ['_id'])) throw new Error();
+        const subProgramName = get(this.program.subPrograms[index], 'name');
+        const subProgramId = get(this.program.subPrograms[index], '_id');
 
-        if (this.tmpInputName === subProgram.name) return;
+        if (this.tmpInput === subProgramName) return;
         this.$v.program.$touch();
         if (this.$v.program.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = { name: subProgram.name };
-        await SubPrograms.update(subProgram._id, payload);
+        await SubPrograms.update(subProgramId, { name: subProgramName });
         NotifyPositive('Modification enregistrée.');
 
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
         if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
-        NotifyNegative('Erreur lors de la modification.');
+        NotifyNegative('Erreur lors de la modification du sous-programme.');
       } finally {
         this.tmpInput = null;
       }
@@ -355,6 +354,11 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
+.sub-program-container
+  display: flex
+  flex-direction: column
+
 .step
   margin-bottom: 10px
   border-radius: 0
@@ -362,6 +366,9 @@ export default {
     justify-content: space-between
   &-subtitle
     font-size: 13px
+
+.add-step-button
+  align-self: flex-end
 
 .activity-container
   display: flex
