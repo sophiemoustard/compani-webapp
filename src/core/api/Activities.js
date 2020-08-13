@@ -9,6 +9,6 @@ export default {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/activities/${activityId}`, payload);
   },
   async addCard (activityId, payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/activities/${activityId}/card`, payload);
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/activities/${activityId}/cards`, payload);
   },
 }
