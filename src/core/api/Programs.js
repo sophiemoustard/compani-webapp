@@ -15,7 +15,10 @@ export default {
   async update (programId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/programs/${programId}`, payload);
   },
+  async addSubProgram (programId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/subprograms`, payload);
+  },
   async addStep (programId, payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/step`, payload);
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/steps`, payload);
   },
 };
