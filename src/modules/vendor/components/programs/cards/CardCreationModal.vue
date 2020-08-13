@@ -5,7 +5,7 @@
     </template>
     <h6 class="text-weight-bold">Cours</h6>
     <div class="row q-mb-lg button-container">
-      <div v-for="template in COURSE_TEMPLATE_TYPES" :key="template.value" @click="selectTemplate(template.value)"
+      <div v-for="template in lessonTemplates" :key="template.value" @click="selectTemplate(template.value)"
         :class="getClass(template.value)">
         <div class="text-weight-bold card-button-content">
           <template v-if="template.value === TITLE_TEXT_MEDIA">
@@ -30,7 +30,7 @@
     </div>
     <h6 class="text-weight-bold">Quiz</h6>
     <div class="row q-mb-lg button-container">
-      <div v-for="template in QUIZ_TEMPLATE_TYPES" :key="template.value" @click="selectTemplate(template.value)"
+      <div v-for="template in quizTemplates" :key="template.value" @click="selectTemplate(template.value)"
         :class="getClass(template.value)">
         <div class="text-weight-bold card-button-content">
           <template v-if="template.value === FILL_THE_GAPS">
@@ -71,8 +71,7 @@
 
 <script>
 import {
-  COURSE_TEMPLATE_TYPES,
-  QUIZ_TEMPLATE_TYPES,
+  CARD_TEMPLATES,
   TITLE_TEXT_MEDIA,
   TEXT_MEDIA,
   FLASHCARD,
@@ -80,6 +79,8 @@ import {
   MULTIPLE_CHOICE_QUESTION,
   SINGLE_CHOICE_QUESTION,
   ORDER_THE_SEQUENCE,
+  LESSON,
+  QUIZ,
 } from '@data/constants';
 import Modal from '@components/modal/Modal';
 
@@ -96,8 +97,7 @@ export default {
   data () {
     return {
       radio: '2',
-      COURSE_TEMPLATE_TYPES,
-      QUIZ_TEMPLATE_TYPES,
+      CARD_TEMPLATES,
       TITLE_TEXT_MEDIA,
       TEXT_MEDIA,
       FLASHCARD,
@@ -106,6 +106,14 @@ export default {
       SINGLE_CHOICE_QUESTION,
       ORDER_THE_SEQUENCE,
     }
+  },
+  computed: {
+    lessonTemplates () {
+      return CARD_TEMPLATES.filter(t => t.type === LESSON);
+    },
+    quizTemplates () {
+      return CARD_TEMPLATES.filter(t => t.type === QUIZ);
+    },
   },
   methods: {
     getClass (template) {

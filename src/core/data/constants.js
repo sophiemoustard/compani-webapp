@@ -334,20 +334,18 @@ export const FILL_THE_GAPS = 'fill_the_gaps';
 export const MULTIPLE_CHOICE_QUESTION = 'multiple_choice_question';
 export const SINGLE_CHOICE_QUESTION = 'single_choice_question';
 export const ORDER_THE_SEQUENCE = 'order_the_sequence';
-export const COURSE_TEMPLATE_TYPES = [
-  { label: 'Transition', value: TRANSITION },
-  { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA },
-  { label: 'Titre Texte', value: TITLE_TEXT },
-  { label: 'Texte Média', value: TEXT_MEDIA },
-  { label: 'Flashcard', value: FLASHCARD },
+export const CARD_TEMPLATES = [
+  { label: 'Transition', value: TRANSITION, type: 'lesson' },
+  { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA, type: 'lesson' },
+  { label: 'Titre Texte', value: TITLE_TEXT, type: 'lesson' },
+  { label: 'Texte Média', value: TEXT_MEDIA, type: 'lesson' },
+  { label: 'Flashcard', value: FLASHCARD, type: 'lesson' },
+  { label: 'Texte à trou', value: FILL_THE_GAPS, type: 'quiz' },
+  { label: 'QCM', value: MULTIPLE_CHOICE_QUESTION, type: 'quiz' },
+  { label: 'QCU', value: SINGLE_CHOICE_QUESTION, type: 'quiz' },
+  { label: 'Mettre dans l\'ordre', value: ORDER_THE_SEQUENCE, type: 'quiz' },
 ];
-export const QUIZ_TEMPLATE_TYPES = [
-  { label: 'Texte à trou', value: FILL_THE_GAPS },
-  { label: 'QCM', value: MULTIPLE_CHOICE_QUESTION },
-  { label: 'QCU', value: SINGLE_CHOICE_QUESTION },
-  { label: 'Mettre dans l\'ordre', value: ORDER_THE_SEQUENCE },
-];
-export const TEMPLATE_TYPES = [
-  ...COURSE_TEMPLATE_TYPES,
-  ...QUIZ_TEMPLATE_TYPES,
-];
+export const TEMPLATE_TYPES = {
+  [LESSON]: 'Cours',
+  [QUIZ]: 'Quiz',
+};
