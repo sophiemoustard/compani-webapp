@@ -51,8 +51,6 @@
       <template slot="title">
         Éditer une <span class="text-weight-bold">étape</span>
       </template>
-      <ni-option-group inline caption="Type" v-model="editedStep.type" type="radio" :options="stepTypeOptions"
-        required-field disable />
       <ni-input in-modal v-model.trim="editedStep.name" :error="$v.editedStep.name.$error"
         @blur="$v.editedStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
