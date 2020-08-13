@@ -11,7 +11,7 @@ export const courseFiltersMixin = {
       selectedProgram: '',
       selectedTrainer: '',
       selectedCompany: '',
-    }
+    };
   },
   computed: {
     coursesFiltered () {
@@ -89,8 +89,8 @@ export const courseFiltersMixin = {
             ? Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')))
             : [],
           slotsToPlan: course.slotsToPlan || [],
-        }
+        };
       });
     },
   },
-}
+};

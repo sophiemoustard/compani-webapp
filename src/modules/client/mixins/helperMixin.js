@@ -36,21 +36,21 @@ export const helperMixin = {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: (value) => formatPhone(value),
+          format: value => formatPhone(value),
         },
         {
           name: 'startDate',
           label: 'Depuis le...',
           field: 'createdAt',
           align: 'left',
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       helpersPagination: { rowsPerPage: 0 },
       helpersLoading: false,
-    }
+    };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
@@ -161,7 +161,7 @@ export const helperMixin = {
           await Users.updateById(user._id, payload);
           NotifyPositive('Aidant créé');
 
-          this.getUserHelpers()
+          this.getUserHelpers();
           this.openNewHelperModal = false;
         } else {
           this.firstStep = false;
@@ -180,7 +180,7 @@ export const helperMixin = {
         if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         if (get(this.editedHelper, 'contact.phone')) {
-          this.editedHelper.contact.phone = formatPhoneForPayload(this.editedHelper.contact.phone)
+          this.editedHelper.contact.phone = formatPhoneForPayload(this.editedHelper.contact.phone);
         }
         const payload = Object.assign({}, omit(this.editedHelper, ['_id']));
         delete payload.local;
@@ -188,7 +188,7 @@ export const helperMixin = {
         NotifyPositive('Aidant modifié');
 
         await this.getUserHelpers();
-        this.openEditedHelperModal = false
+        this.openEditedHelperModal = false;
       } catch (e) {
         NotifyNegative('Erreur lors de la modification de l\'aidant.');
       } finally {
@@ -210,7 +210,7 @@ export const helperMixin = {
         NotifyPositive('Aidant supprimé');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'aidant.");
+        NotifyNegative('Erreur lors de la suppression de l\'aidant.');
       }
     },
     validateHelperDeletion (helperId) {

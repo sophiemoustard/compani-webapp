@@ -31,8 +31,8 @@ export const logInMixin = {
       if (!this.loggedUser) throw new Error('Error on login');
 
       if (this.$route.query.from) return this.$router.replace({ path: this.$route.query.from });
-      if (this.vendorRole && !this.clientRole) return this.$router.replace('/ad').catch(e => {});
-      return this.$router.replace('/').catch(e => {});
+      if (this.vendorRole && !this.clientRole) return this.$router.replace('/ad').catch((e) => {});
+      return this.$router.replace('/').catch((e) => {});
     },
   },
-}
+};

@@ -1,6 +1,6 @@
 import { Notify } from 'quasar';
 
-export const NotifyPositive = (message) => Notify.create({
+export const NotifyPositive = message => Notify.create({
   color: 'positive',
   icon: 'thumb_up',
   message,
@@ -8,7 +8,7 @@ export const NotifyPositive = (message) => Notify.create({
   timeout: 2500,
 });
 
-export const NotifyWarning = (message) => Notify.create({
+export const NotifyWarning = message => Notify.create({
   color: 'warning',
   icon: 'warning',
   message,
@@ -16,7 +16,7 @@ export const NotifyWarning = (message) => Notify.create({
   timeout: 2500,
 });
 
-export const NotifyNegative = (message) => Notify.create({
+export const NotifyNegative = message => Notify.create({
   color: 'negative',
   icon: 'warning',
   message,

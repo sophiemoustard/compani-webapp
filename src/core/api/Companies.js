@@ -1,4 +1,4 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async updateById (id, data) {
@@ -21,4 +21,4 @@ export default {
     const company = await alenviAxios.get(`${process.env.API_HOSTNAME}/companies/${id}`);
     return company.data.data.company;
   },
-}
+};

@@ -4,4 +4,4 @@ export const tableMixin = {
       return data.indexOf(rowObj);
     },
   },
-}
+};

@@ -6,7 +6,10 @@ export default {
     return draftPay.data.data.draftPay;
   },
   async getHoursBalanceDetail (params = null) {
-    const hoursBalanceDetail = await alenviAxios.get(`${process.env.API_HOSTNAME}/pay/hours-balance-details`, { params });
+    const hoursBalanceDetail = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/pay/hours-balance-details`,
+      { params }
+    );
     return hoursBalanceDetail.data.data.hoursBalanceDetail;
   },
   async createList (payload) {
@@ -16,4 +19,4 @@ export default {
     const hoursToWork = await alenviAxios.get(`${process.env.API_HOSTNAME}/pay/hours-to-work`, { params });
     return hoursToWork.data.data.hoursToWork;
   },
-}
+};

@@ -1,4 +1,4 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async create (data) {
@@ -16,4 +16,4 @@ export default {
     const thirdPartyPayer = await alenviAxios.put(`${process.env.API_HOSTNAME}/thirdpartypayers/${id}`, payload);
     return thirdPartyPayer.data.data.thirdPartyPayer;
   },
-}
+};

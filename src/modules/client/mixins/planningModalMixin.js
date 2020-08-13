@@ -104,7 +104,10 @@ export const planningModalMixin = {
     },
     customersOptions () {
       if (this.customers.length === 0) return [];
-      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
+      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
+        return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
+      }
+
       if (!this.selectedAuxiliary.contracts) return [];
 
       return this.customers.map(cus => this.formatPersonOptions(cus));
@@ -155,7 +158,7 @@ export const planningModalMixin = {
     hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
-      return auxiliary.contracts.some(contract => {
+      return auxiliary.contracts.some((contract) => {
         return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
           (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
       });

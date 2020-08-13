@@ -1,11 +1,11 @@
-import { minLength } from 'vuelidate/lib/validators'
-import { REQUIRED_LABEL } from '@data/constants'
+import { minLength } from 'vuelidate/lib/validators';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export const passwordMixin = {
   data () {
     return {
       passwordValidation: { minLength: minLength(6) },
-    }
+    };
   },
   computed: {
     passwordConfirmError () {
@@ -21,4 +21,4 @@ export const passwordMixin = {
       return '';
     },
   },
-}
+};

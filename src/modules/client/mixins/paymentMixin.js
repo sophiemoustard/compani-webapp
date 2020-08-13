@@ -16,7 +16,7 @@ export const paymentMixin = {
       DIRECT_DEBIT,
       PAYMENT_OPTIONS,
       newPayment: {},
-    }
+    };
   },
   validations () {
     return {
@@ -38,7 +38,7 @@ export const paymentMixin = {
         year: { required, validYear },
         file: { required, maxSize: file => !!file && file.size < 5000000 },
       },
-    }
+    };
   },
   methods: {
     openPaymentCreationModal (customer, tpp) {
@@ -49,7 +49,7 @@ export const paymentMixin = {
         date: this.$moment().toISOString(),
         netInclTaxes: 0,
         type: '',
-      }
+      };
       if (tpp) {
         this.selectedTpp = { ...tpp };
         this.newPayment.thirdPartyPayer = tpp._id;

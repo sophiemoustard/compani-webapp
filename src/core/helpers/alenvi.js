@@ -37,7 +37,7 @@ export const refreshAlenviCookies = async () => {
 
       return true;
     }
-    const options = { path: '/', sameSite: 'Strict' }
+    const options = { path: '/', sameSite: 'Strict' };
     Cookies.remove('alenvi_token', options);
     Cookies.remove('user_id', options);
     Cookies.remove('alenvi_token_expires_in', options);
@@ -46,7 +46,7 @@ export const refreshAlenviCookies = async () => {
   } catch (e) {
     console.error(e);
     if (e.response.status === 404) {
-      const options = { path: '/', sameSite: 'Strict' }
+      const options = { path: '/', sameSite: 'Strict' };
       Cookies.remove('alenvi_token', options);
       Cookies.remove('refresh_token', options);
       Cookies.remove('user_id', options);

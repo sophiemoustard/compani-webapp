@@ -1,3 +1,4 @@
+/* eslint-disable import/first */
 const ibantools = require('ibantools');
 const axios = require('axios');
 const moment = require('moment');
@@ -36,7 +37,7 @@ export const frAddress = async (value) => {
       limit: 1,
     },
   });
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve(res.data.features.length === 1 && res.data.features[0].properties.score > 0.9);
   });
 };
@@ -60,11 +61,11 @@ export const validHour = (value) => {
 };
 
 export const minDate = (min) => {
-  return (value) => moment(min).isSameOrBefore(value);
+  return value => moment(min).isSameOrBefore(value);
 };
 
 export const maxDate = (max) => {
-  return (value) => moment(max).isSameOrAfter(value);
+  return value => moment(max).isSameOrAfter(value);
 };
 
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);

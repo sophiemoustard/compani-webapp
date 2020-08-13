@@ -11,10 +11,10 @@ export default {
     },
   },
   mutations: {
-    SET_CUSTOMER: (state, data) => { state.customer = !data ? data : Object.assign({}, data) },
+    SET_CUSTOMER: (state, data) => { state.customer = !data ? data : Object.assign({}, data); },
     SET_NOTIFICATION: (state, notification) => {
       if (!notification) {
-        state.notifications = {}
+        state.notifications = {};
         return;
       }
       state.notifications[notification.type] = Object.assign({}, state.notifications[notification.type], {
@@ -47,7 +47,7 @@ export default {
     },
   },
   getters: {
-    getCustomer: (state) => state.customer,
-    getNotifications: (state) => state.notifications,
+    getCustomer: state => state.customer,
+    getNotifications: state => state.notifications,
   },
-}
+};

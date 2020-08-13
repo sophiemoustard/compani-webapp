@@ -39,9 +39,9 @@ export const defineAbilitiesFor = (user) => {
 
     if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('edit', 'Events');
     if (clientRole === AUXILIARY) {
-      can('edit', 'Events', { auxiliaryId: { $eq: _id } })
-      can('edit', 'Events', { sectorId: { $eq: sector } })
+      can('edit', 'Events', { auxiliaryId: { $eq: _id } });
+      can('edit', 'Events', { sectorId: { $eq: sector } });
     }
   }
   return new Ability(rules);
-}
+};

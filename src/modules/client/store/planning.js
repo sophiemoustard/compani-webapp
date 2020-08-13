@@ -1,6 +1,6 @@
-import Sectors from '@api/Sectors'
-import Users from '@api/Users'
-import Customers from '@api/Customers'
+import Sectors from '@api/Sectors';
+import Users from '@api/Users';
+import Customers from '@api/Customers';
 import { formatIdentity } from '@helpers/utils';
 import { AUXILIARY, SECTOR, PERSON, CUSTOMER } from '@data/constants';
 

@@ -194,12 +194,16 @@ export const payMixin = {
         startDate: this.$moment().startOf('M').toISOString(),
         endDate: this.$moment().endOf('M').toISOString(),
       },
-    }
+    };
   },
   methods: {
     formatPayload (payload) {
       return {
-        ...omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'compensationEdition', 'paidKm']),
+        ...omit(
+          payload,
+          ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition',
+            'compensationEdition', 'paidKm']
+        ),
         hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
         auxiliary: payload.auxiliary._id,
       };
@@ -231,7 +235,7 @@ export const payMixin = {
       this.dates = {
         startDate: this.$moment().subtract(offset, 'M').startOf('M').toISOString(),
         endDate: this.$moment().subtract(offset, 'M').endOf('M').toISOString(),
-      }
+      };
     },
     formatNumberForCSV (number) {
       return parseFloat(number).toFixed(2).replace('.', ',');
@@ -292,7 +296,7 @@ export const payMixin = {
         ]);
       }
 
-      return downloadCsv(csvData, `Paie_${moment().format('MM_YYYY')}.csv`)
+      return downloadCsv(csvData, `Paie_${moment().format('MM_YYYY')}.csv`);
     },
   },
 };

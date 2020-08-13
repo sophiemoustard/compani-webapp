@@ -1,5 +1,5 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
-import axios from 'axios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
+import axios from 'axios';
 
 export default {
   async refreshToken (data) {
@@ -93,4 +93,4 @@ export default {
     const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`, data);
     return driveFolder;
   },
-}
+};

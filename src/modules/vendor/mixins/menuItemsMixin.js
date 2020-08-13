@@ -35,7 +35,7 @@ export const menuItemsMixin = {
           ],
         },
       ],
-    }
+    };
   },
   computed: {
     routes () {

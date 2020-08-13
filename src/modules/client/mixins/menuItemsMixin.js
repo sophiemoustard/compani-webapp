@@ -37,12 +37,12 @@ export const menuItemsMixin = {
         administrative: { open: false },
         teams: { open: false },
       },
-    }
+    };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
     clientRole () {
-      return get(this.loggedUser, 'role.client.name')
+      return get(this.loggedUser, 'role.client.name');
     },
     customer () {
       return this.isHelper ? this.$store.getters['customer/getCustomer'] : null;
@@ -75,7 +75,7 @@ export const menuItemsMixin = {
 
       return routes
         .map(r => (this.isHelper ? r : { ...r, children: r.children.filter(c => ability.can('read', c.name)) }))
-        .filter(r => r.children ? r.children.length : ability.can('read', r.name))
+        .filter(r => r.children ? r.children.length : ability.can('read', r.name));
     },
     activeRoutes () {
       if (this.isHelper) return this.customerActiveRoutes;
@@ -94,7 +94,7 @@ export const menuItemsMixin = {
         },
         { name: 'customers documents', icon: 'euro_symbol', label: 'Facturation', condition: true },
         { name: 'customers subscription', icon: 'playlist_add', label: 'Abonnement', condition: true },
-      ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs)
+      ].filter(r => r.condition).map(({ condition, ...keptAttributs }) => keptAttributs);
     },
     coachRoutes () {
       return [
@@ -118,7 +118,7 @@ export const menuItemsMixin = {
           label: 'Beneficiaires',
           children: [
             { name: 'ni customers', icon: 'contacts', label: 'Répertoire bénéficiaires' },
-            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: "Suivi des plans d'aide" },
+            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },
           ],
         }, {
           ref: 'courses',
@@ -180,7 +180,7 @@ export const menuItemsMixin = {
           label: 'Beneficiaires',
           children: [
             { name: 'auxiliaries customers', icon: 'contacts', label: 'Fiches' },
-            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: "Suivi des plans d'aide" },
+            { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },
           ],
         }, {
           ref: 'administrative',

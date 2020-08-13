@@ -36,6 +36,6 @@ export default {
     resetCard: ({ commit }) => { commit('SET_CARD', null); },
   },
   getters: {
-    getCards: (state) => state.activity ? state.activity.cards : [],
+    getCards: state => state.activity ? state.activity.cards : [],
   },
-}
+};

@@ -15,7 +15,7 @@ export default {
     SET_USER_PROFILE: (state, data) => { state.userProfile = !data ? data : Object.assign({}, data); },
     SET_NOTIFICATION: (state, notification) => {
       if (!notification) {
-        state.notifications = {}
+        state.notifications = {};
         return;
       }
       state.notifications[notification.type] = Object.assign({}, state.notifications[notification.type], {
@@ -46,6 +46,6 @@ export default {
     },
   },
   getters: {
-    getUserProfile: (state) => state.userProfile,
+    getUserProfile: state => state.userProfile,
   },
-}
+};
