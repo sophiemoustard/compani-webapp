@@ -38,16 +38,26 @@
             <div class="fill-the-gaps">Ceci est un ____</div>
           </template>
           <template v-else-if="template.value === MULTIPLE_CHOICE_QUESTION">
-            <div class="q-mb-sm">QCM</div>
-            <q-icon name="fas fa-list" size="sm" />
+            <div class="q-mb-sm">QCU</div>
+            <div class="choices-question">
+              <q-radio dense v-model="radio" val="1" color="grey" disable size="20px" />
+              <q-radio dense v-model="radio" val="2" color="grey" disable size="20px" />
+              <q-radio dense v-model="radio" val="3" color="grey" disable size="20px" />
+            </div>
           </template>
           <template v-else-if="template.value === SINGLE_CHOICE_QUESTION">
-            <div class="q-mb-sm">QCU</div>
-            <q-icon name="fas fa-list-ul" size="sm" />
+            <div class="q-mb-sm">QCM</div>
+            <div class="choices-question">
+              <q-checkbox dense :value="false" color="grey" disable size="20px" />
+              <q-checkbox dense :value="true" color="grey" disable size="20px" />
+              <q-checkbox dense :value="true" color="grey" disable size="20px" />
+            </div>
           </template>
           <template v-else-if="template.value === ORDER_THE_SEQUENCE">
             <div class="q-mb-sm order-the-sequence">Mettre dans l'ordre</div>
-            <q-icon name="fas fa-list-ol" size="sm" />
+            <div class="fill-the-gaps">1</div>
+            <div class="fill-the-gaps">2</div>
+            <div class="fill-the-gaps">3</div>
           </template>
         </div>
       </div>
@@ -85,6 +95,7 @@ export default {
   },
   data () {
     return {
+      radio: '2',
       COURSE_TEMPLATE_TYPES,
       QUIZ_TEMPLATE_TYPES,
       TITLE_TEXT_MEDIA,
@@ -141,6 +152,7 @@ h6
     text-align: center
     flex-wrap: wrap
     white-space: pre-line
+
   .flashcard
     justify-content: center
     & > div
@@ -155,6 +167,20 @@ h6
       background-color: $grey
     .flashcard-left
       background-color: $middle-grey
+
   .fill-the-gaps
     font-size: 10px
+    line-height: 10px
+
+  .choices-question
+    display: flex
+    flex-direction: column
+    align-items: center
+    .q-radio
+      padding: 1px
+      opacity: 1 !important
+      cursor: pointer !important
+    .q-checkbox
+      cursor: pointer !important
+      padding: 1px
 </style>
