@@ -51,7 +51,8 @@
       <template slot="title">
         Éditer une <span class="text-weight-bold">étape</span>
       </template>
-      <ni-select in-modal caption="Type" :options="stepTypeOptions" v-model="editedStep.type" disable />
+      <ni-option-group inline caption="Type" v-model="editedStep.type" type="radio" :options="stepTypeOptions"
+        required-field disable />
       <ni-input in-modal v-model.trim="editedStep.name" :error="$v.editedStep.name.$error"
         @blur="$v.editedStep.name.$touch" required-field caption="Nom" />
       <template slot="footer">
@@ -67,7 +68,8 @@
       </template>
       <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
         @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
-      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field />
+      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field
+        :error="$v.newActivity.type.$error" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
           icon-right="add" @click="createActivity" />
@@ -145,7 +147,7 @@ export default {
     return {
       newStep: { name: { required }, type: { required } },
       editedStep: { name: { required } },
-      newActivity: { name: { required } },
+      newActivity: { name: { required }, type: { required } },
       editedActivity: { name: { required } },
     }
   },
