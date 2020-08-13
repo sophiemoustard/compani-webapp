@@ -4,7 +4,7 @@
       Créer une nouvelle <span class="text-weight-bold">carte</span>
     </template>
     <h6 class="text-weight-bold">Cours</h6>
-    <div class="row q-mb-xl button-container">
+    <div class="row q-mb-lg button-container">
       <div v-for="template in COURSE_TEMPLATE_TYPES" :key="template.value" @click="selectTemplate(template.value)"
         :class="getClass(template.value)">
         <div class="text-weight-bold card-button-content">
@@ -29,7 +29,7 @@
       </div>
     </div>
     <h6 class="text-weight-bold">Quiz</h6>
-    <div class="row q-mb-xl button-container">
+    <div class="row q-mb-lg button-container">
       <div v-for="template in QUIZ_TEMPLATE_TYPES" :key="template.value" @click="selectTemplate(template.value)"
         :class="getClass(template.value)">
         <div class="text-weight-bold card-button-content">
@@ -136,7 +136,8 @@ h6
   background-color: $light-grey
   color: $dark-grey
   border-radius: 10px
-  height: 130px
+  font-size: 14px
+  height: 120px
   width: 100px
   @media (max-width: 767px)
     width: 65px
@@ -157,8 +158,8 @@ h6
     justify-content: center
     & > div
       width: 40%
-      height: 42px
-      margin: 8px 3px
+      height: 35px
+      margin: 5px 2px
       border-radius: 3px
       @media (max-width: 767px)
         width: 30%
