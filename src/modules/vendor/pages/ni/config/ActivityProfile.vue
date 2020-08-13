@@ -99,8 +99,8 @@ import {
   ORDER_THE_SEQUENCE,
 } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
-import CardContainer from 'src/modules/vendor/components/programs/CardContainer';
-import CardEdition from 'src/modules/vendor/components/programs/CardEdition';
+import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
+import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 
 export default {
   name: 'ActivityProfile',
