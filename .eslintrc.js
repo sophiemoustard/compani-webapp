@@ -30,6 +30,8 @@ module.exports = {
     'vue/singleline-html-element-content-newline': 0,
     'vue/html-indent': 0,
     'vue/html-closing-bracket-newline': 0,
+    'arrow-parens': [2, 'as-needed', { requireForBlockBody: true }],
+    'eol-last': 2,
     // Un-used AirBnb rules
     'no-param-reassign': 0,
     'import/no-extraneous-dependencies': 0,
@@ -59,6 +61,5 @@ module.exports = {
     ],
     'object-curly-newline': ['error', { consistent: true }],
     'operator-linebreak': ['error', 'before', { overrides: { '&&': 'after', '||': 'after', '=': 'after' } }],
-    'arrow-parens': [2, 'as-needed', { requireForBlockBody: true }],
   }
 }
