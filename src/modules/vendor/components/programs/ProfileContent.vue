@@ -37,73 +37,25 @@
       @click="subProgramCreationModal = true" />
 
     <!-- Sub-program creation modal -->
-    <ni-modal v-model="subProgramCreationModal" @hide="resetSubProgramCreationModal">
-      <template slot="title">
-        Créer un nouveau <span class="text-weight-bold">sous-programme</span>
-      </template>
-      <ni-input in-modal v-model.trim="newSubProgram.name" :error="$v.newSubProgram.name.$error"
-        @blur="$v.newSubProgram.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le sous-programme" color="primary"
-          icon-right="add" @click="createSubProgram" :loading="modalLoading" />
-      </template>
-    </ni-modal>
+    <sub-program-creation-modal v-model="subProgramCreationModal" :newSubProgram="newSubProgram"
+      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" @submit="createSubProgram" />
 
     <!-- Step creation modal -->
-    <ni-modal v-model="stepCreationModal" @hide="resetStepCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">étape</span>
-      </template>
-      <ni-option-group inline caption="Type" v-model="newStep.type" type="radio" :options="stepTypeOptions"
-        required-field />
-      <ni-input in-modal v-model.trim="newStep.name" :error="$v.newStep.name.$error"
-        @blur="$v.newStep.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'étape" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createStep" />
-      </template>
-    </ni-modal>
+    <step-creation-modal v-model="stepCreationModal" :newStep="newStep" :stepTypeOptions="stepTypeOptions"
+      :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" />
 
     <!-- Step edition modal -->
-    <ni-modal v-model="stepEditionModal" @hide="resetStepEditionModal">
-      <template slot="title">
-        Éditer une <span class="text-weight-bold">étape</span>
-      </template>
-      <ni-input in-modal v-model.trim="editedStep.name" :error="$v.editedStep.name.$error"
-        @blur="$v.editedStep.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="modalLoading"
-          icon-right="add" @click="editStep" />
-      </template>
-    </ni-modal>
+    <step-edition-modal v-model="stepEditionModal" :editedStep="editedStep" :validations="$v.editedStep"
+      @hide="resetStepEditionModal" @submit="editStep" />
 
     <!-- Activity creation modal -->
-    <ni-modal v-model="activityCreationModal" @hide="resetActivityCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">activité</span>
-      </template>
-      <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
-        @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
-      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field
-        :error="$v.newActivity.type.$error" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createActivity" />
-      </template>
-    </ni-modal>
+    <activity-creation-modal v-model="activityCreationModal" :newActivity="newActivity" :activityTypeOptions="activityTypeOptions"
+      :validations="$v.newActivity" @hide="resetActivityCreationModal" @submit="createActivity" />
 
     <!-- Activity edition modal -->
-    <ni-modal v-model="activityEditionModal" @hide="resetActivityEditionModal">
-      <template slot="title">
-        Éditer une <span class="text-weight-bold">activité</span>
-      </template>
-      <ni-input in-modal v-model.trim="editedActivity.name" :error="$v.editedActivity.name.$error"
-        @blur="$v.editedActivity.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="modalLoading"
-          icon-right="add" @click="editActivity" />
-      </template>
-    </ni-modal>
+    <activity-edition-modal v-model="activityEditionModal" :editedActivity="editedActivity" :validations="$v.editedActivity"
+      @hide="resetActivityEditionModal" @submit="editActivity" />
+
   </div>
 </template>
 
@@ -118,9 +70,11 @@ import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import { formatQuantity } from '@helpers/utils';
 import Input from '@components/form/Input';
-import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
-import OptionGroup from '@components/form/OptionGroup';
+import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
+import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
+import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
+import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
+import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
 
@@ -131,9 +85,11 @@ export default {
   },
   components: {
     'ni-input': Input,
-    'ni-option-group': OptionGroup,
-    'ni-modal': Modal,
-    'ni-select': Select,
+    'sub-program-creation-modal': SubProgramCreationModal,
+    'step-creation-modal': StepCreationModal,
+    'step-edition-modal': StepEditionModal,
+    'activity-creation-modal': ActivityCreationModal,
+    'activity-edition-modal': ActivityEditionModal,
   },
   data () {
     return {
