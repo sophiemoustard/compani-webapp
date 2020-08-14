@@ -18,7 +18,7 @@
         </q-card-section>
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
           <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
+            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
               <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
               <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
               <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
@@ -30,32 +30,31 @@
         </div>
       </q-card>
       <q-btn class="q-my-sm add-step-button" flat no-caps color="primary" icon="add" label="Ajouter une étape"
-        @click="stepCreationModal = true" />
+        @click="openStepCreationModal(subProgram._id)" />
     </div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
       @click="subProgramCreationModal = true" />
 
     <!-- Sub-program creation modal -->
-    <sub-program-creation-modal v-model="subProgramCreationModal" :newSubProgram="newSubProgram"
+    <sub-program-creation-modal v-model="subProgramCreationModal" :new-sub-program="newSubProgram"
       :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" @submit="createSubProgram" />
 
     <!-- Step creation modal -->
-    <step-creation-modal v-model="stepCreationModal" :newStep="newStep" :stepTypeOptions="stepTypeOptions"
+    <step-creation-modal v-model="stepCreationModal" :new-step="newStep" :step-type-options="stepTypeOptions"
       :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" />
 
     <!-- Step edition modal -->
-    <step-edition-modal v-model="stepEditionModal" :editedStep="editedStep" :validations="$v.editedStep"
+    <step-edition-modal v-model="stepEditionModal" :edited-step="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" />
 
     <!-- Activity creation modal -->
-    <activity-creation-modal v-model="activityCreationModal" :newActivity="newActivity" :activityTypeOptions="activityTypeOptions"
-      :validations="$v.newActivity" @hide="resetActivityCreationModal" @submit="createActivity" />
+    <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
+      :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity" />
 
     <!-- Activity edition modal -->
-    <activity-edition-modal v-model="activityEditionModal" :editedActivity="editedActivity" :validations="$v.editedActivity"
-      @hide="resetActivityEditionModal" @submit="editActivity" />
-
+    <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity"
+      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
   </div>
 </template>
 
@@ -106,6 +105,7 @@ export default {
       activityEditionModal: false,
       editedActivity: { name: '' },
       isActivitiesShown: {},
+      currentSubProgramId: '',
       currentStepId: '',
       stepTypeOptions: [
         { label: 'eLearning', value: E_LEARNING },
@@ -200,15 +200,20 @@ export default {
       }
     },
     resetSubProgramCreationModal () {
+      this.subProgramCreationModal = false;
       this.newSubProgram.name = '';
       this.$v.newSubProgram.$reset();
+    },
+    async openStepCreationModal (subProgramId) {
+      this.stepCreationModal = true;
+      this.currentSubProgramId = subProgramId;
     },
     async createStep () {
       try {
         this.modalLoading = true;
         this.$v.newStep.$touch();
         if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Programs.addStep(this.profileId, this.newStep);
+        await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
         NotifyPositive('Étape créée.');
 
         await this.refreshProgram();
@@ -249,10 +254,15 @@ export default {
       this.editedStep = { name: '' };
       this.$v.editedStep.$reset();
     },
-    goToActivityProfile (step, activity) {
+    goToActivityProfile (subProgram, step, activity) {
       this.$router.push({
         name: 'ni config activity info',
-        params: { programId: this.program._id, stepId: step._id, activityId: activity._id },
+        params: {
+          programId: this.program._id,
+          subProgramId: subProgram._id,
+          stepId: step._id,
+          activityId: activity._id,
+        },
       });
     },
     openActivityCreationModal (stepId) {

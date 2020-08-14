@@ -120,7 +120,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/programs/:programId/step/:stepId/activity/:activityId',
+        path: 'ni/config/programs/:programId/subprogram/:subProgramId/step/:stepId/activity/:activityId',
         name: 'ni config activity info',
         component: () => import('src/modules/vendor/pages/ni/config/ActivityProfile'),
         props: true,
