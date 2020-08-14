@@ -20,8 +20,8 @@ export default {
   name: 'StepEditionModal',
   props: {
     value: { type: Boolean, default: false },
-    editedStep: { type: Object, default: () => {} },
-    validations: { type: Object, default: () => {} },
+    editedStep: { type: Object, default: () => ({}) },
+    validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -36,5 +36,5 @@ export default {
       this.$emit('submit');
     },
   },
-}
+};
 </script>

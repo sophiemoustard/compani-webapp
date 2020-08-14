@@ -20,8 +20,8 @@ export default {
   name: 'SubProgramCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    newSubProgram: { type: Object, default: () => {} },
-    validations: { type: Object, default: () => {} },
+    newSubProgram: { type: Object, default: () => ({}) },
+    validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -36,5 +36,5 @@ export default {
       this.$emit('submit');
     },
   },
-}
+};
 </script>

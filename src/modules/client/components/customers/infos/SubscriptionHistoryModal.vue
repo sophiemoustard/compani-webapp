@@ -2,7 +2,7 @@
   <ni-modal :value="value" @hide="hide">
     <template slot="title">
       Historique de la souscription
-      <span class="text-weight-bold">{{selected.service && selected.service.name}}</span>
+      <span class="text-weight-bold">{{ selected.service && selected.service.name }}</span>
     </template>
     <ni-responsive-table class="q-mb-sm" :data="selected.versions" :columns="subscriptionHistoryColumns"
       :pagination.sync="paginationHistory">
@@ -40,5 +40,5 @@ export default {
       this.$emit('hide');
     },
   },
-}
+};
 </script>

@@ -23,9 +23,9 @@ export default {
   name: 'StepCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    newStep: { type: Object, default: () => {} },
+    newStep: { type: Object, default: () => ({}) },
     stepTypeOptions: { type: Array, default: () => [] },
-    validations: { type: Object, default: () => {} },
+    validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -41,5 +41,5 @@ export default {
       this.$emit('submit');
     },
   },
-}
+};
 </script>

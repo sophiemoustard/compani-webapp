@@ -20,8 +20,8 @@ export default {
   name: 'ActivityEditionModal',
   props: {
     value: { type: Boolean, default: false },
-    editedActivity: { type: Object, default: () => {} },
-    validations: { type: Object, default: () => {} },
+    editedActivity: { type: Object, default: () => ({}) },
+    validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -36,5 +36,5 @@ export default {
       this.$emit('submit');
     },
   },
-}
+};
 </script>

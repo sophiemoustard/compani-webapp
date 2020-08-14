@@ -40,7 +40,7 @@ export default {
   data () {
     return {
       FIXED,
-    }
+    };
   },
   methods: {
     hide () {
@@ -50,5 +50,5 @@ export default {
       this.$emit('updateSubscription');
     },
   },
-}
+};
 </script>

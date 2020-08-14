@@ -38,8 +38,8 @@ import { removeDiacritics } from '@helpers/utils';
 export default {
   name: 'PictureUploader',
   props: {
-    user: { type: Object, default: () => {} },
-    refreshPicture: { type: Function, default: () => {} },
+    user: { type: Object, default: () => ({}) },
+    refreshPicture: { type: Function, default: () => ({}) },
   },
   data () {
     return {

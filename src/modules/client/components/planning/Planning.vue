@@ -139,7 +139,7 @@ export default {
     persons: { type: Array, default: () => [] },
     filteredSectors: { type: Array, default: () => [] },
     personKey: { type: String, default: 'auxiliary' },
-    canEdit: { type: Function, default: () => {} },
+    canEdit: { type: Function, default: () => ({}) },
     displayAllSectors: { type: Boolean, default: false },
     displayHistory: { type: Boolean, default: false },
     eventHistories: { type: Array, default: () => [] },

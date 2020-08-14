@@ -23,9 +23,9 @@ export default {
   name: 'ActivityCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    newActivity: { type: Object, default: () => {} },
+    newActivity: { type: Object, default: () => ({}) },
     activityTypeOptions: { type: Array, default: () => [] },
-    validations: { type: Object, default: () => {} },
+    validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -41,5 +41,5 @@ export default {
       this.$emit('submit');
     },
   },
-}
+};
 </script>
