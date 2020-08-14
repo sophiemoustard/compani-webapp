@@ -17,11 +17,11 @@
 <script>
 import { mapState } from 'vuex';
 import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD } from '@data/constants';
-import Transition from 'src/modules/vendor/components/programs/templates/Transition';
-import TitleTextMedia from 'src/modules/vendor/components/programs/templates/TitleTextMedia';
-import TitleText from 'src/modules/vendor/components/programs/templates/TitleText';
-import TextMedia from 'src/modules/vendor/components/programs/templates/TextMedia'
-import Flashcard from 'src/modules/vendor/components/programs/templates/Flashcard';
+import Transition from 'src/modules/vendor/components/programs/cards/templates/Transition';
+import TitleTextMedia from 'src/modules/vendor/components/programs/cards/templates/TitleTextMedia';
+import TitleText from 'src/modules/vendor/components/programs/cards/templates/TitleText';
+import TextMedia from 'src/modules/vendor/components/programs/cards/templates/TextMedia'
+import Flashcard from 'src/modules/vendor/components/programs/cards/templates/Flashcard';
 
 export default {
   name: 'CardEdition',
