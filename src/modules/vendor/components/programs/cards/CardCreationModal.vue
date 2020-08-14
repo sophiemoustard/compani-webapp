@@ -94,7 +94,6 @@ export default {
   },
   data () {
     return {
-      radio: '2',
       CARD_TEMPLATES,
       TITLE_TEXT_MEDIA,
       TEXT_MEDIA,
@@ -183,11 +182,4 @@ h6
     display: flex
     flex-direction: column
     align-items: center
-    .q-radio
-      padding: 1px
-      opacity: 1 !important
-      cursor: pointer !important
-    .q-checkbox
-      cursor: pointer !important
-      padding: 1px
 </style>
