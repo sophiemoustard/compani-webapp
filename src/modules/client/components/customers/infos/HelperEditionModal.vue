@@ -22,7 +22,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 
 export default {
-  name: 'EditHelperModal',
+  name: 'HelperEditionModal',
   props: {
     value: { type: Boolean, default: false },
     editedHelper: { type: Object, default: () => ({}) },

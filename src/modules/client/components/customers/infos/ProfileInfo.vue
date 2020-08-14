@@ -57,7 +57,7 @@
         </ni-responsive-table>
         <q-card-actions align="right">
           <q-btn :disable="serviceOptions.length === 0 || subscriptionsLoading" flat no-caps color="primary" icon="add"
-            label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
+            label="Ajouter une souscription" @click="openNewSubscriptionModal = true" />
         </q-card-actions>
       </q-card>
       <template v-if="subscriptions && subscriptions.length > 0">
@@ -234,102 +234,44 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
-      :new-helper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" @nextStep="nextStep"
+    <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @nextStep="nextStep"
+      :new-helper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
       :first-step="firstStep" />
 
     <!-- Edit helper modal -->
-    <edit-helper-modal :edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
+    <helper-edition-modal :edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
       :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper" />
 
     <!-- Subscription creation modal -->
-    <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
-      <template slot="title">
-        Ajouter une <span class="text-weight-bold">souscription</span>
-      </template>
-      <ni-select in-modal caption="Service" :options="serviceOptions" v-model="newSubscription.service"
-        :error="$v.newSubscription.service.$error" @blur="$v.newSubscription.service.$touch" required-field />
-      <ni-input in-modal v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error"
-        caption="Prix unitaire TTC" @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
-      <ni-input in-modal v-model="newSubscription.estimatedWeeklyVolume"
-        :error="$v.newSubscription.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-        @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number" required-field />
-      <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.sundays"
-        caption="Dont dimanche (h)" type="number" />
-      <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.evenings"
-        caption="Dont soirée (h)" last type="number" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
-          :loading="loading" @click="submitSubscription" />
-      </template>
-    </ni-modal>
+    <subscription-creation-modal v-model="openNewSubscriptionModal" :new-subscription="newSubscription"
+      :service-options="serviceOptions" :validations="$v.newSubscription" @hide="resetCreationSubscriptionData"
+      :loading="loading" @submit="submitSubscription" />
 
     <!-- Subscription edition modal -->
-    <ni-modal v-model="subscriptionEditionModal" @hide="resetEditionSubscriptionData">
-      <template slot="title">
-        Editer la <span class="text-weight-bold">souscription</span>
-      </template>
-      <ni-input in-modal v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
-        caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
-      <ni-input in-modal v-model="editedSubscription.estimatedWeeklyVolume"
-        :error="$v.editedSubscription.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-        @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number" required-field />
-      <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays"
-        caption="Dont dimanche (h)" type="number" />
-      <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
-        caption="Dont soirée (h)" last type="number" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
-          :loading="loading" @click="updateSubscription" />
-      </template>
-    </ni-modal>
+    <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription="editedSubscription"
+      :validations="$v.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
+      @updateSubscription="updateSubscription" />
 
     <!-- Subscription history modal -->
-    <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
-      <template slot="title">
-        Historique de la souscription <span class="text-weight-bold">{{ selectedSubscription.service &&
-                selectedSubscription.service.name }}</span>
-      </template>
-      <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
-        :pagination.sync="paginationHistory">
-        <template v-slot:body="{ props }">
-          <q-tr :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </template>
-      </ni-responsive-table>
-    </ni-modal>
+    <subscription-history-modal v-model="subscriptionHistoryModal" :selected="selectedSubscription"
+      @hide="resetSubscriptionHistoryData" />
 
     <!-- Funding details modal -->
-    <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
-      @hide="resetFundingDetailsData">
-      <template slot="title">
-        Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
-      </template>
-      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
-        :visible-columns="fundingDetailsVisibleColumns" />
-    </ni-modal>
+    <funding-details-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
+      :selected="selectedFunding" :funding-details-data="fundingDetailsData" @hide="resetFundingDetailsData" />
 
     <!-- Funding history modal -->
-    <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
-      @hide="resetFundingHistoryData">
-      <template slot="title">
-        Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
-      </template>
-      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingsColumns"
-        :visible-columns="fundingHistoriesVisibleColumns" />
-    </ni-modal>
+    <funding-history-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
+      :selected="selectedFunding" @hide="resetFundingHistoryData" />
 
     <!-- Funding creation modal -->
-    <add-funding-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
+    <funding-creation-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
       :new-funding="newFunding" :third-party-payers="ttpList" @submit="submitFunding" :validations="$v.newFunding"
       :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
 
     <!-- Funding edition modal -->
-    <edit-funding-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
-      :edited-funding="editedFunding" @editFunding="editFunding" :days-options="daysOptions"
+    <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
+      :edited-funding="editedFunding" @edit-funding="editFunding" :days-options="daysOptions"
       :validations="$v.editedFunding" />
 </div>
 </template>
@@ -351,7 +293,6 @@ import Select from '@components/form/Select';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
@@ -365,11 +306,15 @@ import {
   CIVILITY_OPTIONS,
 } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
-import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
-import EditHelperModal from 'src/modules/client/components/customers/infos/EditHelperModal';
-import AddHelperModal from 'src/modules/client/components/customers/infos/AddHelperModal';
-import EditFundingModal from 'src/modules/client/components/customers/infos/EditFundingModal';
-import AddFundingModal from 'src/modules/client/components/customers/infos/AddFundingModal';
+import HelperEditionModal from 'src/modules/client/components/customers/infos/HelperEditionModal';
+import HelperCreationModal from 'src/modules/client/components/customers/infos/HelperCreationModal';
+import SubscriptionCreationModal from 'src/modules/client/components/customers/infos/SubscriptionCreationModal';
+import SubscriptionEditionModal from 'src/modules/client/components/customers/infos/SubscriptionEditionModal';
+import SubscriptionHistoryModal from 'src/modules/client/components/customers/infos/SubscriptionHistoryModal';
+import FundingDetailsModal from 'src/modules/client/components/customers/infos/FundingDetailsModal';
+import FundingHistoryModal from 'src/modules/client/components/customers/infos/FundingHistoryModal';
+import FundingEditionModal from 'src/modules/client/components/customers/infos/FundingEditionModal';
+import FundingCreationModal from 'src/modules/client/components/customers/infos/FundingCreationModal';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
@@ -386,13 +331,16 @@ export default {
     'ni-select': Select,
     'ni-date-input': DateInput,
     'ni-multiple-files-uploader': MultipleFilesUploader,
-    'ni-modal': Modal,
-    'add-helper-modal': AddHelperModal,
-    'edit-helper-modal': EditHelperModal,
-    'add-funding-modal': AddFundingModal,
-    'edit-funding-modal': EditFundingModal,
+    'helper-creation-modal': HelperCreationModal,
+    'helper-edition-modal': HelperEditionModal,
+    'subscription-creation-modal': SubscriptionCreationModal,
+    'subscription-edition-modal': SubscriptionEditionModal,
+    'subscription-history-modal': SubscriptionHistoryModal,
+    'funding-details-modal': FundingDetailsModal,
+    'funding-history-modal': FundingHistoryModal,
+    'funding-creation-modal': FundingCreationModal,
+    'funding-edition-modal': FundingEditionModal,
     'ni-responsive-table': ResponsiveTable,
-    'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [
     customerMixin,
@@ -410,13 +358,12 @@ export default {
       days,
       loading: false,
       openEditedHelperModal: false,
-      subscriptionCreationModal: false,
-      subscriptionEditionModal: false,
+      openNewSubscriptionModal: false,
+      openEditedSubscriptionModal: false,
       civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
       subscriptions: [],
-      selectedSubscription: [],
       services: [],
       quotesVisibleColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       quotesColumns: [
@@ -545,16 +492,6 @@ export default {
           + `par ${this.acceptedBy}`;
       }
       return '';
-    },
-    fundingHistoriesVisibleColumns () {
-      return this.selectedFunding.nature === FIXED
-        ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
-        : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
-    },
-    fundingDetailsVisibleColumns () {
-      return this.selectedFunding.nature === FIXED
-        ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
-        : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
     },
     fundingSubscriptionsOptions () {
       return this.subscriptions
@@ -722,6 +659,7 @@ export default {
       return formattedService;
     },
     resetCreationSubscriptionData () {
+      this.openNewSubscriptionModal = false;
       this.$v.newSubscription.$reset();
       this.newSubscription = {
         service: '',
@@ -738,7 +676,7 @@ export default {
         const payload = this.formatCreatedSubscription();
         await Customers.addSubscription(this.customer._id, payload);
         await this.refreshCustomer();
-        this.subscriptionCreationModal = false;
+        this.openNewSubscriptionModal = false;
         NotifyPositive('Souscription ajoutée');
       } catch (e) {
         console.error(e);
@@ -760,9 +698,10 @@ export default {
         sundays,
       };
 
-      this.subscriptionEditionModal = true;
+      this.openEditedSubscriptionModal = true;
     },
     resetEditionSubscriptionData () {
+      this.openEditedSubscriptionModal = false;
       this.editedSubscription = {};
       this.$v.editedSubscription.$reset();
     },
@@ -777,7 +716,7 @@ export default {
         await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
 
         this.refreshCustomer();
-        this.subscriptionEditionModal = false;
+        this.openEditedSubscriptionModal = false;
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);

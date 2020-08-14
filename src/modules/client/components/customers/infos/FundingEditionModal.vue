@@ -40,7 +40,7 @@ import OptionGroup from '@components/form/OptionGroup';
 import { FIXED } from '@data/constants.js';
 
 export default {
-  name: 'EditFundingModal',
+  name: 'FundingEditionModal',
   props: {
     value: { type: Boolean, default: false },
     editedFunding: { type: Object, default: () => ({}) },

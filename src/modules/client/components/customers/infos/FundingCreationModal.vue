@@ -49,7 +49,7 @@ import OptionGroup from '@components/form/OptionGroup';
 import { FIXED, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants.js';
 
 export default {
-  name: 'AddFundingModal',
+  name: 'FundingCreationModal',
   props: {
     value: { type: Boolean, default: false },
     newFunding: { type: Object, default: () => ({}) },

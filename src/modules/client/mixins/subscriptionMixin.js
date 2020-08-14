@@ -146,7 +146,7 @@ export const subscriptionMixin = {
     },
     resetSubscriptionHistoryData () {
       this.subscriptionHistoryModal = false;
-      this.selectedSubscription = [];
+      this.selectedSubscription = {};
     },
     refreshSubscriptions (customer) {
       try {
