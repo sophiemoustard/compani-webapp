@@ -41,7 +41,7 @@ export const customerMixin = {
         this.$store.dispatch('customer/setCustomer', this.customer);
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;

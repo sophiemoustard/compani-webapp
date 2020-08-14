@@ -5,7 +5,7 @@
         <template v-slot:body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
+              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
               <q-item-section>{{ info.label }}</q-item-section>
             </q-item>
           </div>
@@ -39,9 +39,9 @@ export default {
   name: 'ActivityProfile',
   metadata: { title: 'Fiche activité' },
   props: {
-    activityId: { type: String },
-    programId: { type: String },
-    stepId: { type: String },
+    activityId: { type: String, required: true },
+    programId: { type: String, required: true },
+    stepId: { type: String, required: true },
   },
   components: {
     'ni-profile-header': ProfileHeader,
@@ -138,7 +138,7 @@ export default {
       this.$store.dispatch('program/resetProgram');
     }
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

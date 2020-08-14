@@ -74,7 +74,7 @@ export const templateMixin = {
     async refreshCard () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
-        const card = this.activity.cards.find(card => card._id === this.card._id);
+        const card = this.activity.cards.find(c => c._id === this.card._id);
         this.$store.dispatch('program/fetchCard', card);
       } catch (e) {
         console.error(e);

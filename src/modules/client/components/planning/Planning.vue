@@ -8,7 +8,7 @@
           @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
       </div>
       <div class="col-xs-12 col-md-7">
-        <planning-navigation :timelineTitle="timelineTitle()" :targetDate="targetDate" :type="PLANNING"
+        <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :type="PLANNING"
           @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
           @goToWeek="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
           :is-customer-planning="isCustomerPlanning" @openDeleteEventsModal="openDeleteEventsModal"
@@ -31,8 +31,10 @@
             </div>
             <div class="planning-background" v-if="staffingView">
               <template v-for="(hour, hourIndex) in hours">
-                <div class="planning-hour" v-if="hourIndex !== 0"  :key="hourIndex"
-                  :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">{{ hour.format('H') }}</div>
+                <div class="planning-hour" v-if="hourIndex !== 0" :key="hourIndex"
+                  :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">
+                  {{ hour.format('H') }}
+                </div>
               </template>
             </div>
           </th>
@@ -43,7 +45,7 @@
               <td valign="top">
                 <div class="person-inner-cell">
                   <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
-                    <img :src="UNKNOWN_AVATAR" class="avatar" >
+                    <img :src="UNKNOWN_AVATAR" class="avatar">
                     <q-chip small text-color="white">
                       <span class="chip-indicator">{{ Math.round(unassignedHourCount(sectorId)) }}h</span>
                     </q-chip>
@@ -64,9 +66,10 @@
               data-cy="planning-row">
               <td valign="top">
                 <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)"
-                  :staffing-view="staffingView" :startOfWeek="startOfWeek" />
+                  :staffing-view="staffingView" :start-of-week="startOfWeek" />
                 <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                  :startOfWeek="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
+                  :start-of-week="startOfWeek" :working-stats="workingStats[person._id]"
+                  :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })" class="planning-background"
@@ -85,7 +88,7 @@
     <delete-events-modal v-model="deleteEventsModal" @hide="hideDeleteEventsModal"
       :customers="customersWithInterventions" />
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :eventHistories="eventHistories" @toggleHistory="toggleHistory"
+      <ni-event-history-feed v-if="displayHistory" :event-histories="eventHistories" @toggleHistory="toggleHistory"
         @updateFeeds="$emit('updateFeeds', $event)" />
     </q-page-sticky>
   </div>
@@ -158,7 +161,7 @@ export default {
       customersWithInterventions: [],
       planningHeaderHeight: 0,
       timeout: null,
-    }
+    };
   },
   beforeDestroy () {
     if (this.isCoach) {
@@ -233,10 +236,10 @@ export default {
     // Event display
     unassignedHourCount (sectorId) {
       const unassignedEvents = this.getPersonEvents({ _id: sectorId });
-      let total = 0;
-      for (const event of unassignedEvents) {
-        total += this.$moment(event.endDate).diff(event.startDate, 'm', true);
-      }
+      const total = unassignedEvents.reduce(
+        (acc, event) => acc + this.$moment(event.endDate).diff(event.startDate, 'm', true),
+        0
+      );
 
       return total / 60;
     },
@@ -247,11 +250,9 @@ export default {
     },
     getCellEvents (cellId, day) {
       return this.getRowEvents(cellId)
-        .filter(event =>
-          this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
-          (!this.staffingView || !event.isCancelled)
-        )
-        .map((event) => this.getDisplayedEvent(event, day, STAFFING_VIEW_START_HOUR, STAFFING_VIEW_END_HOUR))
+        .filter(event => this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
+          (!this.staffingView || !event.isCancelled))
+        .map(event => this.getDisplayedEvent(event, day, STAFFING_VIEW_START_HOUR, STAFFING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
     getPersonEvents (person) {
@@ -275,13 +276,12 @@ export default {
     async drop (toDay, target) {
       try {
         if (target.type === SECTOR) { // Unassign event
-          const dropToSameSector = this.draggedObject.sector === target._id && !get(this.draggedObject, 'auxiliary._id')
-          const dropToSameDay = toDay.isSame(this.draggedObject.startDate, 'd')
+          const dropToSameSector = this.draggedObject.sector === target._id &&
+            !get(this.draggedObject, 'auxiliary._id');
+          const dropToSameDay = toDay.isSame(this.draggedObject.startDate, 'd');
           if (dropToSameSector && dropToSameDay) return;
-        } else { // Update event auxiliary
-          if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
+        } else if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
             toDay.isSame(this.draggedObject.startDate, 'd')) return;
-        }
 
         this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
       } catch (e) {
@@ -301,10 +301,10 @@ export default {
       this.$emit('editEvent', event);
     },
     canDrag (event) {
-      return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector })
+      return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

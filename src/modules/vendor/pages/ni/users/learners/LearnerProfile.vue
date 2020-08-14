@@ -5,13 +5,13 @@
         <template v-slot:body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
+              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
               <q-item-section>{{ info.label }}</q-item-section>
             </q-item>
           </div>
         </template>
       </ni-profile-header>
-      <profile-tabs :profile-id="learnerId" :tabsContent="tabsContent" />
+      <profile-tabs :profile-id="learnerId" :tabs-content="tabsContent" />
     </div>
   </q-page>
 </template>
@@ -40,7 +40,7 @@ export default {
   name: 'LearnerProfile',
   metaInfo: { title: 'Fiche apprenant' },
   props: {
-    learnerId: { type: String },
+    learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
   components: {
@@ -65,7 +65,7 @@ export default {
           component: ProfileCourses,
         },
       ],
-    }
+    };
   },
   async created () {
     await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.learnerId });
@@ -79,7 +79,7 @@ export default {
     headerInfo () {
       const infos = [
         { icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' },
-      ]
+      ];
 
       if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
 
@@ -110,13 +110,14 @@ export default {
         case TRAINING_ORGANISATION_MANAGER:
           return 'Responsable Formation';
         case TRAINER:
-          return 'Formateur'
+          return 'Formateur';
+        default:
+          return '';
       }
-      return '';
     },
   },
   beforeDestroy () {
     this.$store.dispatch('userProfile/resetUserProfile');
   },
-}
+};
 </script>

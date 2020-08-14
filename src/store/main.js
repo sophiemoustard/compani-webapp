@@ -13,18 +13,18 @@ export default {
     drawer: !!Platform.is.desktop,
   },
   mutations: {
-    SET_REFRESH_STATE: (state, refresh) => { state.refreshState = refresh },
-    SET_DRAWER: (state, toggle) => { state.drawer = toggle },
-    SET_LOGGED_USER: (state, user) => { state.loggedUser = user },
+    SET_REFRESH_STATE: (state, refresh) => { state.refreshState = refresh; },
+    SET_DRAWER: (state, toggle) => { state.drawer = toggle; },
+    SET_LOGGED_USER: (state, user) => { state.loggedUser = user; },
   },
   actions: {
-    setRefreshState: ({ commit }, refresh) => { commit('SET_REFRESH_STATE', refresh) },
-    setDrawer: ({ commit }, toggle) => { commit('SET_DRAWER', toggle) },
+    setRefreshState: ({ commit }, refresh) => { commit('SET_REFRESH_STATE', refresh); },
+    setDrawer: ({ commit }, toggle) => { commit('SET_DRAWER', toggle); },
     fetchLoggedUser: async ({ commit }, userId) => {
       try {
         const user = await users.getById(userId);
 
-        commit('SET_LOGGED_USER', Object.assign({}, extend(userModel, user)));
+        commit('SET_LOGGED_USER', { ...extend(userModel, user) });
       } catch (e) {
         if (!e) return; // If the api does not respond anything
         console.error(e);
@@ -39,9 +39,9 @@ export default {
     },
   },
   getters: {
-    getLoggedUser: (state) => state.loggedUser,
-    getCompany: (state) => state.loggedUser.company,
-    getClientRole: (state) => get(state, 'loggedUser.role.client.name'),
-    getVendorRole: (state) => get(state, 'loggedUser.role.vendor.name'),
+    getLoggedUser: state => state.loggedUser,
+    getCompany: state => state.loggedUser.company,
+    getClientRole: state => get(state, 'loggedUser.role.client.name'),
+    getVendorRole: state => get(state, 'loggedUser.role.vendor.name'),
   },
 };

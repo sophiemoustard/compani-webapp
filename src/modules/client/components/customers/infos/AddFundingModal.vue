@@ -69,7 +69,7 @@ export default {
   data () {
     return {
       fundingNatureOptions: NATURE_OPTIONS,
-    }
+    };
   },
   computed: {
     isFixedFunding () {
@@ -90,10 +90,10 @@ export default {
     },
   },
   watch: {
-    'newFunding.thirdPartyPayer' () {
+    'newFunding.thirdPartyPayer': function () {
       this.setUnitUTTRate();
     },
-    'newFunding.nature' () {
+    'newFunding.nature': function () {
       this.setUnitUTTRate();
     },
   },
@@ -116,5 +116,5 @@ export default {
       this.$emit('submit');
     },
   },
-}
+};
 </script>

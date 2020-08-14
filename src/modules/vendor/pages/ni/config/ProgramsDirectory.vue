@@ -24,7 +24,7 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
@@ -62,14 +62,14 @@ export default {
       newProgram: { name: '' },
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
-    }
+    };
   },
   validations () {
     return {
       newProgram: {
         name: { required },
       },
-    }
+    };
   },
   computed: {
     filteredPrograms () {
@@ -111,7 +111,7 @@ export default {
         await Programs.create({ ...this.newProgram });
 
         this.programCreationModal = false;
-        NotifyPositive('Programme créé.')
+        NotifyPositive('Programme créé.');
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
@@ -121,5 +121,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

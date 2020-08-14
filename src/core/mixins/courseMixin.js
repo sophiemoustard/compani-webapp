@@ -57,7 +57,7 @@ export const courseMixin = {
 
         if (this.tmpInput === value) return;
 
-        const vAttribute = get(this.$v.course, path)
+        const vAttribute = get(this.$v.course, path);
         if (vAttribute) {
           vAttribute.$touch();
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
@@ -70,11 +70,11 @@ export const courseMixin = {
         await this.refreshCourse();
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
       }
     },
   },
-}
+};

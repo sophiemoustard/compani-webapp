@@ -21,7 +21,7 @@ export default {
     'profile-follow-up': ProfileFollowUp,
   },
   props: {
-    customerId: { type: String },
+    customerId: { type: String, required: true },
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
@@ -36,5 +36,5 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('customer/resetCustomer');
   },
-}
+};
 </script>

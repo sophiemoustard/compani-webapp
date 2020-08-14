@@ -47,7 +47,7 @@
 import { required, email } from 'vuelidate/lib/validators';
 import pickBy from 'lodash/pickBy';
 import get from 'lodash/get';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import Customers from '@api/Customers';
 import { frAddress } from '@helpers/vuelidateCustomVal.js';
 import SearchAddress from '@components/form/SearchAddress';
@@ -107,7 +107,7 @@ export default {
           name: 'fullName',
           label: 'Nom',
           field: 'identity',
-          format: value => value ? value.fullName : '',
+          format: value => (value ? value.fullName : ''),
           align: 'left',
           sortable: true,
           sort: (a, b) => {
@@ -123,7 +123,7 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
           style: 'width: 85px',
         },
@@ -133,7 +133,7 @@ export default {
           field: 'firstIntervention',
           align: 'left',
           sortable: false,
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
           style: 'width: 85px',
         },
         {
@@ -154,7 +154,7 @@ export default {
           style: 'width: 30px',
         },
       ],
-    }
+    };
   },
   validations: {
     newCustomer: {
@@ -178,7 +178,9 @@ export default {
   },
   computed: {
     filteredCustomers () {
-      const customers = this.onlyClients ? this.customers.filter(customer => customer.firstIntervention) : this.customers;
+      const customers = this.onlyClients
+        ? this.customers.filter(customer => customer.firstIntervention)
+        : this.customers;
       const escapedString = escapeRegExp(this.searchStr);
       return customers.filter(customer => customer.identity.fullName.match(new RegExp(escapedString, 'i')));
     },
@@ -193,7 +195,10 @@ export default {
     async getCustomers () {
       try {
         this.tableLoading = true;
-        const [customers, firstInterventions] = await Promise.all([Customers.list(), Customers.listWithFirstIntervention()]);
+        const [customers, firstInterventions] = await Promise.all([
+          Customers.list(),
+          Customers.listWithFirstIntervention(),
+        ]);
         this.firstInterventions = Object.freeze(firstInterventions);
         this.customers = Object.freeze(customers.map(customer => ({
           ...customer,
@@ -242,5 +247,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

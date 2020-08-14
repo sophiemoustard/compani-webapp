@@ -18,13 +18,11 @@ export const planningEventMixin = {
   computed: {
     daysHeader () {
       if (!this.days) return [];
-      return this.days.map(day => {
-        return {
-          name: this.$moment(day).format('dd'),
-          number: this.$moment(day).format('DD'),
-          moment: day,
-        }
-      });
+      return this.days.map(day => ({
+        name: this.$moment(day).format('dd'),
+        number: this.$moment(day).format('DD'),
+        moment: day,
+      }));
     },
     isCustomerPlanning () {
       return this.personKey === 'customer';
@@ -38,7 +36,8 @@ export const planningEventMixin = {
       return this.$moment(momentDay).isSame(new Date(), 'day');
     },
     getEventHours (event) {
-      return `${this.$moment(event.displayedStartDate).format('HH:mm')} - ${this.$moment(event.displayedEndDate).format('HH:mm')}`
+      return `${this.$moment(event.displayedStartDate).format('HH:mm')} - `
+        + `${this.$moment(event.displayedEndDate).format('HH:mm')}`;
     },
     displayAbsenceType (value) {
       const absence = ABSENCE_TYPES.find(abs => abs.value === value);
@@ -47,7 +46,9 @@ export const planningEventMixin = {
     eventTitle (event) {
       if (!event.auxiliary && this.isCustomerPlanning) return 'À affecter';
 
-      return this.isCustomerPlanning ? formatIdentity(event.auxiliary.identity, 'Fl') : formatIdentity(event.customer.identity, 'fL');
+      return this.isCustomerPlanning
+        ? formatIdentity(event.auxiliary.identity, 'Fl')
+        : formatIdentity(event.customer.identity, 'fL');
     },
     getDisplayedEvent (event, day, startDisplay, endDisplay) {
       const dayEvent = { ...event };
@@ -70,9 +71,14 @@ export const planningEventMixin = {
       }
 
       const staffingBeginning = Math.max((staffingStartHour - startDisplay) * 60 + displayedStartMinutes, 0);
-      const staffingEnd = Math.min((displayedEndHour - startDisplay) * 60 + displayedEndMinutes, (endDisplay - startDisplay) * 60 + displayedEndMinutes);
+      const staffingEnd = Math.min((displayedEndHour - startDisplay) * 60
+        + displayedEndMinutes, (endDisplay - startDisplay) * 60
+        + displayedEndMinutes);
 
-      dayEvent.displayedStartDate = this.$moment(day).hour(displayedStartHour).minutes(displayedStartMinutes).toISOString();
+      dayEvent.displayedStartDate = this.$moment(day)
+        .hour(displayedStartHour)
+        .minutes(displayedStartMinutes)
+        .toISOString();
       dayEvent.displayedEndDate = eventEndDate.toISOString();
       dayEvent.staffingBeginning = staffingBeginning;
       dayEvent.staffingDuration = staffingEnd - staffingBeginning;

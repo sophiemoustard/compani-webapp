@@ -30,4 +30,4 @@ export default {
   SI: 'Slovénie',
   SK: 'Slovaquie',
   SE: 'Suède',
-}
+};

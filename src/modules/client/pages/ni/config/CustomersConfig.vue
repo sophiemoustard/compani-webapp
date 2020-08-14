@@ -97,7 +97,7 @@
                         icon="delete" @click="validateTppDeletion(col.value, props.row)" />
                     </div>
                   </template>
-                  <template v-else>{{ col.value}}</template>
+                  <template v-else>{{ col.value }}</template>
                 </q-td>
               </q-tr>
             </template>
@@ -145,18 +145,18 @@
         :error-message="nbrError('newSurcharge.evening')" />
       <ni-time-input in-modal v-model="newSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch"
-        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-message="Heure invalide" />
+        :disable="!newSurcharge.evening" :required-field="!!newSurcharge.evening" error-message="Heure invalide" />
       <ni-time-input in-modal v-model="newSurcharge.eveningEndTime" caption="Fin soirée"
         :error="$v.newSurcharge.eveningEndTime.$error" @blur="$v.newSurcharge.eveningEndTime.$touch"
-        :disable="!newSurcharge.evening" :requiredField="!!newSurcharge.evening" error-message="Heure invalide" />
+        :disable="!newSurcharge.evening" :required-field="!!newSurcharge.evening" error-message="Heure invalide" />
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
         :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
       <ni-time-input in-modal v-model="newSurcharge.customStartTime" caption="Début personnalisé"
         :error="$v.newSurcharge.customStartTime.$error" @blur="$v.newSurcharge.customStartTime.$touch"
-        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-message="Heure invalide" />
+        :disable="!newSurcharge.custom" :required-field="!!newSurcharge.custom" error-message="Heure invalide" />
       <ni-time-input in-modal v-model="newSurcharge.customEndTime" caption="Fin personnalisée"
         :error="$v.newSurcharge.customEndTime.$error" @blur="$v.newSurcharge.customEndTime.$touch"
-        :disable="!newSurcharge.custom" :requiredField="!!newSurcharge.custom" error-message="Heure invalide" />
+        :disable="!newSurcharge.custom" :required-field="!!newSurcharge.custom" error-message="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
           :loading="loading" @click="createNewSurcharge" />
@@ -180,28 +180,30 @@
         v-model="editedSurcharge.publicHoliday" :error="$v.editedSurcharge.publicHoliday.$error"
         @blur="$v.editedSurcharge.publicHoliday.$touch" :error-message="nbrError('editedSurcharge.publicHoliday')" />
       <ni-input in-modal caption="Majoration 25 décembre" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
-        v-model="editedSurcharge.twentyFifthOfDecember" :error-message="nbrError('editedSurcharge.twentyFifthOfDecember')"
-        @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch" suffix="%" type="number" />
+        v-model="editedSurcharge.twentyFifthOfDecember" @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch"
+        :error-message="nbrError('editedSurcharge.twentyFifthOfDecember')" suffix="%" type="number" />
       <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
         :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch"
         :error-message="nbrError('editedSurcharge.firstOfMay')" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
         :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch"
-        :error-message="nbrError('editedSurcharge.evening')" firstOfMay />
+        :error-message="nbrError('editedSurcharge.evening')" first-of-may />
       <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
-        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-message="Heure invalide" />
+        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
+        error-message="Heure invalide" />
       <ni-time-input in-modal v-model="editedSurcharge.eveningEndTime" caption="Fin soirée"
         :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch"
-        :disable="!editedSurcharge.evening" :requiredField="!!editedSurcharge.evening" error-message="Heure invalide" />
+        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
+        error-message="Heure invalide" />
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
         :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
       <ni-time-input in-modal v-model="editedSurcharge.customStartTime" caption="Début personnalisé"
         :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch"
-        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-message="Heure invalide" />
+        :disable="!editedSurcharge.custom" :required-field="!!editedSurcharge.custom" error-message="Heure invalide" />
       <ni-time-input in-modal v-model="editedSurcharge.customEndTime" caption="Fin personnalisée"
         :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch"
-        :disable="!editedSurcharge.custom" :requiredField="!!editedSurcharge.custom" error-message="Heure invalide" />
+        :disable="!editedSurcharge.custom" :required-field="!!editedSurcharge.custom" error-message="Heure invalide" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
           color="primary" :loading="loading" @click="updateSurcharge" />
@@ -245,7 +247,8 @@
         @blur="$v.editedService.startDate.$touch" :min="minStartDate" in-modal required-field />
       <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
         v-model="editedService.defaultUnitAmount" :error="$v.editedService.defaultUnitAmount.$error" required-field
-        @blur="$v.editedService.defaultUnitAmount.$touch" :error-message="nbrError('editedService.defaultUnitAmount')" />
+        @blur="$v.editedService.defaultUnitAmount.$touch"
+        :error-message="nbrError('editedService.defaultUnitAmount')" />
       <ni-input in-modal caption="TVA" suffix="%" v-model="editedService.vat" type="number"
         :error="$v.editedService.vat.$error" @blur="$v.editedService.vat.$touch"
         error-message="La TVA doit être positive ou nulle" />
@@ -369,25 +372,25 @@ export default {
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
-    'editedSurcharge.evening' (value) {
+    'editedSurcharge.evening': function (value) {
       if (!value) {
         this.editedSurcharge.eveningStartTime = null;
         this.editedSurcharge.eveningEndTime = null;
       }
     },
-    'editedSurcharge.custom' (value) {
+    'editedSurcharge.custom': function (value) {
       if (!value) {
         this.editedSurcharge.customStartTime = null;
         this.editedSurcharge.customEndTime = null;
       }
     },
-    'newSurcharge.evening' (value) {
+    'newSurcharge.evening': function (value) {
       if (!value) {
         this.newSurcharge.eveningStartTime = null;
         this.newSurcharge.eveningEndTime = null;
       }
     },
-    'newSurcharge.custom' (value) {
+    'newSurcharge.custom': function (value) {
       if (!value) {
         this.newSurcharge.customStartTime = null;
         this.newSurcharge.customEndTime = null;
@@ -481,13 +484,13 @@ export default {
           name: 'eveningStartTime',
           label: 'Début soirée',
           align: 'center',
-          field: row => row.eveningStartTime ? this.$moment(row.eveningStartTime).format('HH:mm') : '',
+          field: row => (row.eveningStartTime ? this.$moment(row.eveningStartTime).format('HH:mm') : ''),
         },
         {
           name: 'eveningEndTime',
           label: 'Fin soirée',
           align: 'center',
-          field: row => row.eveningEndTime ? this.$moment(row.eveningEndTime).format('HH:mm') : '',
+          field: row => (row.eveningEndTime ? this.$moment(row.eveningEndTime).format('HH:mm') : ''),
         },
         {
           name: 'custom',
@@ -499,13 +502,13 @@ export default {
           name: 'customStartTime',
           label: 'Début perso',
           align: 'center',
-          field: row => row.customStartTime ? this.$moment(row.customStartTime).format('HH:mm') : '',
+          field: row => (row.customStartTime ? this.$moment(row.customStartTime).format('HH:mm') : ''),
         },
         {
           name: 'customEndTime',
           label: 'Fin perso',
           align: 'center',
-          field: row => row.customEndTime ? this.$moment(row.customEndTime).format('HH:mm') : '',
+          field: row => (row.customEndTime ? this.$moment(row.customEndTime).format('HH:mm') : ''),
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -534,14 +537,22 @@ export default {
         exemptFromCharges: false,
       },
       natureOptions: NATURE_OPTIONS,
-      servicesVisibleColumns: ['name', 'nature', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges', 'actions'],
+      servicesVisibleColumns: [
+        'name',
+        'nature',
+        'defaultUnitAmount',
+        'vat',
+        'surcharge',
+        'exemptFromCharges',
+        'actions',
+      ],
       visibleHistoryColumns: ['startDate', 'name', 'defaultUnitAmount', 'vat', 'surcharge', 'exemptFromCharges'],
       serviceColumns: [
         {
           name: 'startDate',
           label: 'Date d\'effet',
           align: 'left',
-          field: row => row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : '',
+          field: row => (row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : ''),
         },
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
@@ -571,13 +582,13 @@ export default {
           name: 'surcharge',
           label: 'Plan de majoration',
           align: 'left',
-          field: row => row.surcharge ? row.surcharge.name : '',
+          field: row => (row.surcharge ? row.surcharge.name : ''),
         },
         {
           name: 'exemptFromCharges',
           label: 'Exonération de charges',
           align: 'center',
-          field: row => row.exemptFromCharges ? 'Oui' : 'Non',
+          field: row => (row.exemptFromCharges ? 'Oui' : 'Non'),
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -598,7 +609,7 @@ export default {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC par défaut',
           field: 'unitTTCRate',
-          format: val => val ? `${val}€` : '',
+          format: val => (val ? `${val}€` : ''),
           align: 'center',
         },
         {
@@ -606,7 +617,7 @@ export default {
           label: 'Facturation',
           field: 'billingMode',
           align: 'center',
-          format: val => {
+          format: (val) => {
             const mode = this.billingModeOptions.find(m => m.value === val);
             return mode ? mode.label : '';
           },
@@ -616,7 +627,7 @@ export default {
           label: 'APA',
           field: 'isApa',
           align: 'center',
-          format: val => val ? 'Oui' : 'Non',
+          format: val => (val ? 'Oui' : 'Non'),
           style: !this.$q.platform.is.mobile && 'width: 100px',
         },
         {
@@ -662,11 +673,11 @@ export default {
       twentyFifthOfDecember: { positiveNumber },
       firstOfMay: { positiveNumber },
       evening: { positiveNumber },
-      eveningStartTime: { required: requiredIf((item) => item.evening) },
-      eveningEndTime: { required: requiredIf((item) => item.evening) },
+      eveningStartTime: { required: requiredIf(item => item.evening) },
+      eveningEndTime: { required: requiredIf(item => item.evening) },
       custom: { numeric },
-      customStartTime: { required: requiredIf((item) => item.custom) },
-      customEndTime: { required: requiredIf((item) => item.custom) },
+      customStartTime: { required: requiredIf(item => item.custom) },
+      customEndTime: { required: requiredIf(item => item.custom) },
     },
     editedSurcharge: {
       name: { required },
@@ -676,11 +687,11 @@ export default {
       twentyFifthOfDecember: { positiveNumber },
       firstOfMay: { positiveNumber },
       evening: { positiveNumber },
-      eveningStartTime: { required: requiredIf((item) => item.evening) },
-      eveningEndTime: { required: requiredIf((item) => item.evening) },
+      eveningStartTime: { required: requiredIf(item => item.evening) },
+      eveningEndTime: { required: requiredIf(item => item.evening) },
       custom: { numeric },
-      customStartTime: { required: requiredIf((item) => item.custom) },
-      customEndTime: { required: requiredIf((item) => item.custom) },
+      customStartTime: { required: requiredIf(item => item.custom) },
+      customEndTime: { required: requiredIf(item => item.custom) },
     },
     newService: {
       name: { required },
@@ -918,7 +929,7 @@ export default {
         this.resetEditionSurchargeData();
         await this.refreshSurcharges();
       } catch (e) {
-        console.error(e)
+        console.error(e);
         NotifyNegative('Erreur lors de la modification du plan de majoration.');
       } finally {
         this.loading = false;
@@ -953,7 +964,8 @@ export default {
           name,
           defaultUnitAmount,
           exemptFromCharges,
-          startDate: this.$moment('1970-01-01').startOf('d').toISOString(), // first version does not have actual start date
+          // first version does not have actual start date
+          startDate: this.$moment('1970-01-01').startOf('d').toISOString(),
         }],
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') {
@@ -977,7 +989,7 @@ export default {
     },
     async createNewService () {
       try {
-        this.$v.newService.$touch()
+        this.$v.newService.$touch();
         if (this.$v.newService.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
@@ -1043,7 +1055,7 @@ export default {
         this.resetEditionServiceData();
         await this.refreshServices();
       } catch (e) {
-        console.error(e)
+        console.error(e);
         NotifyNegative('Erreur lors de la modification du service.');
       } finally {
         this.loading = false;
@@ -1101,7 +1113,7 @@ export default {
         unitTTCRate: 0,
         billingMode: '',
         isApa: false,
-      }
+      };
     },
     formatThirdPartyPayerPayload (tpp) {
       const payload = cloneDeep(tpp);
@@ -1128,7 +1140,7 @@ export default {
     },
     resetThirdPartyPayerEdition () {
       this.$v.editedThirdPartyPayer.$reset();
-      this.editedThirdPartyPayer = { address: {} }
+      this.editedThirdPartyPayer = { address: {} };
     },
     async updateThirdPartyPayer () {
       try {
@@ -1175,5 +1187,5 @@ export default {
       return this.thirdPartyPayers[index].isUsedInFundings;
     },
   },
-}
+};
 </script>

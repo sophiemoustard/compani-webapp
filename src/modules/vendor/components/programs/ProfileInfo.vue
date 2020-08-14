@@ -10,9 +10,9 @@
         <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
           :error="$v.program.learningGoals.$error" />
-        <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinaryStorage
+        <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinary-storage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
-          :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :maxFileSize="500000" />
+          :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :max-file-size="500000" />
       </div>
     </div>
   </div>
@@ -32,7 +32,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 export default {
   name: 'ProfileInfo',
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   components: {
     'ni-input': Input,
@@ -42,12 +42,12 @@ export default {
     return {
       tmpInput: '',
       extensions: 'image/jpg, image/jpeg',
-    }
+    };
   },
   validations () {
     return {
       program: { name: { required }, learningGoals: { required } },
-    }
+    };
   },
   computed: {
     ...mapState('program', ['program']),
@@ -55,7 +55,7 @@ export default {
       return `${process.env.API_HOSTNAME}/programs/${this.program._id}/cloudinary/upload`;
     },
     imageFileName () {
-      return 'Image-' + this.program.name.replace(/ /g, '_');
+      return `Image-${this.program.name.replace(/ /g, '_')}`;
     },
   },
   async mounted () {
@@ -64,7 +64,7 @@ export default {
   },
   methods: {
     saveTmp (path) {
-      this.tmpInput = get(this.program, path)
+      this.tmpInput = get(this.program, path);
     },
     async refreshProgram () {
       try {
@@ -87,7 +87,7 @@ export default {
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
@@ -121,5 +121,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

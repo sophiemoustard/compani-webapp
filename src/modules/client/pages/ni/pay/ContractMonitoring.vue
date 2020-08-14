@@ -28,10 +28,9 @@
     </ni-large-table>
 
     <!-- Edition modal -->
-    <version-edition-modal v-model="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
-      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" @hide="resetVersionEditionModal"
-      @editVersion="editVersion" :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"/>
-
+    <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
+      :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" @hide="resetVersionEditionModal"
+      @editVersion="editVersion" :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
   </q-page>
 </template>
 
@@ -91,7 +90,7 @@ export default {
           name: 'startDate',
           label: 'Date de début',
           field: 'startDate',
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           align: 'center',
           sortable: true,
         },
@@ -101,13 +100,13 @@ export default {
           name: 'endDate',
           label: 'Date de fin',
           field: 'endDate',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : '∞'),
           align: 'center',
           sortable: true,
         },
         { name: 'actions', align: 'center', field: 'user' },
       ],
-    }
+    };
   },
   async mounted () {
     await this.refreshContracts();
@@ -145,7 +144,7 @@ export default {
       const endDate = this.$moment(this.dates.endDate);
       this.versionsList = [];
 
-      this.contractsList.forEach(contract => {
+      this.contractsList.forEach((contract) => {
         const { versions } = contract;
         for (let idx = 0; idx < versions.length; idx++) {
           const version = versions[idx];
@@ -166,7 +165,7 @@ export default {
               contractId: contract._id,
               user: contract.user,
               type: contractType,
-            }
+            };
             this.versionsList.push(versionToDisplay);
           }
         }
@@ -176,5 +175,5 @@ export default {
       this.$router.push({ name: 'ni auxiliaries info', params: { auxiliaryId: user._id, defaultTab: 'contracts' } });
     },
   },
-}
+};
 </script>

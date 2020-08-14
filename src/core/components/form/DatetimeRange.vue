@@ -1,5 +1,5 @@
 <template>
-  <div class='col-12 margin-input'>
+  <div class="col-12 margin-input">
     <div v-if="caption" class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="hasError" name="error_outline" color="secondary" />
@@ -48,7 +48,7 @@ export default {
         startDate: { required },
         endDate: { required, minDate: minDate(this.value.startDate) },
       },
-    }
+    };
   },
   computed: {
     hasError () {
@@ -71,8 +71,8 @@ export default {
     setDateHours (date, hour) {
       const splitHour = hour.split(':');
       return this.$moment(date).set({
-        hours: Number.parseInt(splitHour[0]),
-        minutes: Number.parseInt(splitHour[1]),
+        hours: Number.parseInt(splitHour[0], 10),
+        minutes: Number.parseInt(splitHour[1], 10),
         seconds: 0,
         milliseconds: 0,
       }).toISOString();
@@ -83,7 +83,7 @@ export default {
       const dates = {
         ...this.value,
         [key]: this.$moment(date).set({ ...dateObject }).toISOString(),
-      }
+      };
       if (key === 'startDate' && this.disableEndDate) {
         const endDateObject = pick(this.$moment(this.value.endDate).toObject(), hoursFields);
         dates.endDate = this.$moment(date).set({ ...endDateObject }).toISOString();
@@ -97,14 +97,14 @@ export default {
       if (key === 'startHour') {
         dates.startDate = this.setDateHours(dates.startDate, value);
         if (this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.endHour, 'HH:mm'))) {
-          const max = this.$moment(dates.startDate).endOf('d')
+          const max = this.$moment(dates.startDate).endOf('d');
           dates.endDate = this.$moment.min(this.$moment(dates.startDate).add(2, 'H'), max).toISOString();
         }
       }
       this.$emit('input', dates);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire apprenants" @updateSearch="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @goTo="goToLearnerProfile">
-      <template v-slot:body="{ props, col }">
+      <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
             <img class="avatar" :src="getAvatar(col.value.picture)">
@@ -18,7 +18,7 @@
 
 <script>
 import Users from '@api/Users';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { DEFAULT_AVATAR } from '@data/constants';
@@ -72,7 +72,7 @@ export default {
           sort: (a, b) => b - a,
         },
       ],
-    }
+    };
   },
   computed: {
     filteredLearners () {
@@ -118,5 +118,5 @@ export default {
       return link || DEFAULT_AVATAR;
     },
   },
-}
+};
 </script>

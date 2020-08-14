@@ -6,8 +6,8 @@
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
-      :extensions="extensions" cloudinaryStorage :additional-value="imageFileName" required-field
-      :url="mediaUploadUrl" label="Pas de média" :maxFileSize="maxFileSize" />
+      :extensions="extensions" cloudinary-storage :additional-value="imageFileName" required-field
+      :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" />
   </div>
 </template>
 
@@ -23,7 +23,7 @@ export default {
     'ni-file-uploader': FileUploader,
   },
   mixins: [templateMixin],
-}
+};
 </script>
 
 <style lang="stylus" scoped>

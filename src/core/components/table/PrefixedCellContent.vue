@@ -19,5 +19,5 @@ export default {
       return formatPrice(Math.abs(this.cellValue));
     },
   },
-}
+};
 </script>

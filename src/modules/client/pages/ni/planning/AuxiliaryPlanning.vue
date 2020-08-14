@@ -2,23 +2,24 @@
   <q-page class="client-background">
     <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
       @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
-      :filteredSectors="filteredSectors" :personKey="personKey" :filters="activeFilters" :can-edit="canEditEvent"
-      @toggleAllSectors="toggleAllSectors" :eventHistories="eventHistories" ref="planningManager"
-      :displayAllSectors="displayAllSectors" @toggleHistory="toggleHistory" :displayHistory="displayHistory"
+      :filtered-sectors="filteredSectors" :person-key="personKey" :filters="activeFilters" :can-edit="canEditEvent"
+      @toggleAllSectors="toggleAllSectors" :event-histories="eventHistories" ref="planningManager"
+      :display-all-sectors="displayAllSectors" @toggleHistory="toggleHistory" :display-history="displayHistory"
       @updateFeeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent"
-      :creationModal="creationModal" :internalHours="internalHours" @close="closeCreationModal" :personKey="personKey"
-      :activeAuxiliaries="activeAuxiliaries" @resetForm="resetCreationForm" @createEvent="validateCreationEvent"
-      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" :customers="customers" />
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event.sync="newEvent"
+      :creation-modal="creationModal" :internal-hours="internalHours" @close="closeCreationModal" :customers="customers"
+      :person-key="personKey" :active-auxiliaries="activeAuxiliaries" @resetForm="resetCreationForm"
+      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded"
+      @createEvent="validateCreationEvent" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+      :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
       @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="validateEventDeletion"
-      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey" @updateEvent="updateEvent" />
+      @deleteEventRepetition="validationDeletionEventRepetition" :person-key="personKey" @updateEvent="updateEvent" />
   </q-page>
 </template>
 
@@ -118,7 +119,8 @@ export default {
       return this.filters
         .filter(f => f.type === SECTOR ||
           this.hasContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
-          (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id)); // add targeted auxiliary even if not active on strat of week to display future events
+          // add targeted auxiliary even if not active on strat of week to display future events
+          (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id));
     },
   },
   methods: {
@@ -163,9 +165,7 @@ export default {
         this.savedSearch = search;
         this.filteredAuxiliaries = [];
         this.auxiliaries = this.filters.filter(fil => fil.type === PERSON)
-          .map((aux) => {
-            return this.formatAuxiliaryWithSector(aux);
-          });
+          .map(aux => this.formatAuxiliaryWithSector(aux));
         this.filteredSectors = this.filters.filter(fil => fil.type === SECTOR);
         await this.refresh();
       }
@@ -173,18 +173,16 @@ export default {
     updateAuxiliariesList () {
       const auxiliaries = [];
       for (const sector of this.filteredSectors) {
-        const auxBySector = this.getAuxBySector(sector);
-        for (let i = 0, l = auxBySector.length; i < l; i++) {
-          if (!auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
-            auxiliaries.push(this.formatAuxiliaryWithSector(auxBySector[i]));
-          }
-        }
+        auxiliaries.push(...this.getAuxBySector(sector).reduce(
+          (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
+          []
+        ));
       }
-      for (const auxiliary of this.filteredAuxiliaries) {
-        if (!auxiliaries.some(aux => aux._id === auxiliary._id)) {
-          auxiliaries.push(this.formatAuxiliaryWithSector(auxiliary));
-        }
-      }
+
+      auxiliaries.push(...this.filteredAuxiliaries.reduce(
+        (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
+        []
+      ));
 
       this.auxiliaries = auxiliaries;
     },
@@ -248,7 +246,7 @@ export default {
       } catch (e) {
         console.error(e);
         this.eventHistories = eventHistoriesTmp;
-        NotifyNegative("Erreur lors de la récupération du flux d'activité");
+        NotifyNegative('Erreur lors de la récupération du flux d\'activité');
       }
     },
     // Event creation
@@ -284,10 +282,11 @@ export default {
     },
     getSectorHistory (aux, sector) {
       if (!aux.sectorHistories) return null;
-      const sectorHistory = aux.sectorHistories.find(sectorHistory => {
-        const isSameSector = sector ? sectorHistory.sector._id === sector._id : true;
-        const isStartDateBeforeEndOfWeek = this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek);
-        const isEndDateAfterStartOfWeek = !sectorHistory.endDate || this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek);
+      const sectorHistory = aux.sectorHistories.find((sh) => {
+        const isSameSector = sector ? sh.sector._id === sector._id : true;
+        const isStartDateBeforeEndOfWeek = this.$moment(sh.startDate).isSameOrBefore(this.endOfWeek);
+        const isEndDateAfterStartOfWeek = !sh.endDate ||
+          this.$moment(sh.endDate).isSameOrAfter(this.startOfWeek);
         return isSameSector && isStartDateBeforeEndOfWeek && isEndDateAfterStartOfWeek;
       });
       return sectorHistory;
@@ -301,9 +300,8 @@ export default {
 
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
-      } else { // el = auxiliary
-        if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
-      }
+      } else if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
+
       await this.refresh();
     },
     async removeElementFromFilter (el) {
@@ -313,7 +311,7 @@ export default {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.updateAuxiliariesList();
       } else { // el = auxiliary
-        const auxiliary = this.auxiliaries.find(auxiliary => auxiliary._id === el._id);
+        const auxiliary = this.auxiliaries.find(aux => aux._id === el._id);
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(aux => aux._id !== auxiliary._id);
         this.updateAuxiliariesList();
         if (this.auxiliaries.some(aux => aux._id === auxiliary._id)) return;
@@ -322,17 +320,19 @@ export default {
       await this.updateDisplayedEventHistories();
     },
     async updateDisplayedEventHistories () {
-      this.eventHistories = this.eventHistories.filter(history =>
-        this.auxiliaries.some(aux => history.auxiliaries.map(a => a._id).includes(aux._id)));
+      this.eventHistories = this.eventHistories
+        .filter(history => this.auxiliaries.some(aux => history.auxiliaries.map(a => a._id).includes(aux._id)));
       if (this.auxiliaries.length) await this.getEventHistories();
       if (this.eventHistories.length === 0) this.displayHistory = false;
     },
     async updateEventHistories (done) {
-      const lastCreatedAt = this.eventHistories.length ? this.eventHistories[this.eventHistories.length - 1].createdAt : null
+      const lastCreatedAt = this.eventHistories.length
+        ? this.eventHistories[this.eventHistories.length - 1].createdAt
+        : null;
       const oldEventHistories = await this.getEventHistories(lastCreatedAt);
       if (oldEventHistories.length) return done();
       done(true);
     },
   },
-}
+};
 </script>

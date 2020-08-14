@@ -25,7 +25,7 @@ export default {
       contracts: [],
       contractsVisibleColumns: ['weeklyHours', 'startDate', 'endDate', 'grossHourlyRate', 'contractSigned'],
       loading: false,
-    }
+    };
   },
   async mounted () {
     await this.refreshContracts();
@@ -44,5 +44,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

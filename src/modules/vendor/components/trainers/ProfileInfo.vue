@@ -54,13 +54,13 @@ export default {
         identity: { lastname: { required } },
         local: { email: { required, email } },
       },
-    }
+    };
   },
   computed: {
     ...mapState({
-      userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
+      userProfile: state => (TRAINER === get(state.main.loggedUser, 'role.vendor.name')
         ? state.main.loggedUser
-        : state.userProfile.userProfile,
+        : state.userProfile.userProfile),
     }),
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
   },

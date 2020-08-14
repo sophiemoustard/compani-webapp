@@ -3,11 +3,11 @@
     <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer"
-          :selectedPerson="selectedCustomer" @close="close" />
+          :selected-person="selectedCustomer" @close="close" />
         <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" :options="[]"
-          v-model="editedEvent.auxiliary" :selectedPerson="selectedAuxiliary" @close="close" />
+          v-model="editedEvent.auxiliary" :selected-person="selectedAuxiliary" @close="close" />
         <ni-planning-modal-header v-else v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
-          :selectedPerson="selectedAuxiliary" @close="close" />
+          :selected-person="selectedAuxiliary" @close="close" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
@@ -32,7 +32,7 @@
           <ni-select in-modal caption="Type d'heure interne" v-model="editedEvent.internalHour"
             :options="internalHourOptions" :error="validations.internalHour.$error"
             @blur="validations.internalHour.$touch" />
-          <ni-search-address v-model="editedEvent.address" inModal @blur="validations.address.$touch"
+          <ni-search-address v-model="editedEvent.address" in-modal @blur="validations.address.$touch"
             :error="validations.address.$error" :error-message="addressError" />
         </template>
         <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
@@ -53,7 +53,7 @@
             :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence" required-field
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
-            @uploaded="documentUploaded" :additionalValue="additionalValue" :disable="!selectedAuxiliary._id"
+            @uploaded="documentUploaded" :additional-value="additionalValue" :disable="!selectedAuxiliary._id"
             :error="validations.attachment.$error" @delete="deleteDocument(editedEvent.attachment.driveId)" in-modal />
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
@@ -118,7 +118,7 @@ export default {
     },
     selectedAuxiliary () {
       if (!this.editedEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
-      const aux = this.activeAuxiliaries.find(aux => aux._id === this.editedEvent.auxiliary);
+      const aux = this.activeAuxiliaries.find(a => a._id === this.editedEvent.auxiliary);
       const hasContractOnEvent = this.hasContractOnEvent(aux, this.editedEvent.dates.startDate);
 
       return { ...aux, hasContractOnEvent };
@@ -174,7 +174,7 @@ export default {
       this.$emit('deleteEvent', value);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

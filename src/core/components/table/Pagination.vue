@@ -21,9 +21,9 @@
 export default {
   name: 'Pagination',
   props: {
-    props: Object,
-    data: Array,
-    pagination: Object,
+    props: { type: Object, default: () => ({}) },
+    data: { type: Array, default: () => [] },
+    pagination: { type: Object, default: () => ({}) },
   },
   data () {
     return {
@@ -59,7 +59,7 @@ export default {
         : `1-${this.data.length} de ${this.data.length}`;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

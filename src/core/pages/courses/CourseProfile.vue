@@ -5,7 +5,7 @@
         <template v-slot:body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon"/></q-item-section>
+              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
               <q-item-section>{{ info.label }}</q-item-section>
             </q-item>
           </div>
@@ -15,7 +15,7 @@
         <ni-profile-organization :profile-id="courseId" />
       </div>
       <div v-else>
-        <profile-tabs :profile-id="courseId" :tabsContent="tabsContent" />
+        <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
       </div>
     </template>
   </q-page>
@@ -35,7 +35,7 @@ export default {
   metadata: { title: 'Fiche formation' },
   mixins: [courseMixin],
   props: {
-    courseId: { type: String },
+    courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },
   },
   components: {
@@ -64,7 +64,7 @@ export default {
       ],
       isClientInterface,
       backgroundClass: isClientInterface ? 'client-background' : 'vendor-background',
-    }
+    };
   },
   computed: {
     ...mapState('course', ['course']),
@@ -75,7 +75,7 @@ export default {
       const infos = [
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
-      ]
+      ];
 
       return infos;
     },
@@ -102,7 +102,7 @@ export default {
     this.$store.dispatch('course/resetCourse');
   },
 
-}
+};
 </script>
 
 <style lang="stylus" scoped>

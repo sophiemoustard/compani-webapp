@@ -44,7 +44,7 @@ export default {
       this.$emit('updateFeeds', done);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

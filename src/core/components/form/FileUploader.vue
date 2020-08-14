@@ -55,7 +55,7 @@ export default {
   data () {
     return {
       headers: [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }],
-    }
+    };
   },
   computed: {
     additionalFields () {
@@ -87,7 +87,7 @@ export default {
     rejected (errors) {
       for (const error of errors) {
         if (error.failedPropValidation === 'max-file-size') NotifyNegative('Fichier trop volumineux.');
-      };
+      }
     },
   },
 };

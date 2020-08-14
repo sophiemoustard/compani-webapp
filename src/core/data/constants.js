@@ -1,3 +1,7 @@
+// IMAGES
+export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
+  + 'compani_texte_rose_1000.png';
+
 // CUSTOMER
 export const CIVILITY_OPTIONS = [
   { label: 'Monsieur', value: 'mr' },
@@ -70,7 +74,7 @@ export const CONTRACT_CREATION_MANDATORY_INFO = {
   'identity.socialSecurityNumber': 'numéro de sécurité sociale',
   'contact.address.fullAddress': 'adresse',
   establishment: 'établissement',
-}
+};
 
 // EVENTS
 export const INTERVENTION = 'intervention';
@@ -114,8 +118,10 @@ export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
 
 // AVATAR
-export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
-export const UNKNOWN_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1563288281/images/users/unknown_avatar.png';
+export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/'
+  + 'images/users/default_avatar.png';
+export const UNKNOWN_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1563288281/'
+  + 'images/users/unknown_avatar.png';
 
 // REPETITION FREQUENCY
 export const NEVER = 'never';
@@ -153,7 +159,7 @@ export const CUSTOMER = 'customer';
 export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planning_referent';
-export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company'
+export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 
@@ -169,7 +175,7 @@ export const ROLES_TRANSLATION = {
 };
 
 // SUBSCRIPTIONS
-export const ERP = 'erp'
+export const ERP = 'erp';
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
@@ -291,7 +297,7 @@ export const ASSOCIATION = 'association';
 export const COMPANY_TYPES = [
   { label: 'Association', value: ASSOCIATION },
   { label: 'Entreprise', value: COMPANY },
-]
+];
 
 // SMS
 export const CONVOCATION = 'convocation';
@@ -303,7 +309,7 @@ export const INTER_B2B = 'inter_b2b';
 export const COURSE_TYPES = [
   { label: 'Intra', value: INTRA },
   { label: 'Inter B2B', value: INTER_B2B },
-]
+];
 export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';

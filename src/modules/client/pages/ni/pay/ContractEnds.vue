@@ -11,7 +11,7 @@
     </ni-title-header>
     <ni-large-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
-      <template v-slot:header="{ props }" >
+      <template v-slot:header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :style="col.style" :key="col.name" :props="props">{{ col.label }}</q-th>
           <th>
@@ -19,7 +19,7 @@
           </th>
         </q-tr>
       </template>
-      <template v-slot:body="{ props }" >
+      <template v-slot:body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
             :style="col.style">
@@ -39,27 +39,27 @@
             </template>
             <template v-else-if="col.name === 'hoursCounter'">
               <ni-editable-td :props="props.row" edited-field="hoursCounter" edition-boolean-name="hoursCounterEdition"
-                :refName="`${props.row.auxiliaryId}Counter`" :value="col.value" @disable="disableEditionField($event)"
+                :ref-name="`${props.row.auxiliaryId}Counter`" :value="col.value" @disable="disableEditionField($event)"
                 @click="editField($event)" @change="setEditionField($event)" suffix="h" />
             </template>
             <template v-else-if="col.name === 'overtimeHours'">
                 <ni-editable-td :props="props.row" edited-field="overtimeHours" :value="col.value" suffix="h"
-                  edition-boolean-name="overtimeHoursEdition" :refName="`${props.row.auxiliaryId}Overtime`"
+                  edition-boolean-name="overtimeHoursEdition" :ref-name="`${props.row.auxiliaryId}Overtime`"
                   @disable="disableEditionField($event)" @click="editField($event)" @change="setEditionField($event)" />
             </template>
             <template v-else-if="col.name === 'additionalHours'">
               <ni-editable-td :props="props.row" edited-field="additionalHours" suffix="h" :value="col.value"
-                edition-boolean-name="additionalHoursEdition" :refName="`${props.row.auxiliaryId}Additional`"
+                edition-boolean-name="additionalHoursEdition" :ref-name="`${props.row.auxiliaryId}Additional`"
                 @disable="disableEditionField($event)" @click="editField($event)" @change="setEditionField($event)" />
             </template>
             <template v-else-if="col.name === 'bonus'">
               <ni-editable-td :props="props.row" edited-field="bonus" edition-boolean-name="bonusEdition"
-                :refName="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
+                :ref-name="`${props.row.auxiliaryId}Bonus`" :value="col.value" @disable="disableEditionField($event)"
                 @click="editField($event)" @change="setEditionField($event)" suffix="€" />
             </template>
             <template v-else-if="col.name === 'compensation'">
               <ni-editable-td :props="props.row" edited-field="compensation" edition-boolean-name="compensationEdition"
-                :refName="`${props.row.auxiliaryId}Compensation`" :value="col.value" suffix="€"
+                :ref-name="`${props.row.auxiliaryId}Compensation`" :value="col.value" suffix="€"
                 @click="editField($event)" @change="setEditionField($event)" @disable="disableEditionField($event)" />
             </template>
             <template v-else>{{ col.value }}</template>
@@ -73,8 +73,8 @@
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="validateFinalPayListCreation" />
 
-    <ni-pay-surcharge-details-modal :paySurchargeDetailsModal.sync="surchargeDetailModal"
-      @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surchargeDetailKey="surchargeDetailKey" />
+    <ni-pay-surcharge-details-modal :pay-surcharge-details-modal.sync="surchargeDetailModal"
+      @update:surchargeDetailModal="resetSurchargeDetail" :pay="pay" :surcharge-detail-key="surchargeDetailKey" />
   </q-page>
 </template>
 
@@ -82,7 +82,7 @@
 import FinalPay from '@api/FinalPay';
 import EditableTd from '@components/table/EditableTd';
 import LargeTable from '@components/table/LargeTable';
-import TitleHeader from '@components/TitleHeader'
+import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
@@ -182,5 +182,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

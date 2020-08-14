@@ -6,8 +6,9 @@
 
 <script>
 import gdrive from '@api/GoogleDrive';
+
 export default {
-  name: 'custom-img',
+  name: 'CustomImg',
   props: {
     imageSource: { type: String, required: true },
     alt: { type: String, required: true },
@@ -16,7 +17,7 @@ export default {
   data () {
     return {
       link: '',
-    }
+    };
   },
   mounted () {
     this.getThumbnailUrl();
@@ -36,7 +37,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

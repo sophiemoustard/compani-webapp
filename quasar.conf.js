@@ -1,4 +1,3 @@
-/* eslint-disable func-names */
 require('dotenv').config();
 const path = require('path');
 const webpack = require('webpack');
@@ -117,10 +116,14 @@ module.exports = function (ctx) {
           test: /\.(js|vue)$/,
           loader: 'eslint-loader',
           exclude: /(node_modules|quasar)/,
+          options: {
+            fix: true,
+          },
         }, {
           test: /\.(html)$/,
           use: { loader: 'html-loader' },
         });
+        // eslint-disable-next-line no-param-reassign
         cfg.resolve.alias = {
           ...cfg.resolve.alias,
           '@components': path.resolve(__dirname, './src/core/components'),
@@ -128,13 +131,13 @@ module.exports = function (ctx) {
           '@helpers': path.resolve(__dirname, './src/core/helpers'),
           '@data': path.resolve(__dirname, './src/core/data'),
           '@mixins': path.resolve(__dirname, './src/core/mixins'),
-        }
+        };
         cfg.plugins.push(
           // Select moment locale files
           new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/),
           // Ignore astronomia (date-holidays)
           new webpack.IgnorePlugin(/^\.\/vsop87B.*$/)
-        )
+        );
       },
       env: {
         NODE_ENV: JSON.stringify(process.env.NODE_ENV),

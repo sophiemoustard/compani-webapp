@@ -68,7 +68,7 @@ export default {
           phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
         },
       },
-    }
+    };
   },
   computed: {
     ...mapState('userProfile', ['userProfile']),

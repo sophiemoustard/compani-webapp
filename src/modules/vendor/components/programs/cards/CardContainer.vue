@@ -66,7 +66,7 @@ export default {
       this.$store.dispatch('program/fetchCard', card);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

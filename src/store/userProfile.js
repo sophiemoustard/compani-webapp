@@ -12,15 +12,16 @@ export default {
     },
   },
   mutations: {
-    SET_USER_PROFILE: (state, data) => { state.userProfile = !data ? data : Object.assign({}, data); },
+    SET_USER_PROFILE: (state, data) => { state.userProfile = !data ? data : ({ ...data }); },
     SET_NOTIFICATION: (state, notification) => {
       if (!notification) {
-        state.notifications = {}
+        state.notifications = {};
         return;
       }
-      state.notifications[notification.type] = Object.assign({}, state.notifications[notification.type], {
+      state.notifications[notification.type] = {
+        ...state.notifications[notification.type],
         [notification._id]: notification.exists,
-      });
+      };
     },
   },
   actions: {
@@ -28,7 +29,7 @@ export default {
       try {
         const user = await Users.getById(params.userId);
 
-        commit('SET_USER_PROFILE', Object.assign({}, extend(userModel, user)));
+        commit('SET_USER_PROFILE', { ...extend(userModel, user) });
       } catch (e) {
         console.error(e);
       }
@@ -46,6 +47,6 @@ export default {
     },
   },
   getters: {
-    getUserProfile: (state) => state.userProfile,
+    getUserProfile: state => state.userProfile,
   },
-}
+};

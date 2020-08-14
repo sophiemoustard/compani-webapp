@@ -17,9 +17,9 @@ export default {
     const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
     return {
       backgroundClass: interfaceType === CLIENT ? 'grey-background' : 'beige-background',
-    }
+    };
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

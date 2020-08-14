@@ -147,7 +147,7 @@
                 <template v-else-if="col.name === 'signed'">
                   <div :class="[{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }]" />
                 </template>
-                <template v-else>{{ col.value}}</template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </template>
@@ -179,8 +179,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="fundingSubscriptionsOptions.length === 0 || fundingsLoading" flat no-caps color="primary" icon="add"
-            label="Ajouter un financement" @click="openFundingCreationModal" />
+          <q-btn :disable="fundingSubscriptionsOptions.length === 0 || fundingsLoading" flat no-caps color="primary"
+            icon="add" label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
     </div>
@@ -189,7 +189,7 @@
       <div class="row gutter-profile q-mb-lg">
         <div class="col-xs-12">
           <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
-            @uploaded="documentUploaded" name="financialCertificates" collapsibleLabel="Ajouter un justificatif"
+            @uploaded="documentUploaded" name="financialCertificates" collapsible-label="Ajouter un justificatif"
             :user-profile="customer" :url="docsUploadUrl" @delete="validateFinancialCertifDeletion($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />
         </div>
@@ -235,11 +235,11 @@
 
     <!-- Add helper modal -->
     <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
-      :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" @nextStep="nextStep"
-      :firstStep="firstStep" />
+      :new-helper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" @nextStep="nextStep"
+      :first-step="firstStep" />
 
     <!-- Edit helper modal -->
-    <edit-helper-modal :editedHelper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
+    <edit-helper-modal :edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
       :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper" />
 
     <!-- Subscription creation modal -->
@@ -287,8 +287,8 @@
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
       <template slot="title">
-        Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
-                selectedSubscription.service.name}}</span>
+        Historique de la souscription <span class="text-weight-bold">{{ selectedSubscription.service &&
+                selectedSubscription.service.name }}</span>
       </template>
       <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
         :pagination.sync="paginationHistory">
@@ -324,15 +324,14 @@
 
     <!-- Funding creation modal -->
     <add-funding-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :newFunding="newFunding" :thirdPartyPayers="ttpList" @submit="submitFunding" :validations="$v.newFunding"
-      :fundingSubscriptionsOptions="fundingSubscriptionsOptions" :daysOptions="daysOptions"/>
+      :new-funding="newFunding" :third-party-payers="ttpList" @submit="submitFunding" :validations="$v.newFunding"
+      :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
 
     <!-- Funding edition modal -->
     <edit-funding-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
-      :editedFunding="editedFunding" @editFunding="editFunding" :daysOptions="daysOptions"
+      :edited-funding="editedFunding" @editFunding="editFunding" :days-options="daysOptions"
       :validations="$v.editedFunding" />
-
-  </div>
+</div>
 </template>
 
 <script>
@@ -431,7 +430,7 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
@@ -455,7 +454,7 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
@@ -494,19 +493,20 @@ export default {
       },
       extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
       firstStep: true,
-    }
+    };
   },
   computed: {
     ...mapState('customer', ['customer']),
     customerIdentity () {
       const firstname = get(this.customer, 'identity.firstname');
       const lastname = get(this.customer, 'identity.lastname');
-      return firstname ? `${firstname}_${lastname}` : lastname
+      return firstname ? `${firstname}_${lastname}` : lastname;
     },
     docsUploadUrl () {
       if (!this.customer.driveFolder) return '';
 
-      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`;
+      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}`
+        + '/upload';
     },
     headers () {
       return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
@@ -531,17 +531,18 @@ export default {
     },
     ibanError () {
       if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
-      else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
+      if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
       return '';
     },
     bicError () {
       if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
-      else if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
+      if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
       return '';
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
+        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
+          + `par ${this.acceptedBy}`;
       }
       return '';
     },
@@ -614,20 +615,20 @@ export default {
         subscription: { required },
         nature: { required },
         frequency: { required },
-        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
-        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY }) },
-        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
       },
       editedFunding: {
-        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
-        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
-        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
       },
     };
   },
@@ -641,14 +642,14 @@ export default {
         { name: 'mandateId', value: row._id },
         { name: 'fileName', value: `mandat_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedMandate' },
-      ]
+      ];
     },
     quoteFormFields (quote) {
       return [
         { name: 'quoteId', value: quote._id },
         { name: 'fileName', value: `devis_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedQuote' },
-      ]
+      ];
     },
     getServiceLastVersion (service) {
       if (!service.versions || service.versions.length === 0) return {};
@@ -656,7 +657,7 @@ export default {
       return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
     },
     saveTmp (path) {
-      this.tmpInput = get(this.customer, path)
+      this.tmpInput = get(this.customer, path);
     },
     saveTmpSignedAt (index) {
       this.tmpInput = this.customer.payment.mandates[index].signedAt;
@@ -713,7 +714,7 @@ export default {
     // Subscriptions
     formatCreatedSubscription () {
       const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
-      const formattedService = { service: service._id, versions: [{ unitTTCRate, estimatedWeeklyVolume }] }
+      const formattedService = { service: service._id, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
 
       if (sundays) formattedService.versions[0].sundays = sundays;
       if (evenings) formattedService.versions[0].evenings = evenings;
@@ -780,7 +781,7 @@ export default {
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de la souscription.')
+        NotifyNegative('Erreur lors de la modification de la souscription.');
       } finally {
         this.loading = false;
       }
@@ -793,7 +794,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403) return NotifyNegative(e.data.message);
-        return NotifyNegative('Erreur lors de la suppression de la souscription.')
+        return NotifyNegative('Erreur lors de la suppression de la souscription.');
       }
     },
     validateSubscriptionsDeletion (subscriptionId) {
@@ -869,7 +870,7 @@ export default {
         weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
         sundays: subscription.sundays || '',
         evenings: subscription.evenings || '',
-      }
+      };
     },
     async downloadQuote (doc) {
       try {
@@ -888,7 +889,7 @@ export default {
           rcs: this.company.rcs,
           subscriptions,
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
-        }
+        };
         const params = { driveId: quoteDriveId };
         await downloadDocxFile(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
@@ -902,7 +903,7 @@ export default {
         serviceName: subscription.service.name,
         unitTTCRate: subscription.unitTTCRate,
         estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-      }
+      };
       if (subscription.sundays) sub.sundays = subscription.sundays;
       if (subscription.evenings) sub.evenings = subscription.evenings;
 
@@ -982,7 +983,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de l'ajout d'un financement");
+        NotifyNegative('Erreur lors de l\'ajout d\'un financement');
       } finally {
         this.loading = false;
       }
@@ -1014,10 +1015,10 @@ export default {
     resetFundingDetailsData () {
       this.fundingDetailsModal = false;
       this.selectedFunding = {};
-      this.fundingDetailsData = []
+      this.fundingDetailsData = [];
     },
     startFundingEdition (id) {
-      this.editedFunding = Object.assign({}, this.fundings.find(fund => fund._id === id));
+      this.editedFunding = { ...this.fundings.find(fund => fund._id === id) };
       this.editedFunding.subscription = this.editedFunding.subscription._id;
       this.fundingEditionModal = true;
     },
@@ -1052,13 +1053,13 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de la modification d'un financement");
+        NotifyNegative('Erreur lors de la modification d\'un financement');
       } finally {
         this.loading = false;
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

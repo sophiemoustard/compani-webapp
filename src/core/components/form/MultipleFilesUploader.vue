@@ -24,7 +24,8 @@
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem"
                   @click.native="deleteDocument(certificate.driveId)" />
-                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem"
+                  @click.native="goToUrl(certificate.link)" />
               </div>
             </div>
           </div>
@@ -94,7 +95,7 @@ export default {
       NotifyNegative('Echec de l\'envoi du document.');
     },
     goToUrl (url) {
-      url = `${url}?usp=sharing`
+      url = `${url}?usp=sharing`;
       openURL(url);
     },
   },

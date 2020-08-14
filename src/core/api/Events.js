@@ -31,11 +31,17 @@ export default {
     return workingStats.data.data.workingStats;
   },
   async getPaidTransportStatsBySector (params = null) {
-    const paidTransportStatsBySector = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/paid-transport`, { params });
+    const paidTransportStatsBySector = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/events/paid-transport`,
+      { params }
+    );
     return paidTransportStatsBySector.data.data.paidTransportStatsBySector;
   },
   async getUnassignedHoursBySector (params = null) {
-    const unassignedHoursBySector = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/unassigned-hours`, { params });
+    const unassignedHoursBySector = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/events/unassigned-hours`,
+      { params }
+    );
     return unassignedHoursBySector.data.data.unassignedHoursBySector;
   },
 };

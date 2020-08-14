@@ -1,7 +1,7 @@
 <template>
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
-    <ni-table-list :data="orderedCourses" :columns="columns" @goTo="goToCourseProfileFollowUp"/>
+    <ni-table-list :data="orderedCourses" :columns="columns" @goTo="goToCourseProfileFollowUp" />
   </div>
 </template>
 
@@ -35,7 +35,7 @@ export default {
           field: row => row,
           align: 'left',
           sortable: false,
-          format: (value) => value.program.name + (value.misc ? ` - ${value.misc}` : ''),
+          format: value => value.program.name + (value.misc ? ` - ${value.misc}` : ''),
           style: 'min-width: 200px; width: 65%',
         },
         {
@@ -44,7 +44,7 @@ export default {
           field: 'status',
           align: 'left',
           sortable: false,
-          format: (value) => this.statusTranslation[value],
+          format: value => this.statusTranslation[value],
           style: 'min-width: 110px; width: 35%',
         },
       ],
@@ -53,7 +53,7 @@ export default {
   computed: {
     ...mapState('userProfile', ['userProfile']),
     orderedCourses () {
-      return [...this.courseListForthcoming, ...this.courseListInProgress, ...this.courseListCompleted]
+      return [...this.courseListForthcoming, ...this.courseListInProgress, ...this.courseListCompleted];
     },
   },
   async created () {

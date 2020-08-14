@@ -1,6 +1,6 @@
-const ibantools = require('ibantools');
-const axios = require('axios');
-const moment = require('moment');
+import { isValidIBAN, isValidBIC } from 'ibantools';
+import axios from 'axios';
+import moment from 'moment';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 
@@ -19,13 +19,13 @@ export const frZipCode = (value) => {
 export const iban = (value) => {
   if (!value) return false;
 
-  return ibantools.isValidIBAN(value.split(' ').join(''));
+  return isValidIBAN(value.split(' ').join(''));
 };
 
 export const bic = (value) => {
   if (!value) return false;
 
-  return ibantools.isValidBIC(value);
+  return isValidBIC(value);
 };
 
 export const frAddress = async (value) => {
@@ -36,7 +36,7 @@ export const frAddress = async (value) => {
       limit: 1,
     },
   });
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve(res.data.features.length === 1 && res.data.features[0].properties.score > 0.9);
   });
 };
@@ -55,17 +55,11 @@ export const strictPositiveNumber = (value) => {
   return value > 0;
 };
 
-export const validHour = (value) => {
-  return !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
-};
+export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
-export const minDate = (min) => {
-  return (value) => moment(min).isSameOrBefore(value);
-};
+export const minDate = min => value => moment(min).isSameOrBefore(value);
 
-export const maxDate = (max) => {
-  return (value) => moment(max).isSameOrAfter(value);
-};
+export const maxDate = max => value => moment(max).isSameOrAfter(value);
 
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
 

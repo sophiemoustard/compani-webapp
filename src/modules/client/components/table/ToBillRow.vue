@@ -31,8 +31,8 @@
       <template v-else-if="col.name === 'hours'">{{ formatHours(bill) }}</template>
       <template v-else-if="col.name === 'unitExclTaxes'">{{ formatPrice(bill.unitExclTaxes) }}</template>
       <template v-else-if="col.name === 'discount'">
-        <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition" :refName="bill._id"
-          :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)"
+        <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
+          :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)" :ref-name="bill._id"
           @click="$emit('discount:click', $event)" @change="setDiscount" suffix="€" />
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
@@ -56,8 +56,8 @@ export default {
     'ni-editable-td': EditableTd,
   },
   props: {
-    props: Object,
-    bill: Object,
+    props: { type: Object, default: () => ({}) },
+    bill: { type: Object, default: () => ({}) },
     index: { type: Number, default: () => 0 },
     displayCheckbox: { type: Boolean, default: () => false },
   },
@@ -98,7 +98,7 @@ export default {
       bill.discountEdition = false;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

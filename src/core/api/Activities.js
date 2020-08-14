@@ -1,4 +1,4 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async getById (activityId) {
@@ -11,4 +11,4 @@ export default {
   async addCard (activityId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/activities/${activityId}/cards`, payload);
   },
-}
+};

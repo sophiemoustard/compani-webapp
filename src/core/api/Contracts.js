@@ -15,7 +15,10 @@ export default {
   },
   // Contracts version
   async updateVersion (params, payload) {
-    const contract = await alenviAxios.put(`${process.env.API_HOSTNAME}/contracts/${params.contractId}/versions/${params.versionId}`, payload);
+    const contract = await alenviAxios.put(
+      `${process.env.API_HOSTNAME}/contracts/${params.contractId}/versions/${params.versionId}`,
+      payload
+    );
     return contract.data.data.contract;
   },
   async createVersion (contractId, payload) {
