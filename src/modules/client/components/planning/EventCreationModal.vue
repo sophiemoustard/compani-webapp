@@ -123,7 +123,7 @@ export default {
     },
     selectedAuxiliary () {
       if (!this.newEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
-      const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+      const aux = this.activeAuxiliaries.find(a => a._id === this.newEvent.auxiliary);
       const hasContractOnEvent = this.hasContractOnEvent(aux, this.newEvent.dates.startDate);
 
       return { ...aux, hasContractOnEvent };

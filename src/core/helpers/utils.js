@@ -114,9 +114,9 @@ export const formatPhoneForPayload = phoneNumber => (phoneNumber
   ? phoneNumber.replace(/[\s\-.]/g, '')
   : '');
 
-export const removeDiacritics = str =>
-  // eslint-disable-next-line no-control-regex
-  str.replace(/[^\u0000-\u007E]/g, a => diacriticsMap[a] || a);
+// eslint-disable-next-line no-control-regex
+export const removeDiacritics = str => str.replace(/[^\u0000-\u007E]/g, a => diacriticsMap[a] || a);
+
 export const upperCaseFirstLetter = str => str.charAt(0).toUpperCase() + str.slice(1);
 
 export const truncate = (string, limit = 30) => (string.length > limit ? `${string.slice(0, limit)}...` : string);

@@ -334,7 +334,6 @@ export const planningActionMixin = {
 
       switch (event.type) {
         case INTERVENTION: {
-          const subscription = event.subscription._id;
           this.editedEvent = {
             isCancelled: false,
             cancel: {},
@@ -344,7 +343,7 @@ export const planningActionMixin = {
             sector: sector || auxiliary.sector._id,
             auxiliary: auxiliary ? auxiliary._id : '',
             customer: customer ? customer._id : '',
-            subscription,
+            subscription: subscription._id,
             isBilled,
             address,
           };

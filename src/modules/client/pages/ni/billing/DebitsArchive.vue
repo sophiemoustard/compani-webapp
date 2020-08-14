@@ -23,6 +23,7 @@
 </template>
 
 <script>
+
 import { mapGetters } from 'vuex';
 import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';

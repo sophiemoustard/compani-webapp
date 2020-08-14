@@ -185,14 +185,14 @@ export default {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
     },
     getStepTypeLabel (value) {
-      const type = this.stepTypeOptions.find(type => type.value === value);
+      const type = this.stepTypeOptions.find(t => t.value === value);
       return type ? type.label : '';
     },
     getStepTypeIcon (type) {
       return type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach';
     },
     getActivityTypeLabel (value) {
-      const type = this.activityTypeOptions.find(type => type.value === value);
+      const type = this.activityTypeOptions.find(t => t.value === value);
       return type ? type.label : '';
     },
     showActivities (stepId) {

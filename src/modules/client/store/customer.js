@@ -17,7 +17,10 @@ export default {
         state.notifications = {};
         return;
       }
-      state.notifications[notification.type] = { ...state.notifications[notification.type], [notification._id]: notification.exists };
+      state.notifications[notification.type] = {
+        ...state.notifications[notification.type],
+        [notification._id]: notification.exists,
+      };
     },
   },
   actions: {

@@ -137,7 +137,7 @@ export default {
   },
   methods: {
     isNext (slot) {
-      const nextCourses = Object.values(this.courseSlots).filter(slot => !this.happened(slot))
+      const nextCourses = Object.values(this.courseSlots).filter(s => !this.happened(s))
         .sort((a, b) => new Date(a[0].startDate) - new Date(b[0].startDate));
 
       return !nextCourses.length || nextCourses[0][0]._id === slot[0]._id;

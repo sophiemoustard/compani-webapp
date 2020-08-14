@@ -249,7 +249,7 @@ export default {
   methods: {
     get,
     getType (value) {
-      const type = this.messageTypeOptions.find(type => type.value === value);
+      const type = this.messageTypeOptions.find(t => t.value === value);
       return type ? type.label : '';
     },
     setDefaultMessageType () {

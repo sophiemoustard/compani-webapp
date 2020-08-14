@@ -235,10 +235,10 @@ export default {
     // Event display
     unassignedHourCount (sectorId) {
       const unassignedEvents = this.getPersonEvents({ _id: sectorId });
-      let total = 0;
-      for (const event of unassignedEvents) {
-        total += this.$moment(event.endDate).diff(event.startDate, 'm', true);
-      }
+      const total = unassignedEvents.reduce(
+        (acc, event) => acc + this.$moment(event.endDate).diff(event.startDate, 'm', true),
+        0
+      );
 
       return total / 60;
     },
@@ -279,10 +279,8 @@ export default {
             !get(this.draggedObject, 'auxiliary._id');
           const dropToSameDay = toDay.isSame(this.draggedObject.startDate, 'd');
           if (dropToSameSector && dropToSameDay) return;
-        } else { // Update event auxiliary
-          if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
+        } else if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
             toDay.isSame(this.draggedObject.startDate, 'd')) return;
-        }
 
         this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
       } catch (e) {

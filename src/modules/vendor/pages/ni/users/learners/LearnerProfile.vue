@@ -111,8 +111,9 @@ export default {
           return 'Responsable Formation';
         case TRAINER:
           return 'Formateur';
+        default:
+          return '';
       }
-      return '';
     },
   },
   beforeDestroy () {

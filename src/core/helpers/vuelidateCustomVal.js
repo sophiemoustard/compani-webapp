@@ -1,3 +1,5 @@
+/* eslint-disable import/newline-after-import */
+/* eslint-disable import/order */
 /* eslint-disable import/first */
 import { workHealthServices } from '@data/workHealthServices';
 

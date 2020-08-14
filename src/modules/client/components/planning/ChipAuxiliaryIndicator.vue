@@ -130,6 +130,7 @@ export default {
       try {
         this.monthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
         const monthCustomersDetails = await Stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
+        // eslint-disable-next-line prefer-destructuring
         this.monthCustomersDetails = monthCustomersDetails[0];
       } catch (e) {
         console.error(e);
@@ -141,6 +142,7 @@ export default {
       try {
         this.prevMonthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
         const prevMonthCustomersDetails = await Stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
+        // eslint-disable-next-line prefer-destructuring
         this.prevMonthCustomersDetails = prevMonthCustomersDetails[0];
       } catch (e) {
         console.error(e);

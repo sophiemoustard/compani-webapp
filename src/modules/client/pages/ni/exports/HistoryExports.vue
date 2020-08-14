@@ -63,7 +63,7 @@ export default {
         this.loading = true;
         await this.$v.dateRange.$touch();
         if (this.$v.dateRange.$error) return NotifyWarning('Date(s) invalide(s)');
-        const type = EXPORT_HISTORY_TYPES.find(type => type.value === this.type);
+        const type = EXPORT_HISTORY_TYPES.find(t => t.value === this.type);
         if (!type) return NotifyNegative('Impossible de téléchager le document.');
 
         const csv = await Exports.getHistoryCsv({ ...this.dateRange, type: type.value });

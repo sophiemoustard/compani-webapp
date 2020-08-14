@@ -196,7 +196,7 @@ export const helperMixin = {
       }
     },
     openEditionModalHelper (helperId) {
-      const helper = this.helpers.find(helper => helper._id === helperId);
+      const helper = this.helpers.find(h => h._id === helperId);
       this.editedHelper = {
         ...pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
         contact: { phone: get(helper, 'contact.phone') || '' },

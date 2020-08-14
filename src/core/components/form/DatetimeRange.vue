@@ -71,8 +71,8 @@ export default {
     setDateHours (date, hour) {
       const splitHour = hour.split(':');
       return this.$moment(date).set({
-        hours: Number.parseInt(splitHour[0]),
-        minutes: Number.parseInt(splitHour[1]),
+        hours: Number.parseInt(splitHour[0], 10),
+        minutes: Number.parseInt(splitHour[1], 10),
         seconds: 0,
         milliseconds: 0,
       }).toISOString();

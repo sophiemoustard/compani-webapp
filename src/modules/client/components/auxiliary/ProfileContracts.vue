@@ -216,10 +216,7 @@ export default {
           + `${missingInfo}.`;
       }
 
-      const missingInfoList = [];
-      for (const info of userMissingInfo) {
-        missingInfoList.push([CONTRACT_CREATION_MANDATORY_INFO[info]]);
-      }
+      const missingInfoList = userMissingInfo.reduce((acc, info) => [...acc, info], []);
 
       return 'Il manque les informations suivantes dans la fiche de l\'auxiliaire pour créer un nouveau contrat : '
         + `${missingInfoList.join(', ')}.`;

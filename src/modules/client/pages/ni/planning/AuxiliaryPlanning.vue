@@ -172,18 +172,16 @@ export default {
     updateAuxiliariesList () {
       const auxiliaries = [];
       for (const sector of this.filteredSectors) {
-        const auxBySector = this.getAuxBySector(sector);
-        for (let i = 0, l = auxBySector.length; i < l; i++) {
-          if (!auxiliaries.some(aux => auxBySector[i]._id === aux._id)) {
-            auxiliaries.push(this.formatAuxiliaryWithSector(auxBySector[i]));
-          }
-        }
+        this.getAuxBySector(sector).reduce(
+          (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
+          auxiliaries
+        );
       }
-      for (const auxiliary of this.filteredAuxiliaries) {
-        if (!auxiliaries.some(aux => aux._id === auxiliary._id)) {
-          auxiliaries.push(this.formatAuxiliaryWithSector(auxiliary));
-        }
-      }
+
+      this.filteredAuxiliaries.reduce(
+        (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
+        auxiliaries
+      );
 
       this.auxiliaries = auxiliaries;
     },
@@ -283,11 +281,11 @@ export default {
     },
     getSectorHistory (aux, sector) {
       if (!aux.sectorHistories) return null;
-      const sectorHistory = aux.sectorHistories.find((sectorHistory) => {
-        const isSameSector = sector ? sectorHistory.sector._id === sector._id : true;
-        const isStartDateBeforeEndOfWeek = this.$moment(sectorHistory.startDate).isSameOrBefore(this.endOfWeek);
-        const isEndDateAfterStartOfWeek = !sectorHistory.endDate ||
-          this.$moment(sectorHistory.endDate).isSameOrAfter(this.startOfWeek);
+      const sectorHistory = aux.sectorHistories.find((sh) => {
+        const isSameSector = sector ? sh.sector._id === sector._id : true;
+        const isStartDateBeforeEndOfWeek = this.$moment(sh.startDate).isSameOrBefore(this.endOfWeek);
+        const isEndDateAfterStartOfWeek = !sh.endDate ||
+          this.$moment(sh.endDate).isSameOrAfter(this.startOfWeek);
         return isSameSector && isStartDateBeforeEndOfWeek && isEndDateAfterStartOfWeek;
       });
       return sectorHistory;
@@ -301,9 +299,8 @@ export default {
 
       if (el.type === SECTOR) {
         this.filteredSectors.push(el);
-      } else { // el = auxiliary
-        if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
-      }
+      } else if (!this.filteredAuxiliaries.some(aux => aux._id === el._id)) this.filteredAuxiliaries.push(el);
+
       await this.refresh();
     },
     async removeElementFromFilter (el) {
@@ -313,7 +310,7 @@ export default {
         this.filteredSectors = this.filteredSectors.filter(sec => sec._id !== el._id);
         this.updateAuxiliariesList();
       } else { // el = auxiliary
-        const auxiliary = this.auxiliaries.find(auxiliary => auxiliary._id === el._id);
+        const auxiliary = this.auxiliaries.find(aux => aux._id === el._id);
         this.filteredAuxiliaries = this.filteredAuxiliaries.filter(aux => aux._id !== auxiliary._id);
         this.updateAuxiliariesList();
         if (this.auxiliaries.some(aux => aux._id === auxiliary._id)) return;
@@ -322,7 +319,8 @@ export default {
       await this.updateDisplayedEventHistories();
     },
     async updateDisplayedEventHistories () {
-      this.eventHistories = this.eventHistories.filter(history => this.auxiliaries.some(aux => history.auxiliaries.map(a => a._id).includes(aux._id)));
+      this.eventHistories = this.eventHistories
+        .filter(history => this.auxiliaries.some(aux => history.auxiliaries.map(a => a._id).includes(aux._id)));
       if (this.auxiliaries.length) await this.getEventHistories();
       if (this.eventHistories.length === 0) this.displayHistory = false;
     },

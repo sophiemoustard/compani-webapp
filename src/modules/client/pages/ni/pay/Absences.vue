@@ -164,11 +164,13 @@ export default {
     getAbsenceDuration (absence) {
       if (absence.absenceNature === DAILY) {
         const range = Array.from(this.$moment().range(absence.startDate, absence.endDate).by('days'));
-        let count = 0;
-        for (const day of range) {
-          // startOf('day') is necessery to check fr holidays in business day
-          if (day.startOf('d').isBusinessDay()) count += 1;
-        }
+        const count = range.reduce(
+          (acc, day) => { // startOf('day') is necessery to check fr holidays in business day
+            if (day.startOf('d').isBusinessDay()) acc += 1;
+            return acc;
+          },
+          0
+        );
 
         return `${count}j`;
       }
