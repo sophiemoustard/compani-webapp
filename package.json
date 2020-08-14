@@ -11,7 +11,7 @@
     "test:e2e": "cypress open",
     "postinstall": "holidays2json --pick FR --min && quasar build",
     "start": "node server.js",
-    "lint": "eslint ./src --ext .js --ext .vue -c .eslintrc.js"
+    "lint": "eslint ./src --ext .js,.vue -c .eslintrc.js"
   },
   "dependencies": {
     "@casl/ability": "^4.1.5",

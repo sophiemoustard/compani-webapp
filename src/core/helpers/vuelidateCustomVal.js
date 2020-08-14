@@ -1,9 +1,6 @@
-/* eslint-disable import/newline-after-import */
-/* eslint-disable import/order */
-/* eslint-disable import/first */
-const ibantools = require('ibantools');
-const axios = require('axios');
-const moment = require('moment');
+import { isValidIBAN, isValidBIC } from 'ibantools';
+import axios from 'axios';
+import moment from 'moment';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 
@@ -22,13 +19,13 @@ export const frZipCode = (value) => {
 export const iban = (value) => {
   if (!value) return false;
 
-  return ibantools.isValidIBAN(value.split(' ').join(''));
+  return isValidIBAN(value.split(' ').join(''));
 };
 
 export const bic = (value) => {
   if (!value) return false;
 
-  return ibantools.isValidBIC(value);
+  return isValidBIC(value);
 };
 
 export const frAddress = async (value) => {
