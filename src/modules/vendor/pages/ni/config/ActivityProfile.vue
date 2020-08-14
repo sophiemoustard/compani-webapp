@@ -183,7 +183,9 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
     this.$store.dispatch('program/resetCard');
-    if (!(new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
+    if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
+      this.$store.dispatch('program/fetchProgram', { programId: this.programId });
+    } else {
       this.$store.dispatch('program/resetProgram');
     }
   },
