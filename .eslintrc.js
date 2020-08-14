@@ -7,7 +7,6 @@ module.exports = {
   env: { browser: true },
   extends: [
     'airbnb-base',
-    'plugin:vue/essential',
     'plugin:cypress/recommended',
     'standard',
     'plugin:vue/strongly-recommended'
