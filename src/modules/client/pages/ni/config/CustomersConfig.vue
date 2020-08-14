@@ -190,10 +190,12 @@
         :error-message="nbrError('editedSurcharge.evening')" first-of-may />
       <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
         :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
-        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening" error-message="Heure invalide" />
+        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
+        error-message="Heure invalide" />
       <ni-time-input in-modal v-model="editedSurcharge.eveningEndTime" caption="Fin soirée"
         :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch"
-        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening" error-message="Heure invalide" />
+        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
+        error-message="Heure invalide" />
       <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
         :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
       <ni-time-input in-modal v-model="editedSurcharge.customStartTime" caption="Début personnalisé"

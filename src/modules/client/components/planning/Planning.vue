@@ -33,8 +33,8 @@
               <template v-for="(hour, hourIndex) in hours">
                 <div class="planning-hour" v-if="hourIndex !== 0" :key="hourIndex"
                   :style="{ left: `${(hourIndex * hourWidth * 2) - 3}%` }">
-{{ hour.format('H') }}
-</div>
+                  {{ hour.format('H') }}
+                </div>
               </template>
             </div>
           </th>
@@ -68,7 +68,8 @@
                 <ni-chip-customer-indicator v-if="isCustomerPlanning" :person="person" :events="getPersonEvents(person)"
                   :staffing-view="staffingView" :start-of-week="startOfWeek" />
                 <ni-chip-auxiliary-indicator v-else :person="person" :events="getPersonEvents(person)"
-                  :start-of-week="startOfWeek" :working-stats="workingStats[person._id]" :staffing-view="staffingView" />
+                  :start-of-week="startOfWeek" :working-stats="workingStats[person._id]"
+                  :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
                 valign="top" @click="createEvent({ dayIndex, person })" class="planning-background"

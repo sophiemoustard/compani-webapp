@@ -40,13 +40,13 @@ import {
 import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
-import CourseInfoLink from './CourseInfoLink';
+import CourseInfoLink from '@components/courses/CourseInfoLink';
 
 export default {
   name: 'ProfileOrganization',
   mixins: [userMixin, courseMixin],
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   components: {
     'ni-input': Input,

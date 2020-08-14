@@ -298,8 +298,8 @@ export default {
       await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
       this.company = this.loggedCompany;
       this.company.address = this.company.address || { fullAddress: '' };
-      this.company.legalRepresentative =
-        this.company.legalRepresentative || { lastname: '', firstname: '', position: '' };
+      this.company.legalRepresentative = this.company.legalRepresentative ||
+        { lastname: '', firstname: '', position: '' };
     },
     // Establishment
     async getEstablishments () {

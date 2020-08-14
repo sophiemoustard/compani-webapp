@@ -20,7 +20,7 @@ export default {
   name: 'TrainerProfile',
   metaInfo: { title: 'Fiche formateurs' },
   props: {
-    trainerId: { type: String },
+    trainerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
   components: {

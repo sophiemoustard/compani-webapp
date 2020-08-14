@@ -2,7 +2,7 @@
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
       class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey"
-      :selected="selected" :visible-columns="visibleColumns"
+      :selected="selected" :visible-columns="formattedVisibleColumns"
       @update:pagination="$emit('update:pagination', $event)" @update:selected="$emit('update:selected', $event)">
       <template v-slot:header="props">
         <slot name="header" :props="props">
@@ -44,10 +44,15 @@ export default {
     selection: { type: String, default: 'none' },
     selected: { type: Array, default: () => [] },
     separator: { type: String, default: 'horizontal' },
-    visibleColumns: Array,
+    visibleColumns: { type: Array, default: () => [] },
   },
   components: {
     'ni-pagination': Pagination,
+  },
+  computed: {
+    formattedVisibleColumns () {
+      return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
+    },
   },
 };
 </script>

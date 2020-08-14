@@ -35,7 +35,7 @@ export default {
   metadata: { title: 'Fiche formation' },
   mixins: [courseMixin],
   props: {
-    courseId: { type: String },
+    courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'organization' },
   },
   components: {

@@ -9,9 +9,10 @@
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event.sync="newEvent"
-      :creation-modal="creationModal" :internal-hours="internalHours" @close="closeCreationModal" :person-key="personKey"
-      :active-auxiliaries="activeAuxiliaries" @resetForm="resetCreationForm" @createEvent="validateCreationEvent"
-      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded" :customers="customers" />
+      :creation-modal="creationModal" :internal-hours="internalHours" @close="closeCreationModal" :customers="customers"
+      :person-key="personKey" :active-auxiliaries="activeAuxiliaries" @resetForm="resetCreationForm"
+      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded"
+      @createEvent="validateCreationEvent" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
@@ -172,16 +173,16 @@ export default {
     updateAuxiliariesList () {
       const auxiliaries = [];
       for (const sector of this.filteredSectors) {
-        this.getAuxBySector(sector).reduce(
+        auxiliaries.push(...this.getAuxBySector(sector).reduce(
           (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
-          auxiliaries
-        );
+          []
+        ));
       }
 
-      this.filteredAuxiliaries.reduce(
+      auxiliaries.push(...this.filteredAuxiliaries.reduce(
         (acc, aux) => (!acc.some(a => a._id === aux._id) ? [...acc, this.formatAuxiliaryWithSector(aux)] : acc),
-        auxiliaries
-      );
+        []
+      ));
 
       this.auxiliaries = auxiliaries;
     },

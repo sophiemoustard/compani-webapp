@@ -29,7 +29,7 @@ export default {
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
     options: { type: Array, default: () => [] },
-    value: [String, Number, Object],
+    value: { type: [String, Number, Object], default: '' },
     requiredField: { type: Boolean, default: false },
     inModal: { type: Boolean, default: false },
     last: { type: Boolean, default: false },

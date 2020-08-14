@@ -26,7 +26,7 @@ export default {
   name: 'CompanyProfile',
   metadata: { title: 'Fiche structure' },
   props: {
-    companyId: { type: String },
+    companyId: { type: String, required: true },
     defaultTab: { type: String, default: 'infos' },
   },
   components: {

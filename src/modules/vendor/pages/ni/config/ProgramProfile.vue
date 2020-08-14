@@ -17,7 +17,7 @@ export default {
   name: 'ProgramProfile',
   metadata: { title: 'Fiche programme' },
   props: {
-    programId: { type: String },
+    programId: { type: String, required: true },
     defaultTab: { type: String, default: 'infos' },
   },
   components: {

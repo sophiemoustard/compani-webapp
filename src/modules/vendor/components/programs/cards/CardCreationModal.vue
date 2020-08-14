@@ -102,7 +102,7 @@ export default {
       MULTIPLE_CHOICE_QUESTION,
       SINGLE_CHOICE_QUESTION,
       ORDER_THE_SEQUENCE,
-    }
+    };
   },
   computed: {
     lessonTemplates () {
@@ -114,7 +114,7 @@ export default {
   },
   methods: {
     getClass (template) {
-      return ['card-button', 'cursor-pointer', { 'card-button-selected': this.card.template === template }]
+      return ['card-button', 'cursor-pointer', { 'card-button-selected': this.card.template === template }];
     },
     selectTemplate (template) {
       this.card.template = template;
@@ -123,7 +123,7 @@ export default {
       return label.replace(/ /g, '\n');
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

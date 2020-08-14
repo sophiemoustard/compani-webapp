@@ -19,8 +19,5 @@ export default ({ app, router, Vue }) => {
     workingWeekdays: [1, 2, 3, 4, 5, 6],
   });
 
-  // Destroys performance. Do we even need it?
-  // moment.tz.setDefault('Europe/Paris');
-
   Vue.prototype.$moment = momentRange;
 };

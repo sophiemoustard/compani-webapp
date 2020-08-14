@@ -21,8 +21,8 @@
                 <template v-for="(hour, hourIndex) in hours">
                   <div v-if="hourIndex !== 0" class="planning-hour" :key="`hour_${hourIndex}`"
                     :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">
-{{ hour.format('HH:mm') }}
-</div>
+                    {{ hour.format('HH:mm') }}
+                  </div>
                 </template>
               </template>
               <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)"

@@ -17,8 +17,8 @@ export default {
     editedField: { type: String, default: '' },
     editionBooleanName: { type: String, default: '' },
     refName: { type: String, default: '' },
-    value: String,
-    suffix: String,
+    value: { type: String, default: '' },
+    suffix: { type: String, default: '' },
   },
   methods: {
     disableEdition () {

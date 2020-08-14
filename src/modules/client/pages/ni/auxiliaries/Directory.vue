@@ -336,8 +336,7 @@ export default {
 
         if (userExistsInfo.exists) {
           const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
-          const userHasValidCompany =
-            !get(userExistsInfo, 'user.company') ||
+          const userHasValidCompany = !get(userExistsInfo, 'user.company') ||
              get(userExistsInfo, 'user.company') === this.company._id;
           const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
 

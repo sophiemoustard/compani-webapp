@@ -5,10 +5,15 @@ module.exports = {
     sourceType: 'module'
   },
   env: { browser: true },
-  extends: ['airbnb-base', 'plugin:vue/essential', 'plugin:cypress/recommended', 'standard'],
+  extends: [
+    'airbnb-base',
+    'plugin:vue/essential',
+    'plugin:cypress/recommended',
+    'standard',
+    'plugin:vue/strongly-recommended'
+  ],
   plugins: ['vue', 'cypress'],
   globals: {
-    'ga': true, // Google Analytics
     '__statics': true,
     'cypress/globals': true
   },
@@ -21,7 +26,11 @@ module.exports = {
     'max-len': ['error', { code: 120, tabWidth: 2 }],
     'no-console': ['error', { allow: ['error'] }],
     'no-trailing-spaces': 'error',
-    "indent": ["error", 2, { SwitchCase: 1 }],
+    'indent': ["error", 2, { SwitchCase: 1 }],
+    'vue/max-attributes-per-line': 0,
+    'vue/singleline-html-element-content-newline': 0,
+    'vue/html-indent': 0,
+    'vue/html-closing-bracket-newline': 0,
     // Un-used AirBnb rules
     'no-param-reassign': 0,
     'import/no-extraneous-dependencies': 0,
@@ -50,7 +59,7 @@ module.exports = {
       },
     ],
     'object-curly-newline': ['error', { consistent: true }],
-    'operator-linebreak': ['error', 'before', { overrides: { '&&': 'after', '||': 'after' } }],
+    'operator-linebreak': ['error', 'before', { overrides: { '&&': 'after', '||': 'after', '=': 'after' } }],
     'arrow-parens': [2, 'as-needed', { requireForBlockBody: true }],
   }
 }

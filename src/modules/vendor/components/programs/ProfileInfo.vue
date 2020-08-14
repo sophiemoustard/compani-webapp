@@ -32,7 +32,7 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 export default {
   name: 'ProfileInfo',
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   components: {
     'ni-input': Input,

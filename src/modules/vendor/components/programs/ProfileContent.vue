@@ -4,7 +4,7 @@
       <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
-      <q-card v-for="(step, index) of subProgram.steps" :key="index" flat class="step">
+      <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
         <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
           <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
           <q-item-section>
@@ -17,7 +17,7 @@
           <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
         </q-card-section>
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-          <q-card v-for="(activity, index) of step.activities" :key="index" flat class="activity">
+          <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
             <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
               <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
               <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
@@ -127,7 +127,7 @@ import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@d
 export default {
   name: 'ProfileContent',
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   components: {
     'ni-input': Input,

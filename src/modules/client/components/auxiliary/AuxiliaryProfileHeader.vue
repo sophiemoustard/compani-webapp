@@ -73,7 +73,7 @@ export default {
     'ni-modal': Modal,
   },
   props: {
-    profileId: String,
+    profileId: { type: String, required: true },
   },
   data () {
     return {

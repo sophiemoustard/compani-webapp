@@ -17,7 +17,7 @@ import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
 export default {
   props: {
-    auxiliaryId: { type: String },
+    auxiliaryId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
   components: {

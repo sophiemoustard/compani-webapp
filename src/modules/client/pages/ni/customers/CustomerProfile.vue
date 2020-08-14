@@ -17,7 +17,7 @@ import ProfileBilling from 'src/modules/client/components/customers/billing/Prof
 
 export default {
   props: {
-    customerId: { type: String },
+    customerId: { type: String, required: true },
     defaultTab: { type: String, default: () => 'followUp' },
   },
   components: {

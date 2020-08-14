@@ -1,8 +1,8 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination"
-      :hide-bottom="(!!data.length && pagination.rowsPerPage === 0) || hideBottom" :visible-columns="visibleColumns"
-      :rows-per-page-options="[]" v-on="$listeners" :class="[{'table-simple': responsive }]">
+      :hide-bottom="(!!data.length && pagination.rowsPerPage === 0) || hideBottom" :rows-per-page-options="[]"
+      :visible-columns="formattedVisibleColumns" v-on="$listeners" :class="[{'table-simple': responsive }]">
       <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
         <slot name="top-row" :props="props" />
       </template>
@@ -39,11 +39,16 @@ export default {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
     rowKey: { type: String, default: 'name' },
-    visibleColumns: Array,
+    visibleColumns: { type: Array, default: () => [] },
     pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
     loading: { type: Boolean, default: false },
     responsive: { type: Boolean, default: true },
     hideBottom: { type: Boolean, default: false },
+  },
+  computed: {
+    formattedVisibleColumns () {
+      return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
+    },
   },
 };
 </script>

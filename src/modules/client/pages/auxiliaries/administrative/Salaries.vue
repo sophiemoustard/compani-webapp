@@ -12,7 +12,9 @@ import { mapState } from 'vuex';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
 export default {
-  props: ['id'],
+  props: {
+    id: { type: String, required: true },
+  },
   components: {
     'profile-pay': ProfilePay,
   },

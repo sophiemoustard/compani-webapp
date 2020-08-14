@@ -29,7 +29,7 @@ export default {
   props: {
     natureOptions: { type: Array, default: () => [] },
     inModal: { type: Boolean, default: false },
-    value: null,
+    value: { type: Object, default: () => ({}) },
   },
   data () {
     return {

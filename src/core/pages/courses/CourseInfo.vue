@@ -37,8 +37,7 @@
       <div>
         <q-item v-if="course.program" class="row">
           <q-item-section side class="course-img-container">
-              <img class="course-img course-img-explanation"
-              src="">
+              <img class="course-img course-img-explanation" :src="programImg">
           </q-item-section>
           <q-item-section class="course-item-container">
             <div class="text-weight-bold">Programme de la formation</div>
@@ -57,8 +56,7 @@
         </q-item>
         <q-item v-if="course.contact" class="row">
           <q-item-section side class="course-img-container">
-            <img class="course-img course-img-contact"
-              src="">
+            <img class="course-img course-img-contact" :src="contactImg">
           </q-item-section>
           <div class="course-item-container">
             <div class="text-weight-bold">Votre contact pour la formation</div>

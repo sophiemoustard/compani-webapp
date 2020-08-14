@@ -1,13 +1,11 @@
 /* eslint-disable import/newline-after-import */
 /* eslint-disable import/order */
 /* eslint-disable import/first */
-import { workHealthServices } from '@data/workHealthServices';
-
-import { urssafCodes } from '@data/urssafCodes';
-
 const ibantools = require('ibantools');
 const axios = require('axios');
 const moment = require('moment');
+import { workHealthServices } from '@data/workHealthServices';
+import { urssafCodes } from '@data/urssafCodes';
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;

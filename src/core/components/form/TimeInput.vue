@@ -66,7 +66,8 @@ export default {
             });
           }
           return acc;
-        }
+        },
+        []
       );
     },
   },

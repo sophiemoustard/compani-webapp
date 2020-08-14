@@ -33,7 +33,7 @@ export default {
   name: 'PlanningNavigation',
   props: {
     timelineTitle: { type: String, default: '' },
-    targetDate: { type: String },
+    targetDate: { type: String, default: '' },
     viewMode: { type: String, default: 'week' },
     type: { type: String, default: PLANNING },
     isCoachOrPlanningReferent: { type: Boolean, default: false },

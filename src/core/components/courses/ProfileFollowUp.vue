@@ -134,7 +134,7 @@ import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import { formatIdentity } from '@helpers/utils.js';
 import { courseMixin } from '@mixins/courseMixin';
-import CourseInfoLink from './CourseInfoLink';
+import CourseInfoLink from '@components/courses/CourseInfoLink';
 
 export default {
   name: 'ProfileFollowUp',
@@ -148,7 +148,7 @@ export default {
   },
   mixins: [courseMixin],
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   data () {
     return {

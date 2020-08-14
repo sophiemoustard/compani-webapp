@@ -22,7 +22,7 @@ import { UNKNOWN_AVATAR, DEFAULT_AVATAR } from '@data/constants';
 export default {
   name: 'PlanningModalHeader',
   props: {
-    value: { type: String },
+    value: { type: String, default: '' },
     options: { type: Array, default: () => [] },
     selectedPerson: { type: Object, default: () => ({}) },
   },

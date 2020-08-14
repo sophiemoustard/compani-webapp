@@ -27,9 +27,8 @@
           </ni-responsive-table>
         </q-card>
         <p v-if="subscriptions.length > 0" class="nota-bene">
-* intègre les éventuelles majorations
-          soir / dimanche
-</p>
+          * intègre les éventuelles majorations soir / dimanche
+        </p>
         <div v-if="subscriptions && subscriptions.length > 0" class="row">
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
@@ -76,9 +75,9 @@
                   :style="col.style">
                   <template v-if="col.name === 'sign'">
                     <p class="no-margin" v-if="props.row.signedAt">
-Mandat signé le
+                      Mandat signé le
                       {{ $moment(props.row.signedAt).format('DD/MM/YYYY') }}
-</p>
+                    </p>
                     <q-btn color="primary" @click="preOpenESignModal(props.row)" data-cy="open-mandate"
                       v-else-if="displaySignButton(props.row)">
                       Signer

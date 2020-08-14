@@ -119,7 +119,7 @@ export default {
   name: 'ProfileContracts',
   mixins: [contractMixin],
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   components: {
     'ni-select': Select,

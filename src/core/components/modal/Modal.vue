@@ -5,7 +5,7 @@
         <div class="row justify-between items-baseline">
           <div class="col-11">
             <h5 :class="{ 'text-weight-bold': !!title }">
-{{ title }}
+              {{ title }}
               <slot name="title" />
             </h5>
           </div>

@@ -60,22 +60,22 @@
         <div class="row justify-between items-baseline">
           <div class="col-6 light">
             <p v-if="newCreditNote.exclTaxesCustomer">
-Montant HT bénéficiaire :
+              Montant HT bénéficiaire :
               {{ formatPrice(newCreditNote.exclTaxesCustomer) }}
-</p>
+            </p>
             <p v-if="newCreditNote.exclTaxesTpp">
-Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}
+              Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}
             </p>
           </div>
           <div class="col-6 light">
             <p v-if="newCreditNote.inclTaxesCustomer">
-Montant TTC bénéficiaire :
+              Montant TTC bénéficiaire :
               {{ formatPrice(newCreditNote.inclTaxesCustomer) }}
-</p>
+            </p>
             <p v-if="newCreditNote.inclTaxesTpp">
-Montant TTC tiers-payeur :
+              Montant TTC tiers-payeur :
               {{ formatPrice(newCreditNote.inclTaxesTpp) }}
-</p>
+            </p>
           </div>
         </div>
       </template>
@@ -129,23 +129,23 @@ Montant TTC tiers-payeur :
         <div class="row justify-between items-baseline">
           <div class="col-6 light">
             <p v-if="editedCreditNote.exclTaxesCustomer">
-Montant HT bénéficiaire :
+              Montant HT bénéficiaire :
               {{ formatPrice(editedCreditNote.exclTaxesCustomer) }}
-</p>
+            </p>
             <p v-if="editedCreditNote.exclTaxesTpp">
-Montant HT tiers-payeur :
+              Montant HT tiers-payeur :
               {{ formatPrice(editedCreditNote.exclTaxesTpp) }}
-</p>
+            </p>
           </div>
           <div class="col-6 light">
             <p v-if="editedCreditNote.inclTaxesCustomer">
-Montant TTC bénéficiaire :
+              Montant TTC bénéficiaire :
               {{ formatPrice(editedCreditNote.inclTaxesCustomer) }}
-</p>
+            </p>
             <p v-if="editedCreditNote.inclTaxesTpp">
-Montant TTC tiers-payeur :
+              Montant TTC tiers-payeur :
               {{ formatPrice(editedCreditNote.inclTaxesTpp) }}
-</p>
+            </p>
           </div>
         </div>
       </template>

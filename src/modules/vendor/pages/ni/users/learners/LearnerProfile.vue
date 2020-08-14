@@ -40,7 +40,7 @@ export default {
   name: 'LearnerProfile',
   metaInfo: { title: 'Fiche apprenant' },
   props: {
-    learnerId: { type: String },
+    learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
   components: {

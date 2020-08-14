@@ -46,7 +46,7 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    value: [String, Number, File],
+    value: { type: [String, Number, File], default: '' },
     upperCase: { type: Boolean, default: false },
     lowerCase: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
