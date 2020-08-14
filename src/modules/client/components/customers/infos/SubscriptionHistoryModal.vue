@@ -26,7 +26,7 @@ export default {
   name: 'SubscriptionHistoryModal',
   props: {
     value: { type: Boolean, default: false },
-    selected: { type: Object, default: () => {} },
+    selected: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
