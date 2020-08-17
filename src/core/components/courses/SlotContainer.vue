@@ -161,13 +161,13 @@ export default {
       };
     },
     stepsLength () {
-      return this.course.program.steps.length;
+      return this.course.subProgram.steps.length;
     },
     stepOptions () {
       if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
       return [
         { label: 'Pas d\'étape spécifiée', value: null },
-        ...this.course.program.steps.map((step, index) => ({
+        ...this.course.subProgram.steps.map((step, index) => ({
           label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
           value: step._id,
           disable: step.type === E_LEARNING,

@@ -35,7 +35,7 @@ export default {
           field: row => row,
           align: 'left',
           sortable: false,
-          format: value => value.program.name + (value.misc ? ` - ${value.misc}` : ''),
+          format: value => value.subProgram.program.name + (value.misc ? ` - ${value.misc}` : ''),
           style: 'min-width: 200px; width: 65%',
         },
         {

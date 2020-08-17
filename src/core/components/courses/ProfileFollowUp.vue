@@ -21,7 +21,7 @@
           pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-banner v-if="!get(this.course, 'program.learningGoals')">
+      <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
         <template v-slot:message>
           Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
           les attestations de fin de formation.
@@ -184,7 +184,7 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     disableDownloadCompletionCertificates () {
-      return this.disabledFollowUp || !get(this.course, 'program.learningGoals');
+      return this.disabledFollowUp || !get(this.course, 'subProgram.program.learningGoals');
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate));

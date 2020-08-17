@@ -6,7 +6,10 @@
       <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="validations.type.$error"
         caption="Type" required-field inline @input="update" />
       <ni-select in-modal v-model.trim="newCourse.program" :error="validations.program.$error"
-        @blur="validations.program.$touch" required-field caption="Programme" :options="programOptions" />
+        @blur="validations.program.$touch" required-field caption="Programme" :options="programOptions"
+        @input="setSubProgramOptions" />
+      <ni-select in-modal v-model.trim="newCourse.subProgram" :error="validations.subProgram.$error"
+        @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions" />
       <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="validations.company.$error"
         @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions" />
       <ni-input in-modal v-model.trim="newCourse.misc" caption="Informations Complémentaires" />
@@ -30,7 +33,7 @@ export default {
     value: { type: Boolean, default: false },
     isIntraCourse: { type: Boolean, default: false },
     newCourse: { type: Object, default: () => ({}) },
-    programOptions: { type: Array, default: () => [] },
+    programs: { type: Array, default: () => [] },
     companyOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
@@ -44,9 +47,30 @@ export default {
   data () {
     return {
       courseTypes: COURSE_TYPES,
+      subProgramOptions: [],
     };
   },
+  computed: {
+    programOptions () {
+      return this.programs
+        .map(p => ({ label: p.name, value: p._id }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+    },
+  },
   methods: {
+    setSubProgramOptions () {
+      const selectedProgram = this.programs.find(p => p._id === this.newCourse.program);
+
+      if (selectedProgram) {
+        this.subProgramOptions = selectedProgram.subPrograms.length
+          ? selectedProgram.subPrograms
+            .map(p => ({ label: p.name, value: p._id }))
+            .sort((a, b) => a.label.localeCompare(b.label))
+          : [{ label: 'Veuillez créer un sous-programme pour ce programme', value: '' }];
+
+        if (this.subProgramOptions.length === 1) this.newCourse.subProgram = this.subProgramOptions[0].value;
+      }
+    },
     hide () {
       this.$emit('hide');
     },
