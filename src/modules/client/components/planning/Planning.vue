@@ -9,10 +9,10 @@
       </div>
       <div class="col-xs-12 col-md-7">
         <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :type="PLANNING"
-          @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-          @goToWeek="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
-          :is-customer-planning="isCustomerPlanning" @openDeleteEventsModal="openDeleteEventsModal"
-          @toggleHistory="toggleHistory" :display-history="displayHistory" />
+          @go-to-next-week="goToNextWeek" @go-to-previous-week="goToPreviousWeek" @go-to-today="goToToday"
+          @go-to-week="goToWeek" :is-coach-or-planning-referent="isCoach || isPlanningReferent"
+          :is-customer-planning="isCustomerPlanning" @open-delete-events-modal="openDeleteEventsModal"
+          @toggle-history="toggleHistory" :display-history="displayHistory" />
       </div>
     </div>
     <div class="planning-container full-width">
@@ -54,12 +54,13 @@
                 </div>
               </td>
               <td @drop="drop(day, getSector(sectorId))" @dragover.prevent v-for="(day, dayIndex) in days" valign="top"
-                :key="dayIndex" @click="createEvent({ dayIndex, sectorId })" class="planning-background">
+                :key="dayIndex" @click="openEventCreationModal({ dayIndex, sectorId })" class="planning-background">
                 <div v-for="hourIndex in 5" class="line" :style="{ left: `${(hourIndex * hourWidth * 2)}%` }"
                   :key="`hour_${hourIndex}`" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(sectorId, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" />
+                  :key="eventIndex" @drag="drag" @click="openEventEditionModal"
+                  :can-drag="canDrag" />
               </td>
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id"
@@ -72,13 +73,14 @@
                   :staffing-view="staffingView" />
               </td>
               <td @drop="drop(day, person)" @dragover.prevent v-for="(day, dayIndex) in days" :key="dayIndex"
-                valign="top" @click="createEvent({ dayIndex, person })" class="planning-background"
+                valign="top" @click="openEventCreationModal({ dayIndex, person })" class="planning-background"
                 data-cy="planning-cell">
                 <div v-for="hourIndex in hours.length" class="line" :key="`hour_${hourIndex}`"
                   :style="{ left: `${(hourIndex * hourWidth * 2)}%` }" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(person._id, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @editEvent="editEvent" :can-drag="canDrag" data-cy="planning-event" />
+                  :key="eventIndex" @drag="drag" @click="openEventEditionModal" :can-drag="canDrag"
+                  data-cy="planning-event" />
               </td>
             </tr>
           </template>
@@ -88,8 +90,8 @@
     <delete-events-modal v-model="deleteEventsModal" @hide="hideDeleteEventsModal"
       :customers="customersWithInterventions" />
     <q-page-sticky expand position="right">
-      <ni-event-history-feed v-if="displayHistory" :event-histories="eventHistories" @toggleHistory="toggleHistory"
-        @updateFeeds="$emit('updateFeeds', $event)" />
+      <ni-event-history-feed v-if="displayHistory" :event-histories="eventHistories" @toggle-history="toggleHistory"
+        @update-feeds="$emit('update-feeds', $event)" />
     </q-page-sticky>
   </div>
 </template>
@@ -207,7 +209,7 @@ export default {
       }
     },
     toggleAllSectors () {
-      this.$emit('toggleAllSectors', this.terms);
+      this.$emit('toggle-all-sectors', this.terms);
       this.terms = [];
     },
     getSector (sectorId) {
@@ -231,7 +233,7 @@ export default {
     // Table
     updateTimeline () {
       this.getTimelineDays();
-      this.$emit('updateStartOfWeek', { startOfWeek: this.startOfWeek });
+      this.$emit('update-start-of-week', { startOfWeek: this.startOfWeek });
     },
     // Event display
     unassignedHourCount (sectorId) {
@@ -267,7 +269,7 @@ export default {
     // History
     toggleHistory () {
       if (this.persons.length === 0) return;
-      this.$emit('toggleHistory', !this.displayHistory);
+      this.$emit('toggle-history', !this.displayHistory);
     },
     // Drag & drop
     drag (event) {
@@ -283,7 +285,7 @@ export default {
         } else if (this.draggedObject[this.personKey] && this.draggedObject[this.personKey]._id === target._id &&
             toDay.isSame(this.draggedObject.startDate, 'd')) return;
 
-        this.$emit('onDrop', { toDay, target, draggedObject: this.draggedObject });
+        this.$emit('on-drop', { toDay, target, draggedObject: this.draggedObject });
       } catch (e) {
         console.error(e);
         NotifyNegative('Problème lors de la modification de l\'évènement.');
@@ -291,14 +293,14 @@ export default {
         this.draggedObject = {};
       }
     },
-    createEvent (event) {
+    openEventCreationModal (event) {
       const isAllowed = this.canEdit({ auxiliaryId: get(event, 'person._id'), sectorId: event.sectorId });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
-      this.$emit('createEvent', event);
+      this.$emit('open-creation-modal', event);
     },
-    editEvent (event) {
-      this.$emit('editEvent', event);
+    openEventEditionModal (event) {
+      this.$emit('open-edition-modal', event);
     },
     canDrag (event) {
       return this.canEdit({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });

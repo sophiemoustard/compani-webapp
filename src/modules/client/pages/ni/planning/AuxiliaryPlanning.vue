@@ -1,25 +1,25 @@
 <template>
   <q-page class="client-background">
-    <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @updateStartOfWeek="updateStartOfWeek"
-      @createEvent="openCreationModal" @editEvent="openEditionModal" @onDrop="updateEventOnDrop"
+    <ni-planning-manager :events="events" :persons="displayedAuxiliaries" @update-start-of-week="updateStartOfWeek"
+      @open-creation-modal="openCreationModal" @open-edition-modal="openEditionModal" @on-drop="updateEventOnDrop"
       :filtered-sectors="filteredSectors" :person-key="personKey" :filters="activeFilters" :can-edit="canEditEvent"
-      @toggleAllSectors="toggleAllSectors" :event-histories="eventHistories" ref="planningManager"
-      :display-all-sectors="displayAllSectors" @toggleHistory="toggleHistory" :display-history="displayHistory"
-      @updateFeeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
+      @toggle-all-sectors="toggleAllSectors" :event-histories="eventHistories" ref="planningManager"
+      :display-all-sectors="displayAllSectors" @toggle-history="toggleHistory" :display-history="displayHistory"
+      @update-feeds="updateEventHistories" :working-stats="workingStats" @refresh="refresh" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event.sync="newEvent"
       :creation-modal="creationModal" :internal-hours="internalHours" @close="closeCreationModal" :customers="customers"
-      :person-key="personKey" :active-auxiliaries="activeAuxiliaries" @resetForm="resetCreationForm"
-      @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded"
-      @createEvent="validateCreationEvent" />
+      :person-key="personKey" :active-auxiliaries="activeAuxiliaries" @reset="resetCreationForm"
+      @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
+      @submit="validateCreationEvent" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
-      @documentUploaded="documentUploaded" @close="closeEditionModal" @deleteEvent="validateEventDeletion"
-      @deleteEventRepetition="validationDeletionEventRepetition" :person-key="personKey" @updateEvent="updateEvent" />
+      :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
+      @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
+      @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @submit="updateEvent" />
   </q-page>
 </template>
 

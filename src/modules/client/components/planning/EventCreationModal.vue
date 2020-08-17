@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="resetForm(false)">
+  <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="reset(false)">
     <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" v-model="newEvent.customer"
@@ -8,7 +8,7 @@
           :selected-person="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap v-model="newEvent.type" unelevated toggle-color="primary" :options="eventTypeOptions"
-            @input="resetForm(true, newEvent.type)" text-color="black" />
+            @input="reset(true, newEvent.type)" text-color="black" />
         </div>
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
@@ -70,7 +70,7 @@
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
-        @click="createEvent" icon-right="add" data-cy="event-creation-button" />
+        @click="submit" icon-right="add" data-cy="event-creation-button" />
     </div>
   </q-dialog>
 </template>
@@ -148,17 +148,17 @@ export default {
     close () {
       this.$emit('close');
     },
-    resetForm (partialReset, type) {
-      this.$emit('resetForm', { partialReset, type });
+    reset (partialReset, type) {
+      this.$emit('reset', { partialReset, type });
     },
     deleteDocument (value) {
-      this.$emit('deleteDocument', value);
+      this.$emit('delete-document', value);
     },
     documentUploaded (value) {
-      this.$emit('documentUploaded', value);
+      this.$emit('document-uploaded', value);
     },
-    createEvent (value) {
-      this.$emit('createEvent', value);
+    submit (value) {
+      this.$emit('submit', value);
     },
     resetAbsenceType () {
       if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY) {

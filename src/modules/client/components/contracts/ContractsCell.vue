@@ -184,22 +184,22 @@ export default {
       return this.columns;
     },
     openVersionCreation (contract) {
-      this.$emit('openVersionCreation', contract);
+      this.$emit('open-version-creation', contract);
     },
     openVersionEdition (contract, version) {
-      this.$emit('openVersionEdition', { contract, version });
+      this.$emit('open-version-edition', { contract, version });
     },
     deleteVersion (contractId, versionId) {
-      this.$emit('deleteVersion', { contractId, versionId });
+      this.$emit('delete-version', { contractId, versionId });
     },
     openEndContract (contract) {
-      this.$emit('openEndContract', contract);
+      this.$emit('open-end-contract', contract);
     },
     refresh () {
       this.$emit('refresh');
     },
     refreshWithTimeout () {
-      this.$emit('refreshWithTimeout');
+      this.$emit('refresh-with-timeout');
     },
     getArchiveLink (archive) {
       return archive.link || false;

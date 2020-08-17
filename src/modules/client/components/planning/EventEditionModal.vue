@@ -1,5 +1,5 @@
 <template>
-  <q-dialog v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" @hide="resetForm()">
+  <q-dialog v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" @hide="hide">
     <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer"
@@ -88,7 +88,7 @@
         </div>
       </div>
       <q-btn v-if="!isDisabled" class="modal-btn full-width" no-caps color="primary" :loading="loading"
-        label="Editer l'évènement" @click="updateEvent" icon-right="check" data-cy="event-edition-button" />
+        label="Editer l'évènement" @click="submit" icon-right="check" data-cy="event-edition-button" />
     </div>
   </q-dialog>
 </template>
@@ -140,14 +140,14 @@ export default {
   },
   methods: {
     toggleCancellationForm (value) {
-      if (!value) this.$emit('update:editedEvent', { ...this.editedEvent, cancel: {} });
+      if (!value) this.$emit('update:edited-event', { ...this.editedEvent, cancel: {} });
       else {
         this.validations.misc.$touch();
         this.validations.cancel.$touch();
       }
     },
     toggleRepetition () {
-      this.$emit('update:editedEvent', { ...this.editedEvent, cancel: {}, isCancelled: false });
+      this.$emit('update:edited-event', { ...this.editedEvent, cancel: {}, isCancelled: false });
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
@@ -155,23 +155,23 @@ export default {
     close () {
       this.$emit('close');
     },
-    resetForm (partialReset, type) {
-      this.$emit('resetForm', { partialReset, type });
+    hide (partialReset, type) {
+      this.$emit('hide', { partialReset, type });
     },
     deleteDocument (value) {
-      this.$emit('deleteDocument', value);
+      this.$emit('delete-document', value);
     },
     documentUploaded (value) {
-      this.$emit('documentUploaded', value);
+      this.$emit('document-uploaded', value);
     },
-    updateEvent (value) {
-      this.$emit('updateEvent', value);
+    submit (value) {
+      this.$emit('submit', value);
     },
     deleteEventRepetition (value) {
-      this.$emit('deleteEventRepetition', value);
+      this.$emit('delete-event-repetition', value);
     },
     deleteEvent (value) {
-      this.$emit('deleteEvent', value);
+      this.$emit('delete-event', value);
     },
   },
 };

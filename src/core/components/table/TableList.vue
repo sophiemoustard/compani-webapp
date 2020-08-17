@@ -5,7 +5,7 @@
       :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
       :visible-columns="formattedVisibleColumns">
       <template v-slot:body="props">
-        <q-tr :props="props" @click="$emit('goTo', props.row)">
+        <q-tr :props="props" @click="$emit('go-to', props.row)">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
             :class="col.name">
             <slot name="body" :props="props" :col="col">

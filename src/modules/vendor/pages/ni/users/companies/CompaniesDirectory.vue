@@ -1,9 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
-      @updateSearch="updateSearch" :search="searchStr" />
+      @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"
-      :pagination.sync="pagination" @goTo="goToCompanyProfile" />
+      :pagination.sync="pagination" @go-to="goToCompanyProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" :disable="tableLoading" />
 

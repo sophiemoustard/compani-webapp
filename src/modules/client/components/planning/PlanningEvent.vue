@@ -13,7 +13,7 @@
   </div>
   <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
     :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
-    @click.stop="editEvent(event)">
+    @click.stop="click(event)">
     <div class="event-container">
       <div class="event-title">
         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">
@@ -82,8 +82,8 @@ export default {
       nativeEvent.dataTransfer.setData('text', ''); // Mandatory on Firefox
       this.$emit('drag', event);
     },
-    editEvent (event) {
-      this.$emit('editEvent', event);
+    click (event) {
+      this.$emit('click', event);
     },
     eventTitleForStaffing (event) {
       const lastname = get(event, 'customer.identity.lastname', '');

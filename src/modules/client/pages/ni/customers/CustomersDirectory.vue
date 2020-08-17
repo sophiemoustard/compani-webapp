@@ -1,9 +1,9 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
-      display-toggle @updateSearch="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
+      display-toggle @update-search="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
-      @goTo="goToCustomerProfile" :loading="tableLoading">
+      @go-to="goToCustomerProfile" :loading="tableLoading">
       <template v-slot:body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>

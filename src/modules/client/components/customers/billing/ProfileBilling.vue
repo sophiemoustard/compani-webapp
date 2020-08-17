@@ -12,7 +12,7 @@
         <a :href="'mailto:' + company.billingAssistance"> {{ company.billingAssistance }}</a>.
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :display-actions="isAdmin"
-        @openEditionModal="openEditionModal" :type="CUSTOMER" :start-balance="getStartBalance()"
+        @open-edition-modal="openEditionModal" :type="CUSTOMER" :start-balance="getStartBalance()"
         :end-balance="getEndBalance(customerDocuments)" :loading="tableLoading" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
@@ -22,7 +22,7 @@
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
       <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates" :display-actions="isAdmin"
-        @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
+        @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
         :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
@@ -59,12 +59,12 @@
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :new-payment="newPayment" v-model="paymentCreationModal" :validations="$v.newPayment"
       :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
-      @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
+      @submit="createPayment" @hide="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
       :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment="editedPayment"
-      @updatePayment="updatePayment" @resetForm="resetPaymentEditionModal" />
+      @submit="updatePayment" @hide="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
     <ni-modal v-model="taxCertificateModal" @hide="resetTaxCertificateModal">

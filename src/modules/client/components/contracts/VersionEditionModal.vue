@@ -13,7 +13,7 @@
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
-        :loading="loading" @click="editVersion" />
+        :loading="loading" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -40,8 +40,8 @@ export default {
     'ni-modal': Modal,
   },
   methods: {
-    editVersion () {
-      this.$emit('editVersion');
+    submit () {
+      this.$emit('submit');
     },
     resetVersionEditionModal () {
       this.$emit('hide');

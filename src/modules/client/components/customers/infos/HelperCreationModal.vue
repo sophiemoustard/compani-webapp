@@ -66,7 +66,7 @@ export default {
       this.$emit('submit');
     },
     nextStep () {
-      this.$emit('nextStep');
+      this.$emit('next-step');
     },
   },
 };

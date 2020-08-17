@@ -1,8 +1,8 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-directory-header title="Bénéficiaires" @updateSearch="updateSearch" :search="searchStr" />
+    <ni-directory-header title="Bénéficiaires" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
-      @goTo="goToCustomerProfile" />
+      @go-to="goToCustomerProfile" />
   </q-page>
 </template>
 

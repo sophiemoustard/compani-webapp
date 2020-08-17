@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="$emit('input', $event)" @hide="resetForm">
+  <ni-modal :value="value" @input="$emit('input', $event)" @hide="hide">
     <template slot="title">
       Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
     </template>
@@ -17,7 +17,7 @@
       :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary" :loading="loading"
-        @click="createPayment" />
+        @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -72,11 +72,11 @@ export default {
     },
   },
   methods: {
-    resetForm (partialReset, type) {
-      this.$emit('resetForm', { partialReset, type });
+    hide (partialReset, type) {
+      this.$emit('hide', { partialReset, type });
     },
-    createPayment (value) {
-      this.$emit('createPayment', value);
+    submit (value) {
+      this.$emit('submit', value);
     },
   },
 };

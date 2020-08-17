@@ -1,8 +1,8 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-directory-header title="Répertoire apprenants" @updateSearch="updateSearch" :search="searchStr" />
+    <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @goTo="goToLearnerProfile">
+      @go-to="goToLearnerProfile">
       <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
