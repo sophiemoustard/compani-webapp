@@ -240,7 +240,7 @@
 
     <!-- Edit helper modal -->
     <helper-edition-modal :edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
-      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper" />
+      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
     <!-- Subscription creation modal -->
     <subscription-creation-modal v-model="openNewSubscriptionModal" :new-subscription="newSubscription"
@@ -250,7 +250,7 @@
     <!-- Subscription edition modal -->
     <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription="editedSubscription"
       :validations="$v.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
-      @updateSubscription="updateSubscription" />
+      @submit="updateSubscription" />
 
     <!-- Subscription history modal -->
     <subscription-history-modal v-model="subscriptionHistoryModal" :selected="selectedSubscription"
@@ -271,7 +271,7 @@
 
     <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
-      :edited-funding="editedFunding" @edit-funding="editFunding" :days-options="daysOptions"
+      :edited-funding="editedFunding" @submit="editFunding" :days-options="daysOptions"
       :validations="$v.editedFunding" />
 </div>
 </template>

@@ -52,7 +52,7 @@ export default {
   props: {
     displayStaffingView: { type: Boolean, default: false },
     event: { type: Object, default: () => ({}) },
-    canDrag: { type: Function, default: () => ({}) },
+    canDrag: { type: Function, default: () => {} },
     personKey: { type: String, default: AUXILIARY },
   },
   data () {

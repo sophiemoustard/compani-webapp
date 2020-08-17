@@ -27,7 +27,7 @@
         required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
-          :loading="loading" @click="edit" />
+          :loading="loading" @click="submit" />
       </template>
     </ni-modal>
 </template>
@@ -72,8 +72,8 @@ export default {
     hide () {
       this.$emit('hide');
     },
-    edit () {
-      this.$emit('editFunding');
+    submit () {
+      this.$emit('submit');
     },
   },
 };

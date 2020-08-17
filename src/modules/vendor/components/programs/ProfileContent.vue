@@ -37,23 +37,24 @@
       @click="subProgramCreationModal = true" />
 
     <!-- Sub-program creation modal -->
-    <sub-program-creation-modal v-model="subProgramCreationModal" :new-sub-program="newSubProgram"
-      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" @submit="createSubProgram" />
+    <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
+      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program="newSubProgram" />
 
     <!-- Step creation modal -->
     <step-creation-modal v-model="stepCreationModal" :new-step="newStep" :step-type-options="stepTypeOptions"
-      :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" />
+      :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
 
     <!-- Step edition modal -->
     <step-edition-modal v-model="stepEditionModal" :edited-step="editedStep" :validations="$v.editedStep"
-      @hide="resetStepEditionModal" @submit="editStep" />
+      @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
     <!-- Activity creation modal -->
     <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
-      :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity" />
+      :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
+      :loading="modalLoading" />
 
     <!-- Activity edition modal -->
-    <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity"
+    <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
   </div>
 </template>

@@ -14,7 +14,7 @@
       caption="Dont soirée (h)" last type="number" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
-        :loading="loading" @click="updateSubscription" />
+        :loading="loading" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -46,8 +46,8 @@ export default {
     hide () {
       this.$emit('hide');
     },
-    updateSubscription () {
-      this.$emit('updateSubscription');
+    submit () {
+      this.$emit('submit');
     },
   },
 };

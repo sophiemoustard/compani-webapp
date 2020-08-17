@@ -39,7 +39,7 @@ export default {
   name: 'PictureUploader',
   props: {
     user: { type: Object, default: () => ({}) },
-    refreshPicture: { type: Function, default: () => ({}) },
+    refreshPicture: { type: Function, default: () => {} },
   },
   data () {
     return {
