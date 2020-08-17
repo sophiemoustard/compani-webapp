@@ -140,19 +140,17 @@ module.exports = function (ctx) {
         );
       },
       env: {
-        NODE_ENV: JSON.stringify(process.env.NODE_ENV),
-        API_HOSTNAME: process.env.NODE_ENV === 'test'
-          ? JSON.stringify(process.env.TEST_API_HOSTNAME)
-          : JSON.stringify(process.env.API_HOSTNAME),
-        COMPANI_HOSTNAME: JSON.stringify(process.env.COMPANI_HOSTNAME),
-        MESSENGER_LINK: JSON.stringify(process.env.MESSENGER_LINK),
-        ENTERCODE_LINK: JSON.stringify(process.env.ENTERCODE_LINK),
-        TOKEN_SECRET: JSON.stringify(process.env.TOKEN_SECRET),
-        ALENVI_BOT_ID: JSON.stringify(process.env.ALENVI_BOT_ID),
-        CLOUDINARY_API_KEY: JSON.stringify(process.env.CLOUDINARY_API_KEY),
-        CLOUDINARY_API_SECRET: JSON.stringify(process.env.CLOUDINARY_API_SECRET),
-        CLOUDINARY_CLOUD_NAME: JSON.stringify(process.env.CLOUDINARY_CLOUD_NAME),
-        GA_TRACKING_ID: JSON.stringify(process.env.GA_TRACKING_ID),
+        NODE_ENV: process.env.NODE_ENV,
+        API_HOSTNAME: process.env.NODE_ENV === 'test' ? process.env.TEST_API_HOSTNAME : process.env.API_HOSTNAME,
+        COMPANI_HOSTNAME: process.env.COMPANI_HOSTNAME,
+        MESSENGER_LINK: process.env.MESSENGER_LINK,
+        ENTERCODE_LINK: process.env.ENTERCODE_LINK,
+        TOKEN_SECRET: process.env.TOKEN_SECRET,
+        ALENVI_BOT_ID: process.env.ALENVI_BOT_ID,
+        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
+        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+        CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+        GA_TRACKING_ID: process.env.GA_TRACKING_ID,
       },
     },
     devServer: {
