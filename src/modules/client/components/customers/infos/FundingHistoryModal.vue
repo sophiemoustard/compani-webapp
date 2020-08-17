@@ -4,7 +4,7 @@
       Historique du financement <span class="text-weight-bold">{{ selected.thirdPartyPayer.name }}</span>
     </template>
     <ni-funding-grid-table :data="selected.versions" :columns="fundingsColumns"
-      :visible-columns="fundingHistoriesVisibleColumns" />
+      :visible-columns="visibleColumns" />
   </ni-modal>
 </template>
 
@@ -28,7 +28,7 @@ export default {
     fundingMixin,
   ],
   computed: {
-    fundingHistoriesVisibleColumns () {
+    visibleColumns () {
       return this.selectedFunding.nature === FIXED
         ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
         : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];

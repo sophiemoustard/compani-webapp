@@ -25,7 +25,7 @@
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import { FIXED } from '@data/constants.js';
+import { FIXED } from '@data/constants';
 
 export default {
   name: 'SubscriptionCreationModal',

@@ -235,7 +235,7 @@
 
     <!-- Add helper modal -->
     <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @nextStep="nextStep"
-      :new-helper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
+      :new-helper="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
       :first-step="firstStep" />
 
     <!-- Edit helper modal -->
@@ -245,7 +245,7 @@
     <!-- Subscription creation modal -->
     <subscription-creation-modal v-model="openNewSubscriptionModal" :new-subscription="newSubscription"
       :service-options="serviceOptions" :validations="$v.newSubscription" @hide="resetCreationSubscriptionData"
-      :loading="loading" @submit="submitSubscription" />
+      :loading="loading" @submit="createSubscription" />
 
     <!-- Subscription edition modal -->
     <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription="editedSubscription"
@@ -266,7 +266,7 @@
 
     <!-- Funding creation modal -->
     <funding-creation-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :new-funding="newFunding" :third-party-payers="ttpList" @submit="submitFunding" :validations="$v.newFunding"
+      :new-funding="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
       :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
 
     <!-- Funding edition modal -->
@@ -667,7 +667,7 @@ export default {
         estimatedWeeklyVolume: '',
       };
     },
-    async submitSubscription () {
+    async createSubscription () {
       try {
         this.$v.newSubscription.$touch();
         if (this.$v.newSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -907,7 +907,7 @@ export default {
 
       return { nature, thirdPartyPayer, subscription, frequency, versions: [{ ...version }] };
     },
-    async submitFunding () {
+    async createFunding () {
       try {
         this.$v.newFunding.$touch();
         if (this.$v.newFunding.$error) return NotifyWarning('Champ(s) invalide(s)');

@@ -4,7 +4,7 @@
       Détail du financement <span class="text-weight-bold">{{ selected.thirdPartyPayer.name }}</span>
     </template>
     <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
-      :visible-columns="fundingDetailsVisibleColumns" />
+      :visible-columns="visibleColumns" />
   </ni-modal>
 </template>
 
@@ -29,7 +29,7 @@ export default {
     fundingMixin,
   ],
   computed: {
-    fundingDetailsVisibleColumns () {
+    visibleColumns () {
       return this.selectedFunding.nature === FIXED
         ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
         : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
