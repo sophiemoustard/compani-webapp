@@ -18,7 +18,4 @@ export default {
   async addSubProgram (programId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/subprograms`, payload);
   },
-  async addStep (programId, payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/steps`, payload);
-  },
 };

@@ -39,7 +39,7 @@ export default {
     alt: { type: String, default: '' },
     name: { type: String, default: 'file' },
     additionalValue: { type: String, default: '' },
-    entity: { type: Object, default: () => {} },
+    entity: { type: Object, default: () => ({}) },
     url: { type: String, default: '' },
     errorMessage: { type: String, default: 'Document requis' },
     displayCaption: { type: Boolean, default: true },

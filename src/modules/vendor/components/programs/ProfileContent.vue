@@ -18,7 +18,7 @@
         </q-card-section>
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
           <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(step, activity)">
+            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
               <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
               <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
               <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
@@ -30,80 +30,32 @@
         </div>
       </q-card>
       <q-btn class="q-my-sm add-step-button" flat no-caps color="primary" icon="add" label="Ajouter une étape"
-        @click="stepCreationModal = true" />
+        @click="openStepCreationModal(subProgram._id)" />
     </div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
       @click="subProgramCreationModal = true" />
 
     <!-- Sub-program creation modal -->
-    <ni-modal v-model="subProgramCreationModal" @hide="resetSubProgramCreationModal">
-      <template slot="title">
-        Créer un nouveau <span class="text-weight-bold">sous-programme</span>
-      </template>
-      <ni-input in-modal v-model.trim="newSubProgram.name" :error="$v.newSubProgram.name.$error"
-        @blur="$v.newSubProgram.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le sous-programme" color="primary"
-          icon-right="add" @click="createSubProgram" :loading="modalLoading" />
-      </template>
-    </ni-modal>
+    <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
+      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program="newSubProgram" />
 
     <!-- Step creation modal -->
-    <ni-modal v-model="stepCreationModal" @hide="resetStepCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">étape</span>
-      </template>
-      <ni-option-group inline caption="Type" v-model="newStep.type" type="radio" :options="stepTypeOptions"
-        required-field />
-      <ni-input in-modal v-model.trim="newStep.name" :error="$v.newStep.name.$error"
-        @blur="$v.newStep.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'étape" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createStep" />
-      </template>
-    </ni-modal>
+    <step-creation-modal v-model="stepCreationModal" :new-step="newStep" :step-type-options="stepTypeOptions"
+      :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
 
     <!-- Step edition modal -->
-    <ni-modal v-model="stepEditionModal" @hide="resetStepEditionModal">
-      <template slot="title">
-        Éditer une <span class="text-weight-bold">étape</span>
-      </template>
-      <ni-input in-modal v-model.trim="editedStep.name" :error="$v.editedStep.name.$error"
-        @blur="$v.editedStep.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="modalLoading"
-          icon-right="add" @click="editStep" />
-      </template>
-    </ni-modal>
+    <step-edition-modal v-model="stepEditionModal" :edited-step="editedStep" :validations="$v.editedStep"
+      @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
     <!-- Activity creation modal -->
-    <ni-modal v-model="activityCreationModal" @hide="resetActivityCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">activité</span>
-      </template>
-      <ni-input in-modal v-model.trim="newActivity.name" :error="$v.newActivity.name.$error"
-        @blur="$v.newActivity.name.$touch" required-field caption="Nom" />
-      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field
-        :error="$v.newActivity.type.$error" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createActivity" />
-      </template>
-    </ni-modal>
+    <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
+      :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
+      :loading="modalLoading" />
 
     <!-- Activity edition modal -->
-    <ni-modal v-model="activityEditionModal" @hide="resetActivityEditionModal">
-      <template slot="title">
-        Éditer une <span class="text-weight-bold">activité</span>
-      </template>
-      <ni-input in-modal v-model.trim="editedActivity.name" :error="$v.editedActivity.name.$error"
-        @blur="$v.editedActivity.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="modalLoading"
-          icon-right="add" @click="editActivity" />
-      </template>
-    </ni-modal>
+    <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
+      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
   </div>
 </template>
 
@@ -118,9 +70,11 @@ import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import { formatQuantity } from '@helpers/utils';
 import Input from '@components/form/Input';
-import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
-import OptionGroup from '@components/form/OptionGroup';
+import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
+import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
+import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
+import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
+import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
 
@@ -131,9 +85,11 @@ export default {
   },
   components: {
     'ni-input': Input,
-    'ni-option-group': OptionGroup,
-    'ni-modal': Modal,
-    'ni-select': Select,
+    'sub-program-creation-modal': SubProgramCreationModal,
+    'step-creation-modal': StepCreationModal,
+    'step-edition-modal': StepEditionModal,
+    'activity-creation-modal': ActivityCreationModal,
+    'activity-edition-modal': ActivityEditionModal,
   },
   data () {
     return {
@@ -150,6 +106,7 @@ export default {
       activityEditionModal: false,
       editedActivity: { name: '' },
       isActivitiesShown: {},
+      currentSubProgramId: '',
       currentStepId: '',
       stepTypeOptions: [
         { label: 'eLearning', value: E_LEARNING },
@@ -244,15 +201,20 @@ export default {
       }
     },
     resetSubProgramCreationModal () {
+      this.subProgramCreationModal = false;
       this.newSubProgram.name = '';
       this.$v.newSubProgram.$reset();
+    },
+    async openStepCreationModal (subProgramId) {
+      this.stepCreationModal = true;
+      this.currentSubProgramId = subProgramId;
     },
     async createStep () {
       try {
         this.modalLoading = true;
         this.$v.newStep.$touch();
         if (this.$v.newStep.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Programs.addStep(this.profileId, this.newStep);
+        await SubPrograms.addStep(this.currentSubProgramId, this.newStep);
         NotifyPositive('Étape créée.');
 
         await this.refreshProgram();
@@ -293,10 +255,15 @@ export default {
       this.editedStep = { name: '' };
       this.$v.editedStep.$reset();
     },
-    goToActivityProfile (step, activity) {
+    goToActivityProfile (subProgram, step, activity) {
       this.$router.push({
         name: 'ni config activity info',
-        params: { programId: this.program._id, stepId: step._id, activityId: activity._id },
+        params: {
+          programId: this.program._id,
+          subProgramId: subProgram._id,
+          stepId: step._id,
+          activityId: activity._id,
+        },
       });
     },
     openActivityCreationModal (stepId) {

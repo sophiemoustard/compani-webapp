@@ -41,6 +41,7 @@ export default {
   props: {
     activityId: { type: String, required: true },
     programId: { type: String, required: true },
+    subProgramId: { type: String, required: true },
     stepId: { type: String, required: true },
   },
   components: {
@@ -85,7 +86,9 @@ export default {
       if (!this.progam) await this.$store.dispatch('program/fetchProgram', { programId: this.programId });
       this.programName = get(this.program, 'name') || '';
 
-      const step = this.program.steps.find(s => s._id === this.stepId);
+      const subProgram = this.program.subPrograms.find(sp => sp._id === this.subProgramId);
+
+      const step = subProgram ? subProgram.steps.find(s => s._id === this.stepId) : '';
       this.stepName = get(step, 'name') || '';
     } catch (e) {
       console.error(e);

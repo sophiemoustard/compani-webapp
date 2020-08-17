@@ -29,7 +29,7 @@ import Input from '@components/form/Input';
 import { REQUIRED_LABEL } from '@data/constants.js';
 
 export default {
-  name: 'AddHelperModal',
+  name: 'HelperCreationModal',
   props: {
     value: { type: Boolean, default: false },
     newHelper: { type: Object, default: () => ({}) },

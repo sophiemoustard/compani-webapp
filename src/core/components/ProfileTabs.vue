@@ -18,7 +18,7 @@ export default {
   props: {
     tabsContent: { type: Array, default: () => [] },
     profileId: { type: String, default: '' },
-    notifications: { type: Object, default: () => {} },
+    notifications: { type: Object, default: () => ({}) },
   },
   data () {
     return {

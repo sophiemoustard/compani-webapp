@@ -54,7 +54,7 @@ export default {
   },
   props: {
     paySurchargeDetailsModal: { type: Boolean, default: false },
-    pay: { type: Object, default: () => {} },
+    pay: { type: Object, default: () => ({}) },
     surchargeDetailKey: { type: String, default: '' },
   },
   methods: {

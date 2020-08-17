@@ -111,7 +111,7 @@ export const helperMixin = {
 
       return pickBy(payload);
     },
-    async submitHelper () {
+    async createHelper () {
       try {
         this.loading = true;
         this.$v.newHelper.$touch();

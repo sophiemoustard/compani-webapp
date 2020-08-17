@@ -11,7 +11,7 @@
       caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer l'aidant" icon-right="add" color="primary"
-        :loading="loading" @click="editHelper" />
+        :loading="loading" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -22,7 +22,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 
 export default {
-  name: 'EditHelperModal',
+  name: 'HelperEditionModal',
   props: {
     value: { type: Boolean, default: false },
     editedHelper: { type: Object, default: () => ({}) },
@@ -43,8 +43,8 @@ export default {
     },
   },
   methods: {
-    editHelper () {
-      this.$emit('editHelper');
+    submit () {
+      this.$emit('submit');
     },
     hide () {
       this.$emit('hide');

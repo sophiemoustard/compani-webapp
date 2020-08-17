@@ -67,7 +67,7 @@ export default {
     name: { type: String, default: '' },
     url: { type: String, default: '' },
     additionalFieldsName: { type: String, default: '' },
-    userProfile: { type: Object, default: () => {} },
+    userProfile: { type: Object, default: () => ({}) },
     collapsibleLabel: { type: String, default: '' },
     extensions: { type: String, default: '' },
   },
