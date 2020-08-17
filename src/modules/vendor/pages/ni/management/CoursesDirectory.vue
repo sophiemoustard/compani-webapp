@@ -23,22 +23,9 @@
       @click="courseCreationModal = true" />
 
     <!-- Course creation modal -->
-    <ni-modal v-model="courseCreationModal" @hide="resetCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">formation</span>
-      </template>
-      <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="$v.newCourse.type.$error"
-        caption="Type" required-field inline @input="updateCourseCompany" />
-      <ni-select in-modal v-model.trim="newCourse.program" :error="$v.newCourse.program.$error"
-        @blur="$v.newCourse.program.$touch" required-field caption="Programme" :options="programOptions" />
-      <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="$v.newCourse.company.$error"
-        @blur="$v.newCourse.company.$touch" required-field caption="Structure" :options="companyOptions" />
-      <ni-input in-modal v-model.trim="newCourse.misc" caption="Informations Complémentaires" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createCourse" />
-      </template>
-    </ni-modal>
+    <course-creation-modal v-model="courseCreationModal" :new-course="newCourse" :is-intra-course="isIntraCourse"
+      :program-options="programOptions" :company-options="companyOptions" :validations="$v.newCourse"
+      @hide="resetCreationModal" @submit="createCourse" @update="updateCourseCompany" :loading="modalLoading" />
   </q-page>
 </template>
 
@@ -50,10 +37,8 @@ import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
-import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import Modal from '@components/modal/Modal';
-import OptionGroup from '@components/form/OptionGroup';
+import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
@@ -65,10 +50,8 @@ export default {
   mixins: [courseFiltersMixin],
   components: {
     'ni-title-header': TitleHeader,
-    'ni-input': Input,
     'ni-select': Select,
-    'ni-modal': Modal,
-    'ni-option-group': OptionGroup,
+    'course-creation-modal': CourseCreationModal,
     'ni-trello': Trello,
   },
   data () {
@@ -139,6 +122,7 @@ export default {
       if (this.newCourse.type === INTER_B2B) delete this.newCourse.company;
     },
     resetCreationModal () {
+      this.courseCreationModal = false;
       this.$v.newCourse.$reset();
       this.newCourse = { program: '', company: '', name: '', type: INTRA };
     },
