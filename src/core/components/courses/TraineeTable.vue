@@ -28,50 +28,15 @@
     </div>
 
     <!-- Add trainee modal -->
-    <ni-modal v-model="additionModal" @hide="resetAddTraineeForm">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
-      </template>
-      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field :last="firstStep"
-        @blur="$v.newTrainee.local.email.$touch" caption="Email" :error-message="emailError($v.newTrainee)"
-        :error="$v.newTrainee.local.email.$error" />
-      <template v-if="!firstStep">
-        <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model="newTrainee.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-if="!addNewTraineeCompanyStep" @blur="$v.newTrainee.identity.lastname.$touch" caption="Nom"
-          required-field v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" />
-        <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model.trim="newTrainee.contact.phone"
-          caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error="$v.newTrainee.contact.phone.$error"
-          :error-message="phoneNbrError($v.newTrainee)" :last="isIntraCourse" />
-        <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" required-field caption="Structure"
-          @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions"
-          :last="!isIntraCourse" />
-      </template>
-      <template slot="footer">
-        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
-          :loading="additionModalLoading" icon-right="add" @click="nextStepAdditionModal" />
-        <q-btn v-else no-caps class="full-width modal-btn" color="primary" label="Ajouter à la formation"
-          :loading="additionModalLoading" icon-right="add" @click="addTrainee" />
-      </template>
-    </ni-modal>
+    <trainee-creation-modal v-model="additionModal" :new-trainee="newTrainee" :company-options="companyOptions"
+      :first-step="firstStep" :add-new-trainee-company-step="addNewTraineeCompanyStep" :is-intra-course="isIntraCourse"
+      :validations="$v.newTrainee" :loading="additionModalLoading" @hide="resetAddTraineeForm" @submit="addTrainee"
+      @nextStep="nextStepAdditionModal" />
 
     <!-- Trainee edition modal -->
-    <ni-modal v-model="editionModal" @hide="resetTraineeEditionForm">
-      <template slot="title">
-        Éditer un <span class="text-weight-bold">stagiaire</span>
-      </template>
-      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
-      <ni-input in-modal v-model="editedTrainee.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="editedTrainee.identity.lastname" :error="$v.editedTrainee.identity.lastname.$error"
-        caption="Nom" @blur="$v.editedTrainee.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
-        caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
-        :error-message="phoneNbrError($v.editedTrainee)" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
-          :loading="editionModalLoading" @click="updateTrainee" />
-      </template>
-    </ni-modal>
-</div>
+    <trainee-edition-modal v-model="editionModal" :edited-trainee="editedTrainee" :validations="$v.editedTrainee"
+      @hide="resetTraineeEditionForm" @submit="updateTrainee" :loading="editionModalLoading" />
+  </div>
 </template>
 
 <script>
@@ -88,9 +53,8 @@ import { INTER_B2B } from '@data/constants';
 import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import Modal from '@components/modal/Modal';
-import Input from '@components/form/Input';
-import Select from '@components/form/Select';
+import TraineeCreationModal from '@components/courses/TraineeCreationModal';
+import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -104,9 +68,8 @@ export default {
   },
   components: {
     'ni-responsive-table': ResponsiveTable,
-    'ni-modal': Modal,
-    'ni-input': Input,
-    'ni-select': Select,
+    'trainee-creation-modal': TraineeCreationModal,
+    'trainee-edition-modal': TraineeEditionModal,
   },
   data () {
     return {
@@ -217,6 +180,7 @@ export default {
       this.addNewTraineeCompanyStep = false;
       this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
+      this.additionModal = false;
     },
     async nextStepAdditionModal () {
       try {
@@ -288,6 +252,7 @@ export default {
       this.editionModal = true;
     },
     resetTraineeEditionForm () {
+      this.editionModal = false;
       this.$v.editedTrainee.$reset();
       this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },
