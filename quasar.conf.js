@@ -5,7 +5,6 @@ const webpack = require('webpack');
 module.exports = function (ctx) {
   return {
     boot: [
-      // 'i18n',
       'axios',
       'alenviAxios',
       'moment',
