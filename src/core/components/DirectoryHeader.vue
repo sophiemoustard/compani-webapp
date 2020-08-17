@@ -31,7 +31,7 @@ export default {
   },
   methods: {
     input (value) {
-      this.$emit('updateSearch', value);
+      this.$emit('update-search', value);
     },
     toggle (value) {
       this.$emit('toggle', value);

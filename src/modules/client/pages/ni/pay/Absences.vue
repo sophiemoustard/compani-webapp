@@ -32,8 +32,8 @@
     <!-- Absence edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
       :edition-modal="editionModal" :person-key="personKey" :active-auxiliaries="activeAuxiliaries"
-      @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion" @documentUploaded="documentUploaded"
-      @updateEvent="updateEvent" @close="closeEditionModal" @deleteEvent="validateEventDeletion" />
+      @reset="resetEditionForm" @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
+      @submit="updateEvent" @close="closeEditionModal" @delete-event="validateEventDeletion" />
   </q-page>
 </template>
 

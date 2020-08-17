@@ -48,7 +48,6 @@ export default {
   name: 'EventHistory',
   props: {
     history: { type: Object, default: () => ({}) },
-    index: { type: Number, required: true },
     active: { type: Boolean, default: false },
   },
   data () {

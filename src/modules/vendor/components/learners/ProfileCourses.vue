@@ -1,7 +1,7 @@
 <template>
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
-    <ni-table-list :data="orderedCourses" :columns="columns" @goTo="goToCourseProfileFollowUp" />
+    <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToCourseProfileFollowUp" />
   </div>
 </template>
 

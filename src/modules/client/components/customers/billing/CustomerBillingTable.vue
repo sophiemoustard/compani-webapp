@@ -187,7 +187,7 @@ export default {
       }
     },
     openEditionModal (payment) {
-      this.$emit('openEditionModal', payment);
+      this.$emit('open-edition-modal', payment);
     },
     canDownloadBill (bill) {
       return (bill.number && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);

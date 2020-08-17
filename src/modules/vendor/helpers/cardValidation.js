@@ -39,7 +39,7 @@ const cardSchema = (card) => {
   }
 };
 
-export const cardValidation = (card, options = {}) => {
-  options.allowUnknown = true;
-  return Joi.validate(card, cardSchema(card), options);
-};
+export const cardValidation = (card, options = {}) => cardSchema(card).validate(
+  card,
+  { ...options, allowUnknown: true }
+);

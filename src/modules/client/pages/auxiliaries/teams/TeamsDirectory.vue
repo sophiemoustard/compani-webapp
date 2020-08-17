@@ -1,6 +1,6 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-directory-header title="Répertoire" @updateSearch="updateSearch" :search="searchStr" />
+    <ni-directory-header title="Répertoire" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
       <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'name'">

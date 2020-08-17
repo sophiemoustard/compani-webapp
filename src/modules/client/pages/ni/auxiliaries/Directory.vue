@@ -1,9 +1,9 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
-      @updateSearch="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
+      @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @goTo="goToUserProfile">
+      @go-to="goToUserProfile">
       <template v-slot:body="{ props, col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>

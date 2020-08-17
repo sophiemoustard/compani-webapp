@@ -1,9 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme"
-      @updateSearch="updateSearch" :search="searchStr" />
+      @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @goTo="goToProgramProfile" />
+      @go-to="goToProgramProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un programme"
       @click="programCreationModal = true" :disable="tableLoading" />
 

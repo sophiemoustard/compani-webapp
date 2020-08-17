@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <h4>Contrats</h4>
     <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="loggedUser" :columns="contractsVisibleColumns"
-      @refresh="refreshContracts" :person-key="AUXILIARY" @refreshWithTimeout="refreshContractsWithTimeout"
+      @refresh="refreshContracts" :person-key="AUXILIARY" @refresh-with-timeout="refreshContractsWithTimeout"
       :loading-contracts="loading" />
   </q-page>
 </template>

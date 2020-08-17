@@ -8,9 +8,9 @@
             readonly data-cy="customer-identity">
         </div>
         <div class="col-xs-12 col-sm-7">
-          <planning-navigation :timeline-title="timelineTitle()" @goToNextWeek="goToNextWeek" :target-date="targetDate"
-            :view-mode="viewMode" :type="AGENDA" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-            @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
+          <planning-navigation :timeline-title="timelineTitle()" @go-to-next-week="goToNextWeek"
+            :target-date="targetDate" :view-mode="viewMode" :type="AGENDA" @go-to-previous-week="goToPreviousWeek"
+            @go-to-today="goToToday" @go-to-week="goToWeek" @update-view-mode="updateViewMode" />
         </div>
       </div>
       <agenda :events="events" :days="days" :person-key="personKey" />

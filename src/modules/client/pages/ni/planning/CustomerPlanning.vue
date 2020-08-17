@@ -1,19 +1,20 @@
 <template>
   <q-page class="client-background">
     <ni-planning-manager :events="events" :persons="customers" :person-key="personKey" :can-edit="canEditEvent"
-      @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
+      @update-start-of-week="updateStartOfWeek" @open-edition-modal="openEditionModal" ref="planningManager"
+      @open-creation-modal="openCreationModal" @on-drop="updateEventOnDrop" :filters="filters"
+      @refresh="refresh" />
 
     <!-- Event creation modal -->
     <ni-event-creation-modal :validations="$v.newEvent" :new-event.sync="newEvent" :person-key="personKey"
       :creation-modal="creationModal" :active-auxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
-      @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
+      @reset="resetCreationForm" @submit="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
       :edition-modal="editionModal" :active-auxiliaries="activeAuxiliaries" :customers="customers"
-      @resetForm="resetEditionForm" @updateEvent="updateEvent" @close="closeEditionModal" :person-key="personKey"
-      @deleteEventRepetition="validationDeletionEventRepetition" @deleteEvent="validateEventDeletion" />
+      @reset="resetEditionForm" @submit="updateEvent" @close="closeEditionModal" :person-key="personKey"
+      @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion" />
   </q-page>
 </template>
 

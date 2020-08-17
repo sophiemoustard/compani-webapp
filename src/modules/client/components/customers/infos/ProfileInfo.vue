@@ -234,7 +234,7 @@
     </div>
 
     <!-- Add helper modal -->
-    <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @nextStep="nextStep"
+    <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @next-step="nextStep"
       :new-helper="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
       :first-step="firstStep" />
 

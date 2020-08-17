@@ -2,10 +2,10 @@
   <div>
     <div class="row">
       <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
-        :person-key="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
-        @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
-        @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
-        @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
+        :person-key="COACH" display-actions display-uploader @open-end-contract="openEndContractModal"
+        @open-version-edition="openVersionEditionModal" @open-version-creation="openVersionCreationModal"
+        @refresh="refreshContracts" @refreshW-wth-timeout="refreshContractsWithTimeout"
+        @delete-version="validateVersionDeletion" :contracts-loading="contractsLoading" />
       <q-btn :disable="missingInfoForCreation || contractsLoading || inProgressContract" class="fixed fab-custom"
         no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
       <ni-banner v-if="missingInfoForCreation">
@@ -64,7 +64,7 @@
     <!-- Edition modal -->
     <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @editVersion="editVersion"
+      @hide="resetVersionEditionModal" @submit="editVersion"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
     <!-- End contract modal -->
