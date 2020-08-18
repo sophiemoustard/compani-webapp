@@ -5,6 +5,7 @@ import {
   bic,
   apeCode,
   rcs,
+  validTradeName,
 } from '@helpers/vuelidateCustomVal';
 import { COMPANY, ASSOCIATION, REQUIRED_LABEL } from '@data/constants';
 
@@ -15,7 +16,7 @@ export const companyMixin = {
         apeCode: { required, apeCode },
         ics: { required },
         name: { required },
-        tradeName: { maxLength: maxLength(11) },
+        tradeName: { validTradeName },
         type: { required },
         rcs: {
           required: requiredIf(item => item.type === COMPANY),
@@ -78,7 +79,9 @@ export const companyMixin = {
   },
   methods: {
     tradeNameError (validation) {
-      if (!validation.tradeName.maxLength) return 'Doit contenir 11 caractères maximum (espaces inclus).';
+      if (!validation.tradeName.validTradeName) {
+        return 'Doit contenir maximum 11 caractères, uniquement alphanumériques.';
+      }
 
       return '';
     },

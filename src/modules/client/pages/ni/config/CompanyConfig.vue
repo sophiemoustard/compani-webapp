@@ -7,7 +7,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Raison sociale" v-model="company.name" @focus="saveTmp('name')"
             @blur="updateCompany('name')" :error="$v.company.name.$error" />
-          <ni-input caption="Nom commercial" v-model="company.tradeName" @focus="saveTmp('tradeName')"
+          <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
             @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
             :error-message="tradeNameError($v.company)" />
           <ni-search-address v-model="company.address" color="white" inverted-light :error-message="addressError"
