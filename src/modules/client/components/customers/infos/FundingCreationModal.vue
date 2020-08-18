@@ -46,7 +46,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
-import { FIXED, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants.js';
+import { FIXED, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants';
 
 export default {
   name: 'FundingCreationModal',

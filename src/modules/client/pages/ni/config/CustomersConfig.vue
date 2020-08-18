@@ -335,12 +335,12 @@ import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import DateInput from '@components/form/DateInput.vue';
-import TimeInput from '@components/form/TimeInput.vue';
-import FileUploader from '@components/form/FileUploader.vue';
+import DateInput from '@components/form/DateInput';
+import TimeInput from '@components/form/TimeInput';
+import FileUploader from '@components/form/FileUploader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import SearchAddress from '@components/form/SearchAddress.vue';
+import SearchAddress from '@components/form/SearchAddress';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -352,10 +352,10 @@ import {
   NATURE_OPTIONS,
   FIXED,
   COMPANY,
-} from '@data/constants.js';
+} from '@data/constants';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'CustomersConfig',

@@ -35,7 +35,7 @@ import { formatIdentity } from '@helpers/utils';
 import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES } from '@data/constants';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
-import Planning from 'src/modules/client/components/planning/Planning.vue';
+import Planning from 'src/modules/client/components/planning/Planning';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
 export default {

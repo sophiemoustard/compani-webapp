@@ -10,7 +10,7 @@ import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { frAddress } from '@helpers/vuelidateCustomVal.js';
+import { frAddress } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import {
   INTERNAL_HOUR,

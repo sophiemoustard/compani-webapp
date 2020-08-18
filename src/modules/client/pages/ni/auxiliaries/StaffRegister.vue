@@ -27,7 +27,7 @@
 import get from 'lodash/get';
 import Contracts from '@api/Contracts';
 import LargeTable from '@components/table/LargeTable';
-import nationalities from '@data/nationalities.js';
+import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
 
 export default {

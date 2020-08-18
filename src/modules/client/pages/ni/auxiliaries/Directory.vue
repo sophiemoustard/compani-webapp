@@ -85,12 +85,12 @@ import SearchAddress from '@components/form/SearchAddress';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify.js';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {
   metaInfo: { title: 'Répertoire auxiliaires' },

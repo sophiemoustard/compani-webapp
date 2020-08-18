@@ -62,7 +62,7 @@ import { required, requiredIf } from 'vuelidate/lib/validators';
 import { formatQuantity } from '@helpers/utils';
 import CourseSlots from '@api/CourseSlots';
 import { E_LEARNING } from '@data/constants';
-import { frAddress } from '@helpers/vuelidateCustomVal.js';
+import { frAddress } from '@helpers/vuelidateCustomVal';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';

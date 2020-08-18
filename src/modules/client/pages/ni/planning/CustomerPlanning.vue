@@ -24,7 +24,7 @@ import get from 'lodash/get';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
-import { NotifyNegative } from '@components/popup/notify.js';
+import { NotifyNegative } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
 import {
   INTERVENTION,
@@ -37,7 +37,7 @@ import {
   COACH_ROLES,
 } from '@data/constants';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
-import Planning from 'src/modules/client/components/planning/Planning.vue';
+import Planning from 'src/modules/client/components/planning/Planning';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 

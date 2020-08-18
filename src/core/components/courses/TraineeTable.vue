@@ -51,7 +51,7 @@ import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import { INTER_B2B } from '@data/constants';
 import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import TraineeCreationModal from '@components/courses/TraineeCreationModal';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';

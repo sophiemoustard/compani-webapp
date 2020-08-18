@@ -82,14 +82,14 @@
 import { Cookies } from 'quasar';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
-import esign from '@api/Esign.js';
-import { NotifyNegative } from '@components/popup/notify.js';
+import esign from '@api/Esign';
+import { NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { COACH, CUSTOMER, AUXILIARY } from '@data/constants.js';
+import { COACH, CUSTOMER, AUXILIARY } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
+import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ContractsCell',

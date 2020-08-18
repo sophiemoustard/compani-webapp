@@ -1,6 +1,6 @@
 import pickBy from 'lodash/pickBy';
 import { required } from 'vuelidate/lib/validators';
-import { strictPositiveNumber, validYear } from '@helpers/vuelidateCustomVal.js';
+import { strictPositiveNumber, validYear } from '@helpers/vuelidateCustomVal';
 import Payments from '@api/Payments';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '@data/constants';

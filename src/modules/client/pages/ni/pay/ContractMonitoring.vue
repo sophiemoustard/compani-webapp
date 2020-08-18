@@ -41,8 +41,8 @@ import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import { formatIdentity } from '@helpers/utils';
-import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
-import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal.vue';
+import { contractMixin } from 'src/modules/client/mixins/contractMixin';
+import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
 
 export default {
   name: 'ContractMonitoring',

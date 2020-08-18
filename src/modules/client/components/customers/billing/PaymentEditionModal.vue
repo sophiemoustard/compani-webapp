@@ -24,8 +24,8 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import DateInput from '@components/form/DateInput';
-import { formatIdentity } from '@helpers/utils.js';
-import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '@data/constants.js';
+import { formatIdentity } from '@helpers/utils';
+import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '@data/constants';
 
 export default {
   name: 'PaymentEditionModal',

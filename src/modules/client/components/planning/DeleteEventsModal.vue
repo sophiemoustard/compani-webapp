@@ -33,7 +33,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {
   name: 'DeleteEventsModal',

@@ -82,13 +82,15 @@ import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
 import Modal from '@components/modal/Modal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import PictureUploader from '@components/PictureUploader.vue';
+import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
+// eslint-disable-next-line import/extensions
 import rgpd from 'src/statics/rgpd.html';
+// eslint-disable-next-line import/extensions
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {

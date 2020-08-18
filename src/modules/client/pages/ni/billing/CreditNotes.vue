@@ -185,8 +185,8 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { strictPositiveNumber } from '@helpers/vuelidateCustomVal.js';
-import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils.js';
+import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
+import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
 import { COMPANI } from '@data/constants';
 
 export default {

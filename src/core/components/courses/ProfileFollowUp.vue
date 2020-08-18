@@ -102,7 +102,7 @@ import { mapState } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatIdentity } from '@helpers/utils';
 import Input from '@components/form/Input';
 import MessageSendingModal from '@components/courses/MessageSendingModal';
 import MessageDetailsModal from '@components/courses/MessageDetailsModal';
@@ -110,8 +110,7 @@ import Banner from '@components/Banner';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
-import { formatIdentity } from '@helpers/utils.js';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 

@@ -12,7 +12,7 @@
 import Modal from '@components/modal/Modal';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
-import { FIXED } from '@data/constants.js';
+import { FIXED } from '@data/constants';
 
 export default {
   name: 'FundingDetailsModal',

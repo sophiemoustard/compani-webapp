@@ -37,7 +37,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
-import { FIXED } from '@data/constants.js';
+import { FIXED } from '@data/constants';
 
 export default {
   name: 'FundingEditionModal',

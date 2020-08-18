@@ -16,7 +16,7 @@
 <script>
 import get from 'lodash/get';
 import { formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR } from '@data/constants.js';
+import { DEFAULT_AVATAR } from '@data/constants';
 
 export default {
   name: 'ChipCustomerIndicator',

@@ -158,7 +158,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import SearchAddress from '@components/form/SearchAddress.vue';
+import SearchAddress from '@components/form/SearchAddress';
 import {
   frAddress,
   validWorkHealthService,

@@ -120,7 +120,7 @@ import CustomerBillingTable from 'src/modules/client/components/customers/billin
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
 import PaymentEditionModal from 'src/modules/client/components/customers/billing/PaymentEditionModal';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
-import { paymentMixin } from 'src/modules/client/mixins/paymentMixin.js';
+import { paymentMixin } from 'src/modules/client/mixins/paymentMixin';
 
 export default {
   name: 'ProfileBilling',

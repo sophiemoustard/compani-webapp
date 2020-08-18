@@ -120,7 +120,7 @@ import NiEventHistoryFeed from 'src/modules/client/components/planning/EventHist
 import ChipsAutocomplete from 'src/modules/client/components/planning/ChipsAutocomplete';
 import DeleteEventsModal from 'src/modules/client/components/planning/DeleteEventsModal';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
-import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation.vue';
+import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
 
 export default {

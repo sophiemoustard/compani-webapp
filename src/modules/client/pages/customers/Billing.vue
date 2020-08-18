@@ -7,7 +7,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling.vue';
+import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling';
 import Customers from '@api/Customers';
 
 export default {
