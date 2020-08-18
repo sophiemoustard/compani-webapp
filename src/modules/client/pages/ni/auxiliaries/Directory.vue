@@ -76,7 +76,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import orderBy from 'lodash/orderBy';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Roles from '@api/Roles';
-import Twilio from '@api/Twilio';
+import Sms from '@api/Sms';
 import Users from '@api/Users';
 import SelectSector from '@components/form/SelectSector';
 import Input from '@components/form/Input';
@@ -300,7 +300,7 @@ export default {
       }
 
       const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
-      await Twilio.sendSMS({
+      await Sms.send({
         to: `+33${user.contact.phone.substring(1)}`,
         body: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
           + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '

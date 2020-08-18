@@ -58,7 +58,7 @@
 import get from 'lodash/get';
 import { mapState } from 'vuex';
 import Users from '@api/Users';
-import Twilio from '@api/Twilio';
+import Sms from '@api/Sms';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
@@ -166,7 +166,7 @@ export default {
         if (!this.companyName) {
           return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
         }
-        await Twilio.sendSMS({
+        await Sms.send({
           to: `+33${this.userProfile.contact.phone.substring(1)}`,
           body: this.message,
         });
