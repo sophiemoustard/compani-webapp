@@ -11,7 +11,7 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="edit" @click.native="openEditionModal(props.row)" />
+                    <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
                     <q-icon color="grey" name="close" @click.native="validateTraineeDeletion(col.value)" />
                   </div>
                 </template>
@@ -22,20 +22,20 @@
         </ni-responsive-table>
         <q-card-actions align="right" v-if="canEdit">
           <q-btn no-caps flat color="primary" icon="add" label="Ajouter un stagiaire" :disable="loading"
-            @click="additionModal = true" />
+            @click="traineeCreationModal = true" />
         </q-card-actions>
       </q-card>
     </div>
 
     <!-- Add trainee modal -->
-    <trainee-creation-modal v-model="additionModal" :new-trainee="newTrainee" :company-options="companyOptions"
+    <trainee-creation-modal v-model="traineeCreationModal" :new-trainee="newTrainee" :company-options="companyOptions"
       :first-step="firstStep" :add-new-trainee-company-step="addNewTraineeCompanyStep" :is-intra-course="isIntraCourse"
-      :validations="$v.newTrainee" :loading="additionModalLoading" @hide="resetAddTraineeForm" @submit="addTrainee"
-      @nextStep="nextStepAdditionModal" />
+      :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
+      @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
     <!-- Trainee edition modal -->
-    <trainee-edition-modal v-model="editionModal" :edited-trainee="editedTrainee" :validations="$v.editedTrainee"
-      @hide="resetTraineeEditionForm" @submit="updateTrainee" :loading="editionModalLoading" />
+    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee="editedTrainee" :validations="$v.editedTrainee"
+      @hide="resetTraineeEditionForm" @submit="updateTrainee" :loading="traineeEditionModalLoading" />
   </div>
 </template>
 
@@ -110,8 +110,8 @@ export default {
         sortBy: 'lastname',
       },
       companyOptions: [],
-      additionModal: false,
-      additionModalLoading: false,
+      traineeCreationModal: false,
+      traineeCreationModalLoading: false,
       firstStep: true,
       addNewTraineeCompanyStep: false,
       newTrainee: {
@@ -129,8 +129,8 @@ export default {
         contact: { phone: { frPhoneNumber } },
         company: { required: requiredIf(() => this.course.type === INTER_B2B) },
       },
-      editionModal: false,
-      editionModalLoading: false,
+      traineeEditionModal: false,
+      traineeEditionModalLoading: false,
       editedTrainee: {
         identity: {},
         contact: {},
@@ -180,16 +180,16 @@ export default {
       this.addNewTraineeCompanyStep = false;
       this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
-      this.additionModal = false;
+      this.traineeCreationModal = false;
     },
-    async nextStepAdditionModal () {
+    async nextStepTraineeCreationModal () {
       try {
         this.$v.newTrainee.$touch();
         if (!this.newTrainee.local.email || this.$v.newTrainee.local.email.$error) {
           return NotifyWarning('Champ(s) invalide(s).');
         }
 
-        this.additionModalLoading = true;
+        this.traineeCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainee.local.email });
 
         if (this.isIntraCourse) {
@@ -205,7 +205,7 @@ export default {
       } catch (e) {
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
-        this.additionModalLoading = false;
+        this.traineeCreationModalLoading = false;
       }
     },
     formatAddTraineePayload () {
@@ -229,36 +229,36 @@ export default {
           if (companyFieldError || newTraineeFormInvalid) return NotifyWarning('Champ(s) invalide(s).');
         }
 
-        this.additionModalLoading = true;
+        this.traineeCreationModalLoading = true;
         const payload = this.formatAddTraineePayload();
         await Courses.addTrainee(this.course._id, payload);
         NotifyPositive('Stagiaire ajouté.');
 
-        this.additionModal = false;
+        this.traineeCreationModal = false;
         this.$emit('refresh');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
-        this.additionModalLoading = false;
+        this.traineeCreationModalLoading = false;
       }
     },
-    async openEditionModal (trainee) {
+    async openTraineeEditionModal (trainee) {
       this.editedTrainee = {
         ...this.editedTrainee,
         ...pick(trainee, ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
       };
-      this.editionModal = true;
+      this.traineeEditionModal = true;
     },
     resetTraineeEditionForm () {
-      this.editionModal = false;
+      this.traineeEditionModal = false;
       this.$v.editedTrainee.$reset();
       this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },
     async updateTrainee () {
       try {
-        this.editionModalLoading = true;
+        this.traineeEditionModalLoading = true;
         this.$v.editedTrainee.$touch();
         if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (get(this.editedTrainee, 'contact.phone')) {
@@ -266,14 +266,14 @@ export default {
         }
 
         await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
-        this.editionModal = false;
+        this.traineeEditionModal = false;
         this.$emit('refresh');
         NotifyPositive('Stagiaire modifié.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification du stagiaire.');
       } finally {
-        this.editionModalLoading = false;
+        this.traineeEditionModalLoading = false;
       }
     },
     validateTraineeDeletion (traineeId) {

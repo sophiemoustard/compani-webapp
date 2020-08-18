@@ -118,7 +118,6 @@ export default {
         { label: 'Témoignage', value: SHARING_EXPERIENCE },
         { label: 'Vidéo', value: VIDEO },
       ],
-      formatQuantity,
     };
   },
   validations () {
@@ -138,6 +137,7 @@ export default {
     if (!this.program) await this.refreshProgram();
   },
   methods: {
+    formatQuantity,
     saveTmpName (index) {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
     },

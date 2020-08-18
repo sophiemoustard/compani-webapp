@@ -42,13 +42,12 @@
 
     <!-- Course slot creation modal -->
     <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
-      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" :disable-step="!stepsLength"
-      @submit="addCourseSlot" />
+      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
 
     <!-- Course slot edition modal -->
     <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
-      :validations="$v.editedCourseSlot" :disable-step="!stepsLength" @hide="resetEditionModal" :loading="modalLoading"
-      @delete="deleteCourseSlot" @submit="updateCourseSlot" />
+      :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
+      @submit="updateCourseSlot" />
 </div>
 </template>
 
@@ -115,7 +114,6 @@ export default {
           fullAddress: { frAddress },
         },
       },
-      formatQuantity,
     };
   },
   validations () {

@@ -11,8 +11,7 @@
         :error="validations.dates.$error" @blur="validations.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
         @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step"
-        :disable="disableStep" />
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -32,7 +31,6 @@ export default {
   name: 'SlotEditionModal',
   props: {
     value: { type: Boolean, default: false },
-    disableStep: { type: Boolean, default: true },
     editedCourseSlot: { type: Object, default: () => ({}) },
     stepOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
@@ -46,9 +44,7 @@ export default {
   },
   computed: {
     addressError () {
-      if (!this.validations.address.fullAddress.required) {
-        return REQUIRED_LABEL;
-      }
+      if (!this.validations.address.fullAddress.required) return REQUIRED_LABEL;
       return 'Adresse non valide';
     },
   },

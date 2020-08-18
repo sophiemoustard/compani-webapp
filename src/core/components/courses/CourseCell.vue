@@ -64,7 +64,6 @@ export default {
       IN_PROGRESS,
       COMPLETED,
       isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
-      formatQuantity,
     };
   },
   computed: {

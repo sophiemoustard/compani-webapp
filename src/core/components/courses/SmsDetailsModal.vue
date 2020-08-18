@@ -36,12 +36,8 @@ export default {
     'ni-input': Input,
     'ni-banner': Banner,
   },
-  data () {
-    return {
-      formatQuantity,
-    };
-  },
   methods: {
+    formatQuantity,
     hide () {
       this.$emit('hide');
     },

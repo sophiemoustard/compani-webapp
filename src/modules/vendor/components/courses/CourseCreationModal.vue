@@ -6,8 +6,7 @@
       <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="validations.type.$error"
         caption="Type" required-field inline @input="update" />
       <ni-select in-modal v-model.trim="newCourse.program" :error="validations.program.$error"
-        @blur="validations.program.$touch" required-field caption="Programme" :options="programOptions"
-        @input="setSubProgramOptions" />
+        @blur="validations.program.$touch" required-field caption="Programme" :options="programOptions" />
       <ni-select in-modal v-model.trim="newCourse.subProgram" :error="validations.subProgram.$error"
         @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions" />
       <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="validations.company.$error"
@@ -57,9 +56,9 @@ export default {
         .sort((a, b) => a.label.localeCompare(b.label));
     },
   },
-  methods: {
-    setSubProgramOptions () {
-      const selectedProgram = this.programs.find(p => p._id === this.newCourse.program);
+  watch: {
+    'newCourse.program': function (value) {
+      const selectedProgram = this.programs.find(p => p._id === value);
 
       if (selectedProgram) {
         this.subProgramOptions = selectedProgram.subPrograms.length
@@ -69,8 +68,12 @@ export default {
           : [{ label: 'Veuillez créer un sous-programme pour ce programme', value: '' }];
 
         if (this.subProgramOptions.length === 1) this.newCourse.subProgram = this.subProgramOptions[0].value;
+      } else {
+        this.newCourse.subProgram = '';
       }
     },
+  },
+  methods: {
     hide () {
       this.$emit('hide');
     },

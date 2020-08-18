@@ -55,7 +55,7 @@ export default {
       this.$emit('hide');
     },
     nextStep () {
-      this.$emit('nextStep');
+      this.$emit('next-step');
     },
     submit () {
       this.$emit('submit');
