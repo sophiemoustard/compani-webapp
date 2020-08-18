@@ -88,8 +88,7 @@
 
     <!-- Modal envoi message -->
     <message-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
-      :message-type="messageType" :message="message" @send="sendMessage" @updateType="updateMessage" :loading="loading"
-      @hide="smsModal = false" />
+      :new-sms="newSms" @send="sendMessage" @updateType="updateMessage" :loading="loading" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
     <message-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
@@ -131,12 +130,11 @@ export default {
   data () {
     return {
       smsModal: false,
-      messageType: '',
       messageTypeOptions: [
         { label: 'Convocation', value: CONVOCATION },
         { label: 'Rappel', value: REMINDER },
       ],
-      message: '',
+      newSms: { body: '', type: '' },
       loading: false,
       courseLoading: false,
       smsSent: [],
@@ -162,7 +160,6 @@ export default {
       smsLoading: false,
       smsHistoriesModal: false,
       smsHistory: { missingPhones: [] },
-      formatQuantity,
     };
   },
   async created () {
@@ -226,12 +223,13 @@ export default {
   },
   methods: {
     get,
+    formatQuantity,
     getType (value) {
       const type = this.messageTypeOptions.find(t => t.value === value);
       return type ? type.label : '';
     },
     setDefaultMessageType () {
-      this.messageType = this.courseNotStartedYet ? CONVOCATION : REMINDER;
+      this.newSms.type = this.courseNotStartedYet ? CONVOCATION : REMINDER;
     },
     async refreshSms () {
       try {
@@ -247,8 +245,12 @@ export default {
       }
     },
     openSmsModal () {
-      this.updateMessage(this.messageType);
+      this.updateMessage(this.newSms.type);
       this.smsModal = true;
+    },
+    resetSmsModal () {
+      this.updateMessage(this.newSms.type);
+      this.smsModal = false;
     },
     async refreshCourse () {
       try {
@@ -277,7 +279,7 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      this.newSms.body = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `La première session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
       + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
       + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
@@ -288,15 +290,15 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      this.newSms.body = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `Votre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
       + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
       + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
-    async sendMessage (sentMessage, setMessageType) {
+    async sendMessage (sendingSms) {
       try {
         this.loading = true;
-        await Courses.sendSMS(this.course._id, { body: sentMessage, type: setMessageType });
+        await Courses.sendSMS(this.course._id, sendingSms);
         await this.refreshSms();
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {

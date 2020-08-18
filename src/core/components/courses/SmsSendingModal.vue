@@ -3,9 +3,9 @@
     <template slot="title">
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="sendingMessageType"
+      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="localNewSms.type"
         required-field @input="updateType" />
-      <ni-input in-modal caption="Message" v-model="sendingMessage" type="textarea" :rows="7" required-field />
+      <ni-input in-modal caption="Message" v-model="localNewSms.body" type="textarea" :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click="send" />
@@ -22,9 +22,12 @@ export default {
   name: 'SmsSendingModal',
   props: {
     value: { type: Boolean, default: false },
-    messageType: { type: String, default: () => '' },
+    newSms: {
+      type: Object,
+      validator: p => (typeof p.type === 'string') && (typeof p.body === 'string'),
+      default: () => ({ type: '', body: '' }),
+    },
     filteredMessageTypeOptions: { type: Array, default: () => [] },
-    message: { type: String, default: () => '' },
     loading: { type: Boolean, default: false },
   },
   components: {
@@ -34,16 +37,12 @@ export default {
   },
   data () {
     return {
-      sendingMessage: this.message,
-      sendingMessageType: this.messageType,
+      localNewSms: this.newSms,
     };
   },
   watch: {
-    message () {
-      this.sendingMessage = this.message;
-    },
-    messageType () {
-      this.sendingMessageType = this.messageType;
+    newSms (value) {
+      this.localNewSms = value;
     },
   },
   methods: {
@@ -51,10 +50,10 @@ export default {
       this.$emit('hide');
     },
     updateType () {
-      this.$emit('updateType', this.sendingMessageType);
+      this.$emit('updateType', this.localNewSms.type);
     },
     send () {
-      this.$emit('send', this.sendingMessage, this.sendingMessageType);
+      this.$emit('send', this.localNewSms);
     },
   },
 };
