@@ -122,7 +122,6 @@ export default {
       if (this.newCourse.type === INTER_B2B) delete this.newCourse.company;
     },
     resetCreationModal () {
-      this.courseCreationModal = false;
       this.$v.newCourse.$reset();
       this.newCourse = { program: '', company: '', misc: '', type: INTRA };
     },

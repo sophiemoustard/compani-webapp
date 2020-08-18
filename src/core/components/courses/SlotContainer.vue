@@ -204,7 +204,6 @@ export default {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
     },
     resetCreationModal () {
-      this.creationModal = false;
       this.newCourseSlot = {
         dates: {
           startDate: this.$moment().startOf('d').hours(9).toISOString(),
@@ -238,7 +237,6 @@ export default {
       this.editionModal = true;
     },
     resetEditionModal () {
-      this.editionModal = false;
       this.editedCourseSlot = {};
       this.$v.editedCourseSlot.$reset();
     },

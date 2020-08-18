@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
       <template slot="title">
         Éditer le <span class="text-weight-bold">financement</span>
       </template>
@@ -71,6 +71,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
     submit () {
       this.$emit('submit');

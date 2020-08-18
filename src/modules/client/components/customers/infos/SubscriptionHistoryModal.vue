@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
       Historique de la souscription
       <span v-if="selected.service" class="text-weight-bold">{{ selected.service.name }}</span>
@@ -38,6 +38,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
   },
 };

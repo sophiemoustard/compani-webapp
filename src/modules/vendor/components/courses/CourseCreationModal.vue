@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
@@ -8,7 +8,8 @@
       <ni-select in-modal v-model.trim="newCourse.program" :error="validations.program.$error"
         @blur="validations.program.$touch" required-field caption="Programme" :options="programOptions" />
       <ni-select in-modal v-model.trim="newCourse.subProgram" :error="validations.subProgram.$error"
-        @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions" />
+        @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions"
+        :disable="disableSubProgram" />
       <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="validations.company.$error"
         @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions" />
       <ni-input in-modal v-model.trim="newCourse.misc" caption="Informations Complémentaires" />
@@ -20,6 +21,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
@@ -47,6 +49,7 @@ export default {
     return {
       courseTypes: COURSE_TYPES,
       subProgramOptions: [],
+      disableSubProgram: false,
     };
   },
   computed: {
@@ -60,22 +63,26 @@ export default {
     'newCourse.program': function (value) {
       const selectedProgram = this.programs.find(p => p._id === value);
 
-      if (selectedProgram) {
-        this.subProgramOptions = selectedProgram.subPrograms.length
-          ? selectedProgram.subPrograms
-            .map(p => ({ label: p.name, value: p._id }))
-            .sort((a, b) => a.label.localeCompare(b.label))
-          : [{ label: 'Veuillez créer un sous-programme pour ce programme', value: '' }];
+      if (get(selectedProgram, 'subPrograms.length')) {
+        this.disableSubProgram = false;
+        this.subProgramOptions = selectedProgram.subPrograms
+          .map(p => ({ label: p.name, value: p._id }))
+          .sort((a, b) => a.label.localeCompare(b.label));
 
         if (this.subProgramOptions.length === 1) this.newCourse.subProgram = this.subProgramOptions[0].value;
       } else {
+        this.subProgramOptions = [];
         this.newCourse.subProgram = '';
+        this.disableSubProgram = true;
       }
     },
   },
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
     submit () {
       this.$emit('submit');

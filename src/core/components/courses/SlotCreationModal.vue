@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" container-class="modal-container-md">
+  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
     <template slot="title">
         Ajouter un <span class="text-weight-bold">créneau</span>
       </template>
@@ -46,6 +46,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
     submit () {
       this.$emit('submit');

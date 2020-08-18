@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
       Détail du financement <span class="text-weight-bold">{{ selected.thirdPartyPayer.name }}</span>
     </template>
@@ -38,6 +38,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
   },
 };

@@ -659,7 +659,6 @@ export default {
       return formattedService;
     },
     resetCreationSubscriptionData () {
-      this.openNewSubscriptionModal = false;
       this.$v.newSubscription.$reset();
       this.newSubscription = {
         service: '',
@@ -701,7 +700,6 @@ export default {
       this.openEditedSubscriptionModal = true;
     },
     resetEditionSubscriptionData () {
-      this.openEditedSubscriptionModal = false;
       this.editedSubscription = {};
       this.$v.editedSubscription.$reset();
     },
@@ -879,11 +877,9 @@ export default {
       this.fundingHistoryModal = true;
     },
     resetFundingHistoryData () {
-      this.fundingHistoryModal = false;
       this.selectedFunding = {};
     },
     resetCreationFundingData () {
-      this.fundingCreationModal = false;
       this.$v.newFunding.$reset();
       this.newFunding = {
         thirdPartyPayer: '',
@@ -916,7 +912,7 @@ export default {
         const payload = this.formatCreatedFunding();
         await Customers.addFunding(this.customer._id, payload);
 
-        this.resetCreationFundingData();
+        this.fundingCreationModal = false;
         await this.refreshCustomer();
         NotifyPositive('Financement ajoutée');
       } catch (e) {
@@ -952,7 +948,6 @@ export default {
       this.fundingDetailsModal = true;
     },
     resetFundingDetailsData () {
-      this.fundingDetailsModal = false;
       this.selectedFunding = {};
       this.fundingDetailsData = [];
     },
@@ -962,7 +957,6 @@ export default {
       this.fundingEditionModal = true;
     },
     resetEditionFundingData () {
-      this.fundingEditionModal = false;
       this.editedFunding = {};
       this.$v.editedFunding.$reset();
     },

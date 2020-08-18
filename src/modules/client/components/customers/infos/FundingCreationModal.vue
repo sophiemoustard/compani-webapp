@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">financement</span>
       </template>
@@ -111,6 +111,9 @@ export default {
     },
     hide () {
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
     submit () {
       this.$emit('submit');

@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)"
+  <ni-modal :value="value" @hide="hide" @input="input"
     title="Suppression d'interventions sur une période">
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer" :options="customersOptions"
       required-field @blur="$v.deletedEvents.customer.$touch"
@@ -70,6 +70,9 @@ export default {
       this.deletedEvents = { inRange: true };
       this.$v.deletedEvents.$reset();
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
     validateEventsDeletion () {
       this.$q.dialog({

@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
         Message envoyé le <span class="text-weight-bold">{{ $moment(smsHistory.date).format('DD/MM/YYYY') }}</span>
       </template>
@@ -40,6 +40,9 @@ export default {
     formatQuantity,
     hide () {
       this.$emit('hide');
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
   },
 };

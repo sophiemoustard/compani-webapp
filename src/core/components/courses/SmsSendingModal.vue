@@ -1,11 +1,11 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="localNewSms.type"
+      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="newSms.type"
         required-field @input="updateType" />
-      <ni-input in-modal caption="Message" v-model="localNewSms.body" type="textarea" :rows="7" required-field />
+      <ni-input in-modal caption="Message" v-model="newSms.body" type="textarea" :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click="send" />
@@ -35,25 +35,18 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
   },
-  data () {
-    return {
-      localNewSms: this.newSms,
-    };
-  },
-  watch: {
-    newSms (value) {
-      this.localNewSms = value;
-    },
-  },
   methods: {
     hide () {
       this.$emit('hide');
     },
+    input () {
+      this.$emit('input', this.$event);
+    },
     updateType () {
-      this.$emit('updateType', this.localNewSms.type);
+      this.$emit('updateType', this.newSms.type);
     },
     send () {
-      this.$emit('send', this.localNewSms);
+      this.$emit('send', this.newSms);
     },
   },
 };

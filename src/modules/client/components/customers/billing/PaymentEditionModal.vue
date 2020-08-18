@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="$emit('input', $event)" @hide="hide">
+  <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
       Editer le <span class="text-weight-bold">{{ editionModalNature }}</span>
     </template>
@@ -71,6 +71,9 @@ export default {
   methods: {
     hide (partialReset, type) {
       this.$emit('hide', { partialReset, type });
+    },
+    input () {
+      this.$emit('input', this.$event);
     },
     submit (value) {
       this.$emit('submit', value);

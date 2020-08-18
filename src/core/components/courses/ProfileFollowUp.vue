@@ -87,11 +87,11 @@
     </div>
 
     <!-- Modal envoi message -->
-    <message-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
+    <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
       :new-sms="newSms" @send="sendMessage" @updateType="updateMessage" :loading="loading" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
-    <message-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
+    <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
       :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
   </div>
 </template>
@@ -117,8 +117,8 @@ export default {
   name: 'ProfileFollowUp',
   components: {
     'ni-input': Input,
-    'message-sending-modal': SmsSendingModal,
-    'message-details-modal': SmsDetailsModal,
+    'sms-sending-modal': SmsSendingModal,
+    'sms-details-modal': SmsDetailsModal,
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
@@ -250,7 +250,6 @@ export default {
     },
     resetSmsModal () {
       this.updateMessage(this.newSms.type);
-      this.smsModal = false;
     },
     async refreshCourse () {
       try {
@@ -267,7 +266,6 @@ export default {
       this.smsHistory = this.smsSent.find(sms => sms._id === smsId);
     },
     resetSmsHistoryModal () {
-      this.smsHistoriesModal = false;
       this.smsHistory = { missingPhones: [] };
     },
     updateMessage (newMessageType) {
