@@ -63,7 +63,7 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, HR_SMS } from '@data/constants';
 
 export default {
   name: 'ProfileHeader',
@@ -167,8 +167,9 @@ export default {
           return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
         }
         await Sms.send({
-          to: `+33${this.userProfile.contact.phone.substring(1)}`,
-          body: this.message,
+          recipient: `+33${this.userProfile.contact.phone.substring(1)}`,
+          content: this.message,
+          tag: HR_SMS,
         });
         NotifyPositive('SMS bien envoyé.');
       } catch (e) {

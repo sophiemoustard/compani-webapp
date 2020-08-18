@@ -86,7 +86,7 @@ import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
+import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
@@ -301,8 +301,9 @@ export default {
 
       const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
       await Sms.send({
-        to: `+33${user.contact.phone.substring(1)}`,
-        body: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
+        tag: HR_SMS,
+        recipient: `+33${user.contact.phone.substring(1)}`,
+        content: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
           + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '
           + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
           + `/reset-password/${passwordToken.token} :-)\n`

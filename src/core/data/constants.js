@@ -302,6 +302,8 @@ export const COMPANY_TYPES = [
 // SMS
 export const CONVOCATION = 'convocation';
 export const REMINDER = 'reminder';
+export const HR_SMS = 'RH';
+export const COURSE_SMS = 'Formation';
 
 // COURSE
 export const INTRA = 'intra';
