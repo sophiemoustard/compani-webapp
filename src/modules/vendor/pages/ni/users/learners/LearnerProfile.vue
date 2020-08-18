@@ -51,19 +51,8 @@ export default {
     return {
       userIdentity: '',
       tabsContent: [
-        {
-          label: 'Infos personnelles',
-          name: 'info',
-          default: this.defaultTab === 'info',
-          component: ProfileInfo,
-          notification: 'profiles',
-        },
-        {
-          label: 'Formations',
-          name: 'courses',
-          default: this.defaultTab === 'courses',
-          component: ProfileCourses,
-        },
+        { label: 'Infos personnelles', name: 'info', default: this.defaultTab === 'info', component: ProfileInfo },
+        { label: 'Formations', name: 'courses', default: this.defaultTab === 'courses', component: ProfileCourses },
       ],
     };
   },
@@ -77,10 +66,7 @@ export default {
       return get(this.userProfile, 'role.client.name') || get(this.userProfile, 'role.vendor.name') || '';
     },
     headerInfo () {
-      const infos = [
-        { icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' },
-      ];
-
+      const infos = [{ icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' }];
       if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
 
       return infos;
@@ -89,7 +75,6 @@ export default {
   watch: {
     async userProfile () {
       this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
-      await this.$store.dispatch('userProfile/updateNotifications');
     },
   },
   methods: {
