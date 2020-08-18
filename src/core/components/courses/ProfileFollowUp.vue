@@ -104,8 +104,8 @@ import get from 'lodash/get';
 import Courses from '@api/Courses';
 import { formatQuantity, formatIdentity } from '@helpers/utils';
 import Input from '@components/form/Input';
-import MessageSendingModal from '@components/courses/MessageSendingModal';
-import MessageDetailsModal from '@components/courses/MessageDetailsModal';
+import SmsSendingModal from '@components/courses/SmsSendingModal';
+import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -118,8 +118,8 @@ export default {
   name: 'ProfileFollowUp',
   components: {
     'ni-input': Input,
-    'message-sending-modal': MessageSendingModal,
-    'message-details-modal': MessageDetailsModal,
+    'message-sending-modal': SmsSendingModal,
+    'message-details-modal': SmsDetailsModal,
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,

@@ -23,7 +23,7 @@ import Banner from '@components/Banner';
 import { formatQuantity } from '@helpers/utils';
 
 export default {
-  name: 'MessageDetailsModal',
+  name: 'SmsDetailsModal',
   props: {
     value: { type: Boolean, default: false },
     missingTraineesPhoneHistory: { type: Array, default: () => [] },

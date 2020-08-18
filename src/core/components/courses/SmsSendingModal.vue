@@ -19,7 +19,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 
 export default {
-  name: 'MessageSendingModal',
+  name: 'SmsSendingModal',
   props: {
     value: { type: Boolean, default: false },
     messageType: { type: String, default: () => '' },
