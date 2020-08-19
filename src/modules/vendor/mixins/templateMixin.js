@@ -5,7 +5,7 @@ import set from 'lodash/set';
 import Cards from '@api/Cards';
 import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD } from '@data/constants';
+import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD, FILL_THE_GAPS } from '@data/constants';
 
 export const templateMixin = {
   data () {
@@ -37,6 +37,14 @@ export const templateMixin = {
         return {
           card: { text: { required }, backText: { required } },
         };
+      case FILL_THE_GAPS:
+        return {
+          card: {
+            text: { required },
+            answers: { $each: { required } },
+            explanation: { required },
+          },
+        };
       default:
         return {};
     }
@@ -54,6 +62,9 @@ export const templateMixin = {
     saveTmp (path) {
       this.tmpInput = get(this.card, path);
     },
+    saveTmpAnswer (index) {
+      this.tmpInput = get(this.card, `answers[${index}]`) || '';
+    },
     async updateCard (path) {
       try {
         const value = get(this.card, path);
@@ -63,6 +74,25 @@ export const templateMixin = {
         if (get(this.$v.card, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Cards.updateById(this.card._id, set({}, path, value));
+
+        await this.refreshCard();
+        NotifyPositive('Carte mise à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la carte.');
+      }
+    },
+    async updateAnswer (index) {
+      try {
+        const newAnswer = get(this.card, `answers[${index}]`) || '';
+        if (this.tmpInput === newAnswer) return;
+
+        if (index < 2) {
+          this.$v.card.answers.$each[index].$touch();
+          if (this.$v.card.answers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s)');
+        }
+
+        await Cards.updateById(this.card._id, { answers: this.card.answers.filter(a => !!a) });
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

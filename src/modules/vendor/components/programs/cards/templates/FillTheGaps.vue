@@ -1,0 +1,47 @@
+<template>
+  <div>
+    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
+      @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" />
+    <div class="q-mb-lg row gutter-profile answers">
+      <div class="col-12 q-mb-sm">Mauvaises Réponses :</div>
+      <ni-input v-for="i in 6" :key="i" class="col-xs-12 col-md-6" :caption="`Réponse ${i}`"
+        v-model.trim="card.answers[i - 1]" @focus="saveTmpAnswer(i - 1)" @blur="updateAnswer(i - 1)"
+        :error="getError(i - 1)" :required-field="i < 3" />
+    </div>
+    <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
+      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
+  </div>
+</template>
+
+<script>
+import Input from '@components/form/Input';
+import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import get from 'lodash/get';
+
+export default {
+  name: 'FillTheGaps',
+  components: {
+    'ni-input': Input,
+  },
+  mixins: [templateMixin],
+  methods: {
+    getError (index) {
+      if (index < 2) return get(this.$v.card, `answers.$each[${index}].$error`) || false;
+      return false;
+    },
+    saveTmp (path) {
+      this.tmpInput = get(this.card, path);
+    },
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+
+.answers
+  & > div
+    font-size: small
+  & > .col-md-6
+    padding-top: 0
+
+</style>

@@ -9,6 +9,7 @@
           <title-text v-else-if="card.template === TITLE_TEXT" class="q-mx-lg" :card="card" />
           <text-media v-else-if="card.template === TEXT_MEDIA" class="q-mx-lg" :card="card" />
           <flashcard v-else-if="card.template === FLASHCARD" class="q-mx-lg" :card="card" />
+          <fill-the-gaps v-else-if="card.template === FILL_THE_GAPS" class="q-mx-lg" :card="card" />
         </div>
     </q-scroll-area>
   </div>
@@ -16,12 +17,13 @@
 
 <script>
 import { mapState } from 'vuex';
-import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD } from '@data/constants';
+import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD, FILL_THE_GAPS } from '@data/constants';
 import Transition from 'src/modules/vendor/components/programs/cards/templates/Transition';
 import TitleTextMedia from 'src/modules/vendor/components/programs/cards/templates/TitleTextMedia';
 import TitleText from 'src/modules/vendor/components/programs/cards/templates/TitleText';
 import TextMedia from 'src/modules/vendor/components/programs/cards/templates/TextMedia';
 import Flashcard from 'src/modules/vendor/components/programs/cards/templates/Flashcard';
+import FillTheGaps from 'src/modules/vendor/components/programs/cards/templates/FillTheGaps';
 
 export default {
   name: 'CardEdition',
@@ -31,6 +33,7 @@ export default {
     'title-text': TitleText,
     'text-media': TextMedia,
     flashcard: Flashcard,
+    'fill-the-gaps': FillTheGaps,
   },
   data () {
     return {
@@ -39,6 +42,7 @@ export default {
       TITLE_TEXT,
       TEXT_MEDIA,
       FLASHCARD,
+      FILL_THE_GAPS,
     };
   },
   computed: {
