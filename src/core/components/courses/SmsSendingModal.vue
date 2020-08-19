@@ -5,7 +5,7 @@
       </template>
       <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="newSms.type"
         required-field @input="updateType" />
-      <ni-input in-modal caption="Message" v-model="newSms.body" type="textarea" :rows="7" required-field />
+      <ni-input in-modal caption="Message" v-model="newSms.content" type="textarea" :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click="send" />
@@ -24,8 +24,8 @@ export default {
     value: { type: Boolean, default: false },
     newSms: {
       type: Object,
-      validator: p => (typeof p.type === 'string') && (typeof p.body === 'string'),
-      default: () => ({ type: '', body: '' }),
+      validator: p => (typeof p.type === 'string') && (typeof p.content === 'string'),
+      default: () => ({ type: '', content: '' }),
     },
     filteredMessageTypeOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },

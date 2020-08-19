@@ -107,7 +107,7 @@ import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
 import SimpleTable from '@components/table/SimpleTable';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
@@ -134,7 +134,7 @@ export default {
         { label: 'Convocation', value: CONVOCATION },
         { label: 'Rappel', value: REMINDER },
       ],
-      newSms: { body: '', type: '' },
+      newSms: { content: '', type: '' },
       loading: false,
       courseLoading: false,
       smsSent: [],
@@ -175,6 +175,7 @@ export default {
           email: { email },
         },
       },
+      newSms: { content: { required }, type: { required } },
     };
   },
   computed: {
@@ -277,7 +278,7 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.newSms.body = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      this.newSms.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `La première session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
       + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
       + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
@@ -288,15 +289,18 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.newSms.body = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      this.newSms.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `Votre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
       + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
       + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
-    async sendMessage (sendingSms) {
+    async sendMessage () {
       try {
+        this.$v.newSms.$touch();
+        if (this.$v.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
-        await Courses.sendSMS(this.course._id, sendingSms);
+        await Courses.sendSMS(this.course._id, this.newSms);
         await this.refreshSms();
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
