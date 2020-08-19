@@ -133,7 +133,7 @@ import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import Esign from '@api/Esign.js';
+import Esign from '@api/Esign';
 import Drive from '@api/GoogleDrive';
 import Customers from '@api/Customers';
 import Input from '@components/form/Input';
@@ -146,11 +146,11 @@ import { bic, iban } from '@helpers/vuelidateCustomVal';
 import { getLastVersion } from '@helpers/utils';
 import { REQUIRED_LABEL } from '@data/constants';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
-import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
-import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin.js';
-import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin.js';
-import { fundingMixin } from 'src/modules/client/mixins/fundingMixin.js';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
+import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
+import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
+import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
+import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'Subscriptions',

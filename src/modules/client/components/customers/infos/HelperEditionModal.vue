@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
       Éditer l'<span class="text-weight-bold">aidant</span>
     </template>
@@ -48,6 +48,9 @@ export default {
     },
     hide () {
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
   },
 };

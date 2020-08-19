@@ -111,10 +111,10 @@ import Users from '@api/Users';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
-import { NotifyNegative } from '@components/popup/notify.js';
+import { NotifyNegative } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { formatIdentity, formatHours } from '@helpers/utils.js';
+import { formatIdentity, formatHours } from '@helpers/utils';
 import {
   AUXILIARY,
   PLANNING_REFERENT,
@@ -123,9 +123,9 @@ import {
   UNKNOWN_AVATAR,
   SITUATION_OPTIONS,
 } from '@data/constants';
-import { customerMixin } from 'src/modules/client/mixins/customerMixin.js';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
-import { helperMixin } from 'src/modules/client/mixins/helperMixin.js';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { helperMixin } from 'src/modules/client/mixins/helperMixin';
 
 export default {
   name: 'ProfileFollowUp',

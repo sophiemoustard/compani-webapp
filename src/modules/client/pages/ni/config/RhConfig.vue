@@ -218,7 +218,7 @@ import InternalHours from '@api/InternalHours';
 import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import FileUploader from '@components/form/FileUploader.vue';
+import FileUploader from '@components/form/FileUploader';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { configMixin } from 'src/modules/client/mixins/configMixin';

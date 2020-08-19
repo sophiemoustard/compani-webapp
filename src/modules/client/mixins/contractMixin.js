@@ -7,7 +7,7 @@ import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import { formatIdentity } from '@helpers/utils';
-import nationalities from '@data/nationalities.js';
+import nationalities from '@data/nationalities';
 import { REQUIRED_LABEL } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 

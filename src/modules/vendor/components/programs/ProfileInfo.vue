@@ -26,7 +26,7 @@ import set from 'lodash/set';
 import Programs from '@api/Programs';
 import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
-import FileUploader from '@components/form/FileUploader.vue';
+import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 
 export default {

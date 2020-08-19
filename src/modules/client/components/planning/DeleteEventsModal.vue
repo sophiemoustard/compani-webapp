@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)"
+  <ni-modal :value="value" @hide="hide" @input="input"
     title="Suppression d'interventions sur une période">
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer" :options="customersOptions"
       required-field @blur="$v.deletedEvents.customer.$touch"
@@ -33,7 +33,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {
   name: 'DeleteEventsModal',
@@ -70,6 +70,9 @@ export default {
       this.deletedEvents = { inRange: true };
       this.$v.deletedEvents.$reset();
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
     validateEventsDeletion () {
       this.$q.dialog({

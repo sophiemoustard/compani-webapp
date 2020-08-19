@@ -11,7 +11,7 @@
 import Contracts from '@api/Contracts';
 import { AUXILIARY } from '@data/constants';
 import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
-import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
+import { contractMixin } from 'src/modules/client/mixins/contractMixin';
 
 export default {
   mixins: [contractMixin],

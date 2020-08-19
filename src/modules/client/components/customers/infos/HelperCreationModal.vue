@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
       Ajouter un <span class="text-weight-bold">aidant</span>
     </template>
@@ -26,7 +26,7 @@
 import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import { REQUIRED_LABEL } from '@data/constants.js';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'HelperCreationModal',
@@ -61,6 +61,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
     submit () {
       this.$emit('submit');

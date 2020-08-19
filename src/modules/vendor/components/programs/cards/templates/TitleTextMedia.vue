@@ -13,7 +13,7 @@
 
 <script>
 import Input from '@components/form/Input';
-import FileUploader from '@components/form/FileUploader.vue';
+import FileUploader from '@components/form/FileUploader';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {

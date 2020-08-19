@@ -34,7 +34,7 @@ import {
   VENDOR_ADMIN,
   TRAINING_ORGANISATION_MANAGER,
   TRAINER,
-} from '@data/constants.js';
+} from '@data/constants';
 
 export default {
   name: 'LearnerProfile',

@@ -41,42 +41,13 @@
     </div>
 
     <!-- Course slot creation modal -->
-    <ni-modal v-model="creationModal" @hide="resetCreationModal"
-      container-class="modal-container-md">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">créneau</span>
-      </template>
-      <ni-datetime-range caption="Dates et heures" v-model="newCourseSlot.dates" required-field disable-end-date
-        :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
-      <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
-        @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" in-modal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" :disable="!stepsLength" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
-          :loading="modalLoading" @click="addCourseSlot" />
-      </template>
-    </ni-modal>
+    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
+      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
 
     <!-- Course slot edition modal -->
-    <ni-modal v-model="editionModal" @hide="resetEditionModal" container-class="modal-container-md">
-      <template slot="title">
-        Editer un <span class="text-weight-bold">créneau</span>
-      </template>
-      <div class="modal-icon">
-        <q-icon class="cursor-pointer" color="grey" size="sm" name="delete"
-          @click="validateDeletion(editedCourseSlot._id)" />
-      </div>
-      <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
-        :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
-      <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
-        @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" in-modal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step"
-        :disable="!stepsLength" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
-          :loading="modalLoading" @click="updateCourseSlot" />
-      </template>
-    </ni-modal>
+    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
+      :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
+      @submit="updateCourseSlot" />
 </div>
 </template>
 
@@ -89,12 +60,10 @@ import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { formatQuantity } from '@helpers/utils';
 import CourseSlots from '@api/CourseSlots';
-import { REQUIRED_LABEL, E_LEARNING } from '@data/constants';
-import { frAddress } from '@helpers/vuelidateCustomVal.js';
-import SearchAddress from '@components/form/SearchAddress';
-import DateTimeRange from '@components/form/DatetimeRange';
-import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
+import { E_LEARNING } from '@data/constants';
+import { frAddress } from '@helpers/vuelidateCustomVal';
+import SlotEditionModal from '@components/courses/SlotEditionModal';
+import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -107,10 +76,8 @@ export default {
     loading: { type: Boolean, default: false },
   },
   components: {
-    'ni-search-address': SearchAddress,
-    'ni-datetime-range': DateTimeRange,
-    'ni-modal': Modal,
-    'ni-select': Select,
+    'slot-edition-modal': SlotEditionModal,
+    'slot-creation-modal': SlotCreationModal,
   },
   data () {
     return {
@@ -147,7 +114,6 @@ export default {
           fullAddress: { frAddress },
         },
       },
-      formatQuantity,
     };
   },
   validations () {
@@ -158,12 +124,6 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    addressError () {
-      if (!this.$v.newCourseSlot.address.fullAddress.required) {
-        return REQUIRED_LABEL;
-      }
-      return 'Adresse non valide';
-    },
     slotsDurationTitle () {
       if (!this.course || !this.course.slots) return '0h';
 
@@ -199,13 +159,13 @@ export default {
       };
     },
     stepsLength () {
-      return this.course.program.steps.length;
+      return this.course.subProgram.steps.length;
     },
     stepOptions () {
       if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
       return [
         { label: 'Pas d\'étape spécifiée', value: null },
-        ...this.course.program.steps.map((step, index) => ({
+        ...this.course.subProgram.steps.map((step, index) => ({
           label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
           value: step._id,
           disable: step.type === E_LEARNING,
@@ -338,15 +298,6 @@ export default {
         this.modalLoading = false;
       }
     },
-    validateDeletion (slotId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce créneau ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.deleteCourseSlot(slotId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
     async deleteCourseSlot (slotId) {
       try {
         this.modalLoading = true;
@@ -426,8 +377,4 @@ export default {
   text-decoration: underline
   color: $secondary
   font-size: 14px
-
-.modal-icon
-  display: flex;
-  justify-content: flex-end
 </style>

@@ -106,14 +106,14 @@ import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
-import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal.vue';
+import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
 import {
   END_CONTRACT_REASONS,
   OTHER,
   COACH,
   CONTRACT_CREATION_MANDATORY_INFO,
 } from '@data/constants';
-import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
+import { contractMixin } from 'src/modules/client/mixins/contractMixin';
 
 export default {
   name: 'ProfileContracts',

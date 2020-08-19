@@ -21,7 +21,7 @@
           pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-banner v-if="!get(this.course, 'program.learningGoals')">
+      <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
         <template v-slot:message>
           Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
           les attestations de fin de formation.
@@ -87,34 +87,12 @@
     </div>
 
     <!-- Modal envoi message -->
-    <ni-modal v-model="smsModal">
-      <template slot="title">
-        Envoyer un <span class="text-weight-bold">message</span>
-      </template>
-      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="messageType" required-field
-        @input="updateMessage" />
-      <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
-          :loading="loading" @click="sendMessage" />
-      </template>
-    </ni-modal>
+    <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
+      :new-sms="newSms" @send="sendMessage" @updateType="updateMessage" :loading="loading" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
-    <ni-modal v-model="smsHistoriesModal" @hide="resetSmsHistoryModal">
-      <template slot="title">
-        Message envoyé le <span class="text-weight-bold">{{ $moment(smsHistory.date).format('DD/MM/YYYY') }}</span>
-      </template>
-      <ni-banner v-if="missingTraineesPhoneHistory" icon="info_outline">
-        <template v-slot:message>
-          Pour cet envoi, il manquait le numéro de téléphone de
-          {{ formatQuantity('stagiaire', missingTraineesPhoneHistory.length) }} :
-          {{ missingTraineesPhoneHistory.join(', ') }}.
-        </template>
-      </ni-banner>
-      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="smsHistory.type" disable />
-      <ni-input in-modal caption="Message" v-model="smsHistory.message" type="textarea" :rows="7" disable />
-    </ni-modal>
+    <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
+      :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
   </div>
 </template>
 
@@ -123,16 +101,15 @@ import { mapState } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatIdentity } from '@helpers/utils';
 import Input from '@components/form/Input';
-import Select from '@components/form/Select';
-import Modal from '@components/modal/Modal';
+import SmsSendingModal from '@components/courses/SmsSendingModal';
+import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
-import { formatIdentity } from '@helpers/utils.js';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 
@@ -140,8 +117,8 @@ export default {
   name: 'ProfileFollowUp',
   components: {
     'ni-input': Input,
-    'ni-select': Select,
-    'ni-modal': Modal,
+    'sms-sending-modal': SmsSendingModal,
+    'sms-details-modal': SmsDetailsModal,
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
@@ -153,12 +130,11 @@ export default {
   data () {
     return {
       smsModal: false,
-      messageType: '',
       messageTypeOptions: [
         { label: 'Convocation', value: CONVOCATION },
         { label: 'Rappel', value: REMINDER },
       ],
-      message: '',
+      newSms: { body: '', type: '' },
       loading: false,
       courseLoading: false,
       smsSent: [],
@@ -184,7 +160,6 @@ export default {
       smsLoading: false,
       smsHistoriesModal: false,
       smsHistory: { missingPhones: [] },
-      formatQuantity,
     };
   },
   async created () {
@@ -205,7 +180,7 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     disableDownloadCompletionCertificates () {
-      return this.disabledFollowUp || !get(this.course, 'program.learningGoals');
+      return this.disabledFollowUp || !get(this.course, 'subProgram.program.learningGoals');
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate));
@@ -238,7 +213,7 @@ export default {
         .map(trainee => formatIdentity(trainee.identity, 'FL'));
     },
     missingTraineesPhoneHistory () {
-      if (!this.smsHistory.missingPhones.length) return '';
+      if (!this.smsHistory.missingPhones.length) return [];
 
       return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
     },
@@ -248,12 +223,13 @@ export default {
   },
   methods: {
     get,
+    formatQuantity,
     getType (value) {
       const type = this.messageTypeOptions.find(t => t.value === value);
       return type ? type.label : '';
     },
     setDefaultMessageType () {
-      this.messageType = this.courseNotStartedYet ? CONVOCATION : REMINDER;
+      this.newSms.type = this.courseNotStartedYet ? CONVOCATION : REMINDER;
     },
     async refreshSms () {
       try {
@@ -269,8 +245,11 @@ export default {
       }
     },
     openSmsModal () {
-      this.updateMessage();
+      this.updateMessage(this.newSms.type);
       this.smsModal = true;
+    },
+    resetSmsModal () {
+      this.updateMessage(this.newSms.type);
     },
     async refreshCourse () {
       try {
@@ -289,16 +268,16 @@ export default {
     resetSmsHistoryModal () {
       this.smsHistory = { missingPhones: [] };
     },
-    updateMessage () {
-      if (this.messageType === CONVOCATION) this.setConvocationMessage();
-      else if (this.messageType === REMINDER) this.setReminderMessage();
+    updateMessage (newMessageType) {
+      if (newMessageType === CONVOCATION) this.setConvocationMessage();
+      else if (newMessageType === REMINDER) this.setReminderMessage();
     },
     setConvocationMessage () {
       const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      this.newSms.body = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `La première session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
       + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
       + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
@@ -309,15 +288,15 @@ export default {
       const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      this.newSms.body = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `Votre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
       + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
       + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
     },
-    async sendMessage () {
+    async sendMessage (sendingSms) {
       try {
         this.loading = true;
-        await Courses.sendSMS(this.course._id, { body: this.message, type: this.messageType });
+        await Courses.sendSMS(this.course._id, sendingSms);
         await this.refreshSms();
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {

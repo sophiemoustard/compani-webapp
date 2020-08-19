@@ -261,12 +261,12 @@ import SelectSector from '@components/form/SelectSector';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
-import FileUploader from '@components/form/FileUploader.vue';
-import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
-import DateInput from '@components/form/DateInput.vue';
+import FileUploader from '@components/form/FileUploader';
+import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
+import DateInput from '@components/form/DateInput';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import PictureUploader from '@components/PictureUploader.vue';
+import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber, iban, frAddress, bic } from '@helpers/vuelidateCustomVal';
 import {
   AUXILIARY,

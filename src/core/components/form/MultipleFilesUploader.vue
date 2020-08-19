@@ -50,7 +50,7 @@
 import { openURL } from 'quasar';
 import get from 'lodash/get';
 import CustomImg from '@components/form/CustomImg';
-import FileUploader from '@components/form/FileUploader.vue';
+import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative } from '@components/popup/notify';
 
 export default {

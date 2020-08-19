@@ -19,7 +19,7 @@
 
     <!-- Card creation modal -->
     <card-creation-modal v-model="cardCreationModal" :card="newCard" @hide="resetCardCreationModal"
-      :loading="modalLoading" @create="createCard" />
+      :loading="modalLoading" @submit="createCard" />
   </q-page>
 </template>
 

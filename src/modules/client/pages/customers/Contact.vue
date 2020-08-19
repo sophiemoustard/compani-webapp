@@ -30,7 +30,7 @@
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
-import { formatIdentity } from '@helpers/utils.js';
+import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 
 export default {

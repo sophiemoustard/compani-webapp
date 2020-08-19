@@ -25,7 +25,7 @@ import pick from 'lodash/pick';
 import { required } from 'vuelidate/lib/validators';
 import DateInput from '@components/form/DateInput';
 import TimeInput from '@components/form/TimeInput';
-import { minDate } from '@helpers/vuelidateCustomVal.js';
+import { minDate } from '@helpers/vuelidateCustomVal';
 
 export default {
   components: {

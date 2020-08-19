@@ -64,9 +64,9 @@ import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPercentage } from '@helpers/utils.js';
+import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPercentage } from '@helpers/utils';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
-import { paymentMixin } from 'src/modules/client/mixins/paymentMixin.js';
+import { paymentMixin } from 'src/modules/client/mixins/paymentMixin';
 
 export default {
   name: 'ClientsBalances',

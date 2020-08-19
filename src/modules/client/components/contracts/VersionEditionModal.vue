@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="$emit('input', $event)" @hide="resetVersionEditionModal">
+  <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
@@ -43,7 +43,10 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    resetVersionEditionModal () {
+    input (event) {
+      this.$emit('input', event);
+    },
+    hide () {
       this.$emit('hide');
     },
   },

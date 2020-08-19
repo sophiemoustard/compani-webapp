@@ -35,13 +35,13 @@
     </div>
     <div class="course-container">
       <div>
-        <q-item v-if="course.program" class="row">
+        <q-item v-if="course.subProgram.program" class="row">
           <q-item-section side class="course-img-container">
               <img class="course-img course-img-explanation" :src="programImg">
           </q-item-section>
           <q-item-section class="course-item-container">
             <div class="text-weight-bold">Programme de la formation</div>
-            <div class="description">{{ course.program.learningGoals }}</div>
+            <div class="description">{{ course.subProgram.program.learningGoals }}</div>
           </q-item-section>
         </q-item>
         <q-item v-if="course.trainer" class="row">
@@ -84,6 +84,7 @@ import get from 'lodash/get';
 import Courses from '@api/Courses';
 import { formatIdentity, formatPhone } from '@helpers/utils';
 import HtmlModal from '@components/modal/HtmlModal';
+// eslint-disable-next-line import/extensions
 import rules from 'src/statics/rules.html';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -109,7 +110,7 @@ export default {
   },
   computed: {
     programName () {
-      return get(this.course, 'program.name') || '';
+      return get(this.course, 'subProgram.program.name') || '';
     },
     misc () {
       return this.course.misc || '';

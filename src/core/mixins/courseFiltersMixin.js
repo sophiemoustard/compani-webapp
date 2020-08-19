@@ -57,7 +57,7 @@ export const courseFiltersMixin = {
     },
     programFilterOptions () {
       const programs = this.coursesWithGroupedSlot
-        .map(course => ({ label: course.program.name, value: course.program._id }))
+        .map(course => ({ label: course.subProgram.program.name, value: course.subProgram.program._id }))
         .sort((a, b) => a.label.localeCompare(b.label));
 
       return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
@@ -70,7 +70,7 @@ export const courseFiltersMixin = {
       this.selectedProgram = '';
     },
     filterCoursesByProgram (courses) {
-      return courses.filter(course => course.program._id === this.selectedProgram);
+      return courses.filter(course => course.subProgram.program._id === this.selectedProgram);
     },
     filterCoursesByTrainer (courses) {
       return courses.filter(course => (course.trainer

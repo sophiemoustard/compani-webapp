@@ -11,7 +11,7 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="edit" @click.native="openEditionModal(props.row)" />
+                    <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
                     <q-icon color="grey" name="close" @click.native="validateTraineeDeletion(col.value)" />
                   </div>
                 </template>
@@ -22,56 +22,21 @@
         </ni-responsive-table>
         <q-card-actions align="right" v-if="canEdit">
           <q-btn no-caps flat color="primary" icon="add" label="Ajouter un stagiaire" :disable="loading"
-            @click="additionModal = true" />
+            @click="traineeCreationModal = true" />
         </q-card-actions>
       </q-card>
     </div>
 
     <!-- Add trainee modal -->
-    <ni-modal v-model="additionModal" @hide="resetAddTraineeForm">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
-      </template>
-      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainee.local.email" required-field :last="firstStep"
-        @blur="$v.newTrainee.local.email.$touch" caption="Email" :error-message="emailError($v.newTrainee)"
-        :error="$v.newTrainee.local.email.$error" />
-      <template v-if="!firstStep">
-        <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model="newTrainee.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-if="!addNewTraineeCompanyStep" @blur="$v.newTrainee.identity.lastname.$touch" caption="Nom"
-          required-field v-model="newTrainee.identity.lastname" :error="$v.newTrainee.identity.lastname.$error" />
-        <ni-input in-modal v-if="!addNewTraineeCompanyStep" v-model.trim="newTrainee.contact.phone"
-          caption="Téléphone" @blur="$v.newTrainee.contact.phone.$touch" :error="$v.newTrainee.contact.phone.$error"
-          :error-message="phoneNbrError($v.newTrainee)" :last="isIntraCourse" />
-        <ni-select v-if="!isIntraCourse" in-modal v-model.trim="newTrainee.company" required-field caption="Structure"
-          @blur="$v.newTrainee.company.$touch" :error="$v.newTrainee.company.$error" :options="companyOptions"
-          :last="!isIntraCourse" />
-      </template>
-      <template slot="footer">
-        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
-          :loading="additionModalLoading" icon-right="add" @click="nextStepAdditionModal" />
-        <q-btn v-else no-caps class="full-width modal-btn" color="primary" label="Ajouter à la formation"
-          :loading="additionModalLoading" icon-right="add" @click="addTrainee" />
-      </template>
-    </ni-modal>
+    <trainee-creation-modal v-model="traineeCreationModal" :new-trainee="newTrainee" :company-options="companyOptions"
+      :first-step="firstStep" :add-new-trainee-company-step="addNewTraineeCompanyStep" :is-intra-course="isIntraCourse"
+      :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
+      @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
     <!-- Trainee edition modal -->
-    <ni-modal v-model="editionModal" @hide="resetTraineeEditionForm">
-      <template slot="title">
-        Éditer un <span class="text-weight-bold">stagiaire</span>
-      </template>
-      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
-      <ni-input in-modal v-model="editedTrainee.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="editedTrainee.identity.lastname" :error="$v.editedTrainee.identity.lastname.$error"
-        caption="Nom" @blur="$v.editedTrainee.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="$v.editedTrainee.contact.phone.$error"
-        caption="Téléphone" @blur="$v.editedTrainee.contact.phone.$touch"
-        :error-message="phoneNbrError($v.editedTrainee)" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
-          :loading="editionModalLoading" @click="updateTrainee" />
-      </template>
-    </ni-modal>
-</div>
+    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee="editedTrainee" :validations="$v.editedTrainee"
+      @hide="resetTraineeEditionForm" @submit="updateTrainee" :loading="traineeEditionModalLoading" />
+  </div>
 </template>
 
 <script>
@@ -86,11 +51,10 @@ import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import { INTER_B2B } from '@data/constants';
 import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import Modal from '@components/modal/Modal';
-import Input from '@components/form/Input';
-import Select from '@components/form/Select';
+import TraineeCreationModal from '@components/courses/TraineeCreationModal';
+import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -104,9 +68,8 @@ export default {
   },
   components: {
     'ni-responsive-table': ResponsiveTable,
-    'ni-modal': Modal,
-    'ni-input': Input,
-    'ni-select': Select,
+    'trainee-creation-modal': TraineeCreationModal,
+    'trainee-edition-modal': TraineeEditionModal,
   },
   data () {
     return {
@@ -147,8 +110,8 @@ export default {
         sortBy: 'lastname',
       },
       companyOptions: [],
-      additionModal: false,
-      additionModalLoading: false,
+      traineeCreationModal: false,
+      traineeCreationModalLoading: false,
       firstStep: true,
       addNewTraineeCompanyStep: false,
       newTrainee: {
@@ -166,8 +129,8 @@ export default {
         contact: { phone: { frPhoneNumber } },
         company: { required: requiredIf(() => this.course.type === INTER_B2B) },
       },
-      editionModal: false,
-      editionModalLoading: false,
+      traineeEditionModal: false,
+      traineeEditionModalLoading: false,
       editedTrainee: {
         identity: {},
         contact: {},
@@ -218,14 +181,14 @@ export default {
       this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
     },
-    async nextStepAdditionModal () {
+    async nextStepTraineeCreationModal () {
       try {
         this.$v.newTrainee.$touch();
         if (!this.newTrainee.local.email || this.$v.newTrainee.local.email.$error) {
           return NotifyWarning('Champ(s) invalide(s).');
         }
 
-        this.additionModalLoading = true;
+        this.traineeCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainee.local.email });
 
         if (this.isIntraCourse) {
@@ -241,7 +204,7 @@ export default {
       } catch (e) {
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
-        this.additionModalLoading = false;
+        this.traineeCreationModalLoading = false;
       }
     },
     formatAddTraineePayload () {
@@ -265,27 +228,27 @@ export default {
           if (companyFieldError || newTraineeFormInvalid) return NotifyWarning('Champ(s) invalide(s).');
         }
 
-        this.additionModalLoading = true;
+        this.traineeCreationModalLoading = true;
         const payload = this.formatAddTraineePayload();
         await Courses.addTrainee(this.course._id, payload);
         NotifyPositive('Stagiaire ajouté.');
 
-        this.additionModal = false;
+        this.traineeCreationModal = false;
         this.$emit('refresh');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
-        this.additionModalLoading = false;
+        this.traineeCreationModalLoading = false;
       }
     },
-    async openEditionModal (trainee) {
+    async openTraineeEditionModal (trainee) {
       this.editedTrainee = {
         ...this.editedTrainee,
         ...pick(trainee, ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
       };
-      this.editionModal = true;
+      this.traineeEditionModal = true;
     },
     resetTraineeEditionForm () {
       this.$v.editedTrainee.$reset();
@@ -293,7 +256,7 @@ export default {
     },
     async updateTrainee () {
       try {
-        this.editionModalLoading = true;
+        this.traineeEditionModalLoading = true;
         this.$v.editedTrainee.$touch();
         if (this.$v.editedTrainee.$error) return NotifyWarning('Champ(s) invalide(s)');
         if (get(this.editedTrainee, 'contact.phone')) {
@@ -301,14 +264,14 @@ export default {
         }
 
         await Users.updateById(this.editedTrainee._id, omit(this.editedTrainee, ['_id', 'local']));
-        this.editionModal = false;
+        this.traineeEditionModal = false;
         this.$emit('refresh');
         NotifyPositive('Stagiaire modifié.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification du stagiaire.');
       } finally {
-        this.editionModalLoading = false;
+        this.traineeEditionModalLoading = false;
       }
     },
     validateTraineeDeletion (traineeId) {

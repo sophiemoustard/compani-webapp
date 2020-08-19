@@ -1,7 +1,7 @@
 import capitalize from 'lodash/capitalize';
 import { getLastVersion } from '@helpers/utils';
 import { days } from '@data/days';
-import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants.js';
+import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants';
 
 export const fundingMixin = {
   data () {

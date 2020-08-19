@@ -49,17 +49,17 @@ import pickBy from 'lodash/pickBy';
 import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Customers from '@api/Customers';
-import { frAddress } from '@helpers/vuelidateCustomVal.js';
+import { frAddress } from '@helpers/vuelidateCustomVal';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import TableList from '@components/table/TableList';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
-import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation.js';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
+import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
+import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
 export default {
   name: 'CustomersDirectory',

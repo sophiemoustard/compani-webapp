@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="$emit('input', $event)" @hide="$emit('hide')" container-class="modal-container-md">
+  <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
     <template slot="title">
       Créer une nouvelle <span class="text-weight-bold">carte</span>
     </template>
@@ -62,7 +62,7 @@
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la carte" color="primary" :loading="loading"
-        icon-right="add" @click="$emit('create')" />
+        icon-right="add" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -113,6 +113,15 @@ export default {
     },
   },
   methods: {
+    hide () {
+      this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
+    },
+    submit () {
+      this.$emit('submit');
+    },
     getClass (template) {
       return ['card-button', 'cursor-pointer', { 'card-button-selected': this.card.template === template }];
     },

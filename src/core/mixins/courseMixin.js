@@ -49,7 +49,7 @@ export const courseMixin = {
     composeCourseName (c, attachCompany = false) {
       const possiblyCompanyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
       const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
-      return possiblyCompanyName + c.program.name + possiblyMisc;
+      return possiblyCompanyName + c.subProgram.program.name + possiblyMisc;
     },
     async updateCourse (path) {
       try {

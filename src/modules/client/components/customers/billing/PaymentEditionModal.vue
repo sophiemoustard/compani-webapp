@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="$emit('input', $event)" @hide="hide">
+  <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
       Editer le <span class="text-weight-bold">{{ editionModalNature }}</span>
     </template>
@@ -24,8 +24,8 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import DateInput from '@components/form/DateInput';
-import { formatIdentity } from '@helpers/utils.js';
-import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '@data/constants.js';
+import { formatIdentity } from '@helpers/utils';
+import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '@data/constants';
 
 export default {
   name: 'PaymentEditionModal',
@@ -71,6 +71,9 @@ export default {
   methods: {
     hide (partialReset, type) {
       this.$emit('hide', { partialReset, type });
+    },
+    input (event) {
+      this.$emit('input', event);
     },
     submit (value) {
       this.$emit('submit', value);

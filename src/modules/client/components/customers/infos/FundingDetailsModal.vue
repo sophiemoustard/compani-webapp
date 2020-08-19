@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
       Détail du financement <span class="text-weight-bold">{{ selected.thirdPartyPayer.name }}</span>
     </template>
@@ -12,7 +12,7 @@
 import Modal from '@components/modal/Modal';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
-import { FIXED } from '@data/constants.js';
+import { FIXED } from '@data/constants';
 
 export default {
   name: 'FundingDetailsModal',
@@ -38,6 +38,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
   },
 };
