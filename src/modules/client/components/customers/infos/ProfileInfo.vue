@@ -980,7 +980,7 @@ export default {
         const payload = this.formatFundingEditionPayload(this.editedFunding);
         await Customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, payload);
 
-        this.resetEditionFundingData();
+        this.fundingEditionModal = false;
         await this.refreshCustomer();
         NotifyPositive('Financement modifié');
       } catch (e) {

@@ -180,7 +180,6 @@ export default {
       this.addNewTraineeCompanyStep = false;
       this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
-      this.traineeCreationModal = false;
     },
     async nextStepTraineeCreationModal () {
       try {
@@ -252,7 +251,6 @@ export default {
       this.traineeEditionModal = true;
     },
     resetTraineeEditionForm () {
-      this.traineeEditionModal = false;
       this.$v.editedTrainee.$reset();
       this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },

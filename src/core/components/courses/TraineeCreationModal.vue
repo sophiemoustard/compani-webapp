@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
         Ajouter un <span class="text-weight-bold">stagiaire</span> à la formation
       </template>
@@ -53,6 +53,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
     nextStep () {
       this.$emit('next-step');
