@@ -75,8 +75,8 @@ export default {
     hide (partialReset, type) {
       this.$emit('hide', { partialReset, type });
     },
-    input () {
-      this.$emit('input', this.$event);
+    input (event) {
+      this.$emit('input', event);
     },
     submit (value) {
       this.$emit('submit', value);

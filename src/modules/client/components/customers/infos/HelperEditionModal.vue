@@ -49,8 +49,8 @@ export default {
     hide () {
       this.$emit('hide');
     },
-    input () {
-      this.$emit('input', this.$event);
+    input (event) {
+      this.$emit('input', event);
     },
   },
 };

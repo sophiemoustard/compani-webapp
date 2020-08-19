@@ -71,8 +71,8 @@ export default {
       this.$v.deletedEvents.$reset();
       this.$emit('hide');
     },
-    input () {
-      this.$emit('input', this.$event);
+    input (event) {
+      this.$emit('input', event);
     },
     validateEventsDeletion () {
       this.$q.dialog({

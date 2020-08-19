@@ -43,8 +43,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    input () {
-      this.$emit('input', this.$event);
+    input (event) {
+      this.$emit('input', event);
     },
     hide () {
       this.$emit('hide');
