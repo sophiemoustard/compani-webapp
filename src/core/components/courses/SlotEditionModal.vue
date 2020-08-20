@@ -7,11 +7,12 @@
         <q-icon class="cursor-pointer" color="grey" size="sm" name="delete"
           @click="validateDeletion(editedCourseSlot._id)" />
       </div>
+      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" required-field
+        @blur="validations.step.$touch" :error="validations.step.$error" />
       <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
         :error="validations.dates.$error" @blur="validations.dates.$touch" />
       <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
         @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
           :loading="loading" @click="submit" />

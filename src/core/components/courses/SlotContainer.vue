@@ -103,6 +103,7 @@ export default {
         { name: 'actions', label: '', align: 'center' },
       ],
       courseSlotValidation: {
+        step: { required },
         dates: {
           startDate: { required },
           endDate: { required },
