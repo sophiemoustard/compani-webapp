@@ -58,6 +58,7 @@ import Modal from '@components/modal/Modal';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 import { validationMixin } from 'src/modules/client/mixins/validationMixin';
 
@@ -202,6 +203,10 @@ export default {
         this.firstInterventions = Object.freeze(firstInterventions);
         this.customers = Object.freeze(customers.map(customer => ({
           ...customer,
+          identity: {
+            ...customer.identity,
+            fullName: formatIdentity(customer.identity, 'FL'),
+          },
           firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
           missingInfo: customerProfileValidation(customer).error !== null,
         })));
