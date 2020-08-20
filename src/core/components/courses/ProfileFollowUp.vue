@@ -228,7 +228,7 @@ export default {
     },
     allFuturSlotsAreNotPlanned () {
       const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => this.$moment().isBefore(s.startDate));
-      return this.course.slotsToPlan.length && !futurSlots.length;
+      return !!this.course.slotsToPlan.length && !futurSlots.length;
     },
     disableSms () {
       return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned;
