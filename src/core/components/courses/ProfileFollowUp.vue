@@ -66,12 +66,12 @@
           </q-tr>
         </template>
       </ni-simple-table>
-      <ni-banner v-if="isFinished">
+      <ni-banner v-if="!followUpDisabled && isFinished">
         <template v-slot:message>
           Vous ne pouvez pas envoyer de sms car la formation est terminée.
         </template>
       </ni-banner>
-      <ni-banner v-else-if="allFuturSlotsAreNotPlanned">
+      <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
         <template v-slot:message>
           Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
         </template>
