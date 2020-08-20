@@ -74,3 +74,48 @@ export const rcs = value => !value || /^[0-9]*[1-9][0-9]*$/.test(value);
 export const validYear = value => !value || /^[2]{1}[0]{1}[0-9]{2}$/.test(value);
 
 export const validTradeName = value => !value || /^[0-9a-zA-Z]{0,11}$/.test(value);
+
+// Quiz fill-the-gap
+const parseTagCode = (str) => {
+  const outerAcc = '';
+  const innerAcc = [];
+
+  return parseTagCodeRecursively(outerAcc, innerAcc, str);
+};
+
+const parseTagCodeRecursively = (outerAcc, innerAcc, str) => {
+  const splitedStr = str.match(/(.*?)<trou>(.*?)<\/trou>(.*)/s);
+
+  if (!splitedStr) {
+    return { outerAcc: outerAcc.concat(' ', str), innerAcc };
+  }
+
+  innerAcc.push(splitedStr[2]);
+  return parseTagCodeRecursively(outerAcc.concat(' ', splitedStr[1]), innerAcc, splitedStr[3]);
+};
+
+const containLonelyTag = value => /<trou>|<\/trou>/g.test(value);
+
+export const validTagging = (value) => {
+  const { outerAcc, innerAcc } = parseTagCode(value);
+
+  return !containLonelyTag(outerAcc) && !innerAcc.some(v => containLonelyTag(v));
+};
+
+export const validCaractersInner = (value) => {
+  const { innerAcc } = parseTagCode(value);
+
+  return innerAcc.every(v => /^[a-zA-Z0-9àâçéèêëîïôûùü '-]*$/.test(v));
+};
+
+export const validLengthInner = (value) => {
+  const { innerAcc } = parseTagCode(value);
+
+  return innerAcc.every(v => v.length > 0 && v.length < 16);
+};
+
+export const validNumberOfTags = (value) => {
+  const { innerAcc } = parseTagCode(value);
+
+  return innerAcc.length > 0 && innerAcc.length < 3;
+};

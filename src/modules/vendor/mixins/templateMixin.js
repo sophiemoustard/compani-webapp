@@ -6,6 +6,7 @@ import Cards from '@api/Cards';
 import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD, FILL_THE_GAPS } from '@data/constants';
+import { validTagging, validCaractersInner, validLengthInner, validNumberOfTags } from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
   data () {
@@ -40,7 +41,7 @@ export const templateMixin = {
       case FILL_THE_GAPS:
         return {
           card: {
-            text: { required },
+            text: { required, validTagging, validCaractersInner, validLengthInner, validNumberOfTags },
             answers: { $each: { required } },
             explanation: { required },
           },
