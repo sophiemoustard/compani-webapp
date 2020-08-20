@@ -19,7 +19,7 @@ export const courseMixin = {
     trainerName () {
       return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
     },
-    disabledFollowUp () {
+    followUpDisabled () {
       return this.followUpMissingInfo.length > 0;
     },
     followUpMissingInfo () {
