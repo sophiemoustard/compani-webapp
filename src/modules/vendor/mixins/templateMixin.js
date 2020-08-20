@@ -42,7 +42,7 @@ export const templateMixin = {
         return {
           card: {
             text: { required, validTagging, validCaractersInner, validLengthInner, validNumberOfTags },
-            answers: { $each: { required } },
+            answers: { $each: { label: { required } } },
             explanation: { required },
           },
         };
@@ -64,7 +64,7 @@ export const templateMixin = {
       this.tmpInput = get(this.card, path);
     },
     saveTmpAnswer (index) {
-      this.tmpInput = get(this.card, `answers[${index}]`) || '';
+      this.tmpInput = get(this.card, `answers[${index}].label`) || '';
     },
     async updateCard (path) {
       try {
@@ -85,15 +85,15 @@ export const templateMixin = {
     },
     async updateAnswer (index) {
       try {
-        const newAnswer = get(this.card, `answers[${index}]`) || '';
+        const newAnswer = get(this.card, `answers[${index}].label`) || '';
         if (this.tmpInput === newAnswer) return;
 
         if (index < 2) {
-          this.$v.card.answers.$each[index].$touch();
-          if (this.$v.card.answers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s)');
+          this.$v.card.answers.$each[index].label.$touch();
+          if (this.$v.card.answers.$each[index].label.$error) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        await Cards.updateById(this.card._id, { answers: this.card.answers.filter(a => !!a) });
+        await Cards.updateById(this.card._id, { answers: this.card.answers.filter(a => !!a.label) });
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

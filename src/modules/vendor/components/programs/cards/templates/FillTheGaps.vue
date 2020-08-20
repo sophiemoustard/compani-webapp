@@ -1,12 +1,12 @@
 <template>
-  <div>
+  <div v-if="answersInitialized">
     <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea"
       :error-message="textTagCodeError" />
     <div class="q-mb-lg row gutter-profile answers">
       <div class="col-12 q-mb-sm">Mauvaises Réponses :</div>
       <ni-input v-for="i in 6" :key="i" class="col-xs-12 col-md-6" :caption="`Réponse ${i}`"
-        v-model.trim="card.answers[i - 1]" @focus="saveTmpAnswer(i - 1)" @blur="updateAnswer(i - 1)"
+        v-model.trim="card.answers[i - 1].label" @focus="saveTmpAnswer(i - 1)" @blur="updateAnswer(i - 1)"
         :error="getAnswerError(i - 1)" :required-field="i < 3" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
@@ -16,9 +16,10 @@
 
 <script>
 import Input from '@components/form/Input';
+import get from 'lodash/get';
+import times from 'lodash/times';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import { REQUIRED_LABEL } from '@data/constants';
-import get from 'lodash/get';
 
 export default {
   name: 'FillTheGaps',
@@ -43,10 +44,24 @@ export default {
       }
       return '';
     },
+    answersInitialized () {
+      return !!this.card.answers[5];
+    },
+  },
+  async mounted () {
+    this.initializeAnswers();
+  },
+  watch: {
+    card () {
+      this.initializeAnswers();
+    },
   },
   methods: {
+    initializeAnswers () {
+      this.card.answers = times(6, i => this.card.answers[i] || ({ label: '' }));
+    },
     getAnswerError (index) {
-      if (index < 2) return get(this.$v.card, `answers.$each[${index}].$error`) || false;
+      if (index < 2) return get(this.$v.card, `answers.$each[${index}].label.$error`) || false;
       return false;
     },
     saveTmp (path) {
