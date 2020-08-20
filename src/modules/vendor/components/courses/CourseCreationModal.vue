@@ -55,7 +55,7 @@ export default {
   computed: {
     programOptions () {
       return this.programs
-        .map(p => ({ label: p.name, value: p._id }))
+        .map(p => ({ label: p.name, value: p._id, disable: !get(p, 'subPrograms.length') }))
         .sort((a, b) => a.label.localeCompare(b.label));
     },
   },
