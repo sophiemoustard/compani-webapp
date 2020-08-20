@@ -3,10 +3,10 @@
     <div class="q-mb-xl">
       <div v-if="isClientInterface && isCourseInter" class="q-mb-xl">
         <p class="text-weight-bold">Informations pratiques</p>
-        <ni-banner v-if="disabledFollowUp">
+        <ni-banner v-if="followUpDisabled">
           <template v-slot:message>{{ missingInfoMsg }}</template>
         </ni-banner>
-        <ni-course-info-link :disable-link="disabledFollowUp" />
+        <ni-course-info-link :disable-link="followUpDisabled" />
       </div>
       <div v-else class="row gutter-profile">
         <ni-input caption="Informations complémentaires" v-model.trim="course.misc"

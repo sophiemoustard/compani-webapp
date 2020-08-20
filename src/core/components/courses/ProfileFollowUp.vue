@@ -15,7 +15,7 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Actions utiles</p>
-      <ni-banner v-if="disabledFollowUp">
+      <ni-banner v-if="followUpDisabled">
         <template v-slot:message>
           Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
           pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
@@ -28,12 +28,12 @@
         </template>
       </ni-banner>
 
-      <ni-course-info-link :disable-link="disabledFollowUp" />
+      <ni-course-info-link :disable-link="followUpDisabled" />
 
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-            type="a" :href="!disabledFollowUp && downloadAttendanceSheet()" target="_blank" />
+          <q-btn color="primary" size="sm" :disable="followUpDisabled" icon="file_download" flat dense
+            type="a" :href="!followUpDisabled && downloadAttendanceSheet()" target="_blank" />
         </q-item-section>
         <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
       </q-item>
@@ -66,12 +66,17 @@
           </q-tr>
         </template>
       </ni-simple-table>
-      <ni-banner v-if="isFinished">
+      <ni-banner v-if="!followUpDisabled && isFinished">
         <template v-slot:message>
-          Impossible d'envoyer un sms pour une formation qui est finie.
+          Vous ne pouvez pas envoyer de sms car la formation est terminée.
         </template>
       </ni-banner>
-      <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
+      <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
+        <template v-slot:message>
+          Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
+        </template>
+      </ni-banner>
+      <ni-banner v-else-if="missingTraineesPhone.length" icon="info_outline">
         <template v-slot:message>
           Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
           {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
@@ -79,7 +84,7 @@
       </ni-banner>
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
+          <q-btn color="primary" size="sm" :disable="disableSms" icon="mdi-cellphone-message" flat
             dense @click="openSmsModal" />
         </q-item-section>
         <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
@@ -181,7 +186,7 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     disableDownloadCompletionCertificates () {
-      return this.disabledFollowUp || !get(this.course, 'subProgram.program.learningGoals');
+      return this.followUpDisabled || !get(this.course, 'subProgram.program.learningGoals');
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate));
@@ -220,6 +225,13 @@ export default {
     },
     courseName () {
       return this.composeCourseName(this.course);
+    },
+    allFuturSlotsAreNotPlanned () {
+      const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => this.$moment().isBefore(s.startDate));
+      return !!this.course.slotsToPlan.length && !futurSlots.length;
+    },
+    disableSms () {
+      return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned;
     },
   },
   methods: {
@@ -274,25 +286,27 @@ export default {
       else if (newMessageType === REMINDER) this.setReminderMessage();
     },
     setConvocationMessage () {
-      const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
-      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const slots = this.course.slots.filter(s => !!s.startDate).sort((a, b) => a.startDate - b.startDate);
+      const date = this.$moment(slots[0].startDate).format('DD/MM');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
       this.newSms.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
-      + `La première session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
-      + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
-      + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+      + `La première session a lieu le ${date} à ${hour}.\nMerci de vous `
+      + 'présenter au moins 15 minutes avant le début.\nToutes les informations sur : '
+      + `${this.courseLink}\nBonne formation,\nCompani`;
     },
     setReminderMessage () {
-      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
+      const slots = this.course.slots
+        .filter(s => !!s.startDate)
+        .filter(slot => this.$moment().isBefore(slot.startDate))
         .sort((a, b) => a.startDate - b.startDate);
-      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const date = this.$moment(slots[0].startDate).format('DD/MM');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
       this.newSms.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
-      + `Votre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous `
-      + 'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : '
-      + `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+      + `Votre prochaine session a lieu le ${date} à ${hour}.\nMerci de vous `
+      + 'présenter au moins 15 minutes avant le début.\nToutes les informations sur : '
+      + `${this.courseLink}\nBonne formation,\nCompani`;
     },
     async sendMessage () {
       try {
