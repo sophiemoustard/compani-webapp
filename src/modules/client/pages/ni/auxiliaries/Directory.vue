@@ -90,7 +90,7 @@ import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OP
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   metaInfo: { title: 'Répertoire auxiliaires' },

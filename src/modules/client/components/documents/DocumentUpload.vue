@@ -16,7 +16,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import { REQUIRED_LABEL } from '@data/constants';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'DocumentUpload',

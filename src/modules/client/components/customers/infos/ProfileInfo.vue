@@ -317,7 +317,7 @@ import FundingEditionModal from 'src/modules/client/components/customers/infos/F
 import FundingCreationModal from 'src/modules/client/components/customers/infos/FundingCreationModal';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';

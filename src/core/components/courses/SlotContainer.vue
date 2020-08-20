@@ -66,10 +66,11 @@ import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { courseMixin } from '@mixins/courseMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'SlotContainer',
-  mixins: [courseMixin],
+  mixins: [courseMixin, validationMixin],
   metadata: { title: 'Fiche formation' },
   props: {
     canEdit: { type: Boolean, default: false },
@@ -249,7 +250,8 @@ export default {
     async addCourseSlot () {
       try {
         this.$v.newCourseSlot.$touch();
-        if (this.$v.newCourseSlot.$error) return NotifyWarning('Champ(s) invalide(s).');
+        const isValid = await this.waitForFormValidation(this.$v.newCourseSlot);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         await CourseSlots.create(this.formatCreationPayload(this.newCourseSlot));
@@ -282,7 +284,8 @@ export default {
     async updateCourseSlot () {
       try {
         this.$v.editedCourseSlot.$touch();
-        if (this.$v.editedCourseSlot.$error) return NotifyWarning('Champ(s) invalide(s).');
+        const isValid = await this.waitForFormValidation(this.$v.editedCourseSlot);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         const payload = this.formatEditionPayload(this.editedCourseSlot);

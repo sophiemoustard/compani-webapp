@@ -33,7 +33,7 @@ import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { TRAINER } from '@data/constants';
 
 export default {

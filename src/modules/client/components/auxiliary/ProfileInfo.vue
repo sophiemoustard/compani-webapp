@@ -279,7 +279,7 @@ import {
 import nationalities from '@data/nationalities';
 import countries from '@data/countries';
 import { userMixin } from '@mixins/userMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',

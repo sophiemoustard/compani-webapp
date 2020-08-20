@@ -222,7 +222,7 @@ import FileUploader from '@components/form/FileUploader';
 import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {

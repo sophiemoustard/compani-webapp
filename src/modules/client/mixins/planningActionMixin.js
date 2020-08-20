@@ -25,7 +25,7 @@ import {
   OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export const planningActionMixin = {
   mixins: [validationMixin],

@@ -42,7 +42,7 @@ import { userMixin } from '@mixins/userMixin';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import { AUXILIARY_ROLES } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',

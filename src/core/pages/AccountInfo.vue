@@ -85,7 +85,7 @@ import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup
 import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { passwordMixin } from '@mixins/passwordMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 // eslint-disable-next-line import/extensions
