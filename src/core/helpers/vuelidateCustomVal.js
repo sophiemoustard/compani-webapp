@@ -86,9 +86,7 @@ const parseTagCode = (str) => {
 const parseTagCodeRecursively = (outerAcc, answersAcc, str) => {
   const splitedStr = str.match(/(.*?)<trou>(.*?)<\/trou>(.*)/s);
 
-  if (!splitedStr) {
-    return { outerAcc: outerAcc.concat(' ', str), answersAcc };
-  }
+  if (!splitedStr) return { outerAcc: outerAcc.concat(' ', str), answersAcc };
 
   answersAcc.push(splitedStr[2]);
   return parseTagCodeRecursively(outerAcc.concat(' ', splitedStr[1]), answersAcc, splitedStr[3]);
@@ -103,7 +101,7 @@ export const validTagging = (value) => {
   return !containLonelyTag(outerAcc) && !answersAcc.some(v => containLonelyTag(v));
 };
 
-export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü '-]*$/.test(value);
+export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\s'-]*$/.test(value);
 
 export const validCaractersTags = (value) => {
   if (!value) return true;
@@ -113,16 +111,16 @@ export const validCaractersTags = (value) => {
 };
 
 // value.length can be 0 in front validation, to authorize field clear
-export const validLength = value => value.length >= 0 && value.length < 16;
+export const validAnswerLength = value => value.length >= 0 && value.length < 16;
 
-export const validLengthTags = (value) => {
+export const validTagLength = (value) => {
   if (!value) return true;
   const { answersAcc } = parseTagCode(value);
 
   return answersAcc.every(v => v.length > 0 && v.length < 16);
 };
 
-export const validNumberOfTags = (value) => {
+export const validTagsCount = (value) => {
   if (!value) return true;
   const { answersAcc } = parseTagCode(value);
 

@@ -40,13 +40,13 @@ export default {
       if (!this.$v.card.text.validTagging) {
         return 'Balisage non valide, la bonne syntaxe est : <trou>la réponse</trou>';
       }
-      if (!this.$v.card.text.validLengthTags) {
+      if (!this.$v.card.text.validTagLength) {
         return 'Le nombre de caractères entre les balises doit être entre 1 et 15';
       }
       if (!this.$v.card.text.validCaractersTags) {
         return 'Caractère invalide détecté entre les balises, seuls les symboles - \' et ESPACE sont permis';
       }
-      if (!this.$v.card.text.validNumberOfTags) {
+      if (!this.$v.card.text.validTagsCount) {
         return 'Le nombre de couple de balises doit être de 1 ou 2';
       }
       return '';
@@ -75,7 +75,7 @@ export default {
       return this.$v.card.answers.$each[index].label.$error || this.requiredAnswerIsMissing(index);
     },
     answersErrorMsg (index) {
-      if (!this.$v.card.answers.$each[index].label.validLength) {
+      if (!this.$v.card.answers.$each[index].label.validAnswerLength) {
         return 'Le nombre de caractères doit être entre 1 et 15';
       }
       if (!this.$v.card.answers.$each[index].label.validCaracters) {

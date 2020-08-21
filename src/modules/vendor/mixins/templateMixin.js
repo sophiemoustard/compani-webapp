@@ -9,9 +9,9 @@ import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD, FILL_T
 import {
   validTagging,
   validCaractersTags,
-  validLengthTags,
-  validNumberOfTags,
-  validLength,
+  validTagLength,
+  validTagsCount,
+  validAnswerLength,
   validCaracters,
   min2Answers,
 } from '@helpers/vuelidateCustomVal';
@@ -49,13 +49,13 @@ export const templateMixin = {
       case FILL_THE_GAPS:
         return {
           card: {
-            text: { required, validTagging, validCaractersTags, validLengthTags, validNumberOfTags },
+            text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount },
             answers: {
               min2Answers,
               $each: {
                 label: {
                   validCaracters,
-                  validLength,
+                  validAnswerLength,
                 },
               },
             },
