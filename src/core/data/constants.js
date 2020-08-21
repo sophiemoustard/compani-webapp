@@ -357,3 +357,6 @@ export const TEMPLATE_TYPES = {
   [LESSON]: 'Cours',
   [QUIZ]: 'Quiz',
 };
+
+export const SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT = 4;
+export const FILL_THE_GAPS_MAX_ANSWERS_COUNT = 6;

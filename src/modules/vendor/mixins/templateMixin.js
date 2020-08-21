@@ -25,6 +25,7 @@ import {
   validCaracters,
   min2Answers,
   min2OrderedAnswers,
+  only1Correct,
 } from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
@@ -83,7 +84,7 @@ export const templateMixin = {
         return {
           card: {
             question: { required },
-            answers: { min2Answers },
+            answers: { required, minLength: min2Answers, only1Correct },
             explanation: { required },
           },
         };

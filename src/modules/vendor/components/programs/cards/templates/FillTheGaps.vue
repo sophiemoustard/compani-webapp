@@ -1,11 +1,11 @@
 <template>
   <div v-if="answersInitialized">
-    <ni-input class="q-mb-xl" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
+    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :error-message="textTagCodeErrorMsg" />
-    <div class="q-mb-lg row gutter-profile">
-      <ni-input v-for="i in 6" :key="i" class="col-xs-12 col-md-6 answers" :caption="`Mot ${i}`"
-        v-model.trim="card.answers[i - 1].label" @focus="saveTmp(`answers[${i - 1}].label`)" @blur="updateAnswer(i - 1)"
-        :error="answersError(i - 1)" :required-field="i < 3" :error-message="answersErrorMsg(i - 1)" />
+    <div class="q-mb-lg row gutter-profile answers">
+      <ni-input v-for="(answer, i) in card.answers" :key="i" class="col-xs-12 col-md-6" :caption="`Réponse ${i + 1}`"
+        v-model.trim="card.answers[i].label" @focus="saveTmp(`answers[${i}].label`)" @blur="updateAnswer(i)"
+        :error="answersError(i)" :required-field="i < 2" :error-message="answersErrorMsg(i)" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
@@ -16,9 +16,9 @@
 import Input from '@components/form/Input';
 import times from 'lodash/times';
 import Cards from '@api/Cards';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
-import { REQUIRED_LABEL } from '@data/constants';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { REQUIRED_LABEL, FILL_THE_GAPS_MAX_ANSWERS_COUNT } from '@data/constants';
+import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'FillTheGaps',
@@ -53,7 +53,7 @@ export default {
       return '';
     },
     answersInitialized () {
-      return !!this.card.answers[5];
+      return this.card.answers.length === FILL_THE_GAPS_MAX_ANSWERS_COUNT;
     },
   },
   async mounted () {
@@ -67,7 +67,7 @@ export default {
   methods: {
     initializeAnswers () {
       this.answersCountInDb = this.card.answers.length;
-      this.card.answers = times(6, i => this.card.answers[i] || ({ label: '' }));
+      this.card.answers = times(FILL_THE_GAPS_MAX_ANSWERS_COUNT, i => this.card.answers[i] || ({ label: '' }));
     },
     answersError (index) {
       return this.$v.card.answers.$each[index].label.$error || this.requiredAnswerIsMissing(index);
@@ -79,19 +79,16 @@ export default {
       if (!this.$v.card.answers.$each[index].label.validCaracters) {
         return 'Caractère invalide détecté (seuls - \' ESPACE permis)';
       }
-      if (this.requiredAnswerIsMissing(index)) return 'Champ requis';
+      if (this.requiredAnswerIsMissing(index)) return REQUIRED_LABEL;
       return '';
     },
     requiredAnswerIsMissing (index) {
-      return this.$v.card.answers.$error &&
-        !this.$v.card.answers.min2Answers &&
-        this.card.answers.filter(a => a.label).length < this.answersCountInDb &&
-        index < 2 &&
-        !this.card.answers[index].label;
+      return this.$v.card.answers.$error && !this.$v.card.answers.min2Answers && index < 2 &&
+        this.card.answers.filter(a => !!a.label).length < this.answersCountInDb && !this.card.answers[index].label;
     },
     async updateAnswer (index) {
       try {
-        if (this.tmpInput === this.card.answers[index].label) return;
+        if (this.tmpInput === get(this.card, `answers[${index}].label`)) return;
 
         this.$v.card.answers.$touch();
         if (this.$v.card.answers.$each[index].label.$error || this.requiredAnswerIsMissing(index)) {
