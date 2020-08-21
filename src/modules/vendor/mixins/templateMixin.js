@@ -13,6 +13,7 @@ import {
   FLASHCARD,
   FILL_THE_GAPS,
   ORDER_THE_SEQUENCE,
+  SINGLE_CHOICE_QUESTION,
 } from '@data/constants';
 import {
   validTagging,
@@ -63,10 +64,7 @@ export const templateMixin = {
             answers: {
               min2Answers,
               $each: {
-                label: {
-                  validCaracters,
-                  validAnswerLength,
-                },
+                label: { validCaracters, validAnswerLength },
               },
             },
             explanation: { required },
@@ -79,6 +77,13 @@ export const templateMixin = {
             orderedAnswers: {
               minLength: min2OrderedAnswers,
             },
+          },
+        };
+      case SINGLE_CHOICE_QUESTION:
+        return {
+          card: {
+            question: { required },
+            answers: { min2Answers },
             explanation: { required },
           },
         };

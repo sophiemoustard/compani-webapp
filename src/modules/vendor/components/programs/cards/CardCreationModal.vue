@@ -37,7 +37,7 @@
             <div class="q-mb-sm">Texte à trou</div>
             <div class="fill-the-gaps">Ceci est un ____</div>
           </template>
-          <template v-else-if="template.value === MULTIPLE_CHOICE_QUESTION">
+          <template v-else-if="template.value === SINGLE_CHOICE_QUESTION">
             <div class="q-mb-sm">QCU</div>
             <div class="choices-question">
               <q-icon name="radio_button_unchecked" size="16px" />
@@ -45,7 +45,7 @@
               <q-icon name="radio_button_unchecked" size="16px" />
             </div>
           </template>
-          <template v-else-if="template.value === SINGLE_CHOICE_QUESTION">
+          <template v-else-if="template.value === MULTIPLE_CHOICE_QUESTION">
             <div class="q-mb-sm">QCM</div>
             <div class="choices-question">
               <q-icon name="check_box_outline_blank" size="16px" />
