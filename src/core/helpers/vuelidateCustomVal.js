@@ -78,44 +78,55 @@ export const validTradeName = value => !value || /^[0-9a-zA-Z]{0,11}$/.test(valu
 // Quiz fill-the-gap
 const parseTagCode = (str) => {
   const outerAcc = '';
-  const innerAcc = [];
+  const answersAcc = [];
 
-  return parseTagCodeRecursively(outerAcc, innerAcc, str);
+  return parseTagCodeRecursively(outerAcc, answersAcc, str);
 };
 
-const parseTagCodeRecursively = (outerAcc, innerAcc, str) => {
+const parseTagCodeRecursively = (outerAcc, answersAcc, str) => {
   const splitedStr = str.match(/(.*?)<trou>(.*?)<\/trou>(.*)/s);
 
   if (!splitedStr) {
-    return { outerAcc: outerAcc.concat(' ', str), innerAcc };
+    return { outerAcc: outerAcc.concat(' ', str), answersAcc };
   }
 
-  innerAcc.push(splitedStr[2]);
-  return parseTagCodeRecursively(outerAcc.concat(' ', splitedStr[1]), innerAcc, splitedStr[3]);
+  answersAcc.push(splitedStr[2]);
+  return parseTagCodeRecursively(outerAcc.concat(' ', splitedStr[1]), answersAcc, splitedStr[3]);
 };
 
 const containLonelyTag = value => /<trou>|<\/trou>/g.test(value);
 
 export const validTagging = (value) => {
-  const { outerAcc, innerAcc } = parseTagCode(value);
+  if (!value) return true;
+  const { outerAcc, answersAcc } = parseTagCode(value);
 
-  return !containLonelyTag(outerAcc) && !innerAcc.some(v => containLonelyTag(v));
+  return !containLonelyTag(outerAcc) && !answersAcc.some(v => containLonelyTag(v));
 };
 
-export const validCaractersInner = (value) => {
-  const { innerAcc } = parseTagCode(value);
+export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü '-]*$/.test(value);
 
-  return innerAcc.every(v => /^[a-zA-Z0-9àâçéèêëîïôûùü '-]*$/.test(v));
+export const validCaractersTags = (value) => {
+  if (!value) return true;
+  const { answersAcc } = parseTagCode(value);
+
+  return answersAcc.every(v => validCaracters(v));
 };
 
-export const validLengthInner = (value) => {
-  const { innerAcc } = parseTagCode(value);
+// value.length can be 0 in front validation, to authorize field clear
+export const validLength = value => value.length >= 0 && value.length < 16;
 
-  return innerAcc.every(v => v.length > 0 && v.length < 16);
+export const validLengthTags = (value) => {
+  if (!value) return true;
+  const { answersAcc } = parseTagCode(value);
+
+  return answersAcc.every(v => v.length > 0 && v.length < 16);
 };
 
 export const validNumberOfTags = (value) => {
-  const { innerAcc } = parseTagCode(value);
+  if (!value) return true;
+  const { answersAcc } = parseTagCode(value);
 
-  return innerAcc.length > 0 && innerAcc.length < 3;
+  return answersAcc.length > 0 && answersAcc.length < 3;
 };
+
+export const min2Answers = value => value.filter(a => !!a.label).length > 1;

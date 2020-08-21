@@ -4,12 +4,13 @@
       :content-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
         <div v-if="card && Object.values(card).length">
-          <transition v-if="card.template === TRANSITION" class="q-mx-lg" :card="card" />
-          <title-text-media v-else-if="card.template === TITLE_TEXT_MEDIA" class="q-mx-lg" :card="card" />
-          <title-text v-else-if="card.template === TITLE_TEXT" class="q-mx-lg" :card="card" />
-          <text-media v-else-if="card.template === TEXT_MEDIA" class="q-mx-lg" :card="card" />
-          <flashcard v-else-if="card.template === FLASHCARD" class="q-mx-lg" :card="card" />
-          <fill-the-gaps v-else-if="card.template === FILL_THE_GAPS" class="q-mx-lg" :card="card" />
+          <transition v-if="card.template === TRANSITION" :key="card._id" class="q-mx-lg" :card="card" />
+          <title-text-media v-else-if="card.template === TITLE_TEXT_MEDIA" :key="card._id" class="q-mx-lg"
+            :card="card" />
+          <title-text v-else-if="card.template === TITLE_TEXT" :key="card._id" class="q-mx-lg" :card="card" />
+          <text-media v-else-if="card.template === TEXT_MEDIA" :key="card._id" class="q-mx-lg" :card="card" />
+          <flashcard v-else-if="card.template === FLASHCARD" :key="card._id" class="q-mx-lg" :card="card" />
+          <fill-the-gaps v-else-if="card.template === FILL_THE_GAPS" :key="card._id" class="q-mx-lg" :card="card" />
         </div>
     </q-scroll-area>
   </div>
