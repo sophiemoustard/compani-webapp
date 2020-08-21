@@ -74,3 +74,57 @@ export const rcs = value => !value || /^[0-9]*[1-9][0-9]*$/.test(value);
 export const validYear = value => !value || /^[2]{1}[0]{1}[0-9]{2}$/.test(value);
 
 export const validTradeName = value => !value || /^[0-9a-zA-Z]{0,11}$/.test(value);
+
+// Quiz fill-the-gap
+const parseTagCode = (str) => {
+  const outerAcc = '';
+  const gapAcc = [];
+
+  return parseTagCodeRecursively(outerAcc, gapAcc, str);
+};
+
+const parseTagCodeRecursively = (outerAcc, gapAcc, str) => {
+  const splitedStr = str.match(/(.*?)<trou>(.*?)<\/trou>(.*)/s);
+
+  if (!splitedStr) return { outerAcc: outerAcc.concat(' ', str), gapAcc };
+
+  gapAcc.push(splitedStr[2]);
+  return parseTagCodeRecursively(outerAcc.concat(' ', splitedStr[1]), gapAcc, splitedStr[3]);
+};
+
+const containLonelyTag = value => /<trou>|<\/trou>/g.test(value);
+
+export const validTagging = (value) => {
+  if (!value) return true;
+  const { outerAcc, gapAcc } = parseTagCode(value);
+
+  return !containLonelyTag(outerAcc) && !gapAcc.some(v => containLonelyTag(v));
+};
+
+export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\s'-]*$/.test(value);
+
+export const validCaractersTags = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return gapAcc.every(v => validCaracters(v));
+};
+
+// value.length can be 0 in front validation, to authorize field clear
+export const validAnswerLength = value => value.length >= 0 && value.length < 16;
+
+export const validTagLength = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return gapAcc.every(v => v.length > 0 && v.length < 16);
+};
+
+export const validTagsCount = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return gapAcc.length > 0 && gapAcc.length < 3;
+};
+
+export const min2Answers = value => value.filter(a => !!a.label).length > 1;
