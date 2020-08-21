@@ -17,8 +17,6 @@ export const validationMixin = {
       });
     },
     waitForFormValidation (validationObj) {
-      // eslint-disable-next-line no-console
-      console.log('toto', validationObj);
       return new Promise((resolve) => {
         const unwatch = this.$watch(() => !validationObj.$pending, (notPending) => {
           if (notPending) {
