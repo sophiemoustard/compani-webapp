@@ -3,7 +3,6 @@
     <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
     <div class="q-mb-lg">
-      <div class="col-12 q-mb-sm ordered-answers">Réponses ordonnées :</div>
       <ni-input v-for="i in 3" :key="i" :caption="`Réponse ${i}`" @focus="saveTmp(`orderedAnswers[${i - 1}]`)"
         @blur="updateOrderedAnswer(i - 1)" v-model.trim="card.orderedAnswers[i - 1]" :required-field="i < 3"
         :error="requiredOrderedAnswerIsMissing(i - 1)" />
@@ -75,8 +74,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-.ordered-answers
-  font-size: small
-</style>

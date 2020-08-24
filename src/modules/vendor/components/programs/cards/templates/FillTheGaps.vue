@@ -1,11 +1,9 @@
 <template>
   <div v-if="answersInitialized">
-    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
-      @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea"
-      :error-message="textTagCodeErrorMsg" />
-    <div class="q-mb-lg row gutter-profile answers">
-      <div class="col-12 q-mb-sm">Mauvaises réponses :</div>
-      <ni-input v-for="i in 6" :key="i" class="col-xs-12 col-md-6" :caption="`Réponse ${i}`"
+    <ni-input class="q-mb-xl" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
+      @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :error-message="textTagCodeErrorMsg" />
+    <div class="q-mb-lg row gutter-profile">
+      <ni-input v-for="i in 6" :key="i" class="col-xs-12 col-md-6 answers" :caption="`Mot ${i}`"
         v-model.trim="card.answers[i - 1].label" @focus="saveTmp(`answers[${i - 1}].label`)" @blur="updateAnswer(i - 1)"
         :error="answersError(i - 1)" :required-field="i < 3" :error-message="answersErrorMsg(i - 1)" />
     </div>
@@ -112,9 +110,6 @@ export default {
 <style lang="stylus" scoped>
 
 .answers
-  & > div
-    font-size: small
-  & > .col-md-6
     padding-top: 0
 
 </style>
