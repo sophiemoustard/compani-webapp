@@ -128,3 +128,5 @@ export const validTagsCount = (value) => {
 };
 
 export const min2Answers = value => value.filter(a => !!a.label).length > 1;
+
+export const min2OrderedAnswers = value => value.filter(a => !!a).length > 1;
