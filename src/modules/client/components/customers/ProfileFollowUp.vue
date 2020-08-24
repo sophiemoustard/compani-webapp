@@ -124,7 +124,7 @@ import {
   SITUATION_OPTIONS,
 } from '@data/constants';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
 
 export default {

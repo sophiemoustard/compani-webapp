@@ -175,7 +175,7 @@ import { companyMixin } from '@mixins/companyMixin';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'CompanyConfig',

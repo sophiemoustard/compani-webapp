@@ -354,7 +354,7 @@ import {
   COMPANY,
 } from '@data/constants';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {

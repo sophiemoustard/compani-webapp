@@ -60,7 +60,7 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'CustomersDirectory',
