@@ -78,6 +78,7 @@ export const templateMixin = {
             orderedAnswers: {
               minLength: min2OrderedAnswers,
             },
+            explanation: { required },
           },
         };
       case SINGLE_CHOICE_QUESTION:
