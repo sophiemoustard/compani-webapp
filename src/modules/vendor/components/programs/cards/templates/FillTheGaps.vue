@@ -3,7 +3,7 @@
     <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :error-message="textTagCodeErrorMsg" />
     <div class="q-mb-lg row gutter-profile answers">
-      <ni-input v-for="(answer, i) in card.answers" :key="i" class="col-xs-12 col-md-6" :caption="`Réponse ${i + 1}`"
+      <ni-input v-for="(answer, i) in card.answers" :key="i" class="col-xs-12 col-md-6" :caption="`Mot ${i + 1}`"
         v-model.trim="card.answers[i].label" @focus="saveTmp(`answers[${i}].label`)" @blur="updateAnswer(i)"
         :error="answersError(i)" :required-field="i < 2" :error-message="answersErrorMsg(i)" />
     </div>
@@ -15,6 +15,7 @@
 <script>
 import Input from '@components/form/Input';
 import times from 'lodash/times';
+import get from 'lodash/get';
 import Cards from '@api/Cards';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { REQUIRED_LABEL, FILL_THE_GAPS_MAX_ANSWERS_COUNT } from '@data/constants';
