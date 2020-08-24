@@ -5,7 +5,15 @@ import set from 'lodash/set';
 import Cards from '@api/Cards';
 import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD, FILL_THE_GAPS } from '@data/constants';
+import {
+  TRANSITION,
+  TITLE_TEXT_MEDIA,
+  TITLE_TEXT,
+  TEXT_MEDIA,
+  FLASHCARD,
+  FILL_THE_GAPS,
+  ORDER_THE_SEQUENCE,
+} from '@data/constants';
 import {
   validTagging,
   validCaractersTags,
@@ -14,6 +22,7 @@ import {
   validAnswerLength,
   validCaracters,
   min2Answers,
+  min2OrderedAnswers,
 } from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
@@ -58,6 +67,16 @@ export const templateMixin = {
                   validAnswerLength,
                 },
               },
+            },
+            explanation: { required },
+          },
+        };
+      case ORDER_THE_SEQUENCE:
+        return {
+          card: {
+            question: { required },
+            orderedAnswers: {
+              minLength: min2OrderedAnswers,
             },
             explanation: { required },
           },

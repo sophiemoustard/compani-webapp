@@ -1,11 +1,9 @@
 <template>
   <div v-if="answersInitialized">
-    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
-      @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea"
-      :error-message="textTagCodeErrorMsg" />
-    <div class="q-mb-lg row gutter-profile answers">
-      <div class="col-12 q-mb-sm">Mauvaises Réponses :</div>
-      <ni-input v-for="i in 6" :key="i" class="col-xs-12 col-md-6" :caption="`Réponse ${i}`"
+    <ni-input class="q-mb-xl" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
+      @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :error-message="textTagCodeErrorMsg" />
+    <div class="q-mb-lg row gutter-profile">
+      <ni-input v-for="i in 6" :key="i" class="col-xs-12 col-md-6 answers" :caption="`Mot ${i}`"
         v-model.trim="card.answers[i - 1].label" @focus="saveTmp(`answers[${i - 1}].label`)" @blur="updateAnswer(i - 1)"
         :error="answersError(i - 1)" :required-field="i < 3" :error-message="answersErrorMsg(i - 1)" />
     </div>
@@ -16,7 +14,6 @@
 
 <script>
 import Input from '@components/form/Input';
-import get from 'lodash/get';
 import times from 'lodash/times';
 import Cards from '@api/Cards';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
@@ -31,7 +28,7 @@ export default {
   mixins: [templateMixin],
   data () {
     return {
-      answersLengthInDb: 0,
+      answersCountInDb: 0,
     };
   },
   computed: {
@@ -65,11 +62,8 @@ export default {
   },
   methods: {
     initializeAnswers () {
-      this.answersLengthInDb = this.card.answers.length;
+      this.answersCountInDb = this.card.answers.length;
       this.card.answers = times(6, i => this.card.answers[i] || ({ label: '' }));
-    },
-    saveTmp (path) {
-      this.tmpInput = get(this.card, path);
     },
     answersError (index) {
       return this.$v.card.answers.$each[index].label.$error || this.requiredAnswerIsMissing(index);
@@ -87,14 +81,13 @@ export default {
     requiredAnswerIsMissing (index) {
       return this.$v.card.answers.$error &&
         !this.$v.card.answers.min2Answers &&
-        this.card.answers.filter(a => a.label).length < this.answersLengthInDb &&
+        this.card.answers.filter(a => a.label).length < this.answersCountInDb &&
         index < 2 &&
         !this.card.answers[index].label;
     },
     async updateAnswer (index) {
       try {
-        const newAnswer = get(this.card, `answers[${index}].label`);
-        if (this.tmpInput === newAnswer) return;
+        if (this.tmpInput === this.card.answers[index].label) return;
 
         this.$v.card.answers.$touch();
         if (this.$v.card.answers.$each[index].label.$error || this.requiredAnswerIsMissing(index)) {
@@ -117,9 +110,6 @@ export default {
 <style lang="stylus" scoped>
 
 .answers
-  & > div
-    font-size: small
-  & > .col-md-6
     padding-top: 0
 
 </style>
