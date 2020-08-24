@@ -40,6 +40,10 @@ export default {
       if (!this.$v.card.text.validTagging) {
         return 'Balisage non valide, la bonne syntaxe est : <trou>la réponse</trou>';
       }
+      if (!this.$v.card.text.validAnswerInTag) {
+        return 'Il ne doit pas y avoir d\'espace au début et à la fin de la réponse. '
+          + 'La bonne syntaxe est : <trou>la réponse</trou>';
+      }
       if (!this.$v.card.text.validCaractersTags) {
         return 'Caractère invalide détecté entre les balises, seuls les symboles - \' et ESPACE sont permis';
       }

@@ -101,6 +101,13 @@ export const validTagging = (value) => {
   return !containLonelyTag(outerAcc) && !gapAcc.some(v => containLonelyTag(v));
 };
 
+export const validAnswerInTag = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return !gapAcc.some(v => v.trim() !== v);
+};
+
 export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\s'-]*$/.test(value);
 
 export const validCaractersTags = (value) => {

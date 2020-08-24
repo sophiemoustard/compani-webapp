@@ -16,6 +16,7 @@ import {
 } from '@data/constants';
 import {
   validTagging,
+  validAnswerInTag,
   validCaractersTags,
   validTagLength,
   validTagsCount,
@@ -58,7 +59,7 @@ export const templateMixin = {
       case FILL_THE_GAPS:
         return {
           card: {
-            text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount },
+            text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
             answers: {
               min2Answers,
               $each: {
