@@ -23,8 +23,7 @@ import {
   validTagsCount,
   validAnswerLength,
   validCaracters,
-  min2Answers,
-  min2OrderedAnswers,
+  minArrayLength,
   only1Correct,
 } from '@helpers/vuelidateCustomVal';
 
@@ -63,7 +62,7 @@ export const templateMixin = {
           card: {
             text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
             answers: {
-              min2Answers,
+              minLength: minArrayLength(1, 'label'),
               $each: {
                 label: { validCaracters, validAnswerLength },
               },
@@ -76,7 +75,7 @@ export const templateMixin = {
           card: {
             question: { required },
             orderedAnswers: {
-              minLength: min2OrderedAnswers,
+              minLength: minArrayLength(1),
             },
             explanation: { required },
           },
@@ -85,7 +84,7 @@ export const templateMixin = {
         return {
           card: {
             question: { required },
-            answers: { required, minLength: min2Answers, only1Correct },
+            answers: { required, minLength: minArrayLength(1, 'label'), only1Correct },
             explanation: { required },
           },
         };

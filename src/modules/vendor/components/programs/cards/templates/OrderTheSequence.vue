@@ -3,8 +3,8 @@
     <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
     <div class="q-mb-lg">
-      <ni-input v-for="(answer, i) in card.answers" :key="i" :caption="`Réponse ${i + 1}`" :required-field="i < 2"
-        v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)"
+      <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
+        v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
         @blur="updateOrderedAnswer(i)" :error="requiredOrderedAnswerIsMissing(i)" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
@@ -51,7 +51,7 @@ export default {
     },
     requiredOrderedAnswerIsMissing (index) {
       return this.$v.card.orderedAnswers.$error &&
-        !this.$v.card.orderedAnswers.min2OrderedAnswers &&
+        !this.$v.card.orderedAnswers.minLength &&
         this.card.orderedAnswers.filter(a => !!a).length < this.orderedAnswersCountInDb &&
         index < 2 &&
         !this.card.orderedAnswers[index];
