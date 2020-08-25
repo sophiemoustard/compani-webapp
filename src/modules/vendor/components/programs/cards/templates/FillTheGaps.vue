@@ -34,17 +34,21 @@ export default {
   computed: {
     textTagCodeErrorMsg () {
       if (this.$v.card.text.required === false) return REQUIRED_LABEL;
+      if (!this.$v.card.text.validTagsCount) {
+        return 'Le nombre de couple de balises doit être de 1 ou 2';
+      }
       if (!this.$v.card.text.validTagging) {
         return 'Balisage non valide, la bonne syntaxe est : <trou>la réponse</trou>';
       }
-      if (!this.$v.card.text.validTagLength) {
-        return 'Le nombre de caractères entre les balises doit être entre 1 et 15';
+      if (!this.$v.card.text.validAnswerInTag) {
+        return 'Il ne doit pas y avoir d\'espace au début et à la fin de la réponse. '
+          + 'La bonne syntaxe est : <trou>la réponse</trou>';
       }
       if (!this.$v.card.text.validCaractersTags) {
         return 'Caractère invalide détecté entre les balises, seuls les symboles - \' et ESPACE sont permis';
       }
-      if (!this.$v.card.text.validTagsCount) {
-        return 'Le nombre de couple de balises doit être de 1 ou 2';
+      if (!this.$v.card.text.validTagLength) {
+        return 'Le nombre de caractères entre les balises doit être entre 1 et 15';
       }
       return '';
     },
