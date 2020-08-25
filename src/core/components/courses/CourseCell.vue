@@ -48,6 +48,7 @@
 <script>
 import get from 'lodash/get';
 import { FORTHCOMING, COMPLETED, IN_PROGRESS, INTRA } from '@data/constants';
+import { formatQuantity } from '@helpers/utils';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
@@ -73,7 +74,7 @@ export default {
       const infos = [
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
-      ]
+      ];
 
       return infos;
     },
@@ -108,7 +109,7 @@ export default {
 
       return !totalDates
         ? '0 date'
-        : `${totalDates} date${totalDates > 1 ? 's' : ''},
+        : `${formatQuantity('date', totalDates)},
           ${slotsToPlanLength ? `dont ${slotsToPlanLength} à planifier, ` : ''}${this.slotsDurationTitle}`;
     },
     formatNearestDate () {
@@ -119,27 +120,31 @@ export default {
         const firstSlot = this.course.slots[0];
         const rangeToNextDate = this.$moment(firstSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
-        return rangeToNextDate ? `Commence dans ${rangeToNextDate} jour(s)` : 'Commence aujourd’hui'
+        return rangeToNextDate ? `Commence dans ${formatQuantity('jour', rangeToNextDate)}` : 'Commence aujourd’hui';
       }
 
       if (this.course.status === COMPLETED) {
         const lastSlot = this.course.slots[this.course.slots.length - 1];
         const rangeToLastDate = this.$moment().endOf('day').diff(this.$moment(lastSlot[0].startDate), 'd');
 
-        return rangeToLastDate ? `Dernière date il y a ${rangeToLastDate} jour(s) ` : 'Dernière date aujourd’hui'
+        return rangeToLastDate
+          ? `Dernière date il y a ${formatQuantity('jour', rangeToLastDate)}`
+          : 'Dernière date aujourd’hui';
       }
 
-      const nextSlot = this.course.slots.filter((daySlots) => !this.happened(daySlots))[0];
+      const nextSlot = this.course.slots.filter(daySlots => !this.happened(daySlots))[0];
       if (!nextSlot) return 'Prochaine date à planifier';
       const rangeToNextDate = this.$moment(nextSlot[0].startDate).diff(this.$moment().startOf('day'), 'd');
 
-      return rangeToNextDate ? `Prochaine date dans ${rangeToNextDate} jour(s)` : 'Prochaine date aujourd’hui'
+      return rangeToNextDate
+        ? `Prochaine date dans ${formatQuantity('jour', rangeToNextDate)}`
+        : 'Prochaine date aujourd’hui';
     },
   },
   methods: {
     get,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

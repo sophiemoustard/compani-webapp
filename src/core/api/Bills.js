@@ -12,4 +12,4 @@ export default {
   getPDFUrl (id) {
     return `${process.env.API_HOSTNAME}/bills/${id}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
   },
-}
+};

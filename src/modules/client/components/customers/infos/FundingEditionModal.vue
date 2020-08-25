@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
       <template slot="title">
         Éditer le <span class="text-weight-bold">financement</span>
       </template>
@@ -27,7 +27,7 @@
         required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
-          :loading="loading" @click="edit" />
+          :loading="loading" @click="submit" />
       </template>
     </ni-modal>
 </template>
@@ -37,10 +37,10 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
-import { FIXED } from '@data/constants.js';
+import { FIXED } from '@data/constants';
 
 export default {
-  name: 'EditFundingModal',
+  name: 'FundingEditionModal',
   props: {
     value: { type: Boolean, default: false },
     editedFunding: { type: Object, default: () => ({}) },
@@ -56,7 +56,7 @@ export default {
   },
   data () {
     return {
-    }
+    };
   },
   computed: {
     editedFundingMaxStartDate () {
@@ -72,9 +72,12 @@ export default {
     hide () {
       this.$emit('hide');
     },
-    edit () {
-      this.$emit('editFunding');
+    input (event) {
+      this.$emit('input', event);
+    },
+    submit () {
+      this.$emit('submit');
     },
   },
-}
+};
 </script>

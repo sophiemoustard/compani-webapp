@@ -12,11 +12,9 @@ import {
   ERP,
 } from '@data/constants';
 
-const getClientAbilities = (role, subscriptions) => {
-  return roleBasedAccessControl[role]
-    .filter(r => !r.subscription || subscriptions.includes(r.subscription))
-    .map(r => r.name);
-};
+const getClientAbilities = (role, subscriptions) => roleBasedAccessControl[role]
+  .filter(r => !r.subscription || subscriptions.includes(r.subscription))
+  .map(r => r.name);
 
 const getVendorAbilities = role => roleBasedAccessControl[role].map(r => r.name);
 
@@ -39,9 +37,9 @@ export const defineAbilitiesFor = (user) => {
 
     if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('edit', 'Events');
     if (clientRole === AUXILIARY) {
-      can('edit', 'Events', { auxiliaryId: { $eq: _id } })
-      can('edit', 'Events', { sectorId: { $eq: sector } })
+      can('edit', 'Events', { auxiliaryId: { $eq: _id } });
+      can('edit', 'Events', { sectorId: { $eq: sector } });
     }
   }
   return new Ability(rules);
-}
+};

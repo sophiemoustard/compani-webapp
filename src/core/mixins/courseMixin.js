@@ -19,14 +19,14 @@ export const courseMixin = {
     trainerName () {
       return formatIdentity(get(this.course, 'trainer.identity'), 'FL');
     },
-    disabledFollowUp () {
+    followUpDisabled () {
       return this.followUpMissingInfo.length > 0;
     },
     followUpMissingInfo () {
       const missingInfo = [];
       if (!this.course.trainer) missingInfo.push('l\'intervenant');
-      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('le ou les stagiaire(s)');
-      if (!this.course.slots || !this.course.slots.length) missingInfo.push('le ou les créneau(x)');
+      if (!this.course.slots || !this.course.slots.length) missingInfo.push('minimum 1 créneau');
+      if (!this.course.trainees || !this.course.trainees.length) missingInfo.push('minimum 1 stagiaire');
       if (!get(this.course, 'contact.name')) missingInfo.push('le nom du contact pour la formation');
       if (!get(this.course, 'contact.phone')) missingInfo.push('le numéro du contact pour la formation');
 
@@ -49,7 +49,7 @@ export const courseMixin = {
     composeCourseName (c, attachCompany = false) {
       const possiblyCompanyName = (attachCompany && c.company) ? `${c.company.name} - ` : '';
       const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
-      return possiblyCompanyName + c.program.name + possiblyMisc;
+      return possiblyCompanyName + c.subProgram.program.name + possiblyMisc;
     },
     async updateCourse (path) {
       try {
@@ -57,7 +57,7 @@ export const courseMixin = {
 
         if (this.tmpInput === value) return;
 
-        const vAttribute = get(this.$v.course, path)
+        const vAttribute = get(this.$v.course, path);
         if (vAttribute) {
           vAttribute.$touch();
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
@@ -70,11 +70,11 @@ export const courseMixin = {
         await this.refreshCourse();
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
       }
     },
   },
-}
+};

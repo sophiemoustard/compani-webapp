@@ -37,9 +37,9 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => get(row, 'service.nature') === HOURLY
+          field: row => (get(row, 'service.nature') === HOURLY
             ? row.estimatedWeeklyVolume && `${row.estimatedWeeklyVolume}h`
-            : row.estimatedWeeklyVolume,
+            : row.estimatedWeeklyVolume),
         },
         {
           name: 'weeklyRate',
@@ -72,20 +72,20 @@ export const subscriptionMixin = {
           name: 'estimatedWeeklyVolume',
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
-          field: row => get(this.selectedSubscription, 'service.nature') === HOURLY
-            ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume,
+          field: row => (get(this.selectedSubscription, 'service.nature') === HOURLY
+            ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume),
         },
         {
           name: 'evenings',
           label: 'dont soirées',
           align: 'center',
-          field: row => row.evenings ? `${row.evenings}h` : '',
+          field: row => (row.evenings ? `${row.evenings}h` : ''),
         },
         {
           name: 'sundays',
           label: 'dont dimanche',
           align: 'center',
-          field: row => row.sundays ? `${row.sundays}h` : '',
+          field: row => (row.sundays ? `${row.sundays}h` : ''),
         },
       ],
       paginationHistory: {
@@ -98,7 +98,7 @@ export const subscriptionMixin = {
   },
   methods: {
     formatNumber (number) {
-      return parseFloat(Math.round(number * 100) / 100).toFixed(2)
+      return parseFloat(Math.round(number * 100) / 100).toFixed(2);
     },
     computeWeeklyRate (subscription, funding) {
       let weeklyRate = subscription.unitTTCRate * subscription.estimatedWeeklyVolume;
@@ -123,7 +123,7 @@ export const subscriptionMixin = {
             fundingReduction = refundedHours * funding.unitTTCRate;
           }
 
-          fundingReduction = fundingReduction * (1 - funding.customerParticipationRate / 100);
+          fundingReduction *= (1 - funding.customerParticipationRate / 100);
         }
       }
 
@@ -138,8 +138,7 @@ export const subscriptionMixin = {
     },
     getMatchingFunding (subscription) {
       return this.fundings.find(fd => fd.subscription === subscription._id &&
-        (fd.endDate ? this.$moment().isBetween(fd.startDate, fd.endDate) : this.$moment().isSameOrAfter(fd.startDate))
-      );
+        (fd.endDate ? this.$moment().isBetween(fd.startDate, fd.endDate) : this.$moment().isSameOrAfter(fd.startDate)));
     },
     showHistory (id) {
       this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);
@@ -147,7 +146,7 @@ export const subscriptionMixin = {
     },
     resetSubscriptionHistoryData () {
       this.subscriptionHistoryModal = false;
-      this.selectedSubscription = [];
+      this.selectedSubscription = {};
     },
     refreshSubscriptions (customer) {
       try {

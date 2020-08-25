@@ -57,7 +57,7 @@
         </ni-responsive-table>
         <q-card-actions align="right">
           <q-btn :disable="serviceOptions.length === 0 || subscriptionsLoading" flat no-caps color="primary" icon="add"
-            label="Ajouter une souscription" @click="subscriptionCreationModal = true" />
+            label="Ajouter une souscription" @click="openNewSubscriptionModal = true" />
         </q-card-actions>
       </q-card>
       <template v-if="subscriptions && subscriptions.length > 0">
@@ -147,7 +147,7 @@
                 <template v-else-if="col.name === 'signed'">
                   <div :class="[{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }]" />
                 </template>
-                <template v-else>{{ col.value}}</template>
+                <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
           </template>
@@ -179,8 +179,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="fundingSubscriptionsOptions.length === 0 || fundingsLoading" flat no-caps color="primary" icon="add"
-            label="Ajouter un financement" @click="openFundingCreationModal" />
+          <q-btn :disable="fundingSubscriptionsOptions.length === 0 || fundingsLoading" flat no-caps color="primary"
+            icon="add" label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
     </div>
@@ -189,7 +189,7 @@
       <div class="row gutter-profile q-mb-lg">
         <div class="col-xs-12">
           <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
-            @uploaded="documentUploaded" name="financialCertificates" collapsibleLabel="Ajouter un justificatif"
+            @uploaded="documentUploaded" name="financialCertificates" collapsible-label="Ajouter un justificatif"
             :user-profile="customer" :url="docsUploadUrl" @delete="validateFinancialCertifDeletion($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />
         </div>
@@ -234,105 +234,46 @@
     </div>
 
     <!-- Add helper modal -->
-    <add-helper-modal v-model="openNewHelperModal" :company="company" :loading="loading" :validations="$v.newHelper"
-      :newHelper="newHelper" @submit="submitHelper" @hide="resetAddHelperForm" @nextStep="nextStep"
-      :firstStep="firstStep" />
+    <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @next-step="nextStep"
+      :new-helper="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
+      :first-step="firstStep" />
 
     <!-- Edit helper modal -->
-    <edit-helper-modal :editedHelper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
-      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @editHelper="editHelper" />
+    <helper-edition-modal :edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
+      :validations="$v.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
     <!-- Subscription creation modal -->
-    <ni-modal v-model="subscriptionCreationModal" @hide="resetCreationSubscriptionData">
-      <template slot="title">
-        Ajouter une <span class="text-weight-bold">souscription</span>
-      </template>
-      <ni-select in-modal caption="Service" :options="serviceOptions" v-model="newSubscription.service"
-        :error="$v.newSubscription.service.$error" @blur="$v.newSubscription.service.$touch" required-field />
-      <ni-input in-modal v-model="newSubscription.unitTTCRate" :error="$v.newSubscription.unitTTCRate.$error"
-        caption="Prix unitaire TTC" @blur="$v.newSubscription.unitTTCRate.$touch" type="number" required-field />
-      <ni-input in-modal v-model="newSubscription.estimatedWeeklyVolume"
-        :error="$v.newSubscription.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-        @blur="$v.newSubscription.estimatedWeeklyVolume.$touch" type="number" required-field />
-      <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.sundays"
-        caption="Dont dimanche (h)" type="number" />
-      <ni-input in-modal v-if="newSubscription.service.nature !== FIXED" v-model="newSubscription.evenings"
-        caption="Dont soirée (h)" last type="number" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter une souscription" icon-right="add" color="primary"
-          :loading="loading" @click="submitSubscription" />
-      </template>
-    </ni-modal>
+    <subscription-creation-modal v-model="openNewSubscriptionModal" :new-subscription="newSubscription"
+      :service-options="serviceOptions" :validations="$v.newSubscription" @hide="resetCreationSubscriptionData"
+      :loading="loading" @submit="createSubscription" />
 
     <!-- Subscription edition modal -->
-    <ni-modal v-model="subscriptionEditionModal" @hide="resetEditionSubscriptionData">
-      <template slot="title">
-        Editer la <span class="text-weight-bold">souscription</span>
-      </template>
-      <ni-input in-modal v-model="editedSubscription.unitTTCRate" :error="$v.editedSubscription.unitTTCRate.$error"
-        caption="Prix unitaire TTC" @blur="$v.editedSubscription.unitTTCRate.$touch" type="number" required-field />
-      <ni-input in-modal v-model="editedSubscription.estimatedWeeklyVolume"
-        :error="$v.editedSubscription.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-        @blur="$v.editedSubscription.estimatedWeeklyVolume.$touch" type="number" required-field />
-      <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays"
-        caption="Dont dimanche (h)" type="number" />
-      <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
-        caption="Dont soirée (h)" last type="number" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
-          :loading="loading" @click="updateSubscription" />
-      </template>
-    </ni-modal>
+    <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription="editedSubscription"
+      :validations="$v.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
+      @submit="updateSubscription" />
 
     <!-- Subscription history modal -->
-    <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
-      <template slot="title">
-        Historique de la souscription <span class="text-weight-bold">{{selectedSubscription.service &&
-                selectedSubscription.service.name}}</span>
-      </template>
-      <ni-responsive-table class="q-mb-sm" :data="selectedSubscription.versions" :columns="subscriptionHistoryColumns"
-        :pagination.sync="paginationHistory">
-        <template v-slot:body="{ props }">
-          <q-tr :props="props">
-            <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
-              <template>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-        </template>
-      </ni-responsive-table>
-    </ni-modal>
+    <subscription-history-modal v-model="subscriptionHistoryModal" :selected="selectedSubscription"
+      @hide="resetSubscriptionHistoryData" />
 
     <!-- Funding details modal -->
-    <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
-      @hide="resetFundingDetailsData">
-      <template slot="title">
-        Détail du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
-      </template>
-      <ni-funding-grid-table :data="fundingDetailsData" :columns="fundingsColumns"
-        :visible-columns="fundingDetailsVisibleColumns" />
-    </ni-modal>
+    <funding-details-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingDetailsModal"
+      :selected="selectedFunding" :funding-details-data="fundingDetailsData" @hide="resetFundingDetailsData" />
 
     <!-- Funding history modal -->
-    <ni-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
-      @hide="resetFundingHistoryData">
-      <template slot="title">
-        Historique du financement <span class="text-weight-bold">{{ selectedFunding.thirdPartyPayer.name }}</span>
-      </template>
-      <ni-funding-grid-table :data="selectedFunding.versions" :columns="fundingsColumns"
-        :visible-columns="fundingHistoriesVisibleColumns" />
-    </ni-modal>
+    <funding-history-modal v-if="Object.keys(selectedFunding).length > 0" v-model="fundingHistoryModal"
+      :selected="selectedFunding" @hide="resetFundingHistoryData" />
 
     <!-- Funding creation modal -->
-    <add-funding-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :newFunding="newFunding" :thirdPartyPayers="ttpList" @submit="submitFunding" :validations="$v.newFunding"
-      :fundingSubscriptionsOptions="fundingSubscriptionsOptions" :daysOptions="daysOptions"/>
+    <funding-creation-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
+      :new-funding="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
+      :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
 
     <!-- Funding edition modal -->
-    <edit-funding-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
-      :editedFunding="editedFunding" @editFunding="editFunding" :daysOptions="daysOptions"
+    <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
+      :edited-funding="editedFunding" @submit="editFunding" :days-options="daysOptions"
       :validations="$v.editedFunding" />
-
-  </div>
+</div>
 </template>
 
 <script>
@@ -352,7 +293,6 @@ import Select from '@components/form/Select';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
@@ -366,14 +306,18 @@ import {
   CIVILITY_OPTIONS,
 } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
-import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
-import EditHelperModal from 'src/modules/client/components/customers/infos/EditHelperModal';
-import AddHelperModal from 'src/modules/client/components/customers/infos/AddHelperModal';
-import EditFundingModal from 'src/modules/client/components/customers/infos/EditFundingModal';
-import AddFundingModal from 'src/modules/client/components/customers/infos/AddFundingModal';
+import HelperEditionModal from 'src/modules/client/components/customers/infos/HelperEditionModal';
+import HelperCreationModal from 'src/modules/client/components/customers/infos/HelperCreationModal';
+import SubscriptionCreationModal from 'src/modules/client/components/customers/infos/SubscriptionCreationModal';
+import SubscriptionEditionModal from 'src/modules/client/components/customers/infos/SubscriptionEditionModal';
+import SubscriptionHistoryModal from 'src/modules/client/components/customers/infos/SubscriptionHistoryModal';
+import FundingDetailsModal from 'src/modules/client/components/customers/infos/FundingDetailsModal';
+import FundingHistoryModal from 'src/modules/client/components/customers/infos/FundingHistoryModal';
+import FundingEditionModal from 'src/modules/client/components/customers/infos/FundingEditionModal';
+import FundingCreationModal from 'src/modules/client/components/customers/infos/FundingCreationModal';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
@@ -387,13 +331,16 @@ export default {
     'ni-select': Select,
     'ni-date-input': DateInput,
     'ni-multiple-files-uploader': MultipleFilesUploader,
-    'ni-modal': Modal,
-    'add-helper-modal': AddHelperModal,
-    'edit-helper-modal': EditHelperModal,
-    'add-funding-modal': AddFundingModal,
-    'edit-funding-modal': EditFundingModal,
+    'helper-creation-modal': HelperCreationModal,
+    'helper-edition-modal': HelperEditionModal,
+    'subscription-creation-modal': SubscriptionCreationModal,
+    'subscription-edition-modal': SubscriptionEditionModal,
+    'subscription-history-modal': SubscriptionHistoryModal,
+    'funding-details-modal': FundingDetailsModal,
+    'funding-history-modal': FundingHistoryModal,
+    'funding-creation-modal': FundingCreationModal,
+    'funding-edition-modal': FundingEditionModal,
     'ni-responsive-table': ResponsiveTable,
-    'ni-funding-grid-table': FundingGridTable,
   },
   mixins: [
     customerMixin,
@@ -411,13 +358,12 @@ export default {
       days,
       loading: false,
       openEditedHelperModal: false,
-      subscriptionCreationModal: false,
-      subscriptionEditionModal: false,
+      openNewSubscriptionModal: false,
+      openEditedSubscriptionModal: false,
       civilityOptions: CIVILITY_OPTIONS,
       isLoaded: false,
       tmpInput: '',
       subscriptions: [],
-      selectedSubscription: [],
       services: [],
       quotesVisibleColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       quotesColumns: [
@@ -431,7 +377,7 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
@@ -455,7 +401,7 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
       ],
@@ -494,19 +440,20 @@ export default {
       },
       extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
       firstStep: true,
-    }
+    };
   },
   computed: {
     ...mapState('customer', ['customer']),
     customerIdentity () {
       const firstname = get(this.customer, 'identity.firstname');
       const lastname = get(this.customer, 'identity.lastname');
-      return firstname ? `${firstname}_${lastname}` : lastname
+      return firstname ? `${firstname}_${lastname}` : lastname;
     },
     docsUploadUrl () {
       if (!this.customer.driveFolder) return '';
 
-      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}/upload`;
+      return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}`
+        + '/upload';
     },
     headers () {
       return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
@@ -531,29 +478,20 @@ export default {
     },
     ibanError () {
       if (!this.$v.customer.payment.iban.required) return REQUIRED_LABEL;
-      else if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
+      if (!this.$v.customer.payment.iban.iban) return 'IBAN non valide';
       return '';
     },
     bicError () {
       if (!this.$v.customer.payment.bic.required) return REQUIRED_LABEL;
-      else if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
+      if (!this.$v.customer.payment.bic.bic) return 'BIC non valide';
       return '';
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} par ${this.acceptedBy}`;
+        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
+          + `par ${this.acceptedBy}`;
       }
       return '';
-    },
-    fundingHistoriesVisibleColumns () {
-      return this.selectedFunding.nature === FIXED
-        ? ['startDate', 'endDate', 'amountTTC', 'customerParticipationRate', 'careDays']
-        : ['startDate', 'endDate', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays'];
-    },
-    fundingDetailsVisibleColumns () {
-      return this.selectedFunding.nature === FIXED
-        ? ['frequency', 'amountTTC', 'customerParticipationRate', 'careDays', 'subscription']
-        : ['frequency', 'unitTTCRate', 'careHours', 'customerParticipationRate', 'careDays', 'subscription'];
     },
     fundingSubscriptionsOptions () {
       return this.subscriptions
@@ -614,20 +552,20 @@ export default {
         subscription: { required },
         nature: { required },
         frequency: { required },
-        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
-        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY }) },
-        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
       },
       editedFunding: {
-        amountTTC: { required: requiredIf((item) => { return item.nature === FIXED; }) },
-        unitTTCRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
-        careHours: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf((item) => { return item.nature === HOURLY; }) },
+        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
       },
     };
   },
@@ -641,14 +579,14 @@ export default {
         { name: 'mandateId', value: row._id },
         { name: 'fileName', value: `mandat_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedMandate' },
-      ]
+      ];
     },
     quoteFormFields (quote) {
       return [
         { name: 'quoteId', value: quote._id },
         { name: 'fileName', value: `devis_signe_${this.customerIdentity}` },
         { name: 'type', value: 'signedQuote' },
-      ]
+      ];
     },
     getServiceLastVersion (service) {
       if (!service.versions || service.versions.length === 0) return {};
@@ -656,7 +594,7 @@ export default {
       return service.versions.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
     },
     saveTmp (path) {
-      this.tmpInput = get(this.customer, path)
+      this.tmpInput = get(this.customer, path);
     },
     saveTmpSignedAt (index) {
       this.tmpInput = this.customer.payment.mandates[index].signedAt;
@@ -713,7 +651,7 @@ export default {
     // Subscriptions
     formatCreatedSubscription () {
       const { service, unitTTCRate, estimatedWeeklyVolume, sundays, evenings } = this.newSubscription;
-      const formattedService = { service: service._id, versions: [{ unitTTCRate, estimatedWeeklyVolume }] }
+      const formattedService = { service: service._id, versions: [{ unitTTCRate, estimatedWeeklyVolume }] };
 
       if (sundays) formattedService.versions[0].sundays = sundays;
       if (evenings) formattedService.versions[0].evenings = evenings;
@@ -728,7 +666,7 @@ export default {
         estimatedWeeklyVolume: '',
       };
     },
-    async submitSubscription () {
+    async createSubscription () {
       try {
         this.$v.newSubscription.$touch();
         if (this.$v.newSubscription.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -737,7 +675,7 @@ export default {
         const payload = this.formatCreatedSubscription();
         await Customers.addSubscription(this.customer._id, payload);
         await this.refreshCustomer();
-        this.subscriptionCreationModal = false;
+        this.openNewSubscriptionModal = false;
         NotifyPositive('Souscription ajoutée');
       } catch (e) {
         console.error(e);
@@ -759,7 +697,7 @@ export default {
         sundays,
       };
 
-      this.subscriptionEditionModal = true;
+      this.openEditedSubscriptionModal = true;
     },
     resetEditionSubscriptionData () {
       this.editedSubscription = {};
@@ -776,11 +714,11 @@ export default {
         await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
 
         this.refreshCustomer();
-        this.subscriptionEditionModal = false;
+        this.openEditedSubscriptionModal = false;
         NotifyPositive('Souscription modifiée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de la souscription.')
+        NotifyNegative('Erreur lors de la modification de la souscription.');
       } finally {
         this.loading = false;
       }
@@ -793,7 +731,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 403) return NotifyNegative(e.data.message);
-        return NotifyNegative('Erreur lors de la suppression de la souscription.')
+        return NotifyNegative('Erreur lors de la suppression de la souscription.');
       }
     },
     validateSubscriptionsDeletion (subscriptionId) {
@@ -869,7 +807,7 @@ export default {
         weeklyRate: estimatedWeeklyRate ? `${this.formatNumber(estimatedWeeklyRate)}€` : '',
         sundays: subscription.sundays || '',
         evenings: subscription.evenings || '',
-      }
+      };
     },
     async downloadQuote (doc) {
       try {
@@ -888,7 +826,7 @@ export default {
           rcs: this.company.rcs,
           subscriptions,
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
-        }
+        };
         const params = { driveId: quoteDriveId };
         await downloadDocxFile(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
@@ -902,7 +840,7 @@ export default {
         serviceName: subscription.service.name,
         unitTTCRate: subscription.unitTTCRate,
         estimatedWeeklyVolume: subscription.estimatedWeeklyVolume,
-      }
+      };
       if (subscription.sundays) sub.sundays = subscription.sundays;
       if (subscription.evenings) sub.evenings = subscription.evenings;
 
@@ -939,11 +877,9 @@ export default {
       this.fundingHistoryModal = true;
     },
     resetFundingHistoryData () {
-      this.fundingHistoryModal = false;
       this.selectedFunding = {};
     },
     resetCreationFundingData () {
-      this.fundingCreationModal = false;
       this.$v.newFunding.$reset();
       this.newFunding = {
         thirdPartyPayer: '',
@@ -967,7 +903,7 @@ export default {
 
       return { nature, thirdPartyPayer, subscription, frequency, versions: [{ ...version }] };
     },
-    async submitFunding () {
+    async createFunding () {
       try {
         this.$v.newFunding.$touch();
         if (this.$v.newFunding.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -976,13 +912,13 @@ export default {
         const payload = this.formatCreatedFunding();
         await Customers.addFunding(this.customer._id, payload);
 
-        this.resetCreationFundingData();
+        this.fundingCreationModal = false;
         await this.refreshCustomer();
         NotifyPositive('Financement ajoutée');
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de l'ajout d'un financement");
+        NotifyNegative('Erreur lors de l\'ajout d\'un financement');
       } finally {
         this.loading = false;
       }
@@ -1012,17 +948,15 @@ export default {
       this.fundingDetailsModal = true;
     },
     resetFundingDetailsData () {
-      this.fundingDetailsModal = false;
       this.selectedFunding = {};
-      this.fundingDetailsData = []
+      this.fundingDetailsData = [];
     },
     startFundingEdition (id) {
-      this.editedFunding = Object.assign({}, this.fundings.find(fund => fund._id === id));
+      this.editedFunding = { ...this.fundings.find(fund => fund._id === id) };
       this.editedFunding.subscription = this.editedFunding.subscription._id;
       this.fundingEditionModal = true;
     },
     resetEditionFundingData () {
-      this.fundingEditionModal = false;
       this.editedFunding = {};
       this.$v.editedFunding.$reset();
     },
@@ -1046,19 +980,19 @@ export default {
         const payload = this.formatFundingEditionPayload(this.editedFunding);
         await Customers.updateFunding({ _id: this.customer._id, fundingId: this.editedFunding._id }, payload);
 
-        this.resetEditionFundingData();
+        this.fundingEditionModal = false;
         await this.refreshCustomer();
         NotifyPositive('Financement modifié');
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative("Erreur lors de la modification d'un financement");
+        NotifyNegative('Erreur lors de la modification d\'un financement');
       } finally {
         this.loading = false;
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

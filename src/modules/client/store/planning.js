@@ -1,6 +1,6 @@
-import Sectors from '@api/Sectors'
-import Users from '@api/Users'
-import Customers from '@api/Customers'
+import Sectors from '@api/Sectors';
+import Users from '@api/Users';
+import Customers from '@api/Customers';
 import { formatIdentity } from '@helpers/utils';
 import { AUXILIARY, SECTOR, PERSON, CUSTOMER } from '@data/constants';
 
@@ -35,7 +35,7 @@ export default {
         const persons = filterPromises[1];
         for (let i = 0, l = persons.length; i < l; i++) {
           const value = formatIdentity(persons[i].identity, 'FL');
-          elems.push({ label: value, value: value, ...persons[i], type: PERSON });
+          elems.push({ label: value, value, ...persons[i], type: PERSON });
         }
       }
 

@@ -29,4 +29,4 @@ export default {
     const file = await alenviAxios.get(`${process.env.API_HOSTNAME}/gdrive/file/${driveId}/download`);
     return file;
   },
-}
+};

@@ -14,7 +14,7 @@ export const payMixin = {
           label: 'Auxiliaire',
           align: 'left',
           field: 'auxiliary',
-          format: value => value ? formatIdentity(value.identity, 'LF') : '',
+          format: value => (value ? formatIdentity(value.identity, 'LF') : ''),
           sort: (a, b) => formatIdentity(a.identity, 'LF').localeCompare(formatIdentity(b.identity, 'LF')),
         },
         {
@@ -22,7 +22,7 @@ export const payMixin = {
           label: 'Équipe',
           align: 'left',
           field: 'auxiliary',
-          format: value => value && value.sector ? value.sector.name : '',
+          format: value => (value && value.sector ? value.sector.name : ''),
           sort: (a, b) => get(a, 'sector.name', '').localeCompare(get(b, 'sector.name', '')),
         },
         {
@@ -30,7 +30,7 @@ export const payMixin = {
           label: 'Début',
           align: 'left',
           field: 'startDate',
-          format: value => value ? this.$moment(value).format('DD/MM') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
           sort: (a, b) => new Date(a) - new Date(b),
         },
         {
@@ -38,7 +38,7 @@ export const payMixin = {
           label: 'Date de notif',
           align: 'left',
           field: 'endNotificationDate',
-          format: value => value ? this.$moment(value).format('DD/MM') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
         },
         {
           name: 'endReason',
@@ -55,7 +55,7 @@ export const payMixin = {
           label: 'Fin',
           align: 'left',
           field: 'endDate',
-          format: value => value ? this.$moment(value).format('DD/MM') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
         },
         {
           name: 'contractHours',
@@ -153,8 +153,12 @@ export const payMixin = {
           label: 'Mutuelle',
           align: 'center',
           field: 'mutual',
-          format: value => value ? 'Oui' : 'Non',
-          sort: (a, b) => a === b ? 0 : a ? -1 : 1,
+          format: value => (value ? 'Oui' : 'Non'),
+          sort: (a, b) => {
+            if (a === b) return 0;
+            if (a) return -1;
+            return 1;
+          },
         },
         {
           name: 'transport',
@@ -194,12 +198,16 @@ export const payMixin = {
         startDate: this.$moment().startOf('M').toISOString(),
         endDate: this.$moment().endOf('M').toISOString(),
       },
-    }
+    };
   },
   methods: {
     formatPayload (payload) {
       return {
-        ...omit(payload, ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition', 'compensationEdition', 'paidKm']),
+        ...omit(
+          payload,
+          ['auxiliaryId', 'additionalHoursEdition', 'overtimeHoursEdition', 'bonusEdition', 'hoursCounterEdition',
+            'compensationEdition', 'paidKm']
+        ),
         hoursCounter: payload.hoursCounter - payload.overtimeHours - payload.additionalHours,
         auxiliary: payload.auxiliary._id,
       };
@@ -231,7 +239,7 @@ export const payMixin = {
       this.dates = {
         startDate: this.$moment().subtract(offset, 'M').startOf('M').toISOString(),
         endDate: this.$moment().subtract(offset, 'M').endOf('M').toISOString(),
-      }
+      };
     },
     formatNumberForCSV (number) {
       return parseFloat(number).toFixed(2).replace('.', ',');
@@ -292,7 +300,7 @@ export const payMixin = {
         ]);
       }
 
-      return downloadCsv(csvData, `Paie_${moment().format('MM_YYYY')}.csv`)
+      return downloadCsv(csvData, `Paie_${moment().format('MM_YYYY')}.csv`);
     },
   },
 };

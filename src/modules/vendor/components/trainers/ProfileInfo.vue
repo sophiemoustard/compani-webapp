@@ -33,7 +33,7 @@ import Input from '@components/form/Input';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { TRAINER } from '@data/constants';
 
 export default {
@@ -54,13 +54,13 @@ export default {
         identity: { lastname: { required } },
         local: { email: { required, email } },
       },
-    }
+    };
   },
   computed: {
     ...mapState({
-      userProfile: state => TRAINER === get(state.main.loggedUser, 'role.vendor.name')
+      userProfile: state => (TRAINER === get(state.main.loggedUser, 'role.vendor.name')
         ? state.main.loggedUser
-        : state.userProfile.userProfile,
+        : state.userProfile.userProfile),
     }),
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
   },

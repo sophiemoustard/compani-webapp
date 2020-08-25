@@ -38,13 +38,13 @@ export default {
   },
   methods: {
     close () {
-      this.$emit('toggleHistory');
+      this.$emit('toggle-history');
     },
     load (index, done) {
-      this.$emit('updateFeeds', done);
+      this.$emit('update-feeds', done);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

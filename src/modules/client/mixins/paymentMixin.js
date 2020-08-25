@@ -1,6 +1,6 @@
 import pickBy from 'lodash/pickBy';
 import { required } from 'vuelidate/lib/validators';
-import { strictPositiveNumber, validYear } from '@helpers/vuelidateCustomVal.js';
+import { strictPositiveNumber, validYear } from '@helpers/vuelidateCustomVal';
 import Payments from '@api/Payments';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '@data/constants';
@@ -16,7 +16,7 @@ export const paymentMixin = {
       DIRECT_DEBIT,
       PAYMENT_OPTIONS,
       newPayment: {},
-    }
+    };
   },
   validations () {
     return {
@@ -38,7 +38,7 @@ export const paymentMixin = {
         year: { required, validYear },
         file: { required, maxSize: file => !!file && file.size < 5000000 },
       },
-    }
+    };
   },
   methods: {
     openPaymentCreationModal (customer, tpp) {
@@ -49,7 +49,7 @@ export const paymentMixin = {
         date: this.$moment().toISOString(),
         netInclTaxes: 0,
         type: '',
-      }
+      };
       if (tpp) {
         this.selectedTpp = { ...tpp };
         this.newPayment.thirdPartyPayer = tpp._id;

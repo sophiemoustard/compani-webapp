@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">financement</span>
       </template>
@@ -46,10 +46,10 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
-import { FIXED, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants.js';
+import { FIXED, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants';
 
 export default {
-  name: 'AddFundingModal',
+  name: 'FundingCreationModal',
   props: {
     value: { type: Boolean, default: false },
     newFunding: { type: Object, default: () => ({}) },
@@ -69,7 +69,7 @@ export default {
   data () {
     return {
       fundingNatureOptions: NATURE_OPTIONS,
-    }
+    };
   },
   computed: {
     isFixedFunding () {
@@ -90,10 +90,10 @@ export default {
     },
   },
   watch: {
-    'newFunding.thirdPartyPayer' () {
+    'newFunding.thirdPartyPayer': function () {
       this.setUnitUTTRate();
     },
-    'newFunding.nature' () {
+    'newFunding.nature': function () {
       this.setUnitUTTRate();
     },
   },
@@ -112,9 +112,12 @@ export default {
     hide () {
       this.$emit('hide');
     },
+    input (event) {
+      this.$emit('input', event);
+    },
     submit () {
       this.$emit('submit');
     },
   },
-}
+};
 </script>

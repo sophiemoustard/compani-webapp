@@ -1,6 +1,6 @@
 <template>
-  <q-table class="q-mb-xl" :data="data" :columns="columns" hide-bottom flat grid :visible-columns="visibleColumns"
-    :rows-per-page-options="[0]">
+  <q-table class="q-mb-xl" :data="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
+    :visible-columns="formattedVisibleColumns">
     <template v-slot:item="props">
       <q-card class="full-width q-mb-md" flat bordered>
         <q-list separator dense>
@@ -26,7 +26,7 @@ export default {
   props: {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
-    visibleColumns: Array,
+    visibleColumns: { type: Array, default: () => [] },
   },
   data () {
     return {
@@ -47,7 +47,12 @@ export default {
         'careHours',
         'customerParticipationRate',
       ],
-    }
+    };
+  },
+  computed: {
+    formattedVisibleColumns () {
+      return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
+    },
   },
   methods: {
     filterCols (cols) {
@@ -65,7 +70,7 @@ export default {
       return cols;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

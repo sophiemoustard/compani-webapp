@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import 'vue-croppa/dist/vue-croppa.css'
+import 'vue-croppa/dist/vue-croppa.css';
 import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import Users from '@api/Users';
@@ -38,7 +38,7 @@ import { removeDiacritics } from '@helpers/utils';
 export default {
   name: 'PictureUploader',
   props: {
-    user: { type: Object, default: () => {} },
+    user: { type: Object, default: () => ({}) },
     refreshPicture: { type: Function, default: () => {} },
   },
   data () {
@@ -134,5 +134,5 @@ export default {
       return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${firstname}_${lastname}`) : '';
     },
   },
-}
+};
 </script>

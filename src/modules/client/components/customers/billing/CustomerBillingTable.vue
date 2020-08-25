@@ -109,7 +109,7 @@ export default {
           label: 'Date',
           align: 'left',
           field: 'date',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'document',
@@ -139,21 +139,23 @@ export default {
       ],
       pagination: { rowsPerPage: 0 },
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
-    }
+    };
   },
   methods: {
     balanceIconColor (val) {
-      return this.isZero(val) || !this.isNegative(val) ? 'grey' : 'secondary'
+      return this.isZero(val) || !this.isNegative(val) ? 'grey' : 'secondary';
     },
     balanceIcon (val) {
-      return this.isZero(val) || !this.isNegative(val) ? 'mdi-plus-circle-outline' : 'mdi-minus-circle-outline'
+      return this.isZero(val) || !this.isNegative(val) ? 'mdi-plus-circle-outline' : 'mdi-minus-circle-outline';
     },
     formatBalance (val) {
       if (this.isNegative(val)) return val.substring(1);
-      else return val;
+      return val;
     },
     getPaymentTitle (payment) {
-      const titlePrefix = payment.nature === PAYMENT ? `Paiement ${payment.number}` : `Remboursement ${payment.number}`;
+      const titlePrefix = payment.nature === PAYMENT
+        ? `Paiement ${payment.number}`
+        : `Remboursement ${payment.number}`;
       const paymentOption = PAYMENT_OPTIONS.find(opt => opt.value === payment.type);
       const typeLabel = paymentOption ? ` (${paymentOption.label})` : '';
       return `${titlePrefix}${typeLabel}`;
@@ -185,13 +187,14 @@ export default {
       }
     },
     openEditionModal (payment) {
-      this.$emit('openEditionModal', payment);
+      this.$emit('open-edition-modal', payment);
     },
     canDownloadBill (bill) {
       return (bill.number && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
     },
     canDownloadCreditNote (creditNote) {
-      return (creditNote.number && creditNote.origin === COMPANI) || (creditNote.driveFile && creditNote.driveFile.link);
+      return (creditNote.number && creditNote.origin === COMPANI) ||
+        (creditNote.driveFile && creditNote.driveFile.link);
     },
     billUrl (bill) {
       return get(bill, 'driveFile.link') ? bill.driveFile.link : Bills.getPDFUrl(bill._id);
@@ -202,7 +205,7 @@ export default {
         : CreditNotes.getPDFUrl(creditNote._id);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

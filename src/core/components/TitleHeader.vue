@@ -18,5 +18,5 @@ export default {
     title: { type: String, default: '' },
     padding: { type: Boolean, default: false },
   },
-}
+};
 </script>

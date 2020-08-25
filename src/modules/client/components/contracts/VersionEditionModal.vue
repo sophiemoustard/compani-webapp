@@ -1,9 +1,9 @@
 <template>
-  <ni-modal :value="value" @input="$emit('input', $event)" @hide="resetVersionEditionModal">
+  <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
-    <ni-input in-modal caption="Taux horaire"  type="number" suffix="€" required-field
+    <ni-input in-modal caption="Taux horaire" type="number" suffix="€" required-field
       v-model="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
       @blur="validations.grossHourlyRate.$touch" :error-message="grossHourlyRateError" />
     <ni-date-input caption="Date d'effet" v-model="editedVersion.startDate" :min="minStartDate"
@@ -13,7 +13,7 @@
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
-        :loading="loading" @click="editVersion" />
+        :loading="loading" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -40,12 +40,15 @@ export default {
     'ni-modal': Modal,
   },
   methods: {
-    editVersion () {
-      this.$emit('editVersion');
+    submit () {
+      this.$emit('submit');
     },
-    resetVersionEditionModal () {
+    input (event) {
+      this.$emit('input', event);
+    },
+    hide () {
       this.$emit('hide');
     },
   },
-}
+};
 </script>

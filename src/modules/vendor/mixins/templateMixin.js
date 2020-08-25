@@ -5,7 +5,26 @@ import set from 'lodash/set';
 import Cards from '@api/Cards';
 import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT, TEXT_MEDIA, FLASHCARD } from '@data/constants';
+import {
+  TRANSITION,
+  TITLE_TEXT_MEDIA,
+  TITLE_TEXT,
+  TEXT_MEDIA,
+  FLASHCARD,
+  FILL_THE_GAPS,
+  ORDER_THE_SEQUENCE,
+} from '@data/constants';
+import {
+  validTagging,
+  validAnswerInTag,
+  validCaractersTags,
+  validTagLength,
+  validTagsCount,
+  validAnswerLength,
+  validCaracters,
+  min2Answers,
+  min2OrderedAnswers,
+} from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
   data () {
@@ -36,6 +55,32 @@ export const templateMixin = {
       case FLASHCARD:
         return {
           card: { text: { required }, backText: { required } },
+        };
+      case FILL_THE_GAPS:
+        return {
+          card: {
+            text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
+            answers: {
+              min2Answers,
+              $each: {
+                label: {
+                  validCaracters,
+                  validAnswerLength,
+                },
+              },
+            },
+            explanation: { required },
+          },
+        };
+      case ORDER_THE_SEQUENCE:
+        return {
+          card: {
+            question: { required },
+            orderedAnswers: {
+              minLength: min2OrderedAnswers,
+            },
+            explanation: { required },
+          },
         };
       default:
         return {};
@@ -74,7 +119,7 @@ export const templateMixin = {
     async refreshCard () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
-        const card = this.activity.cards.find(card => card._id === this.card._id);
+        const card = this.activity.cards.find(c => c._id === this.card._id);
         this.$store.dispatch('program/fetchCard', card);
       } catch (e) {
         console.error(e);

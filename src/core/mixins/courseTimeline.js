@@ -9,7 +9,7 @@ export const courseTimelineMixin = {
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
-          return this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b)
+          return this.getRangeNowToStartCourse(a) - this.getRangeNowToStartCourse(b);
         });
     },
     courseListInProgress () {
@@ -19,7 +19,7 @@ export const courseTimelineMixin = {
         .sort((a, b) => {
           if (a.slotsToPlan.length && !b.slotsToPlan.length) return -1;
           if (!a.slotsToPlan.length && b.slotsToPlan.length) return 1;
-          return this.getRangeNowToNextSlot(a) - this.getRangeNowToNextSlot(b)
+          return this.getRangeNowToNextSlot(a) - this.getRangeNowToNextSlot(b);
         });
     },
     courseListCompleted () {
@@ -37,7 +37,7 @@ export const courseTimelineMixin = {
       return noSlot || noSlotHappened;
     },
     isInProgress (course) {
-      const notEverySlotsHappened = course.slots.some((sameDaySlots) => !this.happened(sameDaySlots));
+      const notEverySlotsHappened = course.slots.some(sameDaySlots => !this.happened(sameDaySlots));
       const slotsToPlan = course.slotsToPlan.length;
 
       return !this.isForthcoming(course) && (notEverySlotsHappened || slotsToPlan);
@@ -53,7 +53,7 @@ export const courseTimelineMixin = {
       return this.$moment(firstSlot[0].startDate).diff(this.$moment(), 'd', true);
     },
     getRangeNowToNextSlot (course) {
-      const nextSlot = course.slots.filter((daySlots) => !this.happened(daySlots))[0];
+      const nextSlot = course.slots.filter(daySlots => !this.happened(daySlots))[0];
       if (!nextSlot) return 0;
 
       return this.$moment(nextSlot[0].startDate).diff(this.$moment(), 'd', true);
@@ -66,4 +66,4 @@ export const courseTimelineMixin = {
       return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
   },
-}
+};

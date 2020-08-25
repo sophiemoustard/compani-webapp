@@ -39,7 +39,7 @@ export default {
     alt: { type: String, default: '' },
     name: { type: String, default: 'file' },
     additionalValue: { type: String, default: '' },
-    entity: { type: Object, default: () => {} },
+    entity: { type: Object, default: () => ({}) },
     url: { type: String, default: '' },
     errorMessage: { type: String, default: 'Document requis' },
     displayCaption: { type: Boolean, default: true },
@@ -55,7 +55,7 @@ export default {
   data () {
     return {
       headers: [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }],
-    }
+    };
   },
   computed: {
     additionalFields () {
@@ -87,7 +87,7 @@ export default {
     rejected (errors) {
       for (const error of errors) {
         if (error.failedPropValidation === 'max-file-size') NotifyNegative('Fichier trop volumineux.');
-      };
+      }
     },
   },
 };

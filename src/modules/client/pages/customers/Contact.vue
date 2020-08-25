@@ -5,12 +5,12 @@
       Pour toutes les questions concernant l’organisation des interventions et le planning, nous vous invitons à
       contacter votre auxiliaire référent.
       <div class="items-center row">
-        <img :src="referentAvatar" class="avatar q-mr-sm" />
+        <img :src="referentAvatar" class="avatar q-mr-sm">
         <div class="referent-info">
           <div data-cy="referent-identity">{{ referentIdentity }}</div>
           <div data-cy="referent-phone">
             Numéro de téléphone :
-            <a v-if="referentPhoneNumber" class="text-primary" :href="referentPhoneLink">{{referentPhoneNumber}}</a>
+            <a v-if="referentPhoneNumber" class="text-primary" :href="referentPhoneLink">{{ referentPhoneNumber }}</a>
           </div>
         </div>
       </div>
@@ -30,7 +30,7 @@
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
-import { formatIdentity } from '@helpers/utils.js';
+import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
 
 export default {
@@ -52,7 +52,7 @@ export default {
       return get(this.customer, 'referent');
     },
     referentIdentity () {
-      return formatIdentity(this.referent.identity, 'FL')
+      return formatIdentity(this.referent.identity, 'FL');
     },
     referentPhoneNumber () {
       return get(this.referent, 'contact.phone') || '';
@@ -73,7 +73,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

@@ -19,5 +19,5 @@ export default {
   computed: {
     ...mapState('main', ['loggedUser']),
   },
-}
+};
 </script>

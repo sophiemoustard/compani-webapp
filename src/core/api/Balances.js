@@ -9,4 +9,4 @@ export default {
     const balances = await alenviAxios.get(`${process.env.API_HOSTNAME}/balances/details`, { params });
     return balances.data.data;
   },
-}
+};

@@ -2,10 +2,10 @@
   <div>
     <div class="row">
       <ni-contracts-cell v-if="contracts" :contracts="contracts" :user="auxiliary" :columns="contractsVisibleColumns"
-        :personKey="COACH" display-actions display-uploader @openEndContract="openEndContractModal"
-        @openVersionEdition="openVersionEditionModal" @openVersionCreation="openVersionCreationModal"
-        @refresh="refreshContracts" @refreshWithTimeout="refreshContractsWithTimeout"
-        @deleteVersion="validateVersionDeletion" :contracts-loading="contractsLoading" />
+        :person-key="COACH" display-actions display-uploader @open-end-contract="openEndContractModal"
+        @open-version-edition="openVersionEditionModal" @open-version-creation="openVersionCreationModal"
+        @refresh="refreshContracts" @refreshW-wth-timeout="refreshContractsWithTimeout"
+        @delete-version="validateVersionDeletion" :contracts-loading="contractsLoading" />
       <q-btn :disable="missingInfoForCreation || contractsLoading || inProgressContract" class="fixed fab-custom"
         no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
       <ni-banner v-if="missingInfoForCreation">
@@ -62,10 +62,10 @@
     </ni-modal>
 
     <!-- Edition modal -->
-    <version-edition-modal v-model="versionEditionModal" :editedVersion="editedVersion" :loading="loading"
-      :validations="$v.editedVersion" :minStartDate="editedVersionMinStartDate" :isVersionUpdated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @editVersion="editVersion"
-      :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"/>
+    <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
+      :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
+      @hide="resetVersionEditionModal" @submit="editVersion"
+      :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
     <!-- End contract modal -->
     <ni-modal v-model="endContractModal" @hide="resetEndContractModal">
@@ -106,20 +106,20 @@ import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
-import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal.vue';
+import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
 import {
   END_CONTRACT_REASONS,
   OTHER,
   COACH,
   CONTRACT_CREATION_MANDATORY_INFO,
 } from '@data/constants';
-import { contractMixin } from 'src/modules/client/mixins/contractMixin.js';
+import { contractMixin } from 'src/modules/client/mixins/contractMixin';
 
 export default {
   name: 'ProfileContracts',
   mixins: [contractMixin],
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   components: {
     'ni-select': Select,
@@ -175,7 +175,7 @@ export default {
       },
       endContractReasons: END_CONTRACT_REASONS,
       contractsLoading: false,
-    }
+    };
   },
   validations () {
     return {
@@ -197,9 +197,9 @@ export default {
         endNotificationDate: { required },
         endDate: { required },
         endReason: { required },
-        otherMisc: { required: requiredIf((item) => item.endReason === OTHER) },
+        otherMisc: { required: requiredIf(item => item.endReason === OTHER) },
       },
-    }
+    };
   },
   computed: {
     inProgressContract () {
@@ -212,15 +212,17 @@ export default {
       const userMissingInfo = this.auxiliary.contractCreationMissingInfo;
       if (userMissingInfo.length === 1) {
         const missingInfo = CONTRACT_CREATION_MANDATORY_INFO[userMissingInfo[0]];
-        return `Il manque l'information suivante dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfo}.`;
+        return 'Il manque l\'information suivante dans la fiche de l\'auxiliaire pour créer un nouveau contrat :'
+          + `${missingInfo}.`;
       }
 
-      const missingInfoList = [];
-      for (const info of userMissingInfo) {
-        missingInfoList.push([CONTRACT_CREATION_MANDATORY_INFO[info]]);
-      }
+      const missingInfoList = userMissingInfo.reduce(
+        (acc, info) => [...acc, CONTRACT_CREATION_MANDATORY_INFO[info]],
+        []
+      );
 
-      return `Il manque les informations suivantes dans la fiche de l'auxiliaire pour créer un nouveau contrat : ${missingInfoList.join(', ')}.`;
+      return 'Il manque les informations suivantes dans la fiche de l\'auxiliaire pour créer un nouveau contrat : '
+        + `${missingInfoList.join(', ')}.`;
     },
     contractMinStartDate () {
       if (this.contracts.length === 0) return '';
@@ -278,7 +280,7 @@ export default {
           this.contracts[i].versions = this.contracts[i].versions.map((version, index) => {
             if (index !== this.contracts[i].versions.length - 1) return { ...version, canBeDeleted: false };
             return { ...version, canBeDeleted: index !== 0 || events[i].length === 0 };
-          })
+          });
         }
       } catch (e) {
         this.contracts = [];
@@ -425,7 +427,7 @@ export default {
     // End contract
     async openEndContractModal (contract) {
       this.endContract.contract = contract;
-      this.endContractModal = true
+      this.endContractModal = true;
     },
     resetEndContractModal () {
       this.endContractModal = false;

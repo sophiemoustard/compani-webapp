@@ -1,4 +1,4 @@
-import VueAnalytics from 'vue-analytics'
+import VueAnalytics from 'vue-analytics';
 
 export default ({ app, router, Vue }) => {
   Vue.use(VueAnalytics, {
@@ -7,4 +7,4 @@ export default ({ app, router, Vue }) => {
     router,
     ignoreRoutes: ['settings'],
   });
-}
+};

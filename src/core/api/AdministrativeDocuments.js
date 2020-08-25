@@ -1,8 +1,11 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async list (params) {
-    const administrativedocuments = await alenviAxios.get(`${process.env.API_HOSTNAME}/administrativedocuments`, { params });
+    const administrativedocuments = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/administrativedocuments`,
+      { params }
+    );
     return administrativedocuments.data.data.administrativeDocuments;
   },
   async create (data) {
@@ -11,4 +14,4 @@ export default {
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/administrativedocuments/${id}`);
   },
-}
+};

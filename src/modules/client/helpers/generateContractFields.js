@@ -24,4 +24,4 @@ export const generateContractFields = (data) => {
     uploadDate: moment().format('DD/MM/YYYY'),
     initialContractStartDate: moment(data.initialContractStartDate).format('DD/MM/YYYY'),
   };
-}
+};

@@ -3,10 +3,10 @@
     <q-card class="full-height" style="width: 80vw">
       <q-card-section class="row justify-between no-wrap title-modal">
         <h5 class="q-ml-md q-mb-xs">{{ props.title }}</h5>
-        <q-icon class="cursor-pointer" name="clear" size="1.5rem"  v-close-popup />
+        <q-icon class="cursor-pointer" name="clear" size="1.5rem" v-close-popup />
       </q-card-section>
       <q-card-section>
-        <div v-show="!props.loading" v-html="props.html" class="modal-padding"></div>
+        <div v-show="!props.loading" v-html="props.html" class="modal-padding" />
       </q-card-section>
       <q-inner-loading :showing="props.loading">
         <q-spinner-facebook size="30px" color="primary" />
@@ -24,7 +24,7 @@ export default {
     title: { type: String, default: '' },
     html: { type: String, default: '' },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>
