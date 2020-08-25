@@ -1,9 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Catalogue" search-placeholder="Rechercher un programme"
-      @updateSearch="updateSearch" :search="searchStr" />
+      @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredPrograms" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @goTo="goToProgramProfile" />
+      @go-to="goToProgramProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un programme"
       @click="programCreationModal = true" :disable="tableLoading" />
 
@@ -24,14 +24,13 @@
 
 <script>
 import { required } from 'vuelidate/lib/validators';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { ON_SITE, E_LEARNING } from '@data/constants';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -48,17 +47,12 @@ export default {
       columns: [
         { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
         {
-          name: 'eLearningStepsCount',
-          label: 'Étapes eLearning',
-          field: 'steps',
-          format: value => this.countStepsByType(E_LEARNING, value),
-          align: 'center',
-        },
-        {
-          name: 'onSiteStepsCount',
-          label: 'Étapes présentielles',
-          field: 'steps',
-          format: value => this.countStepsByType(ON_SITE, value),
+          name: 'subPrograms',
+          label: 'Sous-programmes',
+          field: 'subPrograms',
+          format: value => value.length,
+          sortable: true,
+          sort: (a, b) => b.length - a.length,
           align: 'center',
         },
       ],
@@ -68,14 +62,14 @@ export default {
       newProgram: { name: '' },
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
-    }
+    };
   },
   validations () {
     return {
       newProgram: {
         name: { required },
       },
-    }
+    };
   },
   computed: {
     filteredPrograms () {
@@ -92,11 +86,6 @@ export default {
     },
     goToProgramProfile (row) {
       this.$router.push({ name: 'ni config programs info', params: { programId: row._id } });
-    },
-    countStepsByType (filterType, value) {
-      if (!value) return '';
-      const stepsByType = value.filter(s => s.type === filterType);
-      return stepsByType.length || '0';
     },
     async refreshProgram () {
       try {
@@ -122,7 +111,7 @@ export default {
         await Programs.create({ ...this.newProgram });
 
         this.programCreationModal = false;
-        NotifyPositive('Programme créé.')
+        NotifyPositive('Programme créé.');
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
@@ -132,5 +121,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

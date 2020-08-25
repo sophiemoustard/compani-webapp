@@ -8,4 +8,4 @@ export default {
   async createList (payload) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/finalpay`, payload);
   },
-}
+};

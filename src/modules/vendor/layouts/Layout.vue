@@ -1,7 +1,7 @@
 <template>
   <q-layout view="hhh Lpr lff">
     <q-drawer :mini="isMini" :mini-width="30" :width="250" side="left" :value="drawer" @input="toggleMenu">
-      <q-list  v-if="!isMini" class="no-border sidemenu-alenvi sidemenu-flex">
+      <q-list v-if="!isMini" class="no-border sidemenu-alenvi sidemenu-flex">
         <div class="sidemenu-header">
           <q-item-label header class="justify-center">
             <img :src="companiLogo" alt="Compani logo">
@@ -16,14 +16,14 @@
             </q-expansion-item>
           <q-separator :key="`separator-${route.ref}`" />
         </template>
-        <ni-side-menu-footer :label="userFirstname" :userId="loggedUser._id" :interface-type="interfaceType" />
+        <ni-side-menu-footer :label="userFirstname" :user-id="loggedUser._id" :interface-type="interfaceType" />
       </q-list>
-      <div :class="chevronContainerClasses" >
+      <div :class="chevronContainerClasses">
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
     </q-drawer>
     <q-page-container>
-      <router-view :key="$route.fullPath"/>
+      <router-view :key="$route.fullPath" />
     </q-page-container>
     <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
       <q-btn class="menu-icon" color="primary" round dense @click="toggleMenu(true)" icon="menu" />
@@ -38,7 +38,7 @@ import { sideMenuMixin } from '@mixins/sideMenuMixin';
 import { TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, VENDOR } from '@data/constants';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
-import { menuItemsMixin } from '../mixins/menuItemsMixin'
+import { menuItemsMixin } from '../mixins/menuItemsMixin';
 
 export default {
   components: {
@@ -52,7 +52,7 @@ export default {
   data () {
     return {
       interfaceType: VENDOR,
-    }
+    };
   },
   computed: {
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
@@ -63,7 +63,7 @@ export default {
       return this.vendorRole === TRAINER;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

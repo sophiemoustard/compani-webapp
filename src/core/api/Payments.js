@@ -20,4 +20,4 @@ export default {
     const payment = await alenviAxios.put(`${process.env.API_HOSTNAME}/payments/${id}`, data);
     return payment.data.data.payment;
   },
-}
+};

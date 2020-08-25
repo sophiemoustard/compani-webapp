@@ -14,7 +14,7 @@
               :key="route.name" />
             <q-separator :key="`separator-${route.name}`" />
           </template>
-          <template v-else >
+          <template v-else>
             <q-expansion-item :ref="route.ref" v-model="activeRoutes[route.ref].open" :label="route.label"
               :key="route.ref">
               <ni-menu-item v-for="item of route.children" :name="item.name" :icon="item.icon" :label="item.label"
@@ -23,15 +23,15 @@
           <q-separator :key="`separator-${route.ref}`" />
           </template>
         </template>
-        <ni-side-menu-footer :label="footerLabel" :userId="loggedUser._id" :interface-type="interfaceType"
-          @click="connectToBotMessenger"/>
+        <ni-side-menu-footer :label="footerLabel" :user-id="loggedUser._id" :interface-type="interfaceType"
+          @click="connectToBotMessenger" />
       </q-list>
       <div :class="chevronContainerClasses">
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
       </div>
     </q-drawer>
     <q-page-container>
-      <router-view :key="$route.fullPath"/>
+      <router-view :key="$route.fullPath" />
     </q-page-container>
     <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
       <q-btn class="menu-icon" color="primary" round dense @click="toggleMenu(true)" icon="menu" />
@@ -46,7 +46,7 @@ import { sideMenuMixin } from '@mixins/sideMenuMixin';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
 import MenuItem from '@components/menu/MenuItem';
 import { CLIENT } from '@data/constants';
-import { menuItemsMixin } from '../mixins/menuItemsMixin'
+import { menuItemsMixin } from '../mixins/menuItemsMixin';
 
 export default {
   name: 'ClientLayout',
@@ -58,7 +58,7 @@ export default {
   data () {
     return {
       interfaceType: CLIENT,
-    }
+    };
   },
   mounted () {
     this.collapsibleOpening();
@@ -66,16 +66,16 @@ export default {
   computed: {
     footerLabel () {
       if (this.isCoach || this.isAuxiliary) return this.userFirstname;
-      else return this.loggedUser.identity.lastname;
+      return this.loggedUser.identity.lastname;
     },
   },
   methods: {
     connectToBotMessenger () {
       const token = Cookies.get('alenvi_token');
-      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`
+      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

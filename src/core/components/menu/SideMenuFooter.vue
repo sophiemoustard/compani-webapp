@@ -2,7 +2,7 @@
   <div class="sidemenu-footer">
     <q-item class="full-width">
       <q-item-section v-if="accessBothInterface" class="footer-logo-container" @click.native="switchInterface">
-        <img :src="interfaceLogo" alt="go to other interface" >
+        <img :src="interfaceLogo" alt="go to other interface">
       </q-item-section>
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
@@ -57,10 +57,10 @@ export default {
     },
     interfaceLogo () {
       return this.interfaceType === CLIENT
-        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon' +
-          '/favicon_bordeaux-32x32.png'
-        : 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon' +
-          '/favicon-32x32.png';
+        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon'
+          + '/favicon_bordeaux-32x32.png'
+        : 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon'
+          + '/favicon-32x32.png';
     },
     accessBothInterface () {
       return this.clientRole && this.vendorRole;
@@ -83,11 +83,11 @@ export default {
     switchInterface () {
       if (!this.accessBothInterface) return;
 
-      if (this.interfaceType === CLIENT) this.$router.push({ path: '/ad' }).catch(e => {});
-      else this.$router.push({ path: '/' }).catch(e => {});
+      if (this.interfaceType === CLIENT) this.$router.push({ path: '/ad' }).catch((e) => {});
+      else this.$router.push({ path: '/' }).catch((e) => {});
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

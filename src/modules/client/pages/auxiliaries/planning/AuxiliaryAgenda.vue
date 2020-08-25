@@ -6,31 +6,32 @@
           <template v-if="Object.keys(selectedAuxiliary).length > 0">
             <img :src="getAvatar(selectedAuxiliary)" class="avatar">
             <ni-select :value="selectedAuxiliary._id" :options="auxiliariesOptions" @input="updateAuxiliary" no-error
-              ref="personSelect" behavior="menu" icon="swap_vert" class="person-name-select" data-cy="agenda-search"/>
+              ref="personSelect" behavior="menu" icon="swap_vert" class="person-name-select" data-cy="agenda-search" />
           </template>
         </div>
         <div class="col-xs-12 col-sm-7">
           <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :view-mode="viewMode"
-            :type="AGENDA" @goToNextWeek="goToNextWeek" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-            @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
+            :type="AGENDA" @go-to-next-week="goToNextWeek" @go-to-previous-week="goToPreviousWeek"
+            @go-to-today="goToToday" @go-to-week="goToWeek" @update-view-mode="updateViewMode" />
         </div>
       </div>
-      <agenda :events="filteredEvents" :days="days" :personKey="personKey" @createEvent="openCreationModal"
-        @editEvent="openEditionModal" />
+      <agenda :events="filteredEvents" :days="days" :person-key="personKey" @open-creation-modal="openCreationModal"
+        @open-edition-modal="openEditionModal" />
     </div>
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :newEvent.sync="newEvent" :personKey="personKey"
-      :creationModal="creationModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetCreationForm" @deleteDocument="validateDocumentDeletion"
-      @documentUploaded="documentUploaded" @createEvent="validateCreationEvent" @close="closeCreationModal" />
+    <ni-event-creation-modal :validations="$v.newEvent" :loading="loading" :new-event.sync="newEvent"
+      :person-key="personKey" :creation-modal="creationModal" :internal-hours="internalHours"
+      :active-auxiliaries="activeAuxiliaries" :customers="customers" @reset="resetCreationForm"
+      @delete-document="validateDocumentDeletion" @document-uploaded="documentUploaded"
+      @submit="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
-      :editionModal="editionModal" :internalHours="internalHours" :activeAuxiliaries="activeAuxiliaries"
-      :customers="customers" @resetForm="resetEditionForm" @deleteDocument="validateDocumentDeletion"
-      @documentUploaded="documentUploaded" @updateEvent="updateEvent" @deleteEvent="validateEventDeletion"
-      @deleteEventRepetition="validationDeletionEventRepetition" :personKey="personKey"  @close="closeEditionModal" />
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+      :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
+      :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
+      @document-uploaded="documentUploaded" @submit="updateEvent" @delete-event="validateEventDeletion"
+      @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @close="closeEditionModal" />
   </q-page>
 </template>
 
@@ -128,7 +129,7 @@ export default {
           startDate: this.startOfWeek,
           endDate: this.endOfWeek,
           auxiliary: this.selectedAuxiliary._id,
-        }
+        };
         this.events = await Events.list(params);
       } catch (e) {
         this.events = [];
@@ -137,7 +138,7 @@ export default {
     async getAuxiliaries () {
       try {
         const params = {};
-        const companyId = get(this.loggedUser, 'company._id', null)
+        const companyId = get(this.loggedUser, 'company._id', null);
         if (companyId) params.company = companyId;
         this.auxiliaries = await Users.list(params);
       } catch (e) {
@@ -157,7 +158,9 @@ export default {
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       const selectedDay = this.days[dayIndex];
-      if (!this.canCreateEvent(this.selectedAuxiliary, selectedDay)) return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      if (!this.canCreateEvent(this.selectedAuxiliary, selectedDay)) {
+        return NotifyWarning('Impossible de créer un évènement à cette date à cette auxiliaire.');
+      }
 
       this.newEvent = {
         type: INTERVENTION,
@@ -181,7 +184,7 @@ export default {
       this.creationModal = true;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

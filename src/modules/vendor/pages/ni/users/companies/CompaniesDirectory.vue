@@ -1,9 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire structures" search-placeholder="Rechercher une structure"
-      @updateSearch="updateSearch" :search="searchStr" />
+      @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCompanies" :columns="columns" :loading="tableLoading"
-      :pagination.sync="pagination" @goTo="goToCompanyProfile" />
+      :pagination.sync="pagination" @go-to="goToCompanyProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" :disable="tableLoading" />
 
@@ -27,7 +27,7 @@
 <script>
 import pick from 'lodash/pick';
 import Companies from '@api/Companies';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
@@ -63,12 +63,12 @@ export default {
         type: '',
       },
       modalLoading: false,
-    }
+    };
   },
   validations () {
     return {
       newCompany: pick(this.companyValidation, ['type', 'name']),
-    }
+    };
   },
   async mounted () {
     await this.refreshCompanies();
@@ -110,7 +110,7 @@ export default {
         await Companies.create({ ...this.newCompany });
 
         this.companyCreationModal = false;
-        NotifyPositive('Structure créée.')
+        NotifyPositive('Structure créée.');
         await this.refreshCompanies();
       } catch (e) {
         console.error(e);
@@ -121,5 +121,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

@@ -14,14 +14,14 @@
 <script>
 import { mapState } from 'vuex';
 import { formatIdentity } from '@helpers/utils';
-import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp.vue';
+import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 
 export default {
   components: {
     'profile-follow-up': ProfileFollowUp,
   },
   props: {
-    customerId: { type: String },
+    customerId: { type: String, required: true },
   },
   metaInfo: { title: 'Fiche bénéficiaire' },
   computed: {
@@ -36,5 +36,5 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('customer/resetCustomer');
   },
-}
+};
 </script>

@@ -1,5 +1,6 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="$emit('input', $event)" title="Suppression d'interventions sur une période">
+  <ni-modal :value="value" @hide="hide" @input="input"
+    title="Suppression d'interventions sur une période">
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer" :options="customersOptions"
       required-field @blur="$v.deletedEvents.customer.$touch"
       :error="$v.deletedEvents.customer.$error" />
@@ -7,17 +8,18 @@
       :options="deletetionOptions" inline />
     <template v-if="deletedEvents.inRange">
       <ni-date-input caption="Date de début" v-model="deletedEvents.startDate" type="date" required-field
-        in-modal @blur="$v.deletedEvents.startDate.$touch" :error="$v.deletedEvents.startDate.$error"/>
+        in-modal @blur="$v.deletedEvents.startDate.$touch" :error="$v.deletedEvents.startDate.$error" />
       <ni-date-input caption="Date de fin" v-model="deletedEvents.endDate" type="date" required-field in-modal
-        :min="deletedEvents.startDate" @blur="$v.deletedEvents.endDate.$touch" :error="$v.deletedEvents.endDate.$error"/>
+        :min="deletedEvents.startDate" @blur="$v.deletedEvents.endDate.$touch"
+        :error="$v.deletedEvents.endDate.$error" />
     </template>
     <template v-else>
       <ni-date-input caption="Date d'arrêt des interventions" v-model="deletedEvents.startDate" type="date"
-        required-field in-modal/>
+        required-field in-modal />
     </template>
     <template slot="footer">
-      <q-btn class="modal-btn full-width" color="primary" no-caps label="Supprimer les interventions" @click="validateEventsDeletion"
-        icon-right="clear" />
+      <q-btn class="modal-btn full-width" color="primary" no-caps label="Supprimer les interventions"
+        @click="validateEventsDeletion" icon-right="clear" />
     </template>
   </ni-modal>
 </template>
@@ -31,7 +33,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'DeleteEventsModal',
@@ -50,9 +52,9 @@ export default {
       deletedEvents: {
         customer: { required },
         startDate: { required },
-        endDate: { required: requiredIf((item) => item.inRange) },
+        endDate: { required: requiredIf(item => item.inRange) },
       },
-    }
+    };
   },
   data () {
     return {
@@ -68,6 +70,9 @@ export default {
       this.deletedEvents = { inRange: true };
       this.$v.deletedEvents.$reset();
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
     validateEventsDeletion () {
       this.$q.dialog({
@@ -87,12 +92,13 @@ export default {
         NotifyPositive('Les évènements ont bien étés supprimés');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) NotifyNegative('Vous n\'avez pas le droit de supprimer au moins l\'un des évènements.');
-        else NotifyNegative('Problème lors de la suppression.');
+        if (e.data.statusCode === 409) {
+          NotifyNegative('Vous n\'avez pas le droit de supprimer au moins l\'un des évènements.');
+        } else NotifyNegative('Problème lors de la suppression.');
       }
     },
   },
-}
+};
 
 </script>
 

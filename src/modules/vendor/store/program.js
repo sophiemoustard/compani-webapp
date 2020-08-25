@@ -9,9 +9,9 @@ export default {
     card: null,
   },
   mutations: {
-    SET_PROGRAM: (state, data) => { state.program = !data ? data : Object.assign({}, data); },
-    SET_ACTIVITY: (state, data) => { state.activity = !data ? data : Object.assign({}, data); },
-    SET_CARD: (state, data) => { state.card = !data ? data : Object.assign({}, data); },
+    SET_PROGRAM: (state, data) => { state.program = !data ? data : ({ ...data }); },
+    SET_ACTIVITY: (state, data) => { state.activity = !data ? data : ({ ...data }); },
+    SET_CARD: (state, data) => { state.card = !data ? data : ({ ...data }); },
   },
   actions: {
     fetchProgram: async ({ commit }, params) => {
@@ -36,6 +36,6 @@ export default {
     resetCard: ({ commit }) => { commit('SET_CARD', null); },
   },
   getters: {
-    getCards: (state) => state.activity ? state.activity.cards : [],
+    getCards: state => (state.activity ? state.activity.cards : []),
   },
-}
+};

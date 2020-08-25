@@ -23,10 +23,11 @@
 </template>
 
 <script>
+
 import { mapGetters } from 'vuex';
 import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';
-import { NotifyNegative } from '@components/popup/notify'
+import { NotifyNegative } from '@components/popup/notify';
 import LargeTable from '@components/table/LargeTable';
 
 export default {
@@ -45,7 +46,7 @@ export default {
           name: 'createdTime',
           label: 'Date de création',
           align: 'left',
-          field: row => row.createdTime ? this.$moment(row.createdTime).format('DD/MM/YYYY') : '',
+          field: row => (row.createdTime ? this.$moment(row.createdTime).format('DD/MM/YYYY') : ''),
         },
         { name: 'download', label: '', align: 'left', field: 'webViewLink' },
       ],
@@ -54,7 +55,7 @@ export default {
         sortBy: 'createdTime',
         descending: true,
       },
-    }
+    };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
@@ -76,11 +77,11 @@ export default {
       } catch (e) {
         this.directDebits = [];
         console.error(e);
-        NotifyNegative("Erreur lors de la récupération des prélèvements d'archive.");
+        NotifyNegative('Erreur lors de la récupération des prélèvements d\'archive.');
       } finally {
         this.loading = false;
       }
     },
   },
-}
+};
 </script>

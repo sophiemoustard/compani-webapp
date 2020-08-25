@@ -20,7 +20,7 @@ const routes = [
 
         if (!(await canNavigate())) return logOutAndRedirectToLogin();
 
-        const loggedUser = store.state.main.loggedUser;
+        const { loggedUser } = store.state.main;
         const userVendorRole = store.getters['main/getVendorRole'];
         const userClientRole = store.getters['main/getClientRole'];
         if (!userClientRole && !userVendorRole) return next({ name: 'account client', params: { id: loggedUser._id } });
@@ -381,7 +381,7 @@ const routes = [
         name: 'customers contact',
         component: () => import('src/modules/client/pages/customers/Contact'),
         async beforeEnter (to, from, next) {
-          const loggedUser = store.state.main.loggedUser;
+          const { loggedUser } = store.state.main;
           const customer = await Customers.getById(loggedUser.customers[0]);
           return get(loggedUser, 'company.billingAssistance') || customer.referent
             ? next()

@@ -16,8 +16,7 @@
                     type="a" :href="getLink(props.row)" target="_blank" icon="file_download" />
                   <q-btn v-if="isCoach" flat round small color="primary" icon="delete" class="q-mx-sm"
                     :disable="loading"
-                    @click="validatePayDocumentDeletion(payDocuments[getRowIndex(payDocuments, props.row)])">
-                  </q-btn>
+                    @click="validatePayDocumentDeletion(payDocuments[getRowIndex(payDocuments, props.row)])" />
                 </div>
               </template>
               <template v-else>
@@ -38,9 +37,8 @@
         <template slot="title">
           Ajouter un <span class="text-weight-bold">document</span>
         </template>
-        <ni-document-upload inModal :natureOptions="documentNatureOptions" v-model="newDocument"
-          ref="documentUploadForm" @valid="formValid = $event">
-        </ni-document-upload>
+        <ni-document-upload in-modal :nature-options="documentNatureOptions" v-model="newDocument"
+          ref="documentUploadForm" @valid="formValid = $event" />
         <template slot="footer">
           <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add" color="primary"
             :loading="loading" @click="createDocument" />
@@ -95,7 +93,7 @@ export default {
           label: 'Date',
           align: 'left',
           field: 'date',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'actions',
@@ -156,7 +154,7 @@ export default {
       return form;
     },
     async createDocument () {
-      if (!this.driveFolder) NotifyNegative('Dossier Google Drive manquant.')
+      if (!this.driveFolder) NotifyNegative('Dossier Google Drive manquant.');
       const isValid = await this.$refs.documentUploadForm.validate();
       if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -171,7 +169,7 @@ export default {
         await this.getDocuments();
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de l'envoi du document");
+        NotifyNegative('Erreur lors de l\'envoi du document');
       }
 
       this.loading = false;
@@ -208,7 +206,7 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

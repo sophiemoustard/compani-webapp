@@ -1,7 +1,7 @@
 import capitalize from 'lodash/capitalize';
 import { getLastVersion } from '@helpers/utils';
 import { days } from '@data/days';
-import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants.js';
+import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants';
 
 export const fundingMixin = {
   data () {
@@ -14,7 +14,7 @@ export const fundingMixin = {
           name: 'startDate',
           label: 'Date de début de prise en charge',
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
           field: 'startDate',
         },
         {
@@ -22,7 +22,7 @@ export const fundingMixin = {
           label: 'Tiers payeur',
           align: 'left',
           field: 'thirdPartyPayer',
-          format: (value) => value ? value.name : '',
+          format: value => (value ? value.name : ''),
         },
         {
           name: 'nature',
@@ -30,7 +30,7 @@ export const fundingMixin = {
           align: 'left',
           format: (value) => {
             const nature = NATURE_OPTIONS.find(option => option.value === value);
-            return nature ? capitalize(nature.label) : ''
+            return nature ? capitalize(nature.label) : '';
           },
           field: 'nature',
         },
@@ -44,56 +44,56 @@ export const fundingMixin = {
           name: 'endDate',
           label: 'Date de fin de prise en charge',
           align: 'left',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : '∞'),
           field: 'endDate',
         },
         {
           name: 'frequency',
           label: 'Fréquence',
           align: 'left',
-          format: (value) => this.frequencyFormat(value),
+          format: value => this.frequencyFormat(value),
           field: 'frequency',
         },
         {
           name: 'amountTTC',
           label: 'Montant forfaitaire TTC',
           align: 'left',
-          format: (value) => value ? `${value}€` : '',
+          format: value => (value ? `${value}€` : ''),
           field: 'amountTTC',
         },
         {
           name: 'unitTTCRate',
           label: 'Prix unitaire TTC',
           align: 'left',
-          format: (value) => value ? `${value}€` : '',
+          format: value => (value ? `${value}€` : ''),
           field: 'unitTTCRate',
         },
         {
           name: 'careHours',
           label: 'Nb. heures de prise en charge',
           align: 'left',
-          format: (value) => value ? `${value}h` : '',
+          format: value => (value ? `${value}h` : ''),
           field: 'careHours',
         },
         {
           name: 'customerParticipationRate',
           label: 'Tx. participation bénéficiaire',
           align: 'left',
-          format: (value) => value ? `${value}%` : '0%',
+          format: value => (value ? `${value}%` : '0%'),
           field: 'customerParticipationRate',
         },
         {
           name: 'careDays',
           label: 'Jours de prise en charge',
           align: 'left',
-          format: (value) => value && value.length > 0 ? value.map(day => days[day]).join(', ') : '',
+          format: value => (value && value.length > 0 ? value.map(day => days[day]).join(', ') : ''),
           field: 'careDays',
         },
         {
           name: 'subscription',
           label: 'Souscription',
           align: 'left',
-          format: (value) => value ? value.service.name : '',
+          format: value => (value ? value.service.name : ''),
           field: 'subscription',
         },
         {
@@ -109,7 +109,7 @@ export const fundingMixin = {
           field: '_id',
         },
       ],
-    }
+    };
   },
   methods: {
     refreshFundings ({ fundings }) {
@@ -134,7 +134,7 @@ export const fundingMixin = {
     },
     frequencyFormat (value) {
       const freq = FUNDING_FREQ_OPTIONS.find(option => option.value === value);
-      return freq ? capitalize(freq.label) : ''
+      return freq ? capitalize(freq.label) : '';
     },
   },
 };

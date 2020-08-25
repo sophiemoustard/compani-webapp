@@ -1,7 +1,7 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Customers from '@api/Customers';
-import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify.js';
+import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
 
 export const customerMixin = {
@@ -41,7 +41,7 @@ export const customerMixin = {
         this.$store.dispatch('customer/setCustomer', this.customer);
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message)
+        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;

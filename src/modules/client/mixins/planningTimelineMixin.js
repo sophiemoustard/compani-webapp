@@ -36,8 +36,11 @@ export const planningTimelineMixin = {
     },
     timelineTitle () {
       if (this.startOfWeek === '') return '';
-      if (this.$moment(this.startOfWeek).month() === this.$moment(this.endOfWeek).month()) return this.$moment(this.startOfWeek).format('MMMM YYYY');
-      return `${this.$moment(this.startOfWeek).format('MMM')} - ${this.$moment(this.endOfWeek).format('MMM YYYY')}`
+      if (this.$moment(this.startOfWeek).month() === this.$moment(this.endOfWeek).month()) {
+        return this.$moment(this.startOfWeek).format('MMMM YYYY');
+      }
+
+      return `${this.$moment(this.startOfWeek).format('MMM')} - ${this.$moment(this.endOfWeek).format('MMM YYYY')}`;
     },
     goToNextWeek () {
       const gapDays = this.isThreeDaysView ? 3 : 7;
@@ -50,11 +53,15 @@ export const planningTimelineMixin = {
       this.updateTimeline();
     },
     goToToday () {
-      this.startOfWeek = this.isThreeDaysView ? this.$moment().toISOString() : this.$moment().startOf('week').toISOString();
+      this.startOfWeek = this.isThreeDaysView
+        ? this.$moment().toISOString()
+        : this.$moment().startOf('week').toISOString();
       this.updateTimeline();
     },
     goToWeek (value) {
-      this.startOfWeek = this.isThreeDaysView ? this.$moment(value).toISOString() : this.$moment(value).startOf('week').toISOString();
+      this.startOfWeek = this.isThreeDaysView
+        ? this.$moment(value).toISOString()
+        : this.$moment(value).startOf('week').toISOString();
       this.updateTimeline();
       this.datimeModal = false;
     },

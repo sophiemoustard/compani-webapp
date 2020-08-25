@@ -1,4 +1,4 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async list (params) {
@@ -9,4 +9,4 @@ export default {
       console.error(e);
     }
   },
-}
+};

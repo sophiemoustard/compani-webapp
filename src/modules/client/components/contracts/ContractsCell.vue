@@ -4,16 +4,16 @@
       <q-card-section class="cell-title" :style="{ color: cellTitle(contract.endDate).color }">
         {{ cellTitle(contract.endDate).msg }}
       </q-card-section>
-      <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name" :loading="contractsLoading"
-        :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
-        <template v-slot:body="{ props }" >
+      <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name"
+        :loading="contractsLoading" :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
+        <template v-slot:body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'contractEmpty'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract, contractIndex)" icon="file_download"
-                    :disable="!canDownload(props.row, contractIndex)" />
+                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract, contractIndex)"
+                    icon="file_download" :disable="!canDownload(props.row, contractIndex)" />
                 </div>
               </template>
               <template v-if="col.name === 'contractSigned'">
@@ -71,7 +71,7 @@
           <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="esignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
-          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal"></iframe>
+          <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />
         </q-card-section>
       </q-card>
     </q-dialog>
@@ -82,14 +82,14 @@
 import { Cookies } from 'quasar';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
-import esign from '@api/Esign.js';
-import { NotifyNegative } from '@components/popup/notify.js';
+import esign from '@api/Esign';
+import { NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { COACH, CUSTOMER, AUXILIARY } from '@data/constants.js';
+import { COACH, CUSTOMER, AUXILIARY } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
-import { tableMixin } from 'src/modules/client/mixins/tableMixin.js';
+import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ContractsCell',
@@ -119,14 +119,14 @@ export default {
           label: 'Date d\'effet',
           align: 'left',
           field: 'startDate',
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'endDate',
           label: 'Date de fin',
           align: 'left',
           field: 'endDate',
-          format: (value) => value ? this.$moment(value).format('DD/MM/YYYY') : '∞',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : '∞'),
         },
         { name: 'grossHourlyRate', label: 'Taux horaire', align: 'center', field: 'grossHourlyRate' },
         { name: 'contractEmpty', label: 'Word', align: 'center', field: 'contractEmpty' },
@@ -134,17 +134,17 @@ export default {
           name: 'contractSigned',
           label: 'Contrat / Avenant',
           align: 'center',
-          field: (val) => val.signature ? val.signature.eversignId : '',
+          field: val => (val.signature ? val.signature.eversignId : ''),
         },
         { name: 'archives', label: 'Archives', align: 'center', field: 'auxiliaryArchives' },
         { name: 'actions', align: 'center', field: '_id' },
       ],
       extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
-    }
+    };
   },
   computed: {
     sortedContracts () {
-      const contracts = this.contracts;
+      const { contracts } = this;
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
     headers () {
@@ -159,13 +159,12 @@ export default {
         return {
           msg: `Le contrat se termine le ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
           color: 'orange',
-        }
-      } else {
-        return {
-          msg: `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
-          color: 'red',
-        }
+        };
       }
+      return {
+        msg: `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
+        color: 'red',
+      };
     },
     failMsg () {
       NotifyNegative('Echec de l\'envoi du document.');
@@ -185,22 +184,22 @@ export default {
       return this.columns;
     },
     openVersionCreation (contract) {
-      this.$emit('openVersionCreation', contract);
+      this.$emit('open-version-creation', contract);
     },
     openVersionEdition (contract, version) {
-      this.$emit('openVersionEdition', { contract, version });
+      this.$emit('open-version-edition', { contract, version });
     },
     deleteVersion (contractId, versionId) {
-      this.$emit('deleteVersion', { contractId, versionId });
+      this.$emit('delete-version', { contractId, versionId });
     },
     openEndContract (contract) {
-      this.$emit('openEndContract', contract);
+      this.$emit('open-end-contract', contract);
     },
     refresh () {
       this.$emit('refresh');
     },
     refreshWithTimeout () {
-      this.$emit('refreshWithTimeout');
+      this.$emit('refresh-with-timeout');
     },
     getArchiveLink (archive) {
       return archive.link || false;
@@ -223,8 +222,14 @@ export default {
     },
     async dlTemplate (contractVersion, parentContract, contractIndex) {
       try {
-        const data = generateContractFields({ user: this.user, contract: contractVersion, initialContractStartDate: parentContract.startDate });
-        if (!this.canDownload(contractVersion, contractIndex)) return NotifyNegative('Impossible de télécharger le contrat.');
+        const data = generateContractFields({
+          user: this.user,
+          contract: contractVersion,
+          initialContractStartDate: parentContract.startDate,
+        });
+        if (!this.canDownload(contractVersion, contractIndex)) {
+          return NotifyNegative('Impossible de télécharger le contrat.');
+        }
 
         const versionIndex = this.getRowIndex(this.sortedContracts[contractIndex].versions, contractVersion);
         const params = {
@@ -276,7 +281,7 @@ export default {
   filters: {
     formatIdentity,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

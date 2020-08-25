@@ -10,7 +10,7 @@ import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { frAddress } from '@helpers/vuelidateCustomVal.js';
+import { frAddress } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import {
   INTERNAL_HOUR,
@@ -25,7 +25,7 @@ import {
   OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
@@ -38,14 +38,19 @@ export const planningActionMixin = {
         type: { required },
         dates: {
           startDate: { required },
-          endDate: { required: requiredIf(() => this.newEvent && (this.newEvent.type !== ABSENCE || this.newEvent.absenceNature === DAILY)) },
+          endDate: {
+            required: requiredIf(() => this.newEvent &&
+              (this.newEvent.type !== ABSENCE || this.newEvent.absenceNature === DAILY)),
+          },
         },
-        auxiliary: { required: requiredIf((item) => item && (item.type !== INTERVENTION || this.personKey === CUSTOMER)) },
-        customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item && item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item && item.type === ABSENCE) },
+        auxiliary: {
+          required: requiredIf(item => item && (item.type !== INTERVENTION || this.personKey === CUSTOMER)),
+        },
+        customer: { required: requiredIf(item => item && item.type === INTERVENTION) },
+        subscription: { required: requiredIf(item => item && item.type === INTERVENTION) },
+        internalHour: { required: requiredIf(item => item && item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf(item => item && item.type === ABSENCE) },
+        absenceNature: { required: requiredIf(item => item && item.type === ABSENCE) },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
@@ -56,8 +61,14 @@ export const planningActionMixin = {
           frequency: { required: requiredIf(() => this.newEvent && this.newEvent.type !== ABSENCE) },
         },
         attachment: {
-          driveId: { required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)) },
-          link: { required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)) },
+          driveId: {
+            required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE &&
+              [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)),
+          },
+          link: {
+            required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE &&
+            [ILLNESS, WORK_ACCIDENT].includes(this.newEvent.absence)),
+          },
         },
         misc: { required: requiredIf(item => item && item.type === ABSENCE && item.absence === OTHER) },
       },
@@ -66,13 +77,13 @@ export const planningActionMixin = {
           startDate: { required },
           endDate: { required },
         },
-        auxiliary: { required: requiredIf((item) => item && item.type !== INTERVENTION) },
-        sector: { required: requiredIf((item) => item && !item.auxiliary) },
-        customer: { required: requiredIf((item) => item && item.type === INTERVENTION) },
-        subscription: { required: requiredIf((item) => item && item.type === INTERVENTION) },
-        internalHour: { required: requiredIf((item) => item && item.type === INTERNAL_HOUR) },
-        absence: { required: requiredIf((item) => item && item.type === ABSENCE) },
-        absenceNature: { required: requiredIf((item) => item && item.type === ABSENCE) },
+        auxiliary: { required: requiredIf(item => item && item.type !== INTERVENTION) },
+        sector: { required: requiredIf(item => item && !item.auxiliary) },
+        customer: { required: requiredIf(item => item && item.type === INTERVENTION) },
+        subscription: { required: requiredIf(item => item && item.type === INTERVENTION) },
+        internalHour: { required: requiredIf(item => item && item.type === INTERNAL_HOUR) },
+        absence: { required: requiredIf(item => item && item.type === ABSENCE) },
+        absenceNature: { required: requiredIf(item => item && item.type === ABSENCE) },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
@@ -80,22 +91,35 @@ export const planningActionMixin = {
           fullAddress: this.editedEvent && this.editedEvent.type === INTERNAL_HOUR ? { frAddress } : {},
         },
         attachment: {
-          driveId: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)) },
-          link: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE && [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)) },
+          driveId: {
+            required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE &&
+              [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)),
+          },
+          link: {
+            required: requiredIf(() => this.editedEvent && this.editedEvent.type === ABSENCE &&
+              [ILLNESS, WORK_ACCIDENT].includes(this.editedEvent.absence)),
+          },
         },
         cancel: {
-          condition: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION && this.editedEvent.isCancelled) },
-          reason: { required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION && this.editedEvent.isCancelled) },
+          condition: {
+            required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION &&
+              this.editedEvent.isCancelled),
+          },
+          reason: {
+            required: requiredIf(() => this.editedEvent && this.editedEvent.type === INTERVENTION &&
+              this.editedEvent.isCancelled),
+          },
         },
         misc: {
-          required: requiredIf((item) => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
+          required: requiredIf(item => item && ((item.type === ABSENCE && item.absence === OTHER) || item.isCancelled)),
         },
       },
     };
   },
   methods: {
     addSavedTerms (endPath) {
-      if (this.$q.localStorage.has(`lastSearch${endPath}`) && this.$q.localStorage.getItem(`lastSearch${endPath}`).length > 0) {
+      if (this.$q.localStorage.has(`lastSearch${endPath}`) &&
+        this.$q.localStorage.getItem(`lastSearch${endPath}`).length > 0) {
         const lastSearch = JSON.parse(this.$q.localStorage.getItem(`lastSearch${endPath}`));
         if (this.$refs.planningManager) this.$refs.planningManager.restoreFilter(lastSearch);
       }
@@ -111,10 +135,8 @@ export const planningActionMixin = {
     hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
-      return auxiliary.contracts.some(contract => {
-        return this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate));
-      });
+      return auxiliary.contracts.some(contract => this.$moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate)));
     },
     getRowEvents (rowId) {
       const rowEvents = this.events.find(group => group._id === rowId);
@@ -155,11 +177,13 @@ export const planningActionMixin = {
         ...pick(event, ['isCancelled']), // pickBy removes isCancelled: false
         startDate: event.dates.startDate,
         endDate: event.dates.endDate,
-      }
+      };
 
       if (event.auxiliary) delete payload.sector;
 
-      if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
+      if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) {
+        payload.attachment = {};
+      }
 
       return payload;
     },
@@ -167,7 +191,9 @@ export const planningActionMixin = {
       const payload = this.getPayload(event);
 
       if (event.address && !event.address.fullAddress) delete payload.address;
-      if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) payload.attachment = {};
+      if (event.type === ABSENCE && event.absence !== ILLNESS && event.absence !== WORK_ACCIDENT) {
+        payload.attachment = {};
+      }
 
       return payload;
     },
@@ -184,11 +210,12 @@ export const planningActionMixin = {
     hasConflicts (scheduledEvent, eventType) {
       if (!scheduledEvent.auxiliary || scheduledEvent.isCancelled) return false;
 
+      const { startDate, endDate, auxiliary } = scheduledEvent;
       const auxiliaryEvents = eventType !== ABSENCE
-        ? this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate)
-        : this.getAuxiliaryEventsBetweenDates(scheduledEvent.auxiliary, scheduledEvent.startDate, scheduledEvent.endDate, ABSENCE);
+        ? this.getAuxiliaryEventsBetweenDates(auxiliary, startDate, endDate)
+        : this.getAuxiliaryEventsBetweenDates(auxiliary, startDate, endDate, ABSENCE);
 
-      return auxiliaryEvents.some(ev => {
+      return auxiliaryEvents.some((ev) => {
         if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
         return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
           this.$moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
@@ -196,18 +223,17 @@ export const planningActionMixin = {
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate, type) {
       return this.getRowEvents(auxiliaryId)
-        .filter(event => {
-          return (this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
+        .filter(event => (this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
             this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')) &&
-            (!type || type === event.type)
-        });
+            (!type || type === event.type));
     },
     async createEvent () {
       try {
         this.loading = true;
         const payload = this.getCreationPayload(this.newEvent);
         if (!this.isCreationAllowed(payload)) {
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible de créer l\'évènement : '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await Events.create(payload);
@@ -217,19 +243,24 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 409) return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+        if (e.data && e.data.statusCode === 409) {
+          return NotifyNegative('Impossible de créer l\'évènement : '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+        }
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       } finally {
         this.loading = false;
       }
     },
     getMessageForInternalOrUnavailability (type) {
-      return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. Es-tu sûr(e) de vouloir créer cette répétition ?`;
+      return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. `
+        + 'Es-tu sûr(e) de vouloir créer cette répétition ?';
     },
     getConfirmationMessage () {
       switch (this.newEvent.type) {
         case INTERVENTION:
-          return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?';
+          return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en '
+          + 'à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?';
         case INTERNAL_HOUR:
           return this.getMessageForInternalOrUnavailability('heures internes');
         case UNAVAILABILITY:
@@ -247,7 +278,8 @@ export const planningActionMixin = {
         if (this.newEvent.type === ABSENCE) {
           this.$q.dialog({
             title: 'Confirmation',
-            message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
+            message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes '
+            + 'et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
             ok: 'OK',
             cancel: 'Annuler',
           })
@@ -267,7 +299,10 @@ export const planningActionMixin = {
         }
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 409) return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+        if (e.data && e.data.statusCode === 409) {
+          return NotifyNegative('Impossible de créer l\'évènement : '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+        }
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       }
     },
@@ -299,7 +334,6 @@ export const planningActionMixin = {
 
       switch (event.type) {
         case INTERVENTION: {
-          const subscription = event.subscription._id;
           this.editedEvent = {
             isCancelled: false,
             cancel: {},
@@ -309,7 +343,7 @@ export const planningActionMixin = {
             sector: sector || auxiliary.sector._id,
             auxiliary: auxiliary ? auxiliary._id : '',
             customer: customer ? customer._id : '',
-            subscription,
+            subscription: subscription._id,
             isBilled,
             address,
           };
@@ -375,7 +409,8 @@ export const planningActionMixin = {
 
         if (!this.isEditionAllowed(payload, this.editedEvent.type)) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible de modifier l\'évènement : '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
         delete payload._id;
         await Events.updateById(this.editedEvent._id, payload);
@@ -384,10 +419,11 @@ export const planningActionMixin = {
         this.editionModal = false;
         NotifyPositive('Évènement modifié.');
       } catch (e) {
-        console.error(e)
+        console.error(e);
         if (e.data && e.data.statusCode === 409) {
           this.$v.editedEvent.$reset();
-          return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible de créer l\'évènement :  '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       } finally {
@@ -400,7 +436,8 @@ export const planningActionMixin = {
         startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
           .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
         endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-          .minutes(this.$moment(draggedObject.endDate).minutes()).toISOString(),
+          .minutes(this.$moment(draggedObject.endDate).minutes())
+          .toISOString(),
       };
 
       if (target.type === SECTOR) payload.sector = target._id;
@@ -421,16 +458,18 @@ export const planningActionMixin = {
 
         if (this.personKey === CUSTOMER && target._id !== draggedObject.customer._id) {
           return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention.');
-        } else {
-          if (target.type === SECTOR && draggedObject.type !== INTERVENTION) return NotifyNegative('Cette modification n\'est pas autorisée.');
-          if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
-            return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
-          }
+        }
+        if (target.type === SECTOR && draggedObject.type !== INTERVENTION) {
+          return NotifyNegative('Cette modification n\'est pas autorisée.');
+        }
+        if ([ABSENCE, UNAVAILABILITY].includes(draggedObject.type) && draggedObject.auxiliary._id !== target._id) {
+          return NotifyNegative('Impossible de modifier l\'auxiliaire de cet évènement.');
         }
 
         const payload = this.getDragAndDropPayload(toDay, target, draggedObject);
         if (!this.isEditionAllowed(payload, draggedObject.type)) {
-          return NotifyNegative('Impossible de modifier l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible de modifier l\'évènement :  '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
 
         await Events.updateById(draggedObject._id, payload);
@@ -438,7 +477,10 @@ export const planningActionMixin = {
 
         NotifyPositive('Évènement modifié.');
       } catch (e) {
-        if (e.data && e.data.statusCode === 409) return NotifyNegative('Impossible de créer l\'évènement : il est en conflit avec les évènements de l\'auxiliaire.');
+        if (e.data && e.data.statusCode === 409) {
+          return NotifyNegative('Impossible de créer l\'évènement :  '
+            + 'il est en conflit avec les évènements de l\'auxiliaire.');
+        }
         NotifyNegative('Erreur lors de la création de l\'évènement.');
       }
     },
@@ -483,7 +525,7 @@ export const planningActionMixin = {
     },
     async deleteEvent () {
       try {
-        this.loading = true
+        this.loading = true;
         await Events.deleteById(this.editedEvent._id);
 
         await this.refresh();
@@ -493,7 +535,7 @@ export const planningActionMixin = {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
     async deleteEventRepetition (shouldDeleteRepetition) {

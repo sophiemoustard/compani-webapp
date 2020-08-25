@@ -13,7 +13,9 @@
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
           v-model="selectedProgram" />
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters"><span>Effacer les filtres</span></div>
+      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
+        <span>Effacer les filtres</span>
+      </div>
     </div>
 
     <ni-trello :courses="coursesFiltered" />
@@ -21,37 +23,22 @@
       @click="courseCreationModal = true" />
 
     <!-- Course creation modal -->
-    <ni-modal v-model="courseCreationModal" @hide="resetCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">formation</span>
-      </template>
-      <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="$v.newCourse.type.$error"
-        caption="Type" required-field inline @input="updateCourseCompany" />
-      <ni-select in-modal v-model.trim="newCourse.program" :error="$v.newCourse.program.$error"
-        @blur="$v.newCourse.program.$touch" required-field caption="Programme" :options="programOptions" />
-      <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="$v.newCourse.company.$error"
-        @blur="$v.newCourse.company.$touch" required-field caption="Structure" :options="companyOptions" />
-      <ni-input in-modal v-model.trim="newCourse.misc" caption="Informations Complémentaires" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createCourse" />
-      </template>
-    </ni-modal>
+    <course-creation-modal v-model="courseCreationModal" :new-course="newCourse" :is-intra-course="isIntraCourse"
+      :programs="programs" :company-options="companyOptions" :validations="$v.newCourse" :loading="modalLoading"
+      @hide="resetCreationModal" @submit="createCourse" @update="updateCourseCompany" />
   </q-page>
 </template>
 
 <script>
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
-import pickBy from 'lodash/pickBy';
+import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
 import TitleHeader from '@components/TitleHeader';
-import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import Modal from '@components/modal/Modal';
-import OptionGroup from '@components/form/OptionGroup';
+import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
@@ -63,10 +50,8 @@ export default {
   mixins: [courseFiltersMixin],
   components: {
     'ni-title-header': TitleHeader,
-    'ni-input': Input,
     'ni-select': Select,
-    'ni-modal': Modal,
-    'ni-option-group': OptionGroup,
+    'course-creation-modal': CourseCreationModal,
     'ni-trello': Trello,
   },
   data () {
@@ -74,23 +59,26 @@ export default {
       modalLoading: false,
       newCourse: {
         program: '',
+        subProgram: '',
         company: '',
         misc: '',
         type: INTRA,
       },
+      programs: [],
       courseCreationModal: false,
       coursesWithGroupedSlot: [],
       courseTypes: COURSE_TYPES,
-    }
+    };
   },
   validations () {
     return {
       newCourse: {
         program: { required },
-        company: { required: requiredIf((item) => { return item.type === INTRA; }) },
+        subProgram: { required },
+        company: { required: requiredIf(item => item.type === INTRA) },
         type: { required },
       },
-    }
+    };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
@@ -113,13 +101,10 @@ export default {
     },
     async refreshPrograms () {
       try {
-        const programs = await Programs.list();
-        this.programOptions = programs
-          .map(p => ({ label: p.name, value: p._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        this.programs = await Programs.list();
       } catch (e) {
         console.error(e);
-        this.programOptions = [];
+        this.programs = [];
       }
     },
     async refreshCompanies () {
@@ -138,7 +123,7 @@ export default {
     },
     resetCreationModal () {
       this.$v.newCourse.$reset();
-      this.newCourse = { program: '', company: '', name: '', type: INTRA };
+      this.newCourse = { program: '', company: '', misc: '', type: INTRA };
     },
     async createCourse () {
       try {
@@ -146,10 +131,10 @@ export default {
         if (this.$v.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
-        await Courses.create(pickBy(this.newCourse));
+        await Courses.create(omit(this.newCourse, 'program'));
 
         this.courseCreationModal = false;
-        NotifyPositive('Formation créée.')
+        NotifyPositive('Formation créée.');
         await this.refreshCourses();
       } catch (e) {
         console.error(e);
@@ -159,5 +144,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

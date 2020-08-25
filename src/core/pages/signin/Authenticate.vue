@@ -42,7 +42,8 @@ export default {
     title: 'Connexion',
     meta: [{
       name: 'description',
-      content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées par Alenvi.',
+      content: 'Espace personnalisé pour accéder à vos documents et informations liés aux interventions réalisées '
+        + 'par Alenvi.',
     }],
   },
   name: 'Authentication',
@@ -54,7 +55,7 @@ export default {
   data () {
     return {
       credentials: { email: '', password: '' },
-    }
+    };
   },
   computed: {
     isAuxiliary () {
@@ -74,7 +75,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

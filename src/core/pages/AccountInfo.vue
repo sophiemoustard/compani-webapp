@@ -82,13 +82,15 @@ import Input from '@components/form/Input';
 import HtmlModal from '@components/modal/HtmlModal';
 import Modal from '@components/modal/Modal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import PictureUploader from '@components/PictureUploader.vue';
+import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { passwordMixin } from '@mixins/passwordMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
+// eslint-disable-next-line import/extensions
 import rgpd from 'src/statics/rgpd.html';
+// eslint-disable-next-line import/extensions
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {
@@ -114,7 +116,7 @@ export default {
       cguCompani,
       backgroundClass: /\/ad\//.test(this.$router.currentRoute.path) ? 'vendor-background' : 'client-background',
       isLoggingOut: false,
-    }
+    };
   },
   validations () {
     return {
@@ -132,10 +134,10 @@ export default {
         },
       },
       passwordConfirm: {
-        required: requiredIf((item) => !!item.userProfile.local.password),
-        sameAsPassword: sameAs((item) => item.userProfile.local.password),
+        required: requiredIf(item => !!item.userProfile.local.password),
+        sameAsPassword: sameAs(item => item.userProfile.local.password),
       },
-    }
+    };
   },
   async beforeDestroy () {
     if (this.isLoggingOut) this.$store.dispatch('main/resetMain');
@@ -196,7 +198,7 @@ export default {
       logOutAndRedirectToLogin();
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

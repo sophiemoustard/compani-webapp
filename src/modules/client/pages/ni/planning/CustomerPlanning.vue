@@ -1,19 +1,20 @@
 <template>
   <q-page class="client-background">
-    <ni-planning-manager :events="events" :persons="customers" :personKey="personKey" :can-edit="canEditEvent"
-      @updateStartOfWeek="updateStartOfWeek" @editEvent="openEditionModal" @createEvent="openCreationModal"
-      @onDrop="updateEventOnDrop" ref="planningManager" :filters="filters" @refresh="refresh" />
+    <ni-planning-manager :events="events" :persons="customers" :person-key="personKey" :can-edit="canEditEvent"
+      @update-start-of-week="updateStartOfWeek" @open-edition-modal="openEditionModal" ref="planningManager"
+      @open-creation-modal="openCreationModal" @on-drop="updateEventOnDrop" :filters="filters"
+      @refresh="refresh" />
 
     <!-- Event creation modal -->
-    <ni-event-creation-modal :validations="$v.newEvent"  :newEvent.sync="newEvent" :personKey="personKey"
-      :creationModal="creationModal" :activeAuxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
-      @resetForm="resetCreationForm" @createEvent="validateCreationEvent" @close="closeCreationModal" />
+    <ni-event-creation-modal :validations="$v.newEvent" :new-event.sync="newEvent" :person-key="personKey"
+      :creation-modal="creationModal" :active-auxiliaries="activeAuxiliaries" :loading="loading" :customers="customers"
+      @reset="resetCreationForm" @submit="validateCreationEvent" @close="closeCreationModal" />
 
     <!-- Event edition modal -->
-    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :editedEvent.sync="editedEvent"
-      :editionModal="editionModal" :activeAuxiliaries="activeAuxiliaries" :customers="customers" :personKey="personKey"
-      @resetForm="resetEditionForm" @updateEvent="updateEvent" @close="closeEditionModal"
-      @deleteEventRepetition="validationDeletionEventRepetition" @deleteEvent="validateEventDeletion" />
+    <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
+      :edition-modal="editionModal" :active-auxiliaries="activeAuxiliaries" :customers="customers"
+      @reset="resetEditionForm" @submit="updateEvent" @close="closeEditionModal" :person-key="personKey"
+      @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion" />
   </q-page>
 </template>
 
@@ -23,7 +24,7 @@ import get from 'lodash/get';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
-import { NotifyNegative } from '@components/popup/notify.js';
+import { NotifyNegative } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
 import {
   INTERVENTION,
@@ -36,7 +37,7 @@ import {
   COACH_ROLES,
 } from '@data/constants';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
-import Planning from 'src/modules/client/components/planning/Planning.vue';
+import Planning from 'src/modules/client/components/planning/Planning';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 
@@ -136,7 +137,7 @@ export default {
       try {
         this.sectorCustomers = await this.getSectorCustomers(this.filteredSectors);
       } catch (e) {
-        this.sectorCustomers = []
+        this.sectorCustomers = [];
       }
 
       for (let i = 0, l = this.sectorCustomers.length; i < l; i++) {
@@ -235,5 +236,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

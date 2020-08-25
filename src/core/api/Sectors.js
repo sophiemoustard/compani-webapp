@@ -16,4 +16,4 @@ export default {
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/sectors/${id}`);
   },
-}
+};

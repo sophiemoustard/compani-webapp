@@ -5,6 +5,7 @@ import {
   bic,
   apeCode,
   rcs,
+  validTradeName,
 } from '@helpers/vuelidateCustomVal';
 import { COMPANY, ASSOCIATION, REQUIRED_LABEL } from '@data/constants';
 
@@ -15,7 +16,7 @@ export const companyMixin = {
         apeCode: { required, apeCode },
         ics: { required },
         name: { required },
-        tradeName: { maxLength: maxLength(11) },
+        tradeName: { validTradeName },
         type: { required },
         rcs: {
           required: requiredIf(item => item.type === COMPANY),
@@ -53,19 +54,19 @@ export const companyMixin = {
     },
     ibanError () {
       if (!this.$v.company.iban.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.iban.iban) return 'IBAN non valide';
+      if (!this.$v.company.iban.iban) return 'IBAN non valide';
 
       return '';
     },
     bicError () {
       if (!this.$v.company.bic.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.bic.bic) return 'BIC non valide';
+      if (!this.$v.company.bic.bic) return 'BIC non valide';
 
       return '';
     },
     rcsError () {
       if (!this.$v.company.rcs.required) return REQUIRED_LABEL;
-      else if (!this.$v.company.rcs.maxLength || !this.$v.company.rcs.minLength) {
+      if (!this.$v.company.rcs.maxLength || !this.$v.company.rcs.minLength) {
         return 'Doit contenir 9 caractères (espaces inclus).';
       }
 
@@ -78,9 +79,11 @@ export const companyMixin = {
   },
   methods: {
     tradeNameError (validation) {
-      if (!validation.tradeName.maxLength) return 'Doit contenir 11 caractères maximum (espaces inclus).';
+      if (!validation.tradeName.validTradeName) {
+        return 'Doit contenir maximum 11 caractères, uniquement alphanumériques.';
+      }
 
       return '';
     },
   },
-}
+};

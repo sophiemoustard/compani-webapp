@@ -11,7 +11,7 @@ export const courseFiltersMixin = {
       selectedProgram: '',
       selectedTrainer: '',
       selectedCompany: '',
-    }
+    };
   },
   computed: {
     coursesFiltered () {
@@ -57,7 +57,7 @@ export const courseFiltersMixin = {
     },
     programFilterOptions () {
       const programs = this.coursesWithGroupedSlot
-        .map(course => ({ label: course.program.name, value: course.program._id }))
+        .map(course => ({ label: course.subProgram.program.name, value: course.subProgram.program._id }))
         .sort((a, b) => a.label.localeCompare(b.label));
 
       return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
@@ -70,27 +70,25 @@ export const courseFiltersMixin = {
       this.selectedProgram = '';
     },
     filterCoursesByProgram (courses) {
-      return courses.filter(course => course.program._id === this.selectedProgram);
+      return courses.filter(course => course.subProgram.program._id === this.selectedProgram);
     },
     filterCoursesByTrainer (courses) {
-      return courses.filter(course => course.trainer
+      return courses.filter(course => (course.trainer
         ? course.trainer._id === this.selectedTrainer
-        : this.selectedTrainer === 'without_trainer');
+        : this.selectedTrainer === 'without_trainer'));
     },
     filterCoursesByCompany (courses) {
       return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
       (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
     },
     groupByCourses (courses) {
-      return courses.map((course) => {
-        return {
-          ...course,
-          slots: course.slots.length
-            ? Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')))
-            : [],
-          slotsToPlan: course.slotsToPlan || [],
-        }
-      });
+      return courses.map(course => ({
+        ...course,
+        slots: course.slots.length
+          ? Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')))
+          : [],
+        slotsToPlan: course.slotsToPlan || [],
+      }));
     },
   },
-}
+};

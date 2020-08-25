@@ -1,6 +1,6 @@
 import { Cookies } from 'quasar';
 import { alenviAxios } from '@api/ressources/alenviAxios';
-import axios from 'axios'
+import axios from 'axios';
 
 export default {
   async list (params) {
@@ -36,9 +36,11 @@ export default {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees/${traineeId}`);
   },
   downloadAttendanceSheet (courseId) {
-    return `${process.env.API_HOSTNAME}/courses/${courseId}/attendance-sheets?x-access-token=${Cookies.get('alenvi_token')}`;
+    return `${process.env.API_HOSTNAME}/courses/${courseId}/attendance-sheets?x-access-token=`
+      + `${Cookies.get('alenvi_token')}`;
   },
   downloadCompletionCertificates (courseId) {
-    return `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates?x-access-token=${Cookies.get('alenvi_token')}`;
+    return `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates?x-access-token=`
+      + `${Cookies.get('alenvi_token')}`;
   },
 };
