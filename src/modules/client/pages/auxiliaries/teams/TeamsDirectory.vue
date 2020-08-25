@@ -1,14 +1,14 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-directory-header title="Répertoire" @updateSearch="updateSearch" :search="searchStr" />
+    <ni-directory-header title="Répertoire" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
-      <template v-slot:body="{ props, col }">
+      <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'name'">
-          <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar" /></q-item-section>
+          <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar"></q-item-section>
           <q-item-section>{{ col.value.name }}</q-item-section>
         </q-item>
         <template v-else>
-          <a v-if="col.value !== '-'" class="text-primary" :href="getPhoneLink(col.value)">{{col.value}}</a>
+          <a v-if="col.value !== '-'" class="text-primary" :href="getPhoneLink(col.value)">{{ col.value }}</a>
           <div v-if="col.value === '-'">{{ col.value }}</div>
         </template>
       </template>
@@ -19,7 +19,7 @@
 <script>
 import { mapGetters } from 'vuex';
 import get from 'lodash/get';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
@@ -61,11 +61,11 @@ export default {
           field: 'phone',
           align: 'left',
           sortable: false,
-          format: (value) => formatPhone(value),
+          format: value => formatPhone(value),
           style: 'width: 150px',
         },
       ],
-    }
+    };
   },
   mounted () {
     this.getUserList();
@@ -105,5 +105,5 @@ export default {
       return link ? `tel:+33${link.substring(1)}` : '-';
     },
   },
-}
+};
 </script>

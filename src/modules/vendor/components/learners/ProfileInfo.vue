@@ -36,13 +36,13 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
-import PictureUploader from '@components/PictureUploader.vue';
+import PictureUploader from '@components/PictureUploader';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
-import { AUXILIARY_ROLES } from '@data/constants.js';
+import { AUXILIARY_ROLES } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -68,7 +68,7 @@ export default {
           phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
         },
       },
-    }
+    };
   },
   computed: {
     ...mapState('userProfile', ['userProfile']),

@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <div v-if="loggedUser">
       <h4>Documents de paie</h4>
-      <profile-pay/>
+      <profile-pay />
     </div>
   </q-page>
 </template>
@@ -12,7 +12,9 @@ import { mapState } from 'vuex';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
 export default {
-  props: ['id'],
+  props: {
+    id: { type: String, required: true },
+  },
   components: {
     'profile-pay': ProfilePay,
   },
@@ -20,5 +22,5 @@ export default {
   computed: {
     ...mapState('main', ['loggedUser']),
   },
-}
+};
 </script>

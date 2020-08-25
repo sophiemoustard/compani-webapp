@@ -58,12 +58,12 @@
 import get from 'lodash/get';
 import { mapState } from 'vuex';
 import Users from '@api/Users';
-import Twilio from '@api/Twilio';
+import Sms from '@api/Sms';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, HR_SMS } from '@data/constants';
 
 export default {
   name: 'ProfileHeader',
@@ -73,7 +73,7 @@ export default {
     'ni-modal': Modal,
   },
   props: {
-    profileId: String,
+    profileId: { type: String, required: true },
   },
   data () {
     return {
@@ -87,7 +87,7 @@ export default {
         { label: 'Envoi lien d\'activation', value: 'LA' },
         { label: 'Autres', value: 'Autres' },
       ],
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -104,7 +104,7 @@ export default {
       return {
         status: this.userProfile.isActive ? 'Profil Actif' : 'Profil Inactif',
         active: this.userProfile.isActive,
-      }
+      };
     },
     userStartDate () {
       return this.userProfile.createdAt ? this.$moment(this.userProfile.createdAt).format('DD/MM/YY') : 'N/A';
@@ -116,7 +116,8 @@ export default {
       return this.userProfile._id !== this.loggedUser._id;
     },
     isAccountConfirmed () {
-      return this.userProfile.isConfirmed ? 'Accès WebApp activé' : 'Accès WebApp non activé'
+      if (this.userProfile.isConfirmed) return 'Accès WebApp activé';
+      return 'Accès WebApp non activé';
     },
     hasPicture () {
       return get(this.userProfile, 'picture.link') || DEFAULT_AVATAR;
@@ -125,18 +126,23 @@ export default {
   methods: {
     async updateMessage () {
       if (this.messageType === 'PM') {
-        this.message = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et ` +
-        'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: ' +
-        `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/auxiliaries/info` +
-        '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
+        this.message = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et `
+        + 'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: '
+        + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/auxiliaries/info`
+        + '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
       } else if (this.messageType === 'LA') {
         if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
-          this.userProfile.passwordToken = await Users.createPasswordToken(this.userProfile._id, { email: this.userProfile.local.email });
+          this.userProfile.passwordToken = await Users.createPasswordToken(
+            this.userProfile._id,
+            { email: this.userProfile.local.email }
+          );
         }
-        this.message = `${this.companyName}. Bienvenue ! :)\nPour pouvoir ` +
-          'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: ' +
-          `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/reset-password/${this.userProfile.passwordToken.token} :-)\n` +
-          `Par la suite pour te connecter suis ce lien: ${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}.`;
+        this.message = `${this.companyName}. Bienvenue ! :)\nPour pouvoir `
+          + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '
+          + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
+          + `/reset-password/${this.userProfile.passwordToken.token} :-)\n`
+          + 'Par la suite pour te connecter suis ce lien: '
+          + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`;
       } else this.message = '';
     },
     openSmsModal () {
@@ -159,10 +165,10 @@ export default {
         if (!this.companyName) {
           return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
         }
-
-        await Twilio.sendSMS({
-          to: `+33${this.userProfile.contact.phone.substring(1)}`,
-          body: this.message,
+        await Sms.send({
+          recipient: `+33${this.userProfile.contact.phone.substring(1)}`,
+          content: this.message,
+          tag: HR_SMS,
         });
         NotifyPositive('SMS bien envoyé.');
       } catch (e) {
@@ -172,7 +178,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

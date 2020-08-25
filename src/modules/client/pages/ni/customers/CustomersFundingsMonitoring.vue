@@ -14,9 +14,9 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="displayedCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading" row-key="_id"
-      :pagination.sync="pagination">
-      <template v-slot:body="{ props }" >
+    <ni-large-table :data="displayedCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading"
+      row-key="_id" :pagination.sync="pagination">
+      <template v-slot:body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">
@@ -118,7 +118,7 @@ export default {
           name: 'prevMonthCareHours',
           label: 'Mois précédent',
           field: 'prevMonthCareHours',
-          format: value => value === -1 ? 'N/A' : formatHours(value, 1),
+          format: value => (value === -1 ? 'N/A' : formatHours(value, 1)),
           align: 'center',
         },
         {
@@ -133,7 +133,7 @@ export default {
           name: 'nextMonthCareHours',
           label: 'Mois prochain',
           field: 'nextMonthCareHours',
-          format: value => value === -1 ? 'N/A' : formatHours(value, 1),
+          format: value => (value === -1 ? 'N/A' : formatHours(value, 1)),
           align: 'center',
         },
       ],
@@ -181,5 +181,5 @@ export default {
       this.tableLoading = false;
     }
   },
-}
+};
 </script>

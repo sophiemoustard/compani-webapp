@@ -4,16 +4,16 @@
       <svg id="meter">
         <defs>
           <linearGradient id="linear" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
-            <stop offset="0%" :stop-color="maximum.color"/>
-            <stop offset="100%" :stop-color="intermediateMax.color"/>
+            <stop offset="0%" :stop-color="maximum.color" />
+            <stop offset="100%" :stop-color="intermediateMax.color" />
           </linearGradient>
           <linearGradient id="linear2" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
-            <stop offset="0%" :stop-color="intermediateMax.color"/>
-            <stop offset="100%" :stop-color="intermediateMin.color"/>
+            <stop offset="0%" :stop-color="intermediateMax.color" />
+            <stop offset="100%" :stop-color="intermediateMin.color" />
           </linearGradient>
           <linearGradient id="linear3" x1="5%" y1="0%" x2="70%" y2="0%" spreadMethod="pad">
-            <stop offset="0%" :stop-color="intermediateMin.color"/>
-            <stop offset="100%" :stop-color="minimum.color"/>
+            <stop offset="0%" :stop-color="intermediateMin.color" />
+            <stop offset="100%" :stop-color="minimum.color" />
           </linearGradient>
         </defs>
         <path :d="this.first" fill="none" :stroke="getStrokeUrl('linear')" stroke-width="8" opacity="0.6" />
@@ -120,11 +120,11 @@ export default {
       this.$refs.wrapper.style.height = `${this.radius}px`;
     },
     getStrokeUrl (id) {
-      return `url(${this.$route.fullPath}#${id})`
+      return `url(${this.$route.fullPath}#${id})`;
     },
     roundFrenchPercentage,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

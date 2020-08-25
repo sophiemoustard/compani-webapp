@@ -19,4 +19,4 @@ export default {
   getPDFUrl (id) {
     return `${process.env.API_HOSTNAME}/creditNotes/${id}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
   },
-}
+};

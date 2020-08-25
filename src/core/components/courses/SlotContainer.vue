@@ -3,7 +3,7 @@
     <div class="q-mb-xl">
       <q-item class="slot-section-title">
         <q-item-section side>
-          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense/>
+          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense />
         </q-item-section>
         <q-item-section>
           <div class="text-weight-bold">{{ formatSlotTitle.title }}</div>
@@ -41,44 +41,14 @@
     </div>
 
     <!-- Course slot creation modal -->
-    <ni-modal v-model="creationModal" @hide="resetCreationModal"
-      container-class="modal-container-md">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">créneau</span>
-      </template>
-      <ni-datetime-range caption="Dates et heures" v-model="newCourseSlot.dates" required-field disable-end-date
-        :error="$v.newCourseSlot.dates.$error" @blur="$v.newCourseSlot.dates.$touch" />
-      <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
-        @blur="$v.newCourseSlot.address.$touch" :error="$v.newCourseSlot.address.$error" inModal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" :disable="!stepsLength" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
-          :loading="modalLoading" @click="addCourseSlot" />
-      </template>
-    </ni-modal>
+    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
+      :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
 
     <!-- Course slot edition modal -->
-    <ni-modal v-model="editionModal" @hide="resetEditionModal" container-class="modal-container-md">
-      <template slot="title">
-        Editer un <span class="text-weight-bold">créneau</span>
-      </template>
-      <div class="modal-icon">
-        <q-icon class="cursor-pointer" color="grey" size="sm" name="delete"
-          @click="validateDeletion(editedCourseSlot._id)" />
-      </div>
-      <ni-datetime-range caption="Dates et heures" v-model="editedCourseSlot.dates" required-field disable-end-date
-        :error="$v.editedCourseSlot.dates.$error" @blur="$v.editedCourseSlot.dates.$touch" />
-      <ni-search-address v-model="editedCourseSlot.address" :error-message="addressError"
-        @blur="$v.editedCourseSlot.address.$touch" :error="$v.editedCourseSlot.address.$error" inModal last />
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step"
-        :disable="!stepsLength" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer un créneau" icon-right="add" color="primary"
-          :loading="modalLoading" @click="updateCourseSlot" />
-      </template>
-    </ni-modal>
-
-  </div>
+    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
+      :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
+      @submit="updateCourseSlot" />
+</div>
 </template>
 
 <script>
@@ -88,29 +58,27 @@ import has from 'lodash/has';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
+import { formatQuantity } from '@helpers/utils';
 import CourseSlots from '@api/CourseSlots';
-import { REQUIRED_LABEL, E_LEARNING } from '@data/constants';
-import { frAddress } from '@helpers/vuelidateCustomVal.js';
-import SearchAddress from '@components/form/SearchAddress';
-import DateTimeRange from '@components/form/DatetimeRange';
-import Modal from '@components/modal/Modal';
-import Select from '@components/form/Select';
+import { E_LEARNING } from '@data/constants';
+import { frAddress } from '@helpers/vuelidateCustomVal';
+import SlotEditionModal from '@components/courses/SlotEditionModal';
+import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { courseMixin } from '@mixins/courseMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'SlotContainer',
-  mixins: [courseMixin],
+  mixins: [courseMixin, validationMixin],
   metadata: { title: 'Fiche formation' },
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
   },
   components: {
-    'ni-search-address': SearchAddress,
-    'ni-datetime-range': DateTimeRange,
-    'ni-modal': Modal,
-    'ni-select': Select,
+    'slot-edition-modal': SlotEditionModal,
+    'slot-creation-modal': SlotCreationModal,
   },
   data () {
     return {
@@ -136,6 +104,7 @@ export default {
         { name: 'actions', label: '', align: 'center' },
       ],
       courseSlotValidation: {
+        step: { required },
         dates: {
           startDate: { required },
           endDate: { required },
@@ -147,22 +116,16 @@ export default {
           fullAddress: { frAddress },
         },
       },
-    }
+    };
   },
   validations () {
     return {
       newCourseSlot: { ...this.courseSlotValidation },
       editedCourseSlot: { ...this.courseSlotValidation },
-    }
+    };
   },
   computed: {
     ...mapState('course', ['course']),
-    addressError () {
-      if (!this.$v.newCourseSlot.address.fullAddress.required) {
-        return REQUIRED_LABEL;
-      }
-      return 'Adresse non valide';
-    },
     slotsDurationTitle () {
       if (!this.course || !this.course.slots) return '0h';
 
@@ -192,19 +155,19 @@ export default {
       }
 
       return {
-        title: `${totalDate} date${totalDate > 1 ? 's' : ''}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
+        title: `${formatQuantity('date', totalDate)}, ${slotsToPlanTitle}${this.slotsDurationTitle}`,
         subtitle,
         icon: 'mdi-calendar-range',
       };
     },
     stepsLength () {
-      return this.course.program.steps.length;
+      return this.course.subProgram.steps.length;
     },
     stepOptions () {
       if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
       return [
         { label: 'Pas d\'étape spécifiée', value: null },
-        ...this.course.program.steps.map((step, index) => ({
+        ...this.course.subProgram.steps.map((step, index) => ({
           label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
           value: step._id,
           disable: step.type === E_LEARNING,
@@ -271,7 +234,7 @@ export default {
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
         step: get(slot, 'step._id') || null,
-      }
+      };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
     },
@@ -287,7 +250,8 @@ export default {
     async addCourseSlot () {
       try {
         this.$v.newCourseSlot.$touch();
-        if (this.$v.newCourseSlot.$error) return NotifyWarning('Champ(s) invalide(s).');
+        const isValid = await this.waitForFormValidation(this.$v.newCourseSlot);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         await CourseSlots.create(this.formatCreationPayload(this.newCourseSlot));
@@ -296,7 +260,7 @@ export default {
         this.creationModal = false;
         this.$emit('refresh');
       } catch (e) {
-        console.error(e)
+        console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
@@ -311,7 +275,7 @@ export default {
 
         this.$emit('refresh');
       } catch (e) {
-        console.error(e)
+        console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de la date à planifier.');
       } finally {
         this.addDateToPlanloading = false;
@@ -320,7 +284,8 @@ export default {
     async updateCourseSlot () {
       try {
         this.$v.editedCourseSlot.$touch();
-        if (this.$v.editedCourseSlot.$error) return NotifyWarning('Champ(s) invalide(s).');
+        const isValid = await this.waitForFormValidation(this.$v.editedCourseSlot);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         this.modalLoading = true;
         const payload = this.formatEditionPayload(this.editedCourseSlot);
@@ -330,21 +295,12 @@ export default {
         this.editionModal = false;
         this.$emit('refresh');
       } catch (e) {
-        console.error(e)
+        console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la modification du créneau.');
       } finally {
         this.modalLoading = false;
       }
-    },
-    validateDeletion (slotId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce créneau ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.deleteCourseSlot(slotId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     async deleteCourseSlot (slotId) {
       try {
@@ -355,7 +311,7 @@ export default {
         this.editionModal = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du créneau.')
+        NotifyNegative('Erreur lors de la suppression du créneau.');
       } finally {
         this.modalLoading = false;
       }
@@ -367,7 +323,7 @@ export default {
     },
   },
 
-}
+};
 </script>
 
 <style lang="stylus" scoped>
@@ -425,8 +381,4 @@ export default {
   text-decoration: underline
   color: $secondary
   font-size: 14px
-
-.modal-icon
-  display: flex;
-  justify-content: flex-end
 </style>

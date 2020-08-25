@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <div v-if="customer">
       <customer-profile-header :profile-id="customerId" />
-      <profile-tabs :profile-id="customerId" :tabsContent="tabsContent" :notifications="notifications" />
+      <profile-tabs :profile-id="customerId" :tabs-content="tabsContent" :notifications="notifications" />
     </div>
   </q-page>
 </template>
@@ -17,7 +17,7 @@ import ProfileBilling from 'src/modules/client/components/customers/billing/Prof
 
 export default {
   props: {
-    customerId: { type: String },
+    customerId: { type: String, required: true },
     defaultTab: { type: String, default: () => 'followUp' },
   },
   components: {
@@ -48,7 +48,7 @@ export default {
           component: ProfileBilling,
         },
       ],
-    }
+    };
   },
   async mounted () {
     await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customerId });
@@ -64,5 +64,5 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('customer/resetCustomer');
   },
-}
+};
 </script>

@@ -32,7 +32,7 @@ export default {
   data () {
     return {
       selectTime: false,
-    }
+    };
   },
   props: {
     value: { type: String, default: '' },
@@ -50,23 +50,25 @@ export default {
         this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
         this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
       );
-      const hours = Array.from(range.by('hours'));
-      const selectOptions = [];
-      hours.map((hour) => {
-        selectOptions.push({
-          label: hour.format('HH:mm'),
-          value: hour.format('HH:mm'),
-          disable: this.min !== '' && hour.isSameOrBefore(this.$moment(this.min, 'HH:mm')),
-        });
-        if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
-          selectOptions.push({
-            label: hour.minutes(30).format('HH:mm'),
-            value: hour.minutes(30).format('HH:mm'),
-            disable: this.min !== '' && hour.minutes(30).isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+
+      return Array.from(range.by('hours')).reduce(
+        (acc, hour) => {
+          acc.push({
+            label: hour.format('HH:mm'),
+            value: hour.format('HH:mm'),
+            disable: this.min !== '' && hour.isSameOrBefore(this.$moment(this.min, 'HH:mm')),
           });
-        }
-      });
-      return selectOptions;
+          if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
+            acc.push({
+              label: hour.minutes(30).format('HH:mm'),
+              value: hour.minutes(30).format('HH:mm'),
+              disable: this.min !== '' && hour.minutes(30).isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+            });
+          }
+          return acc;
+        },
+        []
+      );
     },
   },
   methods: {
@@ -81,7 +83,7 @@ export default {
       this.$emit('blur');
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

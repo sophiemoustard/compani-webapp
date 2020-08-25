@@ -3,16 +3,17 @@
     <div class="q-pa-sm q-mb-lg">
       <div class="title">
         <p data-cy="customer-identity" class="text-weight-bold text-primary">
-          {{ this.customer.identity | formatIdentity('FL') }}</p>
+          {{ this.customer.identity | formatIdentity('FL') }}
+</p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <div v-if="isHelper && company.billingAssistance" class="message">
         Si vous souhaitez obtenir une facture non disponible sur cette page, adressez un email à
         <a :href="'mailto:' + company.billingAssistance"> {{ company.billingAssistance }}</a>.
       </div>
-      <ni-customer-billing-table :documents="customerDocuments" :billingDates="billingDates" :displayActions="isAdmin"
-        @openEditionModal="openEditionModal" :type="CUSTOMER" :startBalance="getStartBalance()"
-        :endBalance="getEndBalance(customerDocuments)" :loading="tableLoading" />
+      <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :display-actions="isAdmin"
+        @open-edition-modal="openEditionModal" :type="CUSTOMER" :start-balance="getStartBalance()"
+        :end-balance="getEndBalance(customerDocuments)" :loading="tableLoading" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
           color="white" icon="add" />
@@ -20,9 +21,9 @@
     </div>
     <div class="q-pa-sm q-mb-lg" v-for="tpp in tppDocuments" :key="tpp._id">
       <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
-      <ni-customer-billing-table :documents="tpp.documents" :billingDates="billingDates" :display-actions="isAdmin"
-        @openEditionModal="openEditionModal" :type="THIRD_PARTY_PAYER" :startBalance="getStartBalance(tpp)"
-        :endBalance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
+      <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates" :display-actions="isAdmin"
+        @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
+        :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
@@ -58,12 +59,12 @@
     <!-- Payment creation modal -->
     <ni-payment-creation-modal :new-payment="newPayment" v-model="paymentCreationModal" :validations="$v.newPayment"
       :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
-      @createPayment="createPayment" @resetForm="resetPaymentCreationModal" />
+      @submit="createPayment" @hide="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
       :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment="editedPayment"
-      @updatePayment="updatePayment" @resetForm="resetPaymentEditionModal" />
+      @submit="updatePayment" @hide="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
     <ni-modal v-model="taxCertificateModal" @hide="resetTaxCertificateModal">
@@ -119,7 +120,7 @@ import CustomerBillingTable from 'src/modules/client/components/customers/billin
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
 import PaymentEditionModal from 'src/modules/client/components/customers/billing/PaymentEditionModal';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
-import { paymentMixin } from 'src/modules/client/mixins/paymentMixin.js';
+import { paymentMixin } from 'src/modules/client/mixins/paymentMixin';
 
 export default {
   name: 'ProfileBilling',
@@ -158,7 +159,7 @@ export default {
         {
           name: 'date',
           field: 'date',
-          format: value => value ? this.$moment(value).format('DD/MM/YYYY') : '',
+          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
           align: 'left',
           label: 'Date',
         },
@@ -182,7 +183,7 @@ export default {
       REQUIRED_LABEL,
       CUSTOMER,
       THIRD_PARTY_PAYER,
-    }
+    };
   },
   computed: {
     ...mapState({
@@ -253,12 +254,12 @@ export default {
     },
     computeCustomerBalance () {
       const customerStartBalance = this.getStartBalance();
-      this.computeIntermediateBalances(this.customerDocuments, customerStartBalance, CUSTOMER)
+      this.computeIntermediateBalances(this.customerDocuments, customerStartBalance, CUSTOMER);
     },
     computeTppBalances () {
       for (const tpp of this.tppDocuments) {
-        const tppStartBalance = this.getStartBalance(tpp)
-        this.computeIntermediateBalances(tpp.documents, tppStartBalance, THIRD_PARTY_PAYER)
+        const tppStartBalance = this.getStartBalance(tpp);
+        this.computeIntermediateBalances(tpp.documents, tppStartBalance, THIRD_PARTY_PAYER);
       }
     },
     computeIntermediateBalances (docs, startBalance, type) {
@@ -379,7 +380,7 @@ export default {
         this.$v.editedPayment.$touch();
         if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer'])
+        const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer']);
         await Payments.update(this.editedPayment._id, payload);
         this.paymentEditionModal = false;
         NotifyPositive('Règlement créé');
@@ -436,7 +437,7 @@ export default {
         await this.getTaxCertificates();
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de l'envoi de l'attestation fiscale.");
+        NotifyNegative('Erreur lors de l\'envoi de l\'attestation fiscale.');
       } finally {
         this.modalLoading = false;
       }
@@ -465,7 +466,7 @@ export default {
   filters: {
     formatIdentity,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

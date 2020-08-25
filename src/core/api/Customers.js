@@ -1,4 +1,4 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async list (params) {
@@ -42,10 +42,15 @@ export default {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`, data);
   },
   async updateSubscription (params, data) {
-    return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`, data);
+    return alenviAxios.put(
+      `${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`,
+      data
+    );
   },
   async removeSubscription (params) {
-    return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`);
+    return alenviAxios.delete(
+      `${process.env.API_HOSTNAME}/customers/${params._id}/subscriptions/${params.subscriptionId}`
+    );
   },
   async getMandates (id) {
     const mandates = await alenviAxios.get(`${process.env.API_HOSTNAME}/customers/${id}/mandates`);
@@ -65,11 +70,17 @@ export default {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptionshistory`, data);
   },
   async generateMandateSignatureRequest (params, data) {
-    const signatureRequest = await alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/esign`, data);
+    const signatureRequest = await alenviAxios.post(
+      `${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/esign`,
+      data
+    );
     return signatureRequest.data.data.signatureRequest;
   },
   async saveSignedDoc (params, data) {
-    return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/savesigneddoc`, data);
+    return alenviAxios.post(
+      `${process.env.API_HOSTNAME}/customers/${params._id}/mandates/${params.mandateId}/savesigneddoc`,
+      data
+    );
   },
   async deleteCertificates (id, payload) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}/certificates`, payload);
@@ -83,4 +94,4 @@ export default {
   async removeFunding (params) {
     return alenviAxios.delete(`${process.env.API_HOSTNAME}/customers/${params._id}/fundings/${params.fundingId}`);
   },
-}
+};

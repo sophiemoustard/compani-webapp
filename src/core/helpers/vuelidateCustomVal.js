@@ -1,6 +1,6 @@
-const ibantools = require('ibantools');
-const axios = require('axios');
-const moment = require('moment');
+import { isValidIBAN, isValidBIC } from 'ibantools';
+import axios from 'axios';
+import moment from 'moment';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 
@@ -19,13 +19,13 @@ export const frZipCode = (value) => {
 export const iban = (value) => {
   if (!value) return false;
 
-  return ibantools.isValidIBAN(value.split(' ').join(''));
+  return isValidIBAN(value.split(' ').join(''));
 };
 
 export const bic = (value) => {
   if (!value) return false;
 
-  return ibantools.isValidBIC(value);
+  return isValidBIC(value);
 };
 
 export const frAddress = async (value) => {
@@ -36,7 +36,7 @@ export const frAddress = async (value) => {
       limit: 1,
     },
   });
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     resolve(res.data.features.length === 1 && res.data.features[0].properties.score > 0.9);
   });
 };
@@ -55,17 +55,11 @@ export const strictPositiveNumber = (value) => {
   return value > 0;
 };
 
-export const validHour = (value) => {
-  return !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
-};
+export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
-export const minDate = (min) => {
-  return (value) => moment(min).isSameOrBefore(value);
-};
+export const minDate = min => value => moment(min).isSameOrBefore(value);
 
-export const maxDate = (max) => {
-  return (value) => moment(max).isSameOrAfter(value);
-};
+export const maxDate = max => value => moment(max).isSameOrAfter(value);
 
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
 
@@ -78,3 +72,68 @@ export const validSiret = value => !value || /^\d{14}$/.test(value);
 export const rcs = value => !value || /^[0-9]*[1-9][0-9]*$/.test(value);
 
 export const validYear = value => !value || /^[2]{1}[0]{1}[0-9]{2}$/.test(value);
+
+export const validTradeName = value => !value || /^[0-9a-zA-Z]{0,11}$/.test(value);
+
+// Quiz fill-the-gap
+const parseTagCode = (str) => {
+  const outerAcc = '';
+  const gapAcc = [];
+
+  return parseTagCodeRecursively(outerAcc, gapAcc, str);
+};
+
+const parseTagCodeRecursively = (outerAcc, gapAcc, str) => {
+  const splitedStr = str.match(/(.*?)<trou>(.*?)<\/trou>(.*)/s);
+
+  if (!splitedStr) return { outerAcc: outerAcc.concat(' ', str), gapAcc };
+
+  gapAcc.push(splitedStr[2]);
+  return parseTagCodeRecursively(outerAcc.concat(' ', splitedStr[1]), gapAcc, splitedStr[3]);
+};
+
+const containLonelyTag = value => /<trou>|<\/trou>/g.test(value);
+
+export const validTagging = (value) => {
+  if (!value) return true;
+  const { outerAcc, gapAcc } = parseTagCode(value);
+
+  return !containLonelyTag(outerAcc) && !gapAcc.some(v => containLonelyTag(v));
+};
+
+export const validAnswerInTag = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return !gapAcc.some(v => v.trim() !== v);
+};
+
+export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\s'-]*$/.test(value);
+
+export const validCaractersTags = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return gapAcc.every(v => validCaracters(v));
+};
+
+// value.length can be 0 in front validation, to authorize field clear
+export const validAnswerLength = value => value.length >= 0 && value.length < 16;
+
+export const validTagLength = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return gapAcc.every(v => v.length > 0 && v.length < 16);
+};
+
+export const validTagsCount = (value) => {
+  if (!value) return true;
+  const { gapAcc } = parseTagCode(value);
+
+  return gapAcc.length === 1 || (gapAcc.length === 2 && validTagging(value));
+};
+
+export const min2Answers = value => value.filter(a => !!a.label).length > 1;
+
+export const min2OrderedAnswers = value => value.filter(a => !!a).length > 1;

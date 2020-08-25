@@ -67,11 +67,11 @@ export default {
       let detail = '';
       if (this.hoursDetails.internalHours) detail += ` ${formatHours(this.hoursDetails.internalHours)} internes`;
       if (this.hoursDetails.diff && this.hoursDetails.diff.workedHours) {
-        if (detail !== '') detail += ' et'
+        if (detail !== '') detail += ' et';
         detail += ` ${formatHours(this.hoursDetails.diff.workedHours)} de rattrapage`;
       }
 
-      return detail !== '' ? 'dont ' + detail : detail;
+      return detail !== '' ? `dont ${detail}` : detail;
     },
     contractHoursDetail () {
       if (!this.hoursDetails.holidaysHours && !this.absencesHours) return '';
@@ -90,7 +90,7 @@ export default {
         : this.hoursDetails[key];
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

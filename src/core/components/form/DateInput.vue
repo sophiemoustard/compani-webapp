@@ -10,7 +10,7 @@
       <template v-slot:append>
         <q-icon name="event" class="cursor-pointer" @click="focus">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
-            <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable"/>
+            <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable" />
           </q-menu>
         </q-icon>
       </template>
@@ -20,6 +20,7 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
+
 export default {
   name: 'NiDateInput',
   props: {
@@ -53,14 +54,14 @@ export default {
       return isAfterMin && isBeforeMax;
     },
     select (value) {
-      const momentValue = this.$moment(value, 'YYYY/MM/DD', true)
+      const momentValue = this.$moment(value, 'YYYY/MM/DD', true);
       if (!momentValue.isValid()) return;
       this.update(momentValue.toISOString());
       this.$refs.qDateMenu.hide();
       this.$refs.dateInput.blur();
     },
     input (value) {
-      const momentValue = this.$moment(value, 'DD/MM/YYYY', true)
+      const momentValue = this.$moment(value, 'DD/MM/YYYY', true);
       if (!momentValue.isValid()) return;
       this.update(momentValue.toISOString());
     },
@@ -74,7 +75,7 @@ export default {
       this.$emit('focus');
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

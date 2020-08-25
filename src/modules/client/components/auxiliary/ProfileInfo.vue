@@ -21,7 +21,7 @@
       </div>
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-picture-uploader :user="userProfile" :refresh-picture="refreshUser"/>
+          <ni-picture-uploader :user="userProfile" :refresh-picture="refreshUser" />
         </div>
       </div>
     </div>
@@ -156,7 +156,7 @@
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso"
             alt="titre de séjour (verso)" name="residencePermitVerso" @uploaded="documentUploaded" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.residencePermitVerso')" :extensions="extensions"
-            :entity="userProfile"  :additional-value="documentTitle('titre_de_séjour_verso')" />
+            :entity="userProfile" :additional-value="documentTitle('titre_de_séjour_verso')" />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
@@ -247,6 +247,7 @@
 </template>
 
 <script>
+/* eslint-disable no-shadow */
 import { mapState, mapGetters } from 'vuex';
 import { required, email, numeric, minLength, maxLength, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
@@ -255,16 +256,17 @@ import Roles from '@api/Roles';
 import Establishments from '@api/Establishments';
 import Users from '@api/Users';
 import gdrive from '@api/GoogleDrive';
+import { formatQuantity } from '@helpers/utils';
 import SelectSector from '@components/form/SelectSector';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
-import FileUploader from '@components/form/FileUploader.vue';
-import MultipleFilesUploader from '@components/form/MultipleFilesUploader.vue';
-import DateInput from '@components/form/DateInput.vue';
+import FileUploader from '@components/form/FileUploader';
+import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
+import DateInput from '@components/form/DateInput';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import PictureUploader from '@components/PictureUploader.vue';
+import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber, iban, frAddress, bic } from '@helpers/vuelidateCustomVal';
 import {
   AUXILIARY,
@@ -277,7 +279,7 @@ import {
 import nationalities from '@data/nationalities';
 import countries from '@data/countries';
 import { userMixin } from '@mixins/userMixin';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'ProfileInfo',
@@ -343,7 +345,7 @@ export default {
       establishments: [],
       REQUIRED_LABEL,
       mutualOptions: [{ label: 'Oui', value: false }, { label: 'Non', value: true }],
-    }
+    };
   },
   validations () {
     return {
@@ -426,14 +428,14 @@ export default {
       documentsGroup: this.documentsGroup.map(g => `userProfile.${g}`),
       mutualFundGroup: this.mutualFundGroup.map(g => `userProfile.${g}`),
       transportInvoiceGroup: this.transportInvoiceGroup.map(g => `userProfile.${g}`),
-    }
+    };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
     ...mapState({
-      userProfile: state => AUXILIARY_ROLES.includes(get(state.main.loggedUser, 'role.client.name'))
+      userProfile: state => (AUXILIARY_ROLES.includes(get(state.main.loggedUser, 'role.client.name'))
         ? state.main.loggedUser
-        : state.userProfile.userProfile,
+        : state.userProfile.userProfile),
     }),
     ...mapGetters({ clientRole: 'main/getClientRole' }),
     captionTransportUploader () {
@@ -457,9 +459,9 @@ export default {
       return `${process.env.API_HOSTNAME}/users/${this.userProfile._id}/gdrive/${driveId}/upload`;
     },
     birthStateError () {
-      const { required, minLength, maxLength, numeric } = this.$v.userProfile.identity.birthState
+      const { required, minLength, maxLength, numeric } = this.$v.userProfile.identity.birthState;
       if (!required) return REQUIRED_LABEL;
-      else if (!minLength || !maxLength || !numeric) return 'Departement non valide';
+      if (!minLength || !maxLength || !numeric) return 'Departement non valide';
 
       return '';
     },
@@ -467,7 +469,7 @@ export default {
       const { required, minLength, maxLength, numeric } = this.$v.userProfile.identity.socialSecurityNumber;
 
       if (!required) return REQUIRED_LABEL;
-      else if (!minLength || !maxLength || !numeric) return 'Numéro de sécurité sociale non valide';
+      if (!minLength || !maxLength || !numeric) return 'Numéro de sécurité sociale non valide';
 
       return '';
     },
@@ -475,7 +477,7 @@ export default {
       const { required, frZipCode, maxLength } = this.$v.userProfile.contact.zipCode;
 
       if (!required) return REQUIRED_LABEL;
-      else if (!frZipCode || !maxLength) return 'Code postal non valide';
+      if (!frZipCode || !maxLength) return 'Code postal non valide';
 
       return '';
     },
@@ -483,7 +485,7 @@ export default {
       const { required, frPhoneNumber, maxLength } = this.$v.userProfile.administrative.emergencyContact.phoneNumber;
 
       if (!required) return REQUIRED_LABEL;
-      else if (!frPhoneNumber || !maxLength) return 'Numéro de téléphone non valide';
+      if (!frPhoneNumber || !maxLength) return 'Numéro de téléphone non valide';
 
       return '';
     },
@@ -491,7 +493,7 @@ export default {
       const { required, iban } = this.$v.userProfile.administrative.payment.rib.iban;
 
       if (!required) return REQUIRED_LABEL;
-      else if (!iban) return 'IBAN non valide';
+      if (!iban) return 'IBAN non valide';
 
       return '';
     },
@@ -499,7 +501,7 @@ export default {
       const { required, bic } = this.$v.userProfile.administrative.payment.rib.bic;
 
       if (!required) return REQUIRED_LABEL;
-      else if (!bic) return 'BIC non valide';
+      if (!bic) return 'BIC non valide';
 
       return '';
     },
@@ -609,7 +611,10 @@ export default {
         if (this.$v[groupName][`userProfile.${this[groupName][i]}`].$error) j++;
       }
 
-      return { errors: j, msg: j > 0 ? `${j} information(s) manquante(s)` : 'Informations complètes' };
+      return {
+        errors: j,
+        msg: j > 0 ? formatQuantity('information manquante', j) : 'Informations complètes',
+      };
     },
     groupErrorsClass (group) {
       return this.groupErrors(group).errors > 0 ? 'group-error' : 'group-error-ok';
@@ -617,7 +622,7 @@ export default {
     async getAuxiliaryRoles () {
       try {
         const roles = await Roles.list({ name: [AUXILIARY, PLANNING_REFERENT] });
-        this.auxiliaryRolesOptions = roles.map((role) => ({
+        this.auxiliaryRolesOptions = roles.map(role => ({
           label: role.name === AUXILIARY ? 'Auxiliaire' : 'Référent(e) planning',
           value: role._id,
         }));
@@ -634,7 +639,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

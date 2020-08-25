@@ -13,7 +13,8 @@ export const sideMenuMixin = {
     companiLogo () {
       return this.interfaceType === CLIENT
         ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/compani_texte_rose.png'
-        : 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/compani_texte_bordeaux.png';
+        : 'https://res.cloudinary.com/alenvi/image/upload/v1588778194/images/business/Compani/'
+          + 'compani_texte_bordeaux.png';
     },
   },
   watch: {
@@ -26,7 +27,7 @@ export const sideMenuMixin = {
   },
   methods: {
     setUserFirstname () {
-      return (get(this.loggedUser, 'identity.firstname') || '').toUpperCase()
+      return (get(this.loggedUser, 'identity.firstname') || '').toUpperCase();
     },
     collapsibleOpening () {
       if (this.$refs[this.$route.meta.parent]) {

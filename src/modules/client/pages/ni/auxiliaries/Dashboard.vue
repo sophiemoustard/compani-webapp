@@ -215,7 +215,7 @@ export default {
     async getAuxiliariesStats (sectorsIds) {
       try {
         const sectors = [];
-        const auxiliariesStats = {}
+        const auxiliariesStats = {};
         for (const sector of sectorsIds) {
           if (this.auxiliariesStats[sector] || !this.displayStats[sector].openedDetails) continue;
           sectors.push(sector);
@@ -239,26 +239,31 @@ export default {
               picture: hoursDetails.picture,
               paidInterventions: omit(auxiliaryPaidInterventions, 'sectors'),
               hoursBalanceDetail: omit(hoursDetails, ['sectors', 'auxiliary']),
-            }
+            };
             auxiliariesStats[sector].push(auxiliaryStats);
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
           }
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des données.')
+        NotifyNegative('Erreur lors de la récupération des données.');
       } finally {
         this.setDisplayStats(sectorsIds, { loadingDetails: false });
       }
     },
     getCustomersAndDurationBySector (sectorId) {
-      return this.stats[sectorId].customersAndDuration || { customerCount: 0, averageDuration: 0, auxiliaryTurnOver: 0 };
+      return this.stats[sectorId].customersAndDuration ||
+        { customerCount: 0, averageDuration: 0, auxiliaryTurnOver: 0 };
     },
     getBilledHours (sectorId) {
-      return this.stats[sectorId].internalAndBilledHours ? this.stats[sectorId].internalAndBilledHours.interventions : 0;
+      return this.stats[sectorId].internalAndBilledHours
+        ? this.stats[sectorId].internalAndBilledHours.interventions
+        : 0;
     },
     getInternalHours (sectorId) {
-      return this.stats[sectorId].internalAndBilledHours ? this.stats[sectorId].internalAndBilledHours.internalHours : 0;
+      return this.stats[sectorId].internalAndBilledHours
+        ? this.stats[sectorId].internalAndBilledHours.internalHours
+        : 0;
     },
     getInternalHoursRatio (sectorId) {
       return (this.getInternalHours(sectorId) / this.getBilledHours(sectorId)) * 100 || 0;
@@ -320,7 +325,7 @@ export default {
               hoursToWork: hoursToWork.find(hw => hw.sector === sector),
               paidTransportStats: paidTransportStats.find(pt => pt.sector === sector),
             },
-          }
+          };
         }
 
         await this.getAuxiliariesStats(sectors);
@@ -349,7 +354,7 @@ export default {
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

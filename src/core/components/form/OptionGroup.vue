@@ -22,7 +22,7 @@ export default {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
-    value: [String, Array, Boolean],
+    value: { type: [String, Array, Boolean], default: '' },
     last: { type: Boolean, default: false },
     readOnly: { type: Boolean, default: false },
     requiredField: { type: Boolean, default: false },
@@ -32,7 +32,7 @@ export default {
     displayCaption: { type: Boolean, default: true },
     disable: { type: Boolean, default: false },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

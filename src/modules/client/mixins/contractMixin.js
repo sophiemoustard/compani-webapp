@@ -7,7 +7,7 @@ import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import { formatIdentity } from '@helpers/utils';
-import nationalities from '@data/nationalities.js';
+import nationalities from '@data/nationalities';
 import { REQUIRED_LABEL } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 
@@ -20,7 +20,7 @@ export const contractMixin = {
       loading: false,
       selectedContract: { versions: [] },
       selectedVersion: {},
-    }
+    };
   },
   validations () {
     return {
@@ -33,19 +33,19 @@ export const contractMixin = {
         grossHourlyRate: { required, minValue: minValue(0) },
         startDate: { required, minDate: this.editedVersionMinStartDate ? minDate(this.editedVersionMinStartDate) : '' },
       },
-    }
+    };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
     ...mapGetters({ company: 'main/getCompany' }),
     isPreviousPayImpacted () {
       const startOfMonth = this.$moment().startOf('M');
-      return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate)
+      return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate);
     },
     editedVersionMinStartDate () {
       if (!this.editedVersion.versionId) return '';
 
-      const index = this.selectedContract.versions.findIndex(ver => ver._id === this.editedVersion.versionId)
+      const index = this.selectedContract.versions.findIndex(ver => ver._id === this.editedVersion.versionId);
       if (!index) return '';
 
       const previousVersion = this.selectedContract.versions[index - 1];
@@ -58,7 +58,7 @@ export const contractMixin = {
       return {
         redirect: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=true`,
         redirectDecline: `${process.env.COMPANI_HOSTNAME}/docsigned?signed=false`,
-      }
+      };
     },
     isVersionUpdated () {
       if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
@@ -70,12 +70,12 @@ export const contractMixin = {
   methods: {
     grossHourlyRateError (validationObj) {
       if (get(validationObj, 'grossHourlyRate.required', null) === false) return REQUIRED_LABEL;
-      else if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
+      if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
       return '';
     },
     weeklyHoursError (validationObj) {
       if (get(validationObj, 'weeklyHours.required', null) === false) return REQUIRED_LABEL;
-      else if (get(validationObj, 'weeklyHours.minValue', null) === false) {
+      if (get(validationObj, 'weeklyHours.minValue', null) === false) {
         return 'Volume horaire hebdomadaire non valide';
       }
       return '';
@@ -91,7 +91,7 @@ export const contractMixin = {
         templateId: template.driveId,
         meta: { auxiliaryDriveId: this.auxiliary.administrative.driveFolder.driveId },
         fields: generateContractFields(
-          { user: this.auxiliary, contract: contract, initialContractStartDate: this.selectedContract.startDate }
+          { user: this.auxiliary, contract, initialContractStartDate: this.selectedContract.startDate }
         ),
         signers: [
           { id: '1', name: this.userFullName, email: this.auxiliary.local.email },
@@ -124,7 +124,7 @@ export const contractMixin = {
 
         this.loading = true;
         const payload = await this.getVersionEditionPayload();
-        const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId }
+        const params = { contractId: this.editedVersion.contractId, versionId: this.editedVersion.versionId };
         await Contracts.updateVersion(params, payload);
         await this.refreshContracts();
 
@@ -143,7 +143,7 @@ export const contractMixin = {
     },
     async editVersion () {
       if (!this.isVersionUpdated) {
-        NotifyPositive('Pas de modification apportée au contrat.')
+        NotifyPositive('Pas de modification apportée au contrat.');
         return this.resetVersionEditionModal();
       }
 
@@ -151,8 +151,8 @@ export const contractMixin = {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant ' +
-          'prenant effet ce mois-ci. Confirmez-vous ce changement ?',
+        message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant '
+          + 'prenant effet ce mois-ci. Confirmez-vous ce changement ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(this.saveVersion)

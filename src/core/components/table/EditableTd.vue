@@ -17,21 +17,24 @@ export default {
     editedField: { type: String, default: '' },
     editionBooleanName: { type: String, default: '' },
     refName: { type: String, default: '' },
-    value: String,
-    suffix: String,
+    value: { type: String, default: '' },
+    suffix: { type: String, default: '' },
   },
   methods: {
     disableEdition () {
-      this.$emit('disable', { obj: this.props, path: this.editionBooleanName })
+      this.$emit('disable', { obj: this.props, path: this.editionBooleanName });
     },
     setEdition (event) {
-      this.$emit('change', { value: Number.parseFloat(event.target.value, 10), obj: this.props, path: this.editedField })
+      this.$emit(
+        'change',
+        { value: Number.parseFloat(event.target.value, 10), obj: this.props, path: this.editedField }
+      );
     },
     startEdition () {
-      this.$emit('click', { ref: this.$refs[this.refName], obj: this.props, path: this.editionBooleanName })
+      this.$emit('click', { ref: this.$refs[this.refName], obj: this.props, path: this.editionBooleanName });
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

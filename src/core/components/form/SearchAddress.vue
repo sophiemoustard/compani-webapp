@@ -43,17 +43,15 @@ export default {
         if (!terms) return;
 
         const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: terms } });
-        this.options = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => {
-          return {
-            label: result.properties.label,
-            fullAddress: result.properties.label,
-            value: result.properties.label,
-            street: result.properties.name,
-            zipCode: result.properties.postcode,
-            city: result.properties.city,
-            location: result.geometry,
-          }
-        });
+        this.options = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => ({
+          label: result.properties.label,
+          fullAddress: result.properties.label,
+          value: result.properties.label,
+          street: result.properties.name,
+          zipCode: result.properties.postcode,
+          city: result.properties.city,
+          location: result.geometry,
+        }));
         done(this.options);
       } catch (e) {
         console.error(e);
@@ -73,7 +71,7 @@ export default {
       this.$emit('input', { street: '', zipCode: '', city: '', location: {}, fullAddress: '' });
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

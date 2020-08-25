@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <ni-profile-header :title="programName" />
-    <profile-info :profile-id="programId" />
+    <profile-tabs :profile-id="programId" :tabs-content="tabsContent" />
   </q-page>
 </template>
 
@@ -9,23 +9,39 @@
 import get from 'lodash/get';
 import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
+import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/programs/ProfileInfo';
+import ProfileContent from 'src/modules/vendor/components/programs/ProfileContent';
 
 export default {
   name: 'ProgramProfile',
   metadata: { title: 'Fiche programme' },
   props: {
-    programId: { type: String },
-    defaultTab: { type: String, default: 'program' },
+    programId: { type: String, required: true },
+    defaultTab: { type: String, default: 'infos' },
   },
   components: {
     'ni-profile-header': ProfileHeader,
-    'profile-info': ProfileInfo,
+    'profile-tabs': ProfileTabs,
   },
   data () {
     return {
       programName: '',
-    }
+      tabsContent: [
+        {
+          label: 'Infos',
+          name: 'infos',
+          default: this.defaultTab === 'infos',
+          component: ProfileInfo,
+        },
+        {
+          label: 'Sous-programmes',
+          name: 'content',
+          default: this.defaultTab === 'content',
+          component: ProfileContent,
+        },
+      ],
+    };
   },
   computed: {
     ...mapState('program', ['program']),
@@ -55,5 +71,5 @@ export default {
     }
   },
 
-}
+};
 </script>

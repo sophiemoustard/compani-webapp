@@ -30,7 +30,6 @@ const customerProfileSchema = Joi.object().keys({
 });
 
 export const customerProfileValidation = (profile, options = {}) => {
-  options.allowUnknown = true;
   const profileCopy = cloneDeep(profile);
   if (profileCopy.payment) profileCopy.payment.mandates = getLastDocument(profile.payment.mandates);
 
@@ -38,5 +37,5 @@ export const customerProfileValidation = (profile, options = {}) => {
     profileCopy.quotes = getLastDocument(profileCopy.quotes);
   } else profileCopy.quotes = [];
 
-  return Joi.validate(profileCopy, customerProfileSchema, options);
+  return customerProfileSchema.validate(profileCopy, { ...options, allowUnknown: true });
 };

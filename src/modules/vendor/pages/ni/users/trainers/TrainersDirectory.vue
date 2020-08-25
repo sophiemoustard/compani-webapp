@@ -1,9 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un formateur"
-      @updateSearch="updateSearch" :search="searchStr" />
+      @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @goTo="goToTrainerProfile" />
+      @go-to="goToTrainerProfile" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un formateur"
       @click="trainerCreationModal = true" :disable="tableLoading" />
 
@@ -33,7 +33,7 @@
 <script>
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import escapeRegExp from 'lodash/escapeRegExp'
+import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import Roles from '@api/Roles';
 import Email from '@api/Email';
@@ -67,7 +67,7 @@ export default {
       newTrainer: { identity: { lastname: '', firstname: '' }, local: { email: '' } },
       modalLoading: false,
       firstStep: true,
-    }
+    };
   },
   validations () {
     return { newTrainer: { ...pick(this.userValidation, ['identity.lastname', 'local.email']) } };
@@ -127,7 +127,7 @@ export default {
       try {
         this.tableLoading = true;
         const trainers = await Users.list({ role: [TRAINER] });
-        this.trainers = trainers.map(trainer => ({ ...trainer, name: formatIdentity(trainer.identity, 'FL') }))
+        this.trainers = trainers.map(trainer => ({ ...trainer, name: formatIdentity(trainer.identity, 'FL') }));
       } catch (e) {
         console.error(e);
         this.trainers = [];
@@ -150,7 +150,7 @@ export default {
 
         await Users.create({ ...this.newTrainer, role: roles[0]._id });
         this.trainerCreationModal = false;
-        NotifyPositive('Formateur créé.')
+        NotifyPositive('Formateur créé.');
 
         await this.sendWelcome();
         await this.refreshTrainers();
@@ -172,5 +172,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

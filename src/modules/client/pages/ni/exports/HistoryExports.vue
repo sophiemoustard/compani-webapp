@@ -38,7 +38,7 @@ export default {
       min: this.$moment().endOf('M').subtract(1, 'year').toISOString(),
       max: this.$moment().startOf('M').add(1, 'year').toISOString(),
       loading: false,
-    }
+    };
   },
   validations () {
     return {
@@ -62,8 +62,8 @@ export default {
       try {
         this.loading = true;
         await this.$v.dateRange.$touch();
-        if (this.$v.dateRange.$error) return NotifyWarning('Date(s) invalide(s)')
-        const type = EXPORT_HISTORY_TYPES.find(type => type.value === this.type);
+        if (this.$v.dateRange.$error) return NotifyWarning('Date(s) invalide(s)');
+        const type = EXPORT_HISTORY_TYPES.find(t => t.value === this.type);
         if (!type) return NotifyNegative('Impossible de téléchager le document.');
 
         const csv = await Exports.getHistoryCsv({ ...this.dateRange, type: type.value });
@@ -78,5 +78,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

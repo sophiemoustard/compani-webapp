@@ -14,22 +14,24 @@
       </thead>
       <tbody>
         <tr>
-          <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top" @click="createEvent(dayIndex)"
-            data-cy="agenda-cell">
+          <td v-for="(day, dayIndex) in days" :key="`day_${dayIndex}`" valign="top"
+            @click="openEventCreationModal(dayIndex)" data-cy="agenda-cell">
             <div class="planning-background">
               <template v-if="dayIndex === 0">
                 <template v-for="(hour, hourIndex) in hours">
                   <div v-if="hourIndex !== 0" class="planning-hour" :key="`hour_${hourIndex}`"
-                    :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">{{ hour.format('HH:mm') }}</div>
+                    :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">
+                    {{ hour.format('HH:mm') }}
+                  </div>
                 </template>
               </template>
               <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)"
-                :key="eventId" @click.stop="editEvent(event)" class="event"
-                :class="[!isCustomerPlanning && 'cursor-pointer', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
-                data-cy="agenda-event" >
+                :key="eventId" @click.stop="openEventEditionModal(event)" class="event" :class="getEventClass(event)"
+                data-cy="agenda-event">
                 <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                   <div class="col-12 event-title">
-                    <p data-cy="event-title" v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap">
+                    <p data-cy="event-title" v-if="event.type === INTERVENTION"
+                      class="no-margin overflow-hidden-nowrap">
                       {{ eventTitle(event) }}
                     </p>
                     <p v-if="event.type === ABSENCE" class="no-margin overflow-hidden-nowrap">
@@ -90,6 +92,12 @@ export default {
     this.getTimelineHours();
   },
   methods: {
+    getEventClass (event) {
+      return [
+        !this.isCustomerPlanning && 'cursor-pointer',
+        event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
+      ];
+    },
     getEventStyle (event) {
       return {
         top: `${PLANNING_PERCENTAGE_BY_MINUTES * event.staffingBeginning}%`,
@@ -105,20 +113,19 @@ export default {
     },
     getOneDayEvents (day) {
       return this.events
-        .filter(event =>
-          this.$moment(day).isSameOrAfter(event.startDate, 'day') && this.$moment(day).isSameOrBefore(event.endDate, 'day')
-        )
-        .map((event) => this.getDisplayedEvent(event, day, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR))
+        .filter(event => this.$moment(day).isSameOrAfter(event.startDate, 'day') &&
+            this.$moment(day).isSameOrBefore(event.endDate, 'day'))
+        .map(event => this.getDisplayedEvent(event, day, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
-    createEvent (value) {
-      this.$emit('createEvent', value);
+    openEventCreationModal (value) {
+      this.$emit('open-creation-modal', value);
     },
-    editEvent (value) {
-      this.$emit('editEvent', value);
+    openEventEditionModal (value) {
+      this.$emit('open-edition-modal', value);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

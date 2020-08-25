@@ -198,4 +198,4 @@ export default {
   YE: 'Yémenite',
   ZM: 'Zambienne',
   ZW: 'Zimbabwéenne',
-}
+};
