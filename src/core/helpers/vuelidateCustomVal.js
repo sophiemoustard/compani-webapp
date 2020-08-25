@@ -131,7 +131,8 @@ export const validTagsCount = (value) => {
   if (!value) return true;
   const { gapAcc } = parseTagCode(value);
 
-  return gapAcc.length === 1 || (gapAcc.length === 2 && validTagging(value));
+  return (gapAcc.length === 0 && !validTagging(value)) || gapAcc.length === 1 ||
+    (gapAcc.length === 2 && validTagging(value));
 };
 
 export const min2Answers = value => value.filter(a => !!a.label).length > 1;
