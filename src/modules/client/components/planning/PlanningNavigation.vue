@@ -33,7 +33,7 @@ export default {
   name: 'PlanningNavigation',
   props: {
     timelineTitle: { type: String, default: '' },
-    targetDate: { type: String },
+    targetDate: { type: String, default: '' },
     viewMode: { type: String, default: 'week' },
     type: { type: String, default: PLANNING },
     isCoachOrPlanningReferent: { type: Boolean, default: false },
@@ -63,30 +63,30 @@ export default {
   },
   methods: {
     goToNextWeek (value) {
-      this.$emit('goToNextWeek', value)
+      this.$emit('go-to-next-week', value);
     },
     goToPreviousWeek (value) {
-      this.$emit('goToPreviousWeek', value)
+      this.$emit('go-to-previous-week', value);
     },
     goToWeek (value) {
-      const momentValue = this.$moment(value, 'YYYY/MM/DD', true)
+      const momentValue = this.$moment(value, 'YYYY/MM/DD', true);
       if (!momentValue.isValid()) return;
-      this.$emit('goToWeek', momentValue.toISOString())
+      this.$emit('go-to-week', momentValue.toISOString());
     },
     goToToday (value) {
-      this.$emit('goToToday', value)
+      this.$emit('go-to-today', value);
     },
     updateViewMode (value) {
-      this.$emit('updateViewMode', value);
+      this.$emit('update-view-mode', value);
     },
     openDeleteEventsModal (value) {
-      this.$emit('openDeleteEventsModal', value);
+      this.$emit('open-delete-events-modal', value);
     },
     toggleHistory (value) {
-      this.$emit('toggleHistory', value);
+      this.$emit('toggle-history', value);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

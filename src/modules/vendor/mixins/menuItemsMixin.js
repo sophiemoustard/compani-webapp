@@ -35,18 +35,18 @@ export const menuItemsMixin = {
           ],
         },
       ],
-    }
+    };
   },
   computed: {
     routes () {
       if (this.isAdmin) return this.adminRoutes;
-      else if (this.isTrainer) return this.trainerRoutes;
-      else return [];
+      if (this.isTrainer) return this.trainerRoutes;
+      return [];
     },
     activeRoutes () {
       if (this.isAdmin) return this.adminActiveRoutes;
-      else if (this.isTrainer) return this.trainerActiveRoutes;
-      else return {};
+      if (this.isTrainer) return this.trainerActiveRoutes;
+      return {};
     },
     trainerRoutes () {
       return [

@@ -4,13 +4,13 @@
       <template v-slot:body>
         <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
           <q-item>
-            <q-item-section side><q-icon size="xs" name="bookmark_border"/></q-item-section>
+            <q-item-section side><q-icon size="xs" name="bookmark_border" /></q-item-section>
             <q-item-section class="text-capitalize">{{ companyType }}</q-item-section>
           </q-item>
         </div>
       </template>
     </ni-profile-header>
-    <profile-tabs :profile-id="companyId" :tabsContent="tabsContent" />
+    <profile-tabs :profile-id="companyId" :tabs-content="tabsContent" />
   </q-page>
 </template>
 
@@ -26,7 +26,7 @@ export default {
   name: 'CompanyProfile',
   metadata: { title: 'Fiche structure' },
   props: {
-    companyId: { type: String },
+    companyId: { type: String, required: true },
     defaultTab: { type: String, default: 'infos' },
   },
   components: {
@@ -37,7 +37,7 @@ export default {
     return {
       companyName: '',
       tabsContent: [{ label: 'Infos', name: 'infos', default: this.defaultTab === 'infos', component: ProfileInfo }],
-    }
+    };
   },
   computed: {
     ...mapState('company', ['company']),
@@ -67,7 +67,7 @@ export default {
   beforeDestroy () {
     this.$store.dispatch('company/resetCompany');
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

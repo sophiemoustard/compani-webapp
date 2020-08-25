@@ -23,7 +23,7 @@ export default {
     return {
       searchIcon: [{ icon: 'search' }],
       options: [],
-    }
+    };
   },
   computed: {
     ...mapState('planning', ['elementToAdd']),
@@ -54,7 +54,7 @@ export default {
       return this.$refs.refFilter.add(el);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

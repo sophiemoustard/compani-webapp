@@ -1,12 +1,12 @@
 <template>
-  <q-page  class="client-background" padding>
+  <q-page class="client-background" padding>
     <div class="q-mb-xl">
       <table>
         <th>Nom tag</th>
         <th>Description</th>
         <tr v-for="(tag, index) in tags" :key="index">
-          <td>{{`{${index}\}`}}</td>
-          <td>{{tag}}</td>
+          <td>{{ `{${index}\}` }}</td>
+          <td>{{ tag }}</td>
         </tr>
       </table>
     </div>
@@ -62,7 +62,7 @@ export default {
       },
     };
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

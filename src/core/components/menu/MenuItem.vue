@@ -15,5 +15,5 @@ export default {
     icon: { type: String, default: '' },
     displayItem: { type: Boolean, default: true },
   },
-}
+};
 </script>

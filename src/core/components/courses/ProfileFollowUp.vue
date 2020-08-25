@@ -4,7 +4,7 @@
       <p class="text-weight-bold">Contact pour la formation</p>
       <div class="row gutter-profile">
         <ni-input caption="Prénom Nom" v-model.trim="course.contact.name" @focus="saveTmp('contact.name')"
-          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error"/>
+          @blur="updateCourse('contact.name')" :error="$v.course.contact.name.$error" />
         <ni-input caption="Téléphone" @blur="updateCourse('contact.phone')"
           @focus="saveTmp('contact.phone')" v-model.trim="course.contact.phone"
           :error="$v.course.contact.phone.$error" :error-message="phoneNbrErrorcontact" />
@@ -15,25 +15,25 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Actions utiles</p>
-      <ni-banner v-if="disabledFollowUp">
+      <ni-banner v-if="followUpDisabled">
         <template v-slot:message>
-          Il manque la ou les information(s) suivante(s) pour assurer le suivi de la formation :
-          {{ followUpMissingInfo.join(', ') }}.
+          Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
+          pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-banner v-if="!get(this.course, 'program.learningGoals')">
+      <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
         <template v-slot:message>
           Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
           les attestations de fin de formation.
         </template>
       </ni-banner>
 
-      <ni-course-info-link :disable-link="disabledFollowUp" />
+      <ni-course-info-link :disable-link="followUpDisabled" />
 
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp" icon="file_download" flat dense
-            type="a" :href="!disabledFollowUp && downloadAttendanceSheet()" target="_blank" />
+          <q-btn color="primary" size="sm" :disable="followUpDisabled" icon="file_download" flat dense
+            type="a" :href="!followUpDisabled && downloadAttendanceSheet()" target="_blank" />
         </q-item-section>
         <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
       </q-item>
@@ -66,20 +66,25 @@
           </q-tr>
         </template>
       </ni-simple-table>
-      <ni-banner v-if="isFinished">
+      <ni-banner v-if="!followUpDisabled && isFinished">
         <template v-slot:message>
-          Impossible d'envoyer un sms pour une formation qui est finie.
+          Vous ne pouvez pas envoyer de sms car la formation est terminée.
         </template>
       </ni-banner>
-      <ni-banner v-if="missingTraineesPhone.length" icon="info_outline">
+      <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
         <template v-slot:message>
-          Il manque le numéro de téléphone de {{ missingTraineesPhone.length }} stagiaire(s) sur
-          {{course.trainees.length}} : {{ missingTraineesPhone.join(', ') }}.
+          Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
+        </template>
+      </ni-banner>
+      <ni-banner v-else-if="missingTraineesPhone.length" icon="info_outline">
+        <template v-slot:message>
+          Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
+          {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
         </template>
       </ni-banner>
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disabledFollowUp || isFinished" icon="mdi-cellphone-message" flat
+          <q-btn color="primary" size="sm" :disable="disableSms" icon="mdi-cellphone-message" flat
             dense @click="openSmsModal" />
         </q-item-section>
         <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
@@ -87,33 +92,12 @@
     </div>
 
     <!-- Modal envoi message -->
-    <ni-modal v-model="smsModal">
-      <template slot="title">
-        Envoyer un <span class="text-weight-bold">message</span>
-      </template>
-      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="messageType" required-field
-        @input="updateMessage" />
-      <ni-input in-modal caption="Message" v-model="message" type="textarea" :rows="7" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
-          :loading="loading" @click="sendMessage" />
-      </template>
-    </ni-modal>
+    <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
+      :new-sms="newSms" @send="sendMessage" @updateType="updateMessage" :loading="loading" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
-    <ni-modal v-model="smsHistoriesModal" @hide="resetSmsHistoryModal">
-      <template slot="title">
-        Message envoyé le <span class="text-weight-bold">{{$moment(smsHistory.date).format('DD/MM/YYYY')}}</span>
-      </template>
-      <ni-banner v-if="missingTraineesPhoneHistory" icon="info_outline">
-        <template v-slot:message>
-          Pour cet envoi, il manquait le numéro du ou des stagiaire(s) suivant(s) :
-          {{ missingTraineesPhoneHistory.join(', ') }}.
-        </template>
-      </ni-banner>
-      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="smsHistory.type" disable />
-      <ni-input in-modal caption="Message" v-model="smsHistory.message" type="textarea" :rows="7" disable />
-    </ni-modal>
+    <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
+      :message-type-options="messageTypeOptions" :sms-history="smsHistory" @hide="resetSmsHistoryModal" />
   </div>
 </template>
 
@@ -122,41 +106,40 @@ import { mapState } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
+import { formatQuantity, formatIdentity } from '@helpers/utils';
 import Input from '@components/form/Input';
-import Select from '@components/form/Select';
-import Modal from '@components/modal/Modal';
+import SmsSendingModal from '@components/courses/SmsSendingModal';
+import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
 import SimpleTable from '@components/table/SimpleTable';
-import CourseInfoLink from './CourseInfoLink';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal.js';
-import { formatIdentity } from '@helpers/utils.js';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
+import CourseInfoLink from '@components/courses/CourseInfoLink';
 
 export default {
   name: 'ProfileFollowUp',
   components: {
     'ni-input': Input,
-    'ni-select': Select,
-    'ni-modal': Modal,
+    'sms-sending-modal': SmsSendingModal,
+    'sms-details-modal': SmsDetailsModal,
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
   },
   mixins: [courseMixin],
   props: {
-    profileId: { type: String },
+    profileId: { type: String, required: true },
   },
   data () {
     return {
       smsModal: false,
-      messageType: '',
       messageTypeOptions: [
         { label: 'Convocation', value: CONVOCATION },
         { label: 'Rappel', value: REMINDER },
       ],
-      message: '',
+      newSms: { content: '', type: '' },
       loading: false,
       courseLoading: false,
       smsSent: [],
@@ -167,14 +150,14 @@ export default {
           label: 'Date d\'envoi',
           align: 'left',
           field: 'date',
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'sender',
           label: 'Expéditeur',
           align: 'left',
           field: row => get(row, 'sender.identity') || '',
-          format: (value) => formatIdentity(value, 'FL'),
+          format: value => formatIdentity(value, 'FL'),
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -197,24 +180,25 @@ export default {
           email: { email },
         },
       },
+      newSms: { content: { required }, type: { required } },
     };
   },
   computed: {
     ...mapState('course', ['course']),
     disableDownloadCompletionCertificates () {
-      return this.disabledFollowUp || !get(this.course, 'program.learningGoals');
+      return this.followUpDisabled || !get(this.course, 'subProgram.program.learningGoals');
     },
     isFinished () {
-      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
+      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate));
       return !slots.length && !this.course.slotsToPlan.length;
     },
     courseNotStartedYet () {
-      const slots = this.course.slots.filter(slot => this.$moment().isAfter(slot.endDate))
+      const slots = this.course.slots.filter(slot => this.$moment().isAfter(slot.endDate));
       return !slots.length;
     },
     courseLink () {
-      return `${location.protocol}//${location.hostname}${(location.port ? ':' + location.port : '')}/` +
-        `trainees/courses/${this.course._id}`;
+      return `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/`
+        + `trainees/courses/${this.course._id}`;
     },
     emailErrorcontact () {
       if (!this.$v.course.contact.email.email) return 'Email non valide';
@@ -222,7 +206,7 @@ export default {
     },
     phoneNbrErrorcontact () {
       if (this.$v.course.contact.phone.required === false) return REQUIRED_LABEL;
-      else if (!this.$v.course.contact.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
+      if (!this.$v.course.contact.phone.frPhoneNumber) return 'Numéro de téléphone non valide';
       return '';
     },
     filteredMessageTypeOptions () {
@@ -235,28 +219,36 @@ export default {
         .map(trainee => formatIdentity(trainee.identity, 'FL'));
     },
     missingTraineesPhoneHistory () {
-      if (!this.smsHistory.missingPhones.length) return '';
+      if (!this.smsHistory.missingPhones.length) return [];
 
       return this.smsHistory.missingPhones.map(mp => formatIdentity(mp.identity, 'FL'));
     },
     courseName () {
       return this.composeCourseName(this.course);
     },
+    allFuturSlotsAreNotPlanned () {
+      const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => this.$moment().isBefore(s.startDate));
+      return !!this.course.slotsToPlan.length && !futurSlots.length;
+    },
+    disableSms () {
+      return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned;
+    },
   },
   methods: {
     get,
+    formatQuantity,
     getType (value) {
-      const type = this.messageTypeOptions.find(type => type.value === value);
+      const type = this.messageTypeOptions.find(t => t.value === value);
       return type ? type.label : '';
     },
     setDefaultMessageType () {
-      this.messageType = this.courseNotStartedYet ? CONVOCATION : REMINDER;
+      this.newSms.type = this.courseNotStartedYet ? CONVOCATION : REMINDER;
     },
     async refreshSms () {
       try {
         this.smsLoading = true;
         const smsSent = await Courses.getSMSHistory(this.course._id);
-        this.smsSent = smsSent.sort((a, b) => new Date(b.date) - new Date(a.date))
+        this.smsSent = smsSent.sort((a, b) => new Date(b.date) - new Date(a.date));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des sms');
@@ -266,8 +258,11 @@ export default {
       }
     },
     openSmsModal () {
-      this.updateMessage();
+      this.updateMessage(this.newSms.type);
       this.smsModal = true;
+    },
+    resetSmsModal () {
+      this.updateMessage(this.newSms.type);
     },
     async refreshCourse () {
       try {
@@ -286,35 +281,40 @@ export default {
     resetSmsHistoryModal () {
       this.smsHistory = { missingPhones: [] };
     },
-    updateMessage () {
-      if (this.messageType === CONVOCATION) this.setConvocationMessage();
-      else if (this.messageType === REMINDER) this.setReminderMessage();
+    updateMessage (newMessageType) {
+      if (newMessageType === CONVOCATION) this.setConvocationMessage();
+      else if (newMessageType === REMINDER) this.setReminderMessage();
     },
     setConvocationMessage () {
-      const slots = this.course.slots.sort((a, b) => a.startDate - b.startDate);
-      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const slots = this.course.slots.filter(s => !!s.startDate).sort((a, b) => a.startDate - b.startDate);
+      const date = this.$moment(slots[0].startDate).format('DD/MM');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n` +
-      `La première session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
-      'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
-      `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+      this.newSms.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      + `La première session a lieu le ${date} à ${hour}.\nMerci de vous `
+      + 'présenter au moins 15 minutes avant le début.\nToutes les informations sur : '
+      + `${this.courseLink}\nBonne formation,\nCompani`;
     },
     setReminderMessage () {
-      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate))
+      const slots = this.course.slots
+        .filter(s => !!s.startDate)
+        .filter(slot => this.$moment().isBefore(slot.startDate))
         .sort((a, b) => a.startDate - b.startDate);
-      const date = this.$moment(slots[0].startDate).format('DD/MM/YYYY');
+      const date = this.$moment(slots[0].startDate).format('DD/MM');
       const hour = this.$moment(slots[0].startDate).format('HH:mm');
 
-      this.message = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n` +
-      `Votre prochaine session a lieu le ${date} à partir de ${hour}.\nMerci de vous ` +
-      'présenter au moins 15 minutes avant le début de la formation.\nToutes les informations sur : ' +
-      `${this.courseLink}\nNous vous souhaitons une bonne formation,\nCompani`;
+      this.newSms.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
+      + `Votre prochaine session a lieu le ${date} à ${hour}.\nMerci de vous `
+      + 'présenter au moins 15 minutes avant le début.\nToutes les informations sur : '
+      + `${this.courseLink}\nBonne formation,\nCompani`;
     },
     async sendMessage () {
       try {
+        this.$v.newSms.$touch();
+        if (this.$v.newSms.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
-        await Courses.sendSMS(this.course._id, { body: this.message, type: this.messageType });
+        await Courses.sendSMS(this.course._id, this.newSms);
         await this.refreshSms();
         return NotifyPositive('SMS bien envoyé(s).');
       } catch (e) {
@@ -334,7 +334,7 @@ export default {
       return Courses.downloadCompletionCertificates(this.course._id);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

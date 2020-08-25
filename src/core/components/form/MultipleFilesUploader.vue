@@ -24,7 +24,8 @@
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem"
                   @click.native="deleteDocument(certificate.driveId)" />
-                <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(certificate.link)" />
+                <q-btn color="primary" round flat icon="save_alt" size="1rem"
+                  @click.native="goToUrl(certificate.link)" />
               </div>
             </div>
           </div>
@@ -49,7 +50,7 @@
 import { openURL } from 'quasar';
 import get from 'lodash/get';
 import CustomImg from '@components/form/CustomImg';
-import FileUploader from '@components/form/FileUploader.vue';
+import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative } from '@components/popup/notify';
 
 export default {
@@ -66,7 +67,7 @@ export default {
     name: { type: String, default: '' },
     url: { type: String, default: '' },
     additionalFieldsName: { type: String, default: '' },
-    userProfile: { type: Object, default: () => {} },
+    userProfile: { type: Object, default: () => ({}) },
     collapsibleLabel: { type: String, default: '' },
     extensions: { type: String, default: '' },
   },
@@ -94,7 +95,7 @@ export default {
       NotifyNegative('Echec de l\'envoi du document.');
     },
     goToUrl (url) {
-      url = `${url}?usp=sharing`
+      url = `${url}?usp=sharing`;
       openURL(url);
     },
   },

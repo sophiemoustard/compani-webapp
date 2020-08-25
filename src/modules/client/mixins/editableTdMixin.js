@@ -4,7 +4,7 @@ export const editableTdMixin = {
       obj[path] = true;
       this.$nextTick(() => {
         ref.focus();
-      })
+      });
     },
     setEditionField ({ value, obj, path }) {
       obj[path] = !value || isNaN(value) ? 0 : value;

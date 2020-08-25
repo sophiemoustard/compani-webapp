@@ -36,21 +36,21 @@ export const helperMixin = {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: (value) => formatPhone(value),
+          format: value => formatPhone(value),
         },
         {
           name: 'startDate',
           label: 'Depuis le...',
           field: 'createdAt',
           align: 'left',
-          format: (value) => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       helpersPagination: { rowsPerPage: 0 },
       helpersLoading: false,
-    }
+    };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
@@ -83,12 +83,12 @@ export const helperMixin = {
     // Creation
     resetAddHelperForm () {
       this.$v.newHelper.$reset();
-      this.newHelper = Object.assign({}, clear(this.newHelper));
+      this.newHelper = { ...clear(this.newHelper) };
       this.firstStep = true;
     },
     resetEditedHelperForm () {
       this.$v.editedHelper.$reset();
-      this.editedHelper = Object.assign({}, clear(this.editedHelper));
+      this.editedHelper = { ...clear(this.editedHelper) };
       this.openEditedHelperModal = false;
     },
     async formatHelper () {
@@ -111,7 +111,7 @@ export const helperMixin = {
 
       return pickBy(payload);
     },
-    async submitHelper () {
+    async createHelper () {
       try {
         this.loading = true;
         this.$v.newHelper.$touch();
@@ -147,7 +147,7 @@ export const helperMixin = {
         if (this.$v.newHelper.local.email.$error) return NotifyWarning('Champs invalides');
 
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
-        const user = userInfo.user;
+        const { user } = userInfo;
 
         const sameOrNoCompany = !user.company || user.company === this.company._id;
         if (userInfo.exists && (get(user, 'role.client') || !sameOrNoCompany)) {
@@ -161,7 +161,7 @@ export const helperMixin = {
           await Users.updateById(user._id, payload);
           NotifyPositive('Aidant créé');
 
-          this.getUserHelpers()
+          this.getUserHelpers();
           this.openNewHelperModal = false;
         } else {
           this.firstStep = false;
@@ -180,15 +180,15 @@ export const helperMixin = {
         if (this.$v.editedHelper.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         if (get(this.editedHelper, 'contact.phone')) {
-          this.editedHelper.contact.phone = formatPhoneForPayload(this.editedHelper.contact.phone)
+          this.editedHelper.contact.phone = formatPhoneForPayload(this.editedHelper.contact.phone);
         }
-        const payload = Object.assign({}, omit(this.editedHelper, ['_id']));
+        const payload = { ...omit(this.editedHelper, ['_id']) };
         delete payload.local;
         await Users.updateById(this.editedHelper._id, payload);
         NotifyPositive('Aidant modifié');
 
         await this.getUserHelpers();
-        this.openEditedHelperModal = false
+        this.openEditedHelperModal = false;
       } catch (e) {
         NotifyNegative('Erreur lors de la modification de l\'aidant.');
       } finally {
@@ -196,7 +196,7 @@ export const helperMixin = {
       }
     },
     openEditionModalHelper (helperId) {
-      const helper = this.helpers.find(helper => helper._id === helperId);
+      const helper = this.helpers.find(h => h._id === helperId);
       this.editedHelper = {
         ...pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
         contact: { phone: get(helper, 'contact.phone') || '' },
@@ -210,7 +210,7 @@ export const helperMixin = {
         NotifyPositive('Aidant supprimé');
       } catch (e) {
         console.error(e);
-        NotifyNegative("Erreur lors de la suppression de l'aidant.");
+        NotifyNegative('Erreur lors de la suppression de l\'aidant.');
       }
     },
     validateHelperDeletion (helperId) {

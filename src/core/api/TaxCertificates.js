@@ -1,5 +1,5 @@
 import { Cookies } from 'quasar';
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async list (params) {
@@ -15,4 +15,4 @@ export default {
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/taxcertificates/${id}`);
   },
-}
+};

@@ -1,5 +1,5 @@
 
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async create (formData) {
@@ -12,4 +12,4 @@ export default {
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/paydocuments/${id}`);
   },
-}
+};

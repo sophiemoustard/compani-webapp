@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import { formatPrice } from '@helpers/utils.js';
+import { formatPrice } from '@helpers/utils';
 
 export default {
   name: 'PrefixedCellContent',
@@ -19,5 +19,5 @@ export default {
       return formatPrice(Math.abs(this.cellValue));
     },
   },
-}
+};
 </script>

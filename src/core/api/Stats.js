@@ -1,4 +1,4 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async getCustomerFollowUp (params = null) {
@@ -12,7 +12,10 @@ export default {
     return stats.data.data.customerFundingsMonitoring;
   },
   async getAllCustomersFundingsMonitoring (params = null) {
-    const stats = await alenviAxios.get(`${process.env.API_HOSTNAME}/stats/all-customers-fundings-monitoring`, { params });
+    const stats = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/stats/all-customers-fundings-monitoring`,
+      { params }
+    );
 
     return stats.data.data.allCustomersFundingsMonitoring;
   },
@@ -30,4 +33,4 @@ export default {
 
     return stats.data.data.internalAndBilledHours;
   },
-}
+};

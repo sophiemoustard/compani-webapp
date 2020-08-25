@@ -1,8 +1,7 @@
 <template>
   <div class="profile-tabs">
     <q-tabs align="justify" color="transparent" text-color="primary" v-model="selectedTab">
-      <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label"
-        :name="tab.name" :alert="alert(tab)"/>
+      <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" :alert="alert(tab)" />
     </q-tabs>
     <q-tab-panels v-model="selectedTab" class="no-border" flat>
       <q-tab-panel v-for="(tab, index) in tabsContent" :name="tab.name" :key="index">
@@ -18,12 +17,12 @@ export default {
   props: {
     tabsContent: { type: Array, default: () => [] },
     profileId: { type: String, default: '' },
-    notifications: { type: Object, default: () => {} },
+    notifications: { type: Object, default: () => ({}) },
   },
   data () {
     return {
       selectedTab: null,
-    }
+    };
   },
   mounted () {
     const selectedTab = this.tabsContent.find(tab => tab.default);
@@ -31,12 +30,12 @@ export default {
   },
   methods: {
     alert (tab) {
-      return tab.notification && this.notifications && this.notifications[tab.notification][this.profileId]
+      return tab.notification && this.notifications && this.notifications[tab.notification]
         ? this.notifications[tab.notification][this.profileId]
-        : false
+        : false;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

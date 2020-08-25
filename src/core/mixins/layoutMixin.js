@@ -15,7 +15,7 @@ export const layoutMixin = {
       return !this.isMini ? 'chevron chevron-left' : 'chevron chevron-right';
     },
     chevronContainerClasses () {
-      return !this.isMini ? 'absolute q-mini-drawer-hide' : 'absolute q-mini-drawer-only'
+      return !this.isMini ? 'absolute q-mini-drawer-hide' : 'absolute q-mini-drawer-only';
     },
   },
   methods: {

@@ -1,3 +1,7 @@
+// IMAGES
+export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
+  + 'compani_texte_rose_1000.png';
+
 // CUSTOMER
 export const CIVILITY_OPTIONS = [
   { label: 'Monsieur', value: 'mr' },
@@ -70,7 +74,7 @@ export const CONTRACT_CREATION_MANDATORY_INFO = {
   'identity.socialSecurityNumber': 'numéro de sécurité sociale',
   'contact.address.fullAddress': 'adresse',
   establishment: 'établissement',
-}
+};
 
 // EVENTS
 export const INTERVENTION = 'intervention';
@@ -114,8 +118,10 @@ export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
 
 // AVATAR
-export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/images/users/default_avatar.png';
-export const UNKNOWN_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1563288281/images/users/unknown_avatar.png';
+export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/'
+  + 'images/users/default_avatar.png';
+export const UNKNOWN_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1563288281/'
+  + 'images/users/unknown_avatar.png';
 
 // REPETITION FREQUENCY
 export const NEVER = 'never';
@@ -153,7 +159,7 @@ export const CUSTOMER = 'customer';
 export const AUXILIARY = 'auxiliary';
 export const HELPER = 'helper';
 export const PLANNING_REFERENT = 'planning_referent';
-export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company'
+export const AUXILIARY_WITHOUT_COMPANY = 'auxiliary_without_company';
 export const AUXILIARY_ROLES = [AUXILIARY, PLANNING_REFERENT, AUXILIARY_WITHOUT_COMPANY];
 export const COACH_ROLES = [CLIENT_ADMIN, COACH];
 
@@ -169,7 +175,7 @@ export const ROLES_TRANSLATION = {
 };
 
 // SUBSCRIPTIONS
-export const ERP = 'erp'
+export const ERP = 'erp';
 
 // PLANNING
 export const THREE_DAYS_VIEW = '3days';
@@ -291,11 +297,13 @@ export const ASSOCIATION = 'association';
 export const COMPANY_TYPES = [
   { label: 'Association', value: ASSOCIATION },
   { label: 'Entreprise', value: COMPANY },
-]
+];
 
 // SMS
 export const CONVOCATION = 'convocation';
 export const REMINDER = 'reminder';
+export const HR_SMS = 'RH';
+export const COURSE_SMS = 'Formation';
 
 // COURSE
 export const INTRA = 'intra';
@@ -303,12 +311,26 @@ export const INTER_B2B = 'inter_b2b';
 export const COURSE_TYPES = [
   { label: 'Intra', value: INTRA },
   { label: 'Inter B2B', value: INTER_B2B },
-]
+];
 export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
+
+// STEP
 export const E_LEARNING = 'e_learning';
 export const ON_SITE = 'on_site';
+
+// ACTIVITY
+export const LESSON = 'lesson';
+export const QUIZ = 'quiz';
+export const SHARING_EXPERIENCE = 'sharing_experience';
+export const VIDEO = 'video';
+export const ACTIVITY_TYPES = [
+  { label: 'Cours', value: LESSON },
+  { label: 'Quiz', value: QUIZ },
+  { label: 'Témoignage', value: SHARING_EXPERIENCE },
+  { label: 'Vidéo', value: VIDEO },
+];
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
@@ -316,10 +338,22 @@ export const TITLE_TEXT_MEDIA = 'title_text_media';
 export const TITLE_TEXT = 'title_text';
 export const TEXT_MEDIA = 'text_media';
 export const FLASHCARD = 'flashcard';
-export const TEMPLATE_TYPES = [
-  { label: 'Transition', value: TRANSITION },
-  { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA },
-  { label: 'Titre Texte', value: TITLE_TEXT },
-  { label: 'Texte Média', value: TEXT_MEDIA },
-  { label: 'Flashcard', value: FLASHCARD },
-]
+export const FILL_THE_GAPS = 'fill_the_gaps';
+export const MULTIPLE_CHOICE_QUESTION = 'multiple_choice_question';
+export const SINGLE_CHOICE_QUESTION = 'single_choice_question';
+export const ORDER_THE_SEQUENCE = 'order_the_sequence';
+export const CARD_TEMPLATES = [
+  { label: 'Transition', value: TRANSITION, type: LESSON },
+  { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA, type: LESSON },
+  { label: 'Titre Texte', value: TITLE_TEXT, type: LESSON },
+  { label: 'Texte Média', value: TEXT_MEDIA, type: LESSON },
+  { label: 'Flashcard', value: FLASHCARD, type: LESSON },
+  { label: 'Texte à trou', value: FILL_THE_GAPS, type: QUIZ },
+  { label: 'QCM', value: MULTIPLE_CHOICE_QUESTION, type: QUIZ },
+  { label: 'QCU', value: SINGLE_CHOICE_QUESTION, type: QUIZ },
+  { label: 'Mettre dans l\'ordre', value: ORDER_THE_SEQUENCE, type: QUIZ },
+];
+export const TEMPLATE_TYPES = {
+  [LESSON]: 'Cours',
+  [QUIZ]: 'Quiz',
+};

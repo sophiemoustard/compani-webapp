@@ -11,7 +11,7 @@ export const financialCertificatesMixin = {
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression du document.')
+        NotifyNegative('Erreur lors de la suppression du document.');
       }
     },
     // Financial certificates

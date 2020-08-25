@@ -19,10 +19,10 @@
 </template>
 
 <script>
-import { sameAs, required, requiredIf } from 'vuelidate/lib/validators'
+import { sameAs, required, requiredIf } from 'vuelidate/lib/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
-import Users from '@api/Users'
+import Users from '@api/Users';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { logInMixin } from '@mixins/logInMixin';
@@ -42,7 +42,7 @@ export default {
       userId: null,
       timeout: null,
       userEmail: '',
-    }
+    };
   },
   async beforeRouteEnter (to, from, next) {
     try {
@@ -65,7 +65,7 @@ export default {
         required: requiredIf(item => item.password),
         sameAsPassword: sameAs('password'),
       },
-    }
+    };
   },
   methods: {
     setData (checkToken) {
@@ -86,7 +86,7 @@ export default {
         await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true }, this.token);
 
         NotifyPositive('Mot de passe changé. Connexion en cours...');
-        this.timeout = setTimeout(() => this.logIn(), 2000)
+        this.timeout = setTimeout(() => this.logIn(), 2000);
       } catch (e) {
         NotifyNegative('Erreur, si le problème persiste, contactez le support technique.');
         console.error(e.response);
@@ -96,7 +96,7 @@ export default {
   beforeDestroy () {
     clearTimeout(this.timeout);
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

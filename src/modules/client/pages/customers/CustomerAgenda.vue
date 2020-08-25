@@ -5,15 +5,15 @@
         <div class="col-xs-12 col-sm-5 person-name row" v-if="customer && customer.identity">
           <img :src="DEFAULT_AVATAR" class="avatar">
           <input class="q-pl-sm identity" :value="formatIdentity(customer.identity, 'FL')"
-            readonly data-cy="customer-identity" />
+            readonly data-cy="customer-identity">
         </div>
         <div class="col-xs-12 col-sm-7">
-          <planning-navigation :timelineTitle="timelineTitle()" @goToNextWeek="goToNextWeek" :targetDate="targetDate"
-            :view-mode="viewMode" :type="AGENDA" @goToPreviousWeek="goToPreviousWeek" @goToToday="goToToday"
-            @goToWeek="goToWeek" @updateViewMode="updateViewMode" />
+          <planning-navigation :timeline-title="timelineTitle()" @go-to-next-week="goToNextWeek"
+            :target-date="targetDate" :view-mode="viewMode" :type="AGENDA" @go-to-previous-week="goToPreviousWeek"
+            @go-to-today="goToToday" @go-to-week="goToWeek" @update-view-mode="updateViewMode" />
         </div>
       </div>
-      <agenda :events="events" :days="days" :personKey="personKey" />
+      <agenda :events="events" :days="days" :person-key="personKey" />
     </div>
   </q-page>
 </template>
@@ -90,7 +90,7 @@ export default {
     },
     formatIdentity,
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

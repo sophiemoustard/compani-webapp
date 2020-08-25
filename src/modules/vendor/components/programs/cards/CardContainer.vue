@@ -21,7 +21,15 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { TEMPLATE_TYPES, TRANSITION, TITLE_TEXT, TITLE_TEXT_MEDIA, TEXT_MEDIA, FLASHCARD } from '@data/constants';
+import {
+  CARD_TEMPLATES,
+  TRANSITION,
+  TITLE_TEXT,
+  TITLE_TEXT_MEDIA,
+  TEXT_MEDIA,
+  FLASHCARD,
+  TEMPLATE_TYPES,
+} from '@data/constants';
 import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
 
 export default {
@@ -45,8 +53,8 @@ export default {
       return '';
     },
     getTemplateName (value) {
-      const template = TEMPLATE_TYPES.find(t => t.value === value);
-      return template ? `Carte cours - ${template.label}` : '';
+      const template = CARD_TEMPLATES.find(t => t.value === value);
+      return template ? `Carte ${TEMPLATE_TYPES[template.type].toLowerCase()} - ${template.label}` : '';
     },
     scrollDown () {
       const scrollArea = this.$refs.cardContainer;
@@ -58,7 +66,7 @@ export default {
       this.$store.dispatch('program/fetchCard', card);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

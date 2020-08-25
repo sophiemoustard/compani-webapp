@@ -1,14 +1,14 @@
 <template>
-  <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="resetForm(false)">
+  <q-dialog v-if="Object.keys(newEvent).length !== 0" :value="creationModal" @hide="reset(false)">
     <div class="modal-container-md">
       <div class="modal-padding">
         <ni-planning-modal-header v-if="isCustomerPlanning" v-model="newEvent.customer"
-          :selectedPerson="selectedCustomer" @close="close" />
+          :selected-person="selectedCustomer" @close="close" />
         <ni-planning-modal-header v-else v-model="newEvent.auxiliary" :options="auxiliariesOptions"
-          :selectedPerson="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent" />
+          :selected-person="selectedAuxiliary" @close="close" @update:sector="updateSectorEvent" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap v-model="newEvent.type" unelevated toggle-color="primary" :options="eventTypeOptions"
-            @input="resetForm(true, newEvent.type)" text-color="black" />
+            @input="reset(true, newEvent.type)" text-color="black" />
         </div>
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" v-model="newEvent.dates" required-field
@@ -38,7 +38,7 @@
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
             :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
-            :additionalValue="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
+            :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
             :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)" />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
@@ -53,7 +53,7 @@
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-search-address v-model="newEvent.address" :error-message="addressError" @blur="validations.address.$touch"
-            :error="validations.address.$error" inModal />
+            :error="validations.address.$error" in-modal />
         </template>
         <ni-input in-modal v-model="newEvent.misc" caption="Notes" @blur="validations.misc.$touch"
           :error="validations.misc.$error" :required-field="newEvent.type === ABSENCE && newEvent.absence === OTHER" />
@@ -70,7 +70,7 @@
         </div>
       </div>
       <q-btn class="full-width modal-btn" no-caps :loading="loading" label="Créer l'évènement" color="primary"
-        @click="createEvent" icon-right="add" data-cy="event-creation-button" />
+        @click="submit" icon-right="add" data-cy="event-creation-button" />
     </div>
   </q-dialog>
 </template>
@@ -123,7 +123,7 @@ export default {
     },
     selectedAuxiliary () {
       if (!this.newEvent.auxiliary || !this.activeAuxiliaries.length) return { identity: {} };
-      const aux = this.activeAuxiliaries.find(aux => aux._id === this.newEvent.auxiliary);
+      const aux = this.activeAuxiliaries.find(a => a._id === this.newEvent.auxiliary);
       const hasContractOnEvent = this.hasContractOnEvent(aux, this.newEvent.dates.startDate);
 
       return { ...aux, hasContractOnEvent };
@@ -148,17 +148,17 @@ export default {
     close () {
       this.$emit('close');
     },
-    resetForm (partialReset, type) {
-      this.$emit('resetForm', { partialReset, type });
+    reset (partialReset, type) {
+      this.$emit('reset', { partialReset, type });
     },
     deleteDocument (value) {
-      this.$emit('deleteDocument', value);
+      this.$emit('delete-document', value);
     },
     documentUploaded (value) {
-      this.$emit('documentUploaded', value);
+      this.$emit('document-uploaded', value);
     },
-    createEvent (value) {
-      this.$emit('createEvent', value);
+    submit (value) {
+      this.$emit('submit', value);
     },
     resetAbsenceType () {
       if (this.newEvent.type === ABSENCE && this.newEvent.absenceNature === HOURLY) {
@@ -180,7 +180,7 @@ export default {
       this.$emit('update:newEvent', payload);
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

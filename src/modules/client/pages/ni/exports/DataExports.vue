@@ -26,7 +26,7 @@ export default {
     return {
       exportTypeOptions: EXPORT_TYPES,
       type: SERVICE,
-    }
+    };
   },
   methods: {
     async exportCsv () {
@@ -44,5 +44,5 @@ export default {
       }
     },
   },
-}
+};
 </script>

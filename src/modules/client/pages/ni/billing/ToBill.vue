@@ -13,7 +13,7 @@
     <ni-large-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
       :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected"
       data-cy="client-table" separator="none">
-      <template v-slot:header="{ props }" >
+      <template v-slot:header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <th>
@@ -21,7 +21,7 @@
           </th>
         </q-tr>
       </template>
-      <template v-slot:body="{ props }" >
+      <template v-slot:body="{ props }">
         <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
           @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
           @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
@@ -108,7 +108,7 @@ export default {
         { label: 'Avec tiers payeur', value: 2 },
       ],
       toBillOption: 0,
-    }
+    };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
@@ -131,12 +131,16 @@ export default {
       return 'Facturer';
     },
     filteredAndOrderedDraftBills () {
-      const orderedByCustomerDraftBills = orderBy(this.draftBills, (row) => get(row, 'customer.identity.lastname', '').toLowerCase(), ['asc']);
+      const orderedByCustomerDraftBills = orderBy(
+        this.draftBills,
+        row => get(row, 'customer.identity.lastname', '').toLowerCase(),
+        ['asc']
+      );
       if (this.toBillOption === 1) return orderedByCustomerDraftBills.filter(draft => !draft.thirdPartyPayerBills);
       if (this.toBillOption === 2) {
         return orderBy(
           orderedByCustomerDraftBills.filter(draft => draft.thirdPartyPayerBills),
-          (row) => get(row, 'thirdPartyPayerBills[0].bills[0].thirdPartyPayer.name', '').toLowerCase(),
+          row => get(row, 'thirdPartyPayerBills[0].bills[0].thirdPartyPayer.name', '').toLowerCase(),
           ['asc']
         );
       }
@@ -182,8 +186,9 @@ export default {
           endDate: this.$moment().date() > 15 ? this.$moment().date(15).endOf('d').toISOString()
             : this.$moment().subtract(1, 'M').endOf('month').toISOString(),
           startDate: this.$moment().date() > 15 ? this.$moment().startOf('month').toISOString()
-            : this.$moment().subtract(1, 'M').date(16).startOf('d').toISOString(),
-        }
+            : this.$moment().subtract(1, 'M').date(16).startOf('d')
+              .toISOString(),
+        };
       }
     },
     async getDraftBills () {
@@ -195,18 +200,20 @@ export default {
           endDate: this.$moment(this.billingDates.endDate).endOf('d').toISOString(),
           billingStartDate: this.$moment(this.billingDates.startDate).startOf('d').toISOString(),
           billingPeriod: get(this.company, 'customersConfig.billingPeriod'),
-        }
+        };
 
         const draftBills = await Bills.getDraftBills(params);
-        this.draftBills = draftBills.map((draft) => {
-          return {
-            ...draft,
-            customerBills: { total: draft.customerBills.total, bills: this.addEditDiscountToBills(draft.customerBills.bills) },
-            ...(!!draft.thirdPartyPayerBills && {
-              thirdPartyPayerBills: draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) })),
-            }),
-          }
-        });
+        this.draftBills = draftBills.map(draft => ({
+          ...draft,
+          customerBills: {
+            total: draft.customerBills.total,
+            bills: this.addEditDiscountToBills(draft.customerBills.bills),
+          },
+          ...(!!draft.thirdPartyPayerBills && {
+            thirdPartyPayerBills:
+                draft.thirdPartyPayerBills.map(tpp => ({ ...tpp, bills: this.addEditDiscountToBills(tpp.bills) })),
+          }),
+        }));
       } catch (e) {
         this.draftBills = [];
         console.error(e);
@@ -274,7 +281,7 @@ export default {
       return row.customer._id;
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

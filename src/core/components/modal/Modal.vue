@@ -4,7 +4,8 @@
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
           <div class="col-11">
-            <h5 :class="{ 'text-weight-bold': !!title }">{{ title }}
+            <h5 :class="{ 'text-weight-bold': !!title }">
+              {{ title }}
               <slot name="title" />
             </h5>
           </div>
@@ -29,5 +30,5 @@ export default {
     containerClass: { type: String, default: () => 'modal-container-sm' },
     title: { type: String, default: '' },
   },
-}
+};
 </script>

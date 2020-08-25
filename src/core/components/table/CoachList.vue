@@ -128,14 +128,14 @@ export default {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: (value) => formatPhone(value),
+          format: value => formatPhone(value),
         },
         {
           name: 'role',
           label: 'Role',
           align: 'left',
           field: row => get(row, 'role.client.name') || '',
-          format: value => value ? ROLES_TRANSLATION[value] : '',
+          format: value => (value ? ROLES_TRANSLATION[value] : ''),
         },
         { name: 'actions', label: '', align: 'center' },
       ],
@@ -198,12 +198,14 @@ export default {
         this.$v.newUser.local.email.$touch();
         if (this.$v.newUser.local.email.$error || !this.newUser.local.email) return NotifyWarning('Champs invalides');
         const userInfo = await Users.exists({ email: this.newUser.local.email });
-        const user = userInfo.user;
+        const { user } = userInfo;
 
         const sameOrNoCompany = !user.company || user.company === this.company._id;
-        if (userInfo.exists && !sameOrNoCompany) return NotifyNegative('Cet utilisateur n\'est pas relié à cette structure');
-        else if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
-        else if (userInfo.exists) {
+        if (userInfo.exists && !sameOrNoCompany) {
+          return NotifyNegative('Cet utilisateur n\'est pas relié à cette structure');
+        }
+        if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
+        if (userInfo.exists) {
           await Users.updateById(userInfo.user._id, { role: this.newUser.role, company: this.company._id });
           NotifyPositive('Coach créé');
           await this.getUsers();
@@ -233,7 +235,7 @@ export default {
 
       if (!get(newUser, 'company.subscriptions.erp')) {
         try {
-          const userRole = this.roles.find((role) => role._id === this.newUser.role);
+          const userRole = this.roles.find(role => role._id === this.newUser.role);
           if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
           await Email.sendWelcome({ email: this.newUser.local.email, type: get(userRole, 'name') });
           NotifyPositive('Email envoyé.');
@@ -251,7 +253,7 @@ export default {
     },
     resetUserCreationForm () {
       this.firstStep = true;
-      this.newUser = Object.assign({}, clear(this.newUser));
+      this.newUser = { ...clear(this.newUser) };
       this.$v.newUser.$reset();
     },
     async getRoles () {
@@ -311,14 +313,14 @@ export default {
         this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des utilisateurs')
+        NotifyNegative('Erreur lors de la récupération des utilisateurs');
         this.users = [];
       } finally {
         this.usersLoading = false;
       }
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

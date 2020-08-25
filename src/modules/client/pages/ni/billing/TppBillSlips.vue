@@ -2,7 +2,7 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Bordereaux tiers payeurs" padding />
     <ni-large-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination" :loading="loading">
-      <template v-slot:body="{ props }" >
+      <template v-slot:body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style" class="text-capitalize">
@@ -11,7 +11,7 @@
                 <q-btn flat round small color="primary" type="a" :href="billSlipUrl(col.value)" icon="file_download" />
               </div>
             </template>
-            <template v-else >{{ col.value }}</template>
+            <template v-else>{{ col.value }}</template>
           </q-td>
         </q-tr>
       </template>
@@ -90,7 +90,7 @@ export default {
         NotifyPositive('Bordereaux récupérés avec succès.');
       } catch (e) {
         this.billSlipList = [];
-        NotifyNegative('Erreur lors de la récuperation des bordereaux.')
+        NotifyNegative('Erreur lors de la récuperation des bordereaux.');
         console.error(e);
       } finally {
         this.loading = false;
@@ -100,5 +100,5 @@ export default {
       return BillSlip.getPDFUrl(id);
     },
   },
-}
+};
 </script>

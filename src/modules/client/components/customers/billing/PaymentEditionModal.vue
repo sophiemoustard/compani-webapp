@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="$emit('input', $event)" @hide="resetForm">
+  <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
       Editer le <span class="text-weight-bold">{{ editionModalNature }}</span>
     </template>
@@ -14,7 +14,7 @@
       :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
-        :loading="loading" @click="updatePayment" />
+        :loading="loading" @click="submit" />
     </template>
   </ni-modal>
 </template>
@@ -24,8 +24,8 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import DateInput from '@components/form/DateInput';
-import { formatIdentity } from '@helpers/utils.js';
-import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '@data/constants.js';
+import { formatIdentity } from '@helpers/utils';
+import { REQUIRED_LABEL, PAYMENT_OPTIONS, PAYMENT_NATURE_OPTIONS } from '@data/constants';
 
 export default {
   name: 'PaymentEditionModal',
@@ -69,12 +69,15 @@ export default {
     },
   },
   methods: {
-    resetForm (partialReset, type) {
-      this.$emit('resetForm', { partialReset, type });
+    hide (partialReset, type) {
+      this.$emit('hide', { partialReset, type });
     },
-    updatePayment (value) {
-      this.$emit('updatePayment', value);
+    input (event) {
+      this.$emit('input', event);
+    },
+    submit (value) {
+      this.$emit('submit', value);
     },
   },
-}
+};
 </script>

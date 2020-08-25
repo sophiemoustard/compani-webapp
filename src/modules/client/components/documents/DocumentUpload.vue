@@ -1,10 +1,10 @@
 <template>
   <div>
-    <ni-select :inModal="inModal" caption="Type" required-field :value="formValue.nature" :options="natureOptions"
+    <ni-select :in-modal="inModal" caption="Type" required-field :value="formValue.nature" :options="natureOptions"
       @blur="onBlur('nature')" @input="update('nature', $event)" :error="$v.formValue.nature.$error" />
-    <ni-date-input :inModal="inModal" caption="Date" required-field :value="formValue.date"
+    <ni-date-input :in-modal="inModal" caption="Date" required-field :value="formValue.date"
       @input="update('date', $event)" />
-    <ni-input :inModal="inModal" caption="Document" required-field type="file" :value="formValue.file"
+    <ni-input :in-modal="inModal" caption="Document" required-field type="file" :value="formValue.file"
       @input="onBlur('file'); update('file', $event)" :error="$v.formValue.file.$error"
       :error-message="fileErrorMessage" last />
   </div>
@@ -16,7 +16,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import { REQUIRED_LABEL } from '@data/constants';
-import { validationMixin } from 'src/modules/client/mixins/validationMixin.js';
+import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'DocumentUpload',
@@ -29,7 +29,7 @@ export default {
   props: {
     natureOptions: { type: Array, default: () => [] },
     inModal: { type: Boolean, default: false },
-    value: null,
+    value: { type: Object, default: () => ({}) },
   },
   data () {
     return {
@@ -86,11 +86,11 @@ export default {
       }
     },
     async validate () {
-      this.$v.$touch()
+      this.$v.$touch();
       const isValid = await this.waitForFormValidation(this.$v.formValue);
       this.$emit('valid', isValid);
       return isValid;
     },
   },
-}
+};
 </script>

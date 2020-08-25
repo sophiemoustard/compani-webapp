@@ -78,7 +78,7 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
-}
+};
 </script>
 
 <style lang="stylus" scoped>

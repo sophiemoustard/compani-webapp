@@ -1,4 +1,4 @@
-import { alenviAxios } from '@api/ressources/alenviAxios'
+import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async getCsv (params) {
@@ -19,4 +19,4 @@ export default {
       },
     });
   },
-}
+};

@@ -11,15 +11,16 @@ import store from 'src/store/index';
 import clientRoutes from 'src/modules/client/router/routes';
 import vendorRoutes from 'src/modules/vendor/router/routes';
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 Vue.use(VueMeta);
 
 const Router = new VueRouter({
   scrollBehavior: () => ({ y: 0 }),
-  routes: [...clientRoutes, ...vendorRoutes, ...routes], // routes needs to be at the end of array cf. /src/router/routes.js
+  // routes needs to be at the end of array cf. /src/router/routes.js
+  routes: [...clientRoutes, ...vendorRoutes, ...routes],
   mode: process.env.VUE_ROUTER_MODE,
   base: process.env.VUE_ROUTER_BASE,
-})
+});
 
 Router.beforeEach(async (to, from, next) => {
   if (to.meta.cookies) {
