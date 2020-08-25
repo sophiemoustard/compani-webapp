@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
       Créer un nouveau <span class="text-weight-bold">sous-programme</span>
     </template>
@@ -31,6 +31,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
     submit () {
       this.$emit('submit');
