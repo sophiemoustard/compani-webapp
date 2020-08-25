@@ -138,5 +138,3 @@ export const validTagsCount = (value) => {
 export const minArrayLength = (minLength, key) => value => (key
   ? value.filter(a => !!a[key]).length > minLength
   : value.filter(a => !!a).length > minLength);
-
-export const only1Correct = value => value.filter(a => a.correct).length === 1;

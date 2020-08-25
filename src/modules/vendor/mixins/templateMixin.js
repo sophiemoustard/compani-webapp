@@ -1,5 +1,5 @@
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import { required, minLength } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
@@ -24,7 +24,6 @@ import {
   validAnswerLength,
   validCaracters,
   minArrayLength,
-  only1Correct,
 } from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
@@ -84,7 +83,8 @@ export const templateMixin = {
         return {
           card: {
             question: { required },
-            answers: { required, minLength: minArrayLength(1, 'label'), only1Correct },
+            qcuGoodAnswer: { required },
+            falsyAnswers: { required, minLength: minLength(1) },
             explanation: { required },
           },
         };

@@ -84,7 +84,7 @@ export default {
       return '';
     },
     requiredAnswerIsMissing (index) {
-      return this.$v.card.answers.$error && !this.$v.card.answers.min2Answers && index < 2 &&
+      return this.$v.card.answers.$error && !this.$v.card.answers.minLength && index < 2 &&
         this.card.answers.filter(a => !!a.label).length < this.answersCountInDb && !this.card.answers[index].label;
     },
     async updateAnswer (index) {
@@ -112,6 +112,7 @@ export default {
 <style lang="stylus" scoped>
 
 .answers
+  > div
     padding-top: 0
 
 </style>
