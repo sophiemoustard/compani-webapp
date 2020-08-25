@@ -135,6 +135,4 @@ export const validTagsCount = (value) => {
     (gapAcc.length === 2 && validTagging(value));
 };
 
-export const minArrayLength = (minLength, key) => value => (key
-  ? value.filter(a => !!a[key]).length > minLength
-  : value.filter(a => !!a).length > minLength);
+export const minArrayLength = minLength => value => value.filter(a => !!a).length > minLength;

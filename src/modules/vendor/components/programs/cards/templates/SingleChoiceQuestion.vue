@@ -2,10 +2,8 @@
   <div v-if="answersInitialized">
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
-    <div class="q-my-lg">
-      <ni-input caption="Bonne réponse" v-model.trim="card.qcuGoodAnswer" required-field
-        @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" @blur="updateCard('qcuGoodAnswer')" />
-    </div>
+    <ni-input caption="Bonne réponse" v-model.trim="card.qcuGoodAnswer" required-field class="q-my-lg"
+      @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" @blur="updateCard('qcuGoodAnswer')" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.falsyAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
         v-model.trim="card.falsyAnswers[i]" :required-field="i === 0"
@@ -32,11 +30,6 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin, validationMixin],
-  data () {
-    return {
-      answersLengthInDb: 0,
-    };
-  },
   computed: {
     answersInitialized () {
       return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT;
@@ -52,7 +45,6 @@ export default {
   },
   methods: {
     initializeAnswers () {
-      this.answersLengthInDb = this.card.falsyAnswers.length;
       this.card.falsyAnswers = times(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, i => this.card.falsyAnswers[i] || '');
     },
     formatAnswersPayload () {
@@ -60,11 +52,9 @@ export default {
     },
     async updateFalsyAnswer (index) {
       try {
-        if (this.tmpInput === get(this.card, `falsyAnswers[${index}].label`)) return;
+        if (this.tmpInput === get(this.card, `falsyAnswers[${index}]`)) return;
 
         this.$v.card.falsyAnswers.$touch();
-        // eslint-disable-next-line no-console
-        console.log(this.$v.card.falsyAnswers.$error);
         if (this.$v.card.falsyAnswers.$error) return NotifyWarning('Champ(s) invalide(s)');
         await Cards.updateById(this.card._id, { falsyAnswers: this.formatAnswersPayload() });
 

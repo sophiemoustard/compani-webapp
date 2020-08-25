@@ -60,11 +60,9 @@ export const templateMixin = {
         return {
           card: {
             text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
-            answers: {
-              minLength: minArrayLength(1, 'label'),
-              $each: {
-                label: { validCaracters, validAnswerLength },
-              },
+            falsyAnswers: {
+              minLength: minArrayLength(2),
+              $each: { validCaracters, validAnswerLength },
             },
             explanation: { required },
           },
@@ -73,9 +71,7 @@ export const templateMixin = {
         return {
           card: {
             question: { required },
-            orderedAnswers: {
-              minLength: minArrayLength(1),
-            },
+            orderedAnswers: { minLength: minArrayLength(1) },
             explanation: { required },
           },
         };
