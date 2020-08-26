@@ -25,7 +25,6 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import {
   CARD_TEMPLATES,
   TRANSITION,
@@ -71,11 +70,7 @@ export default {
       this.$store.dispatch('program/fetchCard', card);
     },
     deleteCard (card) {
-      try {
-        NotifyPositive('Carte supprimée');
-      } catch (e) {
-        NotifyNegative('Carte supprimée');
-      }
+      this.$emit('delete-card', card._id);
     },
   },
 };
@@ -121,4 +116,7 @@ export default {
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
+
+.dot-error
+  align-self: center
 </style>

@@ -12,7 +12,8 @@
         </template>
       </ni-profile-header>
       <div class="row body">
-        <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
+        <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
+          @delete-card="deleteCard" />
         <card-edition />
       </div>
     </template>
@@ -27,6 +28,7 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
+import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES } from '@data/constants';
@@ -130,6 +132,16 @@ export default {
     resetCardCreationModal () {
       this.newCard = { template: '' };
       this.$v.newCard.$reset();
+    },
+    async deleteCard (cardId) {
+      try {
+        await Cards.deleteById(cardId);
+        await this.refreshActivity();
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Carte supprimée');
+      }
     },
   },
   beforeDestroy () {
