@@ -1,5 +1,5 @@
 <template>
-  <div v-if="answersInitialized">
+  <div v-if="falsyAnswersInitialized">
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
     <ni-input caption="Bonne réponse" v-model.trim="card.qcuGoodAnswer" required-field class="q-my-lg"
@@ -31,23 +31,23 @@ export default {
   },
   mixins: [templateMixin, validationMixin],
   computed: {
-    answersInitialized () {
+    falsyAnswersInitialized () {
       return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT;
     },
   },
   async mounted () {
-    this.initializeAnswers();
+    this.initializeFalsyAnswers();
   },
   watch: {
     card () {
-      this.initializeAnswers();
+      this.initializeFalsyAnswers();
     },
   },
   methods: {
-    initializeAnswers () {
+    initializeFalsyAnswers () {
       this.card.falsyAnswers = times(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, i => this.card.falsyAnswers[i] || '');
     },
-    formatAnswersPayload () {
+    formatFalsyAnswersPayload () {
       return this.card.falsyAnswers.filter(a => !!a);
     },
     async updateFalsyAnswer (index) {
@@ -56,7 +56,7 @@ export default {
 
         this.$v.card.falsyAnswers.$touch();
         if (this.$v.card.falsyAnswers.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Cards.updateById(this.card._id, { falsyAnswers: this.formatAnswersPayload() });
+        await Cards.updateById(this.card._id, { falsyAnswers: this.formatFalsyAnswersPayload() });
 
         await this.refreshCard();
 

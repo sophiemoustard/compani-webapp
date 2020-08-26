@@ -1,11 +1,11 @@
 <template>
-  <div v-if="answersInitialized">
+  <div v-if="falsyAnswersInitialized">
     <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :error-message="textTagCodeErrorMsg" />
     <div class="q-mb-lg row gutter-profile answers">
       <ni-input v-for="(answer, i) in card.falsyAnswers" :key="i" class="col-xs-12 col-md-6" :caption="`Mot ${i + 1}`"
         v-model.trim="card.falsyAnswers[i]" @focus="saveTmp(`falsyAnswers[${i}]`)" @blur="updateAnswer(i)"
-        :error="answersError(i)" :required-field="i < 2" :error-message="answersErrorMsg(i)" />
+        :error="falsyAnswersError(i)" :required-field="i < 2" :error-message="falsyAnswersErrorMsg(i)" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
@@ -29,7 +29,7 @@ export default {
   mixins: [templateMixin],
   data () {
     return {
-      answersCountInDb: 0,
+      falsyAnswersCountInDb: 0,
     };
   },
   computed: {
@@ -53,53 +53,53 @@ export default {
       }
       return '';
     },
-    answersInitialized () {
+    falsyAnswersInitialized () {
       return this.card.falsyAnswers.length === FILL_THE_GAPS_MAX_ANSWERS_COUNT;
     },
   },
   async mounted () {
-    this.answersCountInDb = this.card.falsyAnswers.length;
-    this.initializeAnswers();
+    this.falsyAnswersCountInDb = this.card.falsyAnswers.length;
+    this.initializeFalsyAnswers();
   },
   watch: {
     card () {
-      this.initializeAnswers();
+      this.initializeFalsyAnswers();
     },
   },
   methods: {
-    initializeAnswers () {
+    initializeFalsyAnswers () {
       this.card.falsyAnswers = times(FILL_THE_GAPS_MAX_ANSWERS_COUNT, i => this.card.falsyAnswers[i] || '');
     },
-    answersError (index) {
-      return this.$v.card.falsyAnswers.$each[index].$error || this.requiredAnswerIsMissing(index);
+    falsyAnswersError (index) {
+      return this.$v.card.falsyAnswers.$each[index].$error || this.requiredFalsyAnswerIsMissing(index);
     },
-    answersErrorMsg (index) {
+    falsyAnswersErrorMsg (index) {
       if (!this.$v.card.falsyAnswers.$each[index].validAnswerLength) {
         return 'Le nombre de caractères doit être entre 1 et 15';
       }
       if (!this.$v.card.falsyAnswers.$each[index].validCaracters) {
         return 'Caractère invalide détecté (seuls - \' ESPACE permis)';
       }
-      if (this.requiredAnswerIsMissing(index)) return REQUIRED_LABEL;
+      if (this.requiredFalsyAnswerIsMissing(index)) return REQUIRED_LABEL;
       return '';
     },
-    requiredAnswerIsMissing (index) {
+    requiredFalsyAnswerIsMissing (index) {
       return this.$v.card.falsyAnswers.$error && !this.$v.card.falsyAnswers.minLength && index < 2 &&
-        this.card.falsyAnswers.filter(a => !!a).length < this.answersCountInDb;
+        this.card.falsyAnswers.filter(a => !!a).length < this.falsyAnswersCountInDb;
     },
     async updateAnswer (index) {
       try {
         if (this.tmpInput === get(this.card, `falsyAnswers[${index}]`)) return;
 
         this.$v.card.falsyAnswers.$touch();
-        if (this.$v.card.falsyAnswers.$each[index].$error || this.requiredAnswerIsMissing(index)) {
+        if (this.$v.card.falsyAnswers.$each[index].$error || this.requiredFalsyAnswerIsMissing(index)) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
         await Cards.updateById(this.card._id, { falsyAnswers: this.card.falsyAnswers.filter(a => !!a) });
 
         await this.refreshCard();
-        this.answersCountInDb = this.card.falsyAnswers.length;
+        this.falsyAnswersCountInDb = this.card.falsyAnswers.length;
 
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
