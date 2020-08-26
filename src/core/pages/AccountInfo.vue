@@ -88,9 +88,7 @@ import { passwordMixin } from '@mixins/passwordMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
-// eslint-disable-next-line import/extensions
 import rgpd from 'src/statics/rgpd.html';
-// eslint-disable-next-line import/extensions
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {

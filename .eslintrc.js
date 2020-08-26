@@ -34,7 +34,7 @@ module.exports = {
     // Un-used AirBnb rules
     'no-param-reassign': 0,
     'import/no-extraneous-dependencies': 0,
-    'import/extensions': ['error', 'never'],
+    'import/extensions': ['error', 'never', { 'html': 'always' }],
     'import/prefer-default-export': 0,
     'import/no-unresolved': 0,
     'no-underscore-dangle': 0,
