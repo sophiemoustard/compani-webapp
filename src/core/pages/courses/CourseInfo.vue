@@ -84,7 +84,6 @@ import get from 'lodash/get';
 import Courses from '@api/Courses';
 import { formatIdentity, formatPhone } from '@helpers/utils';
 import HtmlModal from '@components/modal/HtmlModal';
-// eslint-disable-next-line import/extensions
 import rules from 'src/statics/rules.html';
 import { courseMixin } from '@mixins/courseMixin';
 
