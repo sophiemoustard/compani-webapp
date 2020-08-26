@@ -81,11 +81,12 @@ export default {
         return 'Caractère invalide détecté (seuls - \' ESPACE permis)';
       }
       if (this.requiredFalsyAnswerIsMissing(index)) return REQUIRED_LABEL;
+
       return '';
     },
     requiredFalsyAnswerIsMissing (index) {
       return this.$v.card.falsyAnswers.$error && !this.$v.card.falsyAnswers.minLength && index < 2 &&
-        this.card.falsyAnswers.filter(a => !!a).length < this.falsyAnswersCountInDb;
+        this.card.falsyAnswers.filter(a => !!a).length < this.falsyAnswersCountInDb && !this.card.falsyAnswers[index];
     },
     async updateAnswer (index) {
       try {

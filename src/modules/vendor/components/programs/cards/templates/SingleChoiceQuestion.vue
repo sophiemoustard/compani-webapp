@@ -6,7 +6,7 @@
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" @blur="updateCard('qcuGoodAnswer')" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.falsyAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
-        v-model.trim="card.falsyAnswers[i]" :required-field="i === 0"
+        v-model.trim="card.falsyAnswers[i]" :required-field="i === 0" :error="requiredFalsyAnswerIsMissing(i)"
         @focus="saveTmp(`falsyAnswers[${i}]`)" @blur="updateFalsyAnswer(i)" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
@@ -30,12 +30,18 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin, validationMixin],
+  data () {
+    return {
+      falsyAnswersCountInDb: 0,
+    };
+  },
   computed: {
     falsyAnswersInitialized () {
       return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT;
     },
   },
   async mounted () {
+    this.falsyAnswersCountInDb = this.card.falsyAnswers.length;
     this.initializeFalsyAnswers();
   },
   watch: {
@@ -47,6 +53,10 @@ export default {
     initializeFalsyAnswers () {
       this.card.falsyAnswers = times(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, i => this.card.falsyAnswers[i] || '');
     },
+    requiredFalsyAnswerIsMissing (index) {
+      return this.$v.card.falsyAnswers.$error && !this.$v.card.falsyAnswers.minLength && index === 0 &&
+        this.card.falsyAnswers.filter(a => !!a).length < this.falsyAnswersCountInDb && !this.card.falsyAnswers[index];
+    },
     formatFalsyAnswersPayload () {
       return this.card.falsyAnswers.filter(a => !!a);
     },
@@ -55,10 +65,11 @@ export default {
         if (this.tmpInput === get(this.card, `falsyAnswers[${index}]`)) return;
 
         this.$v.card.falsyAnswers.$touch();
-        if (this.$v.card.falsyAnswers.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.requiredFalsyAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
         await Cards.updateById(this.card._id, { falsyAnswers: this.formatFalsyAnswersPayload() });
 
         await this.refreshCard();
+        this.falsyAnswersCountInDb = this.card.falsyAnswers.length;
 
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
