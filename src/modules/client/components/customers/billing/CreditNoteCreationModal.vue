@@ -7,33 +7,31 @@
       required-field @input="getEvents" @blur="validations.customer.$touch"
       :error="validations.customer.$error" use-input clearable />
     <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer"
-      :options="thirdPartyPayerOptions" @input="getEvents"
-      :disable="thirdPartyPayerOptions.length === 0" clearable />
+      :options="thirdPartyPayerOptions" @input="getEvents" :disable="thirdPartyPayerOptions.length === 0" clearable />
     <ni-date-input caption="Date de l'avoir" v-model="newCreditNote.date" :error="validations.date.$error"
-      @blur="validations.date.$touch" in-modal type="date" required-field />
+      @blur="validations.date.$touch" in-modal required-field />
     <div class="row q-mb-md light">
       <q-toggle :value="hasLinkedEvents" @input="updateHasLinkedEvents" label="Lié à des interventions ?" />
     </div>
     <!-- Has linked events -->
     <template v-if="hasLinkedEvents">
       <ni-date-input caption="Début période concernée" v-model="newCreditNote.startDate"
-        :error="validations.startDate.$error" @blur="validations.startDate.$touch" in-modal type="date"
+        :error="validations.startDate.$error" @blur="validations.startDate.$touch" in-modal
         :disable="!hasLinkedEvents" @input="getEvents" required-field />
       <ni-date-input caption="Fin période concernée" v-model="newCreditNote.endDate"
-        :error="validations.endDate.$error" @blur="validations.endDate.$touch" in-modal type="date"
+        :error="validations.endDate.$error" @blur="validations.endDate.$touch" in-modal
         :disable="!hasLinkedEvents" @input="getEvents" required-field />
       <template v-if="creditNoteEvents.length > 0">
         <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error" />
       </template>
       <div v-if="newCreditNoteHasNoEvents" class="light warning">
-        <p>{{ eventsNotFoundMessage }}</p>
+        <p>Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données</p>
       </div>
       <div class="row justify-between items-baseline">
         <div class="col-6 light">
           <p v-if="newCreditNote.exclTaxesCustomer">
-            Montant HT bénéficiaire :
-            {{ formatPrice(newCreditNote.exclTaxesCustomer) }}
+            Montant HT bénéficiaire : {{ formatPrice(newCreditNote.exclTaxesCustomer) }}
           </p>
           <p v-if="newCreditNote.exclTaxesTpp">
             Montant HT tiers-payeur : {{ formatPrice(newCreditNote.exclTaxesTpp) }}
@@ -41,12 +39,10 @@
         </div>
         <div class="col-6 light">
           <p v-if="newCreditNote.inclTaxesCustomer">
-            Montant TTC bénéficiaire :
-            {{ formatPrice(newCreditNote.inclTaxesCustomer) }}
+            Montant TTC bénéficiaire : {{ formatPrice(newCreditNote.inclTaxesCustomer) }}
           </p>
           <p v-if="newCreditNote.inclTaxesTpp">
-            Montant TTC tiers-payeur :
-            {{ formatPrice(newCreditNote.inclTaxesTpp) }}
+            Montant TTC tiers-payeur : {{ formatPrice(newCreditNote.inclTaxesTpp) }}
           </p>
         </div>
       </div>
@@ -98,11 +94,6 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-date-input': DateInput,
-  },
-  data () {
-    return {
-      eventsNotFoundMessage: 'Il n\'y a aucune intervention facturée pour le bénéficiaire aux dates données',
-    };
   },
   computed: {
     newCreditNoteHasNoEvents () {

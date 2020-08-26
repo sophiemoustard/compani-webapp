@@ -27,7 +27,7 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
-       :new-credit-note="newCreditNote" :validations="$v.newCreditNote" :customers-options="customersOptions"
+      :new-credit-note="newCreditNote" :validations="$v.newCreditNote" :customers-options="customersOptions"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" :loading="loading"
       :third-party-payer-options="thirdPartyPayerOptions" @hide="resetCreationCreditNoteData" @get-events="getEvents"
