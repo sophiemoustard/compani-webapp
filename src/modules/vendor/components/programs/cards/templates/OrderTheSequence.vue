@@ -3,9 +3,9 @@
     <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
     <div class="q-mb-lg">
-      <ni-input v-for="i in 3" :key="i" :caption="`Réponse ${i}`" @focus="saveTmp(`orderedAnswers[${i - 1}]`)"
-        @blur="updateOrderedAnswer(i - 1)" v-model.trim="card.orderedAnswers[i - 1]" :required-field="i < 3"
-        :error="requiredOrderedAnswerIsMissing(i - 1)" />
+      <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
+        v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
+        @blur="updateOrderedAnswer(i)" :error="requiredOrderedAnswerIsMissing(i)" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
@@ -13,11 +13,12 @@
 </template>
 
 <script>
-import Input from '@components/form/Input';
-import Cards from '@api/Cards';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import times from 'lodash/times';
+import Cards from '@api/Cards';
+import Input from '@components/form/Input';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT } from '@data/constants';
+import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'OrderTheSequence',
@@ -32,7 +33,7 @@ export default {
   },
   computed: {
     orderedAnswersInitialized () {
-      return this.card.orderedAnswers[2] !== null;
+      return this.card.orderedAnswers.length === ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT;
     },
   },
   async mounted () {
@@ -46,11 +47,11 @@ export default {
   methods: {
     initializeOrderedAnswers () {
       this.orderedAnswersCountInDb = this.card.orderedAnswers.length;
-      this.card.orderedAnswers = times(3, i => this.card.orderedAnswers[i] || '');
+      this.card.orderedAnswers = times(ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT, i => this.card.orderedAnswers[i] || '');
     },
     requiredOrderedAnswerIsMissing (index) {
       return this.$v.card.orderedAnswers.$error &&
-        !this.$v.card.orderedAnswers.min2OrderedAnswers &&
+        !this.$v.card.orderedAnswers.minLength &&
         this.card.orderedAnswers.filter(a => !!a).length < this.orderedAnswersCountInDb &&
         index < 2 &&
         !this.card.orderedAnswers[index];

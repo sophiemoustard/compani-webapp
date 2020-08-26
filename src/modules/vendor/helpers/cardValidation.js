@@ -7,6 +7,9 @@ import {
   FLASHCARD,
   FILL_THE_GAPS,
   ORDER_THE_SEQUENCE,
+  SINGLE_CHOICE_QUESTION,
+  SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
+  FILL_THE_GAPS_MAX_ANSWERS_COUNT,
 } from '@data/constants';
 
 const cardSchema = (card) => {
@@ -45,7 +48,17 @@ const cardSchema = (card) => {
     case FILL_THE_GAPS:
       return Joi.object().keys({
         text: Joi.string().required(),
-        answers: Joi.array().items(Joi.object({ label: Joi.string().required() })).min(2).max(6),
+        answers: Joi.array().items(
+          Joi.object({ label: Joi.string().required() })
+        ).min(2).max(FILL_THE_GAPS_MAX_ANSWERS_COUNT),
+        explanation: Joi.string().required(),
+      });
+    case SINGLE_CHOICE_QUESTION:
+      return Joi.object().keys({
+        question: Joi.string().required(),
+        answers: Joi.array().items(
+          Joi.object({ label: Joi.string().required(), correct: Joi.boolean().required() })
+        ).min(2).max(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT),
         explanation: Joi.string().required(),
       });
     case ORDER_THE_SEQUENCE:

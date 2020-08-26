@@ -13,6 +13,8 @@
           <fill-the-gaps v-else-if="card.template === FILL_THE_GAPS" :key="card._id" class="q-mx-lg" :card="card" />
           <order-the-sequence v-else-if="card.template === ORDER_THE_SEQUENCE" :key="card._id" class="q-mx-lg"
             :card="card" />
+          <single-choice-question v-else-if="card.template === SINGLE_CHOICE_QUESTION" :key="card._id" class="q-mx-lg"
+            :card="card" />
         </div>
     </q-scroll-area>
   </div>
@@ -28,6 +30,7 @@ import {
   FLASHCARD,
   FILL_THE_GAPS,
   ORDER_THE_SEQUENCE,
+  SINGLE_CHOICE_QUESTION,
 } from '@data/constants';
 import Transition from 'src/modules/vendor/components/programs/cards/templates/Transition';
 import TitleTextMedia from 'src/modules/vendor/components/programs/cards/templates/TitleTextMedia';
@@ -36,6 +39,7 @@ import TextMedia from 'src/modules/vendor/components/programs/cards/templates/Te
 import Flashcard from 'src/modules/vendor/components/programs/cards/templates/Flashcard';
 import FillTheGaps from 'src/modules/vendor/components/programs/cards/templates/FillTheGaps';
 import OrderTheSequence from 'src/modules/vendor/components/programs/cards/templates/OrderTheSequence';
+import SingleChoiceQuestion from 'src/modules/vendor/components/programs/cards/templates/SingleChoiceQuestion';
 
 export default {
   name: 'CardEdition',
@@ -47,6 +51,7 @@ export default {
     flashcard: Flashcard,
     'fill-the-gaps': FillTheGaps,
     'order-the-sequence': OrderTheSequence,
+    'single-choice-question': SingleChoiceQuestion,
   },
   data () {
     return {
@@ -57,6 +62,7 @@ export default {
       FLASHCARD,
       FILL_THE_GAPS,
       ORDER_THE_SEQUENCE,
+      SINGLE_CHOICE_QUESTION,
     };
   },
   computed: {

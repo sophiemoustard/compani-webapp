@@ -13,6 +13,7 @@ import {
   FLASHCARD,
   FILL_THE_GAPS,
   ORDER_THE_SEQUENCE,
+  SINGLE_CHOICE_QUESTION,
 } from '@data/constants';
 import {
   validTagging,
@@ -22,8 +23,7 @@ import {
   validTagsCount,
   validAnswerLength,
   validCaracters,
-  min2Answers,
-  min2OrderedAnswers,
+  minArrayLength,
 } from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
@@ -60,14 +60,9 @@ export const templateMixin = {
         return {
           card: {
             text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
-            answers: {
-              min2Answers,
-              $each: {
-                label: {
-                  validCaracters,
-                  validAnswerLength,
-                },
-              },
+            falsyAnswers: {
+              minLength: minArrayLength(2),
+              $each: { validCaracters, validAnswerLength },
             },
             explanation: { required },
           },
@@ -76,9 +71,16 @@ export const templateMixin = {
         return {
           card: {
             question: { required },
-            orderedAnswers: {
-              minLength: min2OrderedAnswers,
-            },
+            orderedAnswers: { minLength: minArrayLength(1) },
+            explanation: { required },
+          },
+        };
+      case SINGLE_CHOICE_QUESTION:
+        return {
+          card: {
+            question: { required },
+            qcuGoodAnswer: { required },
+            falsyAnswers: { required, minLength: minArrayLength(1) },
             explanation: { required },
           },
         };
