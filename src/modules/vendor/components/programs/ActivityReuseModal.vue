@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="resetModal">
+  <ni-modal :value="value" @input="input" @hide="resetModal" container-class="modal-container-md">
     <template slot="title">
         Réutiliser une <span class="text-weight-bold">activité</span>
       </template>
@@ -7,11 +7,13 @@
         inline @input="refreshActivities" />
       <template v-if="!!selectedProgram && !refreshingActivities">
         <ni-option-group v-model="reusedActivity" :options="activityOptions" caption="Activités" required-field
-         type="radio" :error="validations.$error" />
-        <template slot="footer">
-          <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="loading"
-            icon-right="add" @click="submit" />
-        </template>
+          type="radio" :error="validations.$error" />
+        <div class="buttons q-ma-lg">
+          <q-btn class="q-mr-xs" no-caps label="Dupliquer l'activité" color="primary" :loading="loading"
+            icon-right="add" @click="submitDuplication" />
+          <q-btn class="q-ml-xs" no-caps label="Réutiliser l'activité" color="primary" :loading="loading"
+            icon-right="add" @click="submitReuse" />
+        </div>
       </template>
     </ni-modal>
 </template>
@@ -61,6 +63,7 @@ export default {
         console.error(e);
       } finally {
         this.refreshingActivities = false;
+        this.reusedActivity = '';
       }
     },
     resetModal () {
@@ -70,8 +73,11 @@ export default {
     input (event) {
       this.$emit('input', event);
     },
-    submit () {
-      this.$emit('submit', this.reusedActivity);
+    submitReuse () {
+      this.$emit('submit-reuse', this.reusedActivity);
+    },
+    submitDuplication () {
+      this.$emit('submit-duplication', this.reusedActivity);
     },
   },
 };
@@ -81,5 +87,13 @@ export default {
 
 /deep/.q-option-group
   column-count: 2
+
+/deep/ .q-field__control-container
+  justify-content: center
+  padding: 0 5px 0
+
+.buttons
+  display: flex
+  justify-content: space-around
 
 </style>

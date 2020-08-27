@@ -60,8 +60,8 @@
       :loading="modalLoading" />
 
     <!-- Activity reuse modal -->
-    <activity-reuse-modal v-model="activityReuseModal" @submit="reuseActivity" :program-options="programOptions"
-      :loading="modalLoading" :validations="$v.reusedActivity" />
+    <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
+      :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity" />
 
     <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
@@ -337,12 +337,31 @@ export default {
         if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Steps.updateById(this.currentStepId, { activities: this.reusedActivity });
-        this.activityEditionModal = false;
+        this.activityReuseModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité réutilisée.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la réutilisation de l\'activité.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    async duplicateActivity (value) {
+      try {
+        this.modalLoading = true;
+        this.reusedActivity = value;
+
+        this.$v.reusedActivity.$touch();
+        if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Steps.addActivity(this.currentStepId, { activityId: this.reusedActivity });
+        this.activityReuseModal = false;
+        await this.refreshProgram();
+        NotifyPositive('Activité dupliquée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la dupliquation de l\'activité.');
       } finally {
         this.modalLoading = false;
       }
