@@ -134,4 +134,7 @@ export const validTagsCount = (value) => {
   return (gapAcc.length === 0 && !validTagging(value)) || gapAcc.length === 1 ||
     (gapAcc.length === 2 && validTagging(value));
 };
+
 export const minArrayLength = minLength => value => value.filter(a => !!a).length > minLength;
+
+export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;

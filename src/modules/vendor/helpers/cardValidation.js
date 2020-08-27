@@ -10,6 +10,8 @@ import {
   SINGLE_CHOICE_QUESTION,
   SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
   FILL_THE_GAPS_MAX_ANSWERS_COUNT,
+  MULTIPLE_CHOICE_QUESTION,
+  MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
 } from '@data/constants';
 
 const cardSchema = (card) => {
@@ -65,6 +67,16 @@ const cardSchema = (card) => {
       return Joi.object().keys({
         question: Joi.string().required(),
         orderedAnswers: Joi.array().items(Joi.string()).min(2).max(3),
+        explanation: Joi.string().required(),
+      });
+    case MULTIPLE_CHOICE_QUESTION:
+      return Joi.object().keys({
+        question: Joi.string().required(),
+        qcmAnswers: Joi.array()
+          .items(Joi.object({ label: Joi.string().required(), correct: Joi.boolean().required() }))
+          .has(Joi.object({ correct: true }))
+          .min(2)
+          .max(MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT),
         explanation: Joi.string().required(),
       });
     default:

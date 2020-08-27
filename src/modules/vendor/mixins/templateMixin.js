@@ -25,6 +25,7 @@ import {
   validAnswerLength,
   validCaracters,
   minArrayLength,
+  minOneCorrectAnswer,
 } from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
@@ -91,6 +92,7 @@ export const templateMixin = {
             question: { required },
             qcmAnswers: {
               minLength: minArrayLength(2),
+              minOneCorrectAnswer,
               $each: { label: { required }, correct: { required } },
             },
             explanation: { required },

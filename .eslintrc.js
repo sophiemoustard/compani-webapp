@@ -19,7 +19,7 @@ module.exports = {
   rules: {
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
-    indent: ["error", 2, { SwitchCase: 1 }],
+    indent: ['error', 2, { SwitchCase: 1 }],
     'linebreak-style': ['error', 'unix'],
     'react/display-name': 'off',
     'max-len': ['error', { code: 120, tabWidth: 2 }],
