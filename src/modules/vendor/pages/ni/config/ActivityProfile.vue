@@ -13,7 +13,7 @@
       </ni-profile-header>
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
-          @delete-card="deleteCard" />
+          @delete-card="validateCardDeletion" />
         <card-edition />
       </div>
     </template>
@@ -121,7 +121,7 @@ export default {
 
         await this.refreshActivity();
         const cardCreated = this.activity.cards[this.activity.cards.length - 1];
-        this.$store.dispatch('program/fetchCard', cardCreated);
+        await this.$store.dispatch('program/fetchCard', cardCreated);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la carte.');
@@ -133,10 +133,20 @@ export default {
       this.newCard = { template: '' };
       this.$v.newCard.$reset();
     },
+    validateCardDeletion (cardId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette carte ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteCard(cardId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
     async deleteCard (cardId) {
       try {
         await Cards.deleteById(cardId);
         await this.refreshActivity();
+        this.$store.dispatch('program/resetCard');
         NotifyPositive('Carte supprimée');
       } catch (e) {
         console.error(e);
@@ -144,7 +154,7 @@ export default {
       }
     },
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
     this.$store.dispatch('program/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
