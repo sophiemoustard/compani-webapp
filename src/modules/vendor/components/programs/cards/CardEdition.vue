@@ -15,6 +15,8 @@
             :card="card" />
           <single-choice-question v-else-if="card.template === SINGLE_CHOICE_QUESTION" :key="card._id" class="q-mx-lg"
             :card="card" />
+          <multiple-choice-question v-else-if="card.template === MULTIPLE_CHOICE_QUESTION" :key="card._id"
+            class="q-mx-lg" :card="card" />
         </div>
     </q-scroll-area>
   </div>
@@ -31,6 +33,7 @@ import {
   FILL_THE_GAPS,
   ORDER_THE_SEQUENCE,
   SINGLE_CHOICE_QUESTION,
+  MULTIPLE_CHOICE_QUESTION,
 } from '@data/constants';
 import Transition from 'src/modules/vendor/components/programs/cards/templates/Transition';
 import TitleTextMedia from 'src/modules/vendor/components/programs/cards/templates/TitleTextMedia';
@@ -40,6 +43,7 @@ import Flashcard from 'src/modules/vendor/components/programs/cards/templates/Fl
 import FillTheGaps from 'src/modules/vendor/components/programs/cards/templates/FillTheGaps';
 import OrderTheSequence from 'src/modules/vendor/components/programs/cards/templates/OrderTheSequence';
 import SingleChoiceQuestion from 'src/modules/vendor/components/programs/cards/templates/SingleChoiceQuestion';
+import MultipleChoiceQuestion from 'src/modules/vendor/components/programs/cards/templates/MultipleChoiceQuestion';
 
 export default {
   name: 'CardEdition',
@@ -52,6 +56,7 @@ export default {
     'fill-the-gaps': FillTheGaps,
     'order-the-sequence': OrderTheSequence,
     'single-choice-question': SingleChoiceQuestion,
+    'multiple-choice-question': MultipleChoiceQuestion,
   },
   data () {
     return {
@@ -63,6 +68,7 @@ export default {
       FILL_THE_GAPS,
       ORDER_THE_SEQUENCE,
       SINGLE_CHOICE_QUESTION,
+      MULTIPLE_CHOICE_QUESTION,
     };
   },
   computed: {

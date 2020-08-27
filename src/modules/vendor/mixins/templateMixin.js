@@ -14,6 +14,7 @@ import {
   FILL_THE_GAPS,
   ORDER_THE_SEQUENCE,
   SINGLE_CHOICE_QUESTION,
+  MULTIPLE_CHOICE_QUESTION,
 } from '@data/constants';
 import {
   validTagging,
@@ -81,6 +82,17 @@ export const templateMixin = {
             question: { required },
             qcuGoodAnswer: { required },
             falsyAnswers: { required, minLength: minArrayLength(1) },
+            explanation: { required },
+          },
+        };
+      case MULTIPLE_CHOICE_QUESTION:
+        return {
+          card: {
+            question: { required },
+            qcmAnswers: {
+              minLength: minArrayLength(2),
+              $each: { label: { required }, correct: { required } },
+            },
             explanation: { required },
           },
         };
