@@ -4,6 +4,10 @@
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
       <div v-for="(card, index) in cards" :key="index" :class="['card-row', { 'card-row-selected': isSelected(card) }]">
+        <div class="card-actions">
+          <q-btn v-if="isSelected(card)" flat round small dense color="grey" icon="delete"
+            @click.native="deleteCard(card)" />
+        </div>
         <div :class="['card-cell', 'cursor-pointer', { 'card-cell-selected': isSelected(card) }]"
            @click="selectCard(card)">
           <div class="card-cell-title text-weight-bold">
@@ -65,6 +69,9 @@ export default {
     selectCard (card) {
       this.$store.dispatch('program/fetchCard', card);
     },
+    deleteCard (card) {
+      this.$emit('delete-card', card._id);
+    },
   },
 };
 </script>
@@ -83,7 +90,6 @@ export default {
 .card-row
   margin: 4px
   display: flex
-  align-items: center
   justify-content: flex-start
   &-selected
     justify-content: flex-end
@@ -91,6 +97,10 @@ export default {
       background-color: $light-purple
   .dot
     margin: 0 0 0 3px
+
+.card-actions
+  display: flex
+  flex-direction: column
 
 .card-cell
   background-color: $primary-light
@@ -106,4 +116,7 @@ export default {
     white-space: nowrap
     overflow: hidden
     text-overflow: ellipsis
+
+.dot-error
+  align-self: center
 </style>

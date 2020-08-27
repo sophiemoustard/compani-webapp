@@ -12,7 +12,8 @@
         </template>
       </ni-profile-header>
       <div class="row body">
-        <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
+        <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
+          @delete-card="validateCardDeletion" />
         <card-edition />
       </div>
     </template>
@@ -27,6 +28,7 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
+import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES } from '@data/constants';
@@ -119,7 +121,7 @@ export default {
 
         await this.refreshActivity();
         const cardCreated = this.activity.cards[this.activity.cards.length - 1];
-        this.$store.dispatch('program/fetchCard', cardCreated);
+        await this.$store.dispatch('program/fetchCard', cardCreated);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la carte.');
@@ -131,8 +133,28 @@ export default {
       this.newCard = { template: '' };
       this.$v.newCard.$reset();
     },
+    validateCardDeletion (cardId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette carte ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteCard(cardId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteCard (cardId) {
+      try {
+        await Cards.deleteById(cardId);
+        await this.refreshActivity();
+        this.$store.dispatch('program/resetCard');
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Carte supprimée');
+      }
+    },
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
     this.$store.dispatch('program/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
