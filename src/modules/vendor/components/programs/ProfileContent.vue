@@ -25,7 +25,11 @@
                 <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
                 <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
                 <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
-                <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
+                <div class="row no-wrap">
+                  <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
+                  <q-btn flat small color="grey" icon="close"
+                    @click.stop="validateActivityDeletion(step._id, activity._id)" />
+                </div>
               </q-card-section>
             </q-card>
             <div class="q-mt-md" align="right">
@@ -433,6 +437,25 @@ export default {
         NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
     },
+    validateActivityDeletion (stepId, activityId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir détacher cette activité ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.detachActivity(stepId, activityId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async detachActivity (stepId, activityId) {
+      try {
+        await Steps.detachActivity(stepId, activityId);
+        await this.refreshProgram();
+        NotifyPositive('Activité détachée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du détachement de l\'activité.');
+      }
+    },
   },
 };
 </script>
@@ -471,7 +494,8 @@ export default {
     padding: 3px 3px 3px 10px
   .activity-content
     font-size: 12px
-
+  /deep/ .q-btn__wrapper
+    padding: 5px
 .q-btn
     width: fit-content
 
