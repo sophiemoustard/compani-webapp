@@ -36,7 +36,7 @@ export default {
     textTagCodeErrorMsg () {
       if (this.$v.card.text.required === false) return REQUIRED_LABEL;
       if (!this.$v.card.text.validTagsCount) {
-        return 'Le nombre de couple de balises doit être de 1 ou 2';
+        return 'Le nombre de trous doit être de 1 ou 2';
       }
       if (!this.$v.card.text.validTagging) {
         return 'Balisage non valide, la bonne syntaxe est : <trou>la réponse</trou>';
