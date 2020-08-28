@@ -12,6 +12,7 @@ import {
   FILL_THE_GAPS_MAX_ANSWERS_COUNT,
   MULTIPLE_CHOICE_QUESTION,
   MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
+  SURVEY,
 } from '@data/constants';
 
 const cardSchema = (card) => {
@@ -77,6 +78,14 @@ const cardSchema = (card) => {
           .min(2)
           .max(MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT),
         explanation: Joi.string().required(),
+      });
+    case SURVEY:
+      return Joi.object().keys({
+        question: Joi.string(),
+        label: Joi.object().keys({
+          left: Joi.string(),
+          right: Joi.string(),
+        }),
       });
     default:
       return Joi.object().keys();

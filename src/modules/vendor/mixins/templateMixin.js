@@ -15,6 +15,7 @@ import {
   ORDER_THE_SEQUENCE,
   SINGLE_CHOICE_QUESTION,
   MULTIPLE_CHOICE_QUESTION,
+  SURVEY,
 } from '@data/constants';
 import {
   validTagging,
@@ -96,6 +97,14 @@ export const templateMixin = {
               $each: { label: { required }, correct: { required } },
             },
             explanation: { required },
+          },
+        };
+      case SURVEY:
+        return {
+          card: {
+            question: { required },
+            label: { left: {}, right: {} },
+
           },
         };
       default:
