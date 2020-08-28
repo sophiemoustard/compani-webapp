@@ -105,10 +105,11 @@ export default {
 .card-cell
   background-color: $primary-light
   border-radius: 4px
+  height: fit-content
   @media screen and (min-width: 768px)
-    height: 90px
+    min-height: 90px
   @media screen and (max-width: 767px)
-    height: 80px
+    min-height: 80px
   width: 85%
   padding: 7px
   &-title
