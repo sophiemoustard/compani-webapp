@@ -60,6 +60,17 @@
         </div>
       </div>
     </div>
+    <h6 class="text-weight-bold">Questionnaire</h6>
+    <div class="row q-mb-lg button-container">
+      <div v-for="template in questionnaireTemplates" :key="template.value" @click="selectTemplate(template.value)"
+        :class="getClass(template.value)">
+        <div class="text-weight-bold card-button-content">
+          <div class="q-mb-sm">{{ formatButtonLabel(template.label) }}</div>
+          <q-icon v-if="template.value === OPEN_QUESTION" name="mdi-comment-question" size="20px" />
+          <q-icon v-if="template.value === SURVEY" name="assessment" size="20px" />
+        </div>
+      </div>
+    </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la carte" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -77,8 +88,11 @@ import {
   MULTIPLE_CHOICE_QUESTION,
   SINGLE_CHOICE_QUESTION,
   ORDER_THE_SEQUENCE,
+  OPEN_QUESTION,
+  SURVEY,
   LESSON,
   QUIZ,
+  QUESTIONNAIRE,
 } from '@data/constants';
 import Modal from '@components/modal/Modal';
 
@@ -102,6 +116,8 @@ export default {
       MULTIPLE_CHOICE_QUESTION,
       SINGLE_CHOICE_QUESTION,
       ORDER_THE_SEQUENCE,
+      OPEN_QUESTION,
+      SURVEY,
     };
   },
   computed: {
@@ -110,6 +126,9 @@ export default {
     },
     quizTemplates () {
       return CARD_TEMPLATES.filter(t => t.type === QUIZ);
+    },
+    questionnaireTemplates () {
+      return CARD_TEMPLATES.filter(t => t.type === QUESTIONNAIRE);
     },
   },
   methods: {
