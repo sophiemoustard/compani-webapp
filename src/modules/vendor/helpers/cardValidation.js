@@ -58,9 +58,8 @@ const cardSchema = (card) => {
     case SINGLE_CHOICE_QUESTION:
       return Joi.object().keys({
         question: Joi.string().required(),
-        answers: Joi.array().items(
-          Joi.object({ label: Joi.string().required(), correct: Joi.boolean().required() })
-        ).min(2).max(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT),
+        qcuGoodAnswer: Joi.string().required(),
+        falsyAnswers: Joi.array().items(Joi.string()).min(1).max(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT),
         explanation: Joi.string().required(),
       });
     case ORDER_THE_SEQUENCE:
