@@ -15,6 +15,8 @@
             </div>
           </q-item-section>
           <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
+          <q-btn flat small color="grey" icon="close"
+            @click.stop="validateStepDetachment(subProgram._id, step._id)" />
         </q-card-section>
         <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
           <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
@@ -315,6 +317,25 @@ export default {
     resetActivityEditionModal () {
       this.editedActivity = { name: '' };
       this.$v.editedActivity.$reset();
+    },
+    validateStepDetachment (subProgramId, stepId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir retirer cette étape de ce sous-programme ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.detachStep(subProgramId, stepId))
+        .onCancel(() => NotifyPositive('Retrait annulé.'));
+    },
+    async detachStep (subProgramId, stepId) {
+      try {
+        await SubPrograms.detachStep(subProgramId, stepId);
+        await this.refreshProgram();
+        NotifyPositive('Étape retirée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du retrait de l\'étape.');
+      }
     },
   },
 };
