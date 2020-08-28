@@ -3,7 +3,7 @@
     <div class="row col-xs-12 q-mb-md">
       <div class="col-xs-8 row items-baseline col-md-10">
         <div class="row items-center">
-          <q-icon v-if="isExternalUser" class="q-mr-md cursor-pointer" size="1rem" name="arrow_back" color="primary"
+          <ni-button v-if="isExternalUser" class="q-mr-md" icon="arrow_back" color="primary"
             @click.native="$router.go(-1)" />
           <h4>{{ userProfile.identity.firstname }} {{ userProfile.identity.lastname }}</h4>
           <q-btn :disable="isPlanningRouterDisable" flat size="sm" color="primary" icon="date_range"
@@ -60,6 +60,7 @@ import { mapState } from 'vuex';
 import Users from '@api/Users';
 import Sms from '@api/Sms';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -69,6 +70,7 @@ export default {
   name: 'ProfileHeader',
   components: {
     'ni-input': Input,
+    'ni-button': Button,
     'ni-select': Select,
     'ni-modal': Modal,
   },

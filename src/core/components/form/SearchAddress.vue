@@ -9,7 +9,7 @@
         input-debounce="500" :options="options" :class="{ 'borders': inModal }" :disable="disable" behavior="menu"
         @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color">
         <template v-if="value.fullAddress && !disable" v-slot:append>
-          <q-icon name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
+          <ni-button icon="close" @click.stop="resetValue" size="sm" />
         </template>
       </q-select>
     </q-field>
@@ -19,6 +19,7 @@
 <script>
 import pick from 'lodash/pick';
 import { REQUIRED_LABEL } from '@data/constants';
+import Button from '@components/Button';
 
 export default {
   name: 'SearchAddress',
@@ -31,6 +32,9 @@ export default {
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
     color: { type: String, default: 'white' },
+  },
+  components: {
+    'ni-button': Button,
   },
   data () {
     return {

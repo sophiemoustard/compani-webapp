@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
-      <span><q-icon name="clear" @click.native="close" /></span>
+      <ni-button icon="clear" @click.native="close" />
     </div>
   </div>
 </template>
@@ -16,6 +16,7 @@
 <script>
 import get from 'lodash/get';
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 import { formatIdentity } from '@helpers/utils';
 import { UNKNOWN_AVATAR, DEFAULT_AVATAR } from '@data/constants';
 
@@ -28,6 +29,7 @@ export default {
   },
   components: {
     'ni-select': Select,
+    'ni-button': Button,
   },
   computed: {
     formattedIdentity () {

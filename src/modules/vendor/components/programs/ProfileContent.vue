@@ -15,9 +15,8 @@
                 {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
               </div>
             </q-item-section>
-            <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
-            <q-btn flat small color="grey" icon="close"
-              @click.stop="validateStepDetachment(subProgram._id, step._id)" />
+          <ni-button icon="edit" @click.stop="openStepEditionModal(step)" size="12px" />
+          <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)" size="12px" />
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
             <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
@@ -26,9 +25,8 @@
                 <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
                 <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
                 <div class="row no-wrap">
-                  <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-                  <q-btn flat small color="grey" icon="close"
-                    @click.stop="validateActivityDeletion(step._id, activity._id)" />
+                  <ni-button icon="edit" @click.stop="openActivityEditionModal(activity)" />
+                  <ni-button icon="close" @click.stop="validateActivityDeletion(step._id, activity._id)" />
                 </div>
               </q-card-section>
             </q-card>
@@ -91,6 +89,7 @@ import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
+import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
 import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
@@ -105,6 +104,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
     'sub-program-creation-modal': SubProgramCreationModal,
     'step-creation-modal': StepCreationModal,
     'step-edition-modal': StepEditionModal,

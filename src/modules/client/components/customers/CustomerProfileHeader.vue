@@ -1,8 +1,7 @@
 <template>
   <div class="header">
     <div class="row col-xs-12 q-mb-md items-center">
-      <q-icon class="q-mr-md cursor-pointer" size="1rem" name="arrow_back" color="primary"
-        @click="$router.go(-1)" />
+      <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
       <h4>{{ customer.identity.firstname }} {{ customer.identity.lastname }}</h4>
       <q-btn :disable="isPlanningRouterDisable" flat size="sm" color="primary" icon="date_range"
         @click="goToPlanning" />
@@ -25,10 +24,14 @@
 <script>
 import { mapState } from 'vuex';
 import Customers from '@api/Customers';
+import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'ProfileHeader',
+  components: {
+    'ni-button': Button,
+  },
   computed: {
     ...mapState('customer', ['customer']),
     deletionDisabled () {

@@ -2,14 +2,13 @@
   <div class="course-link">
     <q-item>
       <q-item-section side>
-        <q-btn :disable="disableLink" color="primary" size="sm" icon="info" flat dense type="a"
-          target="_blank" :href="!disableLink && courseLink" />
+        <ni-button :disable="disableLink" color="primary" icon="info" type="a" :href="courseLink" />
       </q-item-section>
       <q-item-section class="course-link">Page info formation</q-item-section>
     </q-item>
     <div class="course-link-share" v-clipboard:copy="!disableLink && courseLink"
       v-clipboard:success="handleCopySuccess">
-      <q-btn color="primary" size="xs" :disable="disableLink" icon="link" flat dense />
+      <ni-button color="primary" :disable="disableLink" icon="link" />
       <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disableLink }"
         color="primary">
         Obtenir un lien de partage
@@ -21,9 +20,13 @@
 <script>
 import { mapState } from 'vuex';
 import { NotifyPositive } from '@components/popup/notify';
+import Button from '@components/Button';
 
 export default {
   name: 'CourseInfoLink',
+  components: {
+    'ni-button': Button,
+  },
   props: {
     disableLink: { type: Boolean, default: true },
   },
