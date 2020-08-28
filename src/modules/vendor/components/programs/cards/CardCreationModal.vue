@@ -66,9 +66,10 @@
         :class="getClass(template.value)">
         <div class="text-weight-bold card-button-content">
           <div class="q-mb-sm">{{ formatButtonLabel(template.label) }}</div>
-          <q-icon v-if="template.value === OPEN_QUESTION && card.template === OPEN_QUESTION" size="20px"
-            name="mdi-comment-question-outline" />
-          <q-icon v-else-if="template.value === OPEN_QUESTION" name="mdi-comment-question" size="20px" />
+          <template v-if="template.value === OPEN_QUESTION">
+            <q-icon v-if="card.template === OPEN_QUESTION" name="mdi-comment-question-outline" size="20px" />
+            <q-icon v-else name="mdi-comment-question" size="20px" />
+          </template>
           <q-icon v-if="template.value === SURVEY" name="assessment" size="20px" />
         </div>
       </div>
