@@ -325,16 +325,16 @@ export default {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.detachStep(subProgramId, stepId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
+        .onCancel(() => NotifyPositive('Retrait annulé.'));
     },
     async detachStep (subProgramId, stepId) {
       try {
         await SubPrograms.detachStep(subProgramId, stepId);
         await this.refreshProgram();
-        NotifyPositive('Étape supprimée.');
+        NotifyPositive('Étape retirée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'étape.');
+        NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
     },
   },
