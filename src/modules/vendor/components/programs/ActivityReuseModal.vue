@@ -1,13 +1,13 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="resetModal" container-class="modal-container-md">
+  <ni-modal :value="value" @input="input" @hide="hide" container-class="modal-container-md">
     <template slot="title">
         Réutiliser une <span class="text-weight-bold">activité</span>
       </template>
       <ni-select in-modal v-model.trim="selectedProgram" caption="Programme" required-field :options="programOptions"
         inline @input="refreshActivities" />
       <template v-if="!!selectedProgram && !refreshingActivities">
-        <ni-option-group v-model="reusedActivity" :options="activityOptions" caption="Activités" required-field
-          type="radio" :error="validations.$error" />
+        <ni-option-group :value="reusedActivity" @input="updateReusedActivity" :options="activityOptions"
+          caption="Activités" required-field type="radio" :error="validations.$error" />
         <div class="buttons q-ma-lg">
           <q-btn class="q-mr-xs" no-caps label="Dupliquer l'activité" color="primary" :loading="loading"
             icon-right="add" @click="submitDuplication" />
@@ -30,6 +30,7 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     programOptions: { type: Array, default: () => [] },
+    reusedActivity: { type: String, default: '' },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
@@ -44,7 +45,6 @@ export default {
       programIsSelected: false,
       activityOptions: [],
       refreshingActivities: false,
-      reusedActivity: '',
     };
   },
   methods: {
@@ -63,21 +63,24 @@ export default {
         console.error(e);
       } finally {
         this.refreshingActivities = false;
-        this.reusedActivity = '';
+        this.updateReusedActivity('');
       }
     },
-    resetModal () {
+    updateReusedActivity (value) {
+      this.$emit('update:reusedActivity', value);
+    },
+    hide () {
       this.selectedProgram = '';
-      this.reusedActivity = '';
+      this.$emit('input', event);
     },
     input (event) {
       this.$emit('input', event);
     },
     submitReuse () {
-      this.$emit('submit-reuse', this.reusedActivity);
+      this.$emit('submit-reuse');
     },
     submitDuplication () {
-      this.$emit('submit-duplication', this.reusedActivity);
+      this.$emit('submit-duplication');
     },
   },
 };

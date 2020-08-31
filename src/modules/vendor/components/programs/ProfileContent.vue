@@ -61,7 +61,8 @@
 
     <!-- Activity reuse modal -->
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
-      :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity" />
+      :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity"
+      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" />
 
     <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
@@ -151,7 +152,7 @@ export default {
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
-    this.refreshPrograms();
+    await this.refreshProgramList();
   },
   methods: {
     formatQuantity,
@@ -318,20 +319,20 @@ export default {
       this.activityReuseModal = true;
       this.currentStepId = stepId;
     },
-    async refreshPrograms () {
+    async refreshProgramList () {
       try {
         const programs = await Programs.list();
 
         this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
       } catch (e) {
+        this.programOptions = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');
       }
     },
-    async reuseActivity (value) {
+    async reuseActivity () {
       try {
         this.modalLoading = true;
-        this.reusedActivity = value;
 
         this.$v.reusedActivity.$touch();
         if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -347,10 +348,9 @@ export default {
         this.modalLoading = false;
       }
     },
-    async duplicateActivity (value) {
+    async duplicateActivity () {
       try {
         this.modalLoading = true;
-        this.reusedActivity = value;
 
         this.$v.reusedActivity.$touch();
         if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -365,6 +365,10 @@ export default {
       } finally {
         this.modalLoading = false;
       }
+    },
+    resetActivityReuseModal () {
+      this.reusedActivity = '';
+      this.$v.reusedActivity.$reset();
     },
     // activity edition
     async openActivityEditionModal (activity) {
