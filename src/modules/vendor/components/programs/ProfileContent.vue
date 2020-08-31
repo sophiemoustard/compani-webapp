@@ -166,9 +166,11 @@ export default {
         await SubPrograms.update(subProgramId, { steps });
 
         NotifyPositive('Modification enregistrée.');
-        await this.refreshProgram();
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la modification des étapes.');
+      } finally {
+        await this.refreshProgram();
       }
     },
     formatQuantity,
