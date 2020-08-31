@@ -27,8 +27,12 @@
               <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
             </q-card-section>
           </q-card>
-          <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Ajouter une activité"
-            @click="openActivityCreationModal(step._id)" />
+          <div class="q-mt-md" align="right">
+            <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Réutiliser une activité"
+              @click="openActivityReuseModal(step._id)" />
+            <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Créer une activité"
+              @click="openActivityCreationModal(step._id)" />
+          </div>
         </div>
       </q-card>
       <q-btn class="q-my-sm add-step-button" flat no-caps color="primary" icon="add" label="Ajouter une étape"
@@ -55,6 +59,11 @@
       :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
       :loading="modalLoading" />
 
+    <!-- Activity reuse modal -->
+    <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
+      :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity"
+      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" />
+
     <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
@@ -76,6 +85,7 @@ import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubP
 import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
 import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
+import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
@@ -91,6 +101,7 @@ export default {
     'step-creation-modal': StepCreationModal,
     'step-edition-modal': StepEditionModal,
     'activity-creation-modal': ActivityCreationModal,
+    'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
   },
   data () {
@@ -105,6 +116,9 @@ export default {
       editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
       newActivity: { name: '' },
+      activityReuseModal: false,
+      reusedActivity: '',
+      programOptions: [],
       activityEditionModal: false,
       editedActivity: { name: '' },
       isActivitiesShown: {},
@@ -130,6 +144,7 @@ export default {
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
       editedActivity: { name: { required } },
+      reusedActivity: { required },
     };
   },
   computed: {
@@ -137,6 +152,7 @@ export default {
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
+    await this.refreshProgramList();
   },
   methods: {
     formatQuantity,
@@ -164,6 +180,7 @@ export default {
         console.error(e);
       }
     },
+    // SUB-PROGRAM
     async updateSubProgramName (index) {
       try {
         const subProgramName = get(this.program.subPrograms[index], 'name');
@@ -207,6 +224,7 @@ export default {
       this.newSubProgram.name = '';
       this.$v.newSubProgram.$reset();
     },
+    // STEP
     async openStepCreationModal (subProgramId) {
       this.stepCreationModal = true;
       this.currentSubProgramId = subProgramId;
@@ -232,6 +250,7 @@ export default {
       this.newStep.name = '';
       this.$v.newStep.$reset();
     },
+    // step edition
     async openStepEditionModal (step) {
       this.editedStep = pick(step, ['_id', 'name', 'type']);
       this.stepEditionModal = true;
@@ -257,6 +276,7 @@ export default {
       this.editedStep = { name: '' };
       this.$v.editedStep.$reset();
     },
+    // ACTIVITY
     goToActivityProfile (subProgram, step, activity) {
       this.$router.push({
         name: 'ni config activity info',
@@ -268,6 +288,7 @@ export default {
         },
       });
     },
+    // activity creation
     openActivityCreationModal (stepId) {
       this.activityCreationModal = true;
       this.currentStepId = stepId;
@@ -293,6 +314,63 @@ export default {
       this.newActivity.name = '';
       this.$v.newActivity.$reset();
     },
+    // activity reuse
+    openActivityReuseModal (stepId) {
+      this.activityReuseModal = true;
+      this.currentStepId = stepId;
+    },
+    async refreshProgramList () {
+      try {
+        const programs = await Programs.list();
+
+        this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
+      } catch (e) {
+        this.programOptions = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des programmes.');
+      }
+    },
+    async reuseActivity () {
+      try {
+        this.modalLoading = true;
+
+        this.$v.reusedActivity.$touch();
+        if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Steps.updateById(this.currentStepId, { activities: this.reusedActivity });
+        this.activityReuseModal = false;
+        await this.refreshProgram();
+        NotifyPositive('Activité réutilisée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la réutilisation de l\'activité.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    async duplicateActivity () {
+      try {
+        this.modalLoading = true;
+
+        this.$v.reusedActivity.$touch();
+        if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Steps.addActivity(this.currentStepId, { activityId: this.reusedActivity });
+        this.activityReuseModal = false;
+        await this.refreshProgram();
+        NotifyPositive('Activité dupliquée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la dupliquation de l\'activité.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetActivityReuseModal () {
+      this.reusedActivity = '';
+      this.$v.reusedActivity.$reset();
+    },
+    // activity edition
     async openActivityEditionModal (activity) {
       this.editedActivity = pick(activity, ['_id', 'name']);
       this.activityEditionModal = true;
