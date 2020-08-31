@@ -4,37 +4,39 @@
       <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
-      <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
-        <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
-          <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
-          <q-item-section>
-            <div class="text-weight-bold">{{ step.name }}</div>
-            <div class="step-subtitle">
-              {{ getStepTypeLabel(step.type) }} -
-              {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps" ghost-class="ghost">
+        <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
+          <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
+            <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
+            <q-item-section>
+              <div class="text-weight-bold">{{ step.name }}</div>
+              <div class="step-subtitle">
+                {{ getStepTypeLabel(step.type) }} -
+                {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+              </div>
+            </q-item-section>
+            <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
+            <q-btn flat small color="grey" icon="close"
+              @click.stop="validateStepDetachment(subProgram._id, step._id)" />
+          </q-card-section>
+          <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
+            <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
+              <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
+                <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
+                <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
+                <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
+                <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
+              </q-card-section>
+            </q-card>
+            <div class="q-mt-md" align="right">
+              <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Réutiliser une activité"
+                @click="openActivityReuseModal(step._id)" />
+              <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Créer une activité"
+                @click="openActivityCreationModal(step._id)" />
             </div>
-          </q-item-section>
-          <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
-          <q-btn flat small color="grey" icon="close"
-            @click.stop="validateStepDetachment(subProgram._id, step._id)" />
-        </q-card-section>
-        <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-          <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
-              <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
-              <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
-              <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
-              <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-            </q-card-section>
-          </q-card>
-          <div class="q-mt-md" align="right">
-            <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Réutiliser une activité"
-              @click="openActivityReuseModal(step._id)" />
-            <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Créer une activité"
-              @click="openActivityCreationModal(step._id)" />
           </div>
-        </div>
-      </q-card>
+        </q-card>
+      </draggable>
       <q-btn class="q-my-sm add-step-button" flat no-caps color="primary" icon="add" label="Ajouter une étape"
         @click="openStepCreationModal(subProgram._id)" />
     </div>
@@ -72,6 +74,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
@@ -79,16 +82,16 @@ import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Activities from '@api/Activities';
-import { formatQuantity } from '@helpers/utils';
 import Input from '@components/form/Input';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
+import { formatQuantity } from '@helpers/utils';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
 import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
-import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
 
 export default {
   name: 'ProfileContent',
@@ -103,6 +106,7 @@ export default {
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
+    draggable,
   },
   data () {
     return {
@@ -155,6 +159,18 @@ export default {
     await this.refreshProgramList();
   },
   methods: {
+    async dropStep (subProgramId) {
+      try {
+        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+        const steps = subProgram.steps.map(s => s._id);
+        await SubPrograms.update(subProgramId, { steps });
+
+        NotifyPositive('Modification enregistrée.');
+        await this.refreshProgram();
+      } catch (e) {
+        console.error(e);
+      }
+    },
     formatQuantity,
     saveTmpName (index) {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
@@ -461,4 +477,7 @@ export default {
   .q-card__section
     .q-item__section--side
       padding-right: 10px
+
+.ghost
+  opacity: 0.5
 </style>

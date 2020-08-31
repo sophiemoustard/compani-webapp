@@ -59,8 +59,7 @@
                   :key="`hour_${hourIndex}`" />
                 <ni-planning-event-cell v-for="(event, eventIndex) in getCellEvents(sectorId, days[dayIndex])"
                   :event="event" :display-staffing-view="staffingView && !isCustomerPlanning" :person-key="personKey"
-                  :key="eventIndex" @drag="drag" @click="openEventEditionModal"
-                  :can-drag="canDrag" />
+                  :key="eventIndex" @drag="drag" @click="openEventEditionModal" :can-drag="canDrag" />
               </td>
             </tr>
             <tr class="person-row" v-for="person in personsGroupedBySector[sectorId]" :key="person._id"
