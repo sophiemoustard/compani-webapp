@@ -4,7 +4,7 @@
       <div class="title">
         <p data-cy="customer-identity" class="text-weight-bold text-primary">
           {{ this.customer.identity | formatIdentity('FL') }}
-</p>
+        </p>
         <ni-date-range v-model="billingDates" @input="refresh" />
       </div>
       <div v-if="isHelper && company.billingAssistance" class="message">

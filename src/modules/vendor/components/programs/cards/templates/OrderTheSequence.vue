@@ -14,10 +14,12 @@
 
 <script>
 import times from 'lodash/times';
+import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT } from '@data/constants';
+import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
@@ -29,6 +31,15 @@ export default {
   data () {
     return {
       orderedAnswersCountInDb: 0,
+    };
+  },
+  validations () {
+    return {
+      card: {
+        question: { required },
+        orderedAnswers: { minLength: minArrayLength(1) },
+        explanation: { required },
+      },
     };
   },
   computed: {

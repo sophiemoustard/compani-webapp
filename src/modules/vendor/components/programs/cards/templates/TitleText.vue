@@ -8,6 +8,7 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -17,5 +18,10 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin],
+  validations () {
+    return {
+      card: { title: { required }, text: { required } },
+    };
+  },
 };
 </script>

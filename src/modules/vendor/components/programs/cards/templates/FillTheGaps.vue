@@ -15,10 +15,21 @@
 <script>
 import Input from '@components/form/Input';
 import times from 'lodash/times';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Cards from '@api/Cards';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { REQUIRED_LABEL, FILL_THE_GAPS_MAX_ANSWERS_COUNT } from '@data/constants';
+import {
+  validTagging,
+  validAnswerInTag,
+  validCaractersTags,
+  validTagLength,
+  validTagsCount,
+  validAnswerLength,
+  validCaracters,
+  minArrayLength,
+} from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
@@ -30,6 +41,18 @@ export default {
   data () {
     return {
       falsyAnswersCountInDb: 0,
+    };
+  },
+  validations () {
+    return {
+      card: {
+        text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
+        falsyAnswers: {
+          minLength: minArrayLength(2),
+          $each: { validCaracters, validAnswerLength },
+        },
+        explanation: { required },
+      },
     };
   },
   computed: {
