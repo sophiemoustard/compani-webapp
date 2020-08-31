@@ -8,7 +8,7 @@ import {
   FILL_THE_GAPS,
   ORDER_THE_SEQUENCE,
   SINGLE_CHOICE_QUESTION,
-  SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
+  SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT,
   FILL_THE_GAPS_MAX_ANSWERS_COUNT,
   MULTIPLE_CHOICE_QUESTION,
   MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
@@ -59,7 +59,7 @@ const cardSchema = (card) => {
       return Joi.object().keys({
         question: Joi.string().required(),
         qcuGoodAnswer: Joi.string().required(),
-        falsyAnswers: Joi.array().items(Joi.string()).min(1).max(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT),
+        falsyAnswers: Joi.array().items(Joi.string()).min(1).max(SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT),
         explanation: Joi.string().required(),
       });
     case ORDER_THE_SEQUENCE:

@@ -20,7 +20,7 @@ import get from 'lodash/get';
 import Input from '@components/form/Input';
 import Cards from '@api/Cards';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT } from '@data/constants';
+import { SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT } from '@data/constants';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import { validationMixin } from '@mixins/validationMixin';
 
@@ -37,7 +37,7 @@ export default {
   },
   computed: {
     falsyAnswersInitialized () {
-      return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT;
+      return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT;
     },
   },
   async mounted () {
@@ -51,7 +51,10 @@ export default {
   },
   methods: {
     initializeFalsyAnswers () {
-      this.card.falsyAnswers = times(SINGLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, i => this.card.falsyAnswers[i] || '');
+      this.card.falsyAnswers = times(
+        SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT,
+        i => this.card.falsyAnswers[i] || ''
+      );
     },
     requiredFalsyAnswerIsMissing (index) {
       return this.$v.card.falsyAnswers.$error && !this.$v.card.falsyAnswers.minLength && index === 0 &&
