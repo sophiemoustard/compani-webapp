@@ -13,6 +13,7 @@ import {
   MULTIPLE_CHOICE_QUESTION,
   MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
   SURVEY,
+  SURVEY_LABEL_MAX_LENGTH,
 } from '@data/constants';
 
 const cardSchema = (card) => {
@@ -81,18 +82,22 @@ const cardSchema = (card) => {
       });
     case SURVEY:
       return Joi.object().keys({
-        question: Joi.string(),
-        label: Joi.object().keys({
-          left: Joi.string(),
-          right: Joi.string(),
-        }),
+        question: Joi.string().required(),
+        label: Joi.alternatives().try(
+          Joi.object().keys({
+            left: Joi.string().valid('', null),
+            right: Joi.string().valid('', null),
+          }),
+          Joi.object().keys({
+            left: Joi.string().required().max(SURVEY_LABEL_MAX_LENGTH),
+            right: Joi.string().required().max(SURVEY_LABEL_MAX_LENGTH),
+          })
+        ),
       });
     default:
       return Joi.object().keys();
   }
 };
 
-export const cardValidation = (card, options = {}) => cardSchema(card).validate(
-  card,
-  { ...options, allowUnknown: true }
-);
+export const cardValidation = (card, options = {}) => cardSchema(card)
+  .validate(card, { ...options, allowUnknown: true });
