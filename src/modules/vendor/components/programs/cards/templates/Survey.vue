@@ -15,6 +15,7 @@
 
 <script>
 import set from 'lodash/set';
+import { required, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
@@ -27,6 +28,17 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin],
+  validations () {
+    return {
+      card: {
+        question: { required },
+        label: {
+          left: { required: requiredIf(item => !!item.right), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+          right: { required: requiredIf(item => !!item.left), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+        },
+      },
+    };
+  },
   methods: {
     labelErrorMessage (label) {
       if (!this.$v.card.label[label].required) return 'Les 2 labels doivent etre renseignés ou vides.';

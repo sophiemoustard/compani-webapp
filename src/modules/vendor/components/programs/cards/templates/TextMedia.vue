@@ -10,6 +10,7 @@
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
@@ -21,6 +22,11 @@ export default {
     'ni-file-uploader': FileUploader,
   },
   mixins: [templateMixin],
+  validations () {
+    return {
+      card: { text: { required }, media: { publicId: required, link: required } },
+    };
+  },
 };
 </script>
 

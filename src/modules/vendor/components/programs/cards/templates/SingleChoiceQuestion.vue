@@ -17,12 +17,14 @@
 <script>
 import times from 'lodash/times';
 import get from 'lodash/get';
-import Input from '@components/form/Input';
+import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
+import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT } from '@data/constants';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
+import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'SingleChoiceQuestion',
@@ -33,6 +35,16 @@ export default {
   data () {
     return {
       falsyAnswersCountInDb: 0,
+    };
+  },
+  validations () {
+    return {
+      card: {
+        question: { required },
+        qcuGoodAnswer: { required },
+        falsyAnswers: { required, minLength: minArrayLength(1) },
+        explanation: { required },
+      },
     };
   },
   computed: {

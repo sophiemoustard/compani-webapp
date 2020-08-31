@@ -19,11 +19,13 @@
 <script>
 import times from 'lodash/times';
 import get from 'lodash/get';
+import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
-import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, REQUIRED_LABEL } from '@data/constants';
+import { minArrayLength, minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
+import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'MultipleChoiceQuestion',
@@ -34,6 +36,19 @@ export default {
   data () {
     return {
       answersLengthInDb: 0,
+    };
+  },
+  validations () {
+    return {
+      card: {
+        question: { required },
+        qcmAnswers: {
+          minLength: minArrayLength(2),
+          minOneCorrectAnswer,
+          $each: { label: { required }, correct: { required } },
+        },
+        explanation: { required },
+      },
     };
   },
   computed: {

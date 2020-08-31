@@ -1,34 +1,9 @@
 import { mapState } from 'vuex';
-import { required, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
 import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import {
-  TRANSITION,
-  TITLE_TEXT_MEDIA,
-  TITLE_TEXT,
-  TEXT_MEDIA,
-  FLASHCARD,
-  FILL_THE_GAPS,
-  ORDER_THE_SEQUENCE,
-  SINGLE_CHOICE_QUESTION,
-  MULTIPLE_CHOICE_QUESTION,
-  SURVEY,
-  SURVEY_LABEL_MAX_LENGTH,
-} from '@data/constants';
-import {
-  validTagging,
-  validAnswerInTag,
-  validCaractersTags,
-  validTagLength,
-  validTagsCount,
-  validAnswerLength,
-  validCaracters,
-  minArrayLength,
-  minOneCorrectAnswer,
-} from '@helpers/vuelidateCustomVal';
 
 export const templateMixin = {
   data () {
@@ -37,82 +12,6 @@ export const templateMixin = {
       extensions: 'image/jpg, image/jpeg, image/png',
       maxFileSize: 2000000,
     };
-  },
-  validations () {
-    switch (this.card.template) {
-      case TRANSITION:
-        return {
-          card: { title: { required } },
-        };
-      case TITLE_TEXT_MEDIA:
-        return {
-          card: { title: { required }, text: { required }, media: { publicId: required, link: required } },
-        };
-      case TITLE_TEXT:
-        return {
-          card: { title: { required }, text: { required } },
-        };
-      case TEXT_MEDIA:
-        return {
-          card: { text: { required }, media: { publicId: required, link: required } },
-        };
-      case FLASHCARD:
-        return {
-          card: { text: { required }, backText: { required } },
-        };
-      case FILL_THE_GAPS:
-        return {
-          card: {
-            text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
-            falsyAnswers: {
-              minLength: minArrayLength(2),
-              $each: { validCaracters, validAnswerLength },
-            },
-            explanation: { required },
-          },
-        };
-      case ORDER_THE_SEQUENCE:
-        return {
-          card: {
-            question: { required },
-            orderedAnswers: { minLength: minArrayLength(1) },
-            explanation: { required },
-          },
-        };
-      case SINGLE_CHOICE_QUESTION:
-        return {
-          card: {
-            question: { required },
-            qcuGoodAnswer: { required },
-            falsyAnswers: { required, minLength: minArrayLength(1) },
-            explanation: { required },
-          },
-        };
-      case MULTIPLE_CHOICE_QUESTION:
-        return {
-          card: {
-            question: { required },
-            qcmAnswers: {
-              minLength: minArrayLength(2),
-              minOneCorrectAnswer,
-              $each: { label: { required }, correct: { required } },
-            },
-            explanation: { required },
-          },
-        };
-      case SURVEY:
-        return {
-          card: {
-            question: { required },
-            label: {
-              left: { required: requiredIf(item => !!item.right), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
-              right: { required: requiredIf(item => !!item.left), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
-            },
-          },
-        };
-      default:
-        return {};
-    }
   },
   computed: {
     ...mapState('program', ['card', 'activity']),
