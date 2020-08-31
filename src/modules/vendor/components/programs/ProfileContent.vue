@@ -31,15 +31,15 @@
               </q-card-section>
             </q-card>
             <div class="q-mt-md" align="right">
-              <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Réutiliser une activité"
-                @click="openActivityReuseModal(step)" />
-              <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Créer une activité"
+              <ni-button class="q-my-sm" :dense="false" color="primary" icon="add" label="Réutiliser une activité"
+              @click="openActivityReuseModal(step._id)" />
+              <ni-button class="q-my-sm" :dense="false" color="primary" icon="add" label="Créer une activité"
                 @click="openActivityCreationModal(step._id)" />
             </div>
           </div>
         </q-card>
       </draggable>
-      <q-btn class="q-my-sm add-step-button" flat no-caps color="primary" icon="add" label="Ajouter une étape"
+      <ni-button class="q-my-sm add-step-button" :dense="false" color="primary" icon="add" label="Ajouter une étape"
         @click="openStepCreationModal(subProgram._id)" />
     </div>
 
