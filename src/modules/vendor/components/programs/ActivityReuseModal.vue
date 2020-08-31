@@ -8,11 +8,11 @@
       <template v-if="!!selectedProgram && !refreshingActivities">
         <ni-option-group :value="reusedActivity" @input="updateReusedActivity" :options="activityOptions"
           caption="Activités" required-field type="radio" :error="validations.$error" />
-        <div class="buttons q-ma-lg">
-          <q-btn class="q-mr-xs" no-caps label="Dupliquer l'activité" color="primary" :loading="loading"
-            icon-right="add" @click="submitDuplication" />
-          <q-btn class="q-ml-xs" no-caps label="Réutiliser l'activité" color="primary" :loading="loading"
-            icon-right="add" @click="submitReuse" />
+        <div class="buttons q-ma-md">
+          <q-btn no-caps flat label="Dupliquer l'activité" color="white" :loading="loading"
+            @click="submitDuplication" />
+          <q-btn no-caps flat label="Réutiliser l'activité" color="white" :loading="loading"
+            @click="submitReuse" />
         </div>
       </template>
     </ni-modal>
@@ -60,6 +60,7 @@ export default {
 
         this.activityOptions = uniqBy(activities, a => a.value);
       } catch (e) {
+        this.activityOptions = [];
         console.error(e);
       } finally {
         this.refreshingActivities = false;
@@ -90,13 +91,21 @@ export default {
 
 /deep/.q-option-group
   column-count: 2
+  width: 100%
+  margin-left: 0
 
-/deep/ .q-field__control-container
-  justify-content: center
-  padding: 0 5px 0
+/deep/.q-radio
+  width: 100%
+
+/deep/.q-radio__label
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
 
 .buttons
   display: flex
   justify-content: space-around
+  > .q-btn
+    background-color: $primary;
 
 </style>
