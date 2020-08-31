@@ -73,8 +73,11 @@ export default {
       );
     },
     requiredAnswerIsMissing (index) {
+      if (index === 1 && !this.card.qcmAnswers[0].label) return true;
+      if (index === 1 && this.card.qcmAnswers[2].label) return false;
+
       return index < 2 && this.card.qcmAnswers.filter(a => a.label).length < this.answersLengthInDb &&
-        this.$v.card.qcmAnswers.$error && !this.card.qcmAnswers[index].label;
+        !this.card.qcmAnswers[index].label;
     },
     requiredOneCorrectAnswer (index) {
       return !this.$v.card.qcmAnswers.minOneCorrectAnswer && !!this.card.qcmAnswers[index].label;
