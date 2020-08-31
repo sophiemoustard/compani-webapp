@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     labelErrorMessage (label) {
-      if (!this.$v.card.label[label].required) return 'Les 2 labels doivent etre renseignés ou vides.';
+      if (!this.$v.card.label[label].required) return 'Les 2 labels doivent être renseignés ou vides.';
       if (!this.$v.card.label[label].maxLength) return `${SURVEY_LABEL_MAX_LENGTH} caractères maximum.`;
     },
     async updateCardLabel (label) {
