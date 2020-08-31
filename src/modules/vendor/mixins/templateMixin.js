@@ -1,5 +1,5 @@
 import { mapState } from 'vuex';
-import { required } from 'vuelidate/lib/validators';
+import { required, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
@@ -16,6 +16,7 @@ import {
   SINGLE_CHOICE_QUESTION,
   MULTIPLE_CHOICE_QUESTION,
   SURVEY,
+  SURVEY_LABEL_MAX_LENGTH,
 } from '@data/constants';
 import {
   validTagging,
@@ -103,8 +104,10 @@ export const templateMixin = {
         return {
           card: {
             question: { required },
-            label: { left: {}, right: {} },
-
+            label: {
+              left: { required: requiredIf(item => !!item.right), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+              right: { required: requiredIf(item => !!item.left), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
+            },
           },
         };
       default:
