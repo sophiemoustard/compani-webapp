@@ -440,11 +440,11 @@ export default {
     validateActivityDeletion (stepId, activityId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir détacher cette activité ?',
+        message: 'Es-tu sûr(e) de vouloir retirer cette activité de cette étape ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.detachActivity(stepId, activityId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
+        .onCancel(() => NotifyPositive('Retrait annulé.'));
     },
     async detachActivity (stepId, activityId) {
       try {
@@ -453,7 +453,7 @@ export default {
         NotifyPositive('Activité détachée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du détachement de l\'activité.');
+        NotifyNegative('Erreur lors du retrait de l\'activité.');
       }
     },
   },
@@ -494,8 +494,6 @@ export default {
     padding: 3px 3px 3px 10px
   .activity-content
     font-size: 12px
-  /deep/ .q-btn__wrapper
-    padding: 5px
 .q-btn
     width: fit-content
 
