@@ -9,10 +9,10 @@
         <ni-option-group :value="reusedActivity" @input="updateReusedActivity" :options="activityOptions"
           caption="Activités" required-field type="radio" :error="validations.$error" />
         <div class="buttons q-ma-md">
-          <q-btn no-caps flat label="Dupliquer l'activité" color="white" :loading="loading"
-            @click="submitDuplication" />
           <q-btn no-caps flat label="Réutiliser l'activité" color="white" :loading="loading"
             @click="submitReuse" />
+          <q-btn no-caps flat label="Dupliquer l'activité" color="white" :loading="loading"
+            @click="submitDuplication" />
         </div>
       </template>
     </ni-modal>
