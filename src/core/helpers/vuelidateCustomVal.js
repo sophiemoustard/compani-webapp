@@ -108,7 +108,7 @@ export const validAnswerInTag = (value) => {
   return !gapAcc.some(v => v.trim() !== v);
 };
 
-export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\s'-]*$/.test(value);
+export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\040'-]*$/.test(value);
 
 export const validCaractersTags = (value) => {
   if (!value) return true;
@@ -135,6 +135,6 @@ export const validTagsCount = (value) => {
     (gapAcc.length === 2 && validTagging(value));
 };
 
-export const minArrayLength = minLength => value => value.filter(a => !!a).length > minLength;
+export const minArrayLength = minLength => value => value.filter(a => !!a).length >= minLength;
 
 export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;

@@ -32,11 +32,6 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin, validationMixin],
-  data () {
-    return {
-      falsyAnswersCountInDb: 0,
-    };
-  },
   validations () {
     return {
       card: {
@@ -53,7 +48,6 @@ export default {
     },
   },
   async mounted () {
-    this.falsyAnswersCountInDb = this.card.falsyAnswers.length;
     this.initializeFalsyAnswers();
   },
   watch: {
@@ -70,7 +64,7 @@ export default {
     },
     requiredFalsyAnswerIsMissing (index) {
       return this.$v.card.falsyAnswers.$error && !this.$v.card.falsyAnswers.minLength && index === 0 &&
-        this.card.falsyAnswers.filter(a => !!a).length < this.falsyAnswersCountInDb && !this.card.falsyAnswers[index];
+        !this.card.falsyAnswers[index];
     },
     formatFalsyAnswersPayload () {
       return this.card.falsyAnswers.filter(a => !!a);
@@ -84,7 +78,6 @@ export default {
         await Cards.updateById(this.card._id, { falsyAnswers: this.formatFalsyAnswersPayload() });
 
         await this.refreshCard();
-        this.falsyAnswersCountInDb = this.card.falsyAnswers.length;
 
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
