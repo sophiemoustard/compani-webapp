@@ -28,16 +28,11 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin],
-  data () {
-    return {
-      orderedAnswersCountInDb: 0,
-    };
-  },
   validations () {
     return {
       card: {
         question: { required },
-        orderedAnswers: { minLength: minArrayLength(1) },
+        orderedAnswers: { minLength: minArrayLength(2) },
         explanation: { required },
       },
     };
@@ -57,14 +52,10 @@ export default {
   },
   methods: {
     initializeOrderedAnswers () {
-      this.orderedAnswersCountInDb = this.card.orderedAnswers.length;
       this.card.orderedAnswers = times(ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT, i => this.card.orderedAnswers[i] || '');
     },
     requiredOrderedAnswerIsMissing (index) {
-      return this.$v.card.orderedAnswers.$error &&
-        !this.$v.card.orderedAnswers.minLength &&
-        this.card.orderedAnswers.filter(a => !!a).length < this.orderedAnswersCountInDb &&
-        index < 2 &&
+      return this.$v.card.orderedAnswers.$error && !this.$v.card.orderedAnswers.minLength && index < 2 &&
         !this.card.orderedAnswers[index];
     },
     async updateOrderedAnswer (index) {
