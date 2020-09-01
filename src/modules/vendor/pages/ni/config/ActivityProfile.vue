@@ -150,7 +150,7 @@ export default {
         NotifyPositive('Carte supprimée');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Carte supprimée');
+        NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
   },
