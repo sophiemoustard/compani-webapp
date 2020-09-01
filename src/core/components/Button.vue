@@ -1,12 +1,12 @@
 <template>
-  <q-btn flat small :color="color" :icon="icon" :disable="disable" :type="type" :href="!disable && href"
+  <q-btn flat small no-caps :color="color" :icon="icon" :disable="disable" :type="type" :href="!disable && href"
     :target="target" :label="label" :dense="!label" :loading="loading" :size="size"
     @click.stop.native="click" />
 </template>
 
 <script>
 export default {
-  name: 'Banner',
+  name: 'Button',
   props: {
     color: { type: String, default: 'grey' },
     disable: { type: Boolean, default: false },
