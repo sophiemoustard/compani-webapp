@@ -137,4 +137,6 @@ export const validTagsCount = (value) => {
 
 export const minArrayLength = minLength => value => value.filter(a => !!a).length > minLength;
 
+export const minLabelArrayLength = minLength => value => value.filter(a => !!a.label).length >= minLength;
+
 export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;
