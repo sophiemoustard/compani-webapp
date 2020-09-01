@@ -30,7 +30,7 @@
             </q-card>
             <div class="q-mt-md" align="right">
               <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Réutiliser une activité"
-                @click="openActivityReuseModal(step._id)" />
+                @click="openActivityReuseModal(step)" />
               <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Créer une activité"
                 @click="openActivityCreationModal(step._id)" />
             </div>
@@ -64,7 +64,8 @@
     <!-- Activity reuse modal -->
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity"
-      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" />
+      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal"
+      :same-step-activities="sameStepActivities" />
 
     <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
@@ -121,6 +122,7 @@ export default {
       activityCreationModal: false,
       newActivity: { name: '' },
       activityReuseModal: false,
+      sameStepActivities: [],
       reusedActivity: '',
       programOptions: [],
       activityEditionModal: false,
@@ -333,9 +335,10 @@ export default {
       this.$v.newActivity.$reset();
     },
     // activity reuse
-    openActivityReuseModal (stepId) {
+    openActivityReuseModal (step) {
+      this.currentStepId = step._id;
+      this.sameStepActivities = step.activities.map(a => a._id);
       this.activityReuseModal = true;
-      this.currentStepId = stepId;
     },
     async refreshProgramList () {
       try {
