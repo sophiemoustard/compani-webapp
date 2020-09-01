@@ -7,15 +7,15 @@
       <q-item-section class="sidemenu-footer-user">{{ label }}</q-item-section>
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
-          <q-icon size="xs" name="mdi-lightbulb-on-outline" class="feedback"
+          <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm"
             @click.native="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
         </q-item-section>
         <q-item-section v-if="isAuxiliaryWithCompany">
-          <q-icon size="xs" class="messenger" name="mdi-facebook-messenger"
+          <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm"
             @click.native="clickHandler" />
         </q-item-section>
         <q-item-section>
-          <q-icon size="xs" class="person" name="person" @click.native="goToProfile" />
+          <ni-button class="person" icon="person" color="grey" @click.native="goToProfile" size="sm" />
         </q-item-section>
       </div>
     </q-item>
@@ -34,6 +34,7 @@ import {
   CLIENT,
 } from '@data/constants';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
+import Button from '@components/Button';
 
 export default {
   name: 'SideMenuFooter',
@@ -42,6 +43,9 @@ export default {
     userId: { type: String, required: true },
     label: { type: String, default: '' },
     interfaceType: { type: String, default: CLIENT },
+  },
+  components: {
+    'ni-button': Button,
   },
   computed: {
     ...mapGetters({

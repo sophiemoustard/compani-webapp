@@ -3,7 +3,7 @@
     <div class="row col-xs-12 q-mb-md items-center">
       <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" size="sm" />
       <h4>{{ customer.identity.firstname }} {{ customer.identity.lastname }}</h4>
-      <q-btn :disable="isPlanningRouterDisable" flat size="sm" color="primary" icon="date_range"
+      <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
         @click="goToPlanning" />
     </div>
     <div class="row col-xs-12 profile-info column">
