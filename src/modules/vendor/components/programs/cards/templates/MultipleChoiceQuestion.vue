@@ -24,7 +24,7 @@ import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, REQUIRED_LABEL } from '@data/constants';
-import { minArrayLength, minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
+import { minLabelArrayLength, minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
@@ -33,19 +33,13 @@ export default {
     'ni-input': Input,
   },
   mixins: [templateMixin],
-  data () {
-    return {
-      answersLengthInDb: 0,
-    };
-  },
   validations () {
     return {
       card: {
         question: { required },
         qcmAnswers: {
-          minLength: minArrayLength(2),
+          minLength: minLabelArrayLength(2),
           minOneCorrectAnswer,
-          $each: { label: { required }, correct: { required } },
         },
         explanation: { required },
       },
@@ -66,18 +60,20 @@ export default {
   },
   methods: {
     initializeAnswers () {
-      this.answersLengthInDb = this.card.qcmAnswers.length;
       this.card.qcmAnswers = times(
         MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
-        i => this.card.qcmAnswers[i] || ({ label: '', correct: i === 0 })
+        i => this.card.qcmAnswers[i] || ({ label: '', correct: false })
       );
     },
     requiredAnswerIsMissing (index) {
-      return index < 2 && this.card.qcmAnswers.filter(a => a.label).length < this.answersLengthInDb &&
-        this.$v.card.qcmAnswers.$error && !this.card.qcmAnswers[index].label;
+      return index < 2 && !this.card.qcmAnswers[index].label && this.$v.card.qcmAnswers.$error;
     },
     requiredOneCorrectAnswer (index) {
       return !this.$v.card.qcmAnswers.minOneCorrectAnswer && !!this.card.qcmAnswers[index].label;
+    },
+    removeSingleCorrectAnswer (index) {
+      return this.card.qcmAnswers.filter(a => a.correct).length === 1 && this.card.qcmAnswers[index].correct &&
+        !this.card.qcmAnswers[index].label;
     },
     formatAnswersPayload () {
       return this.card.qcmAnswers.filter(a => !!a.label);
@@ -88,6 +84,9 @@ export default {
 
         this.$v.card.qcmAnswers.$touch();
         if (this.requiredAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
+          return NotifyWarning('Une bonne réponse est nécessaire.');
+        }
 
         await Cards.updateById(this.card._id, { qcmAnswers: this.formatAnswersPayload() });
         await this.refreshCard();
@@ -115,12 +114,15 @@ export default {
     },
     answersErrorMsg (index) {
       if (this.requiredAnswerIsMissing(index)) return REQUIRED_LABEL;
-      if (this.requiredOneCorrectAnswer(index)) return 'Une bonne réponse est nécessaire.';
+      if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
+        return 'Une bonne réponse est nécessaire.';
+      }
 
       return '';
     },
     answersError (index) {
-      return this.requiredAnswerIsMissing(index) || this.requiredOneCorrectAnswer(index);
+      return this.requiredAnswerIsMissing(index) || this.requiredOneCorrectAnswer(index) ||
+        this.removeSingleCorrectAnswer(index);
     },
   },
 };
