@@ -2,7 +2,8 @@
   <q-page padding class="client-background">
     <div v-if="customer">
       <div class="row items-center col-xs-12 header-margin q-mb-xl">
-        <ni-button class="on-left self-center" icon="arrow_back" color="primary" @click.native="$router.go(-1)" />
+        <ni-button class="on-left self-center" icon="arrow_back" color="primary" @click.native="$router.go(-1)"
+          size="sm" />
         <h4 class="no-margin">{{ customer.identity | formatIdentity('FL') }}</h4>
       </div>
       <profile-follow-up />

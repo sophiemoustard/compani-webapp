@@ -30,7 +30,7 @@
         </template>
         <template v-if="isPassword" v-slot:append>
           <ni-button :icon="isPassword && showPassword ? 'visibility' : 'visibility_off'" color="middle-grey"
-            @click.native="showPassword = !showPassword" />
+            @click.native="showPassword = !showPassword" size="sm" />
         </template>
       </q-input>
     </template>

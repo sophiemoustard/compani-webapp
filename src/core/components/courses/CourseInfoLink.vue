@@ -8,7 +8,7 @@
     </q-item>
     <div class="course-link-share" v-clipboard:copy="!disableLink && courseLink"
       v-clipboard:success="handleCopySuccess">
-      <ni-button color="primary" :disable="disableLink" icon="link" />
+      <ni-button color="primary" :disable="disableLink" icon="link" size="xs" />
       <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disableLink }"
         color="primary">
         Obtenir un lien de partage
