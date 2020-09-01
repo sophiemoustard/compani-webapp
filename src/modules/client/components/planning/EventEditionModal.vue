@@ -180,9 +180,7 @@ export default {
     toggleAddressSelect () {
       const addressList = this.customerAddressList(this.editedEvent);
       const addressIndex = addressList.findIndex(ev => this.editedEvent.address.label === ev.label);
-      // eslint-disable-next-line prefer-destructuring
       if (addressIndex === 0) this.editedEvent.address = addressList[1];
-      // eslint-disable-next-line prefer-destructuring
       else this.editedEvent.address = addressList[0];
     },
   },

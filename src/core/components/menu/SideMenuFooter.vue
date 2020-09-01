@@ -15,7 +15,7 @@
             @click.native="clickHandler" />
         </q-item-section>
         <q-item-section>
-          <ni-button class="person" icon="person" color="grey" @click.native="goToProfile" size="sm" />
+          <ni-button class="person" icon="person" @click.native="goToProfile" size="sm" />
         </q-item-section>
       </div>
     </q-item>
