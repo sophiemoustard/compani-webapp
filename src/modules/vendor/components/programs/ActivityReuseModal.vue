@@ -29,6 +29,7 @@ export default {
   name: 'ActivityReuseModal',
   props: {
     value: { type: Boolean, default: false },
+    sameStepActivities: { type: Array, default: () => [] },
     programOptions: { type: Array, default: () => [] },
     reusedActivity: { type: String, default: '' },
     validations: { type: Object, default: () => ({}) },
@@ -53,12 +54,13 @@ export default {
         this.refreshingActivities = true;
         const program = await Programs.getById(this.selectedProgram);
 
-        const activities = program.subPrograms
+        const reuseableActivities = program.subPrograms
           .map(sp => sp.steps.map(s => s.activities.map(a => ({ label: a.name, value: a._id }))))
           .flat(2)
+          .filter(a => !this.sameStepActivities.includes(a.value))
           .sort((a, b) => a.label.localeCompare(b.label));
 
-        this.activityOptions = uniqBy(activities, a => a.value);
+        this.activityOptions = uniqBy(reuseableActivities, a => a.value);
       } catch (e) {
         this.activityOptions = [];
         console.error(e);
