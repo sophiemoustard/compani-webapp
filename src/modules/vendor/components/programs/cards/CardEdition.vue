@@ -18,6 +18,7 @@
           <multiple-choice-question v-else-if="card.template === MULTIPLE_CHOICE_QUESTION" :key="card._id"
             class="q-mx-lg" :card="card" />
           <survey v-else-if="card.template === SURVEY" :key="card._id" class="q-mx-lg" :card="card" />
+          <open-question v-else-if="card.template === OPEN_QUESTION" :key="card._id" class="q-mx-lg" :card="card" />
         </div>
     </q-scroll-area>
   </div>
@@ -36,6 +37,7 @@ import {
   SINGLE_CHOICE_QUESTION,
   MULTIPLE_CHOICE_QUESTION,
   SURVEY,
+  OPEN_QUESTION,
 } from '@data/constants';
 import Transition from 'src/modules/vendor/components/programs/cards/templates/Transition';
 import TitleTextMedia from 'src/modules/vendor/components/programs/cards/templates/TitleTextMedia';
@@ -47,6 +49,7 @@ import OrderTheSequence from 'src/modules/vendor/components/programs/cards/templ
 import SingleChoiceQuestion from 'src/modules/vendor/components/programs/cards/templates/SingleChoiceQuestion';
 import MultipleChoiceQuestion from 'src/modules/vendor/components/programs/cards/templates/MultipleChoiceQuestion';
 import Survey from 'src/modules/vendor/components/programs/cards/templates/Survey';
+import OpenQuestion from 'src/modules/vendor/components/programs/cards/templates/OpenQuestion';
 
 export default {
   name: 'CardEdition',
@@ -61,6 +64,7 @@ export default {
     'single-choice-question': SingleChoiceQuestion,
     'multiple-choice-question': MultipleChoiceQuestion,
     survey: Survey,
+    'open-question': OpenQuestion,
   },
   data () {
     return {
@@ -74,6 +78,7 @@ export default {
       SINGLE_CHOICE_QUESTION,
       MULTIPLE_CHOICE_QUESTION,
       SURVEY,
+      OPEN_QUESTION,
     };
   },
   computed: {

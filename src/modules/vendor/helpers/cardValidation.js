@@ -14,6 +14,7 @@ import {
   MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
   SURVEY,
   SURVEY_LABEL_MAX_LENGTH,
+  OPEN_QUESTION,
 } from '@data/constants';
 
 const cardSchema = (card) => {
@@ -93,6 +94,10 @@ const cardSchema = (card) => {
             right: Joi.string().required().max(SURVEY_LABEL_MAX_LENGTH),
           })
         ),
+      });
+    case OPEN_QUESTION:
+      return Joi.object().keys({
+        question: Joi.string().required(),
       });
     default:
       return Joi.object().keys();
