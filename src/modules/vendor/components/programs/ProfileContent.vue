@@ -33,7 +33,7 @@
             </q-card>
             <div class="q-mt-md" align="right">
               <ni-button class="q-my-sm" color="primary" icon="add" label="Réutiliser une activité"
-              @click="openActivityReuseModal(step)" />
+                @click="openActivityReuseModal(step)" />
               <ni-button class="q-my-sm" color="primary" icon="add" label="Créer une activité"
                 @click="openActivityCreationModal(step._id)" />
             </div>

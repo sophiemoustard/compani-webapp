@@ -167,10 +167,10 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <ni-button color="grey" icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
-                    <ni-button color="grey" icon="history" @click.native="showFundingHistory(col.value)" />
-                    <ni-button color="grey" icon="edit" @click.native="startFundingEdition(col.value)" />
-                    <ni-button color="grey" icon="delete" @click.native="validateFundingDeletion(col.value)" />
+                    <ni-button icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
+                    <ni-button icon="history" @click.native="showFundingHistory(col.value)" />
+                    <ni-button icon="edit" @click.native="startFundingEdition(col.value)" />
+                    <ni-button icon="delete" @click.native="validateFundingDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
