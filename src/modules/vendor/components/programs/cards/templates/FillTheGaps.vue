@@ -2,14 +2,15 @@
   <div v-if="falsyAnswersInitialized">
     <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.gappedText" required-field
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
-      :error-message="gappedTextTagCodeErrorMsg" />
+      :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="q-mb-lg row gutter-profile answers">
       <ni-input v-for="(answer, i) in card.falsyAnswers" :key="i" class="col-xs-12 col-md-6" :caption="`Mot ${i + 1}`"
         v-model.trim="card.falsyAnswers[i]" @focus="saveTmp(`falsyAnswers[${i}]`)" @blur="updateAnswer(i)"
-        :error="falsyAnswersError(i)" :required-field="i < 2" :error-message="falsyAnswersErrorMsg(i)" />
+        :error="falsyAnswersError(i)" :required-field="i < 2" :error-message="falsyAnswersErrorMsg(i)"
+        :disable="disableEdition" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
+      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
@@ -35,6 +36,9 @@ import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'FillTheGaps',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     'ni-input': Input,
   },

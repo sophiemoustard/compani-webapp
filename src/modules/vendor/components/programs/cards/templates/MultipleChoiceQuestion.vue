@@ -1,18 +1,18 @@
 <template>
   <div v-if="answersInitialized">
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
+      @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" :disable="disableEdition" />
     <div class="q-my-xl">
       <div v-for="(qcmAnswers, i) in card.qcmAnswers" :key="i" class="answers">
         <ni-input :caption="`Réponse ${i + 1}`" v-model.trim="card.qcmAnswers[i].label" :required-field="i < 2"
           @focus="saveTmp(`qcmAnswers[${i}].label`)" @blur="updateAnswer(i)"
-          :error="answersError(i)" :error-message="answersErrorMsg(i)" />
+          :error="answersError(i)" :error-message="answersErrorMsg(i)" :disable="disableEdition" />
         <q-checkbox v-model="card.qcmAnswers[i].correct" @input="updateCorrectAnswer(i)"
-          :disable="!card.qcmAnswers[i].label" />
+          :disable="!card.qcmAnswers[i].label || disableEdition" />
       </div>
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
+      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
@@ -29,6 +29,9 @@ import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'MultipleChoiceQuestion',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     'ni-input': Input,
   },

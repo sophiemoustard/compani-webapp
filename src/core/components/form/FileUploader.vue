@@ -17,7 +17,7 @@
       <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
         text-color="black" @failed="failMsg" :form-fields="additionalFields" :max-file-size="maxFileSize"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"
-        @rejected="rejected" />
+        @rejected="rejected" :disable="disable" />
     </q-field>
   </div>
 </template>

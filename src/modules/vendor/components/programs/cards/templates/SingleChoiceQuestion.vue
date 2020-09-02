@@ -1,16 +1,17 @@
 <template>
   <div v-if="falsyAnswersInitialized">
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
+      @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" :disable="disableEdition" />
     <ni-input caption="Bonne réponse" v-model.trim="card.qcuGoodAnswer" required-field class="q-my-lg"
-      @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" @blur="updateCard('qcuGoodAnswer')" />
+      @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" @blur="updateCard('qcuGoodAnswer')"
+      :disable="disableEdition" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.falsyAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
         v-model.trim="card.falsyAnswers[i]" :required-field="i === 0" :error="requiredFalsyAnswerIsMissing(i)"
-        @focus="saveTmp(`falsyAnswers[${i}]`)" @blur="updateFalsyAnswer(i)" />
+        @focus="saveTmp(`falsyAnswers[${i}]`)" @blur="updateFalsyAnswer(i)" :disable="disableEdition" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
+      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
@@ -28,6 +29,9 @@ import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'SingleChoiceQuestion',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     'ni-input': Input,
   },
