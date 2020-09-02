@@ -1,24 +1,31 @@
 <template>
-  <div class="q-mx-md card-edition">
+  <div :class="['q-mx-md', 'card-edition', { 'edition-disabled': disableEdition }]">
     <q-scroll-area :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
         <div v-if="card && Object.values(card).length">
-          <transition v-if="card.template === TRANSITION" :key="card._id" class="q-mx-lg" :card="card" />
+          <transition v-if="card.template === TRANSITION" :key="card._id" class="q-mx-lg" :card="card"
+            :disable-edition="disableEdition" />
           <title-text-media v-else-if="card.template === TITLE_TEXT_MEDIA" :key="card._id" class="q-mx-lg"
-            :card="card" />
-          <title-text v-else-if="card.template === TITLE_TEXT" :key="card._id" class="q-mx-lg" :card="card" />
-          <text-media v-else-if="card.template === TEXT_MEDIA" :key="card._id" class="q-mx-lg" :card="card" />
-          <flashcard v-else-if="card.template === FLASHCARD" :key="card._id" class="q-mx-lg" :card="card" />
-          <fill-the-gaps v-else-if="card.template === FILL_THE_GAPS" :key="card._id" class="q-mx-lg" :card="card" />
+            :card="card" :disable-edition="disableEdition" />
+          <title-text v-else-if="card.template === TITLE_TEXT" :key="card._id" class="q-mx-lg" :card="card"
+            :disable-edition="disableEdition" />
+          <text-media v-else-if="card.template === TEXT_MEDIA" :key="card._id" class="q-mx-lg" :card="card"
+            :disable-edition="disableEdition" />
+          <flashcard v-else-if="card.template === FLASHCARD" :key="card._id" class="q-mx-lg" :card="card"
+            :disable-edition="disableEdition" />
+          <fill-the-gaps v-else-if="card.template === FILL_THE_GAPS" :key="card._id" class="q-mx-lg" :card="card"
+            :disable-edition="disableEdition" />
           <order-the-sequence v-else-if="card.template === ORDER_THE_SEQUENCE" :key="card._id" class="q-mx-lg"
-            :card="card" />
+            :card="card" :disable-edition="disableEdition" />
           <single-choice-question v-else-if="card.template === SINGLE_CHOICE_QUESTION" :key="card._id" class="q-mx-lg"
-            :card="card" />
+            :card="card" :disable-edition="disableEdition" />
           <multiple-choice-question v-else-if="card.template === MULTIPLE_CHOICE_QUESTION" :key="card._id"
-            class="q-mx-lg" :card="card" />
-          <survey v-else-if="card.template === SURVEY" :key="card._id" class="q-mx-lg" :card="card" />
-          <open-question v-else-if="card.template === OPEN_QUESTION" :key="card._id" class="q-mx-lg" :card="card" />
+            class="q-mx-lg" :card="card" :disable-edition="disableEdition" />
+          <survey v-else-if="card.template === SURVEY" :key="card._id" class="q-mx-lg" :card="card"
+            :disable-edition="disableEdition" />
+          <open-question v-else-if="card.template === OPEN_QUESTION" :key="card._id" class="q-mx-lg" :card="card"
+            :disable-edition="disableEdition" />
         </div>
     </q-scroll-area>
   </div>
@@ -53,6 +60,9 @@ import OpenQuestion from 'src/modules/vendor/components/programs/cards/templates
 
 export default {
   name: 'CardEdition',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     transition: Transition,
     'title-text-media': TitleTextMedia,
@@ -97,4 +107,7 @@ export default {
   display: flex
   flex-direction: column
   flex: 1
+
+.edition-disabled
+  opacity: 0.6
 </style>

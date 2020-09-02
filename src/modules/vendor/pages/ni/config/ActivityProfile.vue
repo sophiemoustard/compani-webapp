@@ -13,8 +13,9 @@
       </ni-profile-header>
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
-          @delete-card="validateCardDeletion" />
-        <card-edition />
+          @delete-card="validateCardDeletion" :disable-edition="isEditionLocked"
+          @unlock-edition="validateUnlockEdition" />
+        <card-edition :disable-edition="isEditionLocked" />
       </div>
     </template>
 
@@ -59,6 +60,7 @@ export default {
       modalLoading: false,
       cardCreationModal: false,
       newCard: { template: '' },
+      isEditionLocked: false,
     };
   },
   validations () {
@@ -81,7 +83,7 @@ export default {
       return infos;
     },
   },
-  async created () {
+  async mounted () {
     try {
       await this.refreshActivity();
 
@@ -92,6 +94,8 @@ export default {
 
       const step = subProgram ? subProgram.steps.find(s => s._id === this.stepId) : '';
       this.stepName = get(step, 'name') || '';
+
+      this.isEditionLocked = this.activity.steps.length > 1;
     } catch (e) {
       console.error(e);
     }
@@ -103,6 +107,18 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    validateUnlockEdition () {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette activité est utilisée dans plusieurs étapes '
+          + `des programmes suivants : ${this.activity.steps.map(s => s.subProgram.program.name).join(', ')}. `
+          + 'Si tu la modifies, elle sera modifiée dans toutes ces étapes.'
+          + 'Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
+        .onCancel(() => NotifyPositive('Déverouillage annulée.'));
     },
     openCardCreationModal (stepId) {
       this.cardCreationModal = true;
