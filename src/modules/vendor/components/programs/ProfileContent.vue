@@ -9,7 +9,7 @@
           <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
             <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
             <q-item-section>
-              <div class="text-weight-bold">{{ step.name }}</div>
+              <div class="text-weight-bold">{{ stepIndex + 1 }} - {{ step.name }}</div>
               <div class="step-subtitle">
                 {{ getStepTypeLabel(step.type) }} -
                 {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
