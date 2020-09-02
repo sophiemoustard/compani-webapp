@@ -24,7 +24,7 @@
               :error-message="emailError($v.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
+            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="black" />
           </div>
         </div>
         <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
@@ -79,6 +79,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import HtmlModal from '@components/modal/HtmlModal';
 import Modal from '@components/modal/Modal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -96,6 +97,7 @@ export default {
   metaInfo: { title: 'Mon compte' },
   mixins: [passwordMixin, validationMixin, userMixin],
   components: {
+    'ni-button': Button,
     'ni-input': Input,
     'ni-html-modal': HtmlModal,
     'ni-modal': Modal,

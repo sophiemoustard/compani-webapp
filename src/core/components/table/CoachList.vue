@@ -18,7 +18,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <q-btn flat dense round small color="grey" icon="edit" @click="openUserEditionModal(props.row)" />
+                  <ni-button icon="edit" @click="openUserEditionModal(props.row)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -26,8 +26,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn no-caps flat color="primary" icon="add" label="Ajouter un utilisateur"
-            @click="userCreationModal = true" :disable="usersLoading" />
+          <ni-button color="primary" icon="add" label="Ajouter un utilisateur" @click="userCreationModal = true"
+            :disable="usersLoading" />
         </q-card-actions>
       </q-card>
     </div>
@@ -90,6 +90,7 @@ import Roles from '@api/Roles';
 import Email from '@api/Email';
 import Users from '@api/Users';
 import Select from '@components/form/Select';
+import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -103,6 +104,7 @@ import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 export default {
   name: 'CoachList',
   components: {
+    'ni-button': Button,
     'ni-select': Select,
     'ni-modal': Modal,
     'ni-input': Input,

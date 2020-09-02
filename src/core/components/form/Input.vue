@@ -29,8 +29,8 @@
           <q-icon size="xs" :name="icon" />
         </template>
         <template v-if="isPassword" v-slot:append>
-          <q-icon :name="isPassword && showPassword ? 'visibility' : 'visibility_off'" class="cursor-pointer" size="xs"
-            @click.native="showPassword = !showPassword" />
+          <ni-button :icon="isPassword && showPassword ? 'visibility' : 'visibility_off'" color="middle-grey"
+            @click.native="showPassword = !showPassword" size="sm" />
         </template>
       </q-input>
     </template>
@@ -39,9 +39,13 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
+import Button from '@components/Button';
 
 export default {
   name: 'NiInput',
+  components: {
+    'ni-button': Button,
+  },
   props: {
     caption: { type: String, default: '' },
     error: { type: Boolean, default: false },

@@ -59,5 +59,6 @@ module.exports = {
     ],
     'object-curly-newline': ['error', { consistent: true }],
     'operator-linebreak': ['error', 'before', { overrides: { '&&': 'after', '||': 'after', '=': 'after' } }],
+    'prefer-destructuring': ['error', { 'VariableDeclarator': { 'object': true, 'array': false } }]
   }
 }
