@@ -119,8 +119,9 @@ export default {
         title: 'Confirmation',
         message: 'Cette activité est utilisée dans les étapes '
           + `${programsReusingActivity.length > 1 ? 'des programmes suivants' : 'du programme suivant'} : `
-          + `${programsReusingActivity.join(', ')}. Si tu la modifies, elle sera modifiée dans toutes ces étapes. `
-          + 'Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
+          + `${programsReusingActivity.join(', ')}. <br>Si tu la modifies, elle sera modifiée dans toutes ces étapes.`
+          + '<br><br>Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
