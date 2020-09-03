@@ -1,7 +1,8 @@
 <template>
   <div v-if="falsyAnswersInitialized">
-    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.text" required-field @focus="saveTmp('text')"
-      @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :error-message="textTagCodeErrorMsg" />
+    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.gappedText" required-field
+      @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
+      :error-message="gappedTextTagCodeErrorMsg" />
     <div class="q-mb-lg row gutter-profile answers">
       <ni-input v-for="(answer, i) in card.falsyAnswers" :key="i" class="col-xs-12 col-md-6" :caption="`Mot ${i + 1}`"
         v-model.trim="card.falsyAnswers[i]" @focus="saveTmp(`falsyAnswers[${i}]`)" @blur="updateAnswer(i)"
@@ -41,7 +42,7 @@ export default {
   validations () {
     return {
       card: {
-        text: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
+        gappedText: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
         falsyAnswers: {
           minLength: minArrayLength(2),
           $each: { validCaracters, validAnswerLength },
@@ -51,22 +52,22 @@ export default {
     };
   },
   computed: {
-    textTagCodeErrorMsg () {
-      if (this.$v.card.text.required === false) return REQUIRED_LABEL;
-      if (!this.$v.card.text.validTagsCount) {
+    gappedTextTagCodeErrorMsg () {
+      if (this.$v.card.gappedText.required === false) return REQUIRED_LABEL;
+      if (!this.$v.card.gappedText.validTagsCount) {
         return 'Le nombre de trous doit être de 1 ou 2';
       }
-      if (!this.$v.card.text.validTagging) {
+      if (!this.$v.card.gappedText.validTagging) {
         return 'Balisage non valide, la bonne syntaxe est : <trou>la réponse</trou>';
       }
-      if (!this.$v.card.text.validAnswerInTag) {
+      if (!this.$v.card.gappedText.validAnswerInTag) {
         return 'Il ne doit pas y avoir d\'espace au début et à la fin de la réponse. '
           + 'La bonne syntaxe est : <trou>la réponse</trou>';
       }
-      if (!this.$v.card.text.validCaractersTags) {
+      if (!this.$v.card.gappedText.validCaractersTags) {
         return 'Caractère invalide détecté entre les balises, seuls les symboles - \' et ESPACE sont permis';
       }
-      if (!this.$v.card.text.validTagLength) {
+      if (!this.$v.card.gappedText.validTagLength) {
         return 'Le nombre de caractères entre les balises doit être entre 1 et 15';
       }
       return '';
