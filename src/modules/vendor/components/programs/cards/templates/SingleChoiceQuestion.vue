@@ -51,12 +51,10 @@ export default {
       return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT;
     },
   },
-  async mounted () {
-    this.initializeFalsyAnswers();
-  },
   watch: {
-    card () {
-      this.initializeFalsyAnswers();
+    card: {
+      handler: 'initializeFalsyAnswers',
+      immediate: true,
     },
   },
   methods: {

@@ -53,12 +53,10 @@ export default {
       return this.card.qcmAnswers.length === MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT;
     },
   },
-  async mounted () {
-    this.initializeAnswers();
-  },
   watch: {
-    card () {
-      this.initializeAnswers();
+    card: {
+      handler: 'initializeAnswers',
+      immediate: true,
     },
   },
   methods: {

@@ -80,12 +80,10 @@ export default {
       return this.card.falsyAnswers.length === FILL_THE_GAPS_MAX_ANSWERS_COUNT;
     },
   },
-  async mounted () {
-    this.initializeFalsyAnswers();
-  },
   watch: {
-    card () {
-      this.initializeFalsyAnswers();
+    card: {
+      handler: 'initializeFalsyAnswers',
+      immediate: true,
     },
   },
   methods: {
