@@ -31,6 +31,7 @@ import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { removeDiacritics } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -73,11 +74,11 @@ export default {
   },
   computed: {
     filteredPrograms () {
-      const escapedString = escapeRegExp(this.searchStr);
-      return this.programs.filter(program => program.name.match(new RegExp(escapedString, 'i')));
+      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.programs.filter(program => program.noDiacriticsName.match(new RegExp(formatedString, 'i')));
     },
   },
-  async mounted () {
+  async created () {
     await this.refreshProgram();
   },
   methods: {
@@ -90,7 +91,9 @@ export default {
     async refreshProgram () {
       try {
         this.tableLoading = true;
-        this.programs = await Programs.list();
+        const programList = await Programs.list();
+
+        this.programs = programList.map(p => ({ ...p, noDiacriticsName: removeDiacritics(p.name) }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des programmes.');

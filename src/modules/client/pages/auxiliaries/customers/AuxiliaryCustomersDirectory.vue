@@ -8,7 +8,8 @@
 
 <script>
 import Customers from '@api/Customers';
-import { formatIdentity } from '@helpers/utils';
+import escapeRegExp from 'lodash/escapeRegExp';
+import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 
@@ -48,12 +49,13 @@ export default {
       ],
     };
   },
-  async mounted () {
+  async created () {
     await this.getCustomersList();
   },
   computed: {
     filteredUsers () {
-      return this.customersList.filter(customer => customer.identity.fullName.match(new RegExp(this.searchStr, 'i')));
+      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.customersList.filter(customer => customer.noDiacriticsName.match(new RegExp(formatedString, 'i')));
     },
   },
   methods: {
@@ -66,6 +68,7 @@ export default {
         const customers = await Customers.list();
         this.customersList = customers.map(customer => ({
           identity: { ...customer.identity, fullName: formatIdentity(customer.identity, 'FL') },
+          noDiacriticsName: removeDiacritics(formatIdentity(customer.identity, 'FL')),
           customerId: customer._id,
         }));
         this.tableLoading = false;

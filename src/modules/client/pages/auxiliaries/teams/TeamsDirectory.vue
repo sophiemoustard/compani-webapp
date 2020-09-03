@@ -23,7 +23,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Users from '@api/Users';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
-import { formatPhone, formatIdentity } from '@helpers/utils';
+import { formatPhone, formatIdentity, removeDiacritics } from '@helpers/utils';
 import { DEFAULT_AVATAR, AUXILIARY, PLANNING_REFERENT } from '@data/constants';
 
 export default {
@@ -67,14 +67,14 @@ export default {
       ],
     };
   },
-  mounted () {
+  created () {
     this.getUserList();
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
     filteredUsers () {
-      const escapedString = escapeRegExp(this.searchStr);
-      return this.userList.filter(user => user.auxiliary.name.match(new RegExp(escapedString, 'i')));
+      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.userList.filter(user => user.noDiacriticsName.match(new RegExp(formatedString, 'i')));
     },
   },
   methods: {
@@ -90,6 +90,7 @@ export default {
         const users = await Users.listActive(params);
         this.userList = users.map(user => ({
           auxiliary: { name: formatIdentity(user.identity, 'FL'), picture: get(user, 'picture.link') || null },
+          noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
           phone: get(user, 'contact.phone') || '',
         }));
       } catch (e) {

@@ -87,7 +87,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload, removeDiacritics } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
@@ -214,8 +214,9 @@ export default {
       return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
-      const escapedString = escapeRegExp(this.searchStr);
-      return this.activeUserList.filter(user => user.auxiliary.fullName.match(new RegExp(escapedString, 'i')));
+      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.activeUserList
+        .filter(user => user.noDiacriticsFullName.match(new RegExp(formatedString, 'i')));
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
@@ -228,7 +229,7 @@ export default {
   },
   methods: {
     updateSearch (value) {
-      this.searchStr = value;
+      this.searchStr = value.toString();
     },
     getHiringDate (user) {
       if (!user.contracts || user.contracts.length === 0) return null;
@@ -247,6 +248,7 @@ export default {
         startDate: user.createdAt,
         sector: user.sector ? user.sector.name : 'N/A',
         isActive: user.isActive,
+        noDiacriticsFullName: removeDiacritics(formatIdentity(user.identity, 'FL')),
         hiringDate,
       };
 

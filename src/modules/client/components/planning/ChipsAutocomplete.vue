@@ -10,6 +10,8 @@
 
 <script>
 import { mapState } from 'vuex';
+import escapeRegExp from 'lodash/escapeRegExp';
+import { removeDiacritics } from '@helpers/utils';
 
 export default {
   name: 'ChipsAutocomplete',
@@ -27,6 +29,9 @@ export default {
   },
   computed: {
     ...mapState('planning', ['elementToAdd']),
+    noDiacriticFilters () {
+      return this.filters.map(el => ({ ...el, noDiacriticsValue: removeDiacritics(el.value) }));
+    },
   },
   methods: {
     addEvent (el) {
@@ -42,8 +47,9 @@ export default {
     },
     async search (terms, done) {
       try {
-        const regex = new RegExp(terms, 'i');
-        this.options = this.filters.filter(el => el.value.match(regex));
+        const formatedString = escapeRegExp(removeDiacritics(terms));
+        this.options = this.noDiacriticFilters
+          .filter(el => el.noDiacriticsValue.match(new RegExp(formatedString, 'i')));
         done(this.options);
       } catch (e) {
         done([]);

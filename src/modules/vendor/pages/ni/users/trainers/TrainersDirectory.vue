@@ -42,7 +42,7 @@ import TableList from '@components/table/TableList';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 
@@ -72,14 +72,14 @@ export default {
   validations () {
     return { newTrainer: { ...pick(this.userValidation, ['identity.lastname', 'local.email']) } };
   },
-  async mounted () {
-    await this.refreshTrainers();
-  },
   computed: {
     filteredTrainers () {
-      const escapedString = escapeRegExp(this.searchStr);
-      return this.trainers.filter(trainer => trainer.name.match(new RegExp(escapedString, 'i')));
+      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.trainers.filter(trainer => trainer.noDiacriticsName.match(new RegExp(formatedString, 'i')));
     },
+  },
+  async created () {
+    await this.refreshTrainers();
   },
   methods: {
     async nextStep () {
@@ -127,7 +127,12 @@ export default {
       try {
         this.tableLoading = true;
         const trainers = await Users.list({ role: [TRAINER] });
-        this.trainers = trainers.map(trainer => ({ ...trainer, name: formatIdentity(trainer.identity, 'FL') }));
+
+        this.trainers = trainers.map(trainer => ({
+          ...trainer,
+          name: formatIdentity(trainer.identity, 'FL'),
+          noDiacriticsName: removeDiacritics(formatIdentity(trainer.identity, 'FL')),
+        }));
       } catch (e) {
         console.error(e);
         this.trainers = [];

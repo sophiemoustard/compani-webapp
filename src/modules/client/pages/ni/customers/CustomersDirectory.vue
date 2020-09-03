@@ -58,7 +58,7 @@ import Modal from '@components/modal/Modal';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
 
@@ -182,8 +182,8 @@ export default {
       const customers = this.onlyClients
         ? this.customers.filter(customer => customer.firstIntervention)
         : this.customers;
-      const escapedString = escapeRegExp(this.searchStr);
-      return customers.filter(customer => customer.identity.fullName.match(new RegExp(escapedString, 'i')));
+      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return customers.filter(customer => customer.noDiacriticsFullName.match(new RegExp(formatedString, 'i')));
     },
     primaryAddressError () {
       return !this.$v.newCustomer.contact.primaryAddress.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
@@ -207,6 +207,7 @@ export default {
             ...customer.identity,
             fullName: formatIdentity(customer.identity, 'FL'),
           },
+          noDiacriticsFullName: removeDiacritics(formatIdentity(customer.identity, 'FL')),
           firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
           missingInfo: customerProfileValidation(customer).error !== null,
         })));

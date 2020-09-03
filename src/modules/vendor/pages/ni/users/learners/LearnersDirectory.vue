@@ -22,7 +22,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 
 export default {
@@ -76,8 +76,8 @@ export default {
   },
   computed: {
     filteredLearners () {
-      const escapedString = escapeRegExp(this.searchStr);
-      return this.learnerList.filter(user => user.learner.fullName.match(new RegExp(escapedString, 'i')));
+      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.learnerList.filter(user => user.noDiacriticsName.match(new RegExp(formatedString, 'i')));
     },
   },
   async created () {
@@ -98,6 +98,7 @@ export default {
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
         },
+        noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
         company: user.company ? user.company.name : 'N/A',
         coursesCount: user.coursesCount,
       };
