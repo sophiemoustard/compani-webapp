@@ -1,6 +1,6 @@
 <template>
   <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-    @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
+    @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" :disable="disableEdition" />
 </template>
 
 <script>
@@ -10,6 +10,9 @@ import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'TitleText',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     'ni-input': Input,
   },

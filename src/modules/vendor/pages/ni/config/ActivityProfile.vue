@@ -83,7 +83,7 @@ export default {
       return infos;
     },
   },
-  async mounted () {
+  async created () {
     try {
       await this.refreshActivity();
 
@@ -113,7 +113,7 @@ export default {
         title: 'Confirmation',
         message: 'Cette activité est utilisée dans plusieurs étapes '
           + `des programmes suivants : ${this.activity.steps.map(s => s.subProgram.program.name).join(', ')}. `
-          + 'Si tu la modifies, elle sera modifiée dans toutes ces étapes.'
+          + 'Si tu la modifies, elle sera modifiée dans toutes ces étapes. '
           + 'Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
         ok: true,
         cancel: 'Annuler',
