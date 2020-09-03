@@ -7,8 +7,7 @@
         <div class="card-actions">
           <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)" :disable="disableEdition" />
         </div>
-        <div class="card-cell cursor-pointer"
-          @click="selectCard(card)">
+        <div class="card-cell cursor-pointer" @click="selectCard(card)">
           <div class="card-cell-title">
             <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(card) }}</div>
             <q-icon v-if="disableEdition" name="lock" size="xs" :class="{'locked-unselected': !isSelected(card)}" />
@@ -55,7 +54,7 @@ export default {
       return [
         'card-row',
         { 'card-row-selected': this.isSelected(card) && !this.disableEdition },
-        { 'card-row-locked': this.disableEdition },
+        { 'card-row-locked': !this.isSelected(card) && this.disableEdition },
         { 'card-row-locked-selected': this.isSelected(card) && this.disableEdition },
       ];
     },

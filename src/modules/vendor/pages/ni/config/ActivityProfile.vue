@@ -109,11 +109,17 @@ export default {
       }
     },
     validateUnlockEdition () {
+      const programsReusingActivity = [...new Set(
+        this.activity.steps
+          .filter(s => s._id !== this.stepId)
+          .map(s => s.subProgram.program.name)
+      )];
+
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Cette activité est utilisée dans plusieurs étapes '
-          + `des programmes suivants : ${this.activity.steps.map(s => s.subProgram.program.name).join(', ')}. `
-          + 'Si tu la modifies, elle sera modifiée dans toutes ces étapes. '
+        message: 'Cette activité est utilisée dans les étapes '
+          + `${programsReusingActivity.length > 1 ? 'des programmes suivants' : 'du programme suivant'} : `
+          + `${programsReusingActivity.join(', ')}. Si tu la modifies, elle sera modifiée dans toutes ces étapes. `
           + 'Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
         ok: true,
         cancel: 'Annuler',
