@@ -52,7 +52,7 @@ const cardSchema = (card) => {
       });
     case FILL_THE_GAPS:
       return Joi.object().keys({
-        text: Joi.string().required(),
+        gappedText: Joi.string().required(),
         answers: Joi.array().items(
           Joi.object({ label: Joi.string().required() })
         ).min(2).max(FILL_THE_GAPS_MAX_ANSWERS_COUNT),
