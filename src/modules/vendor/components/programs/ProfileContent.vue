@@ -25,8 +25,8 @@
                 <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
                 <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
                 <div class="row no-wrap">
-                  <ni-button class="q-pltb-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-                  <ni-button class="q-pa-sm" icon="close"
+                  <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
+                  <ni-button class="q-px-sm" icon="close"
                     @click.stop="validateActivityDeletion(step._id, activity._id)" />
                 </div>
               </q-card-section>
