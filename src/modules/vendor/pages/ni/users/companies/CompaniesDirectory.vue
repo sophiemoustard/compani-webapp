@@ -35,6 +35,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANY_TYPES } from '@data/constants';
+import { removeDiacritics } from '@helpers/utils';
 import { companyMixin } from '@mixins/companyMixin';
 
 export default {
@@ -70,13 +71,13 @@ export default {
       newCompany: pick(this.companyValidation, ['type', 'name']),
     };
   },
-  async mounted () {
+  async created () {
     await this.refreshCompanies();
   },
   computed: {
     filteredCompanies () {
-      const escapedString = escapeRegExp(this.searchStr);
-      return this.companies.filter(company => company.name.match(new RegExp(escapedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.companies.filter(company => company.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
   methods: {
@@ -89,7 +90,9 @@ export default {
     async refreshCompanies () {
       try {
         this.tableLoading = true;
-        this.companies = await Companies.list();
+        const companyList = await Companies.list();
+
+        this.companies = companyList.map(c => ({ ...c, noDiacriticsName: removeDiacritics(c.name) }));
       } catch (e) {
         console.error(e);
         this.companies = [];
