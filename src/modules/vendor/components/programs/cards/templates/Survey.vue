@@ -1,14 +1,14 @@
 <template>
   <div>
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" />
+      @blur="updateCard('question')" :error="$v.card.question.$error" :disable="disableEdition" />
     <div class="row gutter-profile">
       <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model.trim="card.label.left"
         @focus="saveTmp('label.left')" @blur="updateCardLabel('left')" :error="$v.card.label.left.$error"
-        :error-message="labelErrorMessage('left')" />
+        :error-message="labelErrorMessage('left')" :disable="disableEdition" />
       <ni-input class="col-md-6 col-xs-12" caption="Label droit" v-model.trim="card.label.right"
         @focus="saveTmp('label.right')" @blur="updateCardLabel('right')" :error="$v.card.label.right.$error"
-        :error-message="labelErrorMessage('right')" />
+        :error-message="labelErrorMessage('right')" :disable="disableEdition" />
     </div>
   </div>
 </template>
@@ -24,6 +24,9 @@ import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'Survey',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     'ni-input': Input,
   },

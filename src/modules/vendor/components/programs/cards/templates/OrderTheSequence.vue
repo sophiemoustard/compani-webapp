@@ -1,14 +1,14 @@
 <template v-if="orderedAnswersInitialized">
   <div>
-    <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field
+    <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field :disable="disableEdition"
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
     <div class="q-mb-lg">
       <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
         v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
-        @blur="updateOrderedAnswer(i)" :error="requiredOrderedAnswerIsMissing(i)" />
+        @blur="updateOrderedAnswer(i)" :error="requiredOrderedAnswerIsMissing(i)" :disable="disableEdition" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
-      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" />
+      @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
@@ -24,6 +24,9 @@ import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
   name: 'OrderTheSequence',
+  props: {
+    disableEdition: { type: Boolean, default: false },
+  },
   components: {
     'ni-input': Input,
   },
