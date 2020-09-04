@@ -31,6 +31,12 @@ import {
   TITLE_TEXT_MEDIA,
   TEXT_MEDIA,
   FLASHCARD,
+  MULTIPLE_CHOICE_QUESTION,
+  SINGLE_CHOICE_QUESTION,
+  ORDER_THE_SEQUENCE,
+  OPEN_QUESTION,
+  SURVEY,
+  FILL_THE_GAPS,
   TEMPLATE_TYPES,
 } from '@data/constants';
 import Button from '@components/Button';
@@ -66,8 +72,18 @@ export default {
       this.$emit('add');
     },
     getHeading (card) {
+      const questionTemplate = [
+        MULTIPLE_CHOICE_QUESTION,
+        SINGLE_CHOICE_QUESTION,
+        ORDER_THE_SEQUENCE,
+        OPEN_QUESTION,
+        SURVEY,
+      ];
+
       if ([TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT].includes(card.template)) return card.title || '';
       if ([FLASHCARD, TEXT_MEDIA].includes(card.template)) return card.text || '';
+      if (questionTemplate.includes(card.template)) return card.question || '';
+      if (card.template === FILL_THE_GAPS) return card.gappedText || '';
       return '';
     },
     getTemplateName (value) {
