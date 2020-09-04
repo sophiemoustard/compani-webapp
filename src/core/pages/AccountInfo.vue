@@ -35,7 +35,7 @@
         <q-btn big @click="newPasswordModal = true" color="primary" icon="mdi-lock-reset"
           label="Modifier mon mot de passe" />
       </div>
-      <hr class="q-my-lg">
+      <q-separator class="q-my-lg" />
       <div class="row button">
         <q-btn big color="primary" @click="logout" icon="logout" label="Déconnexion" />
       </div>
