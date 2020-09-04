@@ -63,18 +63,23 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
+    formatCustomer (customer) {
+      const formattedName = formatIdentity(customer.identity, 'FL');
+
+      return {
+        identity: {
+          ...customer.identity,
+          fullName: formattedName,
+          noDiacriticsName: removeDiacritics(formattedName),
+        },
+        customerId: customer._id,
+      };
+    },
     async getCustomersList () {
       try {
         this.tableLoading = true;
         const customers = await Customers.list();
-        this.customersList = customers.map(customer => ({
-          identity: {
-            ...customer.identity,
-            fullName: formatIdentity(customer.identity, 'FL'),
-            noDiacriticsName: removeDiacritics(formatIdentity(customer.identity, 'FL')),
-          },
-          customerId: customer._id,
-        }));
+        this.customersList = customers.map(customer => this.formatCustomer(customer));
         this.tableLoading = false;
       } catch (e) {
         this.tableLoading = false;

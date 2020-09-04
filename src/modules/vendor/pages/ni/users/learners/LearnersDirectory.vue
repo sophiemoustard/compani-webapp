@@ -91,13 +91,15 @@ export default {
       this.searchStr = value;
     },
     formatRow (user) {
+      const formattedName = formatIdentity(user.identity, 'FL');
+
       return {
         learner: {
           _id: user._id,
-          fullName: formatIdentity(user.identity, 'FL'),
+          fullName: formattedName,
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
-          noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
+          noDiacriticsName: removeDiacritics(formattedName),
         },
         company: user.company ? user.company.name : 'N/A',
         coursesCount: user.coursesCount,

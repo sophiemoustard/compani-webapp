@@ -216,7 +216,7 @@ export default {
     filteredUsers () {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
       return this.activeUserList
-        .filter(user => user.auxiliary.noDiacriticsFullName.match(new RegExp(formattedString, 'i')));
+        .filter(user => user.auxiliary.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
@@ -229,7 +229,7 @@ export default {
   },
   methods: {
     updateSearch (value) {
-      this.searchStr = value.toString();
+      this.searchStr = value;
     },
     getHiringDate (user) {
       if (!user.contracts || user.contracts.length === 0) return null;
@@ -238,13 +238,15 @@ export default {
     },
     formatUser (user) {
       const hiringDate = this.getHiringDate(user);
+      const formattedName = formatIdentity(user.identity, 'FL');
+
       const formattedUser = {
         auxiliary: {
           _id: user._id,
-          fullName: formatIdentity(user.identity, 'FL'),
+          fullName: formattedName,
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
-          noDiacriticsFullName: removeDiacritics(formatIdentity(user.identity, 'FL')),
+          noDiacriticsName: removeDiacritics(formattedName),
         },
         startDate: user.createdAt,
         sector: user.sector ? user.sector.name : 'N/A',

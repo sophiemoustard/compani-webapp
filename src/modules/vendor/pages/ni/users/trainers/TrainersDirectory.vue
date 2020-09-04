@@ -123,16 +123,21 @@ export default {
     goToTrainerProfile (row) {
       this.$router.push({ name: 'ni users trainers info', params: { trainerId: row._id } });
     },
+    formatTrainer (trainer) {
+      const formattedName = formatIdentity(trainer.identity, 'FL');
+
+      return {
+        ...trainer,
+        name: formattedName,
+        noDiacriticsName: removeDiacritics(formattedName),
+      };
+    },
     async refreshTrainers () {
       try {
         this.tableLoading = true;
         const trainers = await Users.list({ role: [TRAINER] });
 
-        this.trainers = trainers.map(trainer => ({
-          ...trainer,
-          name: formatIdentity(trainer.identity, 'FL'),
-          noDiacriticsName: removeDiacritics(formatIdentity(trainer.identity, 'FL')),
-        }));
+        this.trainers = trainers.map(trainer => this.formatTrainer(trainer));
       } catch (e) {
         console.error(e);
         this.trainers = [];

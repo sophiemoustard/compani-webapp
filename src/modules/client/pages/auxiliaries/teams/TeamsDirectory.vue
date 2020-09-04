@@ -81,6 +81,18 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
+    formatUser (user) {
+      const formattedName = formatIdentity(user.identity, 'FL');
+
+      return {
+        auxiliary: {
+          name: formattedName,
+          picture: get(user, 'picture.link') || null,
+          noDiacriticsName: removeDiacritics(formattedName),
+        },
+        phone: get(user, 'contact.phone') || '',
+      };
+    },
     async getUserList () {
       try {
         this.tableLoading = true;
@@ -88,14 +100,8 @@ export default {
         const companyId = get(this.company, '_id') || null;
         if (companyId) params.company = companyId;
         const users = await Users.listActive(params);
-        this.userList = users.map(user => ({
-          auxiliary: {
-            name: formatIdentity(user.identity, 'FL'),
-            picture: get(user, 'picture.link') || null,
-            noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
-          },
-          phone: get(user, 'contact.phone') || '',
-        }));
+
+        this.userList = users.map(user => this.formatUser(user));
       } catch (e) {
         console.error(e);
       } finally {
