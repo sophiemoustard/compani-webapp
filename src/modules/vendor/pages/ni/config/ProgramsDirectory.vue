@@ -74,8 +74,8 @@ export default {
   },
   computed: {
     filteredPrograms () {
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.programs.filter(program => program.noDiacriticsName.match(new RegExp(formatedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.programs.filter(program => program.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
   async created () {

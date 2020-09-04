@@ -54,8 +54,9 @@ export default {
   },
   computed: {
     filteredUsers () {
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.customersList.filter(customer => customer.noDiacriticsName.match(new RegExp(formatedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.customersList
+        .filter(customer => customer.identity.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
   methods: {
@@ -67,8 +68,11 @@ export default {
         this.tableLoading = true;
         const customers = await Customers.list();
         this.customersList = customers.map(customer => ({
-          identity: { ...customer.identity, fullName: formatIdentity(customer.identity, 'FL') },
-          noDiacriticsName: removeDiacritics(formatIdentity(customer.identity, 'FL')),
+          identity: {
+            ...customer.identity,
+            fullName: formatIdentity(customer.identity, 'FL'),
+            noDiacriticsName: removeDiacritics(formatIdentity(customer.identity, 'FL')),
+          },
           customerId: customer._id,
         }));
         this.tableLoading = false;

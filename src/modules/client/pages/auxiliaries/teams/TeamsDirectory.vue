@@ -73,8 +73,8 @@ export default {
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
     filteredUsers () {
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.userList.filter(user => user.noDiacriticsName.match(new RegExp(formatedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.userList.filter(user => user.auxiliary.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
   methods: {
@@ -89,8 +89,11 @@ export default {
         if (companyId) params.company = companyId;
         const users = await Users.listActive(params);
         this.userList = users.map(user => ({
-          auxiliary: { name: formatIdentity(user.identity, 'FL'), picture: get(user, 'picture.link') || null },
-          noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
+          auxiliary: {
+            name: formatIdentity(user.identity, 'FL'),
+            picture: get(user, 'picture.link') || null,
+            noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
+          },
           phone: get(user, 'contact.phone') || '',
         }));
       } catch (e) {

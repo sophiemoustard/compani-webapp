@@ -74,8 +74,8 @@ export default {
   },
   computed: {
     filteredTrainers () {
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.trainers.filter(trainer => trainer.noDiacriticsName.match(new RegExp(formatedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.trainers.filter(trainer => trainer.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
   async created () {

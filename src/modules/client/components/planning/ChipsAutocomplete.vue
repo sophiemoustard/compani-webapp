@@ -47,9 +47,9 @@ export default {
     },
     async search (terms, done) {
       try {
-        const formatedString = escapeRegExp(removeDiacritics(terms));
+        const formattedString = escapeRegExp(removeDiacritics(terms));
         this.options = this.noDiacriticFilters
-          .filter(el => el.noDiacriticsValue.match(new RegExp(formatedString, 'i')));
+          .filter(el => el.noDiacriticsValue.match(new RegExp(formattedString, 'i')));
         done(this.options);
       } catch (e) {
         done([]);

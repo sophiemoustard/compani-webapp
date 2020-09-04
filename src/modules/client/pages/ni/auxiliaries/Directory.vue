@@ -214,9 +214,9 @@ export default {
       return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
       return this.activeUserList
-        .filter(user => user.noDiacriticsFullName.match(new RegExp(formatedString, 'i')));
+        .filter(user => user.auxiliary.noDiacriticsFullName.match(new RegExp(formattedString, 'i')));
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
@@ -244,11 +244,11 @@ export default {
           fullName: formatIdentity(user.identity, 'FL'),
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
+          noDiacriticsFullName: removeDiacritics(formatIdentity(user.identity, 'FL')),
         },
         startDate: user.createdAt,
         sector: user.sector ? user.sector.name : 'N/A',
         isActive: user.isActive,
-        noDiacriticsFullName: removeDiacritics(formatIdentity(user.identity, 'FL')),
         hiringDate,
       };
 

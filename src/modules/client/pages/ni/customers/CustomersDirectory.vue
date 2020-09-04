@@ -182,8 +182,9 @@ export default {
       const customers = this.onlyClients
         ? this.customers.filter(customer => customer.firstIntervention)
         : this.customers;
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return customers.filter(customer => customer.noDiacriticsFullName.match(new RegExp(formatedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return customers
+        .filter(customer => customer.identity.noDiacriticsFullName.match(new RegExp(formattedString, 'i')));
     },
     primaryAddressError () {
       return !this.$v.newCustomer.contact.primaryAddress.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
@@ -206,8 +207,8 @@ export default {
           identity: {
             ...customer.identity,
             fullName: formatIdentity(customer.identity, 'FL'),
+            noDiacriticsFullName: removeDiacritics(formatIdentity(customer.identity, 'FL')),
           },
-          noDiacriticsFullName: removeDiacritics(formatIdentity(customer.identity, 'FL')),
           firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
           missingInfo: customerProfileValidation(customer).error !== null,
         })));

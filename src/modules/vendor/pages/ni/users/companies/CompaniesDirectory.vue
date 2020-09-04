@@ -76,8 +76,8 @@ export default {
   },
   computed: {
     filteredCompanies () {
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.companies.filter(company => company.noDiacriticsName.match(new RegExp(formatedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.companies.filter(company => company.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
   methods: {

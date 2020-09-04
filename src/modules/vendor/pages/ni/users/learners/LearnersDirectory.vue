@@ -76,8 +76,8 @@ export default {
   },
   computed: {
     filteredLearners () {
-      const formatedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.learnerList.filter(user => user.noDiacriticsName.match(new RegExp(formatedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.learnerList.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
   async created () {
@@ -97,8 +97,8 @@ export default {
           fullName: formatIdentity(user.identity, 'FL'),
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
+          noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
         },
-        noDiacriticsName: removeDiacritics(formatIdentity(user.identity, 'FL')),
         company: user.company ? user.company.name : 'N/A',
         coursesCount: user.coursesCount,
       };
