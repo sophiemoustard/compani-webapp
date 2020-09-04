@@ -45,12 +45,10 @@ export default {
       return this.card.orderedAnswers.length === ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT;
     },
   },
-  async mounted () {
-    this.initializeOrderedAnswers();
-  },
   watch: {
-    card () {
-      this.initializeOrderedAnswers();
+    card: {
+      handler: 'initializeOrderedAnswers',
+      immediate: true,
     },
   },
   methods: {
