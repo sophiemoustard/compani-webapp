@@ -31,13 +31,13 @@
           error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="$v.userProfile.contact.phone.$error" />
       </div>
-      <div class="row button">
-        <q-btn big @click="newPasswordModal = true" color="primary" icon="mdi-lock-reset"
+      <div class="row account-button">
+        <ni-button @click="newPasswordModal = true" color="white" icon="mdi-lock-reset"
           label="Modifier mon mot de passe" />
       </div>
       <q-separator class="q-my-lg" />
-      <div class="row button">
-        <q-btn big color="primary" @click="logout" icon="logout" label="Déconnexion" />
+      <div class="row account-button">
+        <ni-button color="white" @click="logout" icon="logout" label="Déconnexion" />
       </div>
       <div class="q-mt-lg links">
         <div class="cursor-pointer q-mb-sm">
@@ -205,11 +205,14 @@ export default {
 .links
   display: flex
   flex-direction: column
-.button
+.account-button
+  button
+    background-color: $primary
   @media screen and (max-width: 676px)
     display: flex
     justify-content: center
 .photo-caption
   font-size: 12px
   margin: 0 0 4px 0
+
 </style>
