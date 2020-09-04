@@ -185,9 +185,9 @@ export default {
     },
     toggleAddressSelect () {
       const addressList = this.customerAddressList(this.newEvent);
-      const addressIndex = addressList.findIndex(ev => this.newEvent.address.label === ev.label);
-      if (addressIndex === 0) this.newEvent.address = addressList[1];
-      else this.newEvent.address = addressList[0];
+      const addressIndex = addressList.findIndex(ev => this.newEvent.address.fullAddress === ev.label);
+      if (addressIndex === 0) this.newEvent.address = addressList[1].value;
+      else this.newEvent.address = addressList[0].value;
     },
   },
 };
