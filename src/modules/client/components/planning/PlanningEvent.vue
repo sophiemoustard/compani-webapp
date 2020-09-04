@@ -11,9 +11,8 @@
       </div>
     </div>
   </div>
-  <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
-    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]"
-    @click.stop="click(event)">
+  <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" @click.stop="click(event)"
+    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
     <div class="event-container">
       <div class="event-title">
         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">

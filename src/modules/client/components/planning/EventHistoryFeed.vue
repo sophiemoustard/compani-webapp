@@ -3,7 +3,7 @@
     <div class="row history-title">
       <div class="col-11">Flux d'activité</div>
       <div class="col-1 cursor-pointer">
-        <q-icon name="clear" size="16px" @click.native="close" />
+        <ni-button icon="clear" size="sm" @click.native="close" />
       </div>
     </div>
     <div class="scroll-container" ref="scrollTargetRef">
@@ -19,11 +19,16 @@
 
 <script>
 import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
+import Button from '@components/Button';
 
 export default {
   name: 'EventHistoryFeed',
   props: {
     eventHistories: { type: Array, default: () => ([]) },
+  },
+  components: {
+    'ni-event-history': NiEventHistory,
+    'ni-button': Button,
   },
   computed: {
     height () {
@@ -32,9 +37,6 @@ export default {
     top () {
       return window.innerWidth >= 768 ? 60 : 100;
     },
-  },
-  components: {
-    'ni-event-history': NiEventHistory,
   },
   methods: {
     close () {

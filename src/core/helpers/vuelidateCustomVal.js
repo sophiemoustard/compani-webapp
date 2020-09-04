@@ -108,7 +108,7 @@ export const validAnswerInTag = (value) => {
   return !gapAcc.some(v => v.trim() !== v);
 };
 
-export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\s'-]*$/.test(value);
+export const validCaracters = value => /^[a-zA-Z0-9àâçéèêëîïôûùü\040'-]*$/.test(value);
 
 export const validCaractersTags = (value) => {
   if (!value) return true;
@@ -131,9 +131,12 @@ export const validTagsCount = (value) => {
   if (!value) return true;
   const { gapAcc } = parseTagCode(value);
 
-  return gapAcc.length === 1 || (gapAcc.length === 2 && validTagging(value));
+  return (gapAcc.length === 0 && !validTagging(value)) || gapAcc.length === 1 ||
+    (gapAcc.length === 2 && validTagging(value));
 };
 
-export const min2Answers = value => value.filter(a => !!a.label).length > 1;
+export const minArrayLength = minLength => value => value.filter(a => !!a).length >= minLength;
 
-export const min2OrderedAnswers = value => value.filter(a => !!a).length > 1;
+export const minLabelArrayLength = minLength => value => value.filter(a => !!a.label).length >= minLength;
+
+export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;

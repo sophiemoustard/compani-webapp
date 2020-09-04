@@ -58,7 +58,7 @@ import Modal from '@components/modal/Modal';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
 
@@ -182,8 +182,9 @@ export default {
       const customers = this.onlyClients
         ? this.customers.filter(customer => customer.firstIntervention)
         : this.customers;
-      const escapedString = escapeRegExp(this.searchStr);
-      return customers.filter(customer => customer.identity.fullName.match(new RegExp(escapedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return customers
+        .filter(customer => customer.identity.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
     primaryAddressError () {
       return !this.$v.newCustomer.contact.primaryAddress.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
@@ -193,6 +194,20 @@ export default {
     updateSearch (value) {
       this.searchStr = value;
     },
+    formatCustomer (customer) {
+      const formattedName = formatIdentity(customer.identity, 'FL');
+
+      return {
+        ...customer,
+        identity: {
+          ...customer.identity,
+          fullName: formattedName,
+          noDiacriticsName: removeDiacritics(formattedName),
+        },
+        firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
+        missingInfo: customerProfileValidation(customer).error !== null,
+      };
+    },
     async getCustomers () {
       try {
         this.tableLoading = true;
@@ -201,15 +216,7 @@ export default {
           Customers.listWithFirstIntervention(),
         ]);
         this.firstInterventions = Object.freeze(firstInterventions);
-        this.customers = Object.freeze(customers.map(customer => ({
-          ...customer,
-          identity: {
-            ...customer.identity,
-            fullName: formatIdentity(customer.identity, 'FL'),
-          },
-          firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
-          missingInfo: customerProfileValidation(customer).error !== null,
-        })));
+        this.customers = Object.freeze(customers.map(customer => this.formatCustomer(customer)));
       } catch (e) {
         this.firstInterventions = [];
         console.error(e);

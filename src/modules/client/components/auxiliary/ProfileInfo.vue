@@ -75,7 +75,7 @@
               :error-message="emailError($v.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
+            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="black" />
           </div>
         </div>
         <ni-search-address v-model="userProfile.contact.address" color="white"
@@ -258,6 +258,7 @@ import Users from '@api/Users';
 import gdrive from '@api/GoogleDrive';
 import { formatQuantity } from '@helpers/utils';
 import SelectSector from '@components/form/SelectSector';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
@@ -286,6 +287,7 @@ export default {
   mixins: [validationMixin, userMixin],
   components: {
     'ni-select-sector': SelectSector,
+    'ni-button': Button,
     'ni-input': Input,
     'ni-select': Select,
     'ni-file-uploader': FileUploader,

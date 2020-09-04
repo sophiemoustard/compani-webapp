@@ -4,8 +4,7 @@
         Editer un <span class="text-weight-bold">créneau</span>
       </template>
       <div class="modal-icon">
-        <q-icon class="cursor-pointer" color="grey" size="sm" name="delete"
-          @click="validateDeletion(editedCourseSlot._id)" />
+        <ni-button icon="delete" @click="validateDeletion(editedCourseSlot._id)" />
       </div>
       <ni-select in-modal caption="Etape" :options="stepOptions" v-model="editedCourseSlot.step" required-field
         @blur="validations.step.$touch" :error="validations.step.$error" />
@@ -22,6 +21,7 @@
 
 <script>
 import Modal from '@components/modal/Modal';
+import Button from '@components/Button';
 import Select from '@components/form/Select';
 import DateTimeRange from '@components/form/DatetimeRange';
 import SearchAddress from '@components/form/SearchAddress';
@@ -38,6 +38,7 @@ export default {
     loading: { type: Boolean, default: false },
   },
   components: {
+    'ni-button': Button,
     'ni-datetime-range': DateTimeRange,
     'ni-search-address': SearchAddress,
     'ni-modal': Modal,

@@ -4,32 +4,43 @@
       <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
-      <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
-        <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
-          <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
-          <q-item-section>
-            <div class="text-weight-bold">{{ step.name }}</div>
-            <div class="step-subtitle">
-              {{ getStepTypeLabel(step.type) }} -
-              {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps" ghost-class="ghost">
+        <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
+          <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
+            <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
+            <q-item-section>
+              <div class="text-weight-bold">{{ stepIndex + 1 }} - {{ step.name }}</div>
+              <div class="step-subtitle">
+                {{ getStepTypeLabel(step.type) }} -
+                {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+              </div>
+            </q-item-section>
+          <ni-button icon="edit" @click.stop="openStepEditionModal(step)" />
+          <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)" />
+          </q-card-section>
+          <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
+            <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
+              <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
+                <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
+                <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
+                <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
+                <div class="row no-wrap">
+                  <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
+                  <ni-button class="q-px-sm" icon="close"
+                    @click.stop="validateActivityDeletion(step._id, activity._id)" />
+                </div>
+              </q-card-section>
+            </q-card>
+            <div class="q-mt-md" align="right">
+              <ni-button class="q-my-sm" color="primary" icon="add" label="Réutiliser une activité"
+                @click="openActivityReuseModal(step)" />
+              <ni-button class="q-my-sm" color="primary" icon="add" label="Créer une activité"
+                @click="openActivityCreationModal(step._id)" />
             </div>
-          </q-item-section>
-          <q-btn flat small color="grey" icon="edit" @click.stop="openStepEditionModal(step)" />
-        </q-card-section>
-        <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-          <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-            <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
-              <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
-              <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
-              <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
-              <q-btn flat small color="grey" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-            </q-card-section>
-          </q-card>
-          <q-btn class="q-my-sm" flat no-caps color="primary" icon="add" label="Ajouter une activité"
-            @click="openActivityCreationModal(step._id)" />
-        </div>
-      </q-card>
-      <q-btn class="q-my-sm add-step-button" flat no-caps color="primary" icon="add" label="Ajouter une étape"
+          </div>
+        </q-card>
+      </draggable>
+      <ni-button class="q-my-sm add-step-button" color="primary" icon="add" label="Ajouter une étape"
         @click="openStepCreationModal(subProgram._id)" />
     </div>
 
@@ -53,6 +64,12 @@
       :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
       :loading="modalLoading" />
 
+    <!-- Activity reuse modal -->
+    <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
+      :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity"
+      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal"
+      :same-step-activities="sameStepActivities" />
+
     <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
@@ -61,6 +78,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
@@ -68,15 +86,17 @@ import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Activities from '@api/Activities';
-import { formatQuantity } from '@helpers/utils';
 import Input from '@components/form/Input';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
+import { formatQuantity } from '@helpers/utils';
+import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
 import StepEditionModal from 'src/modules/vendor/components/programs/StepEditionModal';
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
+import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
-import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
 
 export default {
   name: 'ProfileContent',
@@ -85,11 +105,14 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
     'sub-program-creation-modal': SubProgramCreationModal,
     'step-creation-modal': StepCreationModal,
     'step-edition-modal': StepEditionModal,
     'activity-creation-modal': ActivityCreationModal,
+    'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
+    draggable,
   },
   data () {
     return {
@@ -103,6 +126,10 @@ export default {
       editedStep: { name: '', type: E_LEARNING },
       activityCreationModal: false,
       newActivity: { name: '' },
+      activityReuseModal: false,
+      sameStepActivities: [],
+      reusedActivity: '',
+      programOptions: [],
       activityEditionModal: false,
       editedActivity: { name: '' },
       isActivitiesShown: {},
@@ -128,6 +155,7 @@ export default {
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
       editedActivity: { name: { required } },
+      reusedActivity: { required },
     };
   },
   computed: {
@@ -135,8 +163,23 @@ export default {
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
+    await this.refreshProgramList();
   },
   methods: {
+    async dropStep (subProgramId) {
+      try {
+        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+        const steps = subProgram.steps.map(s => s._id);
+        await SubPrograms.update(subProgramId, { steps });
+
+        NotifyPositive('Modification enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des étapes.');
+      } finally {
+        await this.refreshProgram();
+      }
+    },
     formatQuantity,
     saveTmpName (index) {
       this.tmpInput = this.program.subPrograms[index] ? this.program.subPrograms[index].name : '';
@@ -162,6 +205,7 @@ export default {
         console.error(e);
       }
     },
+    // SUB-PROGRAM
     async updateSubProgramName (index) {
       try {
         const subProgramName = get(this.program.subPrograms[index], 'name');
@@ -205,6 +249,7 @@ export default {
       this.newSubProgram.name = '';
       this.$v.newSubProgram.$reset();
     },
+    // STEP
     async openStepCreationModal (subProgramId) {
       this.stepCreationModal = true;
       this.currentSubProgramId = subProgramId;
@@ -230,6 +275,7 @@ export default {
       this.newStep.name = '';
       this.$v.newStep.$reset();
     },
+    // step edition
     async openStepEditionModal (step) {
       this.editedStep = pick(step, ['_id', 'name', 'type']);
       this.stepEditionModal = true;
@@ -255,6 +301,7 @@ export default {
       this.editedStep = { name: '' };
       this.$v.editedStep.$reset();
     },
+    // ACTIVITY
     goToActivityProfile (subProgram, step, activity) {
       this.$router.push({
         name: 'ni config activity info',
@@ -266,6 +313,7 @@ export default {
         },
       });
     },
+    // activity creation
     openActivityCreationModal (stepId) {
       this.activityCreationModal = true;
       this.currentStepId = stepId;
@@ -291,6 +339,64 @@ export default {
       this.newActivity.name = '';
       this.$v.newActivity.$reset();
     },
+    // activity reuse
+    openActivityReuseModal (step) {
+      this.currentStepId = step._id;
+      this.sameStepActivities = step.activities.map(a => a._id);
+      this.activityReuseModal = true;
+    },
+    async refreshProgramList () {
+      try {
+        const programs = await Programs.list();
+
+        this.programOptions = programs.map(p => ({ label: p.name, value: p._id }));
+      } catch (e) {
+        this.programOptions = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des programmes.');
+      }
+    },
+    async reuseActivity () {
+      try {
+        this.modalLoading = true;
+
+        this.$v.reusedActivity.$touch();
+        if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Steps.updateById(this.currentStepId, { activities: this.reusedActivity });
+        this.activityReuseModal = false;
+        await this.refreshProgram();
+        NotifyPositive('Activité réutilisée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la réutilisation de l\'activité.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    async duplicateActivity () {
+      try {
+        this.modalLoading = true;
+
+        this.$v.reusedActivity.$touch();
+        if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        await Steps.addActivity(this.currentStepId, { activityId: this.reusedActivity });
+        this.activityReuseModal = false;
+        await this.refreshProgram();
+        NotifyPositive('Activité dupliquée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la dupliquation de l\'activité.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetActivityReuseModal () {
+      this.reusedActivity = '';
+      this.$v.reusedActivity.$reset();
+    },
+    // activity edition
     async openActivityEditionModal (activity) {
       this.editedActivity = pick(activity, ['_id', 'name']);
       this.activityEditionModal = true;
@@ -315,6 +421,44 @@ export default {
     resetActivityEditionModal () {
       this.editedActivity = { name: '' };
       this.$v.editedActivity.$reset();
+    },
+    validateStepDetachment (subProgramId, stepId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir retirer cette étape de ce sous-programme ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.detachStep(subProgramId, stepId))
+        .onCancel(() => NotifyPositive('Retrait annulé.'));
+    },
+    async detachStep (subProgramId, stepId) {
+      try {
+        await SubPrograms.detachStep(subProgramId, stepId);
+        await this.refreshProgram();
+        NotifyPositive('Étape retirée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du retrait de l\'étape.');
+      }
+    },
+    validateActivityDeletion (stepId, activityId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir retirer cette activité de cette étape ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.detachActivity(stepId, activityId))
+        .onCancel(() => NotifyPositive('Retrait annulé.'));
+    },
+    async detachActivity (stepId, activityId) {
+      try {
+        await Steps.detachActivity(stepId, activityId);
+        await this.refreshProgram();
+        NotifyPositive('Activité détachée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du retrait de l\'activité.');
+      }
     },
   },
 };
@@ -354,7 +498,6 @@ export default {
     padding: 3px 3px 3px 10px
   .activity-content
     font-size: 12px
-
 .q-btn
     width: fit-content
 
@@ -362,4 +505,7 @@ export default {
   .q-card__section
     .q-item__section--side
       padding-right: 10px
+
+.ghost
+  opacity: 0.5
 </style>

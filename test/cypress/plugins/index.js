@@ -3,7 +3,7 @@ const ctx = require('../../../quasar.conf');
 const { env } = ctx().build;
 
 const parseEnv = (env) => Object.keys(env).reduce((acc, key) => {
-  if (env[key]) acc[key] = JSON.parse(env[key]);
+  if (env[key]) acc[key] = env[key];
   return acc;
 }, {});
 

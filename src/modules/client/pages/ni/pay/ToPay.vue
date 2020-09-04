@@ -21,7 +21,7 @@
       </template>
     </ni-title-header>
     <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
-      :selected.sync="selected" :pagination.sync="sortedPagination" :loading="tableLoading"
+      :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
       :visible-columns="visibleColumns">
       <template v-slot:header="{ props }">
         <q-tr :props="props">
@@ -116,7 +116,7 @@ export default {
     return {
       draftPay: [],
       selected: [],
-      pagination: { rowsPerPage: 0 },
+      pagination: { rowsPerPage: 0, ascending: true },
       visibleColumns: [
         'auxiliary',
         'sector',
@@ -164,20 +164,15 @@ export default {
     hasSelectedRows () {
       return this.selected.length > 0;
     },
-    sortedPagination: {
-      get () {
-        return { ...this.pagination, sortBy: this.sortOption, ascending: true };
-      },
-      set (newVal) {
-        return newVal;
-      },
-    },
     displayedDraftPay () {
       if (this.selectedSector === '') return [...this.draftPay];
       return this.draftPay.filter(dp => dp.auxiliary.sector._id === this.selectedSector);
     },
   },
   watch: {
+    sortBy (value) {
+      this.pagination = { ...this.pagination, sortBy: value };
+    },
     selectedSector (value) {
       this.selected = [];
     },

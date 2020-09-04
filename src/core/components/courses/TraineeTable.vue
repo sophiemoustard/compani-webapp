@@ -11,8 +11,8 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="edit" @click.native="openTraineeEditionModal(props.row)" />
-                    <q-icon color="grey" name="close" @click.native="validateTraineeDeletion(col.value)" />
+                    <ni-button icon="edit" @click.native="openTraineeEditionModal(props.row)" />
+                    <ni-button icon="close" @click.native="validateTraineeDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -21,7 +21,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right" v-if="canEdit">
-          <q-btn no-caps flat color="primary" icon="add" label="Ajouter un stagiaire" :disable="loading"
+          <ni-button color="primary" icon="add" label="Ajouter un stagiaire" :disable="loading"
             @click="traineeCreationModal = true" />
         </q-card-actions>
       </q-card>
@@ -52,6 +52,7 @@ import Companies from '@api/Companies';
 import { INTER_B2B } from '@data/constants';
 import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import TraineeCreationModal from '@components/courses/TraineeCreationModal';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';
@@ -67,6 +68,7 @@ export default {
     loading: { type: Boolean, default: false },
   },
   components: {
+    'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
     'trainee-creation-modal': TraineeCreationModal,
     'trainee-edition-modal': TraineeEditionModal,
