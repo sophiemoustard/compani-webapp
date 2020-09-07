@@ -4,7 +4,7 @@
       <div class="col-xs-8 row items-baseline col-md-10">
         <div class="row items-center">
           <ni-button v-if="isExternalUser" class="q-mr-md" icon="arrow_back" color="primary"
-            @click.native="$router.go(-1)" size="sm" />
+            @click.native="$router.go(-1)" />
           <h4>{{ userProfile.identity.firstname }} {{ userProfile.identity.lastname }}</h4>
           <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
             @click="goToPlanning" />

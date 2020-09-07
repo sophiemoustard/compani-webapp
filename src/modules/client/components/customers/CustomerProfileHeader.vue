@@ -1,7 +1,7 @@
 <template>
   <div class="header">
     <div class="row col-xs-12 q-mb-md items-center">
-      <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" size="sm" />
+      <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
       <h4>{{ customer.identity.firstname }} {{ customer.identity.lastname }}</h4>
       <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
         @click="goToPlanning" />
