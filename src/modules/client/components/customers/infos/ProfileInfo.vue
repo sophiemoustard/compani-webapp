@@ -167,10 +167,10 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-icon color="grey" name="remove_red_eye" @click.native="showFundingDetails(col.value)" />
-                    <q-icon color="grey" name="history" @click.native="showFundingHistory(col.value)" />
-                    <q-icon color="grey" name="edit" @click.native="startFundingEdition(col.value)" />
-                    <q-icon color="grey" name="delete" @click.native="validateFundingDeletion(col.value)" />
+                    <ni-button icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
+                    <ni-button icon="history" @click.native="showFundingHistory(col.value)" />
+                    <ni-button icon="edit" @click.native="startFundingEdition(col.value)" />
+                    <ni-button icon="delete" @click.native="validateFundingDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -207,7 +207,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'emptyQuote'">
-                  <q-icon name="file_download" color="primary" @click="downloadQuote(props.row)" />
+                  <ni-button icon="file_download" color="primary" @click="downloadQuote(props.row)" />
                 </template>
                 <template v-else-if="col.name === 'signedQuote'">
                   <div v-if="!props.row.drive || !getQuoteLink(props.row)" class="row justify-center table-actions">
@@ -288,6 +288,7 @@ import Services from '@api/Services';
 import Customers from '@api/Customers';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SearchAddress from '@components/form/SearchAddress';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
@@ -327,6 +328,7 @@ export default {
   name: 'ProfileInfo',
   components: {
     'ni-search-address': SearchAddress,
+    'ni-button': Button,
     'ni-input': Input,
     'ni-select': Select,
     'ni-date-input': DateInput,

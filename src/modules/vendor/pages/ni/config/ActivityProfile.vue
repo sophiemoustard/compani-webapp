@@ -12,8 +12,10 @@
         </template>
       </ni-profile-header>
       <div class="row body">
-        <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal" />
-        <card-edition />
+        <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
+          @delete-card="validateCardDeletion" :disable-edition="isEditionLocked"
+          @unlock-edition="validateUnlockEdition" />
+        <card-edition :disable-edition="isEditionLocked" />
       </div>
     </template>
 
@@ -27,6 +29,7 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
+import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES } from '@data/constants';
@@ -57,6 +60,7 @@ export default {
       modalLoading: false,
       cardCreationModal: false,
       newCard: { template: '' },
+      isEditionLocked: false,
     };
   },
   validations () {
@@ -90,6 +94,8 @@ export default {
 
       const step = subProgram ? subProgram.steps.find(s => s._id === this.stepId) : '';
       this.stepName = get(step, 'name') || '';
+
+      this.isEditionLocked = this.activity.steps.length > 1;
     } catch (e) {
       console.error(e);
     }
@@ -101,6 +107,25 @@ export default {
       } catch (e) {
         console.error(e);
       }
+    },
+    validateUnlockEdition () {
+      const programsReusingActivity = [...new Set(
+        this.activity.steps
+          .filter(s => s._id !== this.stepId)
+          .map(s => s.subProgram.program.name)
+      )];
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Cette activité est utilisée dans les étapes '
+          + `${programsReusingActivity.length > 1 ? 'des programmes suivants' : 'du programme suivant'} : `
+          + `${programsReusingActivity.join(', ')}. <br />Si tu la modifies, elle sera modifiée dans toutes ces étapes.`
+          + '<br /><br />Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
+        .onCancel(() => NotifyPositive('Déverouillage annulée.'));
     },
     openCardCreationModal (stepId) {
       this.cardCreationModal = true;
@@ -119,7 +144,7 @@ export default {
 
         await this.refreshActivity();
         const cardCreated = this.activity.cards[this.activity.cards.length - 1];
-        this.$store.dispatch('program/fetchCard', cardCreated);
+        await this.$store.dispatch('program/fetchCard', cardCreated);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la carte.');
@@ -131,8 +156,28 @@ export default {
       this.newCard = { template: '' };
       this.$v.newCard.$reset();
     },
+    validateCardDeletion (cardId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette carte ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteCard(cardId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteCard (cardId) {
+      try {
+        await Cards.deleteById(cardId);
+        await this.refreshActivity();
+        this.$store.dispatch('program/resetCard');
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la carte.');
+      }
+    },
   },
-  beforeDestroy () {
+  async beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
     this.$store.dispatch('program/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {

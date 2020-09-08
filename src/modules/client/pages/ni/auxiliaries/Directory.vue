@@ -87,7 +87,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload, removeDiacritics } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
@@ -214,8 +214,9 @@ export default {
       return this.userList.filter(user => !user.isActive);
     },
     filteredUsers () {
-      const escapedString = escapeRegExp(this.searchStr);
-      return this.activeUserList.filter(user => user.auxiliary.fullName.match(new RegExp(escapedString, 'i')));
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.activeUserList
+        .filter(user => user.auxiliary.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
     mobilePhoneError () {
       if (!this.$v.newUser.contact.phone.required) {
@@ -237,12 +238,15 @@ export default {
     },
     formatUser (user) {
       const hiringDate = this.getHiringDate(user);
+      const formattedName = formatIdentity(user.identity, 'FL');
+
       const formattedUser = {
         auxiliary: {
           _id: user._id,
-          fullName: formatIdentity(user.identity, 'FL'),
+          fullName: formattedName,
           lastname: user.identity.lastname,
           picture: user.picture ? user.picture.link : null,
+          noDiacriticsName: removeDiacritics(formattedName),
         },
         startDate: user.createdAt,
         sector: user.sector ? user.sector.name : 'N/A',

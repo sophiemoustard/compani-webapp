@@ -32,16 +32,15 @@
 
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="followUpDisabled" icon="file_download" flat dense
-            type="a" :href="!followUpDisabled && downloadAttendanceSheet()" target="_blank" />
+          <ni-button color="primary" :disable="followUpDisabled" icon="file_download" type="a"
+            :href="!followUpDisabled ? downloadAttendanceSheet() : ''" />
         </q-item-section>
         <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
       </q-item>
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disableDownloadCompletionCertificates" icon="file_download"
-            flat dense type="a" target="_blank"
-            :href="!disableDownloadCompletionCertificates && downloadCompletionCertificates()" />
+          <ni-button color="primary" :disable="disableDownloadCompletionCertificates" icon="file_download" type="a"
+            :href="!disableDownloadCompletionCertificates ? downloadCompletionCertificates() : ''" />
         </q-item-section>
         <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
       </q-item>
@@ -57,8 +56,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <q-btn flat round small color="grey" icon="remove_red_eye"
-                    @click.native="openSmsHistoriesModal(col.value)" />
+                  <ni-button icon="remove_red_eye" @click.native="openSmsHistoriesModal(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -84,8 +82,7 @@
       </ni-banner>
       <q-item>
         <q-item-section side>
-          <q-btn color="primary" size="sm" :disable="disableSms" icon="mdi-cellphone-message" flat
-            dense @click="openSmsModal" />
+          <ni-button color="primary" :disable="disableSms" icon="mdi-cellphone-message" @click="openSmsModal" />
         </q-item-section>
         <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
       </q-item>
@@ -111,6 +108,7 @@ import Input from '@components/form/Input';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
+import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
@@ -122,6 +120,7 @@ export default {
   name: 'ProfileFollowUp',
   components: {
     'ni-input': Input,
+    'ni-button': Button,
     'sms-sending-modal': SmsSendingModal,
     'sms-details-modal': SmsDetailsModal,
     'ni-simple-table': SimpleTable,

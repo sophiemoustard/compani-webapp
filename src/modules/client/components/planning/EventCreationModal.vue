@@ -64,7 +64,7 @@
             :options="customerAddressList(newEvent)" :readonly="customerAddressList(newEvent).length === 1"
             :display-value="newEvent.address.fullAddress" ref="addressSelect">
             <template v-slot:append v-if="customerAddressList(newEvent).length > 1">
-              <q-icon name="swap_vert" class="select-icon pink-icon cursor-pointer" @click.stop="toggleAddressSelect" />
+              <ni-button icon="swap_vert" class="select-icon pink-icon" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>
         </div>
@@ -86,6 +86,7 @@ import {
   NEVER,
 } from '@data/constants';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
+import Button from '@components/Button';
 
 export default {
   name: 'EventCreationModal',
@@ -99,6 +100,9 @@ export default {
     internalHours: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     personKey: { type: String, default: () => '' },
+  },
+  components: {
+    'ni-button': Button,
   },
   computed: {
     isEndDurationRequired () {
@@ -178,6 +182,12 @@ export default {
         payload.subscription = this.customerSubscriptionsOptions[0].value;
       }
       this.$emit('update:newEvent', payload);
+    },
+    toggleAddressSelect () {
+      const addressList = this.customerAddressList(this.newEvent);
+      const addressIndex = addressList.findIndex(ev => this.newEvent.address.fullAddress === ev.label);
+      if (addressIndex === 0) this.newEvent.address = addressList[1].value;
+      else this.newEvent.address = addressList[0].value;
     },
   },
 };

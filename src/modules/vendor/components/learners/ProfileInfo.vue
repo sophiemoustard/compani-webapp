@@ -20,7 +20,7 @@
             :disable="emailLock" v-model.trim="userProfile.local.email" @focus="saveTmp('local.email')" />
         </div>
         <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-          <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
+          <ni-button color="black" :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
         </div>
       </div>
       <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
@@ -36,6 +36,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import PictureUploader from '@components/PictureUploader';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
@@ -49,6 +50,7 @@ export default {
   mixins: [validationMixin, userMixin],
   components: {
     'ni-input': Input,
+    'ni-button': Button,
     'ni-picture-uploader': PictureUploader,
   },
   data () {

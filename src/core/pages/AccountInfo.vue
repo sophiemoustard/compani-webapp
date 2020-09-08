@@ -24,20 +24,20 @@
               :error-message="emailError($v.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <q-icon size="1.5rem" :name="lockIcon" @click.native="toggleEmailLock(!emailLock)" />
+            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="black" />
           </div>
         </div>
         <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
           error-message="Téléphone invalide." @blur="updateUser('contact.phone')" caption="Téléphone"
           :error="$v.userProfile.contact.phone.$error" />
       </div>
-      <div class="row button">
-        <q-btn big @click="newPasswordModal = true" color="primary" icon="mdi-lock-reset"
+      <div class="row account-button">
+        <ni-button @click="newPasswordModal = true" color="white" icon="mdi-lock-reset"
           label="Modifier mon mot de passe" />
       </div>
-      <hr class="q-my-lg">
-      <div class="row button">
-        <q-btn big color="primary" @click="logout" icon="logout" label="Déconnexion" />
+      <q-separator class="q-my-lg" />
+      <div class="row account-button">
+        <ni-button color="white" @click="logout" icon="logout" label="Déconnexion" />
       </div>
       <div class="q-mt-lg links">
         <div class="cursor-pointer q-mb-sm">
@@ -79,6 +79,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import HtmlModal from '@components/modal/HtmlModal';
 import Modal from '@components/modal/Modal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -88,9 +89,7 @@ import { passwordMixin } from '@mixins/passwordMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
-// eslint-disable-next-line import/extensions
 import rgpd from 'src/statics/rgpd.html';
-// eslint-disable-next-line import/extensions
 import cguCompani from 'src/statics/cguCompani.html';
 
 export default {
@@ -98,6 +97,7 @@ export default {
   metaInfo: { title: 'Mon compte' },
   mixins: [passwordMixin, validationMixin, userMixin],
   components: {
+    'ni-button': Button,
     'ni-input': Input,
     'ni-html-modal': HtmlModal,
     'ni-modal': Modal,
@@ -205,11 +205,14 @@ export default {
 .links
   display: flex
   flex-direction: column
-.button
+.account-button
+  button
+    background-color: $primary
   @media screen and (max-width: 676px)
     display: flex
     justify-content: center
 .photo-caption
   font-size: 12px
   margin: 0 0 4px 0
+
 </style>

@@ -19,13 +19,12 @@ module.exports = {
   rules: {
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
-    indent: ['error', 2],
+    indent: ['error', 2, { SwitchCase: 1 }],
     'linebreak-style': ['error', 'unix'],
     'react/display-name': 'off',
     'max-len': ['error', { code: 120, tabWidth: 2 }],
     'no-console': ['error', { allow: ['error'] }],
     'no-trailing-spaces': 'error',
-    'indent': ["error", 2, { SwitchCase: 1 }],
     'vue/max-attributes-per-line': 0,
     'vue/singleline-html-element-content-newline': 0,
     'vue/html-indent': 0,
@@ -34,7 +33,7 @@ module.exports = {
     // Un-used AirBnb rules
     'no-param-reassign': 0,
     'import/no-extraneous-dependencies': 0,
-    'import/extensions': ['error', 'never'],
+    'import/extensions': ['error', 'never', { 'html': 'always' }],
     'import/prefer-default-export': 0,
     'import/no-unresolved': 0,
     'no-underscore-dangle': 0,
@@ -60,5 +59,6 @@ module.exports = {
     ],
     'object-curly-newline': ['error', { consistent: true }],
     'operator-linebreak': ['error', 'before', { overrides: { '&&': 'after', '||': 'after', '=': 'after' } }],
+    'prefer-destructuring': ['error', { 'VariableDeclarator': { 'object': true, 'array': false } }]
   }
 }

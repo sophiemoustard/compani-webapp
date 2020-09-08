@@ -33,10 +33,10 @@
         </q-card>
       </div>
       <div class="q-mt-md" v-if="canEdit" align="right">
-        <q-btn class="add-slot" label="Ajouter un créneau" no-caps flat color="white" icon="add"
+        <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
           :disable="loading || addDateToPlanloading" @click="creationModal = true" />
-        <q-btn class="add-slot" label="Ajouter une date à planifier" no-caps flat color="white" icon="add"
-          :disable="addDateToPlanloading" @click="addDateToPlan" />
+        <ni-button class="add-slot" label="Ajouter une date à planifier" color="white" icon="add" @click="addDateToPlan"
+          :disable="addDateToPlanloading" />
       </div>
     </div>
 
@@ -62,6 +62,7 @@ import { formatQuantity } from '@helpers/utils';
 import CourseSlots from '@api/CourseSlots';
 import { E_LEARNING } from '@data/constants';
 import { frAddress } from '@helpers/vuelidateCustomVal';
+import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -79,6 +80,7 @@ export default {
   components: {
     'slot-edition-modal': SlotEditionModal,
     'slot-creation-modal': SlotCreationModal,
+    'ni-button': Button,
   },
   data () {
     return {

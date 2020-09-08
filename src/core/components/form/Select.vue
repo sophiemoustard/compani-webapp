@@ -8,11 +8,10 @@
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
       :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy">
+      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
       <template v-slot:append>
-        <q-icon v-if="value && !disable" name="close" @click.stop="resetValue" class="cursor-pointer" size="16px" />
-        <q-icon v-if="icon" :name="icon" class="select-icon pink-icon cursor-pointer"
-          @click="$refs['selectInput'].showPopup()" />
+        <ni-button v-if="value && !disable" icon="close" @click.stop="resetValue" size="sm" />
+        <ni-button v-if="icon" :icon="icon" class="select-icon pink-icon" @click="$refs['selectInput'].showPopup()" />
       </template>
     </q-select>
   </div>
@@ -20,6 +19,7 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
+import Button from '@components/Button';
 
 export default {
   name: 'NiSelect',
@@ -39,6 +39,9 @@ export default {
     bgColor: { type: String, default: 'white' },
     optionDisable: { type: String, default: 'disable' },
     dataCy: { type: String, default: '' },
+  },
+  components: {
+    'ni-button': Button,
   },
   data () {
     return {

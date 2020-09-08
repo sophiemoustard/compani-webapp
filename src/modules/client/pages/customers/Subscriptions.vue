@@ -99,7 +99,7 @@
     <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width data-cy="esign-modal">
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end no-wrap">
-          <q-icon class="cursor-pointer" name="clear" size="1.5rem" @click.native="newESignModal = false" />
+          <ni-button icon="clear" @click.native="newESignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
           <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />
@@ -138,6 +138,7 @@ import Drive from '@api/GoogleDrive';
 import Customers from '@api/Customers';
 import Input from '@components/form/Input';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
+import Button from '@components/Button';
 import Modal from '@components/modal/Modal';
 import HtmlModal from '@components/modal/HtmlModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -157,6 +158,7 @@ export default {
   metaInfo: { title: 'Souscriptions' },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
     'ni-multiple-files-uploader': MultipleFilesUploader,
     'ni-modal': Modal,
     'ni-html-modal': HtmlModal,

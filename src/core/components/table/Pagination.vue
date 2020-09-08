@@ -8,18 +8,21 @@
     <div class="row items-center">
       <div class="on-left">{{ paginationLabel }}</div>
       <div>
-        <q-btn icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage" size="12px"
-          dense flat />
-        <q-btn icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage" size="12px"
-          dense flat />
+        <ni-button icon="chevron_left" class="no-shadow" :disable="props.isFirstPage" @click="props.prevPage" />
+        <ni-button icon="chevron_right" class="no-shadow" :disable="props.isLastPage" @click="props.nextPage" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import Button from '@components/Button';
+
 export default {
   name: 'Pagination',
+  components: {
+    'ni-button': Button,
+  },
   props: {
     props: { type: Object, default: () => ({}) },
     data: { type: Array, default: () => [] },
