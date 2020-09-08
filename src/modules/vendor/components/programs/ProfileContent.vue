@@ -19,7 +19,8 @@
           <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)" />
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-            <draggable v-model="step.activities" @end="dropActivity(subProgram._id, step._id)">
+            <draggable v-model="step.activities" @end="dropActivity(subProgram._id, step._id)"
+              class="activity-draggable" ghost-class="ghost">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
                 <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
                   <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
@@ -503,9 +504,12 @@ export default {
   display: flex
   flex-direction: column
   align-items: flex-end
-.activity
+
+.activity-draggable
   width: -moz-available
   width: -webkit-fill-available
+
+.activity
   margin: 10px 10px 0px 50px
   border-radius: 0
   .q-card__section
