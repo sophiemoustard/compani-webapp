@@ -19,18 +19,22 @@
           <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)" />
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-            <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-              <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
-                <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
-                <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
-                <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
-                <div class="row no-wrap">
-                  <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-                  <ni-button class="q-px-sm" icon="close"
-                    @click.stop="validateActivityDeletion(step._id, activity._id)" />
-                </div>
-              </q-card-section>
-            </q-card>
+            <draggable v-model="step.activities" @end="dropActivity(subProgram._id, step._id)">
+              <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
+                <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
+                  <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
+                  <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
+                  <div class="gt-xs col-sm-2 activity-content">
+                    {{ formatQuantity('carte', activity.cards.length) }}
+                  </div>
+                  <div class="row no-wrap">
+                    <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
+                    <ni-button class="q-px-sm" icon="close"
+                      @click.stop="validateActivityDeletion(step._id, activity._id)" />
+                  </div>
+                </q-card-section>
+              </q-card>
+            </draggable>
             <div class="q-mt-md" align="right">
               <ni-button class="q-my-sm" color="primary" icon="add" label="Réutiliser une activité"
                 @click="openActivityReuseModal(step)" />
@@ -175,6 +179,21 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des étapes.');
+      } finally {
+        await this.refreshProgram();
+      }
+    },
+    async dropActivity (subProgramId, stepId) {
+      try {
+        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+        const step = subProgram.steps.find(s => s._id === stepId);
+        const activities = step.activities.map(a => a._id);
+        await Steps.updateById(stepId, { activities });
+
+        NotifyPositive('Modification enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des activités.');
       } finally {
         await this.refreshProgram();
       }
