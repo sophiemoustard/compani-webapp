@@ -66,9 +66,8 @@
 
     <!-- Activity reuse modal -->
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
-      :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity"
-      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal"
-      :same-step-activities="sameStepActivities" />
+      :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
+      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
     <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
@@ -363,7 +362,7 @@ export default {
         this.$v.reusedActivity.$touch();
         if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Steps.updateById(this.currentStepId, { activities: this.reusedActivity });
+        await Steps.reuseActivity(this.currentStepId, { activities: this.reusedActivity });
         this.activityReuseModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité réutilisée.');
