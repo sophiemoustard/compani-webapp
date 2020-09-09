@@ -7,7 +7,7 @@
         <div v-for="(card, index) in cards" :key="index" :class="getCardStyle(card)">
           <div class="card-actions">
             <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
-            :disable="disableEdition" />
+              :disable="disableEdition" />
           </div>
           <div class="card-cell cursor-pointer" @click="selectCard(card)">
             <div class="card-cell-title">
@@ -201,5 +201,4 @@ export default {
 
 .ghost
   opacity: 0.5
-
 </style>
