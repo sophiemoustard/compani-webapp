@@ -36,7 +36,7 @@ export default {
     resetActivity: ({ commit }) => { commit('SET_ACTIVITY', null); },
     fetchCard: ({ commit }, card) => { commit('SET_CARD', card); },
     resetCard: ({ commit }) => { commit('SET_CARD', null); },
-    fetchOpenedStep: async ({ commit }, params) => {
+    setOpenedStep: async ({ commit }, params) => {
       try {
         commit('SET_OPENED_STEP', params.stepId);
       } catch (e) {

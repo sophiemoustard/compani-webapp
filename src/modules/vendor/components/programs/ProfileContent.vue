@@ -165,7 +165,7 @@ export default {
   computed: {
     ...mapState('program', ['program', 'openedStep']),
   },
-  async mounted () {
+  async created () {
     if (!this.program) await this.refreshProgram();
     await this.refreshProgramList();
 
