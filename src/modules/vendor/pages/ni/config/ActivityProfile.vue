@@ -14,7 +14,7 @@
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked"
-          @unlock-edition="validateUnlockEdition" />
+          @unlock-edition="validateUnlockEdition" @refresh="refreshActivity" />
         <card-edition :disable-edition="isEditionLocked" />
       </div>
     </template>

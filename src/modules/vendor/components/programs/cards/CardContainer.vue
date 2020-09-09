@@ -3,7 +3,7 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <draggable v-model="cards" @end="dropCard()">
+      <draggable v-model="draggableCards" @end="dropCard()" ghost-class="ghost">
         <div v-for="(card, index) in cards" :key="index" :class="getCardStyle(card)">
           <div class="card-actions">
             <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
@@ -27,6 +27,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import cloneDeep from 'lodash/cloneDeep';
+import draggable from 'vuedraggable';
 import {
   CARD_TEMPLATES,
   TRANSITION,
@@ -44,9 +46,8 @@ import {
 } from '@data/constants';
 import Button from '@components/Button';
 import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
-import draggable from 'vuedraggable';
-// import Activities from '@api/Activities';
-// import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import Activities from '@api/Activities';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
   name: 'CardContainer',
@@ -57,9 +58,22 @@ export default {
     'ni-button': Button,
     draggable,
   },
+  data () {
+    return {
+      draggableCards: [],
+    };
+  },
   computed: {
     ...mapState('program', ['card', 'activity']),
     ...mapGetters({ cards: 'program/getCards' }),
+  },
+  watch: {
+    cards: {
+      handler () {
+        this.draggableCards = cloneDeep(this.cards);
+      },
+      immediate: true,
+    },
   },
   methods: {
     cardValidation,
@@ -112,23 +126,17 @@ export default {
     unlockEdition () {
       this.$emit('unlock-edition');
     },
-    getActivity () {
-      return this.$store.dispatch('program/activity');
-    },
     async dropCard () {
-      // eslint-disable-next-line no-console
-      console.log(this.getActivity()._id);
-      // try {
-      //   const activity = this.getActivity();
-      //   const cards = activity.map(c => c._id);
-      //   await Activities.updateActivity(activity._id, { cards });
-      //   NotifyPositive('Modification enregistrée.');
-      // } catch (e) {
-      //   console.error(e);
-      //   NotifyNegative('Erreur lors de la modification des cartes.');
-      // } finally {
-      //   await this.refreshProgram();
-      // }
+      try {
+        const cards = this.draggableCards.map(c => c._id);
+        await Activities.updateById(this.activity._id, { cards });
+        NotifyPositive('Modification enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des cartes.');
+      } finally {
+        await this.$emit('refresh');
+      }
     },
   },
 };
@@ -190,4 +198,8 @@ export default {
 
 .dot-error
   align-self: center
+
+.ghost
+  opacity: 0.5
+
 </style>
