@@ -3,19 +3,22 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <div v-for="(card, index) in cards" :key="index" :class="getCardStyle(card)">
-        <div class="card-actions">
-          <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)" :disable="disableEdition" />
-        </div>
-        <div class="card-cell cursor-pointer" @click="selectCard(card)">
-          <div class="card-cell-title">
-            <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(card) }}</div>
-            <q-icon v-if="disableEdition" name="lock" size="xs" :class="{'locked-unselected': !isSelected(card)}" />
+      <draggable v-model="draggableCards" @end="dropCard()" ghost-class="ghost" :disabled="$q.platform.is.mobile">
+        <div v-for="(card, index) in draggableCards" :key="index" :class="getCardStyle(card)">
+          <div class="card-actions">
+            <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
+              :disable="disableEdition" />
           </div>
-          <div>{{ getTemplateName(card.template) }}</div>
+          <div class="card-cell cursor-pointer" @click="selectCard(card)">
+            <div class="card-cell-title">
+              <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(card) }}</div>
+              <q-icon v-if="disableEdition" name="lock" size="xs" :class="{'locked-unselected': !isSelected(card)}" />
+            </div>
+            <div>{{ getTemplateName(card.template) }}</div>
+          </div>
+          <div v-if="!isSelected(card) && cardValidation(card).error" :class="{ 'dot dot-error': true }" />
         </div>
-        <div v-if="!isSelected(card) && cardValidation(card).error" :class="{ 'dot dot-error': true }" />
-      </div>
+      </draggable>
     </q-scroll-area>
     <ni-button v-if="!disableEdition" label="Ajouter une carte" color="primary" icon="add" @click="openCreationModal" />
     <ni-button v-else label="Déverouiller l'activité" color="primary" icon="mdi-lock-outline" @click="unlockEdition" />
@@ -24,6 +27,8 @@
 
 <script>
 import { mapState, mapGetters } from 'vuex';
+import cloneDeep from 'lodash/cloneDeep';
+import draggable from 'vuedraggable';
 import {
   CARD_TEMPLATES,
   TRANSITION,
@@ -41,6 +46,8 @@ import {
 } from '@data/constants';
 import Button from '@components/Button';
 import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
+import Activities from '@api/Activities';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
   name: 'CardContainer',
@@ -49,10 +56,24 @@ export default {
   },
   components: {
     'ni-button': Button,
+    draggable,
+  },
+  data () {
+    return {
+      draggableCards: [],
+    };
   },
   computed: {
-    ...mapState('program', ['card']),
+    ...mapState('program', ['card', 'activity']),
     ...mapGetters({ cards: 'program/getCards' }),
+  },
+  watch: {
+    cards: {
+      handler () {
+        this.draggableCards = cloneDeep(this.cards);
+      },
+      immediate: true,
+    },
   },
   methods: {
     cardValidation,
@@ -104,6 +125,18 @@ export default {
     },
     unlockEdition () {
       this.$emit('unlock-edition');
+    },
+    async dropCard () {
+      try {
+        const cards = this.draggableCards.map(c => c._id);
+        await Activities.updateById(this.activity._id, { cards });
+        NotifyPositive('Modification enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des cartes.');
+      } finally {
+        await this.$emit('refresh');
+      }
     },
   },
 };
@@ -165,4 +198,7 @@ export default {
 
 .dot-error
   align-self: center
+
+.ghost
+  opacity: 0.5
 </style>

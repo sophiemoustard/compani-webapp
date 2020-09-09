@@ -4,7 +4,8 @@
       <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
-      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps" ghost-class="ghost">
+      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps"
+        ghost-class="ghost" :disabled="$q.platform.is.mobile">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
           <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)" :id="step._id">
             <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
@@ -20,7 +21,7 @@
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
             <draggable v-model="step.activities" @end="dropActivity(subProgram._id, step._id)"
-              class="activity-draggable" ghost-class="ghost">
+              class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
                 <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
                   <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
