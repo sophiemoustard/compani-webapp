@@ -6,8 +6,8 @@
           <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
           <span class="published" v-if="isPublished(subProgram)">Publié</span>
         </div>
-        <ni-button v-if="!isPublished(subProgram)" no-caps color="primary" label="Publier" icon="mdi-arrow-collapse-up"
-          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" :unelevated="true" />
+        <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
+          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"

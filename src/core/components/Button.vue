@@ -1,6 +1,6 @@
 <template>
   <q-btn :flat="flat" small no-caps :color="color" :icon="icon" :disable="disable" :type="type" :href="!disable && href"
-    :target="target" :label="label" :dense="!label" :loading="loading" :size="size" :unelevated="unelevated"
+    :target="target" :label="label" :dense="!label" :loading="loading" :size="size" unelevated
     @click.stop.native="click" />
 </template>
 
