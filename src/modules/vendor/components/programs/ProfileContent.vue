@@ -1,16 +1,27 @@
 <template>
   <div v-if="program">
     <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
-      <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
+      <div class="sub-program-header">
+        <div>
+          <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
+          <span class="published" v-if="isPublished(subProgram)">Publié</span>
+        </div>
+        <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
+          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
+      </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
-        @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
+        @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
+        :disable="isPublished(subProgram)" />
       <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps"
         ghost-class="ghost" :disabled="$q.platform.is.mobile">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
           <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)" :id="step._id">
             <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
             <q-item-section>
-              <div class="text-weight-bold">{{ stepIndex + 1 }} - {{ step.name }}</div>
+              <div class="text-weight-bold">
+                <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
+                <div class="dot dot-active" v-if="isPublished(step)" />
+              </div>
               <div class="step-subtitle">
                 {{ getStepTypeLabel(step.type) }} -
                 {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
@@ -24,11 +35,12 @@
               class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
                 <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
-                  <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
+                  <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
                   <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
                   <div class="gt-xs col-sm-2 activity-content">
                     {{ formatQuantity('carte', activity.cards.length) }}
                   </div>
+                  <div class="dot dot-active" v-if="isPublished(activity)" />
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
                     <ni-button class="q-px-sm" icon="close"
@@ -93,7 +105,7 @@ import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
+import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO, PUBLISHED } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
@@ -150,6 +162,7 @@ export default {
         { label: 'Témoignage', value: SHARING_EXPERIENCE },
         { label: 'Vidéo', value: VIDEO },
       ],
+      PUBLISHED,
     };
   },
   validations () {
@@ -490,6 +503,30 @@ export default {
       const el = document.getElementById(openedStep);
       el.scrollIntoView({ behavior: 'smooth' });
     },
+    validateSubProgramPublishment (subProgramId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
+          + 'Es-tu sûr(e) de vouloir publier ce sous-programme ?',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.publishSubProgram(subProgramId))
+        .onCancel(() => NotifyPositive('Publication annulée.'));
+    },
+    async publishSubProgram (subProgramId) {
+      try {
+        await SubPrograms.update(subProgramId, { status: PUBLISHED });
+        NotifyPositive('Sous programme publié');
+        this.refreshProgram();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la publication du sous-programme');
+      }
+    },
+    isPublished (element) {
+      return element.status === PUBLISHED;
+    },
   },
 };
 </script>
@@ -499,6 +536,21 @@ export default {
 .sub-program-container
   display: flex
   flex-direction: column
+
+.sub-program-header
+  display: flex
+  justify-content: space-between
+
+.published
+  background-color: $accent
+  font-size: 14px
+  border-radius: 15px
+  padding: 1px 6px
+  color: white
+  margin-left: 10px
+
+.dot
+  margin-left: 9px
 
 .step
   margin-bottom: 10px
