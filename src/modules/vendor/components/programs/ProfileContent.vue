@@ -6,11 +6,12 @@
           <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
           <span class="published" v-if="isPublished(subProgram)">Publié</span>
         </div>
-        <q-btn v-if="!isPublished(subProgram)" no-caps unelevated color="primary" label="Publier"
-          @click="validateSubProgramPublishment(subProgram._id)" />
+        <ni-button v-if="!isPublished(subProgram)" no-caps color="primary" label="Publier" icon="mdi-arrow-collapse-up"
+          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" :unelevated="true" />
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
-        @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
+        @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
+        :disable="isPublished(subProgram)" />
       <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps"
         ghost-class="ghost" :disabled="$q.platform.is.mobile">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
@@ -505,8 +506,7 @@ export default {
     validateSubProgramPublishment (subProgramId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Une fois le sous-programme publié, tu pourras uniquement modifier le contenu des cartes, mais tu ne '
-          + 'pourras plus rien ajouter, supprimer ou déplacer.<br /><br />'
+        message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
           + 'Es-tu sûr(e) de vouloir publier ce sous-programme ?',
         html: true,
         ok: true,
