@@ -3,19 +3,22 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <div v-for="(card, index) in cards" :key="index" :class="getCardStyle(card)">
-        <div class="card-actions">
-          <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)" :disable="disableEdition" />
-        </div>
-        <div class="card-cell cursor-pointer" @click="selectCard(card)">
-          <div class="card-cell-title">
-            <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(card) }}</div>
-            <q-icon v-if="disableEdition" name="lock" size="xs" :class="{'locked-unselected': !isSelected(card)}" />
+      <draggable v-model="cards" @end="dropCard()">
+        <div v-for="(card, index) in cards" :key="index" :class="getCardStyle(card)">
+          <div class="card-actions">
+            <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
+            :disable="disableEdition" />
           </div>
-          <div>{{ getTemplateName(card.template) }}</div>
+          <div class="card-cell cursor-pointer" @click="selectCard(card)">
+            <div class="card-cell-title">
+              <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(card) }}</div>
+              <q-icon v-if="disableEdition" name="lock" size="xs" :class="{'locked-unselected': !isSelected(card)}" />
+            </div>
+            <div>{{ getTemplateName(card.template) }}</div>
+          </div>
+          <div v-if="!isSelected(card) && cardValidation(card).error" :class="{ 'dot dot-error': true }" />
         </div>
-        <div v-if="!isSelected(card) && cardValidation(card).error" :class="{ 'dot dot-error': true }" />
-      </div>
+      </draggable>
     </q-scroll-area>
     <ni-button v-if="!disableEdition" label="Ajouter une carte" color="primary" icon="add" @click="openCreationModal" />
     <ni-button v-else label="Déverouiller l'activité" color="primary" icon="mdi-lock-outline" @click="unlockEdition" />
@@ -41,6 +44,9 @@ import {
 } from '@data/constants';
 import Button from '@components/Button';
 import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
+import draggable from 'vuedraggable';
+// import Activities from '@api/Activities';
+// import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
   name: 'CardContainer',
@@ -49,9 +55,10 @@ export default {
   },
   components: {
     'ni-button': Button,
+    draggable,
   },
   computed: {
-    ...mapState('program', ['card']),
+    ...mapState('program', ['card', 'activity']),
     ...mapGetters({ cards: 'program/getCards' }),
   },
   methods: {
@@ -104,6 +111,24 @@ export default {
     },
     unlockEdition () {
       this.$emit('unlock-edition');
+    },
+    getActivity () {
+      return this.$store.dispatch('program/activity');
+    },
+    async dropCard () {
+      // eslint-disable-next-line no-console
+      console.log(this.getActivity()._id);
+      // try {
+      //   const activity = this.getActivity();
+      //   const cards = activity.map(c => c._id);
+      //   await Activities.updateActivity(activity._id, { cards });
+      //   NotifyPositive('Modification enregistrée.');
+      // } catch (e) {
+      //   console.error(e);
+      //   NotifyNegative('Erreur lors de la modification des cartes.');
+      // } finally {
+      //   await this.refreshProgram();
+      // }
     },
   },
 };
