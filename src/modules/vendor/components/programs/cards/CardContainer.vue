@@ -4,7 +4,7 @@
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
       <draggable v-model="draggableCards" @end="dropCard()" ghost-class="ghost" :disabled="$q.platform.is.mobile">
-        <div v-for="(card, index) in cards" :key="index" :class="getCardStyle(card)">
+        <div v-for="(card, index) in draggableCards" :key="index" :class="getCardStyle(card)">
           <div class="card-actions">
             <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
               :disable="disableEdition" />
