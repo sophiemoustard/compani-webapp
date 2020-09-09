@@ -2,10 +2,10 @@
   <div v-if="program">
     <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
       <div class="sub-program-header">
-        <span>
+        <div>
           <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
           <span class="published" v-if="isPublished(subProgram)">Publié</span>
-        </span>
+        </div>
         <q-btn v-if="!isPublished(subProgram)" no-caps unelevated color="primary" label="Publier"
           @click="validateSubProgramPublishment(subProgram._id)" />
       </div>
@@ -505,7 +505,10 @@ export default {
     validateSubProgramPublishment (subProgramId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir publier ce sous-programme ?',
+        message: 'Une fois le sous-programme publié, tu pourras uniquement modifier le contenu des cartes, mais tu ne '
+          + 'pourras plus rien ajouter, supprimer ou déplacer.<br /><br />'
+          + 'Es-tu sûr(e) de vouloir publier ce sous-programme ?',
+        html: true,
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.publishSubProgram(subProgramId))
