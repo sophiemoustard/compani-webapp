@@ -182,6 +182,7 @@ export default {
     this.$store.dispatch('program/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
       this.$store.dispatch('program/fetchProgram', { programId: this.programId });
+      this.$store.dispatch('program/fetchOpenedStep', { stepId: this.stepId });
     } else {
       this.$store.dispatch('program/resetProgram');
     }

@@ -6,7 +6,7 @@
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
       <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps" ghost-class="ghost">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
-          <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
+          <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)" :id="step._id">
             <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
             <q-item-section>
               <div class="text-weight-bold">{{ stepIndex + 1 }} - {{ step.name }}</div>
@@ -163,11 +163,17 @@ export default {
     };
   },
   computed: {
-    ...mapState('program', ['program']),
+    ...mapState('program', ['program', 'openedStep']),
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
     await this.refreshProgramList();
+
+    if (this.openedStep) {
+      this.showActivities(this.openedStep);
+      this.scrollToOpenedStep(this.openedStep);
+      this.$store.dispatch('program/resetOpenedStep');
+    }
   },
   methods: {
     async dropStep (subProgramId) {
@@ -478,6 +484,10 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors du retrait de l\'activité.');
       }
+    },
+    scrollToOpenedStep (openedStep) {
+      const el = document.getElementById(openedStep);
+      el.scrollIntoView({ behavior: 'smooth' });
     },
   },
 };
