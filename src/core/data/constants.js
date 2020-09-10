@@ -1,3 +1,5 @@
+export const TOKEN_EXPIRE_TIME = 1; // in days
+
 // IMAGES
 export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
   + 'compani_texte_rose_1000.png';
