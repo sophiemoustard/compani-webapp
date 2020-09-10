@@ -15,7 +15,6 @@ export const logInMixin = {
 
       const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Strict' };
       this.$q.cookies.set('alenvi_token', auth.token, { ...options, expires: 1 });
-      this.$q.cookies.set('alenvi_token_expires_in', auth.expiresIn, { ...options, expires: 1 });
       this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
       this.$q.cookies.set('user_id', auth.user._id, { ...options, expires: 1 });
       await this.$store.dispatch('main/fetchLoggedUser', auth.user._id);

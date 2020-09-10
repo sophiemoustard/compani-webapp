@@ -32,7 +32,6 @@ export const refreshAlenviCookies = async () => {
       };
       Cookies.set('alenvi_token', newToken.token, options);
       Cookies.set('refresh_token', newToken.refreshToken, { ...options, expires: 365 });
-      Cookies.set('alenvi_token_expires_in', newToken.expiresIn, options);
       Cookies.set('user_id', newToken.user._id, options);
 
       return true;
@@ -40,7 +39,6 @@ export const refreshAlenviCookies = async () => {
     const options = { path: '/', sameSite: 'Strict' };
     Cookies.remove('alenvi_token', options);
     Cookies.remove('user_id', options);
-    Cookies.remove('alenvi_token_expires_in', options);
 
     return false;
   } catch (e) {
@@ -50,7 +48,6 @@ export const refreshAlenviCookies = async () => {
       Cookies.remove('alenvi_token', options);
       Cookies.remove('refresh_token', options);
       Cookies.remove('user_id', options);
-      Cookies.remove('alenvi_token_expires_in', options);
     }
 
     return false;
