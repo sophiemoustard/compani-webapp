@@ -12,8 +12,8 @@
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
         :disable="isPublished(subProgram)" />
-      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps"
-        ghost-class="ghost" :disabled="$q.platform.is.mobile || isPublished(subProgram)">
+      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps" ghost-class="ghost"
+        :disabled="$q.platform.is.mobile || isPublished(subProgram)">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
           <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)" :id="step._id">
             <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
@@ -99,6 +99,7 @@ import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
@@ -133,6 +134,7 @@ export default {
   },
   data () {
     return {
+      oldStepOrder: [],
       tmpInput: '',
       modalLoading: false,
       subProgramCreationModal: false,
@@ -190,13 +192,18 @@ export default {
     }
   },
   methods: {
+    saveSteps (subProgramId) {
+      const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+      this.oldStepOrder = subProgram.steps.map(s => s._id);
+    },
     async dropStep (subProgramId) {
       try {
         const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
         const steps = subProgram.steps.map(s => s._id);
-        await SubPrograms.update(subProgramId, { steps });
-
-        NotifyPositive('Modification enregistrée.');
+        if (!isEqual(this.oldStepOrder, steps)) {
+          await SubPrograms.update(subProgramId, { steps });
+          NotifyPositive('Modification enregistrée.');
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des étapes.');
