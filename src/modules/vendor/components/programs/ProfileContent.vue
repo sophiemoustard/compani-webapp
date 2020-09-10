@@ -32,7 +32,8 @@
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
             <draggable v-model="step.activities" @end="dropActivity(subProgram._id, step._id)"
-              class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile">
+              @start="saveActivities(subProgram._id, step._id)" class="activity-draggable" ghost-class="ghost"
+              :disabled="$q.platform.is.mobile">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
                 <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
                   <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
@@ -135,6 +136,7 @@ export default {
   data () {
     return {
       oldStepOrder: [],
+      oldActivityOrder: [],
       tmpInput: '',
       modalLoading: false,
       subProgramCreationModal: false,
@@ -196,6 +198,11 @@ export default {
       const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
       this.oldStepOrder = subProgram.steps.map(s => s._id);
     },
+    saveActivities (subProgramId, stepId) {
+      const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+      const step = subProgram.steps.find(s => s._id === stepId);
+      this.oldActivityOrder = step.activities.map(a => a._id);
+    },
     async dropStep (subProgramId) {
       try {
         const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
@@ -216,9 +223,10 @@ export default {
         const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
         const step = subProgram.steps.find(s => s._id === stepId);
         const activities = step.activities.map(a => a._id);
-        await Steps.updateById(stepId, { activities });
-
-        NotifyPositive('Modification enregistrée.');
+        if (!isEqual(this.oldActivityOrder, activities)) {
+          await Steps.updateById(stepId, { activities });
+          NotifyPositive('Modification enregistrée.');
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des activités.');
