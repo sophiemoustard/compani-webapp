@@ -29,6 +29,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
+import isEqual from 'lodash/isEqual';
 import draggable from 'vuedraggable';
 import {
   CARD_TEMPLATES,
@@ -130,8 +131,11 @@ export default {
     async dropCard () {
       try {
         const cards = this.draggableCards.map(c => c._id);
-        await Activities.updateById(this.activity._id, { cards });
-        NotifyPositive('Modification enregistrée.');
+        const oldCards = this.activity.cards.map(c => c._id);
+        if (!isEqual(oldCards, cards)) {
+          await Activities.updateById(this.activity._id, { cards });
+          NotifyPositive('Modification enregistrée.');
+        }
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des cartes.');
