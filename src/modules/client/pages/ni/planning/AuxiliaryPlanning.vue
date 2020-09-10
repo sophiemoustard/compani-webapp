@@ -134,7 +134,8 @@ export default {
 
       const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
-      if (this.auxiliaries && this.auxiliaries.length) await this.refresh();
+      if ((this.auxiliaries && this.auxiliaries.length) ||
+        (this.filteredSectors && this.filteredSectors.length)) await this.refresh();
     },
     // Filters
     initFilters () {
