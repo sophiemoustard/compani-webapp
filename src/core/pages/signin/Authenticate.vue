@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { required, email } from 'vuelidate/lib/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
@@ -89,7 +90,7 @@ export default {
         await this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
       } catch (e) {
         console.error(e);
-        if (e.response.data.statusCode) return NotifyNegative('Identifiant ou mot de passe invalide');
+        if (get(e, 'response.data.statusCode')) return NotifyNegative('Identifiant ou mot de passe invalide');
         NotifyNegative('Impossible de se connecter.');
       }
     },
