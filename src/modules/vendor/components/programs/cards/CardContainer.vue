@@ -3,8 +3,8 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <draggable v-model="draggableCards" @end="dropCard()"
-        ghost-class="ghost" :disabled="$q.platform.is.mobile || disableEdition">
+      <draggable v-model="draggableCards" @change="dropCard()" ghost-class="ghost"
+        :disabled="$q.platform.is.mobile || disableEdition">
         <div v-for="(card, index) in draggableCards" :key="index" :class="getCardStyle(card)">
           <div class="card-actions">
             <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
@@ -29,7 +29,6 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
-import isEqual from 'lodash/isEqual';
 import draggable from 'vuedraggable';
 import {
   CARD_TEMPLATES,
@@ -131,11 +130,8 @@ export default {
     async dropCard () {
       try {
         const cards = this.draggableCards.map(c => c._id);
-        const oldCards = this.activity.cards.map(c => c._id);
-        if (!isEqual(oldCards, cards)) {
-          await Activities.updateById(this.activity._id, { cards });
-          NotifyPositive('Modification enregistrée.');
-        }
+        await Activities.updateById(this.activity._id, { cards });
+        NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des cartes.');

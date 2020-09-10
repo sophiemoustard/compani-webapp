@@ -12,7 +12,7 @@
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
         :disable="isPublished(subProgram)" />
-      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps" ghost-class="ghost"
+      <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
         :disabled="$q.platform.is.mobile || isPublished(subProgram)">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
           <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)" :id="step._id">
@@ -31,9 +31,8 @@
           <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)" />
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-            <draggable v-model="step.activities" @end="dropActivity(subProgram._id, step._id)"
-              @start="saveActivities(subProgram._id, step._id)" class="activity-draggable" ghost-class="ghost"
-              :disabled="$q.platform.is.mobile">
+            <draggable v-model="step.activities" @change="dropActivity(subProgram._id, step._id)"
+              class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
                 <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
                   <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
@@ -100,7 +99,6 @@ import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
@@ -135,8 +133,6 @@ export default {
   },
   data () {
     return {
-      oldStepOrder: [],
-      oldActivityOrder: [],
       tmpInput: '',
       modalLoading: false,
       subProgramCreationModal: false,
@@ -194,23 +190,12 @@ export default {
     }
   },
   methods: {
-    saveSteps (subProgramId) {
-      const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
-      this.oldStepOrder = subProgram.steps.map(s => s._id);
-    },
-    saveActivities (subProgramId, stepId) {
-      const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
-      const step = subProgram.steps.find(s => s._id === stepId);
-      this.oldActivityOrder = step.activities.map(a => a._id);
-    },
     async dropStep (subProgramId) {
       try {
         const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
         const steps = subProgram.steps.map(s => s._id);
-        if (!isEqual(this.oldStepOrder, steps)) {
-          await SubPrograms.update(subProgramId, { steps });
-          NotifyPositive('Modification enregistrée.');
-        }
+        await SubPrograms.update(subProgramId, { steps });
+        NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des étapes.');
@@ -223,10 +208,8 @@ export default {
         const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
         const step = subProgram.steps.find(s => s._id === stepId);
         const activities = step.activities.map(a => a._id);
-        if (!isEqual(this.oldActivityOrder, activities)) {
-          await Steps.updateById(stepId, { activities });
-          NotifyPositive('Modification enregistrée.');
-        }
+        await Steps.updateById(stepId, { activities });
+        NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des activités.');
