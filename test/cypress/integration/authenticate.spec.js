@@ -48,7 +48,6 @@ describe('Login page tests', () => {
 
       cy.url().should('include', params.url);
       cy.getCookie('alenvi_token').should('exist');
-      cy.getCookie('alenvi_token_expires_in').should('exist');
       cy.getCookie('refresh_token').should('exist');
       cy.getCookie('user_id').should('exist');
     });

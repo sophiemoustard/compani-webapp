@@ -1,6 +1,7 @@
 import { Cookies } from 'quasar';
 import User from '@api/Users';
 import store from 'src/store/index';
+import { TOKEN_EXPIRE_TIME } from '@data/constants';
 
 export const canNavigate = async () => {
   const { loggedUser } = store.state.main;
@@ -21,26 +22,16 @@ export const refreshAlenviCookies = async () => {
     const refreshToken = Cookies.get('refresh_token');
     if (refreshToken) {
       const newToken = await User.refreshToken({ refreshToken });
-      const expiresInDays = parseInt(newToken.expiresIn / 3600 / 24, 10) >= 1
-        ? parseInt(newToken.expiresIn / 3600 / 24, 10)
-        : 1;
-      const options = {
-        path: '/',
-        expires: expiresInDays,
-        secure: process.env.NODE_ENV !== 'development',
-        sameSite: 'Strict',
-      };
-      Cookies.set('alenvi_token', newToken.token, options);
+      const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Strict' };
+      Cookies.set('alenvi_token', newToken.token, { ...options, expires: TOKEN_EXPIRE_TIME });
       Cookies.set('refresh_token', newToken.refreshToken, { ...options, expires: 365 });
-      Cookies.set('alenvi_token_expires_in', newToken.expiresIn, options);
-      Cookies.set('user_id', newToken.user._id, options);
+      Cookies.set('user_id', newToken.user._id, { ...options, expires: TOKEN_EXPIRE_TIME });
 
       return true;
     }
     const options = { path: '/', sameSite: 'Strict' };
     Cookies.remove('alenvi_token', options);
     Cookies.remove('user_id', options);
-    Cookies.remove('alenvi_token_expires_in', options);
 
     return false;
   } catch (e) {
@@ -50,7 +41,6 @@ export const refreshAlenviCookies = async () => {
       Cookies.remove('alenvi_token', options);
       Cookies.remove('refresh_token', options);
       Cookies.remove('user_id', options);
-      Cookies.remove('alenvi_token_expires_in', options);
     }
 
     return false;

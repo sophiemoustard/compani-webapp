@@ -5,7 +5,6 @@ import { Cookies, LocalStorage } from 'quasar';
 export const logOutAndRedirectToLogin = (params) => {
   const options = { path: '/', sameSite: 'Strict' };
   Cookies.remove('alenvi_token', options);
-  Cookies.remove('alenvi_token_expires_in', options);
   Cookies.remove('refresh_token', options);
   Cookies.remove('user_id', options);
   LocalStorage.clear();
