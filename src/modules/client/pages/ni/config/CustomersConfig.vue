@@ -211,30 +211,10 @@
     </ni-modal>
 
     <!-- Service creation modal -->
-    <ni-modal v-model="serviceCreationModal" @hide="resetCreationServiceData">
-      <template slot="title">
-        Créer un <span class="text-weight-bold">service</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newService.name" :error="$v.newService.name.$error"
-        @blur="$v.newService.name.$touch" required-field />
-      <ni-select in-modal caption="Nature" v-model="newService.nature" :error="$v.newService.nature.$error"
-        @blur="$v.newService.nature.$touch" :options="natureOptions" required-field />
-      <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
-        v-model="newService.defaultUnitAmount" :error="$v.newService.defaultUnitAmount.$error" required-field
-        @blur="$v.newService.defaultUnitAmount.$touch" :error-message="nbrError('newService.defaultUnitAmount')" />
-      <ni-input in-modal caption="TVA" suffix="%" v-model="newService.vat" type="number"
-        :error="$v.newService.vat.$error" @blur="$v.newService.vat.$touch"
-        error-message="La TVA doit être positive ou nulle" />
-      <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge"
-        :options="surchargesOptions" clearable />
-      <div class="row q-mb-md">
-        <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" dense />
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
-          :loading="loading" @click="createNewService" />
-      </template>
-    </ni-modal>
+    <service-creation-modal v-model="serviceCreationModal" :new-service="newService" :validations="$v.newService"
+      :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
+      :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
+      :loading="loading" />
 
     <!-- Service edition modal -->
     <ni-modal v-model="serviceEditionModal" @hide="resetEditionServiceData">
@@ -353,6 +333,7 @@ import {
   FIXED,
   COMPANY,
 } from '@data/constants';
+import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -369,6 +350,7 @@ export default {
     'ni-time-input': TimeInput,
     'ni-modal': Modal,
     'ni-responsive-table': ReponsiveTable,
+    'service-creation-modal': ServiceCreationModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
