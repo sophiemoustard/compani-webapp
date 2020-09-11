@@ -195,6 +195,7 @@ export default {
         const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
         const steps = subProgram.steps.map(s => s._id);
         await SubPrograms.update(subProgramId, { steps });
+
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
@@ -209,6 +210,7 @@ export default {
         const step = subProgram.steps.find(s => s._id === stepId);
         const activities = step.activities.map(a => a._id);
         await Steps.updateById(stepId, { activities });
+
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
