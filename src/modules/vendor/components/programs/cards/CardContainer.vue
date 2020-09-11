@@ -3,7 +3,8 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <draggable v-model="draggableCards" @end="dropCard()" ghost-class="ghost" :disabled="$q.platform.is.mobile">
+      <draggable v-model="draggableCards" @change="dropCard()" ghost-class="ghost"
+        :disabled="$q.platform.is.mobile || disableEdition">
         <div v-for="(card, index) in draggableCards" :key="index" :class="getCardStyle(card)">
           <div class="card-actions">
             <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
