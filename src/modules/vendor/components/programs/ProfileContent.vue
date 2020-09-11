@@ -27,9 +27,9 @@
                 {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
               </div>
             </q-item-section>
-            <ni-button icon="edit" @click.stop="openStepEditionModal(step)" :disable="isPublished(step)" />
-            <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)"
-              :disable="isPublished(subProgram)" />
+            <ni-button icon="edit" @click.native.stop="openStepEditionModal(step)" :disable="isPublished(step)" />
+            <ni-button :class="isPublished(subProgram) && 'disabled'" icon="close"
+              @click="validateStepDetachment(subProgram, step._id, $event)" />
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
             <draggable v-model="step.activities" @change="dropActivity(subProgram._id, step._id)"
@@ -465,13 +465,16 @@ export default {
       this.editedActivity = { name: '' };
       this.$v.editedActivity.$reset();
     },
-    validateStepDetachment (subProgramId, stepId) {
+    validateStepDetachment (subProgram, stepId, event) {
+      event.stopPropagation();
+      if (this.isPublished(subProgram)) return;
+
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir retirer cette étape de ce sous-programme ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.detachStep(subProgramId, stepId))
+      }).onOk(() => this.detachStep(subProgram._id, stepId))
         .onCancel(() => NotifyPositive('Retrait annulé.'));
     },
     async detachStep (subProgramId, stepId) {
