@@ -4,10 +4,10 @@
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
       <draggable v-model="draggableCards" @change="dropCard()" ghost-class="ghost"
-        :disabled="$q.platform.is.mobile || disableEdition">
+        :disabled="$q.platform.is.mobile || disableEdition || isActivityPublished">
         <div v-for="(card, index) in draggableCards" :key="index" :class="getCardStyle(card)">
           <div class="card-actions">
-            <ni-button v-if="isSelected(card)" icon="delete" @click.native="deleteCard(card)"
+            <ni-button v-if="isSelected(card) && !isActivityPublished" icon="delete" @click.native="deleteCard(card)"
               :disable="disableEdition" />
           </div>
           <div class="card-cell cursor-pointer" @click="selectCard(card)">
@@ -21,8 +21,10 @@
         </div>
       </draggable>
     </q-scroll-area>
-    <ni-button v-if="!disableEdition" label="Ajouter une carte" color="primary" icon="add" @click="openCreationModal" />
-    <ni-button v-else label="Déverouiller l'activité" color="primary" icon="mdi-lock-outline" @click="unlockEdition" />
+    <ni-button v-if="!disableEdition && !isActivityPublished" label="Ajouter une carte" color="primary" icon="add"
+      @click="openCreationModal" />
+    <ni-button v-else-if="!isActivityPublished" label="Déverouiller l'activité" color="primary"
+      icon="mdi-lock-outline" @click="unlockEdition" />
   </div>
 </template>
 
@@ -44,6 +46,7 @@ import {
   SURVEY,
   FILL_THE_GAPS,
   TEMPLATE_TYPES,
+  PUBLISHED,
 } from '@data/constants';
 import Button from '@components/Button';
 import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
@@ -67,6 +70,9 @@ export default {
   computed: {
     ...mapState('program', ['card', 'activity']),
     ...mapGetters({ cards: 'program/getCards' }),
+    isActivityPublished () {
+      return this.activity.status === PUBLISHED;
+    },
   },
   watch: {
     cards: {

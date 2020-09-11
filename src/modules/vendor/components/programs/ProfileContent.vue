@@ -52,7 +52,8 @@
                     <div class="dot dot-active" v-if="isPublished(activity)" />
                   </div>
                   <div class="row no-wrap">
-                    <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
+                    <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)"
+                     :disable="isPublished(activity)" />
                     <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
                       @click.stop="validateActivityDeletion(step._id, activity._id)" />
                   </div>
