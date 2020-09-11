@@ -27,12 +27,13 @@
                 {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
               </div>
             </q-item-section>
-          <ni-button icon="edit" @click.stop="openStepEditionModal(step)" />
-          <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)" />
+            <ni-button icon="edit" @click.stop="openStepEditionModal(step)" :disable="isPublished(step)" />
+            <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)"
+              :disable="isPublished(subProgram)" />
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
             <draggable v-model="step.activities" @change="dropActivity(subProgram._id, step._id)"
-              class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile">
+              class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile || isPublished(step)">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
                 <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
                   <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
@@ -43,23 +44,26 @@
                   <div class="dot dot-active" v-if="isPublished(activity)" />
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-                    <ni-button class="q-px-sm" icon="close"
+                    <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
                       @click.stop="validateActivityDeletion(step._id, activity._id)" />
                   </div>
                 </q-card-section>
               </q-card>
             </draggable>
-            <div class="q-mt-md" align="right">
-              <ni-button class="q-my-sm" color="primary" icon="add" label="Réutiliser une activité"
+            <div v-if="!isPublished(step)" class="q-mt-md" align="right">
+              <ni-button color="primary" icon="add" label="Réutiliser une activité"
                 @click="openActivityReuseModal(step)" />
-              <ni-button class="q-my-sm" color="primary" icon="add" label="Créer une activité"
+              <ni-button color="primary" icon="add" label="Créer une activité"
                 @click="openActivityCreationModal(step._id)" />
+            </div>
+            <div class="no-activity" v-if="isPublished(step) && !step.activities.length">
+              Il n'y a pas d'activité
             </div>
           </div>
         </q-card>
       </draggable>
-      <ni-button class="q-my-sm add-step-button" color="primary" icon="add" label="Ajouter une étape"
-        @click="openStepCreationModal(subProgram._id)" />
+      <ni-button v-if="!isPublished(subProgram)" class="q-my-sm add-step-button" color="primary" icon="add"
+        @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
     </div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
@@ -573,7 +577,7 @@ export default {
   width: -webkit-fill-available
 
 .activity
-  margin: 10px 10px 0px 50px
+  margin: 10px 10px 10px 50px
   border-radius: 0
   .q-card__section
     display: flex
@@ -590,6 +594,11 @@ export default {
   .q-card__section
     .q-item__section--side
       padding-right: 10px
+
+.no-activity
+  color: $primary
+  font-size: 14px
+  margin: 10px
 
 .ghost
   opacity: 0.5
