@@ -13,7 +13,7 @@
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
         :disable="isPublished(subProgram)" />
       <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps"
-        ghost-class="ghost" :disabled="$q.platform.is.mobile">
+        ghost-class="ghost" :disabled="$q.platform.is.mobile || isPublished(subProgram)">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
           <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)" :id="step._id">
             <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
