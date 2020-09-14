@@ -611,7 +611,7 @@ export default {
       padding-right: 10px
 
 .no-activity
-  color: $primary
+  color: black
   font-size: 14px
   margin: 10px
 
