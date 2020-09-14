@@ -3,11 +3,10 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <draggable v-model="draggableCards" @change="dropCard()" ghost-class="ghost"
-        :disabled="$q.platform.is.mobile || disableEdition || isActivityPublished">
+      <draggable v-model="draggableCards" @change="dropCard()" ghost-class="ghost" :disabled="isDraggableDisabled">
         <div v-for="(card, index) in draggableCards" :key="index" :class="getCardStyle(card)">
           <div class="card-actions">
-            <ni-button v-if="isSelected(card) && !isActivityPublished" icon="delete" @click.native="deleteCard(card)"
+            <ni-button v-if="isSelected(card) && !isActivityPublished" icon="delete" @click="deleteCard(card)"
               :disable="disableEdition" />
           </div>
           <div class="card-cell cursor-pointer" @click="selectCard(card)">
@@ -21,7 +20,7 @@
         </div>
       </draggable>
     </q-scroll-area>
-    <ni-button v-if="!disableEdition && !isActivityPublished" label="Ajouter une carte" color="primary" icon="add"
+    <ni-button v-if="addCardDisabled" label="Ajouter une carte" color="primary" icon="add"
       @click="openCreationModal" />
     <ni-button v-else-if="!isActivityPublished" label="Déverouiller l'activité" color="primary"
       icon="mdi-lock-outline" @click="unlockEdition" />
@@ -72,6 +71,12 @@ export default {
     ...mapGetters({ cards: 'program/getCards' }),
     isActivityPublished () {
       return this.activity.status === PUBLISHED;
+    },
+    isDraggableDisabled () {
+      return this.$q.platform.is.mobile || this.disableEdition || this.isActivityPublished;
+    },
+    addCardDisabled () {
+      return !this.disableEdition && !this.isActivityPublished;
     },
   },
   watch: {
@@ -172,6 +177,7 @@ export default {
     .card-cell
       background-color: $light-grey
   &-locked-selected
+    justify-content: flex-end
     .card-cell
       background-color: $dark-grey
       color: $white
