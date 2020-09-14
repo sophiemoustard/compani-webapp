@@ -474,13 +474,13 @@ export default {
       this.editedActivity = { name: '' };
       this.$v.editedActivity.$reset();
     },
-    validateStepDetachment (subProgram, stepId) {
+    validateStepDetachment (subProgramId, stepId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir retirer cette étape de ce sous-programme ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.detachStep(subProgram._id, stepId))
+      }).onOk(() => this.detachStep(subProgramId, stepId))
         .onCancel(() => NotifyPositive('Retrait annulé.'));
     },
     async detachStep (subProgramId, stepId) {
@@ -594,9 +594,6 @@ export default {
   &-info
     flex: 1
     align-items: center
-    div
-      display: flex
-      align-items: center
   .q-card__section
     display: flex
     justify-content: space-between
