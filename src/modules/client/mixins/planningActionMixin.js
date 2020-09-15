@@ -254,13 +254,13 @@ export const planningActionMixin = {
     },
     getMessageForInternalOrUnavailability (type) {
       return `Les ${type} de la répétition en conflit avec les évènements existants ne seront pas créées. `
-        + 'Es-tu sûr(e) de vouloir créer cette répétition ?';
+        + '<br /><br />Es-tu sûr(e) de vouloir créer cette répétition ?';
     },
     getConfirmationMessage () {
       switch (this.newEvent.type) {
         case INTERVENTION:
           return 'Les interventions de la répétition en conflit avec les évènements existants seront passées en '
-          + 'à affecter. Es-tu sûr(e) de vouloir créer cette répétition ?';
+          + 'à affecter. <br /><br />Es-tu sûr(e) de vouloir créer cette répétition ?';
         case INTERNAL_HOUR:
           return this.getMessageForInternalOrUnavailability('heures internes');
         case UNAVAILABILITY:
@@ -279,7 +279,8 @@ export const planningActionMixin = {
           this.$q.dialog({
             title: 'Confirmation',
             message: 'Les interventions en conflit avec l\'absence seront passées en à affecter et les heures internes '
-            + 'et indispo seront supprimées. Es-tu sûr(e) de vouloir créer cette absence ?',
+            + 'et indispo seront supprimées. <br /><br />Es-tu sûr(e) de vouloir créer cette absence ?',
+            html: true,
             ok: 'OK',
             cancel: 'Annuler',
           })
@@ -289,6 +290,7 @@ export const planningActionMixin = {
           this.$q.dialog({
             title: 'Confirmation',
             message: this.getConfirmationMessage(),
+            html: true,
             ok: 'OK',
             cancel: 'Annuler',
           })
