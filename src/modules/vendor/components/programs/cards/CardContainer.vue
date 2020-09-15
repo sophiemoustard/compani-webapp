@@ -20,10 +20,10 @@
         </div>
       </draggable>
     </q-scroll-area>
-    <ni-button v-if="addCardDisabled" label="Ajouter une carte" color="primary" icon="add"
+    <ni-button v-if="disableEdition" label="Déverouiller l'activité" color="primary" icon="mdi-lock-outline"
+      @click="unlockEdition" />
+    <ni-button v-else-if="!isActivityPublished" label="Ajouter une carte" color="primary" icon="add"
       @click="openCreationModal" />
-    <ni-button v-else-if="!isActivityPublished" label="Déverouiller l'activité" color="primary"
-      icon="mdi-lock-outline" @click="unlockEdition" />
   </div>
 </template>
 
@@ -74,9 +74,6 @@ export default {
     },
     isDraggableDisabled () {
       return this.$q.platform.is.mobile || this.disableEdition || this.isActivityPublished;
-    },
-    addCardDisabled () {
-      return !this.disableEdition && !this.isActivityPublished;
     },
   },
   watch: {
