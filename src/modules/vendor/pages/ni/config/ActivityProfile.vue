@@ -8,13 +8,14 @@
               <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
               <q-item-section>{{ info.label }}</q-item-section>
             </q-item>
+            <div v-if="isActivityPublished"><div class="dot dot-active" />Publiée</div>
           </div>
         </template>
       </ni-profile-header>
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked"
-          @unlock-edition="validateUnlockEdition" />
+          @unlock-edition="validateUnlockEdition" @refresh="refreshActivity" />
         <card-edition :disable-edition="isEditionLocked" />
       </div>
     </template>
@@ -32,7 +33,7 @@ import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { ACTIVITY_TYPES } from '@data/constants';
+import { ACTIVITY_TYPES, PUBLISHED } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
@@ -61,6 +62,7 @@ export default {
       cardCreationModal: false,
       newCard: { template: '' },
       isEditionLocked: false,
+      isActivityUsedInOtherStep: false,
     };
   },
   validations () {
@@ -72,6 +74,9 @@ export default {
     ...mapState('program', ['program', 'activity']),
     activityType () {
       return ACTIVITY_TYPES.find(type => type.value === this.activity.type).label || '';
+    },
+    isActivityPublished () {
+      return this.activity.status === PUBLISHED;
     },
     headerInfo () {
       const infos = [
@@ -95,7 +100,8 @@ export default {
       const step = subProgram ? subProgram.steps.find(s => s._id === this.stepId) : '';
       this.stepName = get(step, 'name') || '';
 
-      this.isEditionLocked = this.activity.steps.length > 1;
+      this.isActivityUsedInOtherStep = this.activity.steps.length > 1;
+      this.isEditionLocked = this.isActivityUsedInOtherStep || this.isActivityPublished;
     } catch (e) {
       console.error(e);
     }
@@ -115,12 +121,21 @@ export default {
           .map(s => s.subProgram.program.name)
       )];
 
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Cette activité est utilisée dans les étapes '
+      const usedInOtherStepMessage = this.isActivityUsedInOtherStep
+        ? 'Cette activité est utilisée dans les étapes '
           + `${programsReusingActivity.length > 1 ? 'des programmes suivants' : 'du programme suivant'} : `
           + `${programsReusingActivity.join(', ')}. <br />Si tu la modifies, elle sera modifiée dans toutes ces étapes.`
-          + '<br /><br />Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
+          + '<br /><br />'
+        : '';
+      const isPublishedMessage = this.isActivityPublished
+        ? 'Cette activité est publiée, tu ne pourras pas ajouter, supprimer ou changer l\'ordre des cartes'
+          + '<br /><br />'
+        : '';
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: `${usedInOtherStepMessage} ${isPublishedMessage}`
+          + 'Es-tu sûr(e) de vouloir déverrouiller cette activité ?',
         html: true,
         ok: true,
         cancel: 'Annuler',
@@ -182,6 +197,7 @@ export default {
     this.$store.dispatch('program/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
       this.$store.dispatch('program/fetchProgram', { programId: this.programId });
+      this.$store.dispatch('program/setOpenedStep', { stepId: this.stepId });
     } else {
       this.$store.dispatch('program/resetProgram');
     }
@@ -196,6 +212,9 @@ export default {
 
 .body
   flex: 1
+
+.dot
+  margin: 0 22px 0 4px
 
 .q-item
   padding: 0

@@ -1,47 +1,79 @@
 <template>
   <div v-if="program">
     <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
-      <p class="text-weight-bold">Sous-programme {{ index + 1 }}</p>
+      <div class="sub-program-header">
+        <div>
+          <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
+          <span class="published" v-if="isPublished(subProgram)">Publié</span>
+        </div>
+        <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
+          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
+      </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
-        @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error" />
-      <draggable @end="dropStep(subProgram._id)" v-model="subProgram.steps" ghost-class="ghost">
+        @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
+        :disable="isPublished(subProgram)" />
+      <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
+        :disabled="$q.platform.is.mobile || isPublished(subProgram)">
         <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
-          <q-card-section class="step-head cursor-pointer row" @click="showActivities(step._id)">
-            <q-item-section side><q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" /></q-item-section>
-            <q-item-section>
-              <div class="text-weight-bold">{{ stepIndex + 1 }} - {{ step.name }}</div>
-              <div class="step-subtitle">
-                {{ getStepTypeLabel(step.type) }} -
-                {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
-              </div>
-            </q-item-section>
-          <ni-button icon="edit" @click.stop="openStepEditionModal(step)" />
-          <ni-button icon="close" @click.stop="validateStepDetachment(subProgram._id, step._id)" />
+          <q-card-section class="step-head cursor-pointer row" :id="step._id">
+            <div class="step-info" @click="showActivities(step._id)">
+              <q-item-section side>
+                <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" />
+              </q-item-section>
+              <q-item-section>
+                <div class="text-weight-bold">
+                  <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
+                  <div class="dot dot-active" v-if="isPublished(step)" />
+                </div>
+                <div class="step-subtitle">
+                  {{ getStepTypeLabel(step.type) }} -
+                  {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+                </div>
+              </q-item-section>
+            </div>
+            <div class="flex align-center">
+              <ni-button icon="edit" @click="openStepEditionModal(step)" :disable="isPublished(step)" />
+              <ni-button icon="close" @click="validateStepDetachment(subProgram._id, step._id)"
+                :disable="isPublished(subProgram)" />
+            </div>
           </q-card-section>
           <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
-            <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
-              <q-card-section class="cursor-pointer row" @click="goToActivityProfile(subProgram, step, activity)">
-                <div class="col-xs-9 col-sm-6">{{ activity.name }}</div>
-                <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
-                <div class="gt-xs col-sm-2 activity-content"> {{ formatQuantity('carte', activity.cards.length) }}</div>
-                <div class="row no-wrap">
-                  <ni-button class="q-px-sm" icon="edit" @click.stop="openActivityEditionModal(activity)" />
-                  <ni-button class="q-px-sm" icon="close"
-                    @click.stop="validateActivityDeletion(step._id, activity._id)" />
-                </div>
-              </q-card-section>
-            </q-card>
-            <div class="q-mt-md" align="right">
-              <ni-button class="q-my-sm" color="primary" icon="add" label="Réutiliser une activité"
+            <draggable v-model="step.activities" @change="dropActivity(subProgram._id, step._id)"
+              class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile || isPublished(step)">
+              <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
+                <q-card-section>
+                  <div class="cursor-pointer row activity-info"
+                    @click="goToActivityProfile(subProgram, step, activity)">
+                    <div class="col-xs-8 col-sm-5">{{ activity.name }}</div>
+                    <div class="gt-xs col-sm-2 activity-content">{{ getActivityTypeLabel(activity.type) }}</div>
+                    <div class="gt-xs col-sm-2 activity-content">
+                      {{ formatQuantity('carte', activity.cards.length) }}
+                    </div>
+                    <div class="dot dot-active" v-if="isPublished(activity)" />
+                  </div>
+                  <div class="row no-wrap">
+                    <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
+                     :disable="isPublished(activity)" />
+                    <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
+                      @click="validateActivityDeletion(step._id, activity._id)" />
+                  </div>
+                </q-card-section>
+              </q-card>
+            </draggable>
+            <div v-if="!isPublished(step)" class="q-mt-md" align="right">
+              <ni-button color="primary" icon="add" label="Réutiliser une activité"
                 @click="openActivityReuseModal(step)" />
-              <ni-button class="q-my-sm" color="primary" icon="add" label="Créer une activité"
+              <ni-button color="primary" icon="add" label="Créer une activité"
                 @click="openActivityCreationModal(step._id)" />
+            </div>
+            <div class="no-activity" v-if="isPublished(step) && !step.activities.length">
+              Il n'y a pas d'activité
             </div>
           </div>
         </q-card>
       </draggable>
-      <ni-button class="q-my-sm add-step-button" color="primary" icon="add" label="Ajouter une étape"
-        @click="openStepCreationModal(subProgram._id)" />
+      <ni-button v-if="!isPublished(subProgram)" class="q-my-sm add-step-button" color="primary" icon="add"
+        @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
     </div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
@@ -66,9 +98,8 @@
 
     <!-- Activity reuse modal -->
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
-      :loading="modalLoading" :validations="$v.reusedActivity" @submit-duplication="duplicateActivity"
-      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal"
-      :same-step-activities="sameStepActivities" />
+      :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
+      :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
     <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
@@ -88,7 +119,7 @@ import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO } from '@data/constants';
+import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO, PUBLISHED } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
@@ -145,6 +176,7 @@ export default {
         { label: 'Témoignage', value: SHARING_EXPERIENCE },
         { label: 'Vidéo', value: VIDEO },
       ],
+      PUBLISHED,
     };
   },
   validations () {
@@ -159,11 +191,17 @@ export default {
     };
   },
   computed: {
-    ...mapState('program', ['program']),
+    ...mapState('program', ['program', 'openedStep']),
   },
-  async mounted () {
+  async created () {
     if (!this.program) await this.refreshProgram();
     await this.refreshProgramList();
+
+    if (this.openedStep) {
+      this.showActivities(this.openedStep);
+      this.scrollToOpenedStep(this.openedStep);
+      this.$store.dispatch('program/resetOpenedStep');
+    }
   },
   methods: {
     async dropStep (subProgramId) {
@@ -176,6 +214,21 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification des étapes.');
+      } finally {
+        await this.refreshProgram();
+      }
+    },
+    async dropActivity (subProgramId, stepId) {
+      try {
+        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+        const step = subProgram.steps.find(s => s._id === stepId);
+        const activities = step.activities.map(a => a._id);
+        await Steps.updateById(stepId, { activities });
+
+        NotifyPositive('Modification enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des activités.');
       } finally {
         await this.refreshProgram();
       }
@@ -363,7 +416,7 @@ export default {
         this.$v.reusedActivity.$touch();
         if (this.$v.reusedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Steps.updateById(this.currentStepId, { activities: this.reusedActivity });
+        await Steps.reuseActivity(this.currentStepId, { activities: this.reusedActivity });
         this.activityReuseModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité réutilisée.');
@@ -460,6 +513,34 @@ export default {
         NotifyNegative('Erreur lors du retrait de l\'activité.');
       }
     },
+    scrollToOpenedStep (openedStep) {
+      const el = document.getElementById(openedStep);
+      el.scrollIntoView({ behavior: 'smooth' });
+    },
+    validateSubProgramPublishment (subProgramId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
+          + 'Es-tu sûr(e) de vouloir publier ce sous-programme ?',
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.publishSubProgram(subProgramId))
+        .onCancel(() => NotifyPositive('Publication annulée.'));
+    },
+    async publishSubProgram (subProgramId) {
+      try {
+        await SubPrograms.update(subProgramId, { status: PUBLISHED });
+        NotifyPositive('Sous programme publié');
+        this.refreshProgram();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la publication du sous-programme');
+      }
+    },
+    isPublished (element) {
+      return element.status === PUBLISHED;
+    },
   },
 };
 </script>
@@ -470,11 +551,29 @@ export default {
   display: flex
   flex-direction: column
 
+.sub-program-header
+  display: flex
+  justify-content: space-between
+
+.published
+  background-color: $accent
+  font-size: 14px
+  border-radius: 15px
+  padding: 1px 6px
+  color: white
+  margin-left: 10px
+
+.dot
+  margin-left: 9px
+
 .step
   margin-bottom: 10px
   border-radius: 0
   &-head
     justify-content: space-between
+    .step-info
+      display: flex
+      flex: 1
   &-subtitle
     font-size: 13px
 
@@ -485,11 +584,17 @@ export default {
   display: flex
   flex-direction: column
   align-items: flex-end
-.activity
+
+.activity-draggable
   width: -moz-available
   width: -webkit-fill-available
-  margin: 10px 10px 0px 50px
+
+.activity
+  margin: 10px 10px 10px 50px
   border-radius: 0
+  &-info
+    flex: 1
+    align-items: center
   .q-card__section
     display: flex
     justify-content: space-between
@@ -505,6 +610,11 @@ export default {
   .q-card__section
     .q-item__section--side
       padding-right: 10px
+
+.no-activity
+  color: black
+  font-size: 14px
+  margin: 10px
 
 .ghost
   opacity: 0.5

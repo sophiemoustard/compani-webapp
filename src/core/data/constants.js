@@ -1,3 +1,5 @@
+export const TOKEN_EXPIRE_TIME = 1; // in days
+
 // IMAGES
 export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
   + 'compani_texte_rose_1000.png';
@@ -315,6 +317,9 @@ export const COURSE_TYPES = [
 export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
+
+// SUBPROGRAM
+export const PUBLISHED = 'published';
 
 // STEP
 export const E_LEARNING = 'e_learning';
