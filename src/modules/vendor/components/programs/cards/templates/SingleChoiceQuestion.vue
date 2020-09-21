@@ -1,7 +1,8 @@
 <template>
   <div v-if="falsyAnswersInitialized">
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" :disable="disableEdition" />
+      @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
+      type="textarea" :disable="disableEdition" />
     <ni-input caption="Bonne réponse" v-model.trim="card.qcuGoodAnswer" required-field class="q-my-lg"
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" @blur="updateCard('qcuGoodAnswer')"
       :disable="disableEdition" />
@@ -18,11 +19,11 @@
 <script>
 import times from 'lodash/times';
 import get from 'lodash/get';
-import { required } from 'vuelidate/lib/validators';
+import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT } from '@data/constants';
+import { SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT, REQUIRED_LABEL } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
@@ -39,7 +40,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required },
+        question: { required, maxLength: maxLength(5) },
         qcuGoodAnswer: { required },
         falsyAnswers: { required, minLength: minArrayLength(1) },
         explanation: { required },
@@ -49,6 +50,13 @@ export default {
   computed: {
     falsyAnswersInitialized () {
       return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT;
+    },
+    questionErrorMsg () {
+      if (!this.$v.card.question.required) return REQUIRED_LABEL;
+      if (!this.$v.card.question.maxLength) {
+        return `${this.$v.card.question.$params.maxLength.max} caractères maximum.`;
+      }
+      return '';
     },
   },
   watch: {

@@ -1,7 +1,8 @@
 <template>
   <div v-if="answersInitialized">
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" :disable="disableEdition" />
+      @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
+      type="textarea" :disable="disableEdition" />
     <div class="q-my-xl">
       <div v-for="(qcmAnswers, i) in card.qcmAnswers" :key="i" class="answers">
         <ni-input :caption="`Réponse ${i + 1}`" v-model.trim="card.qcmAnswers[i].label" :required-field="i < 2"
@@ -19,7 +20,7 @@
 <script>
 import times from 'lodash/times';
 import get from 'lodash/get';
-import { required } from 'vuelidate/lib/validators';
+import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -39,7 +40,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required },
+        question: { required, maxLength: maxLength(5) },
         qcmAnswers: {
           minLength: minLabelArrayLength(2),
           minOneCorrectAnswer,
@@ -51,6 +52,13 @@ export default {
   computed: {
     answersInitialized () {
       return this.card.qcmAnswers.length === MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT;
+    },
+    questionErrorMsg () {
+      if (!this.$v.card.question.required) return REQUIRED_LABEL;
+      if (!this.$v.card.question.maxLength) {
+        return `${this.$v.card.question.$params.maxLength.max} caractères maximum.`;
+      }
+      return '';
     },
   },
   watch: {
