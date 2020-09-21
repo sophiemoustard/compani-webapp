@@ -9,7 +9,7 @@
         <ni-custom-img :cloudinary-storage="cloudinaryStorage" :image-source="imageSource" :alt="alt" />
       </div>
       <div class="self-end doc-delete">
-        <q-btn color="primary" round flat icon="delete" size="1rem" @click.native="deleteDocument" />
+        <q-btn color="primary" round flat icon="delete" size="1rem" :disable="disable" @click.native="deleteDocument" />
         <q-btn color="primary" round flat icon="save_alt" size="1rem" @click.native="goToUrl(document.link)" />
       </div>
     </div>
