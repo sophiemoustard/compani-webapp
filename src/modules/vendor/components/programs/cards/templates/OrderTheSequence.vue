@@ -35,7 +35,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required, maxLength: maxLength(5) },
+        question: { required, maxLength: maxLength(150) },
         orderedAnswers: { minLength: minArrayLength(2) },
         explanation: { required },
       },

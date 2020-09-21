@@ -35,7 +35,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required, maxLength: maxLength(5) },
+        question: { required, maxLength: maxLength(150) },
         label: {
           left: { required: requiredIf(item => !!item.right), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
           right: { required: requiredIf(item => !!item.left), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },

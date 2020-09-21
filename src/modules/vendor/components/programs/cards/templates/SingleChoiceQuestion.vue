@@ -40,7 +40,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required, maxLength: maxLength(5) },
+        question: { required, maxLength: maxLength(150) },
         qcuGoodAnswer: { required },
         falsyAnswers: { required, minLength: minArrayLength(1) },
         explanation: { required },

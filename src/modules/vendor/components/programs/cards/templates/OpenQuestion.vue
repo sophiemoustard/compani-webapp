@@ -21,7 +21,7 @@ export default {
   mixins: [templateMixin],
   validations () {
     return {
-      card: { question: { required, maxLength: maxLength(5) } },
+      card: { question: { required, maxLength: maxLength(150) } },
     };
   },
   computed: {
