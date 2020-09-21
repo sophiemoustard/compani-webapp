@@ -12,6 +12,7 @@
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'TitleText',
@@ -29,9 +30,8 @@ export default {
   },
   computed: {
     textErrorMsg () {
-      if (!this.$v.card.text.maxLength) {
-        return `${this.$v.card.text.$params.maxLength.max} caractères autorisés.`;
-      }
+      if (!this.$v.card.text.required) return REQUIRED_LABEL;
+      if (!this.$v.card.text.maxLength) return `${this.$v.card.text.$params.maxLength.max} caractères autorisés.`;
       return '';
     },
   },
