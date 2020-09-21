@@ -20,7 +20,7 @@ import { required, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import { SURVEY_LABEL_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
+import { SURVEY_LABEL_MAX_LENGTH, REQUIRED_LABEL, QUESTION_MAX_LENGTH } from '@data/constants';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
@@ -35,7 +35,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required, maxLength: maxLength(150) },
+        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         label: {
           left: { required: requiredIf(item => !!item.right), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
           right: { required: requiredIf(item => !!item.left), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
@@ -47,7 +47,7 @@ export default {
     questionErrorMsg () {
       if (!this.$v.card.question.required) return REQUIRED_LABEL;
       if (!this.$v.card.question.maxLength) {
-        return `${this.$v.card.question.$params.maxLength.max} caractères maximum.`;
+        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
       }
       return '';
     },
