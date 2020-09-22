@@ -118,9 +118,6 @@ export const validCaractersTags = (value) => {
   return gapAcc.every(v => validCaracters(v));
 };
 
-// value.length can be 0 in front validation, to authorize field clear
-export const validAnswerLength = value => value.length >= 0 && value.length <= GAP_ANSWER_MAX_LENGTH;
-
 export const validTagLength = (value) => {
   if (!value) return true;
   const { gapAcc } = parseTagCode(value);

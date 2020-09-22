@@ -129,8 +129,10 @@ export default {
       return '';
     },
     answersError (index) {
-      return this.requiredAnswerIsMissing(index) || this.requiredOneCorrectAnswer(index) ||
-        this.removeSingleCorrectAnswer(index) || this.$v.card.qcmAnswers.$each[index].$error;
+      const exceedCharLength = this.$v.card.qcmAnswers.$each[index].$error;
+      const missingField = this.requiredAnswerIsMissing(index) || this.requiredOneCorrectAnswer(index) ||
+        this.removeSingleCorrectAnswer(index);
+      return exceedCharLength || missingField;
     },
   },
 };
