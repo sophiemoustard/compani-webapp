@@ -19,7 +19,7 @@ const routes = [
         if (!userVendorRole) return next({ path: '/' });
 
         if (userVendorRole === TRAINER) return next({ name: 'trainers courses' });
-        return next({ name: 'ni management courses' });
+        return next({ name: 'ni management blended courses' });
       } catch (e) {
         console.error(e);
       }
@@ -79,7 +79,7 @@ const routes = [
         props: true,
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni management courses info') to.params.defaultTab = 'courses';
+            if (from.name === 'ni management blended courses info') to.params.defaultTab = 'courses';
 
             return next();
           } catch (e) {
@@ -130,18 +130,18 @@ const routes = [
         },
       },
       {
-        path: 'ni/management/courses',
-        name: 'ni management courses',
-        component: () => import('src/modules/vendor/pages/ni/management/CoursesDirectory'),
+        path: 'ni/management/blended-courses',
+        name: 'ni management blended courses',
+        component: () => import('src/modules/vendor/pages/ni/management/BlendedCoursesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'management',
         },
       },
       {
-        path: 'ni/management/courses/:courseId',
-        name: 'ni management courses info',
-        component: () => import('src/core/pages/courses/CourseProfile'),
+        path: 'ni/management/blended-courses/:courseId',
+        name: 'ni management blended courses info',
+        component: () => import('src/core/pages/courses/BlendedCourseProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -151,7 +151,7 @@ const routes = [
       {
         path: 'trainers/management/courses',
         name: 'trainers courses',
-        component: () => import('src/modules/vendor/pages/trainers/management/CoursesDirectory'),
+        component: () => import('src/modules/vendor/pages/trainers/management/BlendedCoursesDirectory'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -161,7 +161,7 @@ const routes = [
       {
         path: 'trainers/management/courses/:courseId',
         name: 'trainers courses info',
-        component: () => import('src/core/pages/courses/CourseProfile'),
+        component: () => import('src/core/pages/courses/BlendedCourseProfile'),
         async beforeEnter (to, from, next) {
           await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
           const { course } = store.state.course;

@@ -1,6 +1,6 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Formations" class="q-mb-xl" />
+    <ni-title-header title="Formations mixtes" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
@@ -46,7 +46,7 @@ import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
-  name: 'CoursesDirectory',
+  name: 'BlendedCoursesDirectory',
   mixins: [courseFiltersMixin],
   components: {
     'ni-title-header': TitleHeader,
