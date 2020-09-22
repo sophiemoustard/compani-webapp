@@ -8,7 +8,7 @@
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
-import { REQUIRED_LABEL, QUESTION_MAX_LENGTH } from '@data/constants';
+import { QUESTION_MAX_LENGTH } from '@data/constants';
 
 export default {
   name: 'TitleText',
@@ -23,15 +23,6 @@ export default {
     return {
       card: { question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) } },
     };
-  },
-  computed: {
-    questionErrorMsg () {
-      if (!this.$v.card.question.required) return REQUIRED_LABEL;
-      if (!this.$v.card.question.maxLength) {
-        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-      }
-      return '';
-    },
   },
 };
 </script>

@@ -59,13 +59,6 @@ export default {
     falsyAnswersInitialized () {
       return this.card.falsyAnswers.length === SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT;
     },
-    questionErrorMsg () {
-      if (!this.$v.card.question.required) return REQUIRED_LABEL;
-      if (!this.$v.card.question.maxLength) {
-        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-      }
-      return '';
-    },
     goodAnswerErrorMsg () {
       if (!this.$v.card.qcuGoodAnswer.required) return REQUIRED_LABEL;
       if (!this.$v.card.qcuGoodAnswer.maxLength) {

@@ -19,7 +19,7 @@ import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT, REQUIRED_LABEL, QUESTION_MAX_LENGTH } from '@data/constants';
+import { ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT, QUESTION_MAX_LENGTH } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -44,13 +44,6 @@ export default {
   computed: {
     orderedAnswersInitialized () {
       return this.card.orderedAnswers.length === ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT;
-    },
-    questionErrorMsg () {
-      if (!this.$v.card.question.required) return REQUIRED_LABEL;
-      if (!this.$v.card.question.maxLength) {
-        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-      }
-      return '';
     },
   },
   watch: {

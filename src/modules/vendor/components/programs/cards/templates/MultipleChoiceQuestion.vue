@@ -57,11 +57,6 @@ export default {
     answersInitialized () {
       return this.card.qcmAnswers.length === MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT;
     },
-    questionErrorMsg () {
-      if (!this.$v.card.question.required) return REQUIRED_LABEL;
-      if (!this.$v.card.question.maxLength) return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-      return '';
-    },
   },
   watch: {
     card: {

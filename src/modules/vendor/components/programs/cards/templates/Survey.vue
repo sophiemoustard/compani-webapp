@@ -20,7 +20,7 @@ import { required, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import { SURVEY_LABEL_MAX_LENGTH, REQUIRED_LABEL, QUESTION_MAX_LENGTH } from '@data/constants';
+import { SURVEY_LABEL_MAX_LENGTH, QUESTION_MAX_LENGTH } from '@data/constants';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
@@ -42,15 +42,6 @@ export default {
         },
       },
     };
-  },
-  computed: {
-    questionErrorMsg () {
-      if (!this.$v.card.question.required) return REQUIRED_LABEL;
-      if (!this.$v.card.question.maxLength) {
-        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-      }
-      return '';
-    },
   },
   methods: {
     labelErrorMessage (label) {
