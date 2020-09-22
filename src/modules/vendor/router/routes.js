@@ -149,6 +149,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/management/elearning-courses',
+        name: 'ni management elearning courses',
+        component: () => import('src/modules/vendor/pages/ni/management/ELearningCoursesDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'management',
+        },
+      },
+      {
         path: 'trainers/management/courses',
         name: 'trainers courses',
         component: () => import('src/modules/vendor/pages/trainers/management/BlendedCoursesDirectory'),
