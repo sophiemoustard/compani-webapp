@@ -3,6 +3,7 @@ import axios from 'axios';
 import moment from 'moment';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
+import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;
@@ -118,13 +119,13 @@ export const validCaractersTags = (value) => {
 };
 
 // value.length can be 0 in front validation, to authorize field clear
-export const validAnswerLength = value => value.length >= 0 && value.length < 16;
+export const validAnswerLength = value => value.length >= 0 && value.length <= GAP_ANSWER_MAX_LENGTH;
 
 export const validTagLength = (value) => {
   if (!value) return true;
   const { gapAcc } = parseTagCode(value);
 
-  return gapAcc.every(v => v.length > 0 && v.length < 16);
+  return gapAcc.every(v => v.length > 0 && v.length <= GAP_ANSWER_MAX_LENGTH);
 };
 
 export const validTagsCount = (value) => {

@@ -1,8 +1,8 @@
 <template v-if="orderedAnswersInitialized">
   <div>
     <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field :disable="disableEdition"
-      @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error"
-      :error-message="questionErrorMsg" type="textarea" />
+      @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea"
+      :error-message="questionErrorMsg" />
     <div class="q-mb-lg">
       <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
         v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"

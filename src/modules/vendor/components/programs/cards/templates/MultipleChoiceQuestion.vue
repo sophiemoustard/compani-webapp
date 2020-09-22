@@ -24,7 +24,8 @@ import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, REQUIRED_LABEL, QUESTION_MAX_LENGTH } from '@data/constants';
+import { MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, REQUIRED_LABEL, QUESTION_MAX_LENGTH,
+  QC_ANSWER_MAX_LENGTH } from '@data/constants';
 import { minLabelArrayLength, minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -44,6 +45,9 @@ export default {
         qcmAnswers: {
           minLength: minLabelArrayLength(2),
           minOneCorrectAnswer,
+          $each: {
+            label: { maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
+          },
         },
         explanation: { required },
       },
@@ -55,9 +59,7 @@ export default {
     },
     questionErrorMsg () {
       if (!this.$v.card.question.required) return REQUIRED_LABEL;
-      if (!this.$v.card.question.maxLength) {
-        return `${QUESTION_MAX_LENGTH} caractères maximum.`;
-      }
+      if (!this.$v.card.question.maxLength) return `${QUESTION_MAX_LENGTH} caractères maximum.`;
       return '';
     },
   },
@@ -126,12 +128,14 @@ export default {
       if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
         return 'Une bonne réponse est nécessaire.';
       }
-
+      if (!this.$v.card.qcmAnswers.$each[index].label.maxLength) {
+        return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+      }
       return '';
     },
     answersError (index) {
       return this.requiredAnswerIsMissing(index) || this.requiredOneCorrectAnswer(index) ||
-        this.removeSingleCorrectAnswer(index);
+        this.removeSingleCorrectAnswer(index) || this.$v.card.qcmAnswers.$each[index].$error;
     },
   },
 };
