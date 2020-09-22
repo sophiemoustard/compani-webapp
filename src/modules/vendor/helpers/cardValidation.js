@@ -15,6 +15,8 @@ import {
   SURVEY,
   SURVEY_LABEL_MAX_LENGTH,
   OPEN_QUESTION,
+  QUESTION_MAX_LENGTH,
+  QC_ANSWER_MAX_LENGTH,
 } from '@data/constants';
 
 const cardSchema = (card) => {
@@ -60,22 +62,27 @@ const cardSchema = (card) => {
       });
     case SINGLE_CHOICE_QUESTION:
       return Joi.object().keys({
-        question: Joi.string().required(),
+        question: Joi.string().required().max(QUESTION_MAX_LENGTH),
         qcuGoodAnswer: Joi.string().required(),
-        falsyAnswers: Joi.array().items(Joi.string()).min(1).max(SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT),
+        falsyAnswers: Joi.array().items(
+          Joi.string().max(QC_ANSWER_MAX_LENGTH)
+        ).min(1).max(SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT),
         explanation: Joi.string().required(),
       });
     case ORDER_THE_SEQUENCE:
       return Joi.object().keys({
-        question: Joi.string().required(),
+        question: Joi.string().required().max(QUESTION_MAX_LENGTH),
         orderedAnswers: Joi.array().items(Joi.string()).min(2).max(3),
         explanation: Joi.string().required(),
       });
     case MULTIPLE_CHOICE_QUESTION:
       return Joi.object().keys({
-        question: Joi.string().required(),
+        question: Joi.string().required().max(QUESTION_MAX_LENGTH),
         qcmAnswers: Joi.array()
-          .items(Joi.object({ label: Joi.string().required(), correct: Joi.boolean().required() }))
+          .items(Joi.object({
+            label: Joi.string().required().max(QC_ANSWER_MAX_LENGTH),
+            correct: Joi.boolean().required(),
+          }))
           .has(Joi.object({ correct: true }))
           .min(2)
           .max(MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT),
@@ -83,7 +90,7 @@ const cardSchema = (card) => {
       });
     case SURVEY:
       return Joi.object().keys({
-        question: Joi.string().required(),
+        question: Joi.string().required().max(QUESTION_MAX_LENGTH),
         label: Joi.alternatives().try(
           Joi.object().keys({
             left: Joi.string().valid('', null),
@@ -97,7 +104,7 @@ const cardSchema = (card) => {
       });
     case OPEN_QUESTION:
       return Joi.object().keys({
-        question: Joi.string().required(),
+        question: Joi.string().required().max(QUESTION_MAX_LENGTH),
       });
     default:
       return Joi.object().keys();
