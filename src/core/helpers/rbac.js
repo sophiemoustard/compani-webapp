@@ -82,8 +82,8 @@ const vendorAdminRoutes = [
   { name: 'ni config programs' },
   { name: 'ni config programs info' },
   { name: 'ni config activity info' },
-  { name: 'ni management courses' },
-  { name: 'ni management courses info' },
+  { name: 'ni management blended courses' },
+  { name: 'ni management blended courses info' },
   { name: 'account vendor' },
 ];
 const trainingOrgnaisationManagerRoutes = [
@@ -96,8 +96,8 @@ const trainingOrgnaisationManagerRoutes = [
   { name: 'ni config programs' },
   { name: 'ni config programs info' },
   { name: 'ni config activity info' },
-  { name: 'ni management courses' },
-  { name: 'ni management courses info' },
+  { name: 'ni management blended courses' },
+  { name: 'ni management blended courses info' },
   { name: 'account vendor' },
 ];
 const trainerRoutes = [

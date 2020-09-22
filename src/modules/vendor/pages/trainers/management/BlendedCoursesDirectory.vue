@@ -1,9 +1,9 @@
 <template>
-  <q-page class="client-background" padding>
+  <q-page class="vendor-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :options="trainerFilterOptions" v-model="selectedTrainer" />
+        <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
@@ -13,28 +13,26 @@
         <span>Effacer les filtres</span>
       </div>
     </div>
-
     <ni-trello :courses="coursesFiltered" />
   </q-page>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import get from 'lodash/get';
 import Courses from '@api/Courses';
-import Select from '@components/form/Select';
 import TitleHeader from '@components/TitleHeader';
 import Trello from '@components/courses/Trello';
+import Select from '@components/form/Select';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
-  name: 'CoursesDirectory',
+  name: 'BlendedCoursesDirectory',
   mixins: [courseFiltersMixin],
   components: {
-    'ni-select': Select,
     'ni-title-header': TitleHeader,
     'ni-trello': Trello,
+    'ni-select': Select,
   },
   data () {
     return {
@@ -50,7 +48,7 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list({ company: get(this.loggedUser, 'company._id') || '' });
+        const courses = await Courses.list({ trainer: this.loggedUser._id });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);

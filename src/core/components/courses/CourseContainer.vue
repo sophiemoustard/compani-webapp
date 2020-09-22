@@ -2,7 +2,7 @@
   <div :class="`course-container ${backgroundClass}`">
     <div class="text-weight-bold q-mb-sm">{{ title }}</div>
     <course-cell class="q-mb-sm" v-for="(course, index) in courses" :key="index" :course="course"
-      @click="goToCourseProfile" />
+      @click="goToBlendedCourseProfile" />
   </div>
 </template>
 
@@ -33,10 +33,10 @@ export default {
     },
   },
   methods: {
-    goToCourseProfile (course) {
+    goToBlendedCourseProfile (course) {
       let name = '';
       if (this.interfaceType === VENDOR) {
-        name = this.vendorRole === TRAINER ? 'trainers courses info' : 'ni management courses info';
+        name = this.vendorRole === TRAINER ? 'trainers courses info' : 'ni management blended courses info';
       } else {
         name = 'ni courses info';
       }
