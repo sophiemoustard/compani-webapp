@@ -26,6 +26,7 @@ import Select from '@components/form/Select';
 import TitleHeader from '@components/TitleHeader';
 import Trello from '@components/courses/Trello';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
+import { BLENDED } from '@data/constants';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -50,7 +51,7 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list({ company: get(this.loggedUser, 'company._id') || '' });
+        const courses = await Courses.list({ company: get(this.loggedUser, 'company._id') || '', format: BLENDED });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
