@@ -41,7 +41,7 @@ import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
+import { INTRA, COURSE_TYPES, INTER_B2B, BLENDED } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 
 export default {
@@ -92,7 +92,7 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list();
+        const courses = await Courses.list({ format: BLENDED });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
