@@ -4,7 +4,7 @@
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
     <ni-input caption="Bonne réponse" v-model.trim="card.qcuGoodAnswer" required-field class="q-my-lg"
-    @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
+      @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.falsyAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
@@ -47,9 +47,7 @@ export default {
         falsyAnswers: {
           required,
           minLength: minArrayLength(1),
-          $each: {
-            maxLength: maxLength(QC_ANSWER_MAX_LENGTH),
-          },
+          $each: { maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
         },
         explanation: { required },
       },
@@ -89,7 +87,7 @@ export default {
     falsyAnswerError (index) {
       const exceedCharLength = this.$v.card.falsyAnswers.$each[index].$error;
       const missingField = this.$v.card.falsyAnswers.$error &&
-      !this.$v.card.falsyAnswers.minLength && index === 0 && !this.card.falsyAnswers[index];
+        !this.$v.card.falsyAnswers.minLength && index === 0 && !this.card.falsyAnswers[index];
 
       return exceedCharLength || missingField;
     },

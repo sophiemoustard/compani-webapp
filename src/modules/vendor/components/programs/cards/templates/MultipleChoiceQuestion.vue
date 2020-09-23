@@ -89,8 +89,9 @@ export default {
         if (this.tmpInput === get(this.card, `answers[${index}].label`)) return;
 
         this.$v.card.qcmAnswers.$touch();
-        if (this.requiredAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
-        if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
+        if (this.requiredAnswerIsMissing(index) || this.$v.card.qcmAnswers.$each[index].$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        } if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
           return NotifyWarning('Une bonne réponse est nécessaire.');
         }
 
