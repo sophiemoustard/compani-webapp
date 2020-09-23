@@ -9,7 +9,7 @@ const routes = [
     component: () => import('src/core/pages/DocumentSigned'),
     props: route => ({ signed: route.query.signed }),
   },
-  { path: '/trainees/courses/:courseId', component: () => import('src/core/pages/courses/CourseInfo') },
+  { path: '/trainees/courses/:courseId', component: () => import('src/core/pages/courses/BlendedCourseInfo') },
   {
     // Always leave this as last one
     path: '*',

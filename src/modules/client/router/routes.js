@@ -277,7 +277,7 @@ const routes = [
       {
         path: 'ni/courses',
         name: 'ni courses',
-        component: () => import('src/modules/client/pages/ni/courses/CoursesDirectory'),
+        component: () => import('src/modules/client/pages/ni/courses/BlendedCoursesDirectory'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -287,7 +287,7 @@ const routes = [
       {
         path: 'ni/courses/:courseId',
         name: 'ni courses info',
-        component: () => import('src/core/pages/courses/CourseProfile'),
+        component: () => import('src/core/pages/courses/BlendedCourseProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

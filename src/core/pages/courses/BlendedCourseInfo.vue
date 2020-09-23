@@ -89,7 +89,7 @@ import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   metaInfo: { title: 'Formation' },
-  name: 'CourseInfo',
+  name: 'BlendedCourseInfo',
   mixins: [courseMixin],
   components: {
     'ni-html-modal': HtmlModal,
