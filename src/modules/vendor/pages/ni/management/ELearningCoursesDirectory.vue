@@ -68,12 +68,11 @@ export default {
         this.tableLoading = true;
         const courseList = await Courses.list({ format: STRICTLY_E_LEARNING });
 
-        this.courses = courseList
-          .map(c => ({
-            name: c.subProgram.program.name,
-            noDiacriticsName: removeDiacritics(c.subProgram.program.name),
-            createdAt: c.createdAt,
-          }));
+        this.courses = courseList.map(c => ({
+          name: c.subProgram.program.name,
+          noDiacriticsName: removeDiacritics(c.subProgram.program.name),
+          createdAt: c.createdAt,
+        }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formations.');
