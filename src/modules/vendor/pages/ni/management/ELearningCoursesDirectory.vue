@@ -16,7 +16,7 @@ import { removeDiacritics } from '@helpers/utils';
 import { STRICTLY_E_LEARNING } from '@data/constants';
 
 export default {
-  metaInfo: { title: 'Catalogue' },
+  metaInfo: { title: 'Repertoire formation eLearning' },
   name: 'ELearningCoursesDirectory',
   components: {
     'ni-directory-header': DirectoryHeader,
@@ -29,7 +29,7 @@ export default {
         { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
       ],
       courses: [],
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
+      pagination: { page: 1, rowsPerPage: 15 },
       searchStr: '',
     };
   },
@@ -51,7 +51,13 @@ export default {
         this.tableLoading = true;
         const courseList = await Courses.list({ format: STRICTLY_E_LEARNING });
 
-        this.courses = courseList.map(c => ({ name: c.misc, noDiacriticsName: 'wip' })); // WIIIIP
+        this.courses = courseList
+          .map(c => ({
+            name: c.subProgram.program.name,
+            noDiacriticsName: removeDiacritics(c.subProgram.program.name),
+            createdAt: c.createdAt,
+          }))
+          .sort((a, b) => (this.$moment(b.createdAt).toDate()) - (this.$moment(a.createdAt).toDate()));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formations.');
