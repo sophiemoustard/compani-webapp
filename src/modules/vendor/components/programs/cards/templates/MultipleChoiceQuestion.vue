@@ -91,7 +91,8 @@ export default {
         this.$v.card.qcmAnswers.$touch();
         if (this.requiredAnswerIsMissing(index) || this.$v.card.qcmAnswers.$each[index].$error) {
           return NotifyWarning('Champ(s) invalide(s)');
-        } if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
+        }
+        if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
           return NotifyWarning('Une bonne réponse est nécessaire.');
         }
 
@@ -106,7 +107,9 @@ export default {
     },
     async updateCorrectAnswer (index) {
       try {
-        if (!this.card.qcmAnswers[index].label) return NotifyWarning('Champ(s) invalide(s)');
+        if (!this.card.qcmAnswers[index].label || this.$v.card.qcmAnswers.$each[index].$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
         if (this.requiredOneCorrectAnswer(index)) return NotifyWarning('Une bonne réponse est nécessaire.');
 
         await Cards.updateById(this.card._id, { qcmAnswers: this.formatAnswersPayload() });
