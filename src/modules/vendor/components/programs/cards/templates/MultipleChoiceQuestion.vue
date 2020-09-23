@@ -1,7 +1,8 @@
 <template>
   <div v-if="answersInitialized">
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" :disable="disableEdition" />
+      @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
+      type="textarea" :disable="disableEdition" />
     <div class="q-my-xl">
       <div v-for="(qcmAnswers, i) in card.qcmAnswers" :key="i" class="answers">
         <ni-input :caption="`Réponse ${i + 1}`" v-model.trim="card.qcmAnswers[i].label" :required-field="i < 2"
@@ -19,11 +20,12 @@
 <script>
 import times from 'lodash/times';
 import get from 'lodash/get';
-import { required } from 'vuelidate/lib/validators';
+import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, REQUIRED_LABEL } from '@data/constants';
+import { MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT, REQUIRED_LABEL, QUESTION_MAX_LENGTH,
+  QC_ANSWER_MAX_LENGTH } from '@data/constants';
 import { minLabelArrayLength, minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -39,10 +41,13 @@ export default {
   validations () {
     return {
       card: {
-        question: { required },
+        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcmAnswers: {
           minLength: minLabelArrayLength(2),
           minOneCorrectAnswer,
+          $each: {
+            label: { maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
+          },
         },
         explanation: { required },
       },
@@ -84,7 +89,9 @@ export default {
         if (this.tmpInput === get(this.card, `answers[${index}].label`)) return;
 
         this.$v.card.qcmAnswers.$touch();
-        if (this.requiredAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.requiredAnswerIsMissing(index) || this.$v.card.qcmAnswers.$each[index].$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
         if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
           return NotifyWarning('Une bonne réponse est nécessaire.');
         }
@@ -100,7 +107,9 @@ export default {
     },
     async updateCorrectAnswer (index) {
       try {
-        if (!this.card.qcmAnswers[index].label) return NotifyWarning('Champ(s) invalide(s)');
+        if (!this.card.qcmAnswers[index].label || this.$v.card.qcmAnswers.$each[index].$error) {
+          return NotifyWarning('Champ(s) invalide(s)');
+        }
         if (this.requiredOneCorrectAnswer(index)) return NotifyWarning('Une bonne réponse est nécessaire.');
 
         await Cards.updateById(this.card._id, { qcmAnswers: this.formatAnswersPayload() });
@@ -118,12 +127,16 @@ export default {
       if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
         return 'Une bonne réponse est nécessaire.';
       }
-
+      if (!this.$v.card.qcmAnswers.$each[index].label.maxLength) {
+        return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+      }
       return '';
     },
     answersError (index) {
-      return this.requiredAnswerIsMissing(index) || this.requiredOneCorrectAnswer(index) ||
+      const exceedCharLength = this.$v.card.qcmAnswers.$each[index].$error;
+      const missingField = this.requiredAnswerIsMissing(index) || this.requiredOneCorrectAnswer(index) ||
         this.removeSingleCorrectAnswer(index);
+      return exceedCharLength || missingField;
     },
   },
 };

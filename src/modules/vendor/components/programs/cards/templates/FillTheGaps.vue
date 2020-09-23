@@ -17,18 +17,17 @@
 <script>
 import Input from '@components/form/Input';
 import times from 'lodash/times';
-import { required } from 'vuelidate/lib/validators';
+import { required, maxLength } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Cards from '@api/Cards';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { REQUIRED_LABEL, FILL_THE_GAPS_MAX_ANSWERS_COUNT } from '@data/constants';
+import { REQUIRED_LABEL, FILL_THE_GAPS_MAX_ANSWERS_COUNT, GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 import {
   validTagging,
   validAnswerInTag,
   validCaractersTags,
   validTagLength,
   validTagsCount,
-  validAnswerLength,
   validCaracters,
   minArrayLength,
 } from '@helpers/vuelidateCustomVal';
@@ -49,7 +48,7 @@ export default {
         gappedText: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
         falsyAnswers: {
           minLength: minArrayLength(2),
-          $each: { validCaracters, validAnswerLength },
+          $each: { validCaracters, maxLength: maxLength(GAP_ANSWER_MAX_LENGTH) },
         },
         explanation: { required },
       },
@@ -94,8 +93,8 @@ export default {
       return this.$v.card.falsyAnswers.$each[index].$error || this.requiredFalsyAnswerIsMissing(index);
     },
     falsyAnswersErrorMsg (index) {
-      if (!this.$v.card.falsyAnswers.$each[index].validAnswerLength) {
-        return 'Le nombre de caractères doit être entre 1 et 15';
+      if (!this.$v.card.falsyAnswers.$each[index].maxLength) {
+        return `${GAP_ANSWER_MAX_LENGTH} caractères maximum.`;
       }
       if (!this.$v.card.falsyAnswers.$each[index].validCaracters) {
         return 'Caractère invalide détecté (seuls - \' ESPACE permis)';

@@ -1,7 +1,8 @@
 <template>
   <div>
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
-      @blur="updateCard('question')" :error="$v.card.question.$error" :disable="disableEdition" />
+      @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
+      :disable="disableEdition" />
     <div class="row gutter-profile">
       <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model.trim="card.label.left"
         @focus="saveTmp('label.left')" @blur="updateCardLabel('left')" :error="$v.card.label.left.$error"
@@ -19,7 +20,7 @@ import { required, requiredIf, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Input from '@components/form/Input';
-import { SURVEY_LABEL_MAX_LENGTH } from '@data/constants';
+import { SURVEY_LABEL_MAX_LENGTH, QUESTION_MAX_LENGTH } from '@data/constants';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
 export default {
@@ -34,7 +35,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required },
+        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         label: {
           left: { required: requiredIf(item => !!item.right), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
           right: { required: requiredIf(item => !!item.left), maxLength: maxLength(SURVEY_LABEL_MAX_LENGTH) },
