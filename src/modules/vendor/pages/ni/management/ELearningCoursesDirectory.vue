@@ -26,10 +26,27 @@ export default {
     return {
       tableLoading: false,
       columns: [
-        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
+        {
+          name: 'name',
+          label: 'Nom',
+          field: 'name',
+          align: 'left',
+          sortable: true,
+          style: 'min-width: 200px; width: 70%',
+        },
+        {
+          name: 'createdAt',
+          label: 'Créée le...',
+          field: 'createdAt',
+          align: 'left',
+          sortable: true,
+          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (this.$moment(b).toDate()) - (this.$moment(a).toDate()),
+          style: 'min-width: 110px; width: 10%',
+        },
       ],
       courses: [],
-      pagination: { page: 1, rowsPerPage: 15 },
+      pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
     };
   },
@@ -56,8 +73,7 @@ export default {
             name: c.subProgram.program.name,
             noDiacriticsName: removeDiacritics(c.subProgram.program.name),
             createdAt: c.createdAt,
-          }))
-          .sort((a, b) => (this.$moment(b.createdAt).toDate()) - (this.$moment(a.createdAt).toDate()));
+          }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des formations.');
