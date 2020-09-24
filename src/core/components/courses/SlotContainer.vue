@@ -35,7 +35,7 @@
       <div class="q-mt-md" v-if="canEdit" align="right">
         <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
           :disable="loading || addDateToPlanloading" @click="creationModal = true" />
-        <ni-button v-if="!isClientInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
+        <ni-button v-if="isVendorInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
           icon="add" @click="addDateToPlan" :disable="addDateToPlanloading" />
       </div>
     </div>
@@ -83,7 +83,7 @@ export default {
     'ni-button': Button,
   },
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    const isVendorInterface = /\/ad\//.test(this.$router.currentRoute.path);
 
     return {
       courseSlots: {},
@@ -120,7 +120,7 @@ export default {
           fullAddress: { frAddress },
         },
       },
-      isClientInterface,
+      isVendorInterface,
     };
   },
   validations () {
