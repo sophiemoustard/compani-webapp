@@ -113,13 +113,12 @@ export default {
         if (this.requiredOneCorrectAnswer(index)) return NotifyWarning('Une bonne réponse est nécessaire.');
 
         await Cards.updateById(this.card._id, { qcmAnswers: this.formatAnswersPayload() });
+        await this.refreshCard();
 
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
-      } finally {
-        await this.refreshCard();
       }
     },
     answersErrorMsg (index) {
