@@ -55,7 +55,7 @@ const cardSchema = (card) => {
     case FILL_THE_GAPS:
       return Joi.object().keys({
         gappedText: Joi.string().required(),
-        answers: Joi.array().items(
+        falsyGapAnswers: Joi.array().items(
           Joi.object({ label: Joi.string().required().max(QC_ANSWER_MAX_LENGTH) })
         ).min(2).max(FILL_THE_GAPS_MAX_ANSWERS_COUNT),
         explanation: Joi.string().required(),
@@ -64,7 +64,7 @@ const cardSchema = (card) => {
       return Joi.object().keys({
         question: Joi.string().required().max(QUESTION_MAX_LENGTH),
         qcuGoodAnswer: Joi.string().required().max(QC_ANSWER_MAX_LENGTH),
-        falsyAnswers: Joi.array().items(
+        qcuFalsyAnswers: Joi.array().items(
           Joi.string().max(QC_ANSWER_MAX_LENGTH)
         ).min(1).max(SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT),
         explanation: Joi.string().required(),
