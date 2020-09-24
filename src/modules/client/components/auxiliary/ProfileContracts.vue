@@ -13,79 +13,24 @@
       </ni-banner>
     </div>
 
-    <!-- New contract modal -->
-    <ni-modal v-model="newContractModal" @hide="resetContractCreationModal">
-      <template slot="title">
-        Créer un <span class="text-weight-bold">nouveau contrat</span>
-      </template>
-      <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" v-model="newContract.weeklyHours"
-        :error="$v.newContract.weeklyHours.$error" :error-messsage="weeklyHoursError($v.newContract)"
-        @blur="$v.newContract.weeklyHours.$touch" suffix="h" required-field />
-      <ni-input in-modal caption="Taux horaire" :error="$v.newContract.grossHourlyRate.$error" type="number"
-        v-model="newContract.grossHourlyRate" @blur="$v.newContract.grossHourlyRate.$touch" suffix="€" required-field
-        :error-messsage="grossHourlyRateError($v.newContract)" />
-      <ni-date-input caption="Date d'effet" :error="$v.newContract.startDate.$error" :min="contractMinStartDate"
-        v-model="newContract.startDate" in-modal required-field />
-      <div class="row margin-input last">
-        <div class="col-12">
-          <q-checkbox dense v-model="newContract.shouldBeSigned" label="Signature en ligne" />
-        </div>
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le contrat" icon-right="add" color="primary"
-          :loading="loading" @click="createContract" />
-      </template>
-    </ni-modal>
+    <contract-creation-modal v-model="newContractModal" @hide="resetContractCreationModal" @submit="createContract"
+      :new-contract="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
+      :gross-hourly-rate-error="grossHourlyRateError($v.newContract)" :validations="$v.newContract"
+      :contract-min-start-date="contractMinStartDate" />
 
-    <!-- New version modal -->
-    <ni-modal v-model="newVersionModal" @hide="resetVersionCreationModal">
-      <template slot="title">
-        Créer une <span class="text-weight-bold">version</span>
-      </template>
-      <ni-input in-modal caption="Volume horaire hebdomadaire" v-model="newVersion.weeklyHours" type="number"
-        :error="$v.newVersion.weeklyHours.$error" :error-messsage="weeklyHoursError($v.newVersion)"
-        @blur="$v.newVersion.weeklyHours.$touch" suffix="h" required-field />
-      <ni-input in-modal caption="Taux horaire" :error="$v.newVersion.grossHourlyRate.$error"
-        v-model="newVersion.grossHourlyRate" type="number" suffix="€" required-field
-        @blur="$v.newVersion.grossHourlyRate.$touch" :error-messsage="grossHourlyRateError($v.newVersion)" />
-      <ni-date-input caption="Date d'effet" :error="$v.newVersion.startDate.$error" v-model="newVersion.startDate"
-        :min="newVersionMinStartDate" in-modal required-field />
-      <div class="row margin-input last">
-        <div class="col-12">
-          <q-checkbox dense v-model="newVersion.shouldBeSigned" label="Signature en ligne" />
-        </div>
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'avenant" icon-right="add" color="primary"
-          :loading="loading" @click="createVersion" />
-      </template>
-    </ni-modal>
+    <version-creation-modal v-model="newVersionModal" :gross-hourly-rate-error="grossHourlyRateError($v.newVersion)"
+      :new-version-min-start-date="newVersionMinStartDate" :new-version="newVersion" :validations="$v.newVersion"
+      :weekly-hours-error="weeklyHoursError($v.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
+      :loading="loading" />
 
-    <!-- Edition modal -->
     <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
       @hide="resetVersionEditionModal" @submit="editVersion"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
-    <!-- End contract modal -->
-    <ni-modal v-model="endContractModal" @hide="resetEndContractModal">
-      <template slot="title">
-        Terminer un <span class="text-weight-bold">contrat</span>
-      </template>
-      <ni-date-input caption="Date de notification" v-model="endContract.endNotificationDate" in-modal
-        required-field @blur="$v.endContract.endNotificationDate.$touch"
-        :error="$v.endContract.endNotificationDate.$error" />
-      <ni-date-input caption="Date de fin de contrat" v-model="endContract.endDate" :min="contractMinEndDate"
-        in-modal required-field @blur="$v.endContract.endDate.$touch" :error="$v.endContract.endDate.$error" />
-      <ni-select in-modal caption="Motif" :options="endContractReasons" v-model="endContract.endReason" required-field
-        @blur="$v.endContract.endReason.$touch" :error="$v.endContract.endReason.$error" @input="resetOtherMisc" />
-      <ni-input in-modal caption="Autres" v-if="endContract.endReason === OTHER" v-model="endContract.otherMisc"
-        required-field @blur="$v.endContract.otherMisc.$touch" :error="$v.endContract.otherMisc.$error" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary"
-          :loading="loading" @click="endExistingContract" />
-      </template>
-    </ni-modal>
+    <contract-ending-modal v-model="endContractModal" :end-contract="endContract" :validations="$v.endContract"
+      @hide="resetEndContractModal" @submit="endExistingContract" :contract-min-end-date="contractMinEndDate"
+      :end-contract-reasons="endContractReasons" :loading="loading" />
   </div>
 </template>
 
@@ -98,15 +43,14 @@ import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
 import Users from '@api/Users';
 import Events from '@api/Events';
 import Contracts from '@api/Contracts';
-import Select from '@components/form/Select';
-import Input from '@components/form/Input';
 import Banner from '@components/Banner';
-import DateInput from '@components/form/DateInput';
-import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
+import VersionCreationModal from 'src/modules/client/components/contracts/VersionCreationModal';
+import ContractCreationModal from 'src/modules/client/components/contracts/ContractCreationModal';
+import ContractEndingModal from 'src/modules/client/components/contracts/ContractEndingModal';
 import {
   END_CONTRACT_REASONS,
   OTHER,
@@ -122,12 +66,11 @@ export default {
     profileId: { type: String, required: true },
   },
   components: {
-    'ni-select': Select,
-    'ni-input': Input,
-    'ni-date-input': DateInput,
     'ni-contracts-cell': ContractsCell,
-    'ni-modal': Modal,
     'version-edition-modal': VersionEditionModal,
+    'version-creation-modal': VersionCreationModal,
+    'contract-creation-modal': ContractCreationModal,
+    'contract-ending-modal': ContractEndingModal,
     'ni-banner': Banner,
   },
   data () {
@@ -433,12 +376,6 @@ export default {
       this.endContractModal = false;
       this.endContract = {};
       this.$v.endContract.$reset();
-    },
-    resetOtherMisc () {
-      if (this.endContract.endReason !== OTHER && this.endContract.otherMisc) {
-        delete this.endContract.otherMisc;
-        this.$v.endContract.otherMisc.$reset();
-      }
     },
     formatEndContractPayload () {
       const omittedField = ['contract', 'endDate'];
