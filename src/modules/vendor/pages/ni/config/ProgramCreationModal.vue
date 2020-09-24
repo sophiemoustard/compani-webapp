@@ -1,15 +1,15 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-        Créer un nouveau <span class="text-weight-bold">programme</span>
-      </template>
-      <ni-input in-modal v-model.trim="newProgram.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="loading"
-          icon-right="add" @click="submit" />
-      </template>
-    </ni-modal>
+      Créer un nouveau <span class="text-weight-bold">programme</span>
+    </template>
+    <ni-input in-modal v-model.trim="newProgram.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field caption="Nom" />
+    <template slot="footer">
+      <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="loading"
+        icon-right="add" @click="submit" />
+    </template>
+  </ni-modal>
 </template>
 
 <script>
