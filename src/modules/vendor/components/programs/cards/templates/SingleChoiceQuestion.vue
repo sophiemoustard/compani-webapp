@@ -8,8 +8,8 @@
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.qcuFalsyAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
-        v-model.trim="card.qcuFalsyAnswers[i]" :required-field="i === 0" :error="falsyAnswerError(i)"
-        :error-message="falsyAnswerErrorMsg(i)" @focus="saveTmp(`qcuFalsyAnswers[${i}]`)"
+        v-model.trim="card.qcuFalsyAnswers[i]" :required-field="i === 0" :error="qcuFalsyAnswerError(i)"
+        :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcuFalsyAnswers[${i}]`)"
         @blur="updateFalsyAnswer(i)" :disable="disableEdition" />
     </div>
     <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
@@ -72,7 +72,7 @@ export default {
     },
   },
   methods: {
-    falsyAnswerErrorMsg (index) {
+    qcuFalsyAnswerErrorMsg (index) {
       if (!this.$v.card.qcuFalsyAnswers.$each[index].maxLength) {
         return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
       }
@@ -84,7 +84,7 @@ export default {
         i => this.card.qcuFalsyAnswers[i] || ''
       );
     },
-    falsyAnswerError (index) {
+    qcuFalsyAnswerError (index) {
       const exceedCharLength = this.$v.card.qcuFalsyAnswers.$each[index].$error;
       const missingField = this.$v.card.qcuFalsyAnswers.$error &&
         !this.$v.card.qcuFalsyAnswers.minLength && index === 0 && !this.card.qcuFalsyAnswers[index];
@@ -99,7 +99,7 @@ export default {
         if (this.tmpInput === get(this.card, `qcuFalsyAnswers[${index}]`)) return;
 
         this.$v.card.qcuFalsyAnswers.$touch();
-        if (this.falsyAnswerError(index)) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.qcuFalsyAnswerError(index)) return NotifyWarning('Champ(s) invalide(s)');
         await Cards.updateById(this.card._id, { qcuFalsyAnswers: this.formatQcuFalsyAnswersPayload() });
 
         await this.refreshCard();
