@@ -27,6 +27,7 @@ import { Cookies, openURL } from 'quasar';
 import get from 'lodash/get';
 import CustomImg from '@components/form/CustomImg';
 import { NotifyNegative } from '@components/popup/notify';
+import { removeDiacritics } from '@helpers/utils';
 
 export default {
   components: {
@@ -59,7 +60,7 @@ export default {
   },
   computed: {
     additionalFields () {
-      const fields = [{ name: 'fileName', value: this.additionalValue }];
+      const fields = [{ name: 'fileName', value: removeDiacritics(this.additionalValue) }];
       if (!this.cloudinaryStorage) fields.push({ name: 'type', value: this.name });
       return fields;
     },
