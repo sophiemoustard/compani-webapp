@@ -29,7 +29,6 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     newTrainer: { type: Object, default: () => ({}) },
-    activityTypeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
