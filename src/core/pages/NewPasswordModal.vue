@@ -6,7 +6,7 @@
       <ni-input in-modal v-model.trim="userProfile.local.password" type="password" caption="Nouveau mot de passe"
         :error-message="passwordError" required-field @blur="validations.userProfile.local.password.$touch"
         :error="validations.userProfile.local.password.$error" />
-      <ni-input in-modal v-model.trim="passwordConfirmInput" :error="validations.passwordConfirm.$error"
+      <ni-input in-modal :value="passwordConfirm" :error="validations.passwordConfirm.$error"
         type="password" caption="Confirmation mot de passe" :error-message="passwordConfirmError"
         @blur="validations.passwordConfirm.$touch" required-field @input="update" />
       <template slot="footer">
@@ -29,13 +29,7 @@ export default {
     passwordConfirm: { type: String, default: '' },
     passwordConfirmError: { type: String, default: '' },
     value: { type: Boolean, default: false },
-    activityTypeOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
-  },
-  data () {
-    return {
-      passwordConfirmInput: this.passwordConfirm,
-    };
   },
   components: {
     'ni-input': Input,
@@ -51,8 +45,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update () {
-      this.$emit('update', this.passwordConfirmInput);
+    update (event) {
+      this.$emit('update:password-confirm', event.trim());
     },
   },
 };

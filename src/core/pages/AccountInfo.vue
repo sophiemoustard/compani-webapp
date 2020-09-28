@@ -48,9 +48,8 @@
     </div>
 
     <new-password-modal :validations="$v" v-model="newPasswordModal" :user-profile="userProfile"
-      @submit="submitPasswordChange" @hide="resetForm" :loading="loading" @update="passwordConfirm = $event"
-      :password-error="passwordError($v.userProfile.local.password)" :password-confirm="passwordConfirm"
-      :password-confirm-error="passwordConfirmError" />
+      @submit="submitPasswordChange" @hide="resetForm" :loading="loading" :password-confirm.sync="passwordConfirm"
+      :password-error="passwordError($v.userProfile.local.password)" :password-confirm-error="passwordConfirmError" />
 
     <!-- RGPD modal -->
     <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
