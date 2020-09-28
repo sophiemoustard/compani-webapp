@@ -33,7 +33,6 @@ export default {
     loading: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
     emailError: { type: String, default: '' },
-
   },
   components: {
     'ni-input': Input,
