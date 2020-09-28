@@ -47,22 +47,10 @@
       </div>
     </div>
 
-    <!-- New password modal -->
-    <ni-modal v-model="newPasswordModal" @hide="resetForm">
-      <template slot="title">
-        Modifier mon <span class="text-weight-bold">mot de passe</span>
-      </template>
-      <ni-input in-modal v-model.trim="userProfile.local.password" type="password"
-        caption="Nouveau mot de passe" :error-message="passwordError($v.userProfile.local.password)" required-field
-        @blur="$v.userProfile.local.password.$touch" :error="$v.userProfile.local.password.$error" />
-      <ni-input in-modal v-model.trim="passwordConfirm" :error="$v.passwordConfirm.$error" type="password"
-        caption="Confirmation mot de passe" :error-message="passwordConfirmError" @blur="$v.passwordConfirm.$touch"
-        required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
-          icon-right="done" @click="submitPasswordChange" />
-      </template>
-    </ni-modal>
+    <new-password-modal :validations="$v" v-model="newPasswordModal" :user-profile="userProfile"
+      @submit="submitPasswordChange" @hide="resetForm" :loading="loading" @update="passwordConfirm = $event"
+      :password-error="passwordError($v.userProfile.local.password)" :password-confirm="passwordConfirm"
+      :password-confirm-error="passwordConfirmError" />
 
     <!-- RGPD modal -->
     <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
@@ -81,7 +69,6 @@ import Users from '@api/Users';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import HtmlModal from '@components/modal/HtmlModal';
-import Modal from '@components/modal/Modal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import PictureUploader from '@components/PictureUploader';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
@@ -91,6 +78,7 @@ import { userMixin } from '@mixins/userMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
 import rgpd from 'src/statics/rgpd.html';
 import cguCompani from 'src/statics/cguCompani.html';
+import NewPasswordModal from 'src/core/pages/NewPasswordModal';
 
 export default {
   name: 'AccountInfo',
@@ -100,8 +88,8 @@ export default {
     'ni-button': Button,
     'ni-input': Input,
     'ni-html-modal': HtmlModal,
-    'ni-modal': Modal,
     'ni-picture-uploader': PictureUploader,
+    'new-password-modal': NewPasswordModal,
   },
   data () {
     return {
