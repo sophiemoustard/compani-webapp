@@ -7,18 +7,8 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un programme"
       @click="programCreationModal = true" :disable="tableLoading" />
 
-    <!-- Program creation modal -->
-    <ni-modal v-model="programCreationModal" @hide="resetCreationModal">
-      <template slot="title">
-        Créer un nouveau <span class="text-weight-bold">programme</span>
-      </template>
-      <ni-input in-modal v-model.trim="newProgram.name" :error="$v.newProgram.name.$error"
-        @blur="$v.newProgram.name.$touch" required-field caption="Nom" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createProgram" />
-      </template>
-    </ni-modal>
+    <program-creation-modal v-model="programCreationModal" @hide="resetCreationModal" @submit="createProgram"
+      :new-program="newProgram" :validations="$v.newProgram" :loading="modalLoading" />
   </q-page>
 </template>
 
@@ -28,8 +18,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
-import Modal from '@components/modal/Modal';
-import Input from '@components/form/Input';
+import ProgramCreationModal from 'src/modules/vendor/pages/ni/config/ProgramCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
 
@@ -39,8 +28,7 @@ export default {
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
-    'ni-modal': Modal,
-    'ni-input': Input,
+    'program-creation-modal': ProgramCreationModal,
   },
   data () {
     return {

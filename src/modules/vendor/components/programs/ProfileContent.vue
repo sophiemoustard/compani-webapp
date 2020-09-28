@@ -79,29 +79,23 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
       @click="subProgramCreationModal = true" />
 
-    <!-- Sub-program creation modal -->
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
       :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program="newSubProgram" />
 
-    <!-- Step creation modal -->
     <step-creation-modal v-model="stepCreationModal" :new-step="newStep" :step-type-options="stepTypeOptions"
       :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
 
-    <!-- Step edition modal -->
     <step-edition-modal v-model="stepEditionModal" :edited-step="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
-    <!-- Activity creation modal -->
     <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
       :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
       :loading="modalLoading" />
 
-    <!-- Activity reuse modal -->
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
       :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
-    <!-- Activity edition modal -->
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
   </div>
