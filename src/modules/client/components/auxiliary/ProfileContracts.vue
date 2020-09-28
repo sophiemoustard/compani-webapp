@@ -28,7 +28,7 @@
       @hide="resetVersionEditionModal" @submit="editVersion"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
-    <contract-ending-modal v-model="endContractModal" :end-contract="endContract" :validations="$v.endContract"
+    <contract-ending-modal v-model="endContractModal" :contract-to-end="contractToEnd" :validations="$v.contractToEnd"
       @hide="resetEndContractModal" @submit="endExistingContract" :contract-min-end-date="contractMinEndDate"
       :end-contract-reasons="endContractReasons" :loading="loading" />
   </div>
@@ -109,7 +109,7 @@ export default {
       },
       // End contract
       endContractModal: false,
-      endContract: {
+      contractToEnd: {
         endDate: '',
         endNotificationDate: '',
         endReason: '',
@@ -136,7 +136,7 @@ export default {
         grossHourlyRate: { required, minValue: minValue(0) },
         startDate: { required, minDate: this.editedVersionMinStartDate ? minDate(this.editedVersionMinStartDate) : '' },
       },
-      endContract: {
+      contractToEnd: {
         endNotificationDate: { required },
         endDate: { required },
         endReason: { required },
@@ -178,7 +178,7 @@ export default {
     },
     contractMinEndDate () {
       if (this.endContractModal) {
-        const lastVersion = this.endContract.contract.versions[this.endContract.contract.versions.length - 1];
+        const lastVersion = this.contractToEnd.contract.versions[this.contractToEnd.contract.versions.length - 1];
         return this.$moment(lastVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
@@ -369,30 +369,30 @@ export default {
     },
     // End contract
     async openEndContractModal (contract) {
-      this.endContract.contract = contract;
+      this.contractToEnd.contract = contract;
       this.endContractModal = true;
     },
     resetEndContractModal () {
       this.endContractModal = false;
-      this.endContract = {};
-      this.$v.endContract.$reset();
+      this.contractToEnd = {};
+      this.$v.contractToEnd.$reset();
     },
     formatEndContractPayload () {
       const omittedField = ['contract', 'endDate'];
-      if (this.endContract.endReason !== OTHER) omittedField.push('otherMisc');
+      if (this.contractToEnd.endReason !== OTHER) omittedField.push('otherMisc');
 
       return {
-        ...omit(this.endContract, omittedField),
-        endDate: this.$moment(this.endContract.endDate).endOf('day').toISOString(),
+        ...omit(this.contractToEnd, omittedField),
+        endDate: this.$moment(this.contractToEnd.endDate).endOf('day').toISOString(),
       };
     },
     async endExistingContract () {
       try {
-        this.$v.endContract.$touch();
-        if (this.$v.endContract.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.contractToEnd.$touch();
+        if (this.$v.contractToEnd.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await Contracts.update(this.endContract.contract._id, this.formatEndContractPayload());
+        await Contracts.update(this.contractToEnd.contract._id, this.formatEndContractPayload());
         await this.refreshContracts();
         this.resetEndContractModal();
         NotifyPositive('Contrat terminé');
