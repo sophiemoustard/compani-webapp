@@ -1,17 +1,17 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">activité</span>
-      </template>
-      <ni-input in-modal v-model.trim="newActivity.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field caption="Nom" />
-      <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field
-        :error="validations.type.$error" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="loading"
-          icon-right="add" @click="submit" />
-      </template>
-    </ni-modal>
+      Créer une nouvelle <span class="text-weight-bold">activité</span>
+    </template>
+    <ni-input in-modal v-model.trim="newActivity.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field caption="Nom" />
+    <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field
+      :error="validations.type.$error" />
+    <template slot="footer">
+      <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="loading"
+        icon-right="add" @click="submit" />
+    </template>
+  </ni-modal>
 </template>
 
 <script>
