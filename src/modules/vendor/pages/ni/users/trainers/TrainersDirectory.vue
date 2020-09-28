@@ -7,27 +7,10 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un formateur"
       @click="trainerCreationModal = true" :disable="tableLoading" />
 
-    <!-- Trainer creation modal -->
-    <ni-modal v-model="trainerCreationModal" @hide="resetCreationModal">
-      <template slot="title">
-        Créer un nouveau <span class="text-weight-bold">formateur</span>
-      </template>
-      <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainer.local.email" required-field
-        @blur="$v.newTrainer.local.email.$touch" caption="Email" :error="$v.newTrainer.local.email.$error"
-        :error-message="emailError($v.newTrainer)" :last="firstStep" />
-      <template v-if="!firstStep">
-        <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="$v.newTrainer.identity.lastname.$error"
-          @blur="$v.newTrainer.identity.lastname.$touch" required-field caption="Nom" last />
-      </template>
-      <template slot="footer">
-        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
-          :loading="modalLoading" icon-right="add" @click="nextStep" />
-        <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter le formateur" color="primary"
-          :loading="modalLoading" icon-right="add" @click="createTrainer" />
-      </template>
-    </ni-modal>
-  </q-page>
+    <trainer-creation-modal v-model="trainerCreationModal" @hide="resetCreationModal" @submit="createTrainer"
+      :new-trainer="newTrainer" :validations="$v.newTrainer" :loading="modalLoading" @go-to-next-step="nextStep"
+      :email-error="emailError($v.newTrainer)" :first-step="firstStep" />
+</q-page>
 </template>
 
 <script>
@@ -39,12 +22,11 @@ import Roles from '@api/Roles';
 import Email from '@api/Email';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
-import Modal from '@components/modal/Modal';
-import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
+import TrainerCreationModal from 'src/modules/vendor/pages/ni/users/trainers/TrainerCreationModal';
 
 export default {
   metaInfo: { title: 'Répertoire formateurs' },
@@ -52,8 +34,7 @@ export default {
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
-    'ni-modal': Modal,
-    'ni-input': Input,
+    'trainer-creation-modal': TrainerCreationModal,
   },
   mixins: [userMixin],
   data () {
