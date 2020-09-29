@@ -68,7 +68,7 @@
           <div class="q-mb-sm">{{ formatButtonLabel(template.label) }}</div>
           <q-icon v-if="template.value === OPEN_QUESTION" name="mdi-comment-question" size="20px" />
           <q-icon v-if="template.value === SURVEY" name="assessment" size="20px" />
-          <div style="justify-content: space-around; display: flex" v-if="template.value === QUESTION_ANSWER">
+          <div v-if="template.value === QUESTION_ANSWER">
             <q-icon name="mdi-comment-question-outline" size="20px" />
             <q-icon name="check_box" size="20px" />
           </div>
