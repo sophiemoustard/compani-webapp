@@ -26,7 +26,7 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import { TRAINER } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
-import TrainerCreationModal from 'src/modules/vendor/pages/ni/users/trainers/TrainerCreationModal';
+import TrainerCreationModal from 'src/modules/vendor/components/trainers/TrainerCreationModal';
 
 export default {
   metaInfo: { title: 'Répertoire formateurs' },
