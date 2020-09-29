@@ -7,20 +7,9 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" :disable="tableLoading" />
 
-    <!-- Company creation modal -->
-    <ni-modal v-model="companyCreationModal" @hide="resetCreationModal">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">structure</span>
-      </template>
-      <ni-input in-modal v-model.trim="newCompany.name" :error="$v.newCompany.name.$error"
-        @blur="$v.newCompany.name.$touch" required-field caption="Raison sociale" />
-      <ni-option-group v-model="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
-        :error="$v.newCompany.type.$error" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="modalLoading"
-          icon-right="add" @click="createCompany" />
-      </template>
-    </ni-modal>
+    <company-creation-modal v-model="companyCreationModal" :new-company="newCompany" :validations="$v.newCompany"
+      :loading="modalLoading" :company-type-options="companyTypeOptions" @hide="resetCreationModal"
+      @submit="createCompany" />
   </q-page>
 </template>
 
@@ -28,11 +17,9 @@
 import pick from 'lodash/pick';
 import Companies from '@api/Companies';
 import escapeRegExp from 'lodash/escapeRegExp';
-import OptionGroup from '@components/form/OptionGroup';
-import Input from '@components/form/Input';
-import Modal from '@components/modal/Modal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
+import CompanyCreationModal from 'src/modules/vendor/components/companies/CompanyCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANY_TYPES } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
@@ -44,9 +31,7 @@ export default {
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
-    'ni-option-group': OptionGroup,
-    'ni-input': Input,
-    'ni-modal': Modal,
+    'company-creation-modal': CompanyCreationModal,
   },
   mixins: [companyMixin],
   data () {
