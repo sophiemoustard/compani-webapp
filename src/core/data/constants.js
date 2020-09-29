@@ -352,6 +352,7 @@ export const SINGLE_CHOICE_QUESTION = 'single_choice_question';
 export const ORDER_THE_SEQUENCE = 'order_the_sequence';
 export const OPEN_QUESTION = 'open_question';
 export const SURVEY = 'survey';
+export const QUESTION_ANSWER = 'question_answer';
 export const CARD_TEMPLATES = [
   { label: 'Transition', value: TRANSITION, type: LESSON },
   { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA, type: LESSON },
@@ -364,6 +365,7 @@ export const CARD_TEMPLATES = [
   { label: 'Mettre dans l\'ordre', value: ORDER_THE_SEQUENCE, type: QUIZ },
   { label: 'Question ouverte', value: OPEN_QUESTION, type: QUESTIONNAIRE },
   { label: 'Sondage', value: SURVEY, type: QUESTIONNAIRE },
+  { label: 'Question\t&\tRéponse', value: QUESTION_ANSWER, type: QUESTIONNAIRE },
 ];
 export const TEMPLATE_TYPES = {
   [LESSON]: 'Cours',
