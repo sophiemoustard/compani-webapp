@@ -123,9 +123,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
 .sector-label
   color: grey
   font-size: 14px
-
 </style>
