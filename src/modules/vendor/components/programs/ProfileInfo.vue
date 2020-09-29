@@ -7,7 +7,7 @@
           :error="$v.program.name.$error" required-field />
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
+        <ni-input caption="Description" v-model.trim="program.learningGoals" type="textarea"
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
           :error="$v.program.learningGoals.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinary-storage
