@@ -5,7 +5,9 @@
       <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar"></q-item-section>
-          <q-item-section>{{ col.value.name }}</q-item-section>
+          <q-item-section class="auxilary-column">
+            {{ col.value.name }} <div class="sector-label">{{ col.value.sector }}</div>
+          </q-item-section>
         </q-item>
         <template v-else>
           <a v-if="col.value !== '-'" class="text-primary" :href="getPhoneLink(col.value)">{{ col.value }}</a>
@@ -89,6 +91,8 @@ export default {
           name: formattedName,
           picture: get(user, 'picture.link') || null,
           noDiacriticsName: removeDiacritics(formattedName),
+          sector: get(user, 'sector.name'),
+
         },
         phone: get(user, 'contact.phone') || '',
       };
@@ -117,3 +121,14 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+
+.auxilary-column
+  line-height: 1em
+
+.sector-label
+  color: grey
+  font-size: 14px
+
+</style>
