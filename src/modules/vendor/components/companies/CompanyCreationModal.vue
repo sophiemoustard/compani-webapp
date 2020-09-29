@@ -1,16 +1,16 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">structure</span>
-      </template>
-      <ni-input in-modal v-model.trim="newCompany.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field caption="Raison sociale" />
-      <ni-option-group v-model="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
-        :error="validations.type.$error" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
-          icon-right="add" @click="submit" />
-      </template>
+      Créer une nouvelle <span class="text-weight-bold">structure</span>
+    </template>
+    <ni-input in-modal v-model.trim="newCompany.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field caption="Raison sociale" />
+    <ni-option-group v-model="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
+      :error="validations.type.$error" required-field />
+    <template slot="footer">
+      <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
+        icon-right="add" @click="submit" />
+    </template>
   </ni-modal>
 </template>
 

@@ -20,26 +20,8 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
       @click="customerCreationModal = true" :disable="tableLoading" />
 
-    <!-- Customer creation modal -->
-    <ni-modal v-model="customerCreationModal" @hide="resetForm">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">fiche bénéficiaire</span>
-      </template>
-      <ni-select in-modal v-model="newCustomer.identity.title" :error="$v.newCustomer.identity.title.$error"
-        :options="civilityOptions" caption="Civilité" @blur="$v.newCustomer.identity.title.$touch" required-field />
-      <ni-input in-modal v-model.trim="newCustomer.identity.lastname" :error="$v.newCustomer.identity.lastname.$error"
-        caption="Nom" @blur="$v.newCustomer.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model.trim="newCustomer.identity.firstname" caption="Prénom" />
-      <div class="row margin-input last">
-        <ni-search-address v-model="newCustomer.contact.primaryAddress" in-modal required-field
-          :error="$v.newCustomer.contact.primaryAddress.$error" :error-message="primaryAddressError"
-          @blur="$v.newCustomer.contact.primaryAddress.$touch" />
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
-          :loading="loading" @click="createCustomer" />
-      </template>
-    </ni-modal>
+    <customer-creation-modal v-model="customerCreationModal" :new-customer="newCustomer" :loading="loading"
+      :validations="$v.newCustomer" :civility-options="civilityOptions" @hide="resetForm" @submit="createCustomer" />
   </q-page>
 </template>
 
@@ -50,14 +32,11 @@ import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Customers from '@api/Customers';
 import { frAddress } from '@helpers/vuelidateCustomVal';
-import SearchAddress from '@components/form/SearchAddress';
-import Input from '@components/form/Input';
-import Select from '@components/form/Select';
 import DirectoryHeader from '@components/DirectoryHeader';
-import Modal from '@components/modal/Modal';
+import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { REQUIRED_LABEL, CIVILITY_OPTIONS } from '@data/constants';
+import { CIVILITY_OPTIONS } from '@data/constants';
 import { formatIdentity, removeDiacritics } from '@helpers/utils';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
@@ -67,11 +46,8 @@ export default {
   metaInfo: { title: 'Répertoire bénéficiaires' },
   mixins: [validationMixin],
   components: {
-    'ni-search-address': SearchAddress,
-    'ni-input': Input,
-    'ni-select': Select,
     'ni-directory-header': DirectoryHeader,
-    'ni-modal': Modal,
+    'customer-creation-modal': CustomerCreationModal,
     'ni-table-list': TableList,
   },
   data () {
@@ -185,9 +161,6 @@ export default {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
       return customers
         .filter(customer => customer.identity.noDiacriticsName.match(new RegExp(formattedString, 'i')));
-    },
-    primaryAddressError () {
-      return !this.$v.newCustomer.contact.primaryAddress.fullAddress.required ? REQUIRED_LABEL : 'Adresse non valide';
     },
   },
   methods: {
