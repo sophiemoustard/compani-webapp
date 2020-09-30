@@ -111,7 +111,11 @@ export default {
         step: { required },
         dates: {
           startDate: { required },
-          endDate: { required },
+          endDate: {
+            required,
+            greatherThanStartDate (val, { startDate }) { return this.$moment(startDate).isBefore(val); },
+            onSameDayAsStartDate (val, { startDate }) { return this.$moment(startDate).isSame(val, 'day'); },
+          },
         },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
