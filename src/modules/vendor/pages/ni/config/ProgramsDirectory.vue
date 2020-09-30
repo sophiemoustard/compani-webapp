@@ -18,7 +18,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Programs from '@api/Programs';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
-import ProgramCreationModal from 'src/modules/vendor/pages/ni/config/ProgramCreationModal';
+import ProgramCreationModal from 'src/modules/vendor/components/programs/ProgramCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
 
