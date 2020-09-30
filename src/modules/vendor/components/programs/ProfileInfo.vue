@@ -7,9 +7,9 @@
           :error="$v.program.name.$error" required-field />
       </div>
       <div class="row gutter-profile">
-        <ni-input caption="Objectifs pédagogiques" v-model.trim="program.learningGoals" type="textarea"
-          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
-          :error="$v.program.learningGoals.$error" />
+        <ni-input caption="Description" v-model.trim="program.description" type="textarea"
+          @focus="saveTmp('description')" @blur="updateProgram('description')" required-field
+          :error="$v.program.description.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinary-storage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
           :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :max-file-size="500000" />
@@ -46,7 +46,7 @@ export default {
   },
   validations () {
     return {
-      program: { name: { required }, learningGoals: { required } },
+      program: { name: { required }, description: { required } },
     };
   },
   computed: {
