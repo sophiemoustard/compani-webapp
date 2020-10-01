@@ -17,6 +17,8 @@ import {
   OPEN_QUESTION,
   QUESTION_MAX_LENGTH,
   QC_ANSWER_MAX_LENGTH,
+  QUESTION_ANSWER,
+  QUESTION_ANSWER_MAX_ANSWERS_COUNT,
 } from '@data/constants';
 
 const cardSchema = (card) => {
@@ -105,6 +107,11 @@ const cardSchema = (card) => {
     case OPEN_QUESTION:
       return Joi.object().keys({
         question: Joi.string().required().max(QUESTION_MAX_LENGTH),
+      });
+    case QUESTION_ANSWER:
+      return Joi.object().keys({
+        question: Joi.string().required().max(QUESTION_MAX_LENGTH),
+        orderedAnswers: Joi.array().items(Joi.string()).min(1).max(QUESTION_ANSWER_MAX_ANSWERS_COUNT),
       });
     default:
       return Joi.object().keys();

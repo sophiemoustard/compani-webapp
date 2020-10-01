@@ -381,3 +381,4 @@ export const SURVEY_LABEL_MAX_LENGTH = 25;
 export const QUESTION_MAX_LENGTH = 170;
 export const QC_ANSWER_MAX_LENGTH = 70;
 export const GAP_ANSWER_MAX_LENGTH = 15;
+export const QUESTION_ANSWER_MAX_ANSWERS_COUNT = 4;

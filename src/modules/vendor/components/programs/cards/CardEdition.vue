@@ -4,7 +4,7 @@
       :content-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
         <div v-if="card && Object.values(card).length">
-          <component :is="templateInstance" :key="card._id" class="q-mx-lg" :card="card"
+          <component :is="templateInstance" :key="card._id" class="q-mx-lg"
             :disable-edition="disableEdition" />
         </div>
     </q-scroll-area>
@@ -25,6 +25,7 @@ import {
   MULTIPLE_CHOICE_QUESTION,
   SURVEY,
   OPEN_QUESTION,
+  QUESTION_ANSWER,
 } from '@data/constants';
 
 export default {
@@ -45,6 +46,7 @@ export default {
       MULTIPLE_CHOICE_QUESTION,
       SURVEY,
       OPEN_QUESTION,
+      QUESTION_ANSWER,
       currentTemplate: '',
     };
   },
@@ -74,6 +76,8 @@ export default {
           return () => import('src/modules/vendor/components/programs/cards/templates/Survey');
         case OPEN_QUESTION:
           return () => import('src/modules/vendor/components/programs/cards/templates/OpenQuestion');
+        case QUESTION_ANSWER:
+          return () => import('src/modules/vendor/components/programs/cards/templates/QuestionAnswer');
         default:
           return null;
       }
