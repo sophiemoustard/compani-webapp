@@ -4,8 +4,7 @@
       :content-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
         <div v-if="card && Object.values(card).length">
-          <component :is="templateInstance" :key="card._id" class="q-mx-lg"
-            :disable-edition="disableEdition" />
+          <component :is="templateInstance" :key="card._id" class="q-mx-lg" :disable-edition="disableEdition" />
         </div>
     </q-scroll-area>
   </div>

@@ -111,7 +111,7 @@ const cardSchema = (card) => {
     case QUESTION_ANSWER:
       return Joi.object().keys({
         question: Joi.string().required().max(QUESTION_MAX_LENGTH),
-        orderedAnswers: Joi.array().items(Joi.string()).min(1).max(QUESTION_ANSWER_MAX_ANSWERS_COUNT),
+        questionAnswers: Joi.array().items(Joi.string()).min(1).max(QUESTION_ANSWER_MAX_ANSWERS_COUNT),
       });
     default:
       return Joi.object().keys();
