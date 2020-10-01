@@ -3,6 +3,8 @@
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
+    <q-checkbox v-model="card.severalQuestionAnswers" @input="updateSeveralQuestionAnswers" size="sm"
+        :disable="disableEdition" label="Sélection multiple" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
         v-model.trim="card.questionAnswers[i]" :required-field="i === 0" :error="questionAnswersError(i)"
@@ -55,6 +57,21 @@ export default {
     },
   },
   methods: {
+    async updateSeveralQuestionAnswers () {
+      try {
+        await Cards.updateById(this.card._id, { severalQuestionAnswers: this.card.severalQuestionAnswers });
+        await this.refreshCard();
+
+        NotifyPositive('Carte mise à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la carte.');
+      }
+    },
+    test () {
+      // eslint-disable-next-line no-console
+      console.log(this.card.severalQuestionAnswers);
+    },
     initializeQuestionAnswers () {
       this.card.questionAnswers = times(
         QUESTION_ANSWER_MAX_ANSWERS_COUNT,
