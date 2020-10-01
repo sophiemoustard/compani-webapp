@@ -113,7 +113,7 @@ export default {
           startDate: { required },
           endDate: {
             required,
-            greatherThanStartDate (val, { startDate }) { return this.$moment(startDate).isBefore(val); },
+            greaterThanStartDate (val, { startDate }) { return this.$moment(startDate).isBefore(val); },
             onSameDayAsStartDate (val, { startDate }) { return this.$moment(startDate).isSame(val, 'day'); },
           },
         },
