@@ -7,7 +7,7 @@
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
-        v-model.trim="card.questionAnswers[i]" :required-field="i === 0" :error="requiredQuestionAnswerIsMissing(i)"
+        v-model.trim="card.questionAnswers[i]" :required-field="i < 2" :error="requiredQuestionAnswerIsMissing(i)"
         @focus="saveTmp(`questionAnswers[${i}]`)" @blur="updateQuestionAnswers(i)" :disable="disableEdition" />
     </div>
   </div>
@@ -40,7 +40,7 @@ export default {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         questionAnswers: {
           required,
-          minLength: minArrayLength(1),
+          minLength: minArrayLength(2),
         },
       },
     };
@@ -56,15 +56,15 @@ export default {
       immediate: true,
     },
   },
+  async created () {
+    this.card.isQuestionAnswerMultipleChoiced = !!this.card.isQuestionAnswerMultipleChoiced;
+  },
   methods: {
     initializeQuestionAnswers () {
-      this.card.questionAnswers = times(
-        QUESTION_ANSWER_MAX_ANSWERS_COUNT,
-        i => this.card.questionAnswers[i] || ''
-      );
+      this.card.questionAnswers = times(QUESTION_ANSWER_MAX_ANSWERS_COUNT, i => this.card.questionAnswers[i] || '');
     },
     requiredQuestionAnswerIsMissing (index) {
-      return this.$v.card.questionAnswers.$error && !this.$v.card.questionAnswers.minLength && index === 0 &&
+      return this.$v.card.questionAnswers.$error && !this.$v.card.questionAnswers.minLength && index < 2 &&
       !this.card.questionAnswers[index];
     },
     formatQuestionAnswersPayload () {
