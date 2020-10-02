@@ -56,9 +56,6 @@ export default {
       immediate: true,
     },
   },
-  async created () {
-    this.card.isQuestionAnswerMultipleChoiced = !!this.card.isQuestionAnswerMultipleChoiced;
-  },
   methods: {
     initializeQuestionAnswers () {
       this.card.questionAnswers = times(QUESTION_ANSWER_MAX_ANSWERS_COUNT, i => this.card.questionAnswers[i] || '');
