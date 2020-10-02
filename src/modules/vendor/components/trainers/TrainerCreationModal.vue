@@ -1,0 +1,56 @@
+<template>
+  <ni-modal :value="value" @hide="hide" @input="input">
+    <template slot="title">
+      Créer un nouveau <span class="text-weight-bold">formateur</span>
+    </template>
+    <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainer.local.email" required-field
+      @blur="validations.local.email.$touch" caption="Email" :error="validations.local.email.$error"
+      :error-message="emailError" :last="firstStep" />
+    <template v-if="!firstStep">
+      <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
+      <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="validations.identity.lastname.$error"
+      @blur="validations.identity.lastname.$touch" required-field caption="Nom" last />
+    </template>
+    <template slot="footer">
+      <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
+        :loading="loading" icon-right="add" @click="goToNextStep" />
+      <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter le formateur" color="primary"
+        :loading="loading" icon-right="add" @click="submit" />
+    </template>
+  </ni-modal>
+</template>
+
+<script>
+import Modal from '@components/modal/Modal';
+import Input from '@components/form/Input';
+
+export default {
+  name: 'TrainerCreationModal',
+  props: {
+    value: { type: Boolean, default: false },
+    newTrainer: { type: Object, default: () => ({}) },
+    validations: { type: Object, default: () => ({}) },
+    loading: { type: Boolean, default: false },
+    firstStep: { type: Boolean, default: true },
+    emailError: { type: String, default: '' },
+  },
+  components: {
+    'ni-input': Input,
+    'ni-modal': Modal,
+  },
+  methods: {
+    hide () {
+      this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
+    },
+    submit () {
+      this.$emit('submit');
+    },
+    goToNextStep () {
+      this.$emit('go-to-next-step');
+    },
+  },
+};
+</script>

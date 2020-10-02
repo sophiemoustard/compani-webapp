@@ -10,8 +10,7 @@ export default {
     return internalHours.data.data.internalHours;
   },
   async update (id, payload) {
-    const internalHours = await alenviAxios.put(`${process.env.API_HOSTNAME}/internalhours/${id}`, payload);
-    return internalHours.data.data.internalHour;
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/internalhours/${id}`, payload);
   },
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/internalhours/${id}`);

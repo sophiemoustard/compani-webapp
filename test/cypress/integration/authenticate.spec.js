@@ -11,7 +11,7 @@ describe('Login page tests', () => {
       .should('be.visible')
       .and('contain', 'Impossible de se connecter');
     cy.url().should('include', '/login');
-  })
+  });
 
   const paramsArray = [
     { person: 'client admin', email: 'client-admin@alenvi.io', password: '123456!eR', url: 'ni/auxiliaries' },
@@ -30,12 +30,17 @@ describe('Login page tests', () => {
       url: 'auxiliaries/agenda',
     },
     { person: 'helper', email: 'helper@alenvi.io', password: '123456!eR', url: 'customers/agenda' },
-    { person: 'vendor admin', email: 'vendor-admin@alenvi.io', password: '123456!eR', url: 'ad/ni/management/courses' },
+    {
+      person: 'vendor admin',
+      email: 'vendor-admin@alenvi.io',
+      password: '123456!eR',
+      url: 'ad/ni/management/blended-courses',
+    },
     {
       person: 'training organisation manager',
       email: 'training-organisation-manager@alenvi.io',
       password: '123456!eR',
-      url: 'ad/ni/management/courses',
+      url: 'ad/ni/management/blended-courses',
     },
     { person: 'trainer', email: 'trainer@alenvi.io', password: '123456!eR', url: 'ad/trainers/management/courses' },
   ];

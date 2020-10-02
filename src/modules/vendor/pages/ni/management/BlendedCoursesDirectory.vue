@@ -1,6 +1,6 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Formations" class="q-mb-xl" />
+    <ni-title-header title="Formations mixtes" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
@@ -41,12 +41,12 @@ import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, INTER_B2B } from '@data/constants';
+import { INTRA, COURSE_TYPES, INTER_B2B, BLENDED } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
-  name: 'CoursesDirectory',
+  name: 'BlendedCoursesDirectory',
   mixins: [courseFiltersMixin],
   components: {
     'ni-title-header': TitleHeader,
@@ -92,7 +92,7 @@ export default {
   methods: {
     async refreshCourses () {
       try {
-        const courses = await Courses.list();
+        const courses = await Courses.list({ format: BLENDED });
         this.coursesWithGroupedSlot = this.groupByCourses(courses);
       } catch (e) {
         console.error(e);
