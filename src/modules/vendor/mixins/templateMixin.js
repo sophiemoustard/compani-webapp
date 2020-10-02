@@ -37,8 +37,11 @@ export const templateMixin = {
         const value = get(this.card, path);
         if (this.tmpInput === value) return;
 
-        get(this.$v.card, path).$touch();
-        if (get(this.$v.card, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+        const validation = get(this.$v.card, path);
+        if (validation) {
+          validation.$touch();
+          if (validation.$error) return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         await Cards.updateById(this.card._id, set({}, path, value));
 
