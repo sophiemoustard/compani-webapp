@@ -117,7 +117,7 @@ import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 
 export default {
-  name: 'ProfileFollowUp',
+  name: 'ProfileAdmin',
   components: {
     'ni-input': Input,
     'ni-button': Button,
