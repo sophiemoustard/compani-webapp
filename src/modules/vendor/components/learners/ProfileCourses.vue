@@ -62,8 +62,6 @@ export default {
   },
   methods: {
     goToBlendedCourseProfileAdmin (row) {
-      // eslint-disable-next-line no-console
-      console.log('salut');
       this.$router.push({
         name: 'ni management blended courses info',
         params: { courseId: row._id, defaultTab: 'admin' },
