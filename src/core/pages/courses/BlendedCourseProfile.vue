@@ -26,7 +26,7 @@ import { mapState } from 'vuex';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
-import ProfileFollowUp from '@components/courses/ProfileFollowUp';
+import ProfileAdmin from '@components/courses/ProfileAdmin';
 import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -56,10 +56,10 @@ export default {
           component: ProfileOrganization,
         },
         {
-          label: 'Suivi',
-          name: 'followUp',
-          default: this.defaultTab === 'followUp',
-          component: ProfileFollowUp,
+          label: 'Admin',
+          name: 'admin',
+          default: this.defaultTab === 'admin',
+          component: ProfileAdmin,
         },
       ],
       isClientInterface,
