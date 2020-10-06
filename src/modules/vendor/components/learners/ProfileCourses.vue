@@ -9,7 +9,7 @@
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import TableList from '@components/table/TableList';
-import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
+import { FORTHCOMING, IN_PROGRESS, COMPLETED, BLENDED } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { courseTimelineMixin } from '@mixins/courseTimeline';
@@ -57,7 +57,7 @@ export default {
     },
   },
   async created () {
-    const courses = await Courses.list({ trainees: this.userProfile._id });
+    const courses = await Courses.list({ trainees: this.userProfile._id, format: BLENDED });
     this.courses = this.groupByCourses(courses);
   },
   methods: {
