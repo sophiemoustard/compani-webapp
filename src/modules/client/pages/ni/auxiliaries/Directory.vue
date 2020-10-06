@@ -24,47 +24,10 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="auxiliaryCreationModal = true" :disable="tableLoading" />
 
-    <!-- User creation modal -->
-    <ni-modal v-model="auxiliaryCreationModal" @hide="resetForm">
-      <template slot="title">
-        Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
-      </template>
-      <ni-input in-modal :disable="!firstStep" v-model.trim="newUser.local.email" caption="Email"
-        :error="$v.newUser.local.email.$error" @blur="$v.newUser.local.email.$touch" required-field
-        :error-message="emailError($v.newUser)" />
-      <template v-if="!firstStep">
-        <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
-          required-field :error="$v.newUser.identity.title.$error" @blur="$v.newUser.identity.title.$touch" />
-        <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
-          @blur="$v.newUser.identity.lastname.$touch" required-field caption="Nom" />
-        <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="$v.newUser.identity.firstname.$error"
-          caption="Prénom" @blur="$v.newUser.identity.firstname.$touch" required-field />
-        <ni-input in-modal v-model="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" required-field
-          caption="Numéro de téléphone" @blur="$v.newUser.contact.phone.$touch" :error-message="mobilePhoneError" />
-        <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
-          @blur="$v.newUser.contact.address.$touch" error-message="Adresse non valide"
-          :error="$v.newUser.contact.address.$error" in-modal />
-        <div class="row margin-input">
-          <div class="col-12">
-            <div class="row justify-between">
-              <p class="input-caption required">Équipe</p>
-              <q-icon v-if="$v.newUser.sector.$error" name="error_outline" color="secondary" />
-            </div>
-            <ni-select-sector v-model="newUser.sector" @blur="$v.newUser.sector.$touch" in-modal
-              :company-id="company._id" :error="$v.newUser.sector.$error" :error-message="REQUIRED_LABEL" />
-          </div>
-        </div>
-        <div class="row margin-input last">
-          <q-checkbox v-model="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense />
-        </div>
-      </template>
-      <template slot="footer">
-        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
-          :loading="loading" icon-right="add" @click="nextStep" />
-        <q-btn v-else no-caps class="full-width modal-btn" label="Créer la fiche" color="primary"
-          :loading="loading" icon-right="add" @click="submit" />
-      </template>
-    </ni-modal>
+    <auxiliary-creation-modal v-model="auxiliaryCreationModal" :new-user="newUser" :civility-options="civilityOptions"
+      :validations="$v.newUser" :company-id="company._id" :loading="loading" :email-error="emailError($v.newUser)"
+      :first-step="firstStep" :send-welcome-msg.sync="sendWelcomeMsg"
+      @hide="resetForm" @submit="submit" @go-to-next-step="nextStep" />
   </q-page>
 </template>
 
@@ -78,13 +41,9 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Roles from '@api/Roles';
 import Sms from '@api/Sms';
 import Users from '@api/Users';
-import SelectSector from '@components/form/SelectSector';
-import Input from '@components/form/Input';
-import Select from '@components/form/Select';
-import SearchAddress from '@components/form/SearchAddress';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
-import Modal from '@components/modal/Modal';
+import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/AuxiliaryCreationModal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload, removeDiacritics } from '@helpers/utils';
@@ -96,13 +55,9 @@ export default {
   metaInfo: { title: 'Répertoire auxiliaires' },
   name: 'Directory',
   components: {
-    'ni-select-sector': SelectSector,
-    'ni-input': Input,
-    'ni-select': Select,
-    'ni-search-address': SearchAddress,
     'ni-directory-header': DirectoryHeader,
-    'ni-modal': Modal,
     'ni-table-list': TableList,
+    'auxiliary-creation-modal': AuxiliaryCreationModal,
   },
   mixins: [validationMixin, userMixin],
   data () {
@@ -217,14 +172,6 @@ export default {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
       return this.activeUserList
         .filter(user => user.auxiliary.noDiacriticsName.match(new RegExp(formattedString, 'i')));
-    },
-    mobilePhoneError () {
-      if (!this.$v.newUser.contact.phone.required) {
-        return REQUIRED_LABEL;
-      } if (!this.$v.newUser.contact.phone.frPhoneNumber || !this.$v.newUser.contact.phone.maxLength) {
-        return 'Numéro de téléphone non valide';
-      }
-      return '';
     },
   },
   methods: {

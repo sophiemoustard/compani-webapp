@@ -31,7 +31,7 @@ import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
 export default {
-  name: 'CourseProfile',
+  name: 'BlendedCourseProfile',
   metadata: { title: 'Fiche formation' },
   mixins: [courseMixin],
   props: {

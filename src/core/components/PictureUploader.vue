@@ -62,6 +62,12 @@ export default {
     canvasColor () {
       return /\/ad\//.test(this.$router.currentRoute.path) ? '#FFEDDA' : '#EEE';
     },
+    noDiacriticLastname () {
+      return removeDiacritics(get(this.user, 'identity.lastname')) || '';
+    },
+    noDiacriticFirstname () {
+      return removeDiacritics(get(this.user, 'identity.firstname')) || '';
+    },
   },
   methods: {
     async uploadImage () {
@@ -73,7 +79,7 @@ export default {
         const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         const data = new FormData();
         data.append('_id', this.user._id);
-        data.append('fileName', `photo_${this.user.identity.firstname}_${this.user.identity.lastname}`);
+        data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
         data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
 
@@ -128,10 +134,9 @@ export default {
       if (this.hasPicture && !this.fileChosen) this.croppa.refresh();
     },
     pictureDlLink (link) {
-      const lastname = removeDiacritics(get(this.user, 'identity.lastname'));
-      const firstname = removeDiacritics(get(this.user, 'identity.firstname'));
-
-      return link ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${firstname}_${lastname}`) : '';
+      return link
+        ? link.replace(/(\/upload)/i, `$1/fl_attachment:photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`)
+        : '';
     },
   },
 };

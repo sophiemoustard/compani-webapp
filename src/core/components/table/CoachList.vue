@@ -32,50 +32,14 @@
       </q-card>
     </div>
 
-    <!-- User creation modal -->
-    <ni-modal v-model="userCreationModal" @hide="resetUserCreationForm" @show="openUserCreationModal">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">utilisateur</span>
-      </template>
-      <ni-input :disable="!firstStep" in-modal v-model.trim="newUser.local.email" :error="$v.newUser.local.email.$error"
-        caption="Email" @blur="$v.newUser.local.email.$touch" :error-message="emailError($v.newUser)" required-field />
-      <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" v-model="newUser.role"
-        :error="$v.newUser.role.$error" @blur="$v.newUser.role.$touch" :last="firstStep" required-field />
-      <template v-if="!firstStep">
-        <ni-input in-modal v-model="newUser.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-model="newUser.identity.lastname" :error="$v.newUser.identity.lastname.$error"
-          caption="Nom" @blur="$v.newUser.identity.lastname.$touch" required-field />
-        <ni-input in-modal v-model.trim="newUser.contact.phone" :error="$v.newUser.contact.phone.$error" last
-          caption="Téléphone" @blur="$v.newUser.contact.phone.$touch" :error-message="phoneNbrError($v.newUser)" />
-      </template>
-      <template slot="footer">
-        <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" icon-right="add" color="primary"
-          :loading="loading" @click="nextStep" />
-        <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter un utilisateur" icon-right="add"
-          color="primary" :loading="loading" @click="createUser" />
-      </template>
-    </ni-modal>
+    <user-creation-modal v-model="userCreationModal" :new-user="newUser" :email-error="emailError($v.newUser)"
+      :first-step="firstStep" :loading="loading" :phone-nbr-error="phoneNbrError($v.newUser)"
+      :validations="$v.newUser" :role-options="roleOptions" @hide="resetUserCreationForm" @show="openUserCreationModal"
+      @submit="createUser" @go-to-next-step="nextStep" />
 
-    <!-- User edition modal -->
-    <ni-modal v-model="userEditionModal" @hide="resetUserEditionForm">
-      <template slot="title">
-        Éditer un <span class="text-weight-bold">utilisateur</span>
-      </template>
-      <ni-input in-modal v-model="selectedUser.local.email" :error="$v.selectedUser.local.email.$error" caption="Email"
-        @blur="$v.selectedUser.local.email.$touch" :error-message="emailError($v.selectedUser)" required-field />
-      <ni-select in-modal caption="Role" :options="roleOptions" v-model="selectedUser.role"
-        :error="$v.selectedUser.role.$error" @blur="$v.selectedUser.role.$touch" required-field />
-      <ni-input in-modal v-model="selectedUser.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="selectedUser.identity.lastname" :error="$v.selectedUser.identity.lastname.$error"
-        caption="Nom" @blur="$v.selectedUser.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model.trim="selectedUser.contact.phone" :error="$v.selectedUser.contact.phone.$error"
-        caption="Téléphone" @blur="$v.selectedUser.contact.phone.$touch" last
-        :error-message="phoneNbrError($v.selectedUser)" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer un utilisateur" icon-right="check" color="primary"
-          :loading="loading" @click="updateUser" />
-      </template>
-    </ni-modal>
+    <user-edition-modal v-model="userEditionModal" :phone-nbr-error="phoneNbrError($v.newUser)" :loading="loading"
+      :validations="$v.selectedUser" :email-error="emailError($v.selectedUser)" :selected-user="selectedUser"
+      :role-options="roleOptions" @hide="resetUserEditionForm" @submit="updateUser" />
   </div>
 </template>
 
@@ -89,11 +53,10 @@ import cloneDeep from 'lodash/cloneDeep';
 import Roles from '@api/Roles';
 import Email from '@api/Email';
 import Users from '@api/Users';
-import Select from '@components/form/Select';
 import Button from '@components/Button';
-import Modal from '@components/modal/Modal';
-import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import UserCreationModal from '@components/table/UserCreationModal';
+import UserEditionModal from '@components/table/UserEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { formatPhone, clear, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
@@ -105,10 +68,9 @@ export default {
   name: 'CoachList',
   components: {
     'ni-button': Button,
-    'ni-select': Select,
-    'ni-modal': Modal,
-    'ni-input': Input,
     'ni-responsive-table': ResponsiveTable,
+    'user-creation-modal': UserCreationModal,
+    'user-edition-modal': UserEditionModal,
   },
   props: {
     company: { type: Object, default: () => ({}) },
@@ -232,6 +194,7 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de l\'utilisateur.');
+      } finally {
         this.loading = false;
       }
 

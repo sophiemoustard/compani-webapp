@@ -41,7 +41,7 @@
           </q-item-section>
           <q-item-section class="course-item-container">
             <div class="text-weight-bold">Programme de la formation</div>
-            <div class="description">{{ course.subProgram.program.learningGoals }}</div>
+            <div class="description">{{ course.subProgram.program.description }}</div>
           </q-item-section>
         </q-item>
         <q-item v-if="course.trainer" class="row">
@@ -89,7 +89,7 @@ import { courseMixin } from '@mixins/courseMixin';
 
 export default {
   metaInfo: { title: 'Formation' },
-  name: 'CourseInfo',
+  name: 'BlendedCourseInfo',
   mixins: [courseMixin],
   components: {
     'ni-html-modal': HtmlModal,

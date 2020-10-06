@@ -314,6 +314,8 @@ export const COURSE_TYPES = [
   { label: 'Intra', value: INTRA },
   { label: 'Inter B2B', value: INTER_B2B },
 ];
+export const BLENDED = 'blended';
+export const STRICTLY_E_LEARNING = 'strictly_e_learning';
 export const FORTHCOMING = 'forthcoming';
 export const IN_PROGRESS = 'inProgress';
 export const COMPLETED = 'completed';
@@ -350,6 +352,7 @@ export const SINGLE_CHOICE_QUESTION = 'single_choice_question';
 export const ORDER_THE_SEQUENCE = 'order_the_sequence';
 export const OPEN_QUESTION = 'open_question';
 export const SURVEY = 'survey';
+export const QUESTION_ANSWER = 'question_answer';
 export const CARD_TEMPLATES = [
   { label: 'Transition', value: TRANSITION, type: LESSON },
   { label: 'Titre Texte Média', value: TITLE_TEXT_MEDIA, type: LESSON },
@@ -362,6 +365,7 @@ export const CARD_TEMPLATES = [
   { label: 'Mettre dans l\'ordre', value: ORDER_THE_SEQUENCE, type: QUIZ },
   { label: 'Question ouverte', value: OPEN_QUESTION, type: QUESTIONNAIRE },
   { label: 'Sondage', value: SURVEY, type: QUESTIONNAIRE },
+  { label: 'Question\t&\tRéponse', value: QUESTION_ANSWER, type: QUESTIONNAIRE },
 ];
 export const TEMPLATE_TYPES = {
   [LESSON]: 'Cours',
@@ -374,3 +378,7 @@ export const MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT = 4;
 export const FILL_THE_GAPS_MAX_ANSWERS_COUNT = 6;
 export const ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT = 3;
 export const SURVEY_LABEL_MAX_LENGTH = 25;
+export const QUESTION_MAX_LENGTH = 170;
+export const QC_ANSWER_MAX_LENGTH = 70;
+export const GAP_ANSWER_MAX_LENGTH = 15;
+export const QUESTION_ANSWER_MAX_ANSWERS_COUNT = 4;

@@ -35,8 +35,8 @@
       <div class="q-mt-md" v-if="canEdit" align="right">
         <ni-button class="add-slot" label="Ajouter un créneau" color="white" icon="add"
           :disable="loading || addDateToPlanloading" @click="creationModal = true" />
-        <ni-button class="add-slot" label="Ajouter une date à planifier" color="white" icon="add" @click="addDateToPlan"
-          :disable="addDateToPlanloading" />
+        <ni-button v-if="isVendorInterface" class="add-slot" label="Ajouter une date à planifier" color="white"
+          icon="add" @click="addDateToPlan" :disable="addDateToPlanloading" />
       </div>
     </div>
 
@@ -83,6 +83,8 @@ export default {
     'ni-button': Button,
   },
   data () {
+    const isVendorInterface = /\/ad\//.test(this.$router.currentRoute.path);
+
     return {
       courseSlots: {},
       addDateToPlanloading: false,
@@ -109,7 +111,11 @@ export default {
         step: { required },
         dates: {
           startDate: { required },
-          endDate: { required },
+          endDate: {
+            required,
+            greaterThanStartDate (val, { startDate }) { return this.$moment(startDate).isBefore(val); },
+            onSameDayAsStartDate (val, { startDate }) { return this.$moment(startDate).isSame(val, 'day'); },
+          },
         },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
@@ -118,6 +124,7 @@ export default {
           fullAddress: { frAddress },
         },
       },
+      isVendorInterface,
     };
   },
   validations () {

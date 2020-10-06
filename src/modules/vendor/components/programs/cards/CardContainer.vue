@@ -43,6 +43,7 @@ import {
   ORDER_THE_SEQUENCE,
   OPEN_QUESTION,
   SURVEY,
+  QUESTION_ANSWER,
   FILL_THE_GAPS,
   TEMPLATE_TYPES,
   PUBLISHED,
@@ -108,6 +109,7 @@ export default {
         ORDER_THE_SEQUENCE,
         OPEN_QUESTION,
         SURVEY,
+        QUESTION_ANSWER,
       ];
 
       if ([TRANSITION, TITLE_TEXT_MEDIA, TITLE_TEXT].includes(card.template)) return card.title || '';

@@ -1,7 +1,7 @@
 <template>
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
-    <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToCourseProfileFollowUp" />
+    <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToBlendedCourseProfileFollowUp" />
   </div>
 </template>
 
@@ -61,9 +61,9 @@ export default {
     this.courses = this.groupByCourses(courses);
   },
   methods: {
-    goToCourseProfileFollowUp (row) {
+    goToBlendedCourseProfileFollowUp (row) {
       this.$router.push({
-        name: 'ni management courses info',
+        name: 'ni management blended courses info',
         params: { courseId: row._id, defaultTab: 'followUp' },
       });
     },

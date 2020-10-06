@@ -1,7 +1,8 @@
 <template v-if="orderedAnswersInitialized">
   <div>
     <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field :disable="disableEdition"
-      @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea" />
+      @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea"
+      :error-message="questionErrorMsg" />
     <div class="q-mb-lg">
       <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
         v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
@@ -14,11 +15,11 @@
 
 <script>
 import times from 'lodash/times';
-import { required } from 'vuelidate/lib/validators';
+import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT } from '@data/constants';
+import { ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT, QUESTION_MAX_LENGTH } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -34,7 +35,7 @@ export default {
   validations () {
     return {
       card: {
-        question: { required },
+        question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         orderedAnswers: { minLength: minArrayLength(2) },
         explanation: { required },
       },

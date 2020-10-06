@@ -1,14 +1,14 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-      Créer une nouvelle <span class="text-weight-bold">activité</span>
+      Créer une nouvelle <span class="text-weight-bold">structure</span>
     </template>
-    <ni-input in-modal v-model.trim="newActivity.name" :error="validations.name.$error"
-      @blur="validations.name.$touch" required-field caption="Nom" />
-    <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field
-      :error="validations.type.$error" />
+    <ni-input in-modal v-model.trim="newCompany.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field caption="Raison sociale" />
+    <ni-option-group v-model="newCompany.type" type="radio" :options="companyTypeOptions" inline caption="Type"
+      :error="validations.type.$error" required-field />
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="loading"
+      <q-btn no-caps class="full-width modal-btn" label="Créer la structure" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
     </template>
   </ni-modal>
@@ -17,21 +17,21 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import Select from '@components/form/Select';
+import OptionGroup from '@components/form/OptionGroup';
 
 export default {
-  name: 'ActivityCreationModal',
+  name: 'CompanyCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    newActivity: { type: Object, default: () => ({}) },
-    activityTypeOptions: { type: Array, default: () => [] },
+    newCompany: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
+    companyTypeOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
-    'ni-select': Select,
+    'ni-option-group': OptionGroup,
   },
   methods: {
     hide () {

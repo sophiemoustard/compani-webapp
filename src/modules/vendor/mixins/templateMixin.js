@@ -4,6 +4,7 @@ import set from 'lodash/set';
 import Cards from '@api/Cards';
 import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import { QUESTION_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
 
 export const templateMixin = {
   data () {
@@ -21,6 +22,11 @@ export const templateMixin = {
     mediaUploadUrl () {
       return `${process.env.API_HOSTNAME}/cards/${this.card._id}/cloudinary/upload`;
     },
+    questionErrorMsg () {
+      if (!this.$v.card.question.required) return REQUIRED_LABEL;
+      if (!this.$v.card.question.maxLength) return `${QUESTION_MAX_LENGTH} caractères maximum.`;
+      return '';
+    },
   },
   methods: {
     saveTmp (path) {
@@ -31,8 +37,11 @@ export const templateMixin = {
         const value = get(this.card, path);
         if (this.tmpInput === value) return;
 
-        get(this.$v.card, path).$touch();
-        if (get(this.$v.card, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+        const validation = get(this.$v.card, path);
+        if (validation) {
+          validation.$touch();
+          if (validation.$error) return NotifyWarning('Champ(s) invalide(s)');
+        }
 
         await Cards.updateById(this.card._id, set({}, path, value));
 
