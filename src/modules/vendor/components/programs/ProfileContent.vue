@@ -4,7 +4,7 @@
       <div class="sub-program-header">
         <div>
           <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
-          <span class="subProgramPublished" v-if="isPublished(subProgram)">Publié</span>
+          <span class="published-sub-program" v-if="isPublished(subProgram)">Publié</span>
         </div>
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
           @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
@@ -49,11 +49,12 @@
                     <div class="gt-xs col-sm-2 activity-content">
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
-                    <div class="stepOrActivityDotContainer">
-                      <div v-if="!isActivityValid(activity)" class="dot dot-error" />
-                      <q-icon v-if="isActivityValid(activity) && isPublished(activity)" size="12px" name="check_circle"
-                        color="accent" />
-                      <span v-if="isPublished(activity)" class="stepOrActivityPublishedText">Publiée</span>
+                    <div class="dot-container">
+                      <div v-if="!activity.areCardsValid" class="dot dot-error" />
+                      <q-icon v-if="activity.areCardsValid && isPublished(activity)" size="12px" name="check_circle"
+                        color="accent" class="dot" />
+                      <span v-if="isPublished(activity)" :class="[{'published-activity-text': activity.areCardsValid},
+                        {'published-activity-text-error': !activity.areCardsValid}]">Publiée</span>
                     </div>
                   </div>
                   <div class="row no-wrap">
@@ -540,9 +541,6 @@ export default {
     isPublished (element) {
       return element.status === PUBLISHED;
     },
-    isActivityValid (activity) {
-      return activity.areCardsValid;
-    },
   },
 };
 </script>
@@ -556,7 +554,7 @@ export default {
   display: flex
   justify-content: space-between
 
-.subProgramPublished
+.published-sub-program
   background-color: $accent
   font-size: 14px
   border-radius: 15px
@@ -565,7 +563,7 @@ export default {
   margin-left: 10px
 
 .dot
-  margin-left: 9px
+  margin: 0 8px;
 
 .step
   margin-bottom: 10px
@@ -578,15 +576,17 @@ export default {
   &-subtitle
     font-size: 13px
 
-.stepOrActivityDotContainer
+.dot-container
   display: flex
   flex-direction row
   align-items: center
 
-.stepOrActivityPublishedText
+.published-activity-text
   font-size: 12px
   color: $accent
-  margin-left: 4px
+  &-error
+    font-size: 12px
+    color: $warning
 
 .add-step-button
   align-self: flex-end
