@@ -21,9 +21,16 @@
                 <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" />
               </q-item-section>
               <q-item-section>
-                <div class="text-weight-bold">
-                  <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
-                  <div class="dot dot-active" v-if="isPublished(step)" />
+                <div class="flex-direction row">
+                  <div class="text-weight-bold">
+                    <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
+                  </div>
+                  <div class="dot-container">
+                    <div v-if="!step.areActivitiesValid" class="dot dot-error" />
+                    <q-icon v-if="step.areActivitiesValid && isPublished(step)" size="12px" name="check_circle"
+                      color="accent" class="dot-published" />
+                    <span v-if="isPublished(step)" class="published-activity-text">Publiée</span>
+                  </div>
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} -
@@ -52,7 +59,7 @@
                     <div class="dot-container">
                       <div v-if="!activity.areCardsValid" class="dot dot-error" />
                       <q-icon v-if="activity.areCardsValid && isPublished(activity)" size="12px" name="check_circle"
-                        color="accent" class="dot" />
+                        color="accent" class="dot-published" />
                       <span v-if="isPublished(activity)" :class="[{'published-activity-text': activity.areCardsValid},
                         {'published-activity-text-error': !activity.areCardsValid}]">Publiée</span>
                     </div>
@@ -564,6 +571,8 @@ export default {
 
 .dot
   margin: 0 8px;
+  &-published
+    margin: 0 8px;
 
 .step
   margin-bottom: 10px
