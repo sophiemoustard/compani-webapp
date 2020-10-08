@@ -308,7 +308,6 @@ export default {
         urssafCode: '',
       };
       this.$v.newEstablishment.$reset();
-      this.establishmentCreationModal = false;
     },
     async createNewEstablishment () {
       try {
