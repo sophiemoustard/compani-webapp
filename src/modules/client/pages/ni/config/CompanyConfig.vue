@@ -87,13 +87,7 @@
     <!-- Establishment creation modal -->
     <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment="newEstablishment"
       :validations="$v.newEstablishment" @hide="resetEstablishmentCreationModal" @submit="createNewEstablishment"
-      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes"
-      :establishment-name-error="establishmentNameError($v.newEstablishment)"
-      :establishment-siret-error="establishmentSiretError($v.newEstablishment)"
-      :establishment-address-error="establishmentAddressError($v.newEstablishment)"
-      :establishment-phone-error="establishmentPhoneError($v.newEstablishment)"
-      :establishment-whs-error="establishmentWhsError($v.newEstablishment)"
-      :establishment-urssaf-code-error="establishmentUrssafCodeError($v.newEstablishment)" />
+      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
 
     <!-- Establishment edition modal -->
     <ni-modal v-model="establishmentEditionModal" @hide="resetEstablishmentEditionModal">
@@ -151,7 +145,7 @@ import {
 } from '@helpers/vuelidateCustomVal';
 import { formatPhoneForPayload } from '@helpers/utils';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { REQUIRED_LABEL, COMPANY } from '@data/constants';
+import { COMPANY } from '@data/constants';
 import { urssafCodes } from '@data/urssafCodes';
 import { workHealthServices } from '@data/workHealthServices';
 import { companyMixin } from '@mixins/companyMixin';
@@ -393,36 +387,6 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteEstablishment(sectorId))
         .onCancel(() => NotifyPositive('Suppression annulée'));
-    },
-    establishmentNameError (validationObj) {
-      if (!validationObj.name.required) return REQUIRED_LABEL;
-      if (!validationObj.name.maxLength) return '32 caractères maximimum';
-      return '';
-    },
-    establishmentSiretError (validationObj) {
-      if (!validationObj.siret.required) return REQUIRED_LABEL;
-      if (!validationObj.siret.validSiret) return 'Siret non valide';
-      return '';
-    },
-    establishmentAddressError (validationObj) {
-      if (!validationObj.address.required) return REQUIRED_LABEL;
-      if (!validationObj.address.frAddress) return 'Adresse invalide';
-      return '';
-    },
-    establishmentPhoneError (validationObj) {
-      if (!validationObj.phone.required) return REQUIRED_LABEL;
-      if (!validationObj.phone.frPhoneNumber) return 'Numéro de téléphone invalide';
-      return '';
-    },
-    establishmentWhsError (validationObj) {
-      if (!validationObj.workHealthService.required) return REQUIRED_LABEL;
-      if (!validationObj.workHealthService.validWorkHealthService) return 'Service de santé du travail invalide';
-      return '';
-    },
-    establishmentUrssafCodeError (validationObj) {
-      if (!validationObj.urssafCode.required) return REQUIRED_LABEL;
-      if (!validationObj.urssafCode.validUrssafCode) return 'Code URSSAF invalide';
-      return '';
     },
   },
 };
