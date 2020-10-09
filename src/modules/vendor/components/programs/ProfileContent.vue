@@ -117,7 +117,8 @@
       :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
-      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
+      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
+      :type-options="activityTypeOptions" />
   </div>
 </template>
 
@@ -126,6 +127,7 @@ import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import get from 'lodash/get';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
@@ -176,7 +178,7 @@ export default {
       reusedActivity: '',
       programOptions: [],
       activityEditionModal: false,
-      editedActivity: { name: '' },
+      editedActivity: { name: '', type: '' },
       isActivitiesShown: {},
       currentSubProgramId: '',
       currentStepId: '',
@@ -465,7 +467,7 @@ export default {
     },
     // activity edition
     async openActivityEditionModal (activity) {
-      this.editedActivity = pick(activity, ['_id', 'name']);
+      this.editedActivity = pick(activity, ['_id', 'name', 'type']);
       this.activityEditionModal = true;
     },
     async editActivity () {
@@ -474,7 +476,7 @@ export default {
         this.$v.editedActivity.$touch();
         if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Activities.updateById(this.editedActivity._id, pick(this.editedActivity, ['name']));
+        await Activities.updateById(this.editedActivity._id, omit(this.editedActivity, ['_id']));
         this.activityEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité modifiée.');
@@ -486,7 +488,7 @@ export default {
       }
     },
     resetActivityEditionModal () {
-      this.editedActivity = { name: '' };
+      this.editedActivity = { name: '', type: '' };
       this.$v.editedActivity.$reset();
     },
     validateStepDetachment (subProgramId, stepId) {
