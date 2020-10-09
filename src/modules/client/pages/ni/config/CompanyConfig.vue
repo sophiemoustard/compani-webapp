@@ -153,6 +153,7 @@ import { defineAbilitiesFor } from '@helpers/ability';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import { validationMixin } from '@mixins/validationMixin';
+import { establishmentMixin } from '@mixins/establishmentMixin';
 
 export default {
   name: 'CompanyConfig',
@@ -165,7 +166,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'establishment-creation-modal': EstablishmentCreationModal,
   },
-  mixins: [configMixin, validationMixin, tableMixin, companyMixin],
+  mixins: [configMixin, validationMixin, tableMixin, companyMixin, establishmentMixin],
   data () {
     return {
       company: null,

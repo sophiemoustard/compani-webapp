@@ -30,7 +30,7 @@
 </template>
 
 <script>
-import { companyMixin } from '@mixins/companyMixin';
+import { establishmentMixin } from '@mixins/establishmentMixin';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -38,7 +38,7 @@ import SearchAddress from '@components/form/SearchAddress';
 
 export default {
   name: 'EstablishmentCreationModal',
-  mixins: [companyMixin],
+  mixins: [establishmentMixin],
   props: {
     value: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
