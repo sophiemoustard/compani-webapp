@@ -43,9 +43,9 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
-            :error-message="nbrError('company.rhConfig.feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
-            @focus="saveTmp('rhConfig.feeAmount')" suffix="€" @blur="updateCompany('rhConfig.feeAmount')" />
+          <ni-input caption="Montant des frais" :error="$v.company.rhConfig.phoneFeeAmount.$error" type="number"
+            :error-message="nbrError('company.rhConfig.phoneFeeAmount')" v-model="company.rhConfig.phoneFeeAmount"
+            @focus="saveTmp('rhConfig.phoneFeeAmount')" suffix="€" @blur="updateCompany('rhConfig.phoneFeeAmount')" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -282,7 +282,7 @@ export default {
       company: {
         rhConfig: {
           grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) },
-          feeAmount: { required, positiveNumber, maxValue: maxValue(999) },
+          phoneFeeAmount: { required, positiveNumber, maxValue: maxValue(999) },
           amountPerKm: { required, positiveNumber, maxValue: maxValue(999) },
           transportSubs: { $each: { price: { required, positiveNumber, maxValue: maxValue(999) } } },
         },

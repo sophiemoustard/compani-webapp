@@ -168,10 +168,10 @@ export const payMixin = {
           format: formatPrice,
         },
         {
-          name: 'otherFees',
-          label: 'Autres frais',
+          name: 'phoneFees',
+          label: 'Frais téléphonique',
           align: 'center',
-          field: 'otherFees',
+          field: 'phoneFees',
           format: formatPrice,
         },
         {
@@ -267,7 +267,7 @@ export const payMixin = {
         'Heures comp à payer',
         'Mutuelle',
         'Transport',
-        'Autres frais',
+        'Frais téléphonique',
         'Prime',
       ]];
 
@@ -295,7 +295,7 @@ export const payMixin = {
           this.formatNumberForCSV(draftPay.additionalHours),
           draftPay.mutual ? 'Oui' : 'Non',
           this.formatNumberForCSV(draftPay.transport),
-          this.formatNumberForCSV(draftPay.otherFees),
+          this.formatNumberForCSV(draftPay.phoneFees),
           this.formatNumberForCSV(draftPay.bonus),
         ]);
       }
