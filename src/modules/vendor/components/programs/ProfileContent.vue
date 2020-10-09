@@ -21,9 +21,20 @@
                 <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" />
               </q-item-section>
               <q-item-section>
-                <div class="text-weight-bold">
-                  <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
-                  <div class="dot dot-active" v-if="isPublished(step)" />
+                <div class="flex-direction row">
+                  <div class="text-weight-bold">
+                    <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
+                  </div>
+                  <div class="dot-container">
+                    <div v-if="!step.areActivitiesValid || hasEmptyActivity(step)" class="dot dot-error" />
+                    <q-icon v-if="step.areActivitiesValid && isPublished(step) && !hasEmptyActivity(step)"
+                      size="12px" name="check_circle" color="accent" class="dot-published" />
+                    <span v-if="isPublished(step)"
+                      :class="[{'published-activity-text': step.areActivitiesValid && !hasEmptyActivity(step)},
+                        {'published-activity-text-error': !step.areActivitiesValid || hasEmptyActivity(step)}]">
+                      Publiée
+                    </span>
+                  </div>
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} -
@@ -50,11 +61,14 @@
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
                     <div class="dot-container">
-                      <div v-if="!activity.areCardsValid" class="dot dot-error" />
-                      <q-icon v-if="activity.areCardsValid && isPublished(activity)" size="12px" name="check_circle"
-                        color="accent" class="dot" />
-                      <span v-if="isPublished(activity)" :class="[{'published-activity-text': activity.areCardsValid},
-                        {'published-activity-text-error': !activity.areCardsValid}]">Publiée</span>
+                      <div v-if="!activity.areCardsValid || activity.cards.length === 0" class="dot dot-error" />
+                      <q-icon v-if="activity.areCardsValid && isPublished(activity)&& activity.cards.length > 0"
+                        size="12px" name="check_circle" color="accent" class="dot-published" />
+                      <span v-if="isPublished(activity)"
+                        :class="[{'published-activity-text': activity.areCardsValid && activity.cards.length > 0 },
+                          {'published-activity-text-error': !activity.areCardsValid || activity.cards.length === 0}]">
+                        Publiée
+                      </span>
                     </div>
                   </div>
                   <div class="row no-wrap">
@@ -541,6 +555,9 @@ export default {
     isPublished (element) {
       return element.status === PUBLISHED;
     },
+    hasEmptyActivity (element) {
+      return element.activities.some(activity => activity.cards.length === 0);
+    },
   },
 };
 </script>
@@ -564,6 +581,8 @@ export default {
 
 .dot
   margin: 0 8px;
+  &-published
+    margin: 0 8px;
 
 .step
   margin-bottom: 10px
