@@ -26,11 +26,14 @@
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
                   </div>
                   <div class="dot-container">
-                    <div v-if="!step.areActivitiesValid && step.type==='e_learning'" class="dot dot-error" />
-                    <q-icon v-if="step.areActivitiesValid && isPublished(step) && step.type==='e_learning'" size="12px"
-                      name="check_circle" color="accent" class="dot-published" />
-                    <span v-if="isPublished(step)" :class="[{'published-activity-text': step.areActivitiesValid},
-                        {'published-activity-text-error': !step.areActivitiesValid}]">Publiée</span>
+                    <div v-if="!step.areActivitiesValid && step.activities.length > 0" class="dot dot-error" />
+                    <q-icon v-if="(step.areActivitiesValid || step.activities.length === 0) && isPublished(step)"
+                      size="12px" name="check_circle" color="accent" class="dot-published" />
+                    <span v-if="isPublished(step)"
+                      :class="[{'published-activity-text': (step.areActivitiesValid || step.activities.length === 0)},
+                        {'published-activity-text-error': !step.areActivitiesValid && step.activities.length > 0 }]">
+                          Publiée
+                    </span>
                   </div>
                 </div>
                 <div class="step-subtitle">
