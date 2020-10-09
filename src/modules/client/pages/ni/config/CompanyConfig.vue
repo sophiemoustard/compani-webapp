@@ -90,35 +90,9 @@
       :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
 
     <!-- Establishment edition modal -->
-    <ni-modal v-model="establishmentEditionModal" @hide="resetEstablishmentEditionModal">
-      <template slot="title">
-        Éditer l'<span class="text-weight-bold">établissement</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedEstablishment.name" :error="$v.editedEstablishment.name.$error"
-        :error-message="establishmentNameError($v.editedEstablishment)" @blur="$v.editedEstablishment.name.$touch"
-        required-field />
-      <ni-input in-modal caption="SIRET" v-model="editedEstablishment.siret"
-        :error="$v.editedEstablishment.siret.$error" :error-message="establishmentSiretError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.siret.$touch" required-field />
-      <ni-search-address in-modal v-model="editedEstablishment.address" color="white"
-        @blur="$v.editedEstablishment.address.$touch" :error-message="establishmentAddressError($v.editedEstablishment)"
-        :error="$v.editedEstablishment.address.$error" required-field />
-      <ni-input in-modal caption="Téléphone" v-model="editedEstablishment.phone"
-        :error="$v.editedEstablishment.phone.$error" :error-message="establishmentPhoneError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.phone.$touch" required-field />
-      <ni-select in-modal caption="Service de santé du travail" v-model="editedEstablishment.workHealthService"
-        :options="workHealthServices" :error="$v.editedEstablishment.workHealthService.$error"
-        :error-message="establishmentWhsError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.workHealthService.$touch" required-field />
-      <ni-select in-modal caption="Code URSSAF" v-model="editedEstablishment.urssafCode" :options="urssafCodes"
-        :error="$v.editedEstablishment.urssafCode.$error"
-        :error-message="establishmentUrssafCodeError($v.editedEstablishment)"
-        @blur="$v.editedEstablishment.urssafCode.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer l'établissement" icon-right="add" color="primary"
-          :loading="loading" @click="updateEstablishment" />
-      </template>
-    </ni-modal>
+    <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment="editedEstablishment"
+      :validations="$v.editedEstablishment" @hide="resetEstablishmentEditionModal" @submit="updateEstablishment"
+      :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
   </q-page>
 </template>
 
@@ -130,11 +104,10 @@ import pick from 'lodash/pick';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Establishments from '@api/Establishments';
 import Input from '@components/form/Input';
-import Select from '@components/form/Select';
-import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
 import EstablishmentCreationModal from 'src/modules/client/pages/ni/config/EstablishmentCreationModal';
+import EstablishmentEditionModal from 'src/modules/client/pages/ni/config/EstablishmentEditionModal';
 
 import {
   frAddress,
@@ -153,7 +126,6 @@ import { defineAbilitiesFor } from '@helpers/ability';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import { validationMixin } from '@mixins/validationMixin';
-import { establishmentMixin } from '@mixins/establishmentMixin';
 
 export default {
   name: 'CompanyConfig',
@@ -161,12 +133,11 @@ export default {
   components: {
     'ni-input': Input,
     'ni-search-address': SearchAddress,
-    'ni-select': Select,
-    'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
     'establishment-creation-modal': EstablishmentCreationModal,
+    'establishment-edition-modal': EstablishmentEditionModal,
   },
-  mixins: [configMixin, validationMixin, tableMixin, companyMixin, establishmentMixin],
+  mixins: [configMixin, validationMixin, tableMixin, companyMixin],
   data () {
     return {
       company: null,
