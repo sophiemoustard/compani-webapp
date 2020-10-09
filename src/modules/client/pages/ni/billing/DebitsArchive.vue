@@ -46,6 +46,7 @@ export default {
           name: 'createdTime',
           label: 'Date de création',
           align: 'left',
+          sort: (a, b) => (this.$moment(b).toDate()) - (this.$moment(a).toDate()),
           field: row => (row.createdTime ? this.$moment(row.createdTime).format('DD/MM/YYYY') : ''),
         },
         { name: 'download', label: '', align: 'left', field: 'webViewLink' },
