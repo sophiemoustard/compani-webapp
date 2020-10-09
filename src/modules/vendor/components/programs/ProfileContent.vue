@@ -4,7 +4,7 @@
       <div class="sub-program-header">
         <div>
           <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
-          <span class="published" v-if="isPublished(subProgram)">Publié</span>
+          <span class="published-sub-program" v-if="isPublished(subProgram)">Publié</span>
         </div>
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
           @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
@@ -49,7 +49,13 @@
                     <div class="gt-xs col-sm-2 activity-content">
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
-                    <div class="dot dot-active" v-if="isPublished(activity)" />
+                    <div class="dot-container">
+                      <div v-if="!activity.areCardsValid" class="dot dot-error" />
+                      <q-icon v-if="activity.areCardsValid && isPublished(activity)" size="12px" name="check_circle"
+                        color="accent" class="dot" />
+                      <span v-if="isPublished(activity)" :class="[{'published-activity-text': activity.areCardsValid},
+                        {'published-activity-text-error': !activity.areCardsValid}]">Publiée</span>
+                    </div>
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -540,7 +546,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
 .sub-program-container
   display: flex
   flex-direction: column
@@ -549,7 +554,7 @@ export default {
   display: flex
   justify-content: space-between
 
-.published
+.published-sub-program
   background-color: $accent
   font-size: 14px
   border-radius: 15px
@@ -558,7 +563,7 @@ export default {
   margin-left: 10px
 
 .dot
-  margin-left: 9px
+  margin: 0 8px;
 
 .step
   margin-bottom: 10px
@@ -570,6 +575,18 @@ export default {
       flex: 1
   &-subtitle
     font-size: 13px
+
+.dot-container
+  display: flex
+  flex-direction row
+  align-items: center
+
+.published-activity-text
+  font-size: 12px
+  color: $accent
+  &-error
+    font-size: 12px
+    color: $warning
 
 .add-step-button
   align-self: flex-end
