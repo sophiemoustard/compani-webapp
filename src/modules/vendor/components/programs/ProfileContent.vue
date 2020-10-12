@@ -109,7 +109,7 @@
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
     <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
-      :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
+      :type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
       :loading="modalLoading" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
