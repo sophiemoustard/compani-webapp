@@ -202,7 +202,7 @@ export default {
       newStep: { name: { required }, type: { required } },
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
-      editedActivity: { name: { required } },
+      editedActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     };
   },

@@ -5,7 +5,8 @@
       </template>
       <ni-input in-modal v-model.trim="editedActivity.name" :error="validations.name.$error"
         @blur="validations.name.$touch" required-field caption="Nom" />
-      <ni-select caption="Type" :options="typeOptions" v-model="editedActivity.type" required-field in-modal last />
+      <ni-select caption="Type" :options="typeOptions" v-model="editedActivity.type" required-field in-modal last
+        :error="validations.type.$error" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
