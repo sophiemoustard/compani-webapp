@@ -310,9 +310,9 @@ export default {
 
 <style lang="stylus" scoped>
   th:first-child
-    @media (min-width: 768px) and (max-width: 1024px)
+    @media (min-width: 768px) and (max-width: 1023px)
       width: 100px;
-    @media (min-width: 1025px)
+    @media (min-width: 1024px)
       width: 110px;
 
   .staffing
@@ -338,9 +338,9 @@ export default {
 
   .non-staffing
     .planning-background
-      @media screen and (max-width: 1024px)
+      @media screen and (max-width: 1023px)
         padding-bottom: 2rem;
-      @media screen and (min-width: 1025px)
+      @media screen and (min-width: 1024px)
         padding-bottom: 1rem;
 
   .to-assign

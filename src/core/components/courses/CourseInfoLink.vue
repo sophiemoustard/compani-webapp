@@ -49,7 +49,7 @@ export default {
 .q-item
   padding-left: 0px;
 .course-link
-  @media screen and (min-width: 1025px)
+  @media screen and (min-width: 1024px)
     display: flex
     flex-direction: row
     align-items: center
@@ -58,7 +58,7 @@ export default {
     display: flex
     flex-direction: row
     align-items: center
-    @media screen and (max-width: 1024px)
+    @media screen and (max-width: 1023px)
       padding: 0 0 10px 55px
     &-label
       cursor: pointer
