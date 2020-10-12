@@ -165,8 +165,13 @@ export default {
       return this.selected.length > 0;
     },
     displayedDraftPay () {
-      if (this.selectedSector === '') return [...this.draftPay];
-      return this.draftPay.filter(dp => dp.auxiliary.sector._id === this.selectedSector);
+      let draftPayList = this.draftPay;
+
+      if (this.sortOption) draftPayList = this.sortPayListByOption(draftPayList, this.sortOption);
+
+      if (this.selectedSector === '') return [...draftPayList];
+
+      return draftPayList.filter(dp => dp.auxiliary.sector._id === this.selectedSector);
     },
   },
   watch: {
@@ -242,6 +247,15 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création des fiches de paie.');
       }
+    },
+    sortPayListByOption (draftPayList, option) {
+      const draftPayListSortedByOption = draftPayList.sort((dp1, dp2) => {
+        if (dp1[option] === dp2[option]) return 0;
+
+        return (dp1[option] < dp2[option]) ? 1 : -1;
+      });
+
+      return draftPayListSortedByOption;
     },
   },
 };
