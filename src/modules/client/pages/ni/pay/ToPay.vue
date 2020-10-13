@@ -165,13 +165,13 @@ export default {
       return this.selected.length > 0;
     },
     displayedDraftPay () {
-      let draftPayList = this.draftPay;
+      const draftPayList = this.selectedSector === ''
+        ? [...this.draftPay]
+        : this.draftPay.filter(dp => dp.auxiliary.sector._id === this.selectedSector);
 
-      if (this.sortOption) draftPayList = this.sortPayListByOption(draftPayList, this.sortOption);
+      if (!this.sortOption) return draftPayList;
 
-      if (this.selectedSector === '') return [...draftPayList];
-
-      return draftPayList.filter(dp => dp.auxiliary.sector._id === this.selectedSector);
+      return this.sortPayListByOption(draftPayList, this.sortOption);
     },
   },
   watch: {
@@ -249,13 +249,13 @@ export default {
       }
     },
     sortPayListByOption (draftPayList, option) {
-      const draftPayListSortedByOption = draftPayList.sort((dp1, dp2) => {
+      draftPayList.sort((dp1, dp2) => {
         if (dp1[option] === dp2[option]) return 0;
 
         return (dp1[option] < dp2[option]) ? 1 : -1;
       });
 
-      return draftPayListSortedByOption;
+      return draftPayList;
     },
   },
 };
