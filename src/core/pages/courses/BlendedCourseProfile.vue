@@ -27,6 +27,7 @@ import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
+import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -60,6 +61,12 @@ export default {
           name: 'admin',
           default: this.defaultTab === 'admin',
           component: ProfileAdmin,
+        },
+        {
+          label: 'Suivi des stagiaires',
+          name: 'traineeFollowUp',
+          default: this.defaultTab === 'traineeFollowUp',
+          component: ProfileTraineeFollowUp,
         },
       ],
       isClientInterface,
