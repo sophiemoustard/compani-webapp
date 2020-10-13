@@ -1,11 +1,14 @@
 <template>
   <div>
-    <q-linear-progress size="48px" :value="0.5" rounded class="q-mt-sm bar">
-      <div class="bar-label">
-        <div>Un reseau wifi</div>
-        <div>12 réponses</div>
-      </div>
-    </q-linear-progress>
+    <div v-for="(line, index) in lines" :key="index" class="q-mt-sm bar-container">
+      <div class="q-mr-md">{{ line.percentage * 100 }}%</div>
+      <q-linear-progress size="48px" :value="line.percentage" rounded class="bar">
+        <div class="bar-label">
+          <div>{{ line.title }}</div>
+          <div><span class="text-weight-bold">{{ line.total }}</span> réponses</div>
+        </div>
+      </q-linear-progress>
+    </div>
   </div>
 </template>
 
@@ -14,6 +17,13 @@ export default {
   name: 'HorizontalBarChart',
   data () {
     return {
+      lines: [
+        { title: 'hello', total: 9, percentage: 0.2 },
+        { title: 'hello', total: 9, percentage: 0.2 },
+        { title: 'hello', total: 9, percentage: 0.2 },
+        { title: 'hello', total: 9, percentage: 0.2 },
+        { title: 'hello', total: 9, percentage: 0.2 },
+      ],
     };
   },
 };
@@ -22,6 +32,11 @@ export default {
 <style lang="stylus" scoped>
 .bar
   color: $middle-beige
+
+.bar-container
+  display: flex
+  align-items: center
+
 .bar-label
   font-size: 14px
   position: absolute
