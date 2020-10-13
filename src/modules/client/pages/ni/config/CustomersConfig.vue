@@ -120,8 +120,8 @@
 
     <!-- Surcharge creation modal -->
     <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge="newSurcharge"
-      :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
-      :nbr-errors="nbrErrors" :loading="loading" />
+      :$v="$v" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
+      :loading="loading" />
 
     <!-- Surcharge edition modal -->
     <ni-modal v-model="surchargeEditionModal" @hide="resetEditionSurchargeData">
@@ -658,16 +658,6 @@ export default {
     },
   },
   computed: {
-    nbrErrors () {
-      return {
-        saturday: this.nbrError('newSurcharge.saturday'),
-        sunday: this.nbrError('newSurcharge.sunday'),
-        publicHoliday: this.nbrError('newSurcharge.publicHoliday'),
-        twentyFifthOfDecember: this.nbrError('newSurcharge.twentyFifthOfDecember'),
-        firstOfMay: this.nbrError('newSurcharge.firstOfMay'),
-        evening: this.nbrError('newSurcharge.evening'),
-      };
-    },
     docsUploadUrl () {
       return `${process.env.API_HOSTNAME}/companies/${this.company._id}/gdrive/${this.company.folderId}/upload`;
     },
