@@ -42,10 +42,11 @@ export const configMixin = {
     },
     nbrError (path) {
       if (get(this.$v, path).required === false) return REQUIRED_LABEL;
-      if (get(this.$v, path).positiveNumber === false || get(this.$v, path).numeric === false) {
+      if (get(this.$v, path).positiveNumber === false ||
+      get(this.$v, path).numeric === false ||
+      get(this.$v, path).maxValue === false) {
         return 'Nombre non valide';
       }
-      if (get(this.$v, path).maxValue === false) return 'Le montant doit être inférieur à 999';
     },
     // Documents
     async deleteDocument (driveId, type, key) {

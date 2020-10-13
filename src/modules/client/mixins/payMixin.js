@@ -169,7 +169,7 @@ export const payMixin = {
         },
         {
           name: 'phoneFees',
-          label: 'Frais tel',
+          label: 'Frais tél',
           align: 'center',
           field: 'phoneFees',
           format: formatPrice,
@@ -267,7 +267,7 @@ export const payMixin = {
         'Heures comp à payer',
         'Mutuelle',
         'Transport',
-        'Frais tel',
+        'Frais téléphoniques',
         'Prime',
       ]];
 

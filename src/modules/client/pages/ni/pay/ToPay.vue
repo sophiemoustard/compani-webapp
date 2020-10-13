@@ -155,7 +155,7 @@ export default {
         { label: 'Compteur', value: 'hoursCounter' },
         { label: 'Mutuelle', value: 'mutual' },
         { label: 'Transport', value: 'transport' },
-        { label: 'Frais tel', value: 'phoneFees' },
+        { label: 'Frais téléphoniques', value: 'phoneFees' },
       ],
       sortOption: 'auxiliary',
     };
