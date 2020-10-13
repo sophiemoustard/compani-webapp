@@ -99,6 +99,7 @@ import EditableTd from '@components/table/EditableTd';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
+import get from 'lodash/get';
 
 export default {
   name: 'ToPay',
@@ -146,16 +147,16 @@ export default {
       selectedSector: '',
       tableLoading: false,
       sortOptions: [
-        { label: 'Auxiliaire', value: 'auxiliary' },
-        { label: 'Équipe', value: 'sector' },
-        { label: 'Début', value: 'startDate' },
-        { label: 'Heures contrat', value: 'contractHours' },
-        { label: 'Heures travaillées', value: 'workedHours' },
-        { label: 'Solde heures', value: 'hoursBalance' },
-        { label: 'Compteur', value: 'hoursCounter' },
-        { label: 'Mutuelle', value: 'mutual' },
-        { label: 'Transport', value: 'transport' },
-        { label: 'Frais téléphoniques', value: 'phoneFees' },
+        { label: 'Auxiliaire', value: 'auxiliary', path: 'auxiliary.identity.lastname' },
+        { label: 'Équipe', value: 'sector', path: 'auxiliary.sector.name' },
+        { label: 'Début', value: 'startDate', path: 'startDate' },
+        { label: 'Heures contrat', value: 'contractHours', path: 'contractHours' },
+        { label: 'Heures travaillées', value: 'workedHours', path: 'workedHours' },
+        { label: 'Solde heures', value: 'hoursBalance', path: 'hoursBalance' },
+        { label: 'Compteur', value: 'hoursCounter', path: 'hoursCounter' },
+        { label: 'Mutuelle', value: 'mutual', path: 'mutual' },
+        { label: 'Transport', value: 'transport', path: 'transport' },
+        { label: 'Frais téléphoniques', value: 'phoneFees', path: 'phoneFees' },
       ],
       sortOption: 'auxiliary',
     };
@@ -171,7 +172,17 @@ export default {
 
       if (!this.sortOption) return draftPayList;
 
-      return this.sortPayListByOption(draftPayList, this.sortOption);
+      const option = this.sortOptions.find(op => op.value === this.sortOption);
+
+      return draftPayList.sort((dp1, dp2) => {
+        if (get(dp1, option.path) === get(dp2, option.path)) return 0;
+
+        if (option === this.sortOptions[0] || option === this.sortOptions[1]) {
+          return (get(dp1, option.path) < get(dp2, option.path)) ? -1 : 1;
+        }
+
+        return (get(dp1, option.path) < get(dp2, option.path)) ? 1 : -1;
+      });
     },
   },
   watch: {
@@ -247,15 +258,6 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création des fiches de paie.');
       }
-    },
-    sortPayListByOption (draftPayList, option) {
-      draftPayList.sort((dp1, dp2) => {
-        if (dp1[option] === dp2[option]) return 0;
-
-        return (dp1[option] < dp2[option]) ? 1 : -1;
-      });
-
-      return draftPayList;
     },
   },
 };
