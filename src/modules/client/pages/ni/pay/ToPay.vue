@@ -137,7 +137,7 @@ export default {
         'additionalHours',
         'mutual',
         'transport',
-        'otherFees',
+        'phoneFees',
         'bonus',
       ],
       surchargeDetailModal: false,
@@ -155,7 +155,7 @@ export default {
         { label: 'Compteur', value: 'hoursCounter' },
         { label: 'Mutuelle', value: 'mutual' },
         { label: 'Transport', value: 'transport' },
-        { label: 'Autres frais', value: 'otherFees' },
+        { label: 'Frais téléphoniques', value: 'phoneFees' },
       ],
       sortOption: 'auxiliary',
     };
