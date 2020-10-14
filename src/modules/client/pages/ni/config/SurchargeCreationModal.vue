@@ -7,23 +7,23 @@
         @blur="validations.name.$touch" required-field />
       <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
         :error="validations.saturday.$error" @blur="validations.saturday.$touch"
-        :error-message="nbrError('newSurcharge.saturday', validations)" />
+        :error-message="nbrError('saturday', validations)" />
       <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
         :error="validations.sunday.$error" @blur="validations.sunday.$touch"
-        :error-message="nbrError('newSurcharge.sunday', validations)" />
+        :error-message="nbrError('sunday', validations)" />
       <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
         :error="validations.publicHoliday.$error" @blur="validations.publicHoliday.$touch"
-        :error-message="nbrError('newSurcharge.publicHoliday', validations)" />
+        :error-message="nbrError('publicHoliday', validations)" />
       <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number"
         v-model="newSurcharge.twentyFifthOfDecember" :error="validations.twentyFifthOfDecember.$error"
-        :error-message="nbrError('newSurcharge.twentyFifthOfDecember', validations)"
+        :error-message="nbrError('twentyFifthOfDecember', validations)"
         @blur="validations.twentyFifthOfDecember.$touch" />
       <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
         :error="validations.firstOfMay.$error" @blur="validations.firstOfMay.$touch"
-        :error-message="nbrError('newSurcharge.firstOfMay', validations)" />
+        :error-message="nbrError('firstOfMay', validations)" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
         :error="validations.evening.$error" @blur="validations.evening.$touch"
-        :error-message="nbrError('newSurcharge.evening', validations)" />
+        :error-message="nbrError('evening', validations)" />
       <ni-time-input in-modal v-model="newSurcharge.eveningStartTime" caption="Début soirée"
         :error="validations.eveningStartTime.$error" :disable="!newSurcharge.evening"
         @blur="validations.eveningStartTime.$touch" error-message="Heure invalide"
@@ -61,11 +61,6 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
-  data () {
-    return {
-      
-    }
-  }
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
