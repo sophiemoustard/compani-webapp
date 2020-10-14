@@ -35,7 +35,7 @@
         <p class="text-weight-bold">Contrats prestataires</p>
         <div class="row gutter-profile">
           <ni-input caption="Taux horaire brut par défaut" :error="$v.company.rhConfig.grossHourlyRate.$error"
-            :error-message="nbrError('company.rhConfig.grossHourlyRate', $v)" type="number"
+            :error-message="nbrError('company.rhConfig.grossHourlyRate')" type="number"
             v-model="company.rhConfig.grossHourlyRate" @focus="saveTmp('rhConfig.grossHourlyRate')" suffix="€"
             @blur="updateCompany('rhConfig.grossHourlyRate')" />
         </div>
@@ -44,7 +44,7 @@
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant des frais" :error="$v.company.rhConfig.phoneFeeAmount.$error" type="number"
-            :error-message="nbrError('company.rhConfig.phoneFeeAmount', $v)" v-model="company.rhConfig.phoneFeeAmount"
+            :error-message="nbrError('company.rhConfig.phoneFeeAmount')" v-model="company.rhConfig.phoneFeeAmount"
             @focus="saveTmp('rhConfig.phoneFeeAmount')" suffix="€" @blur="updateCompany('rhConfig.phoneFeeAmount')" />
         </div>
       </div>
@@ -52,7 +52,7 @@
         <p class="text-weight-bold">Taux kilométrique</p>
         <div class="row gutter-profile">
           <ni-input caption="Montant par kilomètre" :error="$v.company.rhConfig.amountPerKm.$error" type="number"
-            :error-message="nbrError('company.rhConfig.amountPerKm', $v)" v-model="company.rhConfig.amountPerKm"
+            :error-message="nbrError('company.rhConfig.amountPerKm')" v-model="company.rhConfig.amountPerKm"
             @focus="saveTmp('rhConfig.amountPerKm')" suffix="€" @blur="updateCompany('rhConfig.amountPerKm')" />
         </div>
       </div>
@@ -64,7 +64,7 @@
               <ni-input :caption="transportSub.department" v-model="company.rhConfig.transportSubs[index].price"
                 :error="$v.company.rhConfig.transportSubs.$each[index].$error" type="number" :key="index"
                 @focus="saveTmp(`rhConfig.transportSubs[${index}].price`)" suffix="€"
-                :error-message="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`, $v)"
+                :error-message="nbrError(`company.rhConfig.transportSubs.$each[${index}].price`)"
                 @blur="updateCompanyTransportSubs(index)" />
             </template>
           </template>

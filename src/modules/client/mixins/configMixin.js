@@ -40,7 +40,7 @@ export const configMixin = {
         this.tmpInput = '';
       }
     },
-    nbrError (path, validations) {
+    nbrError (path, validations = this.$v) {
       if (get(validations, path).required === false) return REQUIRED_LABEL;
       if (get(validations, path).positiveNumber === false ||
       get(validations, path).numeric === false ||
