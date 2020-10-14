@@ -65,7 +65,7 @@
                       <q-icon v-if="activity.areCardsValid && isPublished(activity)&& activity.cards.length > 0"
                         size="12px" name="check_circle" color="accent" class="dot-published" />
                       <span v-if="isPublished(activity)"
-                        :class="[{'published-activity-text': activity.areCardsValid && activity.cards.length > 0 },
+                        :class="[{'published-activity-text': activity.areCardsValid && activity.cards.length > 0},
                           {'published-activity-text-error': !activity.areCardsValid || activity.cards.length === 0}]">
                         Publiée
                       </span>

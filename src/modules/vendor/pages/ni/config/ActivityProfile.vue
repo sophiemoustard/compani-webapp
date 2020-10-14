@@ -8,7 +8,16 @@
               <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
               <q-item-section>{{ info.label }}</q-item-section>
             </q-item>
-            <div v-if="isActivityPublished"><div class="dot dot-active" />Publiée</div>
+            <div class="dot-container">
+              <div v-if="!activity.areCardsValid || activity.cards.length === 0" class="dot dot-error" />
+              <q-icon v-if="activity.areCardsValid && isActivityPublished && activity.cards.length > 0"
+                size="12px" name="check_circle" color="accent" class="dot-published" />
+              <span v-if="isActivityPublished"
+                :class="[{'published-activity-text': activity.areCardsValid && activity.cards.length > 0},
+                  {'published-activity-text-error': !activity.areCardsValid || activity.cards.length === 0}]">
+                Publiée
+              </span>
+          </div>
           </div>
         </template>
       </ni-profile-header>
@@ -213,10 +222,24 @@ export default {
 .body
   flex: 1
 
-.dot
-  margin: 0 22px 0 4px
-
 .q-item
   padding: 0
   min-height: 0
+
+.dot-container
+  display: flex
+  flex-direction row
+  align-items: center
+
+.published-activity-text
+  font-size: 12px
+  color: $accent
+  &-error
+    font-size: 12px
+    color: $warning
+
+.dot
+  margin: 0 22px 0 4px
+  &-published
+    margin: 0 19px 0 3px
 </style>
