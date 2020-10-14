@@ -1,7 +1,12 @@
 <template>
   <div v-if="followUp.subProgram">
     <div v-for="(step, stepIndex) of followUp.subProgram.steps" :key="stepIndex" class="q-mb-xl">
-      <div class="text-weight-bold">{{ stepIndex + 1 }} - {{ step.name }}</div>
+      <div class="text-weight-bold q-mb-sm">{{ stepIndex + 1 }} - {{ step.name }}</div>
+      <q-card v-for="(activity, activityIndex) of step.activities" :key="activityIndex" flat class="q-mb-sm">
+        <q-card-section>
+          <div class="text-weight-bold">{{ activityIndex + 1 }} - {{ activity.name }}</div>
+        </q-card-section>
+      </q-card>
     </div>
     <horizontal-bar-chart />
   </div>

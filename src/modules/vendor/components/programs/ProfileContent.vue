@@ -14,7 +14,7 @@
         :disable="isPublished(subProgram)" />
       <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
         :disabled="$q.platform.is.mobile || isPublished(subProgram)">
-        <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
+        <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step q-mb-sm">
           <q-card-section class="step-head cursor-pointer row" :id="step._id">
             <div class="step-info" @click="showActivities(step._id)">
               <q-item-section side>
@@ -587,7 +587,6 @@ export default {
     margin: 0 8px;
 
 .step
-  margin-bottom: 10px
   border-radius: 0
   &-head
     justify-content: space-between
