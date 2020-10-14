@@ -8,16 +8,8 @@
               <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
               <q-item-section>{{ info.label }}</q-item-section>
             </q-item>
-            <div class="dot-container">
-              <div v-if="!activity.areCardsValid || activity.cards.length === 0" class="dot dot-error" />
-              <q-icon v-if="activity.areCardsValid && isActivityPublished && activity.cards.length > 0"
-                size="12px" name="check_circle" color="accent" class="dot-published" />
-              <span v-if="isActivityPublished"
-                :class="[{'published-activity-text': activity.areCardsValid && activity.cards.length > 0},
-                  {'published-activity-text-error': !activity.areCardsValid || activity.cards.length === 0}]">
-                Publiée
-              </span>
-          </div>
+            <published-dot :is-published="isActivityPublished" :should-have-margin="true"
+              :status="!activity.areCardsValid || activity.cards.length === 0 ? 'error' : 'valid'" />
           </div>
         </template>
       </ni-profile-header>
@@ -47,6 +39,7 @@ import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
+import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 
 export default {
   name: 'ActivityProfile',
@@ -62,6 +55,7 @@ export default {
     'card-container': CardContainer,
     'card-edition': CardEdition,
     'card-creation-modal': CardCreationModal,
+    'published-dot': PublishedDot,
   },
   data () {
     return {

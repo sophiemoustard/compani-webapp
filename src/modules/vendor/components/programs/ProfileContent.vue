@@ -25,16 +25,8 @@
                   <div class="text-weight-bold">
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
                   </div>
-                  <div class="dot-container">
-                    <div v-if="!step.areActivitiesValid || hasEmptyActivity(step)" class="dot dot-error" />
-                    <q-icon v-if="step.areActivitiesValid && isPublished(step) && !hasEmptyActivity(step)"
-                      size="12px" name="check_circle" color="accent" class="dot-published" />
-                    <span v-if="isPublished(step)"
-                      :class="[{'published-activity-text': step.areActivitiesValid && !hasEmptyActivity(step)},
-                        {'published-activity-text-error': !step.areActivitiesValid || hasEmptyActivity(step)}]">
-                      Publiée
-                    </span>
-                  </div>
+                  <published-dot :is-published="isPublished(step)" :should-have-margin="false"
+                    :status="!step.areActivitiesValid || hasEmptyActivity(step) ? 'error' : 'valid'" />
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} -
@@ -60,16 +52,8 @@
                     <div class="gt-xs col-sm-2 activity-content">
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
-                    <div class="dot-container">
-                      <div v-if="!activity.areCardsValid || activity.cards.length === 0" class="dot dot-error" />
-                      <q-icon v-if="activity.areCardsValid && isPublished(activity)&& activity.cards.length > 0"
-                        size="12px" name="check_circle" color="accent" class="dot-published" />
-                      <span v-if="isPublished(activity)"
-                        :class="[{'published-activity-text': activity.areCardsValid && activity.cards.length > 0},
-                          {'published-activity-text-error': !activity.areCardsValid || activity.cards.length === 0}]">
-                        Publiée
-                      </span>
-                    </div>
+                    <published-dot :is-published="isPublished(activity)" :should-have-margin="false"
+                      :status="!activity.areCardsValid || activity.cards.length === 0 ? 'error' : 'valid'" />
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -144,6 +128,7 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
+import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 
 export default {
   name: 'ProfileContent',
@@ -160,6 +145,7 @@ export default {
     'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
     draggable,
+    'published-dot': PublishedDot,
   },
   data () {
     return {
