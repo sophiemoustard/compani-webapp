@@ -4,7 +4,7 @@
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
     <div v-for="(line, index) in lines" :key="index" class="q-mt-sm bar-container">
       <div class="q-mr-sm percentage">{{ formatPercentage(line.percentage) }}</div>
-      <q-linear-progress size="48px" :value="line.percentage" rounded class="bar">
+      <q-linear-progress size="40px" :value="line.percentage" rounded class="bar">
         <div class="bar-label">
           <div>{{ line.title }}</div>
           <div><span class="text-weight-bold">{{ line.total }}</span> réponses</div>
@@ -19,18 +19,10 @@ import { roundFrenchPercentage } from '@helpers/utils';
 
 export default {
   name: 'HorizontalBarChart',
-  data () {
-    return {
-      title: 'Quels sont vos outils (mail, messagerie interne, messenger...) pour communiquer ?',
-      subtitle: '15 réponses à cette question à choix multiple',
-      lines: [
-        { title: 'hello', total: 9, percentage: 0.2 },
-        { title: 'hello', total: 9, percentage: 0 },
-        { title: 'hello', total: 9, percentage: 1 },
-        { title: 'hello', total: 9, percentage: 0.5 },
-        { title: 'hello', total: 9, percentage: 0.888888 },
-      ],
-    };
+  props: {
+    title: { type: String, default: '' },
+    subtitle: { type: String, default: '' },
+    lines: { type: Array, default: () => [] },
   },
   methods: {
     formatPercentage (number) {

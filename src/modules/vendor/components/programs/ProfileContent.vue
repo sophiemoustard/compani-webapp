@@ -621,7 +621,7 @@ export default {
   width: -webkit-fill-available
 
 .activity
-  margin: 10px 10px 10px 50px
+  margin: 8px 8px 8px 48px
   border-radius: 0
   &-info
     flex: 1

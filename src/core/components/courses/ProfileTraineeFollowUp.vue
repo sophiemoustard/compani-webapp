@@ -6,28 +6,26 @@
         <q-card-section class="cursor-pointer" @click="showCards(activity._id)">
           <div class="text-weight-bold">{{ activityIndex + 1 }} - {{ activity.name }}</div>
         </q-card-section>
-        <div class="beige-background">
-          <template v-if="areCardsDisplayed[activity._id]">
-            <div v-for="(card, cardIndex) of activity.followUp" :key="cardIndex">
-              <div>{{ card.question }}</div>
-            </div>
+        <div class="beige-background chart-container" v-if="areCardsDisplayed[activity._id]">
+          <template v-for="(card, cardIndex) of activity.followUp">
+            <survey-chart v-if="card.template === SURVEY" :key="cardIndex" class="chart" :card="card" />
           </template>
         </div>
       </q-card>
     </div>
-    <horizontal-bar-chart />
   </div>
 </template>
 
 <script>
 import { NotifyNegative } from '@components/popup/notify';
-import HorizontalBarChart from '@components/courses/HorizontalBarChart';
+import SurveyChart from '@components/courses/SurveyChart';
 import Courses from '@api/courses';
+import { SURVEY } from '@data/constants';
 
 export default {
   name: 'ProfileTraineeFollowUp',
   components: {
-    'horizontal-bar-chart': HorizontalBarChart,
+    'survey-chart': SurveyChart,
   },
   props: {
     profileId: { type: String, required: true },
@@ -36,6 +34,7 @@ export default {
     return {
       followUp: {},
       areCardsDisplayed: {},
+      SURVEY,
     };
   },
   async created () {
@@ -57,3 +56,12 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.chart-container
+  display: flex
+  flex-direction: column
+
+.chart
+  margin: 8px 8px 8px 48px
+</style>
