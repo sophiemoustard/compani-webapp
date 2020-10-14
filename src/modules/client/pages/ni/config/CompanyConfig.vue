@@ -106,8 +106,8 @@ import Establishments from '@api/Establishments';
 import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
-import EstablishmentCreationModal from 'src/modules/client/pages/ni/config/EstablishmentCreationModal';
-import EstablishmentEditionModal from 'src/modules/client/pages/ni/config/EstablishmentEditionModal';
+import EstablishmentCreationModal from 'src/modules/client/components/config/EstablishmentCreationModal';
+import EstablishmentEditionModal from 'src/modules/client/components/config/EstablishmentEditionModal';
 
 import {
   frAddress,
