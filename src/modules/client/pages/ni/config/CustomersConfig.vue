@@ -120,7 +120,7 @@
 
     <!-- Surcharge creation modal -->
     <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge="newSurcharge"
-      :validations="$v" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
+      :validation="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
       :loading="loading" />
 
     <!-- Surcharge edition modal -->
