@@ -138,8 +138,7 @@
         :error-message="nbrError('editedSurcharge.sunday')" />
       <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number"
         v-model="editedSurcharge.publicHoliday" :error="$v.editedSurcharge.publicHoliday.$error"
-        @blur="$v.editedSurcharge.publicHoliday.$touch"
-        :error-message="nbrError('editedSurcharge.publicHoliday')" />
+        @blur="$v.editedSurcharge.publicHoliday.$touch" :error-message="nbrError('editedSurcharge.publicHoliday')" />
       <ni-input in-modal caption="Majoration 25 décembre" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
         v-model="editedSurcharge.twentyFifthOfDecember" @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch"
         :error-message="nbrError('editedSurcharge.twentyFifthOfDecember')" suffix="%" type="number" />
