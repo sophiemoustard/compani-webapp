@@ -124,51 +124,9 @@
       :loading="loading" />
 
     <!-- Surcharge edition modal -->
-    <ni-modal v-model="surchargeEditionModal" @hide="resetEditionSurchargeData">
-      <template slot="title">
-        Éditer le <span class="text-weight-bold">plan de majoration</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error"
-        @blur="$v.editedSurcharge.name.$touch" required-field />
-      <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
-        :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch"
-        :error-message="nbrError('editedSurcharge.saturday')" />
-      <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
-        :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch"
-        :error-message="nbrError('editedSurcharge.sunday')" />
-      <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number"
-        v-model="editedSurcharge.publicHoliday" :error="$v.editedSurcharge.publicHoliday.$error"
-        @blur="$v.editedSurcharge.publicHoliday.$touch" :error-message="nbrError('editedSurcharge.publicHoliday')" />
-      <ni-input in-modal caption="Majoration 25 décembre" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
-        v-model="editedSurcharge.twentyFifthOfDecember" @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch"
-        :error-message="nbrError('editedSurcharge.twentyFifthOfDecember')" suffix="%" type="number" />
-      <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
-        :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch"
-        :error-message="nbrError('editedSurcharge.firstOfMay')" />
-      <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
-        :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch"
-        :error-message="nbrError('editedSurcharge.evening')" first-of-may />
-      <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
-        :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
-        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
-        error-message="Heure invalide" />
-      <ni-time-input in-modal v-model="editedSurcharge.eveningEndTime" caption="Fin soirée"
-        :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch"
-        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
-        error-message="Heure invalide" />
-      <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
-        :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
-      <ni-time-input in-modal v-model="editedSurcharge.customStartTime" caption="Début personnalisé"
-        :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch"
-        :disable="!editedSurcharge.custom" :required-field="!!editedSurcharge.custom" error-message="Heure invalide" />
-      <ni-time-input in-modal v-model="editedSurcharge.customEndTime" caption="Fin personnalisée"
-        :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch"
-        :disable="!editedSurcharge.custom" :required-field="!!editedSurcharge.custom" error-message="Heure invalide" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
-          color="primary" :loading="loading" @click="updateSurcharge" />
-      </template>
-    </ni-modal>
+    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge="editedSurcharge"
+      :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
+      :loading="loading" />
 
     <!-- Service creation modal -->
     <service-creation-modal v-model="serviceCreationModal" :new-service="newService" :validations="$v.newService"
@@ -253,7 +211,6 @@ import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import TimeInput from '@components/form/TimeInput';
 import FileUploader from '@components/form/FileUploader';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -272,7 +229,8 @@ import {
 } from '@data/constants';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
-import SurchargeCreationModal from 'src/modules/client/pages/ni/config/SurchargeCreationModal';
+import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
+import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -285,12 +243,12 @@ export default {
     'ni-input': Input,
     'ni-select': Select,
     'ni-search-address': SearchAddress,
-    'ni-time-input': TimeInput,
     'ni-modal': Modal,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
     'surcharge-creation-modal': SurchargeCreationModal,
+    'surcharge-edition-modal': SurchargeEditionModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {

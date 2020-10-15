@@ -49,8 +49,8 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
-import { configMixin } from 'src/modules/client/mixins/configMixin';
 import TimeInput from '@components/form/TimeInput';
+import { configMixin } from 'src/modules/client/mixins/configMixin';
 
 export default {
   name: 'SurchargeCreationModal',
