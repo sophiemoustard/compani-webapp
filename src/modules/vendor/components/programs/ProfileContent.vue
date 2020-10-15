@@ -26,9 +26,7 @@
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
                   </div>
                   <published-dot :is-published="isPublished(step)"
-                    :status="!step.areActivitiesValid || hasEmptyActivity(step)
-                      ? PUBLISHED_DOT_WARNING
-                      : PUBLISHED_DOT_ACTIVE" />
+                    :status="isStepValid(step) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} -
@@ -55,9 +53,7 @@
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
                     <published-dot :is-published="isPublished(activity)"
-                      :status="!activity.areCardsValid || activity.cards.length === 0
-                        ? PUBLISHED_DOT_WARNING
-                        : PUBLISHED_DOT_ACTIVE" />
+                      :status="isActivityValid(activity) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -559,8 +555,11 @@ export default {
     isPublished (element) {
       return element.status === PUBLISHED;
     },
-    hasEmptyActivity (element) {
-      return element.activities.some(activity => activity.cards.length === 0);
+    isActivityValid (activity) {
+      return activity.areCardsValid && activity.cards.length > 0;
+    },
+    isStepValid (step) {
+      return step.areActivitiesValid && !step.activities.some(activity => activity.cards.length === 0);
     },
   },
 };

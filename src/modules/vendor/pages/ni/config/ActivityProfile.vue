@@ -6,14 +6,9 @@
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
               <q-item-section side>
-              <q-icon size="xs" :name="info.icon"
-                :class="[{'info-active': info.status === PUBLISHED_DOT_ACTIVE},
-                {'info-warning': info.status === PUBLISHED_DOT_WARNING}]" />
+                <q-icon size="xs" :name="info.icon" :class="info.class" />
               </q-item-section>
-              <q-item-section :class="[{'info-active': info.status === PUBLISHED_DOT_ACTIVE},
-                {'info-warning': info.status === PUBLISHED_DOT_WARNING}]">
-                {{ info.label }}
-              </q-item-section>
+              <q-item-section :class="info.class">{{ info.label }}</q-item-section>
             </q-item>
           </div>
         </template>
@@ -99,7 +94,7 @@ export default {
       if (this.isActivityPublished) {
         infos.push({ icon: !this.isActivityValid ? 'circle' : 'check_circle',
           label: 'Publiée',
-          status: !this.isActivityValid ? PUBLISHED_DOT_WARNING : PUBLISHED_DOT_ACTIVE });
+          class: this.isActivityValid ? 'info-active' : 'info-warning' });
       }
 
       return infos;
