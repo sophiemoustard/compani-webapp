@@ -17,9 +17,9 @@
 </template>
 
 <script>
+import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import SurveyChart from '@components/courses/SurveyChart';
-import Courses from '@api/courses';
 import { SURVEY } from '@data/constants';
 
 export default {
