@@ -1,26 +1,28 @@
 <template>
   <div class="dot-container">
-    <div v-if="!shouldHaveMargin" class="dot-margin" />
-    <div v-if="status === 'error'" class="dot dot-error" />
-    <q-icon v-if="isPublished && status === 'valid'"
+    <q-icon v-if="status === PUBLISHED_DOT_WARNING"
+      size="12px" name="circle" color="warning" />
+    <q-icon v-if="isPublished && status === PUBLISHED_DOT_ACTIVE"
       size="12px" name="check_circle" color="accent" />
-    <div v-if="shouldHaveMargin" class="text-margin" />
     <span v-if="isPublished"
-      :class="[{'published-activity-text': status === 'valid'},
-        {'published-activity-text-error': status === 'error'}]">
+      :class="[{'published-activity-text': status === PUBLISHED_DOT_ACTIVE},
+        {'published-activity-text-error': status === PUBLISHED_DOT_WARNING}]">
       Publiée
     </span>
   </div>
 </template>
 
 <script>
+import { PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 
 export default {
   name: 'PublishedDot',
   props: {
     status: { type: String, required: true },
     isPublished: { type: Boolean, required: true },
-    shouldHaveMargin: { type: Boolean, required: true },
+  },
+  data () {
+    return { PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING };
   },
 };
 </script>
@@ -30,16 +32,7 @@ export default {
   display: flex
   flex-direction row
   align-items: center
-  margin-left: 4px
-
-.dot-margin
-  margin: 0 4px 0 0
-
-.text-margin
-  margin: 0 0 0 12px
-
-.dot
-  margin: 0
+  margin-left: 8px
 
 .published-activity-text
   font-size: 12px
@@ -48,5 +41,5 @@ export default {
   &-error
     font-size: 12px
     color: $warning
-    margin-left: 9px
+    margin-left: 8px
 </style>

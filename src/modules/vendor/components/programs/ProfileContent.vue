@@ -25,8 +25,10 @@
                   <div class="text-weight-bold">
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
                   </div>
-                  <published-dot :is-published="isPublished(step)" :should-have-margin="false"
-                    :status="!step.areActivitiesValid || hasEmptyActivity(step) ? 'error' : 'valid'" />
+                  <published-dot :is-published="isPublished(step)"
+                    :status="!step.areActivitiesValid || hasEmptyActivity(step)
+                      ? PUBLISHED_DOT_WARNING
+                      : PUBLISHED_DOT_ACTIVE" />
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} -
@@ -52,8 +54,10 @@
                     <div class="gt-xs col-sm-2 activity-content">
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
-                    <published-dot :is-published="isPublished(activity)" :should-have-margin="false"
-                      :status="!activity.areCardsValid || activity.cards.length === 0 ? 'error' : 'valid'" />
+                    <published-dot :is-published="isPublished(activity)"
+                      :status="!activity.areCardsValid || activity.cards.length === 0
+                        ? PUBLISHED_DOT_WARNING
+                        : PUBLISHED_DOT_ACTIVE" />
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -119,7 +123,17 @@ import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO, PUBLISHED } from '@data/constants';
+import {
+  E_LEARNING,
+  ON_SITE,
+  LESSON,
+  QUIZ,
+  SHARING_EXPERIENCE,
+  VIDEO,
+  PUBLISHED,
+  PUBLISHED_DOT_ACTIVE,
+  PUBLISHED_DOT_WARNING,
+} from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
@@ -179,6 +193,8 @@ export default {
         { label: 'Vidéo', value: VIDEO },
       ],
       PUBLISHED,
+      PUBLISHED_DOT_ACTIVE,
+      PUBLISHED_DOT_WARNING,
     };
   },
   validations () {
@@ -567,11 +583,6 @@ export default {
   color: white
   margin-left: 10px
 
-.dot
-  margin: 0 8px;
-  &-published
-    margin: 0 8px;
-
 .step
   margin-bottom: 10px
   border-radius: 0
@@ -582,18 +593,6 @@ export default {
       flex: 1
   &-subtitle
     font-size: 13px
-
-.dot-container
-  display: flex
-  flex-direction row
-  align-items: center
-
-.published-activity-text
-  font-size: 12px
-  color: $accent
-  &-error
-    font-size: 12px
-    color: $warning
 
 .add-step-button
   align-self: flex-end

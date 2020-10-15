@@ -5,11 +5,16 @@
         <template v-slot:body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
-              <q-item-section>{{ info.label }}</q-item-section>
+              <q-item-section side>
+              <q-icon size="xs" :name="info.icon"
+                :class="[{'info-active': info.status === PUBLISHED_DOT_ACTIVE},
+                {'info-warning': info.status === PUBLISHED_DOT_WARNING}]" />
+              </q-item-section>
+              <q-item-section :class="[{'info-active': info.status === PUBLISHED_DOT_ACTIVE},
+                {'info-warning': info.status === PUBLISHED_DOT_WARNING}]">
+                {{ info.label }}
+              </q-item-section>
             </q-item>
-            <published-dot :is-published="isActivityPublished" :should-have-margin="true"
-              :status="!activity.areCardsValid || activity.cards.length === 0 ? 'error' : 'valid'" />
           </div>
         </template>
       </ni-profile-header>
@@ -34,12 +39,11 @@ import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { ACTIVITY_TYPES, PUBLISHED } from '@data/constants';
+import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
-import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 
 export default {
   name: 'ActivityProfile',
@@ -55,7 +59,6 @@ export default {
     'card-container': CardContainer,
     'card-edition': CardEdition,
     'card-creation-modal': CardCreationModal,
-    'published-dot': PublishedDot,
   },
   data () {
     return {
@@ -66,6 +69,8 @@ export default {
       newCard: { template: '' },
       isEditionLocked: false,
       isActivityUsedInOtherStep: false,
+      PUBLISHED_DOT_WARNING,
+      PUBLISHED_DOT_ACTIVE,
     };
   },
   validations () {
@@ -81,12 +86,21 @@ export default {
     isActivityPublished () {
       return this.activity.status === PUBLISHED;
     },
+    isActivityValid () {
+      return this.activity.areCardsValid && this.activity.cards.length > 0;
+    },
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.programName },
         { icon: 'book', label: this.stepName },
         { icon: 'bookmark_border', label: this.activityType },
       ];
+
+      if (this.isActivityPublished) {
+        infos.push({ icon: !this.isActivityValid ? 'circle' : 'check_circle',
+          label: 'Publiée',
+          status: !this.isActivityValid ? PUBLISHED_DOT_WARNING : PUBLISHED_DOT_ACTIVE });
+      }
 
       return infos;
     },
@@ -220,20 +234,9 @@ export default {
   padding: 0
   min-height: 0
 
-.dot-container
-  display: flex
-  flex-direction row
-  align-items: center
-
-.published-activity-text
-  font-size: 12px
-  color: $accent
-  &-error
-    font-size: 12px
+.info
+  &-active
+    color: $accent
+  &-warning
     color: $warning
-
-.dot
-  margin: 0 22px 0 4px
-  &-published
-    margin: 0 19px 0 3px
 </style>
