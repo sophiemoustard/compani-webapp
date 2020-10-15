@@ -5,10 +5,11 @@
         <template v-slot:body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
-              <q-item-section>{{ info.label }}</q-item-section>
+              <q-item-section side>
+                <q-icon size="xs" :name="info.icon" :class="info.class" />
+              </q-item-section>
+              <q-item-section :class="info.class">{{ info.label }}</q-item-section>
             </q-item>
-            <div v-if="isActivityPublished"><div class="dot dot-active" />Publiée</div>
           </div>
         </template>
       </ni-profile-header>
@@ -33,7 +34,7 @@ import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { ACTIVITY_TYPES, PUBLISHED } from '@data/constants';
+import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
@@ -63,6 +64,8 @@ export default {
       newCard: { template: '' },
       isEditionLocked: false,
       isActivityUsedInOtherStep: false,
+      PUBLISHED_DOT_WARNING,
+      PUBLISHED_DOT_ACTIVE,
     };
   },
   validations () {
@@ -78,12 +81,21 @@ export default {
     isActivityPublished () {
       return this.activity.status === PUBLISHED;
     },
+    isActivityValid () {
+      return this.activity.areCardsValid && this.activity.cards.length > 0;
+    },
     headerInfo () {
       const infos = [
         { icon: 'library_books', label: this.programName },
         { icon: 'book', label: this.stepName },
         { icon: 'bookmark_border', label: this.activityType },
       ];
+
+      if (this.isActivityPublished) {
+        infos.push({ icon: !this.isActivityValid ? 'circle' : 'check_circle',
+          label: 'Publiée',
+          class: this.isActivityValid ? 'info-active' : 'info-warning' });
+      }
 
       return infos;
     },
@@ -213,10 +225,13 @@ export default {
 .body
   flex: 1
 
-.dot
-  margin: 0 22px 0 4px
-
 .q-item
   padding: 0
   min-height: 0
+
+.info
+  &-active
+    color: $accent
+  &-warning
+    color: $warning
 </style>

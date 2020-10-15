@@ -25,16 +25,8 @@
                   <div class="text-weight-bold">
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
                   </div>
-                  <div class="dot-container">
-                    <div v-if="!step.areActivitiesValid || hasEmptyActivity(step)" class="dot dot-error" />
-                    <q-icon v-if="step.areActivitiesValid && isPublished(step) && !hasEmptyActivity(step)"
-                      size="12px" name="check_circle" color="accent" class="dot-published" />
-                    <span v-if="isPublished(step)"
-                      :class="[{'published-activity-text': step.areActivitiesValid && !hasEmptyActivity(step)},
-                        {'published-activity-text-error': !step.areActivitiesValid || hasEmptyActivity(step)}]">
-                      Publiée
-                    </span>
-                  </div>
+                  <published-dot :is-published="isPublished(step)"
+                    :status="isStepValid(step) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} -
@@ -60,16 +52,8 @@
                     <div class="gt-xs col-sm-2 activity-content">
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
-                    <div class="dot-container">
-                      <div v-if="!activity.areCardsValid || activity.cards.length === 0" class="dot dot-error" />
-                      <q-icon v-if="activity.areCardsValid && isPublished(activity)&& activity.cards.length > 0"
-                        size="12px" name="check_circle" color="accent" class="dot-published" />
-                      <span v-if="isPublished(activity)"
-                        :class="[{'published-activity-text': activity.areCardsValid && activity.cards.length > 0 },
-                          {'published-activity-text-error': !activity.areCardsValid || activity.cards.length === 0}]">
-                        Publiée
-                      </span>
-                    </div>
+                    <published-dot :is-published="isPublished(activity)"
+                      :status="isActivityValid(activity) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -135,7 +119,17 @@ import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO, PUBLISHED } from '@data/constants';
+import {
+  E_LEARNING,
+  ON_SITE,
+  LESSON,
+  QUIZ,
+  SHARING_EXPERIENCE,
+  VIDEO,
+  PUBLISHED,
+  PUBLISHED_DOT_ACTIVE,
+  PUBLISHED_DOT_WARNING,
+} from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
@@ -144,6 +138,7 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
+import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 
 export default {
   name: 'ProfileContent',
@@ -160,6 +155,7 @@ export default {
     'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
     draggable,
+    'published-dot': PublishedDot,
   },
   data () {
     return {
@@ -193,6 +189,8 @@ export default {
         { label: 'Vidéo', value: VIDEO },
       ],
       PUBLISHED,
+      PUBLISHED_DOT_ACTIVE,
+      PUBLISHED_DOT_WARNING,
     };
   },
   validations () {
@@ -557,8 +555,11 @@ export default {
     isPublished (element) {
       return element.status === PUBLISHED;
     },
-    hasEmptyActivity (element) {
-      return element.activities.some(activity => activity.cards.length === 0);
+    isActivityValid (activity) {
+      return activity.areCardsValid && activity.cards.length > 0;
+    },
+    isStepValid (step) {
+      return step.areActivitiesValid && !step.activities.some(activity => activity.cards.length === 0);
     },
   },
 };
@@ -581,11 +582,6 @@ export default {
   color: white
   margin-left: 10px
 
-.dot
-  margin: 0 8px;
-  &-published
-    margin: 0 8px;
-
 .step
   margin-bottom: 10px
   border-radius: 0
@@ -596,18 +592,6 @@ export default {
       flex: 1
   &-subtitle
     font-size: 13px
-
-.dot-container
-  display: flex
-  flex-direction row
-  align-items: center
-
-.published-activity-text
-  font-size: 12px
-  color: $accent
-  &-error
-    font-size: 12px
-    color: $warning
 
 .add-step-button
   align-self: flex-end
