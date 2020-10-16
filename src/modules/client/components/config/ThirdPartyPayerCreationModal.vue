@@ -29,13 +29,12 @@
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
-import { userMixin } from 'src/core/mixins/userMixin';
 import SearchAddress from '@components/form/SearchAddress';
 import Select from '@components/form/Select';
 
 export default {
   name: 'ThirdPartyPayerCreationModal',
-  mixins: [configMixin, userMixin],
+  mixins: [configMixin],
   props: {
     value: { type: Boolean, default: false },
     newThirdPartyPayer: { type: Object, default: () => ({}) },
