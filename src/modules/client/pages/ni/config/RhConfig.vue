@@ -156,19 +156,9 @@
       :loading="loading" />
 
     <!-- Administrative document creation modal -->
-    <ni-modal v-model="administrativeDocumentCreationModal" @hide="resetAdministrativeDocumentModal">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">document administratif</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newAdministrativeDocument.name" required-field
-        :error="$v.newAdministrativeDocument.name.$error" @blur="$v.newAdministrativeDocument.name.$touch" />
-      <ni-input caption="Document" type="file" v-model="newAdministrativeDocument.file" required-field last
-        :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
-          :loading="loading" @click="createNewAdministrativeDocument" />
-      </template>
-    </ni-modal>
+    <administrative-document-creation-modal v-model="administrativeDocumentCreationModal" :loading="loading"
+      :new-administrative-document="newAdministrativeDocument" @submit="createNewAdministrativeDocument"
+      :validations="$v.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
 
     <!-- Sector creation modal -->
     <ni-modal v-model="sectorCreationModal" @hide="resetCreationSectorData">
@@ -217,6 +207,8 @@ import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import NewInternalHourModal from 'src/modules/client/components/config/NewInternalHourModal';
+import AdministrativeDocumentCreationModal
+  from 'src/modules/client/components/config/AdministrativeDocumentCreationModal';
 
 export default {
   name: 'RhConfig',
@@ -227,6 +219,7 @@ export default {
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
     'new-internal-hour-modal': NewInternalHourModal,
+    'administrative-document-creation-modal': AdministrativeDocumentCreationModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
@@ -329,6 +322,7 @@ export default {
       this.$v.newInternalHour.$reset();
     },
     resetAdministrativeDocumentModal () {
+      this.administrativeDocumentCreationModal = false;
       this.newAdministrativeDocument = { name: '', file: null };
       this.$v.newAdministrativeDocument.$reset();
     },
