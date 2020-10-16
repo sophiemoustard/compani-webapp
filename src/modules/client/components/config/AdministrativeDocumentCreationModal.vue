@@ -1,5 +1,5 @@
 <template>
-    <ni-modal :value="value" @hide="hide">
+    <ni-modal :value="value" @hide="hide" @input="input">
       <template slot="title">
         Ajouter un <span class="text-weight-bold">document administratif</span>
       </template>
@@ -19,7 +19,7 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 
 export default {
-  name: 'AdministrativeDocumentModal',
+  name: 'AdministrativeDocumentCreationModal',
   props: {
     value: { type: Boolean, default: false },
     validations: { type: Object, default: () => ({}) },
@@ -33,6 +33,9 @@ export default {
   methods: {
     hide () {
       this.$emit('hide');
+    },
+    input (event) {
+      this.$emit('input', event);
     },
     submit () {
       this.$emit('submit');

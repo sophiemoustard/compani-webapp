@@ -26,7 +26,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
-              @click="newInternalHourModal = true"
+              @click="internalHourCreationModal = true"
               :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER || internalHoursLoading" />
           </q-card-actions>
         </q-card>
@@ -150,21 +150,17 @@
       </div>
     </div>
 
-    <!-- Internal hour creation modal -->
-    <new-internal-hour-modal v-model="newInternalHourModal" :validations="$v.newInternalHour"
+    <internal-hour-creation-modal v-model="internalHourCreationModal" :validations="$v.newInternalHour"
       :new-internal-hour="newInternalHour" @hide="resetInternalHourCreationModal" @submit="createInternalHour"
       :loading="loading" />
 
-    <!-- Administrative document creation modal -->
     <administrative-document-creation-modal v-model="administrativeDocumentCreationModal" :loading="loading"
       :new-administrative-document="newAdministrativeDocument" @submit="createNewAdministrativeDocument"
       :validations="$v.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
 
-    <!-- Sector creation modal -->
     <sector-creation-modal v-model="sectorCreationModal" :loading="loading" @hide="resetCreationSectorData"
       :new-sector="newSector" @submit="createNewSector" :validations="$v.newSector" />
 
-    <!-- Sector edition modal -->
     <sector-edition-modal v-model="sectorEditionModal" :loading="loading" @hide="resetEditionSectorData"
       :edited-sector="editedSector" @submit="updateSector" :validations="$v.editedSector" />
 </q-page>
@@ -187,7 +183,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
-import NewInternalHourModal from 'src/modules/client/components/config/NewInternalHourModal';
+import InternalHourCreationModal from 'src/modules/client/components/config/InternalHourCreationModal';
 import AdministrativeDocumentCreationModal
   from 'src/modules/client/components/config/AdministrativeDocumentCreationModal';
 import SectorCreationModal from 'src/modules/client/components/config/SectorCreationModal';
@@ -200,7 +196,7 @@ export default {
     'ni-input': Input,
     'ni-file-uploader': FileUploader,
     'ni-responsive-table': ResponsiveTable,
-    'new-internal-hour-modal': NewInternalHourModal,
+    'internal-hour-creation-modal': InternalHourCreationModal,
     'administrative-document-creation-modal': AdministrativeDocumentCreationModal,
     'sector-creation-modal': SectorCreationModal,
     'sector-edition-modal': SectorEditionModal,
@@ -217,7 +213,7 @@ export default {
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       internalHoursLoading: false,
-      newInternalHourModal: false,
+      internalHourCreationModal: false,
       newInternalHour: { name: '' },
       loading: false,
       pagination: { rowsPerPage: 0 },
@@ -301,12 +297,10 @@ export default {
     },
     // Internal hours
     resetInternalHourCreationModal () {
-      this.newInternalHourModal = false;
       this.newInternalHour = { name: '' };
       this.$v.newInternalHour.$reset();
     },
     resetAdministrativeDocumentModal () {
-      this.administrativeDocumentCreationModal = false;
       this.newAdministrativeDocument = { name: '', file: null };
       this.$v.newAdministrativeDocument.$reset();
     },
@@ -334,7 +328,7 @@ export default {
         await this.refreshCompany();
 
         NotifyPositive('Heure interne créée');
-        this.newInternalHourModal = false;
+        this.internalHourCreationModal = false;
         await this.refreshInternalHours();
       } catch (e) {
         console.error(e);
@@ -411,7 +405,6 @@ export default {
       }
     },
     resetCreationSectorData () {
-      this.sectorCreationModal = false;
       this.newSector = { name: '' };
       this.$v.newSector.$reset();
     },
@@ -440,7 +433,6 @@ export default {
       }
     },
     resetEditionSectorData () {
-      this.sectorEditionModal = false;
       this.editedSector = { name: '' };
       this.$v.editedSector.$reset();
     },
