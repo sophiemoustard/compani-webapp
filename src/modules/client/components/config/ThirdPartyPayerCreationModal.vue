@@ -7,7 +7,8 @@
         @blur="validations.name.$touch" required-field />
       <ni-search-address v-model="newThirdPartyPayer.address" error-message="Adresse invalide" in-modal
         @blur="validations.address.$touch" :error="validations.address.$error" />
-      <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
+      <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" error-message="Email non valide"
+        :error="!validations.email.email" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
         v-model="newThirdPartyPayer.unitTTCRate" :error="validations.unitTTCRate.$error"
         :error-message="nbrError('unitTTCRate', validations)" />

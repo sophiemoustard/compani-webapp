@@ -186,7 +186,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
+import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
@@ -580,6 +580,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      email: { email },
       billingMode: { required },
       unitTTCRate: { positiveNumber },
       isApa: { required },
@@ -955,12 +956,12 @@ export default {
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
       const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
-      const { name, address, email, unitTTCRate, billingMode, isApa } = currentThirdPartyPayer;
+      const { name, address, mail, unitTTCRate, billingMode, isApa } = currentThirdPartyPayer;
       this.editedThirdPartyPayer = {
         _id: currentThirdPartyPayer._id,
         name,
         address: { ...address } || {},
-        email,
+        mail,
         unitTTCRate,
         billingMode,
         isApa,
