@@ -956,15 +956,9 @@ export default {
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
       const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
-      const { name, address, mail, unitTTCRate, billingMode, isApa } = currentThirdPartyPayer;
       this.editedThirdPartyPayer = {
-        _id: currentThirdPartyPayer._id,
-        name,
-        address: { ...address } || {},
-        mail,
-        unitTTCRate,
-        billingMode,
-        isApa,
+        address: {},
+        ...pick(currentThirdPartyPayer, ['_id', 'name', 'address', 'email', 'unitTTCRate', 'billingMode', 'isApa']),
       };
     },
     resetThirdPartyPayerCreation () {
