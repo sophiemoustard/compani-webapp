@@ -162,22 +162,12 @@
 
     <!-- Sector creation modal -->
     <sector-creation-modal v-model="sectorCreationModal" :loading="loading" @hide="resetCreationSectorData"
-      :new-sector="newSector" @submit="createNewSector"
-      :validations="$v.newSector" />
+      :new-sector="newSector" @submit="createNewSector" :validations="$v.newSector" />
 
     <!-- Sector edition modal -->
-    <ni-modal v-model="sectorEditionModal" @hide="resetEditionSectorData">
-      <template slot="title">
-        Editer l'<span class="text-weight-bold">équipe</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
-        @blur="$v.editedSector.name.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
-          :loading="loading" @click="updateSector" />
-      </template>
-    </ni-modal>
-  </q-page>
+    <sector-edition-modal v-model="sectorEditionModal" :loading="loading" @hide="resetEditionSectorData"
+      :edited-sector="editedSector" @submit="updateSector" :validations="$v.editedSector" />
+</q-page>
 </template>
 
 <script>
@@ -193,7 +183,6 @@ import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
-import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -202,6 +191,7 @@ import NewInternalHourModal from 'src/modules/client/components/config/NewIntern
 import AdministrativeDocumentCreationModal
   from 'src/modules/client/components/config/AdministrativeDocumentCreationModal';
 import SectorCreationModal from 'src/modules/client/components/config/SectorCreationModal';
+import SectorEditionModal from 'src/modules/client/components/config/SectorEditionModal';
 
 export default {
   name: 'RhConfig',
@@ -209,11 +199,11 @@ export default {
   components: {
     'ni-input': Input,
     'ni-file-uploader': FileUploader,
-    'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
     'new-internal-hour-modal': NewInternalHourModal,
     'administrative-document-creation-modal': AdministrativeDocumentCreationModal,
     'sector-creation-modal': SectorCreationModal,
+    'sector-edition-modal': SectorEditionModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
