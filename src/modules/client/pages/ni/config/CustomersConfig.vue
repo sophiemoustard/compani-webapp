@@ -149,29 +149,9 @@
     </ni-modal>
 
     <!-- Third party payers creation modal -->
-    <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerCreation">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">tiers payeur</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error"
-        @blur="$v.newThirdPartyPayer.name.$touch" required-field />
-      <ni-search-address v-model="newThirdPartyPayer.address" error-message="Adresse invalide" in-modal
-        @blur="$v.newThirdPartyPayer.address.$touch" :error="$v.newThirdPartyPayer.address.$error" />
-      <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
-      <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
-        v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
-        :error-message="nbrError('newThirdPartyPayer.unitTTCRate')" />
-      <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
-        :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
-        @blur="$v.newThirdPartyPayer.billingMode.$touch" />
-      <div class="row q-mb-md light-checkbox">
-        <q-checkbox v-model="newThirdPartyPayer.isApa" label="Financement APA" dense />
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
-          :loading="loading" @click="createNewThirdPartyPayer" />
-      </template>
-    </ni-modal>
+    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal" :new-third-party-payer="newThirdPartyPayer"
+      :validations="$v.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
+      :loading="loading" :billing-mode-options="billingModeOptions" />
 
     <!-- Third party payers edition modal -->
     <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerEdition">
@@ -231,6 +211,7 @@ import ServiceCreationModal from 'src/modules/client/components/config/ServiceCr
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
 import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
+import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -249,6 +230,7 @@ export default {
     'service-edition-modal': ServiceEditionModal,
     'surcharge-creation-modal': SurchargeCreationModal,
     'surcharge-edition-modal': SurchargeEditionModal,
+    'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
