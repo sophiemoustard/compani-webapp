@@ -27,6 +27,7 @@ import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
+import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 
@@ -48,20 +49,6 @@ export default {
 
     return {
       courseName: '',
-      tabsContent: [
-        {
-          label: 'Organisation',
-          name: 'organization',
-          default: this.defaultTab === 'organization',
-          component: ProfileOrganization,
-        },
-        {
-          label: 'Admin',
-          name: 'admin',
-          default: this.defaultTab === 'admin',
-          component: ProfileAdmin,
-        },
-      ],
       isClientInterface,
       backgroundClass: isClientInterface ? 'client-background' : 'vendor-background',
     };
@@ -72,12 +59,31 @@ export default {
       return this.course.type === INTER_B2B;
     },
     headerInfo () {
-      const infos = [
+      return [
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
       ];
+    },
+    tabsContent () {
+      const tabs = [
+        {
+          label: 'Organisation',
+          name: 'organization',
+          default: this.defaultTab === 'organization',
+          component: ProfileOrganization,
+        },
+        { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
+      ];
+      if (!this.isClientInterface) {
+        tabs.push({
+          label: 'Suivi des stagiaires',
+          name: 'traineeFollowUp',
+          default: this.defaultTab === 'traineeFollowUp',
+          component: ProfileTraineeFollowUp,
+        });
+      }
 
-      return infos;
+      return tabs;
     },
   },
   watch: {
