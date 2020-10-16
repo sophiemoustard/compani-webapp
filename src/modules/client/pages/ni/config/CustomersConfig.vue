@@ -154,29 +154,10 @@
       :loading="loading" :billing-mode-options="billingModeOptions" />
 
     <!-- Third party payers edition modal -->
-    <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerEdition">
-      <template slot="title">
-        Editer le <span class="text-weight-bold">tiers payeur</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedThirdPartyPayer.name"
-        :error="$v.editedThirdPartyPayer.name.$error" @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
-      <ni-search-address v-model="editedThirdPartyPayer.address" error-message="Adresse invalide"
-        @blur="$v.editedThirdPartyPayer.address.$touch" :error="$v.editedThirdPartyPayer.address.$error" in-modal />
-      <ni-input in-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
-      <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
-        v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
-        :error-message="nbrError('editedThirdPartyPayer.unitTTCRate')" />
-      <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
-        caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
-        @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
-      <div class="row q-mb-md light-checkbox">
-        <q-checkbox v-model="editedThirdPartyPayer.isApa" label="Financement APA" dense />
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
-          :loading="loading" @click="updateThirdPartyPayer" />
-      </template>
-    </ni-modal>
+    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" @submit="updateThirdPartyPayer"
+      :edited-third-party-payer="editedThirdPartyPayer"
+      :validations="$v.editedThirdPartyPayer" @hide="resetThirdPartyPayerEdition"
+      :loading="loading" :billing-mode-options="billingModeOptions" />
   </q-page>
 </template>
 
@@ -192,9 +173,7 @@ import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import FileUploader from '@components/form/FileUploader';
-import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import SearchAddress from '@components/form/SearchAddress';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -212,6 +191,7 @@ import ServiceEditionModal from 'src/modules/client/components/config/ServiceEdi
 import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
+import ThirdPartyPayerEditionModal from 'src/modules/client/components/config/ThirdPartyPayerEditionModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -221,9 +201,7 @@ export default {
   metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
     'ni-file-uploader': FileUploader,
-    'ni-input': Input,
     'ni-select': Select,
-    'ni-search-address': SearchAddress,
     'ni-modal': Modal,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
@@ -231,6 +209,7 @@ export default {
     'surcharge-creation-modal': SurchargeCreationModal,
     'surcharge-edition-modal': SurchargeEditionModal,
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
+    'third-party-payer-edition-modal': ThirdPartyPayerEditionModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
@@ -593,6 +572,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      email: { email },
       billingMode: { required },
       unitTTCRate: { positiveNumber },
       isApa: { required },
