@@ -665,7 +665,6 @@ export default {
     },
     // Surcharges
     resetCreationSurchargeData () {
-      this.surchargeCreationModal = false;
       this.newSurcharge = {
         name: '',
         saturday: '',
@@ -741,7 +740,6 @@ export default {
       this.surchargeEditionModal = true;
     },
     resetEditionSurchargeData () {
-      this.surchargeEditionModal = false;
       this.editedSurcharge = {
         name: '',
         saturday: '',
@@ -819,7 +817,6 @@ export default {
       return formattedService;
     },
     resetCreationServiceData () {
-      this.serviceCreationModal = false;
       this.newService = {
         name: '',
         nature: '',
@@ -866,7 +863,6 @@ export default {
       this.serviceEditionModal = true;
     },
     resetEditionServiceData () {
-      this.serviceEditionModal = false;
       this.editedService = {
         name: '',
         startDate: '',
@@ -929,7 +925,6 @@ export default {
       this.serviceHistoryModal = true;
     },
     resetServiceHistoryData () {
-      this.serviceHistoryModal = false;
       this.selectedService = {};
     },
     // Third party payers
