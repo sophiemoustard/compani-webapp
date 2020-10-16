@@ -151,17 +151,9 @@
     </div>
 
     <!-- Internal hour creation modal -->
-    <ni-modal v-model="newInternalHourModal" @hide="resetInternalHourCreationModal">
-      <template slot="title">
-        Créer une <span class="text-weight-bold">heure interne</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
-        @blur="$v.newInternalHour.name.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
-          :loading="loading" @click="createInternalHour" />
-      </template>
-    </ni-modal>
+    <new-internal-hour-modal v-model="newInternalHourModal" :validations="$v.newInternalHour"
+      :new-internal-hour="newInternalHour" @hide="resetInternalHourCreationModal" @submit="createInternalHour"
+      :loading="loading" />
 
     <!-- Administrative document creation modal -->
     <ni-modal v-model="administrativeDocumentCreationModal" @hide="resetAdministrativeDocumentModal">
@@ -224,6 +216,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
+import NewInternalHourModal from 'src/modules/client/components/config/NewInternalHourModal';
 
 export default {
   name: 'RhConfig',
@@ -233,6 +226,7 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
+    'new-internal-hour-modal': NewInternalHourModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
@@ -330,6 +324,7 @@ export default {
     },
     // Internal hours
     resetInternalHourCreationModal () {
+      this.newInternalHourModal = false;
       this.newInternalHour = { name: '' };
       this.$v.newInternalHour.$reset();
     },
