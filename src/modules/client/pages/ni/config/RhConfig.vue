@@ -161,17 +161,9 @@
       :validations="$v.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
 
     <!-- Sector creation modal -->
-    <ni-modal v-model="sectorCreationModal" @hide="resetCreationSectorData">
-      <template slot="title">
-        Ajouter une <span class="text-weight-bold">équipe</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
-        @blur="$v.newSector.name.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
-          :loading="loading" @click="createNewSector" />
-      </template>
-    </ni-modal>
+    <sector-creation-modal v-model="sectorCreationModal" :loading="loading" @hide="resetCreationSectorData"
+      :new-sector="newSector" @submit="createNewSector"
+      :validations="$v.newSector" />
 
     <!-- Sector edition modal -->
     <ni-modal v-model="sectorEditionModal" @hide="resetEditionSectorData">
@@ -209,6 +201,7 @@ import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 import NewInternalHourModal from 'src/modules/client/components/config/NewInternalHourModal';
 import AdministrativeDocumentCreationModal
   from 'src/modules/client/components/config/AdministrativeDocumentCreationModal';
+import SectorCreationModal from 'src/modules/client/components/config/SectorCreationModal';
 
 export default {
   name: 'RhConfig',
@@ -220,6 +213,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'new-internal-hour-modal': NewInternalHourModal,
     'administrative-document-creation-modal': AdministrativeDocumentCreationModal,
+    'sector-creation-modal': SectorCreationModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
