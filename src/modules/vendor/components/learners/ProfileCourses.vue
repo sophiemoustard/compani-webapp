@@ -1,7 +1,7 @@
 <template>
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
-    <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToBlendedCourseProfileFollowUp" />
+    <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin" />
   </div>
 </template>
 
@@ -9,7 +9,7 @@
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import TableList from '@components/table/TableList';
-import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
+import { FORTHCOMING, IN_PROGRESS, COMPLETED, BLENDED } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { courseTimelineMixin } from '@mixins/courseTimeline';
@@ -57,14 +57,14 @@ export default {
     },
   },
   async created () {
-    const courses = await Courses.list({ trainees: this.userProfile._id });
+    const courses = await Courses.list({ trainees: this.userProfile._id, format: BLENDED });
     this.courses = this.groupByCourses(courses);
   },
   methods: {
-    goToBlendedCourseProfileFollowUp (row) {
+    goToBlendedCourseProfileAdmin (row) {
       this.$router.push({
         name: 'ni management blended courses info',
-        params: { courseId: row._id, defaultTab: 'followUp' },
+        params: { courseId: row._id, defaultTab: 'admin' },
       });
     },
   },

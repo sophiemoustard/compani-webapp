@@ -5,6 +5,8 @@
       </template>
       <ni-input in-modal v-model.trim="editedActivity.name" :error="validations.name.$error"
         @blur="validations.name.$touch" required-field caption="Nom" />
+      <ni-select caption="Type" :options="typeOptions" v-model="editedActivity.type" required-field in-modal last
+        :error="validations.type.$error" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
@@ -15,6 +17,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import Select from '@components/form/Select';
 
 export default {
   name: 'ActivityEditionModal',
@@ -23,10 +26,12 @@ export default {
     editedActivity: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    typeOptions: { type: Array, default: () => [] },
   },
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'ni-select': Select,
   },
   methods: {
     hide () {

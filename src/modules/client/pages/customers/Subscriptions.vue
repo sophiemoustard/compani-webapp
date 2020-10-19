@@ -325,6 +325,7 @@ export default {
           const subscriptions = this.customer.subscriptions.map((subscription) => {
             const lastVersion = getLastVersion(subscription.versions, 'createdAt');
             const obj = {
+              subscriptionId: subscription._id,
               service: subscription.service.name,
               unitTTCRate: lastVersion.unitTTCRate,
               estimatedWeeklyVolume: lastVersion.estimatedWeeklyVolume,

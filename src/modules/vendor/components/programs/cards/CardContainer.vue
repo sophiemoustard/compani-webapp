@@ -16,7 +16,7 @@
             </div>
             <div>{{ getTemplateName(card.template) }}</div>
           </div>
-          <div v-if="!isSelected(card) && cardValidation(card).error" :class="{ 'dot dot-error': true }" />
+          <div v-if="!isSelected(card) && !card.isValid" :class="{ 'dot dot-error': true }" />
         </div>
       </draggable>
     </q-scroll-area>
@@ -49,7 +49,6 @@ import {
   PUBLISHED,
 } from '@data/constants';
 import Button from '@components/Button';
-import { cardValidation } from 'src/modules/vendor/helpers/cardValidation';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
@@ -86,7 +85,6 @@ export default {
     },
   },
   methods: {
-    cardValidation,
     getCardStyle (card) {
       return [
         'card-row',

@@ -4,7 +4,7 @@
       <div class="sub-program-header">
         <div>
           <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
-          <span class="published" v-if="isPublished(subProgram)">Publié</span>
+          <span class="published-sub-program" v-if="isPublished(subProgram)">Publié</span>
         </div>
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
           @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
@@ -14,16 +14,19 @@
         :disable="isPublished(subProgram)" />
       <draggable v-model="subProgram.steps" @change="dropStep(subProgram._id)" ghost-class="ghost"
         :disabled="$q.platform.is.mobile || isPublished(subProgram)">
-        <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step">
+        <q-card v-for="(step, stepIndex) of subProgram.steps" :key="stepIndex" flat class="step q-mb-sm">
           <q-card-section class="step-head cursor-pointer row" :id="step._id">
             <div class="step-info" @click="showActivities(step._id)">
               <q-item-section side>
                 <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" />
               </q-item-section>
               <q-item-section>
-                <div class="text-weight-bold">
-                  <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
-                  <div class="dot dot-active" v-if="isPublished(step)" />
+                <div class="flex-direction row">
+                  <div class="text-weight-bold">
+                    <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
+                  </div>
+                  <published-dot :is-published="isPublished(step)"
+                    :status="isStepValid(step) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} -
@@ -49,7 +52,8 @@
                     <div class="gt-xs col-sm-2 activity-content">
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
-                    <div class="dot dot-active" v-if="isPublished(activity)" />
+                    <published-dot :is-published="isPublished(activity)"
+                      :status="isActivityValid(activity) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -89,7 +93,7 @@
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
     <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
-      :activity-type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
+      :type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
       :loading="modalLoading" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
@@ -97,7 +101,8 @@
       :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
-      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" />
+      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
+      :type-options="activityTypeOptions" />
   </div>
 </template>
 
@@ -106,6 +111,7 @@ import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import get from 'lodash/get';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
@@ -113,7 +119,17 @@ import Steps from '@api/Steps';
 import Activities from '@api/Activities';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
-import { E_LEARNING, ON_SITE, LESSON, QUIZ, SHARING_EXPERIENCE, VIDEO, PUBLISHED } from '@data/constants';
+import {
+  E_LEARNING,
+  ON_SITE,
+  LESSON,
+  QUIZ,
+  SHARING_EXPERIENCE,
+  VIDEO,
+  PUBLISHED,
+  PUBLISHED_DOT_ACTIVE,
+  PUBLISHED_DOT_WARNING,
+} from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
@@ -122,6 +138,7 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
+import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 
 export default {
   name: 'ProfileContent',
@@ -138,6 +155,7 @@ export default {
     'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
     draggable,
+    'published-dot': PublishedDot,
   },
   data () {
     return {
@@ -156,7 +174,7 @@ export default {
       reusedActivity: '',
       programOptions: [],
       activityEditionModal: false,
-      editedActivity: { name: '' },
+      editedActivity: { name: '', type: '' },
       isActivitiesShown: {},
       currentSubProgramId: '',
       currentStepId: '',
@@ -171,6 +189,8 @@ export default {
         { label: 'Vidéo', value: VIDEO },
       ],
       PUBLISHED,
+      PUBLISHED_DOT_ACTIVE,
+      PUBLISHED_DOT_WARNING,
     };
   },
   validations () {
@@ -180,7 +200,7 @@ export default {
       newStep: { name: { required }, type: { required } },
       editedStep: { name: { required } },
       newActivity: { name: { required }, type: { required } },
-      editedActivity: { name: { required } },
+      editedActivity: { name: { required }, type: { required } },
       reusedActivity: { required },
     };
   },
@@ -445,7 +465,7 @@ export default {
     },
     // activity edition
     async openActivityEditionModal (activity) {
-      this.editedActivity = pick(activity, ['_id', 'name']);
+      this.editedActivity = pick(activity, ['_id', 'name', 'type']);
       this.activityEditionModal = true;
     },
     async editActivity () {
@@ -454,7 +474,7 @@ export default {
         this.$v.editedActivity.$touch();
         if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Activities.updateById(this.editedActivity._id, pick(this.editedActivity, ['name']));
+        await Activities.updateById(this.editedActivity._id, omit(this.editedActivity, ['_id']));
         this.activityEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité modifiée.');
@@ -466,7 +486,7 @@ export default {
       }
     },
     resetActivityEditionModal () {
-      this.editedActivity = { name: '' };
+      this.editedActivity = { name: '', type: '' };
       this.$v.editedActivity.$reset();
     },
     validateStepDetachment (subProgramId, stepId) {
@@ -535,12 +555,17 @@ export default {
     isPublished (element) {
       return element.status === PUBLISHED;
     },
+    isActivityValid (activity) {
+      return activity.areCardsValid && activity.cards.length > 0;
+    },
+    isStepValid (step) {
+      return step.areActivitiesValid && !step.activities.some(activity => activity.cards.length === 0);
+    },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-
 .sub-program-container
   display: flex
   flex-direction: column
@@ -549,7 +574,7 @@ export default {
   display: flex
   justify-content: space-between
 
-.published
+.published-sub-program
   background-color: $accent
   font-size: 14px
   border-radius: 15px
@@ -557,11 +582,7 @@ export default {
   color: white
   margin-left: 10px
 
-.dot
-  margin-left: 9px
-
 .step
-  margin-bottom: 10px
   border-radius: 0
   &-head
     justify-content: space-between
@@ -584,7 +605,7 @@ export default {
   width: -webkit-fill-available
 
 .activity
-  margin: 10px 10px 10px 50px
+  margin: 8px 8px 8px 48px
   border-radius: 0
   &-info
     flex: 1
