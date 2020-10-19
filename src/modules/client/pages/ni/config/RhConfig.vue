@@ -395,7 +395,6 @@ export default {
         await Sectors.create(this.newSector);
         NotifyPositive('Équipe créée.');
         this.sectorCreationModal = false;
-        this.resetCreationSectorData();
         await this.getSectors();
       } catch (e) {
         console.error(e);
@@ -424,7 +423,6 @@ export default {
         await Sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
         NotifyPositive('Équipe modifiée.');
         this.sectorEditionModal = false;
-        this.resetEditionSectorData();
         await this.getSectors();
       } catch (e) {
         console.error(e);
