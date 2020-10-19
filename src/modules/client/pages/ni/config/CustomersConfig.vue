@@ -707,7 +707,7 @@ export default {
         const payload = this.getSurchargePayload(this.newSurcharge);
         await Surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
-        this.resetCreationSurchargeData();
+        this.surchargeCreationModal = false;
         await this.refreshSurcharges();
       } catch (e) {
         console.error(e);
@@ -767,7 +767,7 @@ export default {
         delete payload.company;
         await Surcharges.updateById(surchargeId, payload);
         NotifyPositive('Plan de majoration modifié.');
-        this.resetEditionSurchargeData();
+        this.surchargeEditionModal = false;
         await this.refreshSurcharges();
       } catch (e) {
         console.error(e);
@@ -837,7 +837,7 @@ export default {
         await Services.create(payload);
 
         NotifyPositive('Service créé.');
-        this.resetCreationServiceData();
+        this.serviceCreationModal = false;
         await this.refreshServices();
       } catch (e) {
         console.error(e);
@@ -891,7 +891,7 @@ export default {
         await Services.updateById(this.editedService._id, payload);
 
         NotifyPositive('Service modifié');
-        this.resetEditionServiceData();
+        this.serviceEditionModal = false;
         await this.refreshServices();
       } catch (e) {
         console.error(e);
