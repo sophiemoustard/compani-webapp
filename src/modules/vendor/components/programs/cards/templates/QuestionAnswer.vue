@@ -7,7 +7,8 @@
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
-        v-model="card.questionAnswers[i].text" :disable="disableEdition" />
+        v-model="card.questionAnswers[i].text" :disable="disableEdition" @blur="updateQuestionAnswers(i)"
+        @focus="saveTmp(`questionAnswers[${i}.text]`)" :error="$v.card.questionAnswers.$each[i].$error" />
     </div>
   </div>
 </template>
@@ -38,26 +39,27 @@ export default {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         questionAnswers: {
           required,
-          minLength: minArrayLength(),
+          minLength: minArrayLength(2),
+          $each: {
+            text: { required },
+          },
         },
       },
     };
   },
   methods: {
-    requiredQuestionAnswerIsMissing (index) {
-      return this.$v.card.questionAnswers.$error && !this.$v.card.questionAnswers.minLength && index < 2 &&
-      !this.card.questionAnswers[index];
-    },
     formatQuestionAnswersPayload () {
       return this.card.questionAnswers.filter(a => !!a);
     },
     async updateQuestionAnswers (index) {
       try {
-        if (this.tmpInput === get(this.card, `questionAnswers[${index}]`)) return;
+        const editedAnswer = get(this.card, `questionAnswers[${index}]`);
+        if (this.tmpInput === editedAnswer.text) return;
 
         this.$v.card.questionAnswers.$touch();
-        if (this.requiredQuestionAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
-        await Cards.updateById(this.card._id, { questionAnswers: this.formatQuestionAnswersPayload() });
+        if (this.$v.card.questionAnswers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Cards.updateAnswer({ cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text });
 
         await this.refreshCard();
 
