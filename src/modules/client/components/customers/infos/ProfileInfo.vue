@@ -693,10 +693,10 @@ export default {
       this.editedSubscription = {
         _id,
         nature: service.nature,
-        unitTTCRate,
-        estimatedWeeklyVolume,
-        evenings,
-        sundays,
+        unitTTCRate: unitTTCRate || 0,
+        estimatedWeeklyVolume: estimatedWeeklyVolume || 0,
+        evenings: evenings || 0,
+        sundays: sundays || 0,
       };
 
       this.openEditedSubscriptionModal = true;
@@ -712,7 +712,7 @@ export default {
 
         this.loading = true;
         const subscriptionId = this.editedSubscription._id;
-        const payload = omit(pickBy(this.editedSubscription), ['_id', 'nature']);
+        const payload = omit(this.editedSubscription, ['_id', 'nature']);
         await Customers.updateSubscription({ _id: this.customer._id, subscriptionId }, payload);
 
         this.refreshCustomer();

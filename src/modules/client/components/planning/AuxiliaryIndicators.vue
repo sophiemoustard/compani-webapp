@@ -120,7 +120,7 @@ export default {
   .indicators
     padding: 0 24px
     margin: 0 0 24px
-    @media screen and (max-width: 1024px)
+    @media screen and (max-width: 1023px)
       padding: 0 12px
 
   .economic-indicators

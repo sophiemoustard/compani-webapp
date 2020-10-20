@@ -63,9 +63,9 @@ export default {
           style: 'min-width: 100px; width: 15%',
         },
         {
-          name: 'coursesCount',
+          name: 'blendedCoursesCount',
           label: 'Formations suivies',
-          field: 'coursesCount',
+          field: 'blendedCoursesCount',
           align: 'center',
           sortable: true,
           style: 'min-width: 110px; width: 15%',
@@ -102,7 +102,7 @@ export default {
           noDiacriticsName: removeDiacritics(formattedName),
         },
         company: user.company ? user.company.name : 'N/A',
-        coursesCount: user.coursesCount,
+        blendedCoursesCount: user.blendedCoursesCount,
       };
     },
     async getLearnerList () {

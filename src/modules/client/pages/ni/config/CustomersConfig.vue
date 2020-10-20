@@ -119,96 +119,14 @@
     </div>
 
     <!-- Surcharge creation modal -->
-    <ni-modal v-model="surchargeCreationModal" @hide="resetCreationSurchargeData">
-      <template slot="title">
-        Créer un <span class="text-weight-bold">plan de majoration</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newSurcharge.name" :error="$v.newSurcharge.name.$error"
-        @blur="$v.newSurcharge.name.$touch" required-field />
-      <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="newSurcharge.saturday"
-        :error="$v.newSurcharge.saturday.$error" @blur="$v.newSurcharge.saturday.$touch"
-        :error-message="nbrError('newSurcharge.saturday')" />
-      <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="newSurcharge.sunday"
-        :error="$v.newSurcharge.sunday.$error" @blur="$v.newSurcharge.sunday.$touch"
-        :error-message="nbrError('newSurcharge.sunday')" />
-      <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number" v-model="newSurcharge.publicHoliday"
-        :error="$v.newSurcharge.publicHoliday.$error" @blur="$v.newSurcharge.publicHoliday.$touch"
-        :error-message="nbrError('newSurcharge.publicHoliday')" />
-      <ni-input in-modal caption="Majoration 25 décembre" suffix="%" type="number"
-        v-model="newSurcharge.twentyFifthOfDecember" :error-message="nbrError('newSurcharge.twentyFifthOfDecember')"
-        @blur="$v.newSurcharge.twentyFifthOfDecember.$touch" :error="$v.newSurcharge.twentyFifthOfDecember.$error" />
-      <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="newSurcharge.firstOfMay"
-        :error="$v.newSurcharge.firstOfMay.$error" @blur="$v.newSurcharge.firstOfMay.$touch"
-        :error-message="nbrError('newSurcharge.firstOfMay')" />
-      <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="newSurcharge.evening"
-        :error="$v.newSurcharge.evening.$error" @blur="$v.newSurcharge.evening.$touch"
-        :error-message="nbrError('newSurcharge.evening')" />
-      <ni-time-input in-modal v-model="newSurcharge.eveningStartTime" caption="Début soirée"
-        :error="$v.newSurcharge.eveningStartTime.$error" @blur="$v.newSurcharge.eveningStartTime.$touch"
-        :disable="!newSurcharge.evening" :required-field="!!newSurcharge.evening" error-message="Heure invalide" />
-      <ni-time-input in-modal v-model="newSurcharge.eveningEndTime" caption="Fin soirée"
-        :error="$v.newSurcharge.eveningEndTime.$error" @blur="$v.newSurcharge.eveningEndTime.$touch"
-        :disable="!newSurcharge.evening" :required-field="!!newSurcharge.evening" error-message="Heure invalide" />
-      <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="newSurcharge.custom"
-        :error="$v.newSurcharge.custom.$error" @blur="$v.newSurcharge.custom.$touch" />
-      <ni-time-input in-modal v-model="newSurcharge.customStartTime" caption="Début personnalisé"
-        :error="$v.newSurcharge.customStartTime.$error" @blur="$v.newSurcharge.customStartTime.$touch"
-        :disable="!newSurcharge.custom" :required-field="!!newSurcharge.custom" error-message="Heure invalide" />
-      <ni-time-input in-modal v-model="newSurcharge.customEndTime" caption="Fin personnalisée"
-        :error="$v.newSurcharge.customEndTime.$error" @blur="$v.newSurcharge.customEndTime.$touch"
-        :disable="!newSurcharge.custom" :required-field="!!newSurcharge.custom" error-message="Heure invalide" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer le plan de majoration" icon-right="add" color="primary"
-          :loading="loading" @click="createNewSurcharge" />
-      </template>
-    </ni-modal>
+    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge="newSurcharge"
+      :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
+      :loading="loading" />
 
     <!-- Surcharge edition modal -->
-    <ni-modal v-model="surchargeEditionModal" @hide="resetEditionSurchargeData">
-      <template slot="title">
-        Éditer le <span class="text-weight-bold">plan de majoration</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedSurcharge.name" :error="$v.editedSurcharge.name.$error"
-        @blur="$v.editedSurcharge.name.$touch" required-field />
-      <ni-input in-modal caption="Majoration samedi" suffix="%" type="number" v-model="editedSurcharge.saturday"
-        :error="$v.editedSurcharge.saturday.$error" @blur="$v.editedSurcharge.saturday.$touch"
-        :error-message="nbrError('editedSurcharge.saturday')" />
-      <ni-input in-modal caption="Majoration dimanche" suffix="%" type="number" v-model="editedSurcharge.sunday"
-        :error="$v.editedSurcharge.sunday.$error" @blur="$v.editedSurcharge.sunday.$touch"
-        :error-message="nbrError('editedSurcharge.sunday')" />
-      <ni-input in-modal caption="Majoration jour férié" suffix="%" type="number"
-        v-model="editedSurcharge.publicHoliday" :error="$v.editedSurcharge.publicHoliday.$error"
-        @blur="$v.editedSurcharge.publicHoliday.$touch" :error-message="nbrError('editedSurcharge.publicHoliday')" />
-      <ni-input in-modal caption="Majoration 25 décembre" :error="$v.editedSurcharge.twentyFifthOfDecember.$error"
-        v-model="editedSurcharge.twentyFifthOfDecember" @blur="$v.editedSurcharge.twentyFifthOfDecember.$touch"
-        :error-message="nbrError('editedSurcharge.twentyFifthOfDecember')" suffix="%" type="number" />
-      <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" v-model="editedSurcharge.firstOfMay"
-        :error="$v.editedSurcharge.firstOfMay.$error" @blur="$v.editedSurcharge.firstOfMay.$touch"
-        :error-message="nbrError('editedSurcharge.firstOfMay')" />
-      <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" v-model="editedSurcharge.evening"
-        :error="$v.editedSurcharge.evening.$error" @blur="$v.editedSurcharge.evening.$touch"
-        :error-message="nbrError('editedSurcharge.evening')" first-of-may />
-      <ni-time-input in-modal v-model="editedSurcharge.eveningStartTime" caption="Début soirée"
-        :error="$v.editedSurcharge.eveningStartTime.$error" @blur="$v.editedSurcharge.eveningStartTime.$touch"
-        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
-        error-message="Heure invalide" />
-      <ni-time-input in-modal v-model="editedSurcharge.eveningEndTime" caption="Fin soirée"
-        :error="$v.editedSurcharge.eveningEndTime.$error" @blur="$v.editedSurcharge.eveningEndTime.$touch"
-        :disable="!editedSurcharge.evening" :required-field="!!editedSurcharge.evening"
-        error-message="Heure invalide" />
-      <ni-input in-modal caption="Majoration personnalisée" suffix="%" type="number" v-model="editedSurcharge.custom"
-        :error="$v.editedSurcharge.custom.$error" @blur="$v.editedSurcharge.custom.$touch" />
-      <ni-time-input in-modal v-model="editedSurcharge.customStartTime" caption="Début personnalisé"
-        :error="$v.editedSurcharge.customStartTime.$error" @blur="$v.editedSurcharge.customStartTime.$touch"
-        :disable="!editedSurcharge.custom" :required-field="!!editedSurcharge.custom" error-message="Heure invalide" />
-      <ni-time-input in-modal v-model="editedSurcharge.customEndTime" caption="Fin personnalisée"
-        :error="$v.editedSurcharge.customEndTime.$error" @blur="$v.editedSurcharge.customEndTime.$touch"
-        :disable="!editedSurcharge.custom" :required-field="!!editedSurcharge.custom" error-message="Heure invalide" />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer le plan de majoration" icon-right="check"
-          color="primary" :loading="loading" @click="updateSurcharge" />
-      </template>
-    </ni-modal>
+    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge="editedSurcharge"
+      :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
+      :loading="loading" />
 
     <!-- Service creation modal -->
     <service-creation-modal v-model="serviceCreationModal" :new-service="newService" :validations="$v.newService"
@@ -231,54 +149,15 @@
     </ni-modal>
 
     <!-- Third party payers creation modal -->
-    <ni-modal v-model="thirdPartyPayerCreationModal" @hide="resetThirdPartyPayerCreation">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">tiers payeur</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newThirdPartyPayer.name" :error="$v.newThirdPartyPayer.name.$error"
-        @blur="$v.newThirdPartyPayer.name.$touch" required-field />
-      <ni-search-address v-model="newThirdPartyPayer.address" error-message="Adresse invalide" in-modal
-        @blur="$v.newThirdPartyPayer.address.$touch" :error="$v.newThirdPartyPayer.address.$error" />
-      <ni-input in-modal caption="Email" v-model.trim="newThirdPartyPayer.email" />
-      <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
-        v-model="newThirdPartyPayer.unitTTCRate" :error="$v.newThirdPartyPayer.unitTTCRate.$error"
-        :error-message="nbrError('newThirdPartyPayer.unitTTCRate')" />
-      <ni-select in-modal v-model="newThirdPartyPayer.billingMode" :options="billingModeOptions" caption="Facturation"
-        :filter="false" required-field :error="$v.newThirdPartyPayer.billingMode.$error"
-        @blur="$v.newThirdPartyPayer.billingMode.$touch" />
-      <div class="row q-mb-md light-checkbox">
-        <q-checkbox v-model="newThirdPartyPayer.isApa" label="Financement APA" dense />
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter le tiers payeur" icon-right="add" color="primary"
-          :loading="loading" @click="createNewThirdPartyPayer" />
-      </template>
-    </ni-modal>
+    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal" :new-third-party-payer="newThirdPartyPayer"
+      :validations="$v.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
+      :loading="loading" :billing-mode-options="billingModeOptions" />
 
     <!-- Third party payers edition modal -->
-    <ni-modal v-model="thirdPartyPayerEditionModal" @hide="resetThirdPartyPayerEdition">
-      <template slot="title">
-        Editer le <span class="text-weight-bold">tiers payeur</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedThirdPartyPayer.name"
-        :error="$v.editedThirdPartyPayer.name.$error" @blur="$v.editedThirdPartyPayer.name.$touch" required-field />
-      <ni-search-address v-model="editedThirdPartyPayer.address" error-message="Adresse invalide"
-        @blur="$v.editedThirdPartyPayer.address.$touch" :error="$v.editedThirdPartyPayer.address.$error" in-modal />
-      <ni-input in-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" />
-      <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
-        v-model="editedThirdPartyPayer.unitTTCRate" :error="$v.editedThirdPartyPayer.unitTTCRate.$error"
-        :error-message="nbrError('editedThirdPartyPayer.unitTTCRate')" />
-      <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
-        caption="Facturation" :filter="false" required-field :error="$v.editedThirdPartyPayer.billingMode.$error"
-        @blur="$v.editedThirdPartyPayer.billingMode.$touch" />
-      <div class="row q-mb-md light-checkbox">
-        <q-checkbox v-model="editedThirdPartyPayer.isApa" label="Financement APA" dense />
-      </div>
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
-          :loading="loading" @click="updateThirdPartyPayer" />
-      </template>
-    </ni-modal>
+    <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" @submit="updateThirdPartyPayer"
+      :edited-third-party-payer="editedThirdPartyPayer"
+      :validations="$v.editedThirdPartyPayer" @hide="resetThirdPartyPayerEdition"
+      :loading="loading" :billing-mode-options="billingModeOptions" />
   </q-page>
 </template>
 
@@ -288,16 +167,13 @@ import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { required, numeric, requiredIf } from 'vuelidate/lib/validators';
+import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import TimeInput from '@components/form/TimeInput';
 import FileUploader from '@components/form/FileUploader';
-import Input from '@components/form/Input';
 import Select from '@components/form/Select';
-import SearchAddress from '@components/form/SearchAddress';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -312,6 +188,10 @@ import {
 } from '@data/constants';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
+import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
+import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
+import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
+import ThirdPartyPayerEditionModal from 'src/modules/client/components/config/ThirdPartyPayerEditionModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -321,14 +201,15 @@ export default {
   metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
     'ni-file-uploader': FileUploader,
-    'ni-input': Input,
     'ni-select': Select,
-    'ni-search-address': SearchAddress,
-    'ni-time-input': TimeInput,
     'ni-modal': Modal,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
+    'surcharge-creation-modal': SurchargeCreationModal,
+    'surcharge-edition-modal': SurchargeEditionModal,
+    'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
+    'third-party-payer-edition-modal': ThirdPartyPayerEditionModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
@@ -678,6 +559,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      email: { email },
       billingMode: { required },
       unitTTCRate: { positiveNumber },
       isApa: { required },
@@ -690,6 +572,7 @@ export default {
         city: { required: requiredIf(item => !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      email: { email },
       billingMode: { required },
       unitTTCRate: { positiveNumber },
       isApa: { required },
@@ -782,7 +665,6 @@ export default {
     },
     // Surcharges
     resetCreationSurchargeData () {
-      this.surchargeCreationModal = false;
       this.newSurcharge = {
         name: '',
         saturday: '',
@@ -825,7 +707,7 @@ export default {
         const payload = this.getSurchargePayload(this.newSurcharge);
         await Surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
-        this.resetCreationSurchargeData();
+        this.surchargeCreationModal = false;
         await this.refreshSurcharges();
       } catch (e) {
         console.error(e);
@@ -858,7 +740,6 @@ export default {
       this.surchargeEditionModal = true;
     },
     resetEditionSurchargeData () {
-      this.surchargeEditionModal = false;
       this.editedSurcharge = {
         name: '',
         saturday: '',
@@ -886,7 +767,7 @@ export default {
         delete payload.company;
         await Surcharges.updateById(surchargeId, payload);
         NotifyPositive('Plan de majoration modifié.');
-        this.resetEditionSurchargeData();
+        this.surchargeEditionModal = false;
         await this.refreshSurcharges();
       } catch (e) {
         console.error(e);
@@ -936,7 +817,6 @@ export default {
       return formattedService;
     },
     resetCreationServiceData () {
-      this.serviceCreationModal = false;
       this.newService = {
         name: '',
         nature: '',
@@ -957,7 +837,7 @@ export default {
         await Services.create(payload);
 
         NotifyPositive('Service créé.');
-        this.resetCreationServiceData();
+        this.serviceCreationModal = false;
         await this.refreshServices();
       } catch (e) {
         console.error(e);
@@ -983,7 +863,6 @@ export default {
       this.serviceEditionModal = true;
     },
     resetEditionServiceData () {
-      this.serviceEditionModal = false;
       this.editedService = {
         name: '',
         startDate: '',
@@ -1012,7 +891,7 @@ export default {
         await Services.updateById(this.editedService._id, payload);
 
         NotifyPositive('Service modifié');
-        this.resetEditionServiceData();
+        this.serviceEditionModal = false;
         await this.refreshServices();
       } catch (e) {
         console.error(e);
@@ -1046,22 +925,15 @@ export default {
       this.serviceHistoryModal = true;
     },
     resetServiceHistoryData () {
-      this.serviceHistoryModal = false;
       this.selectedService = {};
     },
     // Third party payers
     openThirdPartyPayerEditionModal (tppId) {
       this.thirdPartyPayerEditionModal = true;
       const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
-      const { name, address, email, unitTTCRate, billingMode, isApa } = currentThirdPartyPayer;
       this.editedThirdPartyPayer = {
-        _id: currentThirdPartyPayer._id,
-        name,
-        address: { ...address } || {},
-        email,
-        unitTTCRate,
-        billingMode,
-        isApa,
+        address: {},
+        ...pick(currentThirdPartyPayer, ['_id', 'name', 'address', 'email', 'unitTTCRate', 'billingMode', 'isApa']),
       };
     },
     resetThirdPartyPayerCreation () {

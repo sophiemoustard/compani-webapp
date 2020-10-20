@@ -40,9 +40,11 @@ export const configMixin = {
         this.tmpInput = '';
       }
     },
-    nbrError (path) {
-      if (get(this.$v, path).required === false) return REQUIRED_LABEL;
-      if (get(this.$v, path).positiveNumber === false || get(this.$v, path).numeric === false) {
+    nbrError (path, validations = this.$v) {
+      if (get(validations, path).required === false) return REQUIRED_LABEL;
+      if (get(validations, path).positiveNumber === false ||
+      get(validations, path).numeric === false ||
+      get(validations, path).maxValue === false) {
         return 'Nombre non valide';
       }
     },

@@ -26,7 +26,7 @@
           </ni-responsive-table>
           <q-card-actions align="right">
             <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
-              @click="newInternalHourModal = true"
+              @click="internalHourCreationModal = true"
               :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER || internalHoursLoading" />
           </q-card-actions>
         </q-card>
@@ -43,9 +43,9 @@
       <div class="q-mb-xl">
         <p class="text-weight-bold">Remboursement frais</p>
         <div class="row gutter-profile">
-          <ni-input caption="Montant des frais" :error="$v.company.rhConfig.feeAmount.$error"
-            :error-message="nbrError('company.rhConfig.feeAmount')" type="number" v-model="company.rhConfig.feeAmount"
-            @focus="saveTmp('rhConfig.feeAmount')" suffix="€" @blur="updateCompany('rhConfig.feeAmount')" />
+          <ni-input caption="Montant des frais" :error="$v.company.rhConfig.phoneFeeAmount.$error" type="number"
+            :error-message="nbrError('company.rhConfig.phoneFeeAmount')" v-model="company.rhConfig.phoneFeeAmount"
+            @focus="saveTmp('rhConfig.phoneFeeAmount')" suffix="€" @blur="updateCompany('rhConfig.phoneFeeAmount')" />
         </div>
       </div>
       <div class="q-mb-xl">
@@ -150,60 +150,20 @@
       </div>
     </div>
 
-    <!-- Internal hour creation modal -->
-    <ni-modal v-model="newInternalHourModal" @hide="resetInternalHourCreationModal">
-      <template slot="title">
-        Créer une <span class="text-weight-bold">heure interne</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newInternalHour.name" :error="$v.newInternalHour.name.$error"
-        @blur="$v.newInternalHour.name.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
-          :loading="loading" @click="createInternalHour" />
-      </template>
-    </ni-modal>
+    <internal-hour-creation-modal v-model="internalHourCreationModal" :validations="$v.newInternalHour"
+      :new-internal-hour="newInternalHour" @hide="resetInternalHourCreationModal" @submit="createInternalHour"
+      :loading="loading" />
 
-    <!-- Administrative document creation modal -->
-    <ni-modal v-model="administrativeDocumentCreationModal" @hide="resetAdministrativeDocumentModal">
-      <template slot="title">
-        Ajouter un <span class="text-weight-bold">document administratif</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newAdministrativeDocument.name" required-field
-        :error="$v.newAdministrativeDocument.name.$error" @blur="$v.newAdministrativeDocument.name.$touch" />
-      <ni-input caption="Document" type="file" v-model="newAdministrativeDocument.file" required-field last
-        :error="$v.newAdministrativeDocument.file.$error" @blur="$v.newAdministrativeDocument.file.$touch" in-modal />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter un document" icon-right="add" color="primary"
-          :loading="loading" @click="createNewAdministrativeDocument" />
-      </template>
-    </ni-modal>
+    <administrative-document-creation-modal v-model="administrativeDocumentCreationModal" :loading="loading"
+      :new-administrative-document="newAdministrativeDocument" @submit="createNewAdministrativeDocument"
+      :validations="$v.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
 
-    <!-- Sector creation modal -->
-    <ni-modal v-model="sectorCreationModal" @hide="resetCreationSectorData">
-      <template slot="title">
-        Ajouter une <span class="text-weight-bold">équipe</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="newSector.name" :error="$v.newSector.name.$error"
-        @blur="$v.newSector.name.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Ajouter une équipe" icon-right="add" color="primary"
-          :loading="loading" @click="createNewSector" />
-      </template>
-    </ni-modal>
+    <sector-creation-modal v-model="sectorCreationModal" :loading="loading" @hide="resetCreationSectorData"
+      :new-sector="newSector" @submit="createNewSector" :validations="$v.newSector" />
 
-    <!-- Sector edition modal -->
-    <ni-modal v-model="sectorEditionModal" @hide="resetEditionSectorData">
-      <template slot="title">
-        Editer l'<span class="text-weight-bold">équipe</span>
-      </template>
-      <ni-input in-modal caption="Nom" v-model="editedSector.name" :error="$v.editedSector.name.$error"
-        @blur="$v.editedSector.name.$touch" required-field />
-      <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Editer l'équipe" icon-right="add" color="primary"
-          :loading="loading" @click="updateSector" />
-      </template>
-    </ni-modal>
-  </q-page>
+    <sector-edition-modal v-model="sectorEditionModal" :loading="loading" @hide="resetEditionSectorData"
+      :edited-sector="editedSector" @submit="updateSector" :validations="$v.editedSector" />
+</q-page>
 </template>
 
 <script>
@@ -219,11 +179,15 @@ import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
-import Modal from '@components/modal/Modal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
+import InternalHourCreationModal from 'src/modules/client/components/config/InternalHourCreationModal';
+import AdministrativeDocumentCreationModal
+  from 'src/modules/client/components/config/AdministrativeDocumentCreationModal';
+import SectorCreationModal from 'src/modules/client/components/config/SectorCreationModal';
+import SectorEditionModal from 'src/modules/client/components/config/SectorEditionModal';
 
 export default {
   name: 'RhConfig',
@@ -231,8 +195,11 @@ export default {
   components: {
     'ni-input': Input,
     'ni-file-uploader': FileUploader,
-    'ni-modal': Modal,
     'ni-responsive-table': ResponsiveTable,
+    'internal-hour-creation-modal': InternalHourCreationModal,
+    'administrative-document-creation-modal': AdministrativeDocumentCreationModal,
+    'sector-creation-modal': SectorCreationModal,
+    'sector-edition-modal': SectorEditionModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   data () {
@@ -246,7 +213,7 @@ export default {
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       internalHoursLoading: false,
-      newInternalHourModal: false,
+      internalHourCreationModal: false,
       newInternalHour: { name: '' },
       loading: false,
       pagination: { rowsPerPage: 0 },
@@ -282,7 +249,7 @@ export default {
       company: {
         rhConfig: {
           grossHourlyRate: { required, positiveNumber, maxValue: maxValue(999) },
-          feeAmount: { required, positiveNumber, maxValue: maxValue(999) },
+          phoneFeeAmount: { required, positiveNumber, maxValue: maxValue(999) },
           amountPerKm: { required, positiveNumber, maxValue: maxValue(999) },
           transportSubs: { $each: { price: { required, positiveNumber, maxValue: maxValue(999) } } },
         },
@@ -361,7 +328,7 @@ export default {
         await this.refreshCompany();
 
         NotifyPositive('Heure interne créée');
-        this.newInternalHourModal = false;
+        this.internalHourCreationModal = false;
         await this.refreshInternalHours();
       } catch (e) {
         console.error(e);
@@ -427,7 +394,7 @@ export default {
         this.loading = true;
         await Sectors.create(this.newSector);
         NotifyPositive('Équipe créée.');
-        this.resetCreationSectorData();
+        this.sectorCreationModal = false;
         await this.getSectors();
       } catch (e) {
         console.error(e);
@@ -438,7 +405,6 @@ export default {
       }
     },
     resetCreationSectorData () {
-      this.sectorCreationModal = false;
       this.newSector = { name: '' };
       this.$v.newSector.$reset();
     },
@@ -456,7 +422,7 @@ export default {
         this.loading = true;
         await Sectors.updateById(this.editedSector._id, { name: this.editedSector.name });
         NotifyPositive('Équipe modifiée.');
-        this.resetEditionSectorData();
+        this.sectorEditionModal = false;
         await this.getSectors();
       } catch (e) {
         console.error(e);
@@ -467,7 +433,6 @@ export default {
       }
     },
     resetEditionSectorData () {
-      this.sectorEditionModal = false;
       this.editedSector = { name: '' };
       this.$v.editedSector.$reset();
     },

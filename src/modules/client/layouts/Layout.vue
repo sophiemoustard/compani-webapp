@@ -33,7 +33,7 @@
     <q-page-container>
       <router-view :key="$route.fullPath" />
     </q-page-container>
-    <q-page-sticky v-if="$q.platform.is.mobile" position="bottom-left" :offset="[18, 18]">
+    <q-page-sticky position="bottom-left" :offset="[18, 18]">
       <q-btn class="menu-icon" color="primary" round dense @click="toggleMenu(true)" icon="menu" />
     </q-page-sticky>
   </q-layout>
@@ -81,7 +81,7 @@ export default {
 <style lang="stylus" scoped>
   .q-page-sticky
     z-index: 10
-    @media (min-width: 1025px)
+    @media (min-width: 1024px)
       display: none;
 
   .chevron
@@ -94,7 +94,7 @@ export default {
       left: 235px
     &-right
       left: 15px
-    @media (max-width: 1024px)
+    @media (max-width: 1023px)
       display: none
 
   .q-toolbar

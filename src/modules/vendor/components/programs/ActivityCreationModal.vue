@@ -5,7 +5,7 @@
     </template>
     <ni-input in-modal v-model.trim="newActivity.name" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Nom" />
-    <ni-select in-modal caption="Type" :options="activityTypeOptions" v-model="newActivity.type" required-field
+    <ni-select in-modal caption="Type" :options="typeOptions" v-model="newActivity.type" required-field
       :error="validations.type.$error" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="loading"
@@ -24,7 +24,7 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     newActivity: { type: Object, default: () => ({}) },
-    activityTypeOptions: { type: Array, default: () => [] },
+    typeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },

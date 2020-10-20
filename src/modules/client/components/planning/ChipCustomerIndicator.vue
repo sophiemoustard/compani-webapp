@@ -59,10 +59,10 @@ export default {
 <style lang="stylus" scoped>
   .referent-name
     font-style: italic;
-    @media (min-width: 1025px)
+    @media (min-width: 1024px)
       margin-top: 15px;
       font-size: 12px;
-    @media (min-width: 421px) and (max-width: 1024px)
+    @media (min-width: 421px) and (max-width: 1023px)
       margin-top: 15px;
       font-size: 8px;
     @media (max-width: 420px)
@@ -73,9 +73,9 @@ export default {
     &-name
       font-weight: 600;
       font-size: 14px;
-      @media (min-width: 1025px)
+      @media (min-width: 1024px)
         margin-bottom: 15px;
-      @media (min-width: 421px) and (max-width: 1024px)
+      @media (min-width: 421px) and (max-width: 1023px)
         margin-bottom: 15px;
         font-size: 12px;
       @media (max-width: 420px)
