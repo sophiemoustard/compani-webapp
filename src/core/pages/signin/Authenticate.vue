@@ -22,11 +22,10 @@
         <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
           <small>Mot de passe oublié ?</small>
         </router-link>
-        <div class="row justify-center first-login">
-          <router-link class="q-mr-lg" :to="{ name: 'forgotPassword' }">
-            <small>Première connexion ?</small>
-          </router-link>
-          <ni-button data-cy="login" class="signup-btn" label="Me connecter" icon="ion-log-in" @click="submit"
+        <div class="q-my-lg buttons first-login">
+          <ni-button @click="$router.push({ name: 'forgotPassword' })" color="primary" class="firstLoginBtn"
+            label="C'est ma première connexion" />
+          <ni-button data-cy="login" label="Me connecter" icon="ion-log-in" @click="submit"
             color="primary" :flat="false" />
         </div>
       </div>
@@ -108,9 +107,6 @@ export default {
       padding: 24px 0px 24px 0px
     &-body-padding
       padding: 0px 24px 0px 24px
-    &-btn
-      margin-top: 20px
-      margin-bottom: 24px
 
   .client-background
     min-height: 100vh
@@ -119,5 +115,13 @@ export default {
 
   .first-login
     align-items: center
+
+  .buttons
+    display: flex
+    justify-content: center
+    @media (max-width: 420px)
+      flex-direction: column-reverse
+      .firstLoginBtn
+        margin-top: 16px
 
 </style>

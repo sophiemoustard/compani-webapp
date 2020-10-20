@@ -12,7 +12,7 @@ export default {
     disable: { type: Boolean, default: false },
     flat: { type: Boolean, default: true },
     href: { type: String, default: '' },
-    icon: { type: String, default: '' },
+    icon: { type: String, default: undefined },
     label: { type: String, default: '' },
     loading: { type: Boolean, default: false },
     size: { type: String, default: 'md' }, // determine the font-size for label, icon is 1.715em of that
