@@ -117,7 +117,7 @@ export default {
     },
     getTemplateName (value) {
       const template = CARD_TEMPLATES.find(t => t.value === value);
-      return template ? `Carte ${template.label}` : '';
+      return template ? template.label : '';
     },
     scrollDown () {
       const scrollArea = this.$refs.cardContainer;
