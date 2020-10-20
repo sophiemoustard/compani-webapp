@@ -45,7 +45,6 @@ import {
   SURVEY,
   QUESTION_ANSWER,
   FILL_THE_GAPS,
-  TEMPLATE_TYPES,
   PUBLISHED,
 } from '@data/constants';
 import Button from '@components/Button';
@@ -118,7 +117,7 @@ export default {
     },
     getTemplateName (value) {
       const template = CARD_TEMPLATES.find(t => t.value === value);
-      return template ? `Carte ${TEMPLATE_TYPES[template.type].toLowerCase()} - ${template.label}` : '';
+      return template ? template.label : '';
     },
     scrollDown () {
       const scrollArea = this.$refs.cardContainer;
