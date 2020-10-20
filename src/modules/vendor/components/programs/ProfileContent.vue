@@ -72,10 +72,10 @@
           </div>
         </q-card>
       </draggable>
-      <div class="sub-program-footer">
+      <div class="q-my-md sub-program-footer">
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
           @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
-        <ni-button v-if="!isPublished(subProgram)" class="q-my-sm add-step-button" color="primary" icon="add"
+        <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
           @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
       </div>
       <q-separator v-if="index !== program.subPrograms.length-1" />
