@@ -42,12 +42,13 @@
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
                       <ni-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
-                      <ni-btn flat round small dense color="grey" icon="edit" :disable="props.row.isArchived"
+                      <ni-btn v-if="!props.row.isArchived" flat round small dense color="grey" icon="edit"
                         @click="openServiceEditionModal(col.value)" />
                       <ni-btn v-if="props.row.subscriptionCount === 0" flat round small dense color="grey" icon="delete"
                         @click="validateServiceDeletion(col.value, props.row)" />
-                      <ni-btn v-else-if="!props.row.isArchived" color="grey" icon="archive"
+                      <ni-btn v-else-if="!props.row.isArchived" color="grey" icon="mdi-archive"
                         @click="validateServiceArchiving(col.value)" />
+                      <div class="archived" v-else>archivé</div>
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -640,7 +641,11 @@ export default {
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
           ...service,
-        }));
+        })).sort((a, b) => {
+          if (a.isArchived && !b.isArchived) return 1;
+          if (!a.isArchived && b.isArchived) return -1;
+          return 0;
+        });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du rafraîchissement des services.');
@@ -927,6 +932,7 @@ export default {
       try {
         await Services.updateById(serviceId, { isArchived: true });
         NotifyPositive('Service archivé.');
+        await this.refreshServices();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'archivage du service.');
@@ -1042,3 +1048,10 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .archived
+    display: flex;
+    align-items: flex-end;
+    margin-bottom: 5px;
+</style>
