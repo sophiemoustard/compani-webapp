@@ -41,12 +41,11 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
-                      <ni-btn v-if="!props.row.isArchived" flat round small dense color="grey" icon="edit"
-                        @click="openServiceEditionModal(col.value)" />
-                      <ni-btn v-if="props.row.subscriptionCount === 0" flat round small dense color="grey" icon="delete"
+                      <ni-btn icon="history" @click="showHistory(col.value)" />
+                      <ni-btn v-if="!props.row.isArchived" icon="edit" @click="openServiceEditionModal(col.value)" />
+                      <ni-btn v-if="props.row.subscriptionCount === 0" icon="delete"
                         @click="validateServiceDeletion(col.value, props.row)" />
-                      <ni-btn v-else-if="!props.row.isArchived" color="grey" icon="mdi-archive"
+                      <ni-btn v-else-if="!props.row.isArchived" icon="mdi-archive"
                         @click="validateServiceArchiving(col.value)" />
                       <div class="archived" v-else>archivé</div>
                     </div>
