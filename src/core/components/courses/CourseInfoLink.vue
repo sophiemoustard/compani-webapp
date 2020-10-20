@@ -67,5 +67,4 @@ export default {
       &-disabled
         opacity: 0.7 !important;
         cursor: not-allowed !important
-
 </style>
