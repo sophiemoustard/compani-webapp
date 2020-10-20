@@ -1,5 +1,5 @@
 <template>
-  <div v-if="questionAnswersInitialized">
+  <div>
     <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
@@ -7,20 +7,18 @@
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
-        v-model.trim="card.questionAnswers[i]" :required-field="i < 2" :error="requiredQuestionAnswerIsMissing(i)"
-        @focus="saveTmp(`questionAnswers[${i}]`)" @blur="updateQuestionAnswers(i)" :disable="disableEdition" />
+        v-model="card.questionAnswers[i].text" :disable="disableEdition" />
     </div>
   </div>
 </template>
 
 <script>
-import times from 'lodash/times';
 import get from 'lodash/get';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { QUESTION_ANSWER_MAX_ANSWERS_COUNT, QUESTION_MAX_LENGTH } from '@data/constants';
+import { QUESTION_MAX_LENGTH } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
@@ -40,26 +38,12 @@ export default {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         questionAnswers: {
           required,
-          minLength: minArrayLength(2),
+          minLength: minArrayLength(),
         },
       },
     };
   },
-  computed: {
-    questionAnswersInitialized () {
-      return this.card.questionAnswers.length === QUESTION_ANSWER_MAX_ANSWERS_COUNT;
-    },
-  },
-  watch: {
-    card: {
-      handler: 'initializeQuestionAnswers',
-      immediate: true,
-    },
-  },
   methods: {
-    initializeQuestionAnswers () {
-      this.card.questionAnswers = times(QUESTION_ANSWER_MAX_ANSWERS_COUNT, i => this.card.questionAnswers[i] || '');
-    },
     requiredQuestionAnswerIsMissing (index) {
       return this.$v.card.questionAnswers.$error && !this.$v.card.questionAnswers.minLength && index < 2 &&
       !this.card.questionAnswers[index];
