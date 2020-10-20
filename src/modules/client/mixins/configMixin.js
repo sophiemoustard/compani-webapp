@@ -47,6 +47,7 @@ export const configMixin = {
       get(validations, path).maxValue === false) {
         return 'Nombre non valide';
       }
+      return '';
     },
     // Documents
     async deleteDocument (driveId, type, key) {
