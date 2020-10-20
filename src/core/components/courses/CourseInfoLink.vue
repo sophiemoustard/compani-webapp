@@ -1,10 +1,18 @@
 <template>
   <div class="course-link">
+    <div>
+      <ni-button :disable="disableLink" color="primary" icon="info" type="a" :href="courseLink" />
+      <ni-button :disable="disableLink" color="black" size="16px" type="a" :href="courseLink"
+        label="Page info formation" />
+    </div>
     <q-item>
       <q-item-section side>
         <ni-button :disable="disableLink" color="primary" icon="info" type="a" :href="courseLink" />
       </q-item-section>
-      <q-item-section class="course-link">Page info formation</q-item-section>
+      <q-item-section>
+        <ni-button :disable="disableLink" color="black" size="16px" type="a" :href="courseLink"
+          label="Page info formation" />
+      </q-item-section>
     </q-item>
     <div class="course-link-share" v-clipboard:copy="!disableLink && courseLink"
       v-clipboard:success="handleCopySuccess">
@@ -70,4 +78,5 @@ export default {
       &-disabled
         opacity: 0.7 !important;
         cursor: not-allowed !important
+
 </style>
