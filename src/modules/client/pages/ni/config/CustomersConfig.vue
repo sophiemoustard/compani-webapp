@@ -1051,6 +1051,5 @@ export default {
 <style lang="stylus" scoped>
   .archived
     display: flex;
-    align-items: flex-end;
-    margin-bottom: 5px;
+    align-self: center;
 </style>
