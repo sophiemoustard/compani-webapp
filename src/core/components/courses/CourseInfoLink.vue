@@ -1,20 +1,9 @@
 <template>
-  <div class="course-link">
-    <div>
-      <ni-button :disable="disableLink" color="primary" icon="info" type="a" :href="courseLink" />
-      <ni-button :disable="disableLink" color="black" size="16px" type="a" :href="courseLink"
-        label="Page info formation" />
-    </div>
-    <q-item>
-      <q-item-section side>
-        <ni-button :disable="disableLink" color="primary" icon="info" type="a" :href="courseLink" />
-      </q-item-section>
-      <q-item-section>
-        <ni-button :disable="disableLink" color="black" size="16px" type="a" :href="courseLink"
-          label="Page info formation" />
-      </q-item-section>
-    </q-item>
-    <div class="course-link-share" v-clipboard:copy="!disableLink && courseLink"
+  <q-item class="course-link">
+    <ni-button :disable="disableLink" type="a" :href="courseLink" color="primary" icon="info" />
+    <ni-button :disable="disableLink" type="a" :href="courseLink"
+      label="Page info formation" color="black" size="16px" />
+    <div class="q-mx-sm course-link-share" v-clipboard:copy="!disableLink && courseLink"
       v-clipboard:success="handleCopySuccess">
       <ni-button color="primary" :disable="disableLink" icon="link" size="xs" />
       <div class="course-link-share-label" :class="{ 'course-link-share-label-disabled': disableLink }"
@@ -22,7 +11,7 @@
         Obtenir un lien de partage
       </div>
     </div>
-  </div>
+  </q-item>
 </template>
 
 <script>
