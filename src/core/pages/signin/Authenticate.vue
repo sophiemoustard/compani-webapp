@@ -22,7 +22,7 @@
         <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
           <small>Mot de passe oublié ?</small>
         </router-link>
-        <div class="q-my-lg buttons first-login">
+        <div class="q-my-lg buttons">
           <ni-button @click="$router.push({ name: 'forgotPassword' })" color="primary" class="firstLoginBtn"
             label="C'est ma première connexion" />
           <ni-button data-cy="login" label="Me connecter" icon="ion-log-in" @click="submit"
@@ -112,9 +112,6 @@ export default {
     min-height: 100vh
     @media screen and (max-width: 768px)
       height: 85vh
-
-  .first-login
-    align-items: center
 
   .buttons
     display: flex
