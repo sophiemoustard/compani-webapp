@@ -1,5 +1,5 @@
 <template>
-  <q-item class="course-link">
+  <div class="course-link">
     <ni-button :disable="disableLink" type="a" :href="courseLink" color="primary" icon="info" />
     <ni-button :disable="disableLink" type="a" :href="courseLink"
       label="Page info formation" color="black" size="16px" />
@@ -11,7 +11,7 @@
         Obtenir un lien de partage
       </div>
     </div>
-  </q-item>
+  </div>
 </template>
 
 <script>
@@ -43,8 +43,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.q-item
-  padding-left: 0px;
 .course-link
   @media screen and (min-width: 1024px)
     display: flex

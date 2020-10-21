@@ -32,16 +32,15 @@
 
       <q-item>
         <ni-button color="primary" :disable="followUpDisabled" icon="file_download" type="a"
-          :href="!followUpDisabled ? downloadAttendanceSheet() : ''" />
-        <ni-button color="black" :disable="followUpDisabled" :href="!followUpDisabled ? downloadAttendanceSheet() : ''"
+          :href="downloadAttendanceSheet" />
+        <ni-button color="black" :disable="followUpDisabled" :href="downloadAttendanceSheet"
           label="Télécharger les feuilles d'émargement" size="16px" type="a" />
       </q-item>
       <q-item>
-          <ni-button color="primary" :disable="disableDownloadCompletionCertificates" icon="file_download" type="a"
-            :href="!disableDownloadCompletionCertificates ? downloadCompletionCertificates() : ''" />
-          <ni-button color="black" :disable="disableDownloadCompletionCertificates" type="a" size="16px"
-            :href="!disableDownloadCompletionCertificates ? downloadCompletionCertificates() : ''"
-            label="Télécharger les attestations de fin de formation" />
+        <ni-button color="primary" :disable="disableDownloadCompletionCertificates" icon="file_download" type="a"
+          :href="downloadCompletionCertificates" />
+        <ni-button color="black" :disable="disableDownloadCompletionCertificates" type="a" size="16px"
+          :href="downloadCompletionCertificates" label="Télécharger les attestations de fin de formation" />
       </q-item>
     </div>
     <div class="q-mb-xl">
@@ -325,9 +324,11 @@ export default {
       }
     },
     downloadAttendanceSheet () {
+      if (this.followUpDisabled) return;
       return Courses.downloadAttendanceSheet(this.course._id);
     },
     downloadCompletionCertificates () {
+      if (this.disableDownloadCompletionCertificates) return;
       return Courses.downloadCompletionCertificates(this.course._id);
     },
   },
