@@ -31,18 +31,16 @@
       <ni-course-info-link :disable-link="followUpDisabled" />
 
       <q-item>
-        <q-item-section side>
-          <ni-button color="primary" :disable="followUpDisabled" icon="file_download" type="a"
-            :href="!followUpDisabled ? downloadAttendanceSheet() : ''" />
-        </q-item-section>
-        <q-item-section>Télécharger les feuilles d'émargement</q-item-section>
+        <ni-button color="primary" :disable="followUpDisabled" icon="file_download" type="a"
+          :href="downloadAttendanceSheet()" />
+        <ni-button color="black" :disable="followUpDisabled" :href="downloadAttendanceSheet()"
+          label="Télécharger les feuilles d'émargement" size="16px" type="a" />
       </q-item>
       <q-item>
-        <q-item-section side>
-          <ni-button color="primary" :disable="disableDownloadCompletionCertificates" icon="file_download" type="a"
-            :href="!disableDownloadCompletionCertificates ? downloadCompletionCertificates() : ''" />
-        </q-item-section>
-        <q-item-section>Télécharger les attestations de fin de formation</q-item-section>
+        <ni-button color="primary" :disable="disableDownloadCompletionCertificates" icon="file_download" type="a"
+          :href="downloadCompletionCertificates()" />
+        <ni-button color="black" :disable="disableDownloadCompletionCertificates" type="a" size="16px"
+          :href="downloadCompletionCertificates()" label="Télécharger les attestations de fin de formation" />
       </q-item>
     </div>
     <div class="q-mb-xl">
@@ -81,10 +79,9 @@
         </template>
       </ni-banner>
       <q-item>
-        <q-item-section side>
           <ni-button color="primary" :disable="disableSms" icon="mdi-cellphone-message" @click="openSmsModal" />
-        </q-item-section>
-        <q-item-section>Envoyer un SMS de convocation ou de rappel aux stagiaires</q-item-section>
+          <ni-button color="black" :disable="disableSms" @click="openSmsModal" size="16px"
+            label="Envoyer un SMS de convocation ou de rappel aux stagiaires" />
       </q-item>
     </div>
 
@@ -327,9 +324,11 @@ export default {
       }
     },
     downloadAttendanceSheet () {
+      if (this.followUpDisabled) return;
       return Courses.downloadAttendanceSheet(this.course._id);
     },
     downloadCompletionCertificates () {
+      if (this.disableDownloadCompletionCertificates) return;
       return Courses.downloadCompletionCertificates(this.course._id);
     },
   },
