@@ -45,7 +45,8 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat dense color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn flat dense color="grey" icon="edit" @click="startSubscriptionEdition(col.value)" />
+                    <q-btn flat dense color="grey" icon="edit" @click="startSubscriptionEdition(col.value)"
+                      :disable="get(props, 'row.service.isArchived') || false" />
                     <q-btn flat dense color="grey" icon="delete" :disable="props.row.eventCount > 0"
                       @click="validateSubscriptionsDeletion(col.value)" />
                   </div>
@@ -576,6 +577,7 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    get,
     mandateFormFields (row) {
       return [
         { name: 'mandateId', value: row._id },
@@ -604,7 +606,7 @@ export default {
     // Refresh data
     async getServices () {
       try {
-        this.services = await Services.list();
+        this.services = await Services.list({ isArchived: false });
       } catch (e) {
         console.error(e);
         this.services = [];
