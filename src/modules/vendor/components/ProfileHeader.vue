@@ -3,6 +3,7 @@
     <div class="arrow-title q-mb-md items-center">
       <ni-button class="on-left" icon="arrow_back" color="primary" @click.native="$router.go(-1)" />
       <h4>{{ title }}</h4>
+      <slot name="title" />
     </div>
     <slot name="body" />
   </div>
