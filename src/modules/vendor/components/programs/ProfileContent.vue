@@ -78,7 +78,7 @@
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
           @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
       </div>
-      <q-separator v-if="index !== program.subPrograms.length-1" />
+      <q-separator v-if="index !== program.subPrograms.length-1" class="q-mt-lg" />
     </div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
