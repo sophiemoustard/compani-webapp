@@ -40,7 +40,7 @@ import Button from '@components/Button';
 import PictureUploader from '@components/PictureUploader';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
 import { AUXILIARY_ROLES } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
@@ -67,7 +67,7 @@ export default {
           email: { required, email },
         },
         contact: {
-          phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
+          phone: { frPhoneNumber },
         },
       },
     };
