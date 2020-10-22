@@ -75,7 +75,7 @@
         </div>
       </div>
     </div>
-</ni-modal>
+  </ni-modal>
 </template>
 
 <script>
