@@ -24,8 +24,8 @@
         </div>
       </div>
       <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
-          :error-message="phoneNbrError($v.userProfile)" @blur="updateUser('contact.phone')" caption="Téléphone"
-          :error="$v.userProfile.contact.phone.$error" />
+        :error-message="phoneNbrError($v.userProfile)" @blur="updateUser('contact.phone')" caption="Téléphone"
+        :error="$v.userProfile.contact.phone.$error" />
     </div>
   </div>
 </template>

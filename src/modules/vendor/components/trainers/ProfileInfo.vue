@@ -16,6 +16,9 @@
           <ni-button :icon="lockIcon" color="black" @click.native="toggleEmailLock(!emailLock)" />
         </div>
       </div>
+      <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
+        :error-message="phoneNbrError($v.userProfile)" @blur="updateUser('contact.phone')" caption="Téléphone"
+        :error="$v.userProfile.contact.phone.$error" />
     </div>
     <div class="row gutter-profile q-mb-xl">
       <ni-input caption="Biographie du formateur" v-model="userProfile.biography" type="textarea"
@@ -33,9 +36,10 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
-import { required, email } from 'vuelidate/lib/validators';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import { validationMixin } from '@mixins/validationMixin';
 import { TRAINER } from '@data/constants';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'ProfileInfo',
@@ -55,6 +59,9 @@ export default {
       userProfile: {
         identity: { lastname: { required } },
         local: { email: { required, email } },
+        contact: {
+          phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
+        },
       },
     };
   },
