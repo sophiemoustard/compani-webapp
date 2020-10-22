@@ -45,7 +45,7 @@
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat dense color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn flat dense color="grey" icon="edit" @click="startSubscriptionEdition(col.value)"
+                    <q-btn flat dense color="grey" icon="edit" @click="openSubscriptionEditionModal(col.value)"
                       :disable="get(props, 'row.service.isArchived') || false" />
                     <q-btn flat dense color="grey" icon="delete" :disable="props.row.eventCount > 0"
                       @click="validateSubscriptionsDeletion(col.value)" />
@@ -170,7 +170,7 @@
                   <div class="row no-wrap table-actions">
                     <ni-button icon="remove_red_eye" @click.native="showFundingDetails(col.value)" />
                     <ni-button icon="history" @click.native="showFundingHistory(col.value)" />
-                    <ni-button icon="edit" @click.native="startFundingEdition(col.value)" />
+                    <ni-button icon="edit" @click.native="openFundingEditionModal(col.value)" />
                     <ni-button icon="delete" @click.native="validateFundingDeletion(col.value)" />
                   </div>
                 </template>
@@ -689,7 +689,7 @@ export default {
         this.loading = false;
       }
     },
-    startSubscriptionEdition (id) {
+    openSubscriptionEditionModal (id) {
       const selectedSubscription = this.subscriptions.find(sub => sub._id === id);
       const { _id, service, unitTTCRate, estimatedWeeklyVolume, evenings, sundays } = selectedSubscription;
       this.editedSubscription = {
@@ -955,7 +955,7 @@ export default {
       this.selectedFunding = {};
       this.fundingDetailsData = [];
     },
-    startFundingEdition (id) {
+    openFundingEditionModal (id) {
       this.editedFunding = { ...this.fundings.find(fund => fund._id === id) };
       this.editedFunding.subscription = this.editedFunding.subscription._id;
       this.fundingEditionModal = true;
