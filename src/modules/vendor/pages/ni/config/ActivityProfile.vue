@@ -22,18 +22,16 @@
     </template>
 
     <!-- Card creation modal -->
-    <card-creation-modal v-model="cardCreationModal" :card="newCard" @hide="resetCardCreationModal"
-      :loading="modalLoading" @submit="createCard" />
+    <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
   </q-page>
 </template>
 
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
-import { required } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Activities from '@api/Activities';
-import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
 import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
@@ -59,18 +57,11 @@ export default {
     return {
       programName: '',
       stepName: '',
-      modalLoading: false,
       cardCreationModal: false,
-      newCard: { template: '' },
       isEditionLocked: false,
       isActivityUsedInOtherStep: false,
       PUBLISHED_DOT_WARNING,
       PUBLISHED_DOT_ACTIVE,
-    };
-  },
-  validations () {
-    return {
-      newCard: { template: { required } },
     };
   },
   computed: {
@@ -157,12 +148,10 @@ export default {
     openCardCreationModal (stepId) {
       this.cardCreationModal = true;
     },
-    async createCard () {
+    async createCard (template) {
+      this.$q.loading.show();
       try {
-        this.modalLoading = true;
-        this.$v.newCard.$touch();
-        if (this.$v.newCard.$error) return NotifyWarning('Champ(s) invalide(s)');
-        await Activities.addCard(this.activityId, this.newCard);
+        await Activities.addCard(this.activityId, { template });
 
         NotifyPositive('Carte créée.');
         this.cardCreationModal = false;
@@ -176,12 +165,10 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la carte.');
       } finally {
-        this.modalLoading = false;
+        this.$q.loading.hide();
       }
     },
     resetCardCreationModal () {
-      this.newCard = { template: '' };
-      this.$v.newCard.$reset();
     },
     validateCardDeletion (cardId) {
       this.$q.dialog({
