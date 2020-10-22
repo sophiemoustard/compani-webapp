@@ -178,7 +178,7 @@ export default {
           noDiacriticsName: removeDiacritics(formattedName),
         },
         firstIntervention: get(this.firstInterventions[customer._id], 'firstIntervention.startDate', ''),
-        missingInfo: customerProfileValidation(customer).error !== null,
+        missingInfo: !!customerProfileValidation(customer).error,
       };
     },
     async getCustomers () {
