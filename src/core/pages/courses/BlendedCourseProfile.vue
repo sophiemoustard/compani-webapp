@@ -93,7 +93,7 @@ export default {
       return tabs;
     },
     disableCourseDeletion () {
-      return !!this.course.slots.length || !!this.course.trainees.length;
+      return !!this.course.slots.length || !!this.course.trainees.length || !!this.course.slotsToPlan.length;
     },
   },
   watch: {
@@ -125,7 +125,7 @@ export default {
       }
     },
     validateCourseDeletion () {
-      if (this.deletionDisabled) return;
+      if (this.disableCourseDeletion) return;
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
