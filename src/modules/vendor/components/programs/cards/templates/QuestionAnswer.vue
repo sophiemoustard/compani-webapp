@@ -6,12 +6,17 @@
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div class="q-my-lg answers-container">
-      <ni-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
+      <q-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
         v-model="card.questionAnswers[i].text" :disable="disableEdition" @blur="updateQuestionAnswers(i)"
-        @focus="saveTmp(`questionAnswers[${i}.text]`)" :error="$v.card.questionAnswers.$each[i].$error" />
-      <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer" />
+        @focus="saveTmp(`questionAnswers[${i}.text]`)" :error="$v.card.questionAnswers.$each[i].$error">
+        <template v-slot:after>
+          <ni-button icon="delete" />
+        </template>
+      </q-input>
+      <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+        :disable="isDisabled" />
     </div>
-</div>
+  </div>
 </template>
 
 <script>
@@ -21,8 +26,12 @@ import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { QUESTION_MAX_LENGTH } from '@data/constants';
-import { minArrayLength } from '@helpers/vuelidateCustomVal';
+import {
+  QUESTION_MAX_LENGTH,
+  QUESTION_ANSWER_MAX_ANSWERS_COUNT,
+  QUESTION_ANSWER_MIN_ANSWERS_COUNT,
+} from '@data/constants';
+import { minArrayLength, maxArrayLength } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -42,13 +51,19 @@ export default {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         questionAnswers: {
           required,
-          minLength: minArrayLength(2),
+          minLength: minArrayLength(QUESTION_ANSWER_MIN_ANSWERS_COUNT),
+          maxLength: maxArrayLength(QUESTION_ANSWER_MAX_ANSWERS_COUNT),
           $each: {
             text: { required },
           },
         },
       },
     };
+  },
+  computed: {
+    isDisabled () {
+      return this.card.questionAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT;
+    },
   },
   methods: {
     formatQuestionAnswersPayload () {
