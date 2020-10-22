@@ -27,5 +27,5 @@ export default {
   .arrow-title
     display: flex
   h4
-    margin: 0
+    margin: 0 !important
 </style>
