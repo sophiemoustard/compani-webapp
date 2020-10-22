@@ -168,8 +168,6 @@ export default {
         this.$q.loading.hide();
       }
     },
-    resetCardCreationModal () {
-    },
     validateCardDeletion (cardId) {
       this.$q.dialog({
         title: 'Confirmation',
