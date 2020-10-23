@@ -26,6 +26,7 @@ import {
   QUESTION_MAX_LENGTH,
   QUESTION_ANSWER_MAX_ANSWERS_COUNT,
   QUESTION_ANSWER_MIN_ANSWERS_COUNT,
+  PUBLISHED,
 } from '@data/constants';
 import { minArrayLength, maxArrayLength } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
@@ -56,7 +57,8 @@ export default {
   },
   computed: {
     disableAnswerCreation () {
-      return this.card.questionAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT || this.disableEdition;
+      return this.card.questionAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
     },
   },
   methods: {
