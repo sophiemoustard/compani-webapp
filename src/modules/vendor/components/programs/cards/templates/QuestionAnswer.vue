@@ -49,9 +49,7 @@ export default {
           required,
           minLength: minArrayLength(QUESTION_ANSWER_MIN_ANSWERS_COUNT),
           maxLength: maxArrayLength(QUESTION_ANSWER_MAX_ANSWERS_COUNT),
-          $each: {
-            text: { required },
-          },
+          $each: { text: { required } },
         },
       },
     };
