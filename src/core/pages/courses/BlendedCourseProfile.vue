@@ -1,9 +1,9 @@
 <template>
   <q-page padding :class="backgroundClass">
     <template v-if="course">
-      <ni-profile-header :title="courseName">
+      <ni-profile-header :title="courseName" class="delete-container">
         <template v-slot:title>
-          <ni-button icon="delete" @click="validateCourseDeletion" :disabled="disableCourseDeletion" />
+          <ni-button class="delete" icon="delete" @click="validateCourseDeletion" :disabled="disableCourseDeletion" />
         </template>
         <template v-slot:body>
           <div class="row profile-info q-pl-lg">
@@ -146,4 +146,15 @@ export default {
 .q-item
   padding: 0
   min-height: 0
+
+/deep/ h4
+  margin-right: 32px !important
+
+.delete-container
+  position: relative
+
+.delete
+  position: absolute
+  top: 0
+  right: 0
 </style>
