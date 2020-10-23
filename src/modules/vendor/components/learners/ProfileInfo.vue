@@ -24,8 +24,8 @@
         </div>
       </div>
       <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"
-          :error-message="phoneNbrError($v.userProfile)" @blur="updateUser('contact.phone')" caption="Téléphone"
-          :error="$v.userProfile.contact.phone.$error" />
+        :error-message="phoneNbrError($v.userProfile)" @blur="updateUser('contact.phone')" caption="Téléphone"
+        :error="$v.userProfile.contact.phone.$error" />
     </div>
   </div>
 </template>
@@ -40,7 +40,7 @@ import Button from '@components/Button';
 import PictureUploader from '@components/PictureUploader';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
 import { AUXILIARY_ROLES } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
@@ -63,12 +63,8 @@ export default {
     return {
       userProfile: {
         identity: { lastname: { required } },
-        local: {
-          email: { required, email },
-        },
-        contact: {
-          phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
-        },
+        local: { email: { required, email } },
+        contact: { phone: { required, frPhoneNumber } },
       },
     };
   },
