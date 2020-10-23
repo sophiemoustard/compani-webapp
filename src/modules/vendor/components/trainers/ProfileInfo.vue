@@ -59,9 +59,7 @@ export default {
       userProfile: {
         identity: { lastname: { required } },
         local: { email: { required, email } },
-        contact: {
-          phone: { frPhoneNumber, required },
-        },
+        contact: { phone: { required, frPhoneNumber } },
       },
     };
   },

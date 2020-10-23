@@ -63,12 +63,8 @@ export default {
     return {
       userProfile: {
         identity: { lastname: { required } },
-        local: {
-          email: { required, email },
-        },
-        contact: {
-          phone: { frPhoneNumber, required },
-        },
+        local: { email: { required, email } },
+        contact: { phone: { required, frPhoneNumber } },
       },
     };
   },
