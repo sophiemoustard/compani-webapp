@@ -10,7 +10,7 @@
         v-model="card.questionAnswers[i].text" :disable="disableEdition" @blur="updateQuestionAnswers(i)"
         @focus="saveTmp(`questionAnswers[${i}.text]`)" :error="$v.card.questionAnswers.$each[i].$error" />
       <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
-        :disable="isDisabled" />
+        :disable="disableAnswerCreation" />
     </div>
   </div>
 </template>
@@ -55,8 +55,8 @@ export default {
     };
   },
   computed: {
-    isDisabled () {
-      return this.card.questionAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT;
+    disableAnswerCreation () {
+      return this.card.questionAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT || this.disableEdition;
     },
   },
   methods: {
