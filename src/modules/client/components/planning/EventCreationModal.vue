@@ -178,9 +178,8 @@ export default {
         ...this.newEvent,
         address: get(this.selectedCustomer, 'contact.primaryAddress', {}),
       };
-      if (this.customerSubscriptionsOptions.length === 1) {
-        payload.subscription = this.customerSubscriptionsOptions[0].value;
-      }
+      const cusSubNotArchived = this.customerSubscriptionsOptions.filter(sub => !sub.disable);
+      if (cusSubNotArchived.length === 1) payload.subscription = cusSubNotArchived[0].value;
       this.$emit('update:newEvent', payload);
     },
     toggleAddressSelect () {
