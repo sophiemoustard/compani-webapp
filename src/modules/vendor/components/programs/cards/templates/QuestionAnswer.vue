@@ -6,13 +6,9 @@
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div class="q-my-lg answers-container">
-      <q-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
+      <ni-input v-for="(answer, i) in card.questionAnswers" :key="i" :caption="`Réponse ${i + 1}`"
         v-model="card.questionAnswers[i].text" :disable="disableEdition" @blur="updateQuestionAnswers(i)"
-        @focus="saveTmp(`questionAnswers[${i}.text]`)" :error="$v.card.questionAnswers.$each[i].$error">
-        <template v-slot:after>
-          <ni-button icon="delete" />
-        </template>
-      </q-input>
+        @focus="saveTmp(`questionAnswers[${i}.text]`)" :error="$v.card.questionAnswers.$each[i].$error" />
       <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
         :disable="isDisabled" />
     </div>
