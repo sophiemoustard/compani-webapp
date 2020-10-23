@@ -10,6 +10,9 @@ export default {
   async updateAnswer (params, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/cards/${params.cardId}/answers/${params.answerId}`, payload);
   },
+  async deleteAnswer (params) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${params.cardId}/answers/${params.answerId}`);
+  },
   async deleteById (cardId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${cardId}`);
   },
