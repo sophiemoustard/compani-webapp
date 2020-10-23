@@ -9,7 +9,7 @@
       <div v-for="(answer, i) in card.questionAnswers" :key="i" class="answers-container">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.questionAnswers[i].text" :disable="disableEdition"
           @blur="updateQuestionAnswers(i)" @focus="saveTmp(`questionAnswers[${i}.text]`)"
-          :error="$v.card.questionAnswers.$each[i].$error" />
+          :error="$v.card.questionAnswers.$each[i].$error" class="answers-container-input" />
         <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" />
       </div>
       <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
@@ -124,6 +124,8 @@ export default {
   &-container
     display: flex
     justify-content: space-between
+    &-input
+      flex: 1
 .add-button
   align-self: end
 </style>
