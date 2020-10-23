@@ -5,8 +5,8 @@
       :disable="disableEdition" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       size="sm" :disable="disableEdition" label="Sélection multiple" />
-    <div class="q-my-lg answers-container">
-      <div v-for="(answer, i) in card.questionAnswers" :key="i">
+    <div class="q-my-lg answers">
+      <div v-for="(answer, i) in card.questionAnswers" :key="i" class="answers-container">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.questionAnswers[i].text" :disable="disableEdition"
           @blur="updateQuestionAnswers(i)" @focus="saveTmp(`questionAnswers[${i}.text]`)"
           :error="$v.card.questionAnswers.$each[i].$error" />
@@ -118,10 +118,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.answers-container
+.answers
   display: flex
   flex-direction: column
-  justify-content: space-between
+  &-container
+    display: flex
+    justify-content: space-between
 .add-button
   align-self: end
 </style>
