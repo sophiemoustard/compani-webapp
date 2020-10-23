@@ -8,7 +8,7 @@
     <div class="q-my-lg answers">
       <div v-for="(answer, i) in card.questionAnswers" :key="i" class="answers-container">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.questionAnswers[i].text" :disable="disableEdition"
-          @blur="updateQuestionAnswers(i)" @focus="saveTmp(`questionAnswers[${i}.text]`)"
+          @blur="updateQuestionAnswers(i)" @focus="saveTmp(`questionAnswers[${i}].text`)"
           :error="$v.card.questionAnswers.$each[i].$error" class="answers-container-input" />
         <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" />
       </div>
@@ -103,7 +103,8 @@ export default {
     },
     async deleteQuestionAnswer (index) {
       try {
-        const answerId = get(this.card, `questionAnswers[${index}]`)._id;
+        const answerId = get(this.card, `questionAnswers[${index}]._id`);
+        if (!answerId) return;
         await Cards.deleteAnswer({ cardId: this.card._id, answerId });
 
         await this.refreshCard();
