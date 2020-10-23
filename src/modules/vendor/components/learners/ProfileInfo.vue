@@ -67,7 +67,7 @@ export default {
           email: { required, email },
         },
         contact: {
-          phone: { frPhoneNumber },
+          phone: { frPhoneNumber, required },
         },
       },
     };

@@ -36,7 +36,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
 import { validationMixin } from '@mixins/validationMixin';
 import { TRAINER } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
@@ -60,7 +60,7 @@ export default {
         identity: { lastname: { required } },
         local: { email: { required, email } },
         contact: {
-          phone: { frPhoneNumber, required: requiredIf(() => this.isAuxiliary) },
+          phone: { frPhoneNumber, required },
         },
       },
     };
