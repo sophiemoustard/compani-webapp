@@ -41,12 +41,13 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small dense color="grey" icon="history" @click="showHistory(col.value)" />
-                      <q-btn flat round small dense color="grey" icon="edit"
-                        @click="openServiceEditionModal(col.value)" />
-                      <q-btn flat round small dense color="grey" icon="delete"
-                        :disable="props.row.subscriptionCount > 0"
+                      <ni-btn icon="history" @click="showHistory(col.value)" />
+                      <ni-btn v-if="!props.row.isArchived" icon="edit" @click="openServiceEditionModal(col.value)" />
+                      <ni-btn v-if="props.row.subscriptionCount === 0" icon="delete"
                         @click="validateServiceDeletion(col.value, props.row)" />
+                      <ni-btn v-else-if="!props.row.isArchived" icon="mdi-archive"
+                        @click="validateServiceArchiving(col.value)" />
+                      <div class="archived" v-else>archivé</div>
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -173,6 +174,7 @@ import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import FileUploader from '@components/form/FileUploader';
+import Button from '@components/Button';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
@@ -203,6 +205,7 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-select': Select,
     'ni-modal': Modal,
+    'ni-btn': Button,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
@@ -637,7 +640,11 @@ export default {
         this.services = services.map(service => ({
           ...this.getServiceLastVersion(service),
           ...service,
-        }));
+        })).sort((a, b) => {
+          if (a.isArchived && !b.isArchived) return 1;
+          if (!a.isArchived && b.isArchived) return -1;
+          return 0;
+        });
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du rafraîchissement des services.');
@@ -920,6 +927,25 @@ export default {
       }).onOk(() => this.deleteService(serviceId, row))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
+    async archiveService (serviceId) {
+      try {
+        await Services.updateById(serviceId, { isArchived: true });
+        NotifyPositive('Service archivé.');
+        await this.refreshServices();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'archivage du service.');
+      }
+    },
+    validateServiceArchiving (serviceId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Etes-vous sûr de vouloir archiver ce service ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.archiveService(serviceId))
+        .onCancel(() => NotifyPositive('Archivage annulé.'));
+    },
     showHistory (id) {
       this.selectedService = this.services.find(ser => ser._id === id);
       this.serviceHistoryModal = true;
@@ -1021,3 +1047,9 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .archived
+    display: flex;
+    align-self: center;
+</style>
