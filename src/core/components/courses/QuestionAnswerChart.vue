@@ -24,7 +24,7 @@ export default {
   },
   computed: {
     subtitle () {
-      return `${this.card.answers.length} réponses à cette carte Question/Réponse`;
+      return `${this.card.answers.length} réponses à cette question`;
     },
     lines () {
       return this.card.questionAnswers.map((pa) => {
