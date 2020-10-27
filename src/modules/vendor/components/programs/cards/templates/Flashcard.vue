@@ -1,8 +1,8 @@
 <template>
   <div>
-    <ni-input caption="Texte recto" v-model.trim="card.text" required-field @focus="saveTmp('text')"
+    <ni-input caption="Texte recto" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :disable="disableEdition" />
-    <ni-input caption="Texte verso" v-model.trim="card.backText" required-field @focus="saveTmp('backText')"
+    <ni-input caption="Texte verso" v-model="card.backText" required-field @focus="saveTmp('backText')"
       @blur="updateCard('backText')" :error="$v.card.backText.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>

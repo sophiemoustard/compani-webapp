@@ -1,6 +1,6 @@
 <template>
   <div v-if="falsyGapAnswersInitialized">
-    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.gappedText" required-field
+    <ni-input class="q-mb-lg" caption="Texte" v-model="card.gappedText" required-field
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="q-mb-lg row gutter-profile answers">
@@ -9,7 +9,7 @@
         :error="falsyGapAnswersError(i)" :required-field="i < 2" :error-message="falsyGapAnswersErrorMsg(i)"
         :disable="disableEdition" />
     </div>
-    <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
+    <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>

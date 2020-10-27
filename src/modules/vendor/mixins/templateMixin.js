@@ -34,7 +34,7 @@ export const templateMixin = {
     },
     async updateCard (path) {
       try {
-        const value = get(this.card, path);
+        const value = get(this.card, path).trim();
         if (this.tmpInput === value) return;
 
         const validation = get(this.$v.card, path);
