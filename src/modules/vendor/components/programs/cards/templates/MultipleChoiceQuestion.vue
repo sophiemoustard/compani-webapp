@@ -5,7 +5,7 @@
       type="textarea" :disable="disableEdition" />
     <div class="q-my-xl">
       <div v-for="(qcmAnswers, i) in card.qcmAnswers" :key="i" class="answers">
-        <ni-input :caption="`Réponse ${i + 1}`" v-model.trim="card.qcmAnswers[i].label" :required-field="i < 2"
+        <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcmAnswers[i].label" :required-field="i < 2"
           @focus="saveTmp(`qcmAnswers[${i}].label`)" @blur="updateAnswer(i)"
           :error="answersError(i)" :error-message="answersErrorMsg(i)" :disable="disableEdition" />
         <q-checkbox v-model="card.qcmAnswers[i].correct" @input="updateCorrectAnswer(i)"
@@ -86,6 +86,7 @@ export default {
     },
     async updateAnswer (index) {
       try {
+        this.card.qcmAnswers[index].label = this.card.qcmAnswers[index].label.trim();
         if (this.tmpInput === get(this.card, `answers[${index}].label`)) return;
 
         this.$v.card.qcmAnswers.$touch();
