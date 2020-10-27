@@ -5,7 +5,7 @@
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="q-mb-lg row gutter-profile answers">
       <ni-input v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-xs-12 col-md-6" @blur="updateAnswer(i)"
-        v-model.trim="card.falsyGapAnswers[i]" @focus="saveTmp(`falsyGapAnswers[${i}]`)" :caption="`Mot ${i + 1}`"
+        v-model="card.falsyGapAnswers[i]" @focus="saveTmp(`falsyGapAnswers[${i}]`)" :caption="`Mot ${i + 1}`"
         :error="falsyGapAnswersError(i)" :required-field="i < 2" :error-message="falsyGapAnswersErrorMsg(i)"
         :disable="disableEdition" />
     </div>
@@ -109,6 +109,7 @@ export default {
     },
     async updateAnswer (index) {
       try {
+        this.card.falsyGapAnswers[index] = this.card.falsyGapAnswers[index].trim();
         if (this.tmpInput === get(this.card, `falsyGapAnswers[${index}]`)) return;
 
         this.$v.card.falsyGapAnswers.$touch();
