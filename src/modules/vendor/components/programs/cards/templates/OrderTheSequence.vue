@@ -5,7 +5,7 @@
       :error-message="questionErrorMsg" />
     <div class="q-mb-lg">
       <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
-        v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
+        v-model="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
         @blur="updateOrderedAnswer(i)" :error="requiredOrderedAnswerIsMissing(i)" :disable="disableEdition" />
     </div>
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
@@ -62,6 +62,7 @@ export default {
     },
     async updateOrderedAnswer (index) {
       try {
+        this.card.orderedAnswers[index] = this.card.orderedAnswers[index].trim();
         if (this.tmpInput === this.card.orderedAnswers[index]) return;
 
         this.$v.card.orderedAnswers.$touch();
