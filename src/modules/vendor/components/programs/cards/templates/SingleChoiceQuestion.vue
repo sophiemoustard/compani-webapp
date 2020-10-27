@@ -8,7 +8,7 @@
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.qcuFalsyAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
-        v-model.trim="card.qcuFalsyAnswers[i]" :required-field="i === 0" :error="qcuFalsyAnswerError(i)"
+        v-model="card.qcuFalsyAnswers[i]" :required-field="i === 0" :error="qcuFalsyAnswerError(i)"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcuFalsyAnswers[${i}]`)"
         @blur="updateFalsyAnswer(i)" :disable="disableEdition" />
     </div>
@@ -96,6 +96,7 @@ export default {
     },
     async updateFalsyAnswer (index) {
       try {
+        this.card.qcuFalsyAnswers[index] = this.card.qcuFalsyAnswers[index].trim();
         if (this.tmpInput === get(this.card, `qcuFalsyAnswers[${index}]`)) return;
 
         this.$v.card.qcuFalsyAnswers.$touch();
