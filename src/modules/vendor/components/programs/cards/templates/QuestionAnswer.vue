@@ -74,6 +74,7 @@ export default {
     },
     async updateQuestionAnswers (index) {
       try {
+        this.card.questionAnswers[index].text = this.card.questionAnswers[index].text.trim();
         const editedAnswer = get(this.card, `questionAnswers[${index}]`);
         if (this.tmpInput === editedAnswer.text) return;
 
