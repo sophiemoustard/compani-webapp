@@ -4,10 +4,10 @@
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
     <div class="row gutter-profile">
-      <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model.trim="card.label.left"
+      <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model="card.label.left"
         @focus="saveTmp('label.left')" @blur="updateCardLabel('left')" :error="$v.card.label.left.$error"
         :error-message="labelErrorMessage('left')" :disable="disableEdition" />
-      <ni-input class="col-md-6 col-xs-12" caption="Label droit" v-model.trim="card.label.right"
+      <ni-input class="col-md-6 col-xs-12" caption="Label droit" v-model="card.label.right"
         @focus="saveTmp('label.right')" @blur="updateCardLabel('right')" :error="$v.card.label.right.$error"
         :error-message="labelErrorMessage('right')" :disable="disableEdition" />
     </div>
@@ -50,7 +50,7 @@ export default {
     },
     async updateCardLabel (label) {
       try {
-        const value = this.card.label[label];
+        const value = this.card.label[label].trim();
         if (this.tmpInput === this.card.label[label]) return;
 
         this.$v.card.label.$touch();
