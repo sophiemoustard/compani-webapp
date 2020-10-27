@@ -141,7 +141,11 @@ export const planningModalMixin = {
       if (!this.selectedCustomer || !this.selectedCustomer.subscriptions ||
         this.selectedCustomer.subscriptions.length === 0) return [];
 
-      return this.selectedCustomer.subscriptions.map(sub => ({ label: get(sub, 'service.name'), value: sub._id }));
+      return this.selectedCustomer.subscriptions.map(sub => ({
+        label: get(sub, 'service.name') || '',
+        value: sub._id,
+        disable: get(sub, 'service.isArchived') || false,
+      }));
     },
     additionalValue () {
       return !this.selectedAuxiliary._id ? '' : `justificatif_absence_${this.selectedAuxiliary.identity.lastname}`;

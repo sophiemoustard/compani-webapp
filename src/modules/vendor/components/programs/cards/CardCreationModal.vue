@@ -5,8 +5,8 @@
     </template>
     <h6 class="text-weight-bold">Cours</h6>
     <div class="row q-mb-lg button-container">
-      <div v-for="template in lessonTemplates" :key="template.value" @click="selectTemplate(template.value)"
-        :class="getClass(template.value)">
+      <div v-for="template in lessonTemplates" :key="template.value" @click="submit(template.value)"
+        class="card-button cursor-pointer">
         <div class="text-weight-bold card-button-content">
           <template v-if="template.value === TITLE_TEXT_MEDIA">
             <div>Titre</div>
@@ -30,8 +30,8 @@
     </div>
     <h6 class="text-weight-bold">Quiz</h6>
     <div class="row q-mb-lg button-container">
-      <div v-for="template in quizTemplates" :key="template.value" @click="selectTemplate(template.value)"
-        :class="getClass(template.value)">
+      <div v-for="template in quizTemplates" :key="template.value" @click="submit(template.value)"
+        class="card-button cursor-pointer">
         <div class="text-weight-bold card-button-content">
           <template v-if="template.value === FILL_THE_GAPS">
             <div class="q-mb-sm">Texte à trou</div>
@@ -62,8 +62,8 @@
     </div>
     <h6 class="text-weight-bold">Questionnaire</h6>
     <div class="row q-mb-lg button-container">
-      <div v-for="template in questionnaireTemplates" :key="template.value" @click="selectTemplate(template.value)"
-        :class="getClass(template.value)">
+      <div v-for="template in questionnaireTemplates" :key="template.value" @click="submit(template.value)"
+        class="card-button cursor-pointer">
         <div class="text-weight-bold card-button-content">
           <div class="q-mb-sm">{{ formatButtonLabel(template.label) }}</div>
           <q-icon v-if="template.value === OPEN_QUESTION" name="mdi-comment-question" size="20px" />
@@ -75,10 +75,6 @@
         </div>
       </div>
     </div>
-    <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Créer la carte" color="primary" :loading="loading"
-        icon-right="add" @click="submit" />
-    </template>
   </ni-modal>
 </template>
 
@@ -105,8 +101,6 @@ export default {
   name: 'CardCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    loading: { type: Boolean, default: false },
-    card: { type: Object, required: true },
   },
   components: {
     'ni-modal': Modal,
@@ -144,14 +138,8 @@ export default {
     input (event) {
       this.$emit('input', event);
     },
-    submit () {
-      this.$emit('submit');
-    },
-    getClass (template) {
-      return ['card-button', 'cursor-pointer', { 'card-button-selected': this.card.template === template }];
-    },
-    selectTemplate (template) {
-      this.card.template = template;
+    submit (template) {
+      this.$emit('submit', template);
     },
     formatButtonLabel (label) {
       return label.replace(/ /g, '\n');
@@ -185,9 +173,6 @@ h6
   align-items: center
   justify-content: center
   margin: 10px 7px
-  &-selected
-    background-color: $dark-grey
-    color: $light-grey
   &-content
     text-align: center
     flex-wrap: wrap

@@ -1,13 +1,9 @@
 <template>
   <div v-if="program">
     <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
-      <div class="sub-program-header">
-        <div>
-          <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
-          <span class="published-sub-program" v-if="isPublished(subProgram)">Publié</span>
-        </div>
-        <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
-          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
+      <div>
+        <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
+        <span class="published-sub-program" v-if="isPublished(subProgram)">Publié</span>
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
@@ -76,8 +72,13 @@
           </div>
         </q-card>
       </draggable>
-      <ni-button v-if="!isPublished(subProgram)" class="q-my-sm add-step-button" color="primary" icon="add"
-        @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
+      <div class="q-my-md sub-program-footer">
+        <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
+          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
+        <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
+          @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
+      </div>
+      <q-separator v-if="index !== program.subPrograms.length-1" class="q-mt-lg" />
     </div>
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un sous programme"
@@ -570,7 +571,7 @@ export default {
   display: flex
   flex-direction: column
 
-.sub-program-header
+.sub-program-footer
   display: flex
   justify-content: space-between
 

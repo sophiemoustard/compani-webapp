@@ -14,8 +14,7 @@
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
         <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-        <q-btn round flat :disable="deletionDisabled" icon="delete" color="grey" size="0px"
-          @click="validateCustomerDeletion" />
+        <ni-button :disable="deletionDisabled" icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
   </div>
