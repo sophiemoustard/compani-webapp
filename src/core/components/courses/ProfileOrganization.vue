@@ -8,15 +8,21 @@
         </ni-banner>
         <ni-course-info-link :disable-link="followUpDisabled" />
       </div>
-      <div v-else class="row gutter-profile">
-        <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
-          @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
-        <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
-          :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
+      <div v-else>
+        <ni-button icon="history" label="Historique" color="primary" />
+        <div class="row gutter-profile">
+          <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
+            @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
+          <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
+            :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
+        </div>
       </div>
     </div>
     <ni-slot-container :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
+    <q-page-sticky expand position="right">
+      <course-history-feed />
+    </q-page-sticky>
   </div>
 </template>
 
@@ -27,6 +33,7 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import Select from '@components/form/Select';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
@@ -41,6 +48,7 @@ import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
+import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 
 export default {
   name: 'ProfileOrganization',
@@ -55,6 +63,8 @@ export default {
     'ni-trainee-table': TraineeTable,
     'ni-course-info-link': CourseInfoLink,
     'ni-banner': Banner,
+    'ni-button': Button,
+    'course-history-feed': CourseHistoryFeed,
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
