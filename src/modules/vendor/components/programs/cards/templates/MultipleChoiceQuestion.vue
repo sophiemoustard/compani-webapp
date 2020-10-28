@@ -82,7 +82,7 @@ export default {
         !this.card.qcmAnswers[index].label;
     },
     formatAnswersPayload () {
-      return this.card.qcmAnswers.filter(a => !!a.label.trim());
+      return this.card.qcmAnswers.filter(a => !!a.label).map(a => a.label.trim());
     },
     async updateQcmAnswer (index) {
       try {

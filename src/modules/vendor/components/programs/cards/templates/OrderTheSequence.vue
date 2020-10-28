@@ -60,6 +60,9 @@ export default {
       return this.$v.card.orderedAnswers.$error && !this.$v.card.orderedAnswers.minLength && index < 2 &&
         !this.card.orderedAnswers[index];
     },
+    formatOrderedAnswerPayload () {
+      return this.card.orderedAnswers.filter(a => !!a).map(a => a.trim());
+    },
     async updateOrderedAnswer (index) {
       try {
         if (this.tmpInput === this.card.orderedAnswers[index]) return;
@@ -67,9 +70,7 @@ export default {
         this.$v.card.orderedAnswers.$touch();
         if (this.requiredOrderedAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Cards.updateById(
-          this.card._id, { orderedAnswers: this.card.orderedAnswers.filter(a => !!a).map(a => a.trim()) }
-        );
+        await Cards.updateById(this.card._id, { orderedAnswers: this.formatOrderedAnswerPayload });
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

@@ -107,6 +107,9 @@ export default {
       return this.$v.card.falsyGapAnswers.$error && !this.$v.card.falsyGapAnswers.minLength && index < 2 &&
         !this.card.falsyGapAnswers[index];
     },
+    formatFalsyGapAnswerPayload () {
+      return this.card.falsyGapAnswers.filter(a => !!a).map(a => a.trim());
+    },
     async updateFalsyGapAnswer (index) {
       try {
         if (this.tmpInput === get(this.card, `falsyGapAnswers[${index}]`)) return;
@@ -117,7 +120,7 @@ export default {
         }
 
         await Cards.updateById(
-          this.card._id, { falsyGapAnswers: this.card.falsyGapAnswers.filter(a => !!a).map(a => a.trim()) }
+          this.card._id, { falsyGapAnswers: this.formatFalsyGapAnswerPayload }
         );
         await this.refreshCard();
 
