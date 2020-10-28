@@ -9,7 +9,10 @@
         <ni-course-info-link :disable-link="followUpDisabled" />
       </div>
       <div v-else>
-        <ni-button icon="history" label="Historique" color="primary" />
+        <div class="button-container">
+          <ni-button class="button" flat icon="history" color="primary" @click="toggleHistory" />
+          <ni-button class="button" flat label="Historique" color="black" @click="toggleHistory" />
+        </div>
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
@@ -21,7 +24,7 @@
     <ni-slot-container :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
-      <course-history-feed />
+      <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories" />
     </q-page-sticky>
   </div>
 </template>
@@ -32,12 +35,16 @@ import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import Users from '@api/Users';
+import CourseHistories from '@api/CourseHistories';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
+import CourseInfoLink from '@components/courses/CourseInfoLink';
+import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import Banner from '@components/Banner';
+import { NotifyNegative } from '@components/popup/notify';
 import {
   INTER_B2B,
   VENDOR_ADMIN,
@@ -47,8 +54,6 @@ import {
 import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
-import CourseInfoLink from '@components/courses/CourseInfoLink';
-import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 
 export default {
   name: 'ProfileOrganization',
@@ -75,6 +80,8 @@ export default {
       courseSlotsLoading: false,
       tmpInput: '',
       isClientInterface,
+      displayHistory: false,
+      courseHistories: [],
     };
   },
   validations () {
@@ -109,6 +116,20 @@ export default {
   },
   methods: {
     get,
+    async toggleHistory () {
+      this.displayHistory = !this.displayHistory;
+      if (this.displayHistory) await this.getCourseHistories();
+      else this.courseHistories = [];
+    },
+    async getCourseHistories () {
+      try {
+        this.courseHistories = await CourseHistories.getCourseHistories({ course: this.profileId });
+      } catch (e) {
+        this.courseHistories = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération de l\'historique d\'activité');
+      }
+    },
     async refreshCourse () {
       try {
         this.courseLoading = true;
@@ -130,3 +151,10 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+    .button-container
+      text-align: end
+    .button
+      margin: -4px
+</style>
