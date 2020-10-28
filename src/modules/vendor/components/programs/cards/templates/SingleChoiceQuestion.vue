@@ -92,11 +92,11 @@ export default {
       return exceedCharLength || missingField;
     },
     formatQcuFalsyAnswersPayload () {
-      return this.card.qcuFalsyAnswers.filter(a => !!a);
+      return this.card.qcuFalsyAnswers.filter(a => !!a).map(a => a.trim());
     },
     async updateFalsyAnswer (index) {
       try {
-        this.card.qcuFalsyAnswers[index] = this.card.qcuFalsyAnswers[index].trim();
+        // this.card.qcuFalsyAnswers[index] = this.card.qcuFalsyAnswers[index].trim();
         if (this.tmpInput === get(this.card, `qcuFalsyAnswers[${index}]`)) return;
 
         this.$v.card.qcuFalsyAnswers.$touch();

@@ -50,13 +50,12 @@ export default {
     },
     async updateCardLabel (label) {
       try {
-        const value = this.card.label[label].trim();
         if (this.tmpInput === this.card.label[label]) return;
 
         this.$v.card.label.$touch();
         if (!this.$v.card.label[label].maxLength) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Cards.updateById(this.card._id, set({}, `label.${label}`, value));
+        await Cards.updateById(this.card._id, set({}, `label.${label}`, this.card.label[label].trim()));
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

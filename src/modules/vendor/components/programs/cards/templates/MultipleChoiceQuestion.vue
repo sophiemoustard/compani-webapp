@@ -6,7 +6,7 @@
     <div class="q-my-xl">
       <div v-for="(qcmAnswers, i) in card.qcmAnswers" :key="i" class="answers">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcmAnswers[i].label" :required-field="i < 2"
-          @focus="saveTmp(`qcmAnswers[${i}].label`)" @blur="updateAnswer(i)"
+          @focus="saveTmp(`qcmAnswers[${i}].label`)" @blur="updateQcmAnswer(i)"
           :error="answersError(i)" :error-message="answersErrorMsg(i)" :disable="disableEdition" />
         <q-checkbox v-model="card.qcmAnswers[i].correct" @input="updateCorrectAnswer(i)"
           :disable="!card.qcmAnswers[i].label || disableEdition" />
@@ -82,12 +82,12 @@ export default {
         !this.card.qcmAnswers[index].label;
     },
     formatAnswersPayload () {
-      return this.card.qcmAnswers.filter(a => !!a.label);
+      return this.card.qcmAnswers.filter(a => !!a.label.trim());
     },
-    async updateAnswer (index) {
+    async updateQcmAnswer (index) {
       try {
         this.card.qcmAnswers[index].label = this.card.qcmAnswers[index].label.trim();
-        if (this.tmpInput === get(this.card, `answers[${index}].label`)) return;
+        if (this.tmpInput === get(this.card, `qcmAnswers[${index}].label`)) return;
 
         this.$v.card.qcmAnswers.$touch();
         if (this.requiredAnswerIsMissing(index) || this.$v.card.qcmAnswers.$each[index].$error) {

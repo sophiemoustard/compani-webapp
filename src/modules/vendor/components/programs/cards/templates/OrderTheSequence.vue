@@ -62,13 +62,14 @@ export default {
     },
     async updateOrderedAnswer (index) {
       try {
-        this.card.orderedAnswers[index] = this.card.orderedAnswers[index].trim();
         if (this.tmpInput === this.card.orderedAnswers[index]) return;
 
         this.$v.card.orderedAnswers.$touch();
         if (this.requiredOrderedAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Cards.updateById(this.card._id, { orderedAnswers: this.card.orderedAnswers.filter(a => !!a) });
+        await Cards.updateById(
+          this.card._id, { orderedAnswers: this.card.orderedAnswers.filter(a => !!a).map(a => a.trim()) }
+        );
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

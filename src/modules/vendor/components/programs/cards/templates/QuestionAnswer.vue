@@ -69,20 +69,17 @@ export default {
     },
   },
   methods: {
-    formatQuestionAnswersPayload () {
-      return this.card.questionAnswers.filter(a => !!a);
-    },
     async updateQuestionAnswers (index) {
       try {
-        this.card.questionAnswers[index].text = this.card.questionAnswers[index].text.trim();
         const editedAnswer = get(this.card, `questionAnswers[${index}]`);
         if (this.tmpInput === editedAnswer.text) return;
 
         this.$v.card.questionAnswers.$touch();
         if (this.$v.card.questionAnswers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Cards.updateAnswer({ cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text });
-
+        await Cards.updateAnswer(
+          { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
+        );
         await this.refreshCard();
 
         NotifyPositive('Carte mise à jour.');
