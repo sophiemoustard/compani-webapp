@@ -1,6 +1,6 @@
 <template>
   <q-card class="card" flat>
-    <div class="text-weight-bold">{{ title }}</div>
+    <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
     <div v-for="(line, index) in lines" :key="index" class="q-mt-sm bar-container">
       <div class="q-mr-sm percentage">{{ formatPercentage(line.percentage) }}</div>
@@ -18,11 +18,22 @@
 import { roundFrenchPercentage } from '@helpers/utils';
 
 export default {
-  name: 'HorizontalBarChart',
+  name: 'QuestionAnswerChart',
   props: {
-    title: { type: String, default: '' },
-    subtitle: { type: String, default: '' },
-    lines: { type: Array, default: () => [] },
+    card: { type: Object, default: () => ({}) },
+  },
+  computed: {
+    subtitle () {
+      return `${this.card.answers.length} réponses à cette question à choix
+        ${this.card.isQuestionAnswerMultipleChoiced ? 'multiple' : 'simple'}`;
+    },
+    lines () {
+      return this.card.questionAnswers.map((pa) => {
+        const total = this.card.answers.filter(a => a === pa._id).length;
+
+        return { title: pa.text, total, percentage: total / this.card.answers.length };
+      });
+    },
   },
   methods: {
     formatPercentage (number) {
