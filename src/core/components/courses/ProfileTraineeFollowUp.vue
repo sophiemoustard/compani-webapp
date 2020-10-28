@@ -9,6 +9,7 @@
         <div class="beige-background chart-container" v-if="areCardsDisplayed[activity._id]">
           <template v-for="(card, cardIndex) of activity.followUp">
             <survey-chart v-if="card.template === SURVEY" :key="cardIndex" class="chart" :card="card" />
+            <open-question-chart v-if="card.template === OPEN_QUESTION" :key="cardIndex" class="chart" :card="card" />
           </template>
         </div>
       </q-card>
@@ -20,12 +21,14 @@
 import Courses from '@api/Courses';
 import { NotifyNegative } from '@components/popup/notify';
 import SurveyChart from '@components/courses/SurveyChart';
-import { SURVEY } from '@data/constants';
+import OpenQuestionChart from '@components/courses/OpenQuestionChart';
+import { SURVEY, OPEN_QUESTION } from '@data/constants';
 
 export default {
   name: 'ProfileTraineeFollowUp',
   components: {
     'survey-chart': SurveyChart,
+    'open-question-chart': OpenQuestionChart,
   },
   props: {
     profileId: { type: String, required: true },
@@ -35,6 +38,7 @@ export default {
       followUp: {},
       areCardsDisplayed: {},
       SURVEY,
+      OPEN_QUESTION,
     };
   },
   async created () {
