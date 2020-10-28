@@ -25,8 +25,7 @@
                     :status="isStepValid(step) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                 </div>
                 <div class="step-subtitle">
-                  {{ getStepTypeLabel(step.type) }} -
-                  {{ step.activities.length }} activité{{ step.activities.length > 1 ? 's' : '' }}
+                  {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
                 </div>
               </q-item-section>
             </div>

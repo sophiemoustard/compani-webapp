@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import { formatQuantity } from '@helpers/utils';
+
 export default {
   name: 'OpenQuestionChart',
   props: {
@@ -16,7 +18,7 @@ export default {
   },
   computed: {
     subtitle () {
-      return `${this.card.answers.length} réponse${this.card.answers.length > 1 ? 's' : ''} à cette question ouverte`;
+      return `${formatQuantity('réponse', this.card.answers.length)} à cette question ouverte`;
     },
   },
 };
