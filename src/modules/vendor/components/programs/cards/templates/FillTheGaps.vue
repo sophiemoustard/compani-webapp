@@ -108,7 +108,7 @@ export default {
         !this.card.falsyGapAnswers[index];
     },
     formatFalsyGapAnswerPayload () {
-      return this.card.falsyGapAnswers.filter(a => !!a).map(a => a.trim());
+      return { falsyGapAnswers: this.card.falsyGapAnswers.filter(a => !!a).map(a => a.trim()) };
     },
     async updateFalsyGapAnswer (index) {
       try {
@@ -118,10 +118,7 @@ export default {
         if (this.$v.card.falsyGapAnswers.$each[index].$error || this.requiredFalsyAnswerIsMissing(index)) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
-
-        await Cards.updateById(
-          this.card._id, { falsyGapAnswers: this.formatFalsyGapAnswerPayload }
-        );
+        await Cards.updateById(this.card._id, this.formatFalsyGapAnswerPayload());
         await this.refreshCard();
 
         NotifyPositive('Carte mise à jour.');

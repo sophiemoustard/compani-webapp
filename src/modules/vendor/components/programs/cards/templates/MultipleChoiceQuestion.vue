@@ -82,11 +82,10 @@ export default {
         !this.card.qcmAnswers[index].label;
     },
     formatAnswersPayload () {
-      return this.card.qcmAnswers.filter(a => !!a.label).map(a => a.label.trim());
+      return { qcmAnswers: this.card.qcmAnswers.filter(a => !!a.label).map(a => ({ ...a, label: a.label.trim() })) };
     },
     async updateQcmAnswer (index) {
       try {
-        this.card.qcmAnswers[index].label = this.card.qcmAnswers[index].label.trim();
         if (this.tmpInput === get(this.card, `qcmAnswers[${index}].label`)) return;
 
         this.$v.card.qcmAnswers.$touch();
@@ -97,7 +96,7 @@ export default {
           return NotifyWarning('Une bonne réponse est nécessaire.');
         }
 
-        await Cards.updateById(this.card._id, { qcmAnswers: this.formatAnswersPayload() });
+        await Cards.updateById(this.card._id, this.formatAnswersPayload());
         await this.refreshCard();
 
         NotifyPositive('Carte mise à jour.');

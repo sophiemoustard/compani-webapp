@@ -34,7 +34,7 @@ export const templateMixin = {
     },
     async updateCard (path) {
       try {
-        const value = get(this.card, path).trim();
+        const value = get(this.card, path);
         if (this.tmpInput === value) return;
 
         const validation = get(this.$v.card, path);
@@ -43,7 +43,7 @@ export const templateMixin = {
           if (validation.$error) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        await Cards.updateById(this.card._id, set({}, path, value));
+        await Cards.updateById(this.card._id, set({}, path, value.trim()));
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');
