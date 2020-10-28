@@ -15,7 +15,7 @@ export default {
   },
   computed: {
     subtitle () {
-      return `${this.card.answers.length} réponses à ce sondage`;
+      return `${this.card.answers.length} réponse${this.card.answers.length > 1 ? 's' : ''} à ce sondage`;
     },
     lines () {
       return ['1', '2', '3', '4', '5'].map((pa) => {

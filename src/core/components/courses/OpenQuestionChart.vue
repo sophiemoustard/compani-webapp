@@ -16,7 +16,7 @@ export default {
   },
   computed: {
     subtitle () {
-      return `${this.card.answers.length} réponses à cette question ouverte`;
+      return `${this.card.answers.length} réponse${this.card.answers.length > 1 ? 's' : ''} à cette question ouverte`;
     },
   },
 };
