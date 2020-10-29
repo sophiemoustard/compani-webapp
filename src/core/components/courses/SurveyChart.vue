@@ -5,15 +5,15 @@
     <div class="bar-container">
       <div v-for="(line, index) in lines" :key="index" class="q-my-sm">
         <div class="bar rounded-borders">
-          <div class="q-mt-sm bar-label">{{ index+1 }}</div>
-          <div class="bar-fill rounded-borders" :style="`height: ${line.percentage*100}%`" />
+          <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
+          <div class="bar-fill rounded-borders" :style="`height: ${line.percentage * 100}%`" />
         </div>
         <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
       </div>
     </div>
     <div class="chart-footer">
-      <div>Pas du tout satisfait</div>
-      <div>Très satisfait</div>
+      <div>{{ this.card.label.left }}</div>
+      <div>{{ this.card.label.right }}</div>
     </div>
   </q-card>
 </template>
