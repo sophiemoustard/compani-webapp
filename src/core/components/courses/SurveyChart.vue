@@ -63,6 +63,7 @@ export default {
   width: 304px
 
 .bar
+  position: relative
   color: $middle-beige
   background-color: $neutral-beige
   width: 48px
@@ -77,10 +78,13 @@ export default {
   width: 304px
 
 .bar-fill
+  position: absolute
+  bottom: 0px
   background-color: $middle-beige
   width: 48px
 
 .bar-label
+  z-index: 2
   font-size: 14px
   color: black
   text-align: center
