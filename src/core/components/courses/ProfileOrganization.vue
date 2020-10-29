@@ -8,7 +8,7 @@
         </ni-banner>
         <ni-course-info-link :disable-link="followUpDisabled" />
       </div>
-      <div v-else>
+      <div v-else class="profile-container">
         <div class="button-container">
           <ni-button class="button" flat icon="history" color="primary" @click="toggleHistory" />
           <ni-button class="button" flat label="Historique" color="black" @click="toggleHistory" />
@@ -153,8 +153,15 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-    .button-container
-      text-align: end
-    .button
-      margin: -4px
+  .profile-container
+    display: flex
+    flex-direction: column
+
+  .button-container
+    align-self: flex-end
+
+  .button
+    margin: -4px
+    align-self: center
+
 </style>

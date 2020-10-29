@@ -1,5 +1,5 @@
 <template>
-  <div class="history-container" :style="{ height: `${height}px`, top: `${this.top}px` }">
+  <div class="history-container" :style="{ height: `${height}px`, top: `${top}px` }">
     <div class="row history-container-title">
       <div class="col-11">Flux d'activité</div>
       <div class="col-1 cursor-pointer">
@@ -50,9 +50,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .history-container-title
-    height: 5%
-
   .loading
     width: 100%
     height: 30px

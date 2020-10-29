@@ -43,8 +43,3 @@ export default {
   },
 };
 </script>
-
-<style  lang="stylus" scoped>
-  .history-container-title
-    height: 8%
-</style>
