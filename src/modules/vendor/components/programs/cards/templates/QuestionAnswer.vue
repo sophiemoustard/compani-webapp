@@ -80,8 +80,8 @@ export default {
         await Cards.updateAnswer(
           { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
         );
-        await this.refreshCard();
 
+        await this.refreshCard();
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);

@@ -118,9 +118,10 @@ export default {
         if (this.$v.card.falsyGapAnswers.$each[index].$error || this.requiredFalsyAnswerIsMissing(index)) {
           return NotifyWarning('Champ(s) invalide(s)');
         }
-        await Cards.updateById(this.card._id, this.formatFalsyGapAnswerPayload());
-        await this.refreshCard();
 
+        await Cards.updateById(this.card._id, this.formatFalsyGapAnswerPayload());
+
+        await this.refreshCard();
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);

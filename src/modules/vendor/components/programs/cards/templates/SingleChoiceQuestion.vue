@@ -100,10 +100,10 @@ export default {
 
         this.$v.card.qcuFalsyAnswers.$touch();
         if (this.qcuFalsyAnswerError(index)) return NotifyWarning('Champ(s) invalide(s)');
+
         await Cards.updateById(this.card._id, { qcuFalsyAnswers: this.formatQcuFalsyAnswersPayload() });
 
         await this.refreshCard();
-
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);
