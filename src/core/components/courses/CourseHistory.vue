@@ -1,19 +1,21 @@
 <template>
   <div class="history">
-    <div class="row title">
-      <div class="col-11">
-        {{ formatedHistory.title.pre }}<span class="title-type"> {{ formatedHistory.title.type }}</span>
-        {{ formatedHistory.title.post }}<span class="title-bold"> {{ formatedHistory.title.infos }}</span>
+    <div class="history-title">
+      <div class="history-info">
+        <div>
+          {{ formatedHistory.title.pre }}<span class="type"> {{ formatedHistory.title.type }}</span>
+          {{ formatedHistory.title.post }}<span class="title-bold"> {{ formatedHistory.title.infos }}</span>
+        </div>
+        <ni-button class="button" v-if="formatedHistory.details" color="primary" size="sm" icon="remove_red_eye"
+          @click="toggleDetails" />
       </div>
-      <ni-button class="col-1 button" v-if="formatedHistory.details" color="primary" size="sm" icon="remove_red_eye"
-        @click="toggleDetails" />
-    </div>
-    <div class="history-details" v-if="displayDetails">
-      {{ formatedHistory.details }}
-    </div>
-    <div class="history-signature">
-      <img :src="getAvatar(courseHistory.createdBy)" class="avatar">
-      <div>{{ historySignature }}</div>
+      <div class="history-details" v-if="displayDetails">
+        {{ formatedHistory.details }}
+      </div>
+      <div class="history-signature">
+        <img :src="getAvatar(courseHistory.createdBy)" class="avatar">
+        <div>{{ historySignature }}</div>
+      </div>
     </div>
   </div>
 </template>
@@ -77,22 +79,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  .history
-    margin-top: 16px
-
-  .title
-    align-items: center
-    margin-right: 16px
-    &-type
-      color: $primary
-    &-bold
-      font-weight: bold
-      color: $dark-grey
-
-  .history-signature
-    margin-bottom: 4px
-    div
-      margin-left: 4px
-</style>

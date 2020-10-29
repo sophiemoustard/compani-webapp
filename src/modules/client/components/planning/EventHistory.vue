@@ -4,18 +4,18 @@
       <div class="history-info">
         <div>
           {{ historyInfo.title.pre }}<span class="type">{{ eventType }}</span>
-          <template v-if="!isAuxiliaryUpdate"> de <span class="auxiliary">{{ auxiliaryName }}</span></template>
+          <template v-if="!isAuxiliaryUpdate"> de <span class="title-bold">{{ auxiliaryName }}</span></template>
           {{ historyInfo.title.post }}
         </div>
         <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye"
-          @click="toggleDetails" />
+          @click="toggleDetails" class="button" />
       </div>
       <div v-if="displayDetails" class="history-details">
         <div>{{ historyInfo.details }}</div>
         <div class="history-misc">{{ history.event.misc }}</div>
       </div>
       <div class="history-signature">
-        <img size="20px" :src="getAvatar(history.createdBy)" class="avatar">
+        <img :src="getAvatar(history.createdBy)" class="avatar">
         <div>{{ historySignature }}</div>
       </div>
     </div>
@@ -310,36 +310,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  .history
-    margin: 2px;
-
-  .history-title
-    margin: 2px 10px 0 2px;
-    padding: 5px;
-
-    .history-info
-      display: flex;
-      div
-        flex: 1;
-      .q-btn-round
-        height: 20px;
-
-    .history-details
-      margin: 3px 0 5px;
-
-      .history-misc
-        font-style: italic;
-
-    .history-signature
-      margin: 2px 0 3px;
-      div
-        margin-left: 5px
-
-  .type
-    color: $primary
-  .auxiliary
-    font-weight: bold;
-    color: #2E2E2E
-</style>
