@@ -2,7 +2,9 @@
   <div class="cell-container">
     <q-card v-for="(contract, contractIndex) in sortedContracts" :key="contractIndex" class="contract-cell">
       <q-card-section class="cell-title" :style="{ color: cellTitle(contract.endDate).color }">
-        {{ cellTitle(contract.endDate).msg }}
+        <div>{{ cellTitle(contract.endDate).msg }}</div>
+        <ni-button v-if="displayActions" label="DPAE" icon="file_download" color="primary"
+          @click="exportDpae(contract._id)" />
       </q-card-section>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name"
         :loading="contractsLoading" :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
@@ -83,10 +85,11 @@ import { Cookies } from 'quasar';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import esign from '@api/Esign';
+import Contracts from '@api/Contracts';
 import Button from '@components/Button';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { downloadDocxFile } from '@helpers/file';
+import { downloadDocxFile, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
 import { COACH, CUSTOMER, AUXILIARY } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
@@ -222,6 +225,12 @@ export default {
 
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;
     },
+    async exportDpae (contractId) {
+      const txt = await Contracts.exportDpae(contractId);
+      await downloadFile(txt, 'dpae.txt');
+
+      NotifyPositive('Document téléchargé.');
+    },
     async dlTemplate (contractVersion, parentContract, contractIndex) {
       try {
         const data = generateContractFields({
@@ -298,6 +307,8 @@ export default {
   .cell-title
     font-size: 18px
     padding: 16px 10px
+    display: flex
+    justify-content: space-between
 
   .cell-subtitle
     margin:  0 10px 10px
