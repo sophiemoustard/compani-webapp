@@ -1,5 +1,5 @@
 <template>
-  <div class="history-cell">
+  <div class="history">
     <div class="row title">
       <div class="col-11">
         {{ formatedHistory.title.pre }}<span class="title-type"> {{ formatedHistory.title.type }}</span>
@@ -12,7 +12,7 @@
       {{ formatedHistory.details }}
     </div>
     <div class="history-signature">
-      <img size="20px" :src="getAvatar(courseHistory.createdBy)" class="avatar">
+      <img :src="getAvatar(courseHistory.createdBy)" class="avatar">
       <div>{{ historySignature }}</div>
     </div>
   </div>
@@ -22,12 +22,12 @@
 import get from 'lodash/get';
 import { SLOT_CREATION, DEFAULT_AVATAR } from '@data/constants';
 import Button from '@components/Button';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 
 export default {
   name: 'CourseHistory',
   props: {
-    courseHistory: { type: Object, default: () => ({}) },
+    courseHistory: { type: Object, required: true },
   },
   components: {
     'ni-button': Button,
@@ -50,8 +50,7 @@ export default {
     },
     historySignature () {
       const date = this.$moment(this.courseHistory.createdAt).format('DD/MM');
-      const hour = `${this.$moment(this.courseHistory.createdAt).hour()}h`
-        + `${this.$moment(this.courseHistory.createdAt).format('mm')}`;
+      const hour = formatHoursWithMinutes(this.courseHistory.createdAt);
       const user = formatIdentity(this.courseHistory.createdBy.identity, 'FL');
 
       return `${user} le ${date} à ${hour}.`;
@@ -66,10 +65,8 @@ export default {
     },
     getSlotCreationTitle () {
       const date = this.$moment(this.courseHistory.slot.startDate).format('DD/MM');
-      const startHour = `${this.$moment(this.courseHistory.slot.startDate).hour()}h`
-        + `${this.$moment(this.courseHistory.slot.startDate).format('mm')}`;
-      const endHour = `${this.$moment(this.courseHistory.slot.endDate).hour()}h`
-        + `${this.$moment(this.courseHistory.slot.endDate).format('mm')}`;
+      const startHour = formatHoursWithMinutes(this.courseHistory.slot.startDate);
+      const endHour = formatHoursWithMinutes(this.courseHistory.slot.endDate);
       const infos = `${date} de ${startHour} à ${endHour}`;
 
       return { pre: 'Nouveau', type: 'créneau', post: 'le', infos };
@@ -82,17 +79,8 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .history-cell
-    width: 100%
-    display: block
-    font-size: 13px
-    padding: 0 8px
+  .history
     margin-top: 16px
-    &:after
-      content: ""
-      display: block
-      margin: auto
-      border-bottom: 1px solid $neutral-grey
 
   .title
     align-items: center
@@ -101,22 +89,9 @@ export default {
       color: $primary
     &-bold
       font-weight: bold
-      color: #2E2E2E
-
-  .history-details
-    font-size: 12px
-    color: $dark-grey
-
-  .avatar
-    height: 20px
-    width: 20px
+      color: $dark-grey
 
   .history-signature
-    color: $dark-grey
-    font-size: 12px
-    font-style: italic
-    display: flex
-    align-items: center
     margin-bottom: 4px
     div
       margin-left: 4px

@@ -154,8 +154,7 @@ export default {
     },
     historySignature () {
       const date = this.$moment(this.history.createdAt).format('DD/MM');
-      const hour = `${this.$moment(this.history.createdAt).hour()}h`
-        + `${this.$moment(this.history.createdAt).format('mm')}`;
+      const hour = formatHoursWithMinutes(this.history.createdAt);
       const user = formatIdentity(this.history.createdBy.identity, 'Fl');
 
       return `${user} le ${date} à ${hour}.`;
@@ -315,18 +314,6 @@ export default {
 <style lang="stylus" scoped>
   .history
     margin: 2px;
-    width: 100%;
-    display: block;
-    font-size: 13px;
-    &:after
-      content: "";
-      display: block;
-      margin: auto;
-      width: 95%;
-      border-bottom: 1px solid $neutral-grey;
-    .avatar
-      height: 20px !important;
-      width: 20px !important;
 
   .history-title
     margin: 2px 10px 0 2px;
@@ -340,19 +327,12 @@ export default {
         height: 20px;
 
     .history-details
-      font-size: 12px;
-      color: $dark-grey;
       margin: 3px 0 5px;
 
       .history-misc
         font-style: italic;
 
     .history-signature
-      color: $dark-grey;
-      font-size: 12px;
-      font-style: italic;
-      display: flex;
-      align-items: center
       margin: 2px 0 3px;
       div
         margin-left: 5px
