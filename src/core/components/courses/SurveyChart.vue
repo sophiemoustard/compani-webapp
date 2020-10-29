@@ -2,14 +2,18 @@
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
-    <div v-for="(line, index) in lines" :key="index" class="q-mt-sm bar-container">
-      <div class="q-mr-sm percentage">{{ formatPercentage(line.percentage) }}</div>
-      <q-linear-progress size="40px" :value="line.percentage" rounded class="bar">
-        <div class="bar-label">
-          <div>{{ line.title }}</div>
-          <div><span class="text-weight-bold">{{ line.total }}</span> réponses</div>
+    <div class="bar-container">
+      <div v-for="(line, index) in lines" :key="index" class="q-my-sm">
+        <div class="bar rounded-borders">
+          <div class="q-mt-sm bar-label">{{ index+1 }}</div>
+          <div class="bar-fill rounded-borders" :style="`height: ${line.percentage*100}%`" />
         </div>
-      </q-linear-progress>
+        <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
+      </div>
+    </div>
+    <div class="chart-footer">
+      <div>Pas du tout satisfait</div>
+      <div>Très satisfait</div>
     </div>
   </q-card>
 </template>
@@ -36,7 +40,7 @@ export default {
   },
   methods: {
     formatPercentage (number) {
-      return roundFrenchPercentage(number * 100, 1);
+      return roundFrenchPercentage(number * 100, 0);
     },
   },
 };
@@ -52,27 +56,33 @@ export default {
 
 .percentage
   text-align: center
-  width: 56px
 
 .bar-container
   display: flex
-  align-items: center
+  justify-content: space-evenly
+  width: 304px
 
 .bar
   color: $middle-beige
   background-color: $neutral-beige
+  width: 48px
+  height: 344px
+  display: flex
+  align-content: space-between
+  flex-wrap: wrap
 
-/deep/ .q-linear-progress__track
-  opacity: 0
+.chart-footer
+  display: flex
+  justify-content: space-between
+  width: 304px
+
+.bar-fill
+  background-color: $middle-beige
+  width: 48px
 
 .bar-label
   font-size: 14px
-  position: absolute
   color: black
-  display: flex
-  justify-content: space-between
+  text-align: center
   width: 100%
-  align-items: center
-  height: 100%
-  padding: 0 24px
 </style>
