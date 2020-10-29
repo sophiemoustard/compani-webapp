@@ -1,10 +1,15 @@
 <template>
-  <div class="container" :style="{ height: `${height}px`, top: `${top}px` }">
-    <div class="row container-title">
+  <div class="history-container" :style="{ height: `${height}px`, top: `${top}px` }">
+    <div class="row history-container-title">
       <div class="col-11">Historique d'activité</div>
-      <ni-button class="col-1" icon="clear" size="sm" @click="close" />
+      <div class="col-1 cursor-pointer">
+        <ni-button icon="clear" size="sm" @click.native="close" />
+      </div>
     </div>
-    <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id" :course-history="courseHistory" />
+    <div>
+      <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
+        :course-history="courseHistory" />
+    </div>
 </div>
 </template>
 
@@ -40,13 +45,6 @@ export default {
 </script>
 
 <style  lang="stylus" scoped>
-.container
-  position: absolute
-  right: 0
-  background-color: $white
-  width: 300px
-
-.container-title
-  margin: 16px 8px 0 8px
-
+  .history-container-title
+    height: 8%
 </style>
