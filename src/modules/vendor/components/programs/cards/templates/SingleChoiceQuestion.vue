@@ -1,18 +1,18 @@
 <template>
   <div v-if="qcuFalsyAnswersInitialized">
-    <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
+    <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
-    <ni-input caption="Bonne réponse" v-model.trim="card.qcuGoodAnswer" required-field class="q-my-lg"
+    <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-my-lg"
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
     <div class="q-my-lg">
       <ni-input v-for="(answer, i) in card.qcuFalsyAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
-        v-model.trim="card.qcuFalsyAnswers[i]" :required-field="i === 0" :error="qcuFalsyAnswerError(i)"
+        v-model="card.qcuFalsyAnswers[i]" :required-field="i === 0" :error="qcuFalsyAnswerError(i)"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcuFalsyAnswers[${i}]`)"
         @blur="updateFalsyAnswer(i)" :disable="disableEdition" />
     </div>
-    <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
+    <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
@@ -92,7 +92,7 @@ export default {
       return exceedCharLength || missingField;
     },
     formatQcuFalsyAnswersPayload () {
-      return this.card.qcuFalsyAnswers.filter(a => !!a);
+      return this.card.qcuFalsyAnswers.filter(a => !!a).map(a => a.trim());
     },
     async updateFalsyAnswer (index) {
       try {
@@ -100,10 +100,10 @@ export default {
 
         this.$v.card.qcuFalsyAnswers.$touch();
         if (this.qcuFalsyAnswerError(index)) return NotifyWarning('Champ(s) invalide(s)');
+
         await Cards.updateById(this.card._id, { qcuFalsyAnswers: this.formatQcuFalsyAnswersPayload() });
 
         await this.refreshCard();
-
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);

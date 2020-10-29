@@ -1,5 +1,5 @@
 <template>
-  <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
+  <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
     @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
     type="textarea" :disable="disableEdition" />
 </template>
