@@ -387,3 +387,6 @@ export const QUESTION_ANSWER_MAX_ANSWERS_COUNT = 4;
 // PUBLISHED_DOT
 export const PUBLISHED_DOT_ACTIVE = 'active';
 export const PUBLISHED_DOT_WARNING = 'warning';
+
+// COURSE HISTORY
+export const SLOT_CREATION = 'slot_creation';
