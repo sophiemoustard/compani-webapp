@@ -36,6 +36,7 @@ export default {
     textErrorMessage (modifiedText) {
       if (!modifiedText.required) return REQUIRED_LABEL;
       if (!modifiedText.maxLength) return `${FLASHCARD_TEXT_MAX_LENGTH} caractères maximum.`;
+
       return '';
     },
   },
