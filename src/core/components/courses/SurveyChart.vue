@@ -2,14 +2,20 @@
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
-    <div v-for="(line, index) in lines" :key="index" class="q-mt-sm bar-container">
-      <div class="q-mr-sm percentage">{{ formatPercentage(line.percentage) }}</div>
-      <q-linear-progress size="40px" :value="line.percentage" rounded class="bar">
-        <div class="bar-label">
-          <div>{{ line.title }}</div>
-          <div><span class="text-weight-bold">{{ line.total }}</span> réponses</div>
+    <div class="chart">
+      <div class="bar-container">
+        <div v-for="(line, index) in lines" :key="index">
+          <div class="bar rounded-borders">
+            <div class="bar-fill rounded-borders" :style="`height: ${line.percentage * 100}%`" />
+            <div class="bar-label">{{ index + 1 }}</div>
+          </div>
+          <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
         </div>
-      </q-linear-progress>
+      </div>
+      <div class="chart-footer">
+        <div>{{ this.card.label.left }}</div>
+        <div>{{ this.card.label.right }}</div>
+      </div>
     </div>
   </q-card>
 </template>
@@ -36,7 +42,7 @@ export default {
   },
   methods: {
     formatPercentage (number) {
-      return roundFrenchPercentage(number * 100, 1);
+      return roundFrenchPercentage(number * 100, 0);
     },
   },
 };
@@ -52,27 +58,43 @@ export default {
 
 .percentage
   text-align: center
-  width: 56px
 
 .bar-container
   display: flex
-  align-items: center
+  justify-content: space-evenly
+  width: 50%
+  @media screen and (max-width: 767px)
+    width: 100%
+
+.chart
+  display: flex
+  flex-direction: column
 
 .bar
-  color: $middle-beige
+  position: relative
   background-color: $neutral-beige
+  width: 48px
+  height: 320px
+  @media screen and (max-width: 767px)
+    width: 32px
 
-/deep/ .q-linear-progress__track
-  opacity: 0
-
-.bar-label
-  font-size: 14px
-  position: absolute
-  color: black
+.chart-footer
   display: flex
   justify-content: space-between
+  width: 50%
+  @media screen and (max-width: 767px)
+    width: 100%
+
+.bar-fill
+  position: absolute
+  bottom: 0px
+  background-color: $middle-beige
   width: 100%
-  align-items: center
-  height: 100%
-  padding: 0 24px
+
+.bar-label
+  position: absolute
+  font-size: 14px
+  color: black
+  text-align: center
+  width: 100%
 </style>
