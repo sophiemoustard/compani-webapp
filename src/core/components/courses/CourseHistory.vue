@@ -74,7 +74,7 @@ export default {
       return { pre: 'Nouveau', type: 'créneau', post: 'le', infos };
     },
     getSlotCreationDetails () {
-      return get(this.courseHistory, 'slot.address.fullAddress', 'Pas d\'addresse renseignée');
+      return get(this.courseHistory, 'slot.address.fullAddress', 'Pas d\'adresse renseignée');
     },
   },
 };
