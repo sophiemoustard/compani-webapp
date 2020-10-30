@@ -63,6 +63,8 @@ export default {
   display: flex
   justify-content: space-evenly
   width: 50%
+  @media screen and (max-width: 767px)
+    width: 100%
 
 .chart
   display: flex
@@ -70,15 +72,18 @@ export default {
 
 .bar
   position: relative
-  color: $middle-beige
   background-color: $neutral-beige
   width: 48px
   height: 320px
+  @media screen and (max-width: 767px)
+    width: 32px
 
 .chart-footer
   display: flex
   justify-content: space-between
   width: 50%
+  @media screen and (max-width: 767px)
+    width: 100%
 
 .bar-fill
   position: absolute
@@ -87,8 +92,9 @@ export default {
   width: 100%
 
 .bar-label
-  z-index: 2
+  position: absolute
   font-size: 14px
   color: black
   text-align: center
+  width: 100%
 </style>
