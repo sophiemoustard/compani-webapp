@@ -24,7 +24,8 @@
     <ni-slot-container :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
-      <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories" />
+      <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
+        @load="updateCourseHistories" />
     </q-page-sticky>
   </div>
 </template>
@@ -121,19 +122,33 @@ export default {
       if (this.displayHistory) await this.getCourseHistories();
       else this.courseHistories = [];
     },
-    async getCourseHistories () {
+    async getCourseHistories (createdAt = new Date()) {
       try {
-        this.courseHistories = await CourseHistories.getCourseHistories({ course: this.profileId });
+        const olderCourseHistories = await CourseHistories.getCourseHistories({ course: this.profileId, createdAt });
+        this.courseHistories.push(...olderCourseHistories);
+
+        return olderCourseHistories;
       } catch (e) {
         this.courseHistories = [];
         console.error(e);
         NotifyNegative('Erreur lors de la récupération de l\'historique d\'activité');
       }
     },
+    async updateCourseHistories (done) {
+      const lastCreatedAt = this.courseHistories.length
+        ? this.courseHistories[this.courseHistories.length - 1].createdAt
+        : new Date();
+      const olderCourseHistories = await this.getCourseHistories(lastCreatedAt);
+
+      if (!olderCourseHistories.length) return done(true);
+
+      return done();
+    },
     async refreshCourse () {
       try {
         this.courseLoading = true;
         await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
+        if (this.displayHistory) await this.getCourseHistories();
       } catch (e) {
         console.error(e);
       } finally {

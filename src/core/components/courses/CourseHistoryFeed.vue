@@ -6,11 +6,16 @@
         <ni-button icon="clear" size="sm" @click.native="close" />
       </div>
     </div>
-    <div>
-      <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
-        :course-history="courseHistory" />
+    <div class="scroll-container" ref="scrollTarget">
+      <q-infinite-scroll @load="load" :offset="1" :scroll-target="$refs.scrollTarget">
+        <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
+          :course-history="courseHistory" />
+        <div class="loading" slot="loading">
+          <q-spinner />
+        </div>
+      </q-infinite-scroll>
     </div>
-</div>
+  </div>
 </template>
 
 <script>
@@ -40,6 +45,22 @@ export default {
     close () {
       this.$emit('toggle-history');
     },
+    load (index, done) {
+      this.$emit('load', done);
+    },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .scroll-container
+    overflow: auto
+    height: 80%
+
+  .loading
+    width: 100%
+    margin: 4px 0
+    display: flex
+    justify-content: center
+    height: 24px
+</style>
