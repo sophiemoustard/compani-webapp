@@ -74,6 +74,7 @@ export const companyMixin = {
     },
     billingAssistanceError () {
       if (!this.$v.company.billingAssistance.email) return 'Email non valide';
+
       return '';
     },
   },
