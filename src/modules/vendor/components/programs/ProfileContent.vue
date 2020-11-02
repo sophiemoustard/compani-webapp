@@ -306,6 +306,7 @@ export default {
         this.subProgramCreationModal = false;
       } catch (e) {
         console.error(e);
+
         NotifyNegative('Erreur lors de la création du sous-programme.');
       } finally {
         this.modalLoading = false;
@@ -549,6 +550,9 @@ export default {
         this.refreshProgram();
       } catch (e) {
         console.error(e);
+        if (e.data.message === 'Un sous-programme ELearning publié existe déjà') {
+          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme ELearning publié');
+        }
         NotifyNegative('Erreur lors de la publication du sous-programme');
       }
     },
