@@ -7,7 +7,7 @@
       </div>
     </div>
     <div class="scroll-container" :style="{ height: `${height - 50}px` }" ref="scrollTarget">
-      <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTarget">
+      <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTarget" ref="infiniteScroll">
         <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
           :course-history="courseHistory" />
         <div class="loading" slot="loading">
@@ -45,6 +45,9 @@ export default {
     },
     load (index, done) {
       this.$emit('load', done);
+    },
+    resumeScroll () {
+      this.$refs.infiniteScroll.resume();
     },
   },
 };

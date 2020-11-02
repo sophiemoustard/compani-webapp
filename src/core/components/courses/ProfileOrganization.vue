@@ -25,7 +25,7 @@
     <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
-        @load="updateCourseHistories" />
+        @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
   </div>
 </template>
@@ -154,7 +154,10 @@ export default {
       try {
         this.courseLoading = true;
         await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
-        if (this.displayHistory) await this.getCourseHistories();
+        if (this.displayHistory) {
+          await this.getCourseHistories();
+          this.$refs.courseHistoryFeed.resumeScroll();
+        }
       } catch (e) {
         console.error(e);
       } finally {
