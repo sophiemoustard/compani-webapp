@@ -36,7 +36,7 @@ export default {
       return window.innerHeight - this.top;
     },
     top () {
-      return window.innerWidth >= 768 ? 200 : 350;
+      return window.innerWidth >= 768 ? 300 : 350;
     },
   },
   methods: {
