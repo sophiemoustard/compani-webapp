@@ -6,8 +6,8 @@
         <ni-button icon="clear" size="sm" @click.native="close" />
       </div>
     </div>
-    <div class="scroll-container" ref="scrollTarget">
-      <q-infinite-scroll @load="load" :offset="1" :scroll-target="$refs.scrollTarget">
+    <div class="scroll-container" :style="{ height: `${height - 50}px` }" ref="scrollTarget">
+      <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTarget">
         <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
           :course-history="courseHistory" />
         <div class="loading" slot="loading">
@@ -36,7 +36,7 @@ export default {
       return window.innerHeight - this.top;
     },
     top () {
-      return window.innerWidth >= 768 ? 300 : 350;
+      return window.innerWidth >= 768 ? 200 : 350;
     },
   },
   methods: {
@@ -52,8 +52,8 @@ export default {
 
 <style lang="stylus" scoped>
   .scroll-container
-    overflow: auto
-    height: 80%
+    overflow-y: auto
+    overflow-x: hidden
 
   .loading
     width: 100%

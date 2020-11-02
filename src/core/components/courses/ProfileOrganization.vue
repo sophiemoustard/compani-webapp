@@ -148,9 +148,7 @@ export default {
         : null;
       const olderCourseHistories = await this.getCourseHistories(lastCreatedAt);
 
-      if (!olderCourseHistories.length) return done(true);
-
-      return done();
+      return done(!olderCourseHistories.length);
     },
     async refreshCourse () {
       try {
