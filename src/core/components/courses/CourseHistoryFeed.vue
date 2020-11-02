@@ -31,14 +31,12 @@ export default {
   props: {
     courseHistories: { type: Array, default: () => ([]) },
   },
-  data () {
-    return {
-      top: 300,
-    };
-  },
   computed: {
     height () {
       return window.innerHeight - this.top;
+    },
+    top () {
+      return window.innerWidth >= 768 ? 300 : 350;
     },
   },
   methods: {
