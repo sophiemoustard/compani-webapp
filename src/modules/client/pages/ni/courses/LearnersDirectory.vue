@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import Users from '@api/Users';
 import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
@@ -66,6 +67,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({ company: 'main/getCompany' }),
     filteredLearners () {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
       return this.learnerList.filter(user => user.learner.noDiacriticsName.match(new RegExp(formattedString, 'i')));
@@ -96,7 +98,7 @@ export default {
     async getLearnerList () {
       try {
         this.tableLoading = true;
-        const learners = await Users.learnerList({ company: '5c35c086119849001438a38d' }); // exemple avec Alenvi SAS
+        const learners = await Users.learnerList({ company: this.company._id });
         this.learnerList = Object.freeze(learners.map(this.formatRow));
       } catch (e) {
         console.error(e);
