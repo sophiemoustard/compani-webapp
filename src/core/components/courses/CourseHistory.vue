@@ -22,7 +22,7 @@
 
 <script>
 import get from 'lodash/get';
-import { SLOT_CREATION, DEFAULT_AVATAR } from '@data/constants';
+import { SLOT_CREATION, DEFAULT_AVATAR, SLOT_DELETION } from '@data/constants';
 import Button from '@components/Button';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 
@@ -42,6 +42,11 @@ export default {
   computed: {
     formatedHistory () {
       switch (this.courseHistory.action) {
+        case SLOT_DELETION:
+          return {
+            title: this.getSlotDeletionTitle(),
+            details: this.getSlotDeletionDetails(),
+          };
         case SLOT_CREATION:
         default:
           return {
@@ -75,6 +80,18 @@ export default {
     },
     getSlotCreationDetails () {
       return get(this.courseHistory, 'slot.address.fullAddress', 'Pas d\'adresse renseignée');
+    },
+    getSlotDeletionTitle () {
+      const date = this.$moment(this.courseHistory.slot.startDate).format('DD/MM');
+
+      return { pre: 'Suppression du', type: 'créneau', post: 'du', infos: `${date}` };
+    },
+    getSlotDeletionDetails () {
+      const address = get(this.courseHistory, 'slot.address.fullAddress', '');
+
+      return `Créneau initialement prévu de ${formatHoursWithMinutes(this.courseHistory.slot.startDate)}`
+        + ` à ${formatHoursWithMinutes(this.courseHistory.slot.endDate)}, `
+        + `${address ? `au ${address}` : 'Pas d\'adresse renseignée'}`; // DEMANDER à SOPHIE
     },
   },
 };

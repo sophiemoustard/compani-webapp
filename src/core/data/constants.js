@@ -391,3 +391,4 @@ export const PUBLISHED_DOT_WARNING = 'warning';
 
 // COURSE HISTORY
 export const SLOT_CREATION = 'slot_creation';
+export const SLOT_DELETION = 'slot_deletion';
