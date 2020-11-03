@@ -36,7 +36,7 @@
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
             <template v-if="col.name === 'surchargedAndExempt'">
-              <div v-if="props.row.surchargedAndExempt || props.row.diff.surchargedAndExempt"
+              <div v-if="shouldDisplayDetails(props.row.auxiliary._id, 'surchargedAndExemptDetails')"
                 class="cursor-pointer text-primary"
                 @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
                 {{ col.value }}
@@ -44,7 +44,7 @@
               <div v-else>{{ col.value }}</div>
             </template>
             <template v-else-if="col.name === 'surchargedAndNotExempt'">
-              <div v-if="props.row.surchargedAndNotExempt || props.row.diff.surchargedAndNotExempt"
+              <div v-if="shouldDisplayDetails(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')"
                 class="cursor-pointer text-primary"
                 @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
                 {{ col.value }}
@@ -89,6 +89,8 @@
 </template>
 
 <script>
+import get from 'lodash/get';
+import has from 'lodash/has';
 import Pay from '@api/Pay';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Select from '@components/form/Select';
@@ -99,7 +101,6 @@ import EditableTd from '@components/table/EditableTd';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
-import get from 'lodash/get';
 
 export default {
   name: 'ToPay',
@@ -202,6 +203,7 @@ export default {
     await this.refreshDraftPay();
   },
   methods: {
+    has,
     async refreshDraftPay () {
       try {
         this.tableLoading = true;
@@ -222,6 +224,12 @@ export default {
       } finally {
         this.tableLoading = false;
       }
+    },
+    shouldDisplayDetails (id, details) {
+      const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
+      if (!draft) return false;
+
+      return Object.keys(draft[details]).length || Object.keys(draft.diff[details]).length;
     },
     openSurchargeDetailModal (id, details) {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);

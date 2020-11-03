@@ -68,7 +68,7 @@ export const payMixin = {
           name: 'hoursToWork',
           label: 'Heures à travailler',
           align: 'center',
-          field: row => row.hoursToWork + row.diff.absencesHours,
+          field: row => row.hoursToWork - row.diff.absencesHours,
           format: value => formatHours(value),
         },
         {
