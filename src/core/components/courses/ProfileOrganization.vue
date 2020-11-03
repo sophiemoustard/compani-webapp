@@ -24,7 +24,8 @@
     <ni-slot-container :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
-      <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories" />
+      <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
+        @load="updateCourseHistories" ref="courseHistoryFeed" />
     </q-page-sticky>
   </div>
 </template>
@@ -34,6 +35,7 @@ import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
+import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Input from '@components/form/Input';
@@ -121,19 +123,41 @@ export default {
       if (this.displayHistory) await this.getCourseHistories();
       else this.courseHistories = [];
     },
-    async getCourseHistories () {
+    async getCourseHistories (createdAt = null) {
+      const courseHistoriesTmp = cloneDeep(this.courseHistories);
       try {
-        this.courseHistories = await CourseHistories.getCourseHistories({ course: this.profileId });
+        let olderCourseHistories;
+        if (createdAt) {
+          olderCourseHistories = await CourseHistories.getCourseHistories({ course: this.profileId, createdAt });
+          this.courseHistories.push(...olderCourseHistories);
+        } else {
+          olderCourseHistories = await CourseHistories.getCourseHistories({ course: this.profileId });
+          this.courseHistories = olderCourseHistories;
+        }
+
+        return olderCourseHistories;
       } catch (e) {
-        this.courseHistories = [];
+        this.courseHistories = courseHistoriesTmp;
         console.error(e);
         NotifyNegative('Erreur lors de la récupération de l\'historique d\'activité');
       }
+    },
+    async updateCourseHistories (done) {
+      const lastCreatedAt = this.courseHistories.length
+        ? this.courseHistories[this.courseHistories.length - 1].createdAt
+        : null;
+      const olderCourseHistories = await this.getCourseHistories(lastCreatedAt);
+
+      return done(!olderCourseHistories.length);
     },
     async refreshCourse () {
       try {
         this.courseLoading = true;
         await this.$store.dispatch('course/fetchCourse', { courseId: this.profileId });
+        if (this.displayHistory) {
+          await this.getCourseHistories();
+          this.$refs.courseHistoryFeed.resumeScroll();
+        }
       } catch (e) {
         console.error(e);
       } finally {

@@ -6,11 +6,16 @@
         <ni-button icon="clear" size="sm" @click.native="close" />
       </div>
     </div>
-    <div>
-      <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
-        :course-history="courseHistory" />
+    <div class="scroll-container" :style="{ height: `${height - 50}px` }" ref="scrollTarget">
+      <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTarget" ref="infiniteScroll">
+        <course-history v-for="courseHistory in courseHistories" :key="courseHistory._id"
+          :course-history="courseHistory" />
+        <div class="loading" slot="loading">
+          <q-spinner />
+        </div>
+      </q-infinite-scroll>
     </div>
-</div>
+  </div>
 </template>
 
 <script>
@@ -26,20 +31,37 @@ export default {
   props: {
     courseHistories: { type: Array, default: () => ([]) },
   },
-  data () {
-    return {
-      top: 300,
-    };
-  },
   computed: {
     height () {
       return window.innerHeight - this.top;
+    },
+    top () {
+      return window.innerWidth >= 768 ? 300 : 350;
     },
   },
   methods: {
     close () {
       this.$emit('toggle-history');
     },
+    load (index, done) {
+      this.$emit('load', done);
+    },
+    resumeScroll () {
+      this.$refs.infiniteScroll.resume();
+    },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .scroll-container
+    overflow-y: auto
+    overflow-x: hidden
+
+  .loading
+    width: 100%
+    margin: 4px 0
+    display: flex
+    justify-content: center
+    height: 24px
+</style>
