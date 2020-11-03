@@ -73,7 +73,7 @@
       </draggable>
       <div class="q-my-md sub-program-footer">
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
-          @click="validateSubProgramPublishment(subProgram._id)" :flat="false" />
+          @click="validateSubProgramPublishment(subProgram)" :flat="false" />
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
           @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
       </div>
@@ -532,7 +532,7 @@ export default {
       const el = document.getElementById(openedStep);
       el.scrollIntoView({ behavior: 'smooth' });
     },
-    validateSubProgramPublishment (subProgramId) {
+    validateSubProgramPublishment (subProgram) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
@@ -540,19 +540,26 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.publishSubProgram(subProgramId))
+      }).onOk(() => this.publishSubProgram(subProgram))
         .onCancel(() => NotifyPositive('Publication annulée.'));
     },
-    async publishSubProgram (subProgramId) {
+    async publishSubProgram (subProgram) {
       try {
-        await SubPrograms.update(subProgramId, { status: PUBLISHED });
+        if (subProgram.isStrictlyELearning && this.program.subPrograms.some(
+          sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
+        )) {
+          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
+        }
+
+        await SubPrograms.update(subProgram._id, { status: PUBLISHED });
         NotifyPositive('Sous programme publié');
         this.refreshProgram();
       } catch (e) {
         console.error(e);
-        if (e.data.message === 'Un sous-programme ELearning publié existe déjà') {
-          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme ELearning publié');
+        if (e.status === 409) {
+          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
         }
+
         NotifyNegative('Erreur lors de la publication du sous-programme');
       }
     },
