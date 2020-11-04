@@ -226,10 +226,15 @@ export default {
       return `${process.env.API_HOSTNAME}/contracts/${contractId}/gdrive/${driveId}/upload`;
     },
     async exportDpae (contractId) {
-      const txt = await Contracts.exportDpae(contractId);
-      await downloadFile(txt, 'dpae.txt');
+      try {
+        const txt = await Contracts.exportDpae(contractId);
+        await downloadFile(txt, 'dpae.txt');
 
-      NotifyPositive('Document téléchargé.');
+        NotifyPositive('Document téléchargé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du document.');
+      }
     },
     async dlTemplate (contractVersion, parentContract, contractIndex) {
       try {
@@ -252,6 +257,7 @@ export default {
         await downloadDocxFile(params, data, 'contrat.docx');
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
     async openSignatureModal (eversignId) {

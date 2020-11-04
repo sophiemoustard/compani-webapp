@@ -90,7 +90,6 @@
 
 <script>
 import get from 'lodash/get';
-import has from 'lodash/has';
 import Pay from '@api/Pay';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Select from '@components/form/Select';
@@ -203,7 +202,6 @@ export default {
     await this.refreshDraftPay();
   },
   methods: {
-    has,
     async refreshDraftPay () {
       try {
         this.tableLoading = true;
