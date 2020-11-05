@@ -37,7 +37,7 @@ export default {
   },
   methods: {
     formatPercentage (number) {
-      return roundFrenchPercentage(number * 100, 1);
+      return roundFrenchPercentage(number * 100, 0);
     },
   },
 };
