@@ -46,7 +46,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/AuxiliaryCreationModal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload, removeDiacritics } from '@helpers/utils';
+import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortNames } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
@@ -102,11 +102,7 @@ export default {
           field: row => row.auxiliary,
           align: 'left',
           sortable: true,
-          sort: (a, b) => {
-            const aLastnameLower = a.lastname.toLowerCase();
-            const bLastnameLower = b.lastname.toLowerCase();
-            return aLastnameLower.localeCompare(bLastnameLower);
-          },
+          sort: sortNames,
           style: 'min-width: 200px; width: 35%',
         },
         {
