@@ -4,13 +4,13 @@
       <div class="history-info">
         <div>
           {{ formatedHistory.title.pre }}<span class="type"> {{ formatedHistory.title.type }}</span>
-          {{ formatedHistory.title.post }}<span class="title-bold"> {{ formatedHistory.title.infos }}</span>
+          {{ formatedHistory.title.post }}<span class="title-bold"> {{ formatedHistory.title.infos }}.</span>
         </div>
         <ni-button class="button" v-if="formatedHistory.details" color="primary" size="sm" icon="remove_red_eye"
           @click="toggleDetails" />
       </div>
       <div class="history-details" v-if="displayDetails">
-        {{ formatedHistory.details }}
+        <div style="white-space: pre-line">{{ formatedHistory.details }}</div>
       </div>
       <div class="history-signature">
         <img :src="getAvatar(courseHistory.createdBy)" class="avatar">
@@ -79,7 +79,7 @@ export default {
       return { pre: 'Nouveau', type: 'créneau', post: 'le', infos };
     },
     getSlotCreationDetails () {
-      return get(this.courseHistory, 'slot.address.fullAddress', 'Pas d\'adresse renseignée');
+      return get(this.courseHistory, 'slot.address.fullAddress', 'Pas d\'adresse renseignée.');
     },
     getSlotDeletionTitle () {
       const date = this.$moment(this.courseHistory.slot.startDate).format('DD/MM');
@@ -90,8 +90,8 @@ export default {
       const address = get(this.courseHistory, 'slot.address.fullAddress', '');
 
       return `Créneau initialement prévu de ${formatHoursWithMinutes(this.courseHistory.slot.startDate)}`
-        + ` à ${formatHoursWithMinutes(this.courseHistory.slot.endDate)}, `
-        + `${address ? `au ${address}` : 'Pas d\'adresse renseignée'}`; // DEMANDER à SOPHIE
+        + ` à ${formatHoursWithMinutes(this.courseHistory.slot.endDate)}`
+        + `${address ? `, au ${address}.` : '.\r\nPas d\'adresse renseignée.'}`;
     },
   },
 };
