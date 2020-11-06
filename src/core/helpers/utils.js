@@ -126,3 +126,5 @@ export const formatQuantity = (itemLabel, quantity) => {
 
   return `${quantity} ${itemLabel}`;
 };
+
+export const sortStrings = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase());
