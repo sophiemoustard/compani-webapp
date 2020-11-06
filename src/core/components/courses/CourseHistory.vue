@@ -1,20 +1,20 @@
 <template>
   <div class="history">
-    <div class="history-title">
-      <div class="history-info">
-        <div>
-          {{ formatedHistory.title.pre }}<span class="type"> {{ formatedHistory.title.type }}</span>
+    <div class="history-cell">
+      <div class="history-title">
+        <div class="history-title-text">
+          {{ formatedHistory.title.pre }}<span class="history-type"> {{ formatedHistory.title.type }}</span>
           {{ formatedHistory.title.post }}
-          <span class="title-bold"> {{ formatedHistory.title.infos }}.</span>
+          <span class="history-info"> {{ formatedHistory.title.infos }}.</span>
         </div>
-        <ni-button class="button" v-if="formatedHistory.details" color="primary" size="sm" icon="remove_red_eye"
+        <ni-button class="history-button" v-if="formatedHistory.details" color="primary" size="sm" icon="remove_red_eye"
           @click="toggleDetails" />
       </div>
       <div class="history-details" v-if="displayDetails">
         <div>{{ formatedHistory.details }}</div>
       </div>
       <div class="history-signature">
-        <img :src="getAvatar(courseHistory.createdBy)" class="avatar">
+        <img :src="getAvatar(courseHistory.createdBy)" class="avatar history-avatar">
         <div>{{ historySignature }}</div>
       </div>
     </div>

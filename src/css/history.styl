@@ -9,9 +9,17 @@
     margin: auto
     width: 95%
     border-bottom: 1px solid $neutral-grey
-  &-title
+  &-cell
     margin: 2px 10px 0 2px;
     padding: 5px;
+  &-title
+    display: flex;
+    &-text
+      flex: 1;
+  &-info
+    font-weight: bold;
+    color: #2E2E2E
+    white-space: pre-line
   &-details
     font-size: 12px;
     color: $dark-grey;  
@@ -26,10 +34,9 @@
     margin: 2px 0 3px;
     div
       margin-left: 5px
-  &-info
-    display: flex;
-    div
-      flex: 1;
+  &-avatar
+    height: 20px !important
+    width: 20px !important
   &-container
     background-color: $white
     width: 300px
@@ -42,18 +49,7 @@
   &-container-title
     margin: 10px 2px
     padding: 5px
-
-.title-bold
-  font-weight: bold;
-  color: #2E2E2E
-  white-space: pre-line
-  
-.avatar
-  height: 20px !important
-  width: 20px !important
-
-.type
-  color: $primary
-
-.button
-  height: 20px;
+  &-type
+    color: $primary
+  &-button
+    height: 20px;

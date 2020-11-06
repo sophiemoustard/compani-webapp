@@ -1,21 +1,21 @@
 <template>
   <div class="history">
-    <div class="history-title">
-      <div class="history-info">
-        <div>
-          {{ historyInfo.title.pre }}<span class="type">{{ eventType }}</span>
-          <template v-if="!isAuxiliaryUpdate"> de <span class="title-bold">{{ auxiliaryName }}</span></template>
+    <div class="history-cell">
+      <div class="history-title">
+        <div class="history-title-text">
+          {{ historyInfo.title.pre }}<span class="history-type">{{ eventType }}</span>
+          <template v-if="!isAuxiliaryUpdate"> de <span class="history-info">{{ auxiliaryName }}</span></template>
           {{ historyInfo.title.post }}
         </div>
         <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye"
-          @click="toggleDetails" class="button" />
+          @click="toggleDetails" class="history-button" />
       </div>
       <div v-if="displayDetails" class="history-details">
         <div>{{ historyInfo.details }}</div>
         <div class="history-misc">{{ history.event.misc }}</div>
       </div>
       <div class="history-signature">
-        <img :src="getAvatar(history.createdBy)" class="avatar">
+        <img :src="getAvatar(history.createdBy)" class="avatar history-avatar">
         <div>{{ historySignature }}</div>
       </div>
     </div>
