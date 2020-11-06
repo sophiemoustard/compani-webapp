@@ -58,14 +58,14 @@ export default {
 
 .percentage
   text-align: center
-  @media screen and (max-width: 767px)
+  @media screen and (max-width: 420px)
     font-size: 12px
 
 .bar-container
   display: flex
   justify-content: space-between
   width: 312px
-  @media screen and (max-width: 767px)
+  @media screen and (max-width: 420px)
     width: 100%
 
 .chart
@@ -78,21 +78,21 @@ export default {
   background-color: $neutral-beige
   width: 56px
   height: 160px
-  @media screen and (max-width: 767px)
+  @media screen and (max-width: 420px)
     width: 32px
 
 .chart-footer
   display: flex
   justify-content: space-between
   width: 312px
-  @media screen and (max-width: 767px)
+  @media screen and (max-width: 420px)
     width: 100%
 
 .left-label
-  width: 40%
+  width: 30%
 
 .right-label
-  width: 40%
+  width: 30%
   text-align: right
 
 .bar-fill
