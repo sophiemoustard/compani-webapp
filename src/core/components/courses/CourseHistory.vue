@@ -22,7 +22,7 @@
 
 <script>
 import get from 'lodash/get';
-import { SLOT_CREATION, DEFAULT_AVATAR, SLOT_DELETION } from '@data/constants';
+import { SLOT_CREATION, DEFAULT_AVATAR, SLOT_DELETION, SLOT_EDITION } from '@data/constants';
 import Button from '@components/Button';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 
@@ -47,6 +47,8 @@ export default {
             title: this.getSlotDeletionTitle(),
             details: this.getSlotDeletionDetails(),
           };
+        case SLOT_EDITION:
+          return { title: this.getSlotEditionTitle() };
         case SLOT_CREATION:
         default:
           return {
@@ -92,6 +94,12 @@ export default {
       return `Créneau initialement prévu de ${formatHoursWithMinutes(this.courseHistory.slot.startDate)}`
         + ` à ${formatHoursWithMinutes(this.courseHistory.slot.endDate)}`
         + `${address ? `, au ${address}.` : '.\r\nPas d\'adresse renseignée.'}`;
+    },
+    getSlotEditionTitle () {
+      const from = this.$moment(this.courseHistory.update.startDate.from).format('DD/MM');
+      const to = this.$moment(this.courseHistory.update.startDate.to).format('DD/MM');
+
+      return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
     },
   },
 };
