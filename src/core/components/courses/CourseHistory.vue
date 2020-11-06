@@ -98,6 +98,7 @@ export default {
     getSlotEditionTitle () {
       const from = this.$moment(this.courseHistory.update.startDate.from).format('DD/MM');
       const to = this.$moment(this.courseHistory.update.startDate.to).format('DD/MM');
+
       return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
     },
   },
