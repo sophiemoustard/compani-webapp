@@ -64,7 +64,7 @@ export default {
   justify-content: space-between
   width: 312px
   @media screen and (max-width: 767px)
-    width: 212px
+    width: 100%
 
 .chart
   display: flex
@@ -77,14 +77,14 @@ export default {
   width: 56px
   height: 160px
   @media screen and (max-width: 767px)
-    width: 36px
+    width: 32px
 
 .chart-footer
   display: flex
   justify-content: space-between
   width: 312px
   @media screen and (max-width: 767px)
-    width: 212px
+    width: 100%
 
 .bar-fill
   position: absolute
