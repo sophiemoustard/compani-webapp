@@ -13,8 +13,8 @@
         </div>
       </div>
       <div class="chart-footer">
-        <div>{{ this.card.label.left }}</div>
-        <div>{{ this.card.label.right }}</div>
+        <div class="left-label">{{ this.card.label.left }}</div>
+        <div class="right-label">{{ this.card.label.right }}</div>
       </div>
     </div>
   </q-card>
@@ -58,6 +58,8 @@ export default {
 
 .percentage
   text-align: center
+  @media screen and (max-width: 767px)
+    font-size: 12px
 
 .bar-container
   display: flex
@@ -85,6 +87,13 @@ export default {
   width: 312px
   @media screen and (max-width: 767px)
     width: 100%
+
+.left-label
+  width: 40%
+
+.right-label
+  width: 40%
+  text-align: right
 
 .bar-fill
   position: absolute
