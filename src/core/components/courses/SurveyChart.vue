@@ -5,9 +5,9 @@
     <div class="chart">
       <div class="bar-container">
         <div v-for="(line, index) in lines" :key="index">
-          <div class="bar rounded-borders">
-            <div class="bar-fill rounded-borders" :style="`height: ${line.percentage * 100}%`" />
-            <div class="bar-label">{{ index + 1 }}</div>
+          <div class="bar">
+            <div class="bar-fill" :style="`height: ${line.percentage * 100}%`" />
+            <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
           </div>
           <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
         </div>
@@ -61,10 +61,10 @@ export default {
 
 .bar-container
   display: flex
-  justify-content: space-evenly
-  width: 50%
+  justify-content: space-between
+  width: 312px
   @media screen and (max-width: 767px)
-    width: 100%
+    width: 212px
 
 .chart
   display: flex
@@ -72,28 +72,30 @@ export default {
 
 .bar
   position: relative
+  border-radius: 8px
   background-color: $neutral-beige
-  width: 48px
-  height: 320px
+  width: 56px
+  height: 160px
   @media screen and (max-width: 767px)
-    width: 32px
+    width: 36px
 
 .chart-footer
   display: flex
   justify-content: space-between
-  width: 50%
+  width: 312px
   @media screen and (max-width: 767px)
-    width: 100%
+    width: 212px
 
 .bar-fill
   position: absolute
+  border-radius: 8px
   bottom: 0px
   background-color: $middle-beige
   width: 100%
 
 .bar-label
   position: absolute
-  font-size: 14px
+  font-size: 16px
   color: black
   text-align: center
   width: 100%
