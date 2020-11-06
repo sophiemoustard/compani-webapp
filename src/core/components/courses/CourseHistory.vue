@@ -4,7 +4,8 @@
       <div class="history-info">
         <div>
           {{ formatedHistory.title.pre }}<span class="type"> {{ formatedHistory.title.type }}</span>
-          {{ formatedHistory.title.post }}<span class="title-bold"> {{ formatedHistory.title.infos }}.</span>
+          {{ formatedHistory.title.post }}
+          <span class="title-bold" style="white-space: pre-line"> {{ formatedHistory.title.infos }}.</span>
         </div>
         <ni-button class="button" v-if="formatedHistory.details" color="primary" size="sm" icon="remove_red_eye"
           @click="toggleDetails" />
@@ -22,9 +23,10 @@
 
 <script>
 import get from 'lodash/get';
-import { SLOT_CREATION, DEFAULT_AVATAR, SLOT_DELETION, SLOT_EDITION } from '@data/constants';
+import { SLOT_CREATION, DEFAULT_AVATAR, SLOT_DELETION, SLOT_EDITION, TRAINEE_ADDITION } from '@data/constants';
 import Button from '@components/Button';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
+import Users from '@api/Users';
 
 export default {
   name: 'CourseHistory',
@@ -37,11 +39,27 @@ export default {
   data () {
     return {
       displayDetails: false,
+      traineeName: null,
     };
+  },
+  async mounted () {
+    try {
+      if (this.courseHistory.trainee) {
+        const trainee = await Users.getById(this.courseHistory.trainee);
+        this.traineeName = formatIdentity(trainee.identity, 'FL');
+      }
+    } catch (e) {
+      console.error(e);
+    }
   },
   computed: {
     formatedHistory () {
       switch (this.courseHistory.action) {
+        case TRAINEE_ADDITION:
+          return {
+            title: this.getTraineeAdditionTitle(),
+            details: null,
+          };
         case SLOT_DELETION:
           return {
             title: this.getSlotDeletionTitle(),
@@ -100,6 +118,9 @@ export default {
       const to = this.$moment(this.courseHistory.update.startDate.to).format('DD/MM');
 
       return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
+    },
+    getTraineeAdditionTitle () {
+      return { pre: 'Nouveau', type: 'participant', post: 'à la formation :', infos: `\r\n${this.traineeName}` };
     },
   },
 };
