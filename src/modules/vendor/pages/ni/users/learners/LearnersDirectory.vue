@@ -22,7 +22,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, removeDiacritics, sortNames } from '@helpers/utils';
+import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 
 export default {
@@ -47,7 +47,7 @@ export default {
           field: row => row.learner,
           align: 'left',
           sortable: true,
-          sort: sortNames,
+          sort: (a, b) => sortStrings(a.lastname, b.lastname),
           style: 'min-width: 200px; width: 35%',
         },
         {

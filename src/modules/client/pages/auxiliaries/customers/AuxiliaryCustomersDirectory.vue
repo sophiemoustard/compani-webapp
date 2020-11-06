@@ -9,7 +9,7 @@
 <script>
 import Customers from '@api/Customers';
 import escapeRegExp from 'lodash/escapeRegExp';
-import { formatIdentity, removeDiacritics, sortNames } from '@helpers/utils';
+import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 
@@ -40,7 +40,7 @@ export default {
           format: value => (value ? value.fullName : ''),
           align: 'left',
           sortable: true,
-          sort: sortNames,
+          sort: (a, b) => sortStrings(a.lastname, b.lastname),
         },
       ],
     };

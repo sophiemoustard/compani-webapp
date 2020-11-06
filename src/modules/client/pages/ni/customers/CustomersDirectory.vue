@@ -37,7 +37,7 @@ import CustomerCreationModal from 'src/modules/client/components/customers/Custo
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { CIVILITY_OPTIONS } from '@data/constants';
-import { formatIdentity, removeDiacritics, sortNames } from '@helpers/utils';
+import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
 
@@ -87,7 +87,7 @@ export default {
           format: value => (value ? value.fullName : ''),
           align: 'left',
           sortable: true,
-          sort: sortNames,
+          sort: (a, b) => sortStrings(a.lastname, b.lastname),
           style: 'width: 350px',
         },
         {
