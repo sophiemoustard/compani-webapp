@@ -5,16 +5,16 @@
     <div class="chart">
       <div class="bar-container">
         <div v-for="(line, index) in lines" :key="index">
-          <div class="bar rounded-borders">
-            <div class="bar-fill rounded-borders" :style="`height: ${line.percentage * 100}%`" />
-            <div class="bar-label">{{ index + 1 }}</div>
+          <div class="bar">
+            <div class="bar-fill" :style="`height: ${line.percentage * 100}%`" />
+            <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
           </div>
           <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
         </div>
       </div>
       <div class="chart-footer">
-        <div>{{ this.card.label.left }}</div>
-        <div>{{ this.card.label.right }}</div>
+        <div class="left-label">{{ this.card.label.left }}</div>
+        <div class="right-label">{{ this.card.label.right }}</div>
       </div>
     </div>
   </q-card>
@@ -58,12 +58,14 @@ export default {
 
 .percentage
   text-align: center
+  @media screen and (max-width: 420px)
+    font-size: 12px
 
 .bar-container
   display: flex
-  justify-content: space-evenly
-  width: 50%
-  @media screen and (max-width: 767px)
+  justify-content: space-between
+  width: 312px
+  @media screen and (max-width: 420px)
     width: 100%
 
 .chart
@@ -72,28 +74,37 @@ export default {
 
 .bar
   position: relative
+  border-radius: 8px
   background-color: $neutral-beige
-  width: 48px
-  height: 320px
-  @media screen and (max-width: 767px)
+  width: 56px
+  height: 160px
+  @media screen and (max-width: 420px)
     width: 32px
 
 .chart-footer
   display: flex
   justify-content: space-between
-  width: 50%
-  @media screen and (max-width: 767px)
+  width: 312px
+  @media screen and (max-width: 420px)
     width: 100%
+
+.left-label
+  width: 30%
+
+.right-label
+  width: 30%
+  text-align: right
 
 .bar-fill
   position: absolute
+  border-radius: 8px
   bottom: 0px
   background-color: $middle-beige
   width: 100%
 
 .bar-label
   position: absolute
-  font-size: 14px
+  font-size: 16px
   color: black
   text-align: center
   width: 100%
