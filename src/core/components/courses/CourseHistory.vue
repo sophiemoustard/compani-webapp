@@ -23,7 +23,14 @@
 
 <script>
 import get from 'lodash/get';
-import { SLOT_CREATION, DEFAULT_AVATAR, SLOT_DELETION, SLOT_EDITION, TRAINEE_ADDITION } from '@data/constants';
+import {
+  SLOT_CREATION,
+  DEFAULT_AVATAR,
+  SLOT_DELETION,
+  SLOT_EDITION,
+  TRAINEE_ADDITION,
+  TRAINEE_DELETION,
+} from '@data/constants';
 import Button from '@components/Button';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 
@@ -43,6 +50,8 @@ export default {
   computed: {
     formatedHistory () {
       switch (this.courseHistory.action) {
+        case TRAINEE_DELETION:
+          return { title: this.getTraineeDeletionTitle() };
         case TRAINEE_ADDITION:
           return { title: this.getTraineeAdditionTitle() };
         case SLOT_DELETION:
@@ -109,6 +118,14 @@ export default {
         pre: 'Nouveau',
         type: 'participant',
         post: 'à la formation :',
+        infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
+      };
+    },
+    getTraineeDeletionTitle () {
+      return {
+        pre: 'Retrait d\'un',
+        type: 'participant',
+        post: 'de la formation :',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };
     },
