@@ -1,14 +1,14 @@
 <template v-if="orderedAnswersInitialized">
   <div>
-    <ni-input class="q-mb-lg" caption="Question" v-model.trim="card.question" required-field :disable="disableEdition"
+    <ni-input class="q-mb-lg" caption="Question" v-model="card.question" required-field :disable="disableEdition"
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea"
       :error-message="questionErrorMsg" />
     <div class="q-mb-lg">
       <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
-        v-model.trim="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
+        v-model="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
         @blur="updateOrderedAnswer(i)" :error="requiredOrderedAnswerIsMissing(i)" :disable="disableEdition" />
     </div>
-    <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
+    <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
@@ -60,6 +60,9 @@ export default {
       return this.$v.card.orderedAnswers.$error && !this.$v.card.orderedAnswers.minLength && index < 2 &&
         !this.card.orderedAnswers[index];
     },
+    formatOrderedAnswerPayload () {
+      return { orderedAnswers: this.card.orderedAnswers.filter(a => !!a).map(a => a.trim()) };
+    },
     async updateOrderedAnswer (index) {
       try {
         if (this.tmpInput === this.card.orderedAnswers[index]) return;
@@ -67,7 +70,7 @@ export default {
         this.$v.card.orderedAnswers.$touch();
         if (this.requiredOrderedAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Cards.updateById(this.card._id, { orderedAnswers: this.card.orderedAnswers.filter(a => !!a) });
+        await Cards.updateById(this.card._id, this.formatOrderedAnswerPayload());
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

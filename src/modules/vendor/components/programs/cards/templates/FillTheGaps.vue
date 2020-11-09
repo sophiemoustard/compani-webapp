@@ -1,15 +1,15 @@
 <template>
   <div v-if="falsyGapAnswersInitialized">
-    <ni-input class="q-mb-lg" caption="Texte" v-model.trim="card.gappedText" required-field
+    <ni-input class="q-mb-lg" caption="Texte" v-model="card.gappedText" required-field
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="q-mb-lg row gutter-profile answers">
-      <ni-input v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-xs-12 col-md-6" @blur="updateAnswer(i)"
-        v-model.trim="card.falsyGapAnswers[i]" @focus="saveTmp(`falsyGapAnswers[${i}]`)" :caption="`Mot ${i + 1}`"
-        :error="falsyGapAnswersError(i)" :required-field="i < 2" :error-message="falsyGapAnswersErrorMsg(i)"
+      <ni-input v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-xs-12 col-md-6" :required-field="i < 2"
+        @blur="updateFalsyGapAnswer(i)" v-model="card.falsyGapAnswers[i]" @focus="saveTmp(`falsyGapAnswers[${i}]`)"
+        :caption="`Mot ${i + 1}`" :error="falsyGapAnswersError(i)" :error-message="falsyGapAnswersErrorMsg(i)"
         :disable="disableEdition" />
     </div>
-    <ni-input caption="Correction" v-model.trim="card.explanation" required-field @focus="saveTmp('explanation')"
+    <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
@@ -107,7 +107,10 @@ export default {
       return this.$v.card.falsyGapAnswers.$error && !this.$v.card.falsyGapAnswers.minLength && index < 2 &&
         !this.card.falsyGapAnswers[index];
     },
-    async updateAnswer (index) {
+    formatFalsyGapAnswerPayload () {
+      return { falsyGapAnswers: this.card.falsyGapAnswers.filter(a => !!a).map(a => a.trim()) };
+    },
+    async updateFalsyGapAnswer (index) {
       try {
         if (this.tmpInput === get(this.card, `falsyGapAnswers[${index}]`)) return;
 
@@ -116,10 +119,9 @@ export default {
           return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        await Cards.updateById(this.card._id, { falsyGapAnswers: this.card.falsyGapAnswers.filter(a => !!a) });
+        await Cards.updateById(this.card._id, this.formatFalsyGapAnswerPayload());
 
         await this.refreshCard();
-
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);

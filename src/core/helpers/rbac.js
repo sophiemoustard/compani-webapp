@@ -27,6 +27,7 @@ const coachRoutes = [
   { name: 'account client' },
   { name: 'ni courses' },
   { name: 'ni courses info' },
+  { name: 'ni courses learners' },
 ];
 const clientAdminRoutes = [
   ...coachRoutes,

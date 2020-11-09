@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
+    <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
@@ -69,9 +69,6 @@ export default {
     },
   },
   methods: {
-    formatQuestionAnswersPayload () {
-      return this.card.questionAnswers.filter(a => !!a);
-    },
     async updateQuestionAnswers (index) {
       try {
         const editedAnswer = get(this.card, `questionAnswers[${index}]`);
@@ -80,10 +77,11 @@ export default {
         this.$v.card.questionAnswers.$touch();
         if (this.$v.card.questionAnswers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Cards.updateAnswer({ cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text });
+        await Cards.updateAnswer(
+          { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
+        );
 
         await this.refreshCard();
-
         NotifyPositive('Carte mise à jour.');
       } catch (e) {
         console.error(e);
