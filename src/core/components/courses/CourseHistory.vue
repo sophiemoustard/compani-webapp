@@ -60,7 +60,10 @@ export default {
             details: this.getSlotDeletionDetails(),
           };
         case SLOT_EDITION:
-          return { title: this.getSlotEditionTitle() };
+          return {
+            title: this.getSlotEditionTitle(),
+            details: this.getSlotEditionDetails(),
+          };
         case SLOT_CREATION:
         default:
           return {
@@ -108,10 +111,27 @@ export default {
         + `${address ? `, au ${address}.` : '.\r\nPas d\'adresse renseignée.'}`;
     },
     getSlotEditionTitle () {
-      const from = this.$moment(this.courseHistory.update.startDate.from).format('DD/MM');
-      const to = this.$moment(this.courseHistory.update.startDate.to).format('DD/MM');
+      if (this.courseHistory.update.startDate) {
+        const from = this.$moment(this.courseHistory.update.startDate.from).format('DD/MM');
+        const to = this.$moment(this.courseHistory.update.startDate.to).format('DD/MM');
 
-      return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
+        return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
+      }
+      if (this.courseHistory.update.startHour) {
+        const date = this.$moment(this.courseHistory.update.startHour.from).format('DD/MM');
+        const startHour = formatHoursWithMinutes(this.courseHistory.update.startHour.to);
+        const endHour = formatHoursWithMinutes(this.courseHistory.update.endHour.to);
+
+        return { type: 'Nouvel horaire', post: ' pour le créneau du', infos: `${date} : ${startHour} - ${endHour}` };
+      }
+    },
+    getSlotEditionDetails () {
+      if (this.courseHistory.update.startDate) return undefined;
+
+      const oldStartHour = formatHoursWithMinutes(this.courseHistory.update.startHour.from);
+      const oldEndHour = formatHoursWithMinutes(this.courseHistory.update.endHour.from);
+
+      return `Créneau initialement prévu de ${oldStartHour} à ${oldEndHour}`;
     },
     getTraineeAdditionTitle () {
       return {
