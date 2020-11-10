@@ -6,7 +6,8 @@
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
       :extensions="extensions" cloudinary-storage :additional-value="imageFileName" required-field
-      :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" :disable="disableEdition" />
+      :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize"
+      :disable="disableEdition || [UPLOAD_VIDEO, UPLOAD_AUDIO].includes(selectedExtension)" />
   </div>
 </template>
 
@@ -33,6 +34,8 @@ export default {
     return {
       selectedExtension: UPLOAD_IMAGE,
       extensionOptions: UPLOAD_EXTENSION_OPTIONS,
+      UPLOAD_VIDEO,
+      UPLOAD_AUDIO,
     };
   },
   computed: {
