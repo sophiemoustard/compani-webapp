@@ -10,7 +10,9 @@ export const templateMixin = {
   data () {
     return {
       tmpInput: '',
-      extensions: 'image/jpg, image/jpeg, image/png',
+      imageExtensions: 'image/jpg, image/jpeg, image/png',
+      videoExtensions: 'video/mp4, video/m4v, video/avi',
+      audioExtensions: 'audio/mp3',
       maxFileSize: 2000000,
     };
   },
