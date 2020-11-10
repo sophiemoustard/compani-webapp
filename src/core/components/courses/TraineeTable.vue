@@ -28,8 +28,8 @@
     </div>
 
     <!-- Add trainee modal -->
-    <learner-creation-modal v-model="traineeCreationModal" :new-trainee="newTrainee" :company-options="companyOptions"
-      :first-step="firstStep" :add-new-trainee-company-step="addNewTraineeCompanyStep" :is-intra-course="isIntraCourse"
+    <learner-creation-modal v-model="traineeCreationModal" :new-user="newTrainee" :company-options="companyOptions"
+      :first-step="firstStep" :identity-step="addNewTraineeCompanyStep" :company-step="isIntraCourse"
       :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
@@ -193,14 +193,19 @@ export default {
         this.traineeCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainee.local.email });
 
-        if (this.isIntraCourse) {
-          this.newTrainee.company = this.course.company._id;
-          if (userInfo.exists) this.addTrainee();
+        if (userInfo.exists) {
+          if (this.isIntraCourse) {
+            if (!userInfo.user.company) {
+              this.newTrainee.company = this.course.company._id;
+              await this.addTrainee();
+            } else if (userInfo.user.company === this.course.company._id) await this.addTrainee();
+            else return NotifyNegative('Ce stagiaire n\'est pas relié à la structure de la formation.');
+          } else if (userInfo.user.company) await this.addTrainee();
           else this.firstStep = false;
-        } else if (userInfo.exists && userInfo.user.company) this.addTrainee();
-        else {
-          if (userInfo.exists) this.addNewTraineeCompanyStep = true;
+        } else {
           this.firstStep = false;
+          this.identityStep = true;
+          if (this.isIntraCourse) this.newTrainee.company = this.course.company._id;
         }
         this.$v.newTrainee.$reset();
       } catch (e) {
