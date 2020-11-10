@@ -43,7 +43,7 @@ export const templateMixin = {
           if (validation.$error) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        await Cards.updateById(this.card._id, set({}, path, value));
+        await Cards.updateById(this.card._id, set({}, path, typeof value === 'string' ? value.trim() : value));
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

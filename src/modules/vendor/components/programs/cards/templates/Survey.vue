@@ -1,13 +1,13 @@
 <template>
   <div>
-    <ni-input caption="Question" v-model.trim="card.question" required-field @focus="saveTmp('question')"
+    <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
     <div class="row gutter-profile">
-      <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model.trim="card.label.left"
+      <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model="card.label.left"
         @focus="saveTmp('label.left')" @blur="updateCardLabel('left')" :error="$v.card.label.left.$error"
         :error-message="labelErrorMessage('left')" :disable="disableEdition" />
-      <ni-input class="col-md-6 col-xs-12" caption="Label droit" v-model.trim="card.label.right"
+      <ni-input class="col-md-6 col-xs-12" caption="Label droit" v-model="card.label.right"
         @focus="saveTmp('label.right')" @blur="updateCardLabel('right')" :error="$v.card.label.right.$error"
         :error-message="labelErrorMessage('right')" :disable="disableEdition" />
     </div>
@@ -50,13 +50,12 @@ export default {
     },
     async updateCardLabel (label) {
       try {
-        const value = this.card.label[label];
         if (this.tmpInput === this.card.label[label]) return;
 
         this.$v.card.label.$touch();
         if (!this.$v.card.label[label].maxLength) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Cards.updateById(this.card._id, set({}, `label.${label}`, value));
+        await Cards.updateById(this.card._id, set({}, `label.${label}`, this.card.label[label].trim()));
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

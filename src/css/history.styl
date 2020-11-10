@@ -1,0 +1,55 @@
+.history
+  margin: 2px
+  width: 100%
+  display: block
+  font-size: 13px
+  &:after
+    content: ""
+    display: block
+    margin: auto
+    width: 95%
+    border-bottom: 1px solid $neutral-grey
+  &-cell
+    margin: 2px 10px 0 2px;
+    padding: 5px;
+  &-title
+    display: flex;
+    &-text
+      flex: 1;
+  &-info
+    font-weight: bold;
+    color: #2E2E2E
+    white-space: pre-line
+  &-details
+    font-size: 12px;
+    color: $dark-grey;  
+    margin: 3px 0 5px;
+    white-space: pre-line
+  &-signature
+    color: $dark-grey
+    font-size: 12px
+    font-style: italic
+    display: flex
+    align-items: center
+    margin: 2px 0 3px;
+    div
+      margin-left: 5px
+  &-avatar
+    height: 20px !important
+    width: 20px !important
+  &-container
+    background-color: $white
+    width: 300px
+    top: 60px
+    @media (max-width: 767px)
+      top: 100px
+    right: 0
+    position: absolute
+    box-shadow: 0 3px 5px -1px rgba(0,0,0,0.2), 0 5px 8px rgba(0,0,0,0.14), 0 1px 14px rgba(0,0,0,0.12)
+  &-container-title
+    margin: 10px 2px
+    padding: 5px
+  &-type
+    color: $primary
+  &-button
+    height: 20px;

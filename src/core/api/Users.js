@@ -34,9 +34,9 @@ export default {
       console.error(e.response);
     }
   },
-  async learnerList () {
+  async learnerList (params = null) {
     try {
-      const learners = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/learners`, {});
+      const learners = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/learners`, { params });
       return learners.data.data.users;
     } catch (e) {
       console.error(e.response);

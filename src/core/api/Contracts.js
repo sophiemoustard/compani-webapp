@@ -9,6 +9,13 @@ export default {
   async update (contractId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/contracts/${contractId}`, payload);
   },
+  async exportDpae (contractId) {
+    return alenviAxios({
+      url: `${process.env.API_HOSTNAME}/contracts/${contractId}/dpae`,
+      method: 'GET',
+      responseType: 'blob',
+    });
+  },
   async list (params) {
     const contracts = await alenviAxios.get(`${process.env.API_HOSTNAME}/contracts`, { params });
     return contracts.data.data.contracts;

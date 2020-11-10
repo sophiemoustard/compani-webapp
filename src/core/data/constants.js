@@ -383,7 +383,15 @@ export const QC_ANSWER_MAX_LENGTH = 70;
 export const GAP_ANSWER_MAX_LENGTH = 15;
 export const QUESTION_ANSWER_MIN_ANSWERS_COUNT = 2;
 export const QUESTION_ANSWER_MAX_ANSWERS_COUNT = 4;
+export const FLASHCARD_TEXT_MAX_LENGTH = 450;
 
 // PUBLISHED_DOT
 export const PUBLISHED_DOT_ACTIVE = 'active';
 export const PUBLISHED_DOT_WARNING = 'warning';
+
+// COURSE HISTORY
+export const SLOT_CREATION = 'slot_creation';
+export const SLOT_DELETION = 'slot_deletion';
+export const SLOT_EDITION = 'slot_edition';
+export const TRAINEE_ADDITION = 'trainee_addition';
+export const TRAINEE_DELETION = 'trainee_deletion';
