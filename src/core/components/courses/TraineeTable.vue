@@ -28,8 +28,8 @@
     </div>
 
     <!-- Add trainee modal -->
-    <trainee-creation-modal v-model="traineeCreationModal" :new-trainee="newTrainee" :company-options="companyOptions"
-      :first-step="firstStep" :add-new-trainee-company-step="addNewTraineeCompanyStep" :is-intra-course="isIntraCourse"
+    <learner-creation-modal v-model="traineeCreationModal" :new-user="newTrainee" :company-options="companyOptions"
+      :first-step="firstStep" :identity-step="addNewTraineeIdentityStep" :company-step="!isIntraCourse"
       :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
@@ -54,7 +54,7 @@ import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import TraineeCreationModal from '@components/courses/TraineeCreationModal';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
@@ -70,7 +70,7 @@ export default {
   components: {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
-    'trainee-creation-modal': TraineeCreationModal,
+    'learner-creation-modal': LearnerCreationModal,
     'trainee-edition-modal': TraineeEditionModal,
   },
   data () {
@@ -115,7 +115,7 @@ export default {
       traineeCreationModal: false,
       traineeCreationModalLoading: false,
       firstStep: true,
-      addNewTraineeCompanyStep: false,
+      addNewTraineeIdentityStep: false,
       newTrainee: {
         identity: {
           firstname: '',
@@ -126,7 +126,7 @@ export default {
         company: '',
       },
       traineeValidations: {
-        identity: { lastname: { required } },
+        identity: { lastname: { required: requiredIf(this.addNewTraineeIdentityStep) } },
         local: { email: { required, email } },
         contact: { phone: { frPhoneNumber } },
         company: { required: requiredIf(() => this.course.type === INTER_B2B) },
@@ -179,7 +179,7 @@ export default {
     },
     resetAddTraineeForm () {
       this.firstStep = true;
-      this.addNewTraineeCompanyStep = false;
+      this.addNewTraineeIdentityStep = false;
       this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
     },
@@ -193,14 +193,19 @@ export default {
         this.traineeCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newTrainee.local.email });
 
-        if (this.isIntraCourse) {
-          this.newTrainee.company = this.course.company._id;
-          if (userInfo.exists) this.addTrainee();
+        if (userInfo.exists) {
+          if (this.isIntraCourse) {
+            if (!userInfo.user.company) {
+              this.newTrainee.company = this.course.company._id;
+              await this.addTrainee();
+            } else if (userInfo.user.company === this.course.company._id) await this.addTrainee();
+            else return NotifyNegative('Ce stagiaire n\'est pas relié à la structure de la formation.');
+          } else if (userInfo.user.company) await this.addTrainee();
           else this.firstStep = false;
-        } else if (userInfo.exists && userInfo.user.company) this.addTrainee();
-        else {
-          if (userInfo.exists) this.addNewTraineeCompanyStep = true;
+        } else {
+          if (this.isIntraCourse) this.newTrainee.company = this.course.company._id;
           this.firstStep = false;
+          this.addNewTraineeIdentityStep = true;
         }
         this.$v.newTrainee.$reset();
       } catch (e) {
@@ -225,8 +230,8 @@ export default {
       try {
         if (!this.firstStep) {
           this.$v.newTrainee.$touch();
-          const companyFieldError = this.addNewTraineeCompanyStep && this.$v.newTrainee.company.$error;
-          const newTraineeFormInvalid = !this.addNewTraineeCompanyStep && this.$v.newTrainee.$invalid;
+          const companyFieldError = this.addNewTraineeIdentityStep && this.$v.newTrainee.company.$error;
+          const newTraineeFormInvalid = !this.addNewTraineeIdentityStep && this.$v.newTrainee.$invalid;
           if (companyFieldError || newTraineeFormInvalid) return NotifyWarning('Champ(s) invalide(s).');
         }
 
