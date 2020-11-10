@@ -20,7 +20,7 @@ export const templateMixin = {
       return this.card.title ? this.card.title.replace(/ /g, '_') : this.activity.name.replace(/ /g, '_');
     },
     mediaUploadUrl () {
-      return `${process.env.API_HOSTNAME}/cards/${this.card._id}/cloudinary/upload`;
+      return `${process.env.API_HOSTNAME}/cards/${this.card._id}/upload`;
     },
     questionErrorMsg () {
       if (!this.$v.card.question.required) return REQUIRED_LABEL;
