@@ -29,7 +29,7 @@
 
     <!-- Add trainee modal -->
     <learner-creation-modal v-model="traineeCreationModal" :new-user="newTrainee" :company-options="companyOptions"
-      :first-step="firstStep" :identity-step="addNewTraineeCompanyStep" :company-step="isIntraCourse"
+      :first-step="firstStep" :identity-step="!addNewTraineeCompanyStep" :company-step="!isIntraCourse"
       :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
@@ -203,9 +203,8 @@ export default {
           } else if (userInfo.user.company) await this.addTrainee();
           else this.firstStep = false;
         } else {
-          this.firstStep = false;
-          this.identityStep = true;
           if (this.isIntraCourse) this.newTrainee.company = this.course.company._id;
+          this.firstStep = false;
         }
         this.$v.newTrainee.$reset();
       } catch (e) {

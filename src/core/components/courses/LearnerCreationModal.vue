@@ -7,13 +7,13 @@
         @blur="validations.local.email.$touch" caption="Email" :error-message="emailError(validations)"
         :error="validations.local.email.$error" />
       <template v-if="!firstStep">
-        <ni-input in-modal v-if="!identityStep" v-model="newUser.identity.firstname" caption="Prénom" />
-        <ni-input in-modal v-if="!identityStep" @blur="validations.identity.lastname.$touch" caption="Nom"
+        <ni-input in-modal v-if="identityStep" v-model="newUser.identity.firstname" caption="Prénom" />
+        <ni-input in-modal v-if="identityStep" @blur="validations.identity.lastname.$touch" caption="Nom"
           required-field v-model="newUser.identity.lastname" :error="validations.identity.lastname.$error" />
-        <ni-input in-modal v-if="!identityStep" v-model.trim="newUser.contact.phone"
+        <ni-input in-modal v-if="identityStep" v-model.trim="newUser.contact.phone"
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" :last="companyStep" />
-        <ni-select v-if="!companyStep" in-modal v-model.trim="newUser.company" required-field caption="Structure"
+        <ni-select v-if="companyStep" in-modal v-model.trim="newUser.company" required-field caption="Structure"
           @blur="validations.company.$touch" :error="validations.company.$error" :options="companyOptions"
           :last="!companyStep" />
       </template>
