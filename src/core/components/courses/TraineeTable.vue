@@ -29,7 +29,7 @@
 
     <!-- Add trainee modal -->
     <learner-creation-modal v-model="traineeCreationModal" :new-user="newTrainee" :company-options="companyOptions"
-      :first-step="firstStep" :identity-step="!addNewTraineeCompanyStep" :company-step="!isIntraCourse"
+      :first-step="firstStep" :identity-step="addNewTraineeIdentityStep" :company-step="!isIntraCourse"
       :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
@@ -115,7 +115,7 @@ export default {
       traineeCreationModal: false,
       traineeCreationModalLoading: false,
       firstStep: true,
-      addNewTraineeCompanyStep: false,
+      addNewTraineeIdentityStep: false,
       newTrainee: {
         identity: {
           firstname: '',
@@ -179,7 +179,7 @@ export default {
     },
     resetAddTraineeForm () {
       this.firstStep = true;
-      this.addNewTraineeCompanyStep = false;
+      this.addNewTraineeIdentityStep = false;
       this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
     },
@@ -205,6 +205,7 @@ export default {
         } else {
           if (this.isIntraCourse) this.newTrainee.company = this.course.company._id;
           this.firstStep = false;
+          this.addNewTraineeIdentityStep = true;
         }
         this.$v.newTrainee.$reset();
       } catch (e) {
@@ -229,8 +230,8 @@ export default {
       try {
         if (!this.firstStep) {
           this.$v.newTrainee.$touch();
-          const companyFieldError = this.addNewTraineeCompanyStep && this.$v.newTrainee.company.$error;
-          const newTraineeFormInvalid = !this.addNewTraineeCompanyStep && this.$v.newTrainee.$invalid;
+          const companyFieldError = this.addNewTraineeIdentityStep && this.$v.newTrainee.company.$error;
+          const newTraineeFormInvalid = !this.addNewTraineeIdentityStep && this.$v.newTrainee.$invalid;
           if (companyFieldError || newTraineeFormInvalid) return NotifyWarning('Champ(s) invalide(s).');
         }
 

@@ -12,10 +12,10 @@
           required-field v-model="newUser.identity.lastname" :error="validations.identity.lastname.$error" />
         <ni-input in-modal v-if="identityStep" v-model.trim="newUser.contact.phone"
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
-          :error-message="phoneNbrError(validations)" :last="companyStep" />
+          :error-message="phoneNbrError(validations)" :last="!companyStep" />
         <ni-select v-if="companyStep" in-modal v-model.trim="newUser.company" required-field caption="Structure"
           @blur="validations.company.$touch" :error="validations.company.$error" :options="companyOptions"
-          :last="!companyStep" />
+          :last="companyStep" />
       </template>
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
