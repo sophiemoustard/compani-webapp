@@ -226,7 +226,7 @@ export default {
       this.$v.newCourseSlot.$reset();
     },
     formatCreationPayload (courseSlot) {
-      const payload = { ...courseSlot.dates, courseId: this.course._id };
+      const payload = { ...courseSlot.dates, course: this.course._id };
       if (courseSlot.address && courseSlot.address.fullAddress) payload.address = { ...courseSlot.address };
       if (courseSlot.step) payload.step = courseSlot.step;
 
