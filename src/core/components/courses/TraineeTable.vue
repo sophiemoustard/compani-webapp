@@ -28,7 +28,7 @@
     </div>
 
     <!-- Add trainee modal -->
-    <trainee-creation-modal v-model="traineeCreationModal" :new-trainee="newTrainee" :company-options="companyOptions"
+    <learner-creation-modal v-model="traineeCreationModal" :new-trainee="newTrainee" :company-options="companyOptions"
       :first-step="firstStep" :add-new-trainee-company-step="addNewTraineeCompanyStep" :is-intra-course="isIntraCourse"
       :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
@@ -54,7 +54,7 @@ import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import TraineeCreationModal from '@components/courses/TraineeCreationModal';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
@@ -70,7 +70,7 @@ export default {
   components: {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
-    'trainee-creation-modal': TraineeCreationModal,
+    'learner-creation-modal': LearnerCreationModal,
     'trainee-edition-modal': TraineeEditionModal,
   },
   data () {

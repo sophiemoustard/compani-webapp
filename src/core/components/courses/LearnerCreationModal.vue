@@ -33,7 +33,7 @@ import Input from '@components/form/Input';
 import { userMixin } from '@mixins/userMixin';
 
 export default {
-  name: 'TraineeCreationModal',
+  name: 'LearnerCreationModal',
   mixins: [userMixin],
   props: {
     value: { type: Boolean, default: false },
