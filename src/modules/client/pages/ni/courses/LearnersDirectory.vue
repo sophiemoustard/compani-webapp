@@ -12,17 +12,29 @@
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
+      @click="learnerCreationModal = true" :disable="tableLoading" />
+
+      <!-- New learner modal -->
+    <learner-creation-modal v-model="learnerCreationModal" :new-user="newLearner" @hide="resetAddLearnerForm"
+      :first-step="firstStep" :identity-step="addNewLearnerIdentityStep" @next-step="nextStepLearnerCreationModal"
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="addLearner" />
   </q-page>
 </template>
 
 <script>
+import get from 'lodash/get';
 import { mapGetters } from 'vuex';
 import Users from '@api/Users';
 import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
+import { formatIdentity, removeDiacritics, sortStrings, clear } from '@helpers/utils';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 
 export default {
@@ -31,6 +43,7 @@ export default {
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
+    'learner-creation-modal': LearnerCreationModal,
   },
   mixins: [userMixin],
   data () {
@@ -60,6 +73,18 @@ export default {
           sort: (a, b) => b - a,
         },
       ],
+      learnerCreationModal: false,
+      learnerCreationModalLoading: false,
+      firstStep: true,
+      addNewLearnerIdentityStep: false,
+      newLearner: {
+        identity: {
+          firstname: '',
+          lastname: '',
+        },
+        contact: { phone: '' },
+        local: { email: '' },
+      },
     };
   },
   computed: {
@@ -71,6 +96,15 @@ export default {
   },
   async created () {
     await this.getLearnerList();
+  },
+  validations () {
+    return {
+      newLearner: {
+        identity: { lastname: { required: requiredIf(this.addNewLearnerIdentityStep) } },
+        local: { email: { required, email } },
+        contact: { phone: { frPhoneNumber } },
+      },
+    };
   },
   methods: {
     updateSearch (value) {
@@ -105,6 +139,83 @@ export default {
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
+    },
+    resetAddLearnerForm () {
+      this.firstStep = true;
+      this.addNewLearnerIdentityStep = false;
+      this.newLearner = { ...clear(this.newLearner) };
+      this.$v.newLearner.$reset();
+    },
+    async nextStepLearnerCreationModal () {
+      try {
+        this.$v.newUser.$touch();
+        if (this.$v.newUser.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        this.loading = true;
+        const userExistsInfo = await Users.exists({ email: this.newUser.local.email });
+
+        if (userExistsInfo.exists) {
+          const hasPermissionOnUserInfo = !!userExistsInfo.user._id;
+          const userHasValidCompany = !get(userExistsInfo, 'user.company') ||
+             get(userExistsInfo, 'user.company') === this.company._id;
+          const userHasClientRole = !!get(userExistsInfo, 'user.role.client');
+
+          if (hasPermissionOnUserInfo && userHasValidCompany && !userHasClientRole) {
+            this.fetchedUser = await Users.getById(userExistsInfo.user._id);
+            this.fillNewUser(this.fetchedUser);
+          } else {
+            const otherCompanyEmail = !userHasValidCompany || !hasPermissionOnUserInfo;
+            if (otherCompanyEmail) return NotifyNegative('Email relié à une autre structure.');
+            if (userHasClientRole) return NotifyNegative('Email déjà existant.');
+          }
+        }
+
+        this.firstStep = false;
+        this.$v.newUser.$reset();
+      } catch (e) {
+        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async addLearner () {
+      let editedUser = {};
+      try {
+        this.loading = true;
+        this.$v.newUser.$touch();
+        const isValid = await this.waitForFormValidation(this.$v.newUser);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+
+        const folderId = get(this.company, 'auxiliariesFolderId', null);
+        if (!folderId) return NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+
+        const payload = await this.formatUserPayload();
+
+        if (this.fetchedUser._id) {
+          await Users.updateById(this.fetchedUser._id, payload);
+          editedUser = { contact: { phone: get(payload, 'contact.phone') || '' }, ...this.fetchedUser };
+        } else {
+          editedUser = await Users.create(payload);
+        }
+        await Users.createDriveFolder(editedUser._id, { parentFolderId: folderId });
+        await this.getUserList();
+        NotifyPositive('Fiche auxiliaire créée');
+
+        this.auxiliaryCreationModal = false;
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant.');
+        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+      } finally {
+        this.loading = false;
+      }
+      try {
+        if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
+        NotifyNegative('Erreur lors de l\'envoi de SMS');
+      }
     },
   },
 };
