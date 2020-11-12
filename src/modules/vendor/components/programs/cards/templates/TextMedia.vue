@@ -2,11 +2,12 @@
   <div>
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :disable="disableEdition" />
-    <ni-option-group v-model="selectedExtension" type="radio" :options="extensionOptions" inline />
+    <ni-option-group v-model="card.media.type" type="radio" :options="extensionOptions" inline
+      @input="updateMediaType" :disable="isUploading || !!card.media.publicId" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
       :extensions="extensions" cloudinary-storage :additional-value="imageFileName" required-field
-      :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize"
+      :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" @start="start" @finish="finish"
       :disable="disableEdition || [UPLOAD_VIDEO, UPLOAD_AUDIO].includes(selectedExtension)" />
   </div>
 </template>
@@ -36,6 +37,7 @@ export default {
       extensionOptions: UPLOAD_EXTENSION_OPTIONS,
       UPLOAD_VIDEO,
       UPLOAD_AUDIO,
+      isUploading: false,
     };
   },
   computed: {
@@ -54,6 +56,18 @@ export default {
     return {
       card: { text: { required }, media: { publicId: required, link: required } },
     };
+  },
+  methods: {
+    updateMediaType () {
+      this.selectedExtension = this.card.media.type;
+      this.updateCard('media.type');
+    },
+    start () {
+      this.isUploading = true;
+    },
+    finish () {
+      this.isUploading = false;
+    },
   },
 };
 </script>
