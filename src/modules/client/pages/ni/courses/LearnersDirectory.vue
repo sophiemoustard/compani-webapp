@@ -158,9 +158,12 @@ export default {
         const userInfo = await Users.exists({ email: this.newLearner.local.email });
 
         if (userInfo.exists) {
-          if (!userInfo.user.company) await this.addTrainee();
-          else if (userInfo.user.company === this.company._id) return NotifyWarning('L\'apprenant a déjà été ajouté.');
-          else return NotifyNegative('L\'apprenant n\'est pas relié à cette structure.');
+          if (!userInfo.user.company) {
+            await Users.updateById(userInfo.user._id, { company: this.company._id });
+            await this.addLearner();
+          } else if (userInfo.user.company === this.company._id) {
+            return NotifyWarning('L\'apprenant a déjà été ajouté.');
+          } else return NotifyNegative('L\'apprenant n\'est pas relié à cette structure.');
         } else this.addNewLearnerIdentityStep = true;
         this.firstStep = false;
         this.$v.newLearner.$reset();
@@ -180,13 +183,13 @@ export default {
     },
     async addLearner () {
       try {
-        this.learnerCreationModalLoading = false;
+        this.learnerCreationModalLoading = true;
         if (!this.firstStep) {
           this.$v.newLearner.$touch();
           if (!this.addnewLearnerIdentityStep && this.$v.newLearner.$invalid) return NotifyWarning('Champs invalides.');
+          const payload = await this.formatUserPayload();
+          await Users.create(payload);
         }
-        const payload = await this.formatUserPayload();
-        await Users.create(payload);
         NotifyPositive('Apprenant ajouté avec succès.');
 
         this.learnerCreationModal = false;
