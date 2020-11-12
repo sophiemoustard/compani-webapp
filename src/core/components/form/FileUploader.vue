@@ -17,7 +17,7 @@
       <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
         text-color="black" @failed="failMsg" :form-fields="additionalFields" :max-file-size="maxFileSize"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"
-        @rejected="rejected" :disable="disable" />
+        @rejected="rejected" :disable="disable" @start="uploadStarted" @finish="uploadFinished" />
     </q-field>
   </div>
 </template>
@@ -72,6 +72,12 @@ export default {
     },
   },
   methods: {
+    uploadStarted () {
+      this.$emit('start');
+    },
+    uploadFinished () {
+      this.$emit('finish');
+    },
     deleteDocument () {
       this.$emit('delete');
     },

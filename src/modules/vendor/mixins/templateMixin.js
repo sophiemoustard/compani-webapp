@@ -10,7 +10,9 @@ export const templateMixin = {
   data () {
     return {
       tmpInput: '',
-      extensions: 'image/jpg, image/jpeg, image/png',
+      imageExtensions: 'image/jpg, image/jpeg, image/png',
+      videoExtensions: 'video/mp4, video/m4v, video/avi',
+      audioExtensions: 'audio/mp3',
       maxFileSize: 2000000,
     };
   },
@@ -20,7 +22,7 @@ export const templateMixin = {
       return this.card.title ? this.card.title.replace(/ /g, '_') : this.activity.name.replace(/ /g, '_');
     },
     mediaUploadUrl () {
-      return `${process.env.API_HOSTNAME}/cards/${this.card._id}/cloudinary/upload`;
+      return `${process.env.API_HOSTNAME}/cards/${this.card._id}/upload`;
     },
     questionErrorMsg () {
       if (!this.$v.card.question.required) return REQUIRED_LABEL;

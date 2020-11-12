@@ -395,3 +395,13 @@ export const SLOT_DELETION = 'slot_deletion';
 export const SLOT_EDITION = 'slot_edition';
 export const TRAINEE_ADDITION = 'trainee_addition';
 export const TRAINEE_DELETION = 'trainee_deletion';
+
+// MEDIA UPLOAD
+export const UPLOAD_IMAGE = 'image';
+export const UPLOAD_VIDEO = 'video';
+export const UPLOAD_AUDIO = 'audio';
+export const UPLOAD_EXTENSION_OPTIONS = [
+  { label: 'Image', value: UPLOAD_IMAGE },
+  { label: 'Video', value: UPLOAD_VIDEO },
+  { label: 'Audio', value: UPLOAD_AUDIO },
+];
