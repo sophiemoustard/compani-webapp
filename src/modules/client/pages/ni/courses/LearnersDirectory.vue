@@ -18,7 +18,7 @@
       <!-- New learner modal -->
     <learner-creation-modal v-model="learnerCreationModal" :new-user="newLearner" @hide="resetAddLearnerForm"
       :first-step="firstStep" :identity-step="addNewLearnerIdentityStep" @next-step="nextStepLearnerCreationModal"
-      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="addLearner" />
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" />
   </q-page>
 </template>
 
@@ -154,36 +154,51 @@ export default {
         this.learnerCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newLearner.local.email });
 
-        if (userInfo.exists) {
-          if (!userInfo.user.company) {
-            await Users.updateById(userInfo.user._id, { company: this.company._id });
-            await this.addLearner();
-          } else if (userInfo.user.company === this.company._id) {
-            return NotifyWarning('L\'apprenant a déjà été ajouté.');
-          } else return NotifyNegative('L\'apprenant n\'est pas relié à cette structure.');
-        } else this.addNewLearnerIdentityStep = true;
-        this.firstStep = false;
-        this.$v.newLearner.$reset();
+        if (!userInfo.exists) return this.goToCreationStep();
+        if (!userInfo.user.company) return this.updateLearner(userInfo.user._id);
+
+        return userInfo.user.company === this.company._id
+          ? NotifyWarning('L\'apprenant est déjà ajouté.')
+          : NotifyNegative('L\'apprenant n\'est pas relié à cette structure.');
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de l\'ajout de l\'apprenant.');
       } finally {
         this.learnerCreationModalLoading = false;
       }
     },
+    goToCreationStep () {
+      this.addNewLearnerIdentityStep = true;
+      this.firstStep = false;
+      this.$v.newLearner.$reset();
+    },
+    async updateLearner (userId) {
+      try {
+        await Users.updateById(userId, { company: this.company._id });
+        NotifyPositive('Apprenant ajouté avec succès.');
+
+        this.learnerCreationModal = false;
+        await this.getLearnerList();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant.');
+      }
+    },
     formatUserPayload () {
       const payload = removeEmptyProps(this.newLearner);
       if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
+
       return ({ ...payload, company: this.company._id });
     },
-    async addLearner () {
+    async createLearner () {
       try {
         this.learnerCreationModalLoading = true;
-        if (!this.firstStep) {
-          this.$v.newLearner.$touch();
-          if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
-          const payload = await this.formatUserPayload();
-          await Users.create(payload);
-        }
+        this.$v.newLearner.$touch();
+        if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        const payload = await this.formatUserPayload();
+        await Users.create(payload);
         NotifyPositive('Apprenant ajouté avec succès.');
 
         this.learnerCreationModal = false;
