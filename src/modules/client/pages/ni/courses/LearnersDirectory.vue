@@ -12,7 +12,7 @@
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un apprenant"
       @click="learnerCreationModal = true" :disable="tableLoading" />
 
       <!-- New learner modal -->
@@ -33,8 +33,14 @@ import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload, removeDiacritics, removeEmptyProps, sortStrings, clear }
-  from '@helpers/utils';
+import {
+  formatIdentity,
+  formatPhoneForPayload,
+  removeDiacritics,
+  removeEmptyProps,
+  sortStrings,
+  clear,
+} from '@helpers/utils';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 
@@ -78,14 +84,7 @@ export default {
       learnerCreationModalLoading: false,
       firstStep: true,
       addNewLearnerIdentityStep: false,
-      newLearner: {
-        identity: {
-          firstname: '',
-          lastname: '',
-        },
-        contact: { phone: '' },
-        local: { email: '' },
-      },
+      newLearner: { identity: { firstname: '', lastname: '' }, contact: { phone: '' }, local: { email: '' } },
     };
   },
   computed: {
@@ -150,9 +149,7 @@ export default {
     async nextStepLearnerCreationModal () {
       try {
         this.$v.newLearner.$touch();
-        if (!this.newLearner.local.email || this.$v.newLearner.local.email.$error) {
-          return NotifyWarning('Champ(s) invalide(s).');
-        }
+        if (this.$v.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
 
         this.learnerCreationModalLoading = true;
         const userInfo = await Users.exists({ email: this.newLearner.local.email });
@@ -176,17 +173,14 @@ export default {
     formatUserPayload () {
       const payload = removeEmptyProps(this.newLearner);
       if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
-      return ({
-        ...payload,
-        company: this.company._id,
-      });
+      return ({ ...payload, company: this.company._id });
     },
     async addLearner () {
       try {
         this.learnerCreationModalLoading = true;
         if (!this.firstStep) {
           this.$v.newLearner.$touch();
-          if (!this.addnewLearnerIdentityStep && this.$v.newLearner.$invalid) return NotifyWarning('Champs invalides.');
+          if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
           const payload = await this.formatUserPayload();
           await Users.create(payload);
         }
