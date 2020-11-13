@@ -12,13 +12,13 @@ export const templateMixin = {
       tmpInput: '',
       imageExtensions: 'image/jpg, image/jpeg, image/png',
       videoExtensions: 'video/mp4, video/m4v, video/avi',
-      audioExtensions: 'audio/mp3',
+      audioExtensions: '.mp3',
       maxFileSize: 2000000,
     };
   },
   computed: {
     ...mapState('program', ['card', 'activity']),
-    imageFileName () {
+    mediaFileName () {
       return this.card.title ? this.card.title.replace(/ /g, '_') : this.activity.name.replace(/ /g, '_');
     },
     mediaUploadUrl () {

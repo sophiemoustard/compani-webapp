@@ -3,12 +3,12 @@
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :disable="disableEdition" />
     <ni-option-group v-model="card.media.type" type="radio" :options="extensionOptions" inline
-      @input="updateMediaType" :disable="isUploading || !!card.media.publicId" />
+      @input="updateCard('media.type')" :disable="isUploading || !!card.media.publicId" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
-      :extensions="extensions" cloudinary-storage :additional-value="imageFileName" required-field
+      :extensions="extensions" cloudinary-storage :additional-value="mediaFileName" required-field
       :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" @start="start" @finish="finish"
-      :disable="disableEdition || [UPLOAD_VIDEO, UPLOAD_AUDIO].includes(selectedExtension)" />
+      :disable="disableEdition" />
   </div>
 </template>
 
@@ -33,22 +33,21 @@ export default {
   mixins: [templateMixin],
   data () {
     return {
-      selectedExtension: UPLOAD_IMAGE,
       extensionOptions: UPLOAD_EXTENSION_OPTIONS,
-      UPLOAD_VIDEO,
-      UPLOAD_AUDIO,
       isUploading: false,
     };
   },
   computed: {
     extensions () {
-      switch (this.selectedExtension) {
+      switch (this.card.media.type) {
         case UPLOAD_VIDEO:
           return this.videoExtensions;
         case UPLOAD_AUDIO:
           return this.audioExtensions;
-        default:
+        case UPLOAD_IMAGE:
           return this.imageExtensions;
+        default:
+          return '';
       }
     },
   },
@@ -58,10 +57,6 @@ export default {
     };
   },
   methods: {
-    updateMediaType () {
-      this.selectedExtension = this.card.media.type;
-      this.updateCard('media.type');
-    },
     start () {
       this.isUploading = true;
     },
