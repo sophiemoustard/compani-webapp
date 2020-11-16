@@ -5,7 +5,7 @@ export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v154686
   + 'compani_texte_rose_1000.png';
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
-export const VIDEO_EXTENSIONS = 'video/mp4, video/m4v, video/avi';
+export const VIDEO_EXTENSIONS = 'video/*';
 export const AUDIO_EXTENSIONS = '.mp3';
 
 // CUSTOMER

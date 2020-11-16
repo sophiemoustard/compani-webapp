@@ -18,8 +18,6 @@ export const templateMixin = {
     return {
       tmpInput: '',
       imageExtensions: IMAGE_EXTENSIONS,
-      videoExtensions: VIDEO_EXTENSIONS,
-      audioExtensions: AUDIO_EXTENSIONS,
     };
   },
   computed: {
@@ -38,23 +36,23 @@ export const templateMixin = {
     extensions () {
       switch (this.card.media.type) {
         case UPLOAD_VIDEO:
-          return this.videoExtensions;
+          return VIDEO_EXTENSIONS;
         case UPLOAD_AUDIO:
-          return this.audioExtensions;
+          return AUDIO_EXTENSIONS;
         case UPLOAD_IMAGE:
-          return this.imageExtensions;
+          return IMAGE_EXTENSIONS;
         default:
           return '';
       }
     },
     maxFileSize () {
       switch (this.card.media.type) {
-        case UPLOAD_VIDEO:
+        case UPLOAD_IMAGE:
           return 300 * 1000;
         case UPLOAD_AUDIO:
-          return 20 * 1000 * 1000;
-        case UPLOAD_IMAGE:
-          return 2 * 1000 * 1000;
+          return 5 * 1000 * 1000;
+        case UPLOAD_VIDEO:
+          return 25 * 1000 * 1000;
         default:
       }
     },

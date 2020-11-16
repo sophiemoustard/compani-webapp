@@ -18,4 +18,7 @@ export default {
   async addSubProgram (programId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/subprograms`, payload);
   },
+  async deleteImage (programId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/programs/${programId}/upload`);
+  },
 };

@@ -24,7 +24,6 @@ import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Programs from '@api/Programs';
-import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -54,10 +53,10 @@ export default {
   computed: {
     ...mapState('program', ['program']),
     programsUploadUrl () {
-      return `${process.env.API_HOSTNAME}/programs/${this.program._id}/cloudinary/upload`;
+      return `${process.env.API_HOSTNAME}/programs/${this.program._id}/upload`;
     },
     imageFileName () {
-      return `Image-${this.program.name.replace(/ /g, '_')}`;
+      return this.program.name.replace(/ /g, '');
     },
   },
   async mounted () {
@@ -111,12 +110,11 @@ export default {
     async deleteProgramImage () {
       try {
         if (get(this.program, 'image')) {
-          await Cloudinary.deleteImageById({ id: this.program.image.publicId });
-          await Programs.update(this.program._id, { image: { link: null, publicId: null } });
+          await Programs.deleteImage(this.program._id);
 
           this.refreshProgram();
           NotifyPositive('Image supprimée');
-        } else NotifyNegative('Erreur lors de la suppression de l\'image.');
+        } else NotifyWarning('Il n\'y a pas d\'image a supprimer.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'image.');
