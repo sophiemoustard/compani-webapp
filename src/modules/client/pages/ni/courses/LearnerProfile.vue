@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="vendor-background">
+  <q-page padding class="client-background">
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity">
         <template v-slot:body>
