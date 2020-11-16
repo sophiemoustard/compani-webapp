@@ -4,7 +4,14 @@ import set from 'lodash/set';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { QUESTION_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
-import { AUDIO_EXTENSIONS, IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from '../../../core/data/constants';
+import {
+  AUDIO_EXTENSIONS,
+  IMAGE_EXTENSIONS,
+  VIDEO_EXTENSIONS,
+  UPLOAD_IMAGE,
+  UPLOAD_VIDEO,
+  UPLOAD_AUDIO,
+} from '../../../core/data/constants';
 
 export const templateMixin = {
   data () {
@@ -13,7 +20,6 @@ export const templateMixin = {
       imageExtensions: IMAGE_EXTENSIONS,
       videoExtensions: VIDEO_EXTENSIONS,
       audioExtensions: AUDIO_EXTENSIONS,
-      maxFileSize: 2000000,
     };
   },
   computed: {
@@ -28,6 +34,29 @@ export const templateMixin = {
       if (!this.$v.card.question.required) return REQUIRED_LABEL;
       if (!this.$v.card.question.maxLength) return `${QUESTION_MAX_LENGTH} caractères maximum.`;
       return '';
+    },
+    extensions () {
+      switch (this.card.media.type) {
+        case UPLOAD_VIDEO:
+          return this.videoExtensions;
+        case UPLOAD_AUDIO:
+          return this.audioExtensions;
+        case UPLOAD_IMAGE:
+          return this.imageExtensions;
+        default:
+          return '';
+      }
+    },
+    maxFileSize () {
+      switch (this.card.media.type) {
+        case UPLOAD_VIDEO:
+          return 300 * 1000;
+        case UPLOAD_AUDIO:
+          return 20 * 1000 * 1000;
+        case UPLOAD_IMAGE:
+          return 2 * 1000 * 1000;
+        default:
+      }
     },
   },
   methods: {

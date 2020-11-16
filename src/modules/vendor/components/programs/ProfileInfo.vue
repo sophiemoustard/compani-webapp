@@ -12,7 +12,7 @@
           :error="$v.program.description.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinary-storage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
-          :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :max-file-size="500000" />
+          :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :max-file-size="maxFileSize" />
       </div>
     </div>
   </div>
@@ -43,6 +43,7 @@ export default {
     return {
       tmpInput: '',
       extensions: IMAGE_EXTENSIONS,
+      maxFileSize: 500 * 1000,
     };
   },
   validations () {

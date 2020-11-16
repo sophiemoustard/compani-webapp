@@ -18,7 +18,7 @@ import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import OptionGroup from '@components/form/OptionGroup';
-import { UPLOAD_IMAGE, UPLOAD_VIDEO, UPLOAD_AUDIO, UPLOAD_EXTENSION_OPTIONS } from '@data/constants';
+import { UPLOAD_EXTENSION_OPTIONS } from '@data/constants';
 
 export default {
   name: 'TextMedia',
@@ -36,20 +36,6 @@ export default {
       extensionOptions: UPLOAD_EXTENSION_OPTIONS,
       isUploading: false,
     };
-  },
-  computed: {
-    extensions () {
-      switch (this.card.media.type) {
-        case UPLOAD_VIDEO:
-          return this.videoExtensions;
-        case UPLOAD_AUDIO:
-          return this.audioExtensions;
-        case UPLOAD_IMAGE:
-          return this.imageExtensions;
-        default:
-          return '';
-      }
-    },
   },
   validations () {
     return {
