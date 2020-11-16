@@ -200,6 +200,16 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
         },
       },
+      {
+        path: 'ni/management/elearning-courses/:courseId',
+        name: 'ni management elearning courses info',
+        component: () => import('src/modules/vendor/pages/ni/management/ELearningCourseProfile.vue'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          // parent: 'management' à ajouter ?
+        },
+      },
     ],
   },
 ];
