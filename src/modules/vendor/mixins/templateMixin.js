@@ -2,7 +2,6 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
-import Cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { QUESTION_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
 
@@ -74,8 +73,7 @@ export const templateMixin = {
     async deleteMedia () {
       try {
         if (get(this.card, 'media')) {
-          await Cloudinary.deleteImageById({ id: this.card.media.publicId });
-          await Cards.updateById(this.card._id, { media: { link: null, publicId: null } });
+          await Cards.deleteMedia(this.card._id);
 
           await this.refreshCard();
           NotifyPositive('Média supprimé');
