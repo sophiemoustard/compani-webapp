@@ -73,7 +73,7 @@ export const templateMixin = {
     async deleteMedia () {
       try {
         if (get(this.card, 'media')) {
-          await Cards.deleteMedia({ cardId: this.card._id, publicId: this.card.media.publicId });
+          await Cards.deleteMedia(this.card._id);
 
           await this.refreshCard();
           NotifyPositive('Média supprimé');

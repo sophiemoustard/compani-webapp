@@ -16,7 +16,7 @@ export default {
   async deleteById (cardId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${cardId}`);
   },
-  async deleteMedia (params) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${params.cardId}/upload/${params.publicId}`);
+  async deleteMedia (cardId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${cardId}/upload`);
   },
 };
