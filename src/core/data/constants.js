@@ -1,8 +1,12 @@
 export const TOKEN_EXPIRE_TIME = 1; // in days
 
-// IMAGES
+// MEDIA
 export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
   + 'compani_texte_rose_1000.png';
+export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
+export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
+export const VIDEO_EXTENSIONS = 'video/*';
+export const AUDIO_EXTENSIONS = '.mp3';
 
 // CUSTOMER
 export const CIVILITY_OPTIONS = [

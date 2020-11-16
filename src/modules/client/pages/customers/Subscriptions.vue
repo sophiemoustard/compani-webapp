@@ -145,7 +145,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { bic, iban } from '@helpers/vuelidateCustomVal';
 import { getLastVersion } from '@helpers/utils';
-import { REQUIRED_LABEL } from '@data/constants';
+import { REQUIRED_LABEL, DOC_EXTENSIONS } from '@data/constants';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
@@ -197,7 +197,7 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
-      extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
+      extensions: DOC_EXTENSIONS,
     };
   },
   validations () {

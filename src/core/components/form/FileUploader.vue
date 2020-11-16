@@ -51,7 +51,7 @@ export default {
     multiple: { type: Boolean, default: false },
     label: { type: String, default: 'Pas de document' },
     cloudinaryStorage: { type: Boolean, default: false },
-    maxFileSize: { type: Number, default: 1000000 },
+    maxFileSize: { type: Number, default: 1000 * 1000 },
   },
   data () {
     return {
