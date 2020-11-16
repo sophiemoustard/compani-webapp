@@ -4,14 +4,15 @@ import set from 'lodash/set';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { QUESTION_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
+import { AUDIO_EXTENSIONS, IMAGE_EXTENSIONS, VIDEO_EXTENSIONS } from '../../../core/data/constants';
 
 export const templateMixin = {
   data () {
     return {
       tmpInput: '',
-      imageExtensions: 'image/jpg, image/jpeg, image/png',
-      videoExtensions: 'video/mp4, video/m4v, video/avi',
-      audioExtensions: '.mp3',
+      imageExtensions: IMAGE_EXTENSIONS,
+      videoExtensions: VIDEO_EXTENSIONS,
+      audioExtensions: AUDIO_EXTENSIONS,
       maxFileSize: 2000000,
     };
   },

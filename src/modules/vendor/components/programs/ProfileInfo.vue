@@ -28,6 +28,7 @@ import Cloudinary from '@api/Cloudinary';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { IMAGE_EXTENSIONS } from '@data/constants';
 
 export default {
   name: 'ProfileInfo',
@@ -41,7 +42,7 @@ export default {
   data () {
     return {
       tmpInput: '',
-      extensions: 'image/jpg, image/jpeg',
+      extensions: IMAGE_EXTENSIONS,
     };
   },
   validations () {
