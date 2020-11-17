@@ -1,7 +1,8 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      @go-to="goToLearnerProfile">
       <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
@@ -72,8 +73,17 @@ export default {
         },
         {
           name: 'blendedCoursesCount',
-          label: 'Formations suivies',
+          label: 'Formations mixtes',
           field: 'blendedCoursesCount',
+          align: 'center',
+          sortable: true,
+          style: 'min-width: 110px; width: 15%',
+          sort: (a, b) => b - a,
+        },
+        {
+          name: 'eLearningCoursesCount',
+          label: 'Formations eLearning',
+          field: 'eLearningCoursesCount',
           align: 'center',
           sortable: true,
           style: 'min-width: 110px; width: 15%',
@@ -106,6 +116,9 @@ export default {
     };
   },
   methods: {
+    goToLearnerProfile (row) {
+      this.$router.push({ name: 'ni courses learners info', params: { learnerId: row.learner._id } });
+    },
     updateSearch (value) {
       this.searchStr = value;
     },
@@ -122,6 +135,7 @@ export default {
         },
         company: user.company ? user.company.name : 'N/A',
         blendedCoursesCount: user.blendedCoursesCount,
+        eLearningCoursesCount: user.eLearningCoursesCount,
       };
     },
     async getLearnerList () {

@@ -8,7 +8,7 @@
 <script>
 import get from 'lodash/get';
 import { mapState } from 'vuex';
-import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
+import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/programs/ProfileInfo';
 import ProfileContent from 'src/modules/vendor/components/programs/ProfileContent';

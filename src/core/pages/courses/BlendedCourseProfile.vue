@@ -35,7 +35,7 @@ import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
-import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
+import ProfileHeader from '@components/ProfileHeader';
 
 export default {
   name: 'BlendedCourseProfile',

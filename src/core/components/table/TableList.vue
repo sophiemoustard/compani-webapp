@@ -5,7 +5,7 @@
       :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
       :visible-columns="formattedVisibleColumns">
       <template v-slot:body="props">
-        <q-tr :props="props" @click="$emit('go-to', props.row)">
+        <q-tr :no-hover="disabled" :props="props" @click="click(props.row)">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
             :class="col.name">
             <slot name="body" :props="props" :col="col">
@@ -37,10 +37,17 @@ export default {
     pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
     loading: { type: Boolean, default: false },
     rowKey: { type: String, default: 'name' },
+    disabled: { type: Boolean, default: false },
   },
   computed: {
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
+    },
+  },
+  methods: {
+    click (row) {
+      if (this.disabled) return;
+      this.$emit('go-to', row);
     },
   },
 };
