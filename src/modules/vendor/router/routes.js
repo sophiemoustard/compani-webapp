@@ -158,6 +158,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/management/elearning-courses/:courseId',
+        name: 'ni management elearning courses info',
+        component: () => import('src/modules/vendor/pages/ni/management/ELearningCourseProfile.vue'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'management',
+        },
+      },
+      {
         path: 'trainers/management/courses',
         name: 'trainers courses',
         component: () => import('src/modules/vendor/pages/trainers/management/BlendedCoursesDirectory'),
@@ -198,16 +208,6 @@ const routes = [
         component: () => import('src/core/pages/AccountInfo'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
-      {
-        path: 'ni/management/elearning-courses/:courseId',
-        name: 'ni management elearning courses info',
-        component: () => import('src/modules/vendor/pages/ni/management/ELearningCourseProfile.vue'),
-        props: true,
-        meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-          // parent: 'management' à ajouter ?
         },
       },
     ],
