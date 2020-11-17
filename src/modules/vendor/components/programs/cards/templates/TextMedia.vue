@@ -45,14 +45,6 @@ export default {
       },
     };
   },
-  methods: {
-    start () {
-      this.isUploading = true;
-    },
-    finish () {
-      this.isUploading = false;
-    },
-  },
 };
 </script>
 

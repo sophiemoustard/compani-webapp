@@ -58,6 +58,12 @@ export const templateMixin = {
     },
   },
   methods: {
+    start () {
+      this.isUploading = true;
+    },
+    finish () {
+      this.isUploading = false;
+    },
     saveTmp (path) {
       this.tmpInput = get(this.card, path);
     },
