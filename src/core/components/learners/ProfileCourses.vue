@@ -2,7 +2,13 @@
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
     <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin"
-      :pagination.sync="pagination" :disabled="!isVendorInterface" />
+      :pagination.sync="pagination" :disabled="!isVendorInterface">
+      <template v-slot:body="{ col }">
+        <q-item v-if="col.name === 'status'">
+          <course-progress :value="col.value" />
+        </q-item>
+      </template>
+    </ni-table-list>
   </div>
 </template>
 
@@ -16,11 +22,13 @@ import { userMixin } from '@mixins/userMixin';
 import { sortStrings } from '@helpers/utils';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { courseTimelineMixin } from '@mixins/courseTimeline';
+import CourseProgress from '@components/CourseProgress';
 
 export default {
   name: 'ProfileCourses',
   components: {
     'ni-table-list': TableList,
+    'course-progress': CourseProgress,
   },
   mixins: [userMixin, courseTimelineMixin, courseFiltersMixin],
   data () {
@@ -28,9 +36,9 @@ export default {
       isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
       courses: [],
       statusTranslation: {
-        [FORTHCOMING]: 'À venir',
-        [IN_PROGRESS]: 'En cours',
-        [COMPLETED]: 'Terminée',
+        [FORTHCOMING]: 0,
+        [IN_PROGRESS]: 0.5,
+        [COMPLETED]: 1,
       },
       pagination: {
         sortBy: 'name',
@@ -63,8 +71,8 @@ export default {
           name: 'status',
           label: 'Progression',
           field: 'status',
-          align: 'left',
-          sortable: false,
+          align: 'center',
+          sortable: true,
           format: value => this.statusTranslation[value],
           style: 'min-width: 110px; width: 35%',
         },
