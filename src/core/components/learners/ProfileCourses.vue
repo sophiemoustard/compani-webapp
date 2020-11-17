@@ -2,7 +2,7 @@
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
     <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin"
-      :pagination.sync="pagination" />
+      :pagination.sync="pagination" :disabled="!isVendorInterface" />
   </div>
 </template>
 
@@ -45,8 +45,8 @@ export default {
           field: row => row,
           align: 'left',
           sortable: true,
-          format: value => get(value, 'subProgram.program.name') + (value.misc ? ` - ${value.misc}` : ''),
-          sort: (a, b) => sortStrings(get(a, 'subProgram.program.name'), get(b, 'subProgram.program.name')),
+          format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
+          sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
           style: 'min-width: 200px; width: 65%',
         },
         {
@@ -83,12 +83,11 @@ export default {
   },
   methods: {
     goToBlendedCourseProfileAdmin (row) {
-      if (this.isVendorInterface) {
-        this.$router.push({
-          name: 'ni management blended courses info',
-          params: { courseId: row._id, defaultTab: 'admin' },
-        });
-      }
+      if (!this.isVendorInterface) return;
+      this.$router.push({
+        name: 'ni management blended courses info',
+        params: { courseId: row._id, defaultTab: 'admin' },
+      });
     },
   },
 };
