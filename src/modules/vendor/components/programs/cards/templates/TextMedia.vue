@@ -39,7 +39,10 @@ export default {
   },
   validations () {
     return {
-      card: { text: { required }, media: { publicId: required, link: required } },
+      card: {
+        text: { required },
+        media: { publicId: required, link: required, type: required },
+      },
     };
   },
   methods: {
