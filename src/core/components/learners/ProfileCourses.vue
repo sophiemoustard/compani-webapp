@@ -25,6 +25,7 @@ export default {
   mixins: [userMixin, courseTimelineMixin, courseFiltersMixin],
   data () {
     return {
+      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
       courses: [],
       statusTranslation: {
         [FORTHCOMING]: 'À venir',
@@ -82,10 +83,12 @@ export default {
   },
   methods: {
     goToBlendedCourseProfileAdmin (row) {
-      this.$router.push({
-        name: 'ni management blended courses info',
-        params: { courseId: row._id, defaultTab: 'admin' },
-      });
+      if (this.isVendorInterface) {
+        this.$router.push({
+          name: 'ni management blended courses info',
+          params: { courseId: row._id, defaultTab: 'admin' },
+        });
+      }
     },
   },
 };
