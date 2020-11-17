@@ -33,7 +33,7 @@ import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
-import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
+import ProfileHeader from '@components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';

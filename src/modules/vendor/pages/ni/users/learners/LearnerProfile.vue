@@ -19,7 +19,7 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
-import ProfileHeader from '@components/learners/ProfileHeader';
+import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';

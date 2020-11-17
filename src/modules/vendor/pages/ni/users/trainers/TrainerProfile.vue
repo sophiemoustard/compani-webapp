@@ -10,7 +10,7 @@
 <script>
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
-import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
+import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from 'src/modules/vendor/components/trainers/ProfileInfo';
 import { formatIdentity } from '@helpers/utils';
