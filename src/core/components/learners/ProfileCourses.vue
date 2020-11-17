@@ -8,6 +8,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import get from 'lodash/get';
 import Courses from '@api/Courses';
 import TableList from '@components/table/TableList';
 import { FORTHCOMING, IN_PROGRESS, COMPLETED, BLENDED } from '@data/constants';
@@ -43,8 +44,8 @@ export default {
           field: row => row,
           align: 'left',
           sortable: true,
-          format: value => value.subProgram.program.name + (value.misc ? ` - ${value.misc}` : ''),
-          sort: (a, b) => sortStrings(a.subProgram.program.name, b.subProgram.program.name),
+          format: value => get(value, 'subProgram.program.name') + (value.misc ? ` - ${value.misc}` : ''),
+          sort: (a, b) => sortStrings(get(a, 'subProgram.program.name'), get(b, 'subProgram.program.name')),
           style: 'min-width: 200px; width: 65%',
         },
         {

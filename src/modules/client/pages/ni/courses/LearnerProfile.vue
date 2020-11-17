@@ -24,17 +24,7 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileInfo from '@components/learners/ProfileInfo';
 import ProfileCourses from '@components/learners/ProfileCourses';
 import { formatIdentity } from '@helpers/utils';
-import {
-  AUXILIARY,
-  HELPER,
-  COACH,
-  PLANNING_REFERENT,
-  AUXILIARY_WITHOUT_COMPANY,
-  CLIENT_ADMIN,
-  VENDOR_ADMIN,
-  TRAINING_ORGANISATION_MANAGER,
-  TRAINER,
-} from '@data/constants';
+import { learnerMixin } from '@mixins/learnerMixin';
 
 export default {
   name: 'LearnerProfile',
@@ -43,6 +33,7 @@ export default {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },
   },
+  mixins: [learnerMixin],
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
@@ -63,10 +54,10 @@ export default {
   computed: {
     ...mapState('userProfile', ['userProfile']),
     userProfileRole () {
-      return get(this.userProfile, 'role.client.name') || get(this.userProfile, 'role.vendor.name') || '';
+      return get(this.userProfile, 'role.client.name') || '';
     },
     headerInfo () {
-      const infos = [{ icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' }];
+      const infos = [{ icon: 'apartment', label: this.userProfile.company.name }];
       if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
 
       return infos;
@@ -75,30 +66,6 @@ export default {
   watch: {
     async userProfile () {
       this.userIdentity = formatIdentity(get(this, 'userProfile.identity'), 'FL');
-    },
-  },
-  methods: {
-    getRoleLabel (role) {
-      switch (role) {
-        case HELPER:
-          return 'Aidant';
-        case AUXILIARY:
-        case PLANNING_REFERENT:
-        case AUXILIARY_WITHOUT_COMPANY:
-          return 'Auxiliaire';
-        case CLIENT_ADMIN:
-          return 'Administateur';
-        case VENDOR_ADMIN:
-          return 'Administateur Vendeur';
-        case COACH:
-          return 'Coach';
-        case TRAINING_ORGANISATION_MANAGER:
-          return 'Responsable Formation';
-        case TRAINER:
-          return 'Formateur';
-        default:
-          return '';
-      }
     },
   },
   beforeDestroy () {
