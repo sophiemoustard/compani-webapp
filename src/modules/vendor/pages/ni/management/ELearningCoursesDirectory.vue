@@ -2,8 +2,7 @@
   <q-page class="vendor-background" padding>
     <ni-directory-header title="Formations eLearning" search-placeholder="Rechercher une formation"
       @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @go-to="goToCourseProfile" />
+    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination" />
   </q-page>
 </template>
 
@@ -73,7 +72,6 @@ export default {
           name: c.subProgram.program.name,
           noDiacriticsName: removeDiacritics(c.subProgram.program.name),
           createdAt: c.createdAt,
-          _id: c._id,
         }));
       } catch (e) {
         console.error(e);
@@ -81,9 +79,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    goToCourseProfile (row) {
-      this.$router.push({ name: 'ni management elearning courses info', params: { courseId: row._id } });
     },
   },
 };
