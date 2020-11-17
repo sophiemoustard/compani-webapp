@@ -11,10 +11,6 @@ import {
 } from '@data/constants';
 
 export const learnerMixin = {
-  data () {
-    return {
-    };
-  },
   methods: {
     getRoleLabel (role) {
       switch (role) {
