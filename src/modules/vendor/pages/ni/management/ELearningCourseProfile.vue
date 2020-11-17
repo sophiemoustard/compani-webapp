@@ -13,7 +13,7 @@
 <script>
 import Courses from '@api/Courses';
 import get from 'lodash/get';
-import ProfileHeader from 'src/modules/vendor/components/ProfileHeader';
+import ProfileHeader from '@components/ProfileHeader';
 import TableList from '@components/table/TableList';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 
