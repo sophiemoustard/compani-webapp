@@ -74,7 +74,7 @@ const helperRoutes = [
   { name: 'customers subscription', subscription: ERP },
   { name: 'account client' },
 ];
-const trainingOrganisationManagerRoutes = [
+const vendorAdminRoutes = [
   { name: 'ni users companies' },
   { name: 'ni users companies info' },
   { name: 'ni users trainers' },
@@ -87,10 +87,23 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni management blended courses' },
   { name: 'ni management blended courses info' },
   { name: 'ni management elearning courses' },
-  { name: 'ni management elearning courses info' },
   { name: 'account vendor' },
 ];
-const vendorAdminRoutes = [...trainingOrganisationManagerRoutes];
+const trainingOrgnaisationManagerRoutes = [
+  { name: 'ni users companies' },
+  { name: 'ni users companies info' },
+  { name: 'ni users trainers' },
+  { name: 'ni users trainers info' },
+  { name: 'ni users learners' },
+  { name: 'ni users learners info' },
+  { name: 'ni config programs' },
+  { name: 'ni config programs info' },
+  { name: 'ni config activity info' },
+  { name: 'ni management blended courses' },
+  { name: 'ni management blended courses info' },
+  { name: 'ni management elearning courses' },
+  { name: 'account vendor' },
+];
 const trainerRoutes = [
   { name: 'trainers courses' },
   { name: 'trainers courses info' },
@@ -106,6 +119,6 @@ export const roleBasedAccessControl = {
   [PLANNING_REFERENT]: planningReferentRoutes,
   [HELPER]: helperRoutes,
   [VENDOR_ADMIN]: vendorAdminRoutes,
-  [TRAINING_ORGANISATION_MANAGER]: trainingOrganisationManagerRoutes,
+  [TRAINING_ORGANISATION_MANAGER]: trainingOrgnaisationManagerRoutes,
   [TRAINER]: trainerRoutes,
 };
