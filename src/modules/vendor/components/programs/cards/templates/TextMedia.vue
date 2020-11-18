@@ -2,8 +2,8 @@
   <div>
     <ni-input caption="Texte" v-model="card.text" required-field @focus="saveTmp('text')"
       @blur="updateCard('text')" :error="$v.card.text.$error" type="textarea" :disable="disableEdition" />
-    <ni-option-group v-model="card.media.type" type="radio" :options="extensionOptions" inline
-      @input="updateCard('media.type')" :disable="isUploading || !!card.media.publicId" />
+    <ni-option-group v-model="card.media.type" :options="extensionOptions" inline @input="updateCard('media.type')"
+       type="radio" :disable="isUploading || !!card.media.publicId" :error="$v.card.media.type.$error" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
       :extensions="extensions" cloudinary-storage :additional-value="mediaFileName" required-field
@@ -18,7 +18,6 @@ import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 import OptionGroup from '@components/form/OptionGroup';
-import { UPLOAD_EXTENSION_OPTIONS } from '@data/constants';
 
 export default {
   name: 'TextMedia',
@@ -31,27 +30,13 @@ export default {
     'ni-option-group': OptionGroup,
   },
   mixins: [templateMixin],
-  data () {
-    return {
-      extensionOptions: UPLOAD_EXTENSION_OPTIONS,
-      isUploading: false,
-    };
-  },
   validations () {
     return {
       card: {
         text: { required },
-        media: { publicId: required, link: required, type: required },
+        media: { publicId: { required }, link: { required }, type: { required } },
       },
     };
-  },
-  methods: {
-    start () {
-      this.isUploading = true;
-    },
-    finish () {
-      this.isUploading = false;
-    },
   },
 };
 </script>
