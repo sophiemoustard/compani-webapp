@@ -23,6 +23,7 @@
     <div class="q-mx-md">
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT)" label="Données contrat" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_VERSION)" label="Données avenants" />
+      <ni-button icon="save_alt" color="primary" @click="exportTxt(ABSENCE)" label="Données absences" />
     </div>
     <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
@@ -94,7 +95,6 @@
 
 <script>
 import get from 'lodash/get';
-import pick from 'lodash/pick';
 import Pay from '@api/Pay';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Button from '@components/Button';
@@ -103,7 +103,7 @@ import SelectSector from '@components/form/SelectSector';
 import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import EditableTd from '@components/table/EditableTd';
-import { CONTRACT, CONTRACT_VERSION } from '@data/constants';
+import { CONTRACT, ABSENCE, CONTRACT_VERSION } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
@@ -170,6 +170,7 @@ export default {
       sortOption: 'auxiliary',
       CONTRACT,
       CONTRACT_VERSION,
+      ABSENCE,
     };
   },
   computed: {
@@ -278,7 +279,7 @@ export default {
     },
     async exportTxt (type) {
       try {
-        const txt = await Pay.export(type, pick(this.dates, 'endDate'));
+        const txt = await Pay.export(type, this.dates);
         await downloadFile(txt, `${type}_${this.$moment(this.dates.startDate).format('MM_YYYY')}.txt`);
 
         NotifyPositive('Document téléchargé.');
