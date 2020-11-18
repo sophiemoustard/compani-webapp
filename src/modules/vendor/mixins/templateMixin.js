@@ -3,7 +3,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Cards from '@api/Cards';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { QUESTION_MAX_LENGTH, REQUIRED_LABEL } from '@data/constants';
+import { QUESTION_MAX_LENGTH, REQUIRED_LABEL, UPLOAD_EXTENSION_OPTIONS } from '@data/constants';
 import {
   AUDIO_EXTENSIONS,
   IMAGE_EXTENSIONS,
@@ -18,6 +18,8 @@ export const templateMixin = {
     return {
       tmpInput: '',
       imageExtensions: IMAGE_EXTENSIONS,
+      extensionOptions: UPLOAD_EXTENSION_OPTIONS,
+      isUploading: false,
     };
   },
   computed: {
