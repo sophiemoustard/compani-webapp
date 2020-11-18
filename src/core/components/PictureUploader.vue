@@ -78,9 +78,7 @@ export default {
         this.loadingImage = true;
         const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
         const data = new FormData();
-        data.append('_id', this.user._id);
         data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
-        data.append('Content-Type', blob.type || 'application/octet-stream');
         data.append('picture', blob);
 
         await this.$axios.post(
