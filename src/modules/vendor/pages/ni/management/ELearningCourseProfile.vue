@@ -3,8 +3,9 @@
     <ni-profile-header :title="courseName" />
     <ni-table-list :data="learners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
       <template v-slot:body="{ col }">
-        <div v-if="col.name === 'name'">{{ col.value }}</div>
-        <div v-else>{{ col.value }}</div>
+        <q-item v-if="col.name === 'progress'">
+          <ni-progress :value="col.value" />
+        </q-item>
       </template>
     </ni-table-list>
   </q-page>
@@ -16,12 +17,14 @@ import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import TableList from '@components/table/TableList';
 import { sortStrings, formatIdentity } from '@helpers/utils';
+import Progress from '@components/CourseProgress';
 
 export default {
   name: 'ELearningCoursesProfile',
   components: {
     'ni-profile-header': ProfileHeader,
     'ni-table-list': TableList,
+    'ni-progress': Progress,
   },
   props: {
     courseId: { type: String, required: true },
@@ -46,7 +49,6 @@ export default {
           field: 'progress',
           align: 'left',
           sortable: true,
-          sort: (a, b) => b - a,
           style: 'min-width: 110px; width: 10%',
         },
       ],
