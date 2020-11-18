@@ -93,6 +93,7 @@
 
 <script>
 import get from 'lodash/get';
+import pick from 'lodash/pick';
 import Pay from '@api/Pay';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Button from '@components/Button';
@@ -275,8 +276,8 @@ export default {
     },
     async exportTxt (type) {
       try {
-        const txt = await Pay.export(type, this.dates);
-        await downloadFile(txt, `${type}_${this.$moment(this.dates.startDate).format('MMMM')}.txt`);
+        const txt = await Pay.export(type, pick(this.dates, 'endDate'));
+        await downloadFile(txt, `${type}_${this.$moment(this.dates.startDate).format('MM_YYYY')}.txt`);
 
         NotifyPositive('Document téléchargé.');
       } catch (e) {
