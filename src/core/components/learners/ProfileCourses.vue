@@ -4,8 +4,8 @@
     <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin"
       :pagination.sync="pagination" :disabled="!isVendorInterface">
       <template v-slot:body="{ col }">
-        <q-item v-if="col.name === 'status'">
-          <course-progress :value="col.value" />
+        <q-item v-if="col.name === 'progress'">
+          <ni-progress :value="col.value" />
         </q-item>
       </template>
     </ni-table-list>
@@ -22,13 +22,13 @@ import { userMixin } from '@mixins/userMixin';
 import { sortStrings } from '@helpers/utils';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { courseTimelineMixin } from '@mixins/courseTimeline';
-import CourseProgress from '@components/CourseProgress';
+import Progress from '@components/CourseProgress';
 
 export default {
   name: 'ProfileCourses',
   components: {
     'ni-table-list': TableList,
-    'course-progress': CourseProgress,
+    'ni-progress': Progress,
   },
   mixins: [userMixin, courseTimelineMixin, courseFiltersMixin],
   data () {
@@ -68,7 +68,7 @@ export default {
           style: 'min-width: 110px; width: 35%',
         },
         {
-          name: 'status',
+          name: 'progress',
           label: 'Progression',
           field: 'status',
           align: 'center',

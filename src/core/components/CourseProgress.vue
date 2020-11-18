@@ -4,7 +4,7 @@
 
 <script>
 export default {
-  name: 'CourseProgress',
+  name: 'Progress',
   props: {
     value: { type: Number, default: 0 },
   },
