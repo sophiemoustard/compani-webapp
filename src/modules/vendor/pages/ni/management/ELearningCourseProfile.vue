@@ -1,7 +1,8 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-profile-header :title="courseName" />
-    <ni-table-list :data="learners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+    <ni-table-list :data="learners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      @go-to="goToLearnerProfile">
       <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'progress'">
           <ni-progress :value="col.value" />
@@ -65,7 +66,7 @@ export default {
       const formattedName = formatIdentity(trainee.identity, 'FL');
       const progress = trainee.followUp.reduce((acc, followUp) => followUp.progress + acc, 0) / trainee.followUp.length;
 
-      return ({ identity: { ...trainee.identity, fullName: formattedName }, progress });
+      return ({ _id: trainee._id, identity: { ...trainee.identity, fullName: formattedName }, progress });
     },
     async getLearnersList () {
       try {
@@ -81,6 +82,9 @@ export default {
       } finally {
         this.tableLoading = false;
       }
+    },
+    goToLearnerProfile (row) {
+      this.$router.push({ name: 'ni users learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
     },
   },
 };
