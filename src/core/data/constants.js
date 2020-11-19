@@ -6,7 +6,7 @@ export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v154686
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
 export const VIDEO_EXTENSIONS = 'video/*';
-export const AUDIO_EXTENSIONS = '.mp3';
+export const AUDIO_EXTENSIONS = 'audio/*';
 
 // CUSTOMER
 export const CIVILITY_OPTIONS = [
