@@ -112,7 +112,7 @@ export default {
         }
         if (this.requiredOneCorrectAnswer(index)) return NotifyWarning('Une bonne réponse est nécessaire.');
 
-        await Cards.updateById(this.card._id, { qcmAnswers: this.formatAnswersPayload() });
+        await Cards.updateById(this.card._id, this.formatAnswersPayload());
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');
