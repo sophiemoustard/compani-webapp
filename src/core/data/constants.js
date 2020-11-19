@@ -56,6 +56,7 @@ export const SITUATION_OPTIONS = [
 
 // CONTRACTS
 export const CONTRACT = 'contract';
+export const CONTRACT_VERSION = 'contract_version';
 export const OTHER = 'other';
 export const END_CONTRACT_REASONS = [
   { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
