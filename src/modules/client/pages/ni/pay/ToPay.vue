@@ -22,6 +22,7 @@
     </ni-title-header>
     <div class="q-mx-md">
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT)" label="Données contrat" />
+      <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_VERSION)" label="Données avenants" />
     </div>
     <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
@@ -102,7 +103,7 @@ import SelectSector from '@components/form/SelectSector';
 import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import EditableTd from '@components/table/EditableTd';
-import { CONTRACT } from '@data/constants';
+import { CONTRACT, CONTRACT_VERSION } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
@@ -168,6 +169,7 @@ export default {
       ],
       sortOption: 'auxiliary',
       CONTRACT,
+      CONTRACT_VERSION,
     };
   },
   computed: {
