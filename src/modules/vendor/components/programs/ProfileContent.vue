@@ -73,7 +73,7 @@
       </draggable>
       <div class="q-my-md sub-program-footer">
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
-          @click="validateSubProgramPublishment(subProgram)" :flat="false" />
+          @click="validateSubProgramPublishment(subProgram)" :flat="false" :disable="!subProgram.areStepsValid" />
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
           @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
       </div>
