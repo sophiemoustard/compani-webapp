@@ -68,6 +68,7 @@ export default {
       const formattedName = formatIdentity(trainee.identity, 'FL');
 
       return {
+        _id: trainee._id,
         identity: { ...trainee.identity, fullName: formattedName },
         progress: this.getCourseProgress(trainee.steps),
       };
