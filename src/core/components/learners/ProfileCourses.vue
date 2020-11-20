@@ -1,7 +1,7 @@
 <template>
   <div class="q-mb-xl">
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
-    <ni-table-list :data="orderedCourses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin"
+    <ni-table-list :data="courses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin"
       :pagination.sync="pagination" :disabled="!isVendorInterface">
       <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'progress'">
@@ -17,12 +17,10 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import TableList from '@components/table/TableList';
-import { FORTHCOMING, IN_PROGRESS, COMPLETED, BLENDED } from '@data/constants';
-import { userMixin } from '@mixins/userMixin';
+import { BLENDED } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
-import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
-import { courseTimelineMixin } from '@mixins/courseTimeline';
 import Progress from '@components/CourseProgress';
+import { courseFollowUpMixin } from '@mixins/courseFollowUpMixin';
 
 export default {
   name: 'ProfileCourses',
@@ -30,16 +28,11 @@ export default {
     'ni-table-list': TableList,
     'ni-progress': Progress,
   },
-  mixins: [userMixin, courseTimelineMixin, courseFiltersMixin],
+  mixins: [courseFollowUpMixin],
   data () {
     return {
       isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
       courses: [],
-      statusTranslation: {
-        [FORTHCOMING]: 0,
-        [IN_PROGRESS]: 0.5,
-        [COMPLETED]: 1,
-      },
       pagination: {
         sortBy: 'name',
         descending: false,
@@ -70,10 +63,9 @@ export default {
         {
           name: 'progress',
           label: 'Progression',
-          field: 'status',
+          field: 'progress',
           align: 'center',
           sortable: true,
-          format: value => this.statusTranslation[value],
           style: 'min-width: 110px; width: 35%',
         },
       ],
@@ -81,13 +73,10 @@ export default {
   },
   computed: {
     ...mapState('userProfile', ['userProfile']),
-    orderedCourses () {
-      return [...this.courseListForthcoming, ...this.courseListInProgress, ...this.courseListCompleted];
-    },
   },
   async created () {
-    const courses = await Courses.list({ trainees: this.userProfile._id });
-    this.courses = this.groupByCourses(courses);
+    const courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+    this.courses = courses.map(c => ({ ...c, progress: this.getCourseProgress(c.subProgram.steps) }));
   },
   methods: {
     goToBlendedCourseProfileAdmin (row) {
