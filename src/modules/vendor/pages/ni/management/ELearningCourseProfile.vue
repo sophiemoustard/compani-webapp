@@ -19,6 +19,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import TableList from '@components/table/TableList';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
+import { courseFollowUpMixin } from '@mixins/courseFollowUpMixin';
 
 export default {
   name: 'ELearningCoursesProfile',
@@ -30,6 +31,7 @@ export default {
   props: {
     courseId: { type: String, required: true },
   },
+  mixins: [courseFollowUpMixin],
   data () {
     return {
       tableLoading: false,
@@ -64,9 +66,12 @@ export default {
   methods: {
     formatRow (trainee) {
       const formattedName = formatIdentity(trainee.identity, 'FL');
-      const progress = trainee.followUp.reduce((acc, followUp) => followUp.progress + acc, 0) / trainee.followUp.length;
 
-      return ({ _id: trainee._id, identity: { ...trainee.identity, fullName: formattedName }, progress });
+      return {
+        _id: trainee._id,
+        identity: { ...trainee.identity, fullName: formattedName },
+        progress: this.getCourseProgress(trainee.steps),
+      };
     },
     async getLearnersList () {
       try {
