@@ -35,6 +35,7 @@ import {
   CANCELLATION_REASONS,
   OTHER,
   SECTOR,
+  DOC_EXTENSIONS,
 } from '@data/constants';
 import PlanningModalHeader from 'src/modules/client/components/planning/PlanningModalHeader';
 
@@ -67,6 +68,7 @@ export const planningModalMixin = {
       cancellationReasons: CANCELLATION_REASONS,
       addressError: 'Adresse non valide',
       selectedAddress: '',
+      extensions: DOC_EXTENSIONS,
     };
   },
   computed: {

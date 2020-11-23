@@ -306,6 +306,7 @@ import {
   MONTHLY,
   REQUIRED_LABEL,
   CIVILITY_OPTIONS,
+  DOC_EXTENSIONS,
 } from '@data/constants';
 import { userMixin } from '@mixins/userMixin';
 import HelperEditionModal from 'src/modules/client/components/customers/infos/HelperEditionModal';
@@ -441,7 +442,7 @@ export default {
         ascending: true,
         rowsPerPage: 0,
       },
-      extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
+      extensions: DOC_EXTENSIONS,
       firstStep: true,
     };
   },

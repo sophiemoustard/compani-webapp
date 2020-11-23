@@ -1,7 +1,8 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+    <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+      @go-to="goToLearnerProfile">
       <template v-slot:body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
@@ -12,17 +13,36 @@
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un apprenant"
+      @click="learnerCreationModal = true" :disable="tableLoading" />
+
+      <!-- New learner modal -->
+    <learner-creation-modal v-model="learnerCreationModal" :new-user="newLearner" @hide="resetAddLearnerForm"
+      :first-step="!identityStep" :identity-step="identityStep" @next-step="nextStepLearnerCreationModal"
+      :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" />
   </q-page>
 </template>
 
 <script>
+import get from 'lodash/get';
 import { mapGetters } from 'vuex';
 import Users from '@api/Users';
 import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
+import LearnerCreationModal from '@components/courses/LearnerCreationModal';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
+import {
+  formatIdentity,
+  formatPhoneForPayload,
+  removeDiacritics,
+  removeEmptyProps,
+  sortStrings,
+  clear,
+} from '@helpers/utils';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 
 export default {
@@ -31,6 +51,7 @@ export default {
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
+    'learner-creation-modal': LearnerCreationModal,
   },
   mixins: [userMixin],
   data () {
@@ -52,14 +73,27 @@ export default {
         },
         {
           name: 'blendedCoursesCount',
-          label: 'Formations suivies',
+          label: 'Formations mixtes',
           field: 'blendedCoursesCount',
           align: 'center',
           sortable: true,
           style: 'min-width: 110px; width: 15%',
           sort: (a, b) => b - a,
         },
+        {
+          name: 'eLearningCoursesCount',
+          label: 'Formations eLearning',
+          field: 'eLearningCoursesCount',
+          align: 'center',
+          sortable: true,
+          style: 'min-width: 110px; width: 15%',
+          sort: (a, b) => b - a,
+        },
       ],
+      learnerCreationModal: false,
+      learnerCreationModalLoading: false,
+      identityStep: false,
+      newLearner: { identity: { firstname: '', lastname: '' }, contact: { phone: '' }, local: { email: '' } },
     };
   },
   computed: {
@@ -72,7 +106,19 @@ export default {
   async created () {
     await this.getLearnerList();
   },
+  validations () {
+    return {
+      newLearner: {
+        identity: { lastname: { required: requiredIf(this.identityStep) } },
+        local: { email: { required, email } },
+        contact: { phone: { frPhoneNumber } },
+      },
+    };
+  },
   methods: {
+    goToLearnerProfile (row) {
+      this.$router.push({ name: 'ni courses learners info', params: { learnerId: row.learner._id } });
+    },
     updateSearch (value) {
       this.searchStr = value;
     },
@@ -89,6 +135,7 @@ export default {
         },
         company: user.company ? user.company.name : 'N/A',
         blendedCoursesCount: user.blendedCoursesCount,
+        eLearningCoursesCount: user.eLearningCoursesCount,
       };
     },
     async getLearnerList () {
@@ -105,6 +152,75 @@ export default {
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
+    },
+    resetAddLearnerForm () {
+      this.identityStep = false;
+      this.newLearner = { ...clear(this.newLearner) };
+      this.$v.newLearner.$reset();
+    },
+    async nextStepLearnerCreationModal () {
+      try {
+        this.$v.newLearner.$touch();
+        if (this.$v.newLearner.local.email.$error) return NotifyWarning('Champ invalide.');
+
+        this.learnerCreationModalLoading = true;
+        const userInfo = await Users.exists({ email: this.newLearner.local.email });
+
+        if (!userInfo.exists) return this.goToCreationStep();
+        if (!userInfo.user.company) return this.updateLearner(userInfo.user._id);
+
+        return userInfo.user.company === this.company._id
+          ? NotifyWarning('L\'apprenant est déjà ajouté.')
+          : NotifyNegative('L\'apprenant n\'est pas relié à cette structure.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant.');
+      } finally {
+        this.learnerCreationModalLoading = false;
+      }
+    },
+    goToCreationStep () {
+      this.identityStep = true;
+      this.$v.newLearner.$reset();
+    },
+    async updateLearner (userId) {
+      try {
+        await Users.updateById(userId, { company: this.company._id });
+        NotifyPositive('Apprenant ajouté avec succès.');
+
+        this.learnerCreationModal = false;
+        await this.getLearnerList();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout de l\'apprenant.');
+      }
+    },
+    formatUserPayload () {
+      const payload = removeEmptyProps(this.newLearner);
+      if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
+
+      return ({ ...payload, company: this.company._id });
+    },
+    async createLearner () {
+      try {
+        this.learnerCreationModalLoading = true;
+        this.$v.newLearner.$touch();
+        if (this.$v.newLearner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        const payload = await this.formatUserPayload();
+        await Users.create(payload);
+        NotifyPositive('Apprenant ajouté avec succès.');
+
+        this.learnerCreationModal = false;
+        await this.getLearnerList();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyNegative(e.data.message);
+        NotifyNegative('Erreur lors de l\'ajout de l\' apprenant.');
+      } finally {
+        this.learnerCreationModalLoading = false;
+      }
     },
   },
 };

@@ -1,5 +1,5 @@
 <template>
-  <q-page padding class="vendor-background">
+  <q-page padding class="client-background">
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity">
         <template v-slot:body>
@@ -54,10 +54,10 @@ export default {
   computed: {
     ...mapState('userProfile', ['userProfile']),
     userProfileRole () {
-      return get(this.userProfile, 'role.client.name') || get(this.userProfile, 'role.vendor.name') || '';
+      return get(this.userProfile, 'role.client.name') || '';
     },
     headerInfo () {
-      const infos = [{ icon: 'apartment', label: this.userProfile.company ? this.userProfile.company.name : 'N/A' }];
+      const infos = [{ icon: 'apartment', label: this.userProfile.company.name }];
       if (this.userProfileRole) infos.push({ icon: 'person', label: this.getRoleLabel(this.userProfileRole) });
 
       return infos;

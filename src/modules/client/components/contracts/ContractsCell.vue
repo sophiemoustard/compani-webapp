@@ -91,7 +91,7 @@ import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { downloadDocxFile, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { COACH, CUSTOMER, AUXILIARY } from '@data/constants';
+import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -144,7 +144,7 @@ export default {
         { name: 'archives', label: 'Archives', align: 'center', field: 'auxiliaryArchives' },
         { name: 'actions', align: 'center', field: '_id' },
       ],
-      extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
+      extensions: DOC_EXTENSIONS,
     };
   },
   computed: {
