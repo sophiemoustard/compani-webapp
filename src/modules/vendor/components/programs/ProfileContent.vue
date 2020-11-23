@@ -73,7 +73,7 @@
       </draggable>
       <div class="q-my-md sub-program-footer">
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
-          @click="validateSubProgramPublishment(subProgram)" :flat="false" :disable="!subProgram.areStepsValid" />
+          @click="validateSubProgramPublishment(subProgram)" :flat="false" />
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
           @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
       </div>
@@ -542,6 +542,8 @@ export default {
         )) {
           return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
         }
+
+        if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
 
         await SubPrograms.update(subProgram._id, { status: PUBLISHED });
         NotifyPositive('Sous programme publié');
