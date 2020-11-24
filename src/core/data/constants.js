@@ -1,8 +1,12 @@
 export const TOKEN_EXPIRE_TIME = 1; // in days
 
-// IMAGES
+// MEDIA
 export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
   + 'compani_texte_rose_1000.png';
+export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
+export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
+export const VIDEO_EXTENSIONS = 'video/*';
+export const AUDIO_EXTENSIONS = 'audio/*';
 
 // CUSTOMER
 export const CIVILITY_OPTIONS = [
@@ -52,6 +56,7 @@ export const SITUATION_OPTIONS = [
 
 // CONTRACTS
 export const CONTRACT = 'contract';
+export const CONTRACT_VERSION = 'contract_version';
 export const OTHER = 'other';
 export const END_CONTRACT_REASONS = [
   { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
@@ -93,9 +98,12 @@ export const ABSENCE_TYPES = [
   { label: 'Congé', value: PAID_LEAVE },
   { label: 'Congé sans solde', value: 'unpaid leave' },
   { label: 'Congé maternité', value: 'maternity leave' },
+  { label: 'Congé paternité', value: 'paternity_leave' },
+  { label: 'Congé parental', value: 'parental_leave' },
+  { label: 'Accident du travail', value: WORK_ACCIDENT },
+  { label: 'Accident de trajet', value: 'transport_accident' },
   { label: 'Maladie', value: ILLNESS },
   { label: 'Absence injustifiée', value: UNJUSTIFIED },
-  { label: 'Accident du travail', value: WORK_ACCIDENT },
   { label: 'Arrêt de travail - garde d’enfant', value: CESSATION_OF_WORK_CHILD },
   { label: 'Arrêt de travail - salarié à risque', value: CESSATION_OF_WORK_RISK },
   { label: 'Autre', value: OTHER },
@@ -332,14 +340,15 @@ export const LESSON = 'lesson';
 export const QUIZ = 'quiz';
 export const SHARING_EXPERIENCE = 'sharing_experience';
 export const VIDEO = 'video';
+export const QUESTIONNAIRE = 'questionnaire';
 export const ACTIVITY_TYPES = [
   { label: 'Cours', value: LESSON },
   { label: 'Quiz', value: QUIZ },
   { label: 'Témoignage', value: SHARING_EXPERIENCE },
   { label: 'Vidéo', value: VIDEO },
+  { label: 'Questionnaire', value: QUESTIONNAIRE },
 ];
 
-export const QUESTIONNAIRE = 'questionnaire';
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
 export const TITLE_TEXT_MEDIA = 'title_text_media';
@@ -395,3 +404,13 @@ export const SLOT_DELETION = 'slot_deletion';
 export const SLOT_EDITION = 'slot_edition';
 export const TRAINEE_ADDITION = 'trainee_addition';
 export const TRAINEE_DELETION = 'trainee_deletion';
+
+// MEDIA UPLOAD
+export const UPLOAD_IMAGE = 'image';
+export const UPLOAD_VIDEO = 'video';
+export const UPLOAD_AUDIO = 'audio';
+export const UPLOAD_EXTENSION_OPTIONS = [
+  { label: 'Image', value: UPLOAD_IMAGE },
+  { label: 'Video', value: UPLOAD_VIDEO },
+  { label: 'Audio', value: UPLOAD_AUDIO },
+];

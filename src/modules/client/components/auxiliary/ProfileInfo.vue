@@ -276,6 +276,7 @@ import {
   REQUIRED_LABEL,
   COACH_ROLES,
   AUXILIARY_ROLES,
+  DOC_EXTENSIONS,
 } from '@data/constants';
 import nationalities from '@data/nationalities';
 import countries from '@data/countries';
@@ -337,7 +338,7 @@ export default {
         'administrative.transportInvoice.transportType',
         'administrative.transportInvoice.driveId',
       ],
-      extensions: 'image/jpg, image/jpeg, image/png, application/pdf',
+      extensions: DOC_EXTENSIONS,
       auxiliaryRolesOptions: [],
       identityDocsOptions: [
         { label: 'Carte Nationale d\'Identité', value: 'cni' },
