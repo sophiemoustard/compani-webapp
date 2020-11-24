@@ -543,6 +543,8 @@ export default {
           return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
         }
 
+        if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
+
         await SubPrograms.update(subProgram._id, { status: PUBLISHED });
         NotifyPositive('Sous programme publié');
         this.refreshProgram();
