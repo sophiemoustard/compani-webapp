@@ -314,7 +314,7 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        const folderId = get(this.company, 'auxiliariesFolderId', null);
+        const folderId = get(this.company, 'auxiliariesFolderId');
         if (!folderId) return NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
 
         const payload = await this.formatUserPayload();
@@ -325,7 +325,7 @@ export default {
         } else {
           editedUser = await Users.create(payload);
         }
-        await Users.createDriveFolder(editedUser._id, { parentFolderId: folderId });
+        await Users.createDriveFolder(editedUser._id);
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
 
