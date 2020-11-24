@@ -17,7 +17,6 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import TableList from '@components/table/TableList';
-import { BLENDED } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
 import { courseFollowUpMixin } from '@mixins/courseFollowUpMixin';
@@ -53,11 +52,10 @@ export default {
         {
           name: 'type',
           label: 'Type',
-          field: 'format',
+          field: row => get(row, 'subProgram.isStrictlyELearning'),
           align: 'left',
           sortable: true,
-          format: value => ((value === BLENDED) ? 'Formation mixte' : 'Formation eLearning'),
-          sort: (a, b) => sortStrings(a, b),
+          format: value => (value ? 'Formation eLearning' : 'Formation mixte'),
           style: 'min-width: 110px; width: 35%',
         },
         {
