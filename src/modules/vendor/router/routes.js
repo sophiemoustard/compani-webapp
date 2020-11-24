@@ -210,6 +210,15 @@ const routes = [
           cookies: ['alenvi_token', 'refresh_token'],
         },
       },
+      {
+        path: 'ni/config/categories',
+        name: 'ni config categories',
+        component: () => import('src/modules/vendor/pages/ni/config/CategoriesDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'configuration',
+        },
+      },
     ],
   },
 ];
