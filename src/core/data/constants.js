@@ -414,3 +414,11 @@ export const UPLOAD_EXTENSION_OPTIONS = [
   { label: 'Video', value: UPLOAD_VIDEO },
   { label: 'Audio', value: UPLOAD_AUDIO },
 ];
+
+// ACCESS RULES
+export const FREE_ACCESS = 'free';
+export const RESTRICTED_ACCESS = 'restricted';
+export const ACCESS_OPTIONS = [
+  { label: 'Libre accès', value: FREE_ACCESS },
+  { label: 'Choisir une structure', value: RESTRICTED_ACCESS },
+];
