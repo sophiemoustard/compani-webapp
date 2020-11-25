@@ -24,7 +24,7 @@
       <template #body="{ props }">
         <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
           @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
-          @discount-input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
+          @discount-input="computeTotalAmount(props.row.customerBills)" :index="index" :bill="bill"
           display-checkbox data-cy="bill-row" />
         <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
           <q-td colspan="10">
@@ -35,7 +35,7 @@
         </q-tr>
         <template v-if="props.row.thirdPartyPayerBills">
           <template v-for="tpp in props.row.thirdPartyPayerBills">
-            <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" :bill.sync="bill"
+            <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" :bill="bill"
               @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
               @discount-input="computeTotalAmount(tpp)" display-checkbox :index="index" data-cy="bill-row" />
           </template>
