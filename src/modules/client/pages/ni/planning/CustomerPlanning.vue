@@ -194,11 +194,13 @@ export default {
       this.creationModal = true;
     },
     async getSectorCustomers (sectors) {
-      return sectors.length === 0 ? [] : Customers.listBySector({
-        startDate: this.startOfWeek,
-        endDate: this.endOfWeek,
-        sector: sectors,
-      });
+      return sectors.length === 0
+        ? []
+        : Customers.listBySector({
+          startDate: this.startOfWeek,
+          endDate: this.endOfWeek,
+          sector: sectors,
+        });
     },
     // Filter
     async addElementToFilter (el) {

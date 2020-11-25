@@ -5,7 +5,7 @@
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
           :visible-columns="traineesVisibleColumns">
-          <template v-slot:body="{ props }">
+          <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
@@ -152,7 +152,8 @@ export default {
       return this.course.trainees ? this.course.trainees.length : 0;
     },
     tableTitle () {
-      return this.canEdit ? `Participants (${this.traineesNumber})`
+      return this.canEdit
+        ? `Participants (${this.traineesNumber})`
         : `Participants de votre structure (${this.traineesNumber})`;
     },
     traineesVisibleColumns () {

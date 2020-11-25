@@ -22,13 +22,13 @@
     <template v-else>
       <q-input borderless dense :ref="name" :value="value" bg-color="white" @focus="onFocus" :disable="disable"
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
-        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup:enter')" :error-message="errorMessage" :mask="mask"
+        @blur="onBlur" @input="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
         :class="{ 'borders': inModal }" :data-cy="dataCy">
-        <template v-if="icon" v-slot:prepend>
+        <template v-if="icon" #prepend>
           <q-icon size="xs" :name="icon" />
         </template>
-        <template v-if="isPassword" v-slot:append>
+        <template v-if="isPassword" #append>
           <ni-button :icon="isPassword && showPassword ? 'visibility' : 'visibility_off'" color="middle-grey"
             @click.native="showPassword = !showPassword" size="sm" />
         </template>

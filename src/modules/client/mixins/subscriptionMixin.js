@@ -73,7 +73,8 @@ export const subscriptionMixin = {
           label: 'Volume hebdomadaire estimatif',
           align: 'center',
           field: row => (get(this.selectedSubscription, 'service.nature') === HOURLY
-            ? `${row.estimatedWeeklyVolume}h` : row.estimatedWeeklyVolume),
+            ? `${row.estimatedWeeklyVolume}h`
+            : row.estimatedWeeklyVolume),
         },
         {
           name: 'evenings',
@@ -152,10 +153,12 @@ export const subscriptionMixin = {
       try {
         this.subscriptionsLoading = true;
         const { subscriptions } = customer;
-        this.subscriptions = subscriptions ? subscriptions.map(sub => ({
-          ...getLastVersion(sub.versions, 'createdAt'),
-          ...sub,
-        })) : [];
+        this.subscriptions = subscriptions
+          ? subscriptions.map(sub => ({
+            ...getLastVersion(sub.versions, 'createdAt'),
+            ...sub,
+          }))
+          : [];
       } catch (e) {
         console.error(e);
       } finally {

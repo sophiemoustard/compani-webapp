@@ -18,7 +18,7 @@
         <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup:enter="submit"
          :error="$v.credentials.email.$error" :error-message="emailErrorMessage" @blur="$v.credentials.email.$touch" />
         <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password"
-          @keyup:enter="submit" :error="$v.credentials.password.$error" @blur="$v.credentials.password.$touch" />
+          @keyup-enter="submit" :error="$v.credentials.password.$error" @blur="$v.credentials.password.$touch" />
         <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
           <small>Mot de passe oublié ?</small>
         </router-link>
