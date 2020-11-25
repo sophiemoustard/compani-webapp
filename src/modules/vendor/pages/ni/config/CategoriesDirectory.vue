@@ -1,16 +1,16 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Catégories" class="row q-mb-md" />
-    <q-card class="q-mb-md">
+    <ni-title-header title="Catégories" class="row q-mb-xl" />
+    <q-card>
       <ni-responsive-table :data="categories" :columns="columns">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="edit" @click.native="openCategoryEditionModal(props.row)" />
-                  <ni-button icon="close" @click.native="validateCategoryDeletion(col.value)" />
+                  <ni-button icon="edit" disabled="true" />
+                  <ni-button icon="close" disabled="true" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -19,26 +19,22 @@
         </template>
       </ni-responsive-table>
       <q-card-actions align="right">
-        <ni-button color="primary" icon="add" label="Créer une catégorie" :disable="!tableLoading"
-          @click="traineeCreationModal = true" />
+        <ni-button color="primary" icon="add" label="Créer une catégorie" :disable="tableLoading"
+          @click="categoryCreationModal = true" />
       </q-card-actions>
     </q-card>
 
-    <div>
-      test route GET
-      {{ categories }}
-      <br>
-      test route POST
-      <q-btn @click="createCategory" label="click" />
-    </div>
+    <category-creation-modal v-model="categoryCreationModal" @hide="resetCreationModal" @submit="createCategory"
+      :new-category="newCategory" :validations="$v.newCategory" :loading="modalLoading" />
   </q-page>
 </template>
 
 <script>
-import get from 'lodash/get';
+import { required } from 'vuelidate/lib/validators';
 import TitleHeader from '@components/TitleHeader';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import CategoryCreationModal from 'src/modules/vendor/components/programs/CategoryCreationModal';
 import Button from '@components/Button';
 import Categories from '@api/Categories';
 
@@ -49,22 +45,26 @@ export default {
     'ni-title-header': TitleHeader,
     'ni-responsive-table': ResponsiveTable,
     'ni-button': Button,
+    'category-creation-modal': CategoryCreationModal,
   },
   data () {
     return {
       tableLoading: false,
+      modalLoading: false,
       categories: [],
-      newCategory: { name: 'test' },
+      newCategory: { name: '' },
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: row => get(row, 'name') || '',
-          classes: 'text-capitalize',
-        },
-        { name: 'actions', label: '', align: 'right', field: '_id' },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name', classes: 'text-capitalize', style: 'width: 85%' },
+        { name: 'actions', label: '', field: '_id' },
       ],
+      categoryCreationModal: false,
+    };
+  },
+  validations () {
+    return {
+      newCategory: {
+        name: { required },
+      },
     };
   },
   async created () {
@@ -82,9 +82,27 @@ export default {
         this.tableLoading = false;
       }
     },
+    resetCreationModal () {
+      this.$v.newCategory.$reset();
+      this.newCategory = { name: '' };
+    },
     async createCategory () {
-      await Categories.create({ ...this.newCategory });
-      await this.refreshCategories();
+      try {
+        this.$v.newCategory.$touch();
+        if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.modalLoading = true;
+        await Categories.create({ ...this.newCategory });
+
+        this.categoryCreationModal = false;
+        NotifyPositive('Catégorie créée.');
+        await this.refreshCategories();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la catégorie.');
+      } finally {
+        this.modalLoading = false;
+      }
     },
   },
 };
