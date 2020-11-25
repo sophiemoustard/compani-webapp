@@ -9,7 +9,7 @@
       <q-btn :disable="missingInfoForCreation || contractsLoading || inProgressContract" class="fixed fab-custom"
         no-caps rounded color="primary" icon="add" label="Créer un nouveau contrat" @click="openCreationModal" />
       <ni-banner v-if="missingInfoForCreation">
-        <template v-slot:message>{{ creationMissingInfo }}</template>
+        <template #message>{{ creationMissingInfo }}</template>
       </ni-banner>
     </div>
 

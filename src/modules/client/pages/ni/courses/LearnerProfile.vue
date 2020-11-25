@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <div v-if="userProfile">
       <ni-profile-header :title="userIdentity">
-        <template v-slot:body>
+        <template #body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
               <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>

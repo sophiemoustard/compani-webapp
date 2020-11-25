@@ -2,21 +2,22 @@ module.exports = {
   root: true,
   parserOptions: {
     parser: 'babel-eslint',
-    sourceType: 'module'
+    sourceType: 'module',
   },
   env: { browser: true },
   extends: [
     'airbnb-base',
     'plugin:cypress/recommended',
     'standard',
-    'plugin:vue/strongly-recommended'
+    'plugin:vue/strongly-recommended',
   ],
   plugins: ['vue', 'cypress'],
   globals: {
-    '__statics': true,
-    'cypress/globals': true
+    __statics: true,
+    'cypress/globals': true,
   },
   rules: {
+    'vue/no-mutating-props': 0,
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     indent: ['error', 2, { SwitchCase: 1 }],
@@ -33,7 +34,7 @@ module.exports = {
     // Un-used AirBnb rules
     'no-param-reassign': 0,
     'import/no-extraneous-dependencies': 0,
-    'import/extensions': ['error', 'never', { 'html': 'always' }],
+    'import/extensions': ['error', 'never', { html: 'always' }],
     'import/prefer-default-export': 0,
     'import/no-unresolved': 0,
     'no-underscore-dangle': 0,
@@ -59,6 +60,6 @@ module.exports = {
     ],
     'object-curly-newline': ['error', { consistent: true }],
     'operator-linebreak': ['error', 'before', { overrides: { '&&': 'after', '||': 'after', '=': 'after' } }],
-    'prefer-destructuring': ['error', { 'VariableDeclarator': { 'object': true, 'array': false } }]
-  }
-}
+    'prefer-destructuring': ['error', { VariableDeclarator: { object: true, array: false } }],
+  },
+};

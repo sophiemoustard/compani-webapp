@@ -16,13 +16,13 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Actions utiles</p>
       <ni-banner v-if="followUpDisabled">
-        <template v-slot:message>
+        <template #message>
           Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
           pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
       <ni-banner v-if="!get(this.course, 'subProgram.program.description')">
-        <template v-slot:message>
+        <template #message>
           Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
           les attestations de fin de formation.
         </template>
@@ -48,7 +48,7 @@
       <p>Historique d'envoi </p>
       <ni-simple-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
         :loading="smsLoading">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
@@ -63,17 +63,17 @@
         </template>
       </ni-simple-table>
       <ni-banner v-if="!followUpDisabled && isFinished">
-        <template v-slot:message>
+        <template #message>
           Vous ne pouvez pas envoyer de sms car la formation est terminée.
         </template>
       </ni-banner>
       <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
-        <template v-slot:message>
+        <template #message>
           Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
         </template>
       </ni-banner>
       <ni-banner v-else-if="missingTraineesPhone.length" icon="info_outline">
-        <template v-slot:message>
+        <template #message>
           Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
           {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
         </template>
@@ -87,7 +87,7 @@
 
     <!-- Modal envoi message -->
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
-      :new-sms="newSms" @send="sendMessage" @updateType="updateMessage" :loading="loading" @hide="resetSmsModal" />
+      :new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :loading="loading" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"

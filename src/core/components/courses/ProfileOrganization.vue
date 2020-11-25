@@ -4,7 +4,7 @@
       <div v-if="isClientInterface && isCourseInter" class="q-mb-xl">
         <p class="text-weight-bold">Informations pratiques</p>
         <ni-banner v-if="followUpDisabled">
-          <template v-slot:message>{{ missingInfoMsg }}</template>
+          <template #message>{{ missingInfoMsg }}</template>
         </ni-banner>
         <ni-course-info-link :disable-link="followUpDisabled" />
       </div>

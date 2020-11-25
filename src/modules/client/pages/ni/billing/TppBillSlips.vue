@@ -2,7 +2,7 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Bordereaux tiers payeurs" padding />
     <ni-large-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination" :loading="loading">
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style" class="text-capitalize">

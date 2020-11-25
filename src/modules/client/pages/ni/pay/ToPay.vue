@@ -28,7 +28,7 @@
     <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
       :visible-columns="visibleColumns">
-      <template v-slot:header="{ props }">
+      <template #header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
           <th>
@@ -36,7 +36,7 @@
           </th>
         </q-tr>
       </template>
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">

@@ -64,7 +64,7 @@
           <q-select borderless dense v-model="newEvent.address" @input="deleteClassFocus" emit-value behavior="menu"
             :options="customerAddressList(newEvent)" :readonly="customerAddressList(newEvent).length === 1"
             :display-value="newEvent.address.fullAddress" ref="addressSelect">
-            <template v-slot:append v-if="customerAddressList(newEvent).length > 1">
+            <template #append v-if="customerAddressList(newEvent).length > 1">
               <ni-button icon="swap_vert" class="select-icon pink-icon" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>

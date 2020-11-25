@@ -8,7 +8,7 @@
       </q-card-section>
       <ni-responsive-table :data="contract.versions" :columns="contractsColumns" row-key="name"
         :loading="contractsLoading" :pagination.sync="pagination" :visible-columns="visibleColumns(contract)">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">

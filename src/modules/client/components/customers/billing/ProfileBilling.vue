@@ -33,7 +33,7 @@
       <p class="text-weight-bold text-primary">Attestations fiscales</p>
       <ni-simple-table :data="taxCertificates" :columns="taxCertificatesColumns" :loading="tableLoading"
         :pagination.sync="taxCertificatesPagination">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr data-cy="tax-certificate" :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">

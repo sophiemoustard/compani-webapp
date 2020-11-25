@@ -7,7 +7,7 @@
         <q-card>
           <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" :pagination.sync="pagination"
             :loading="internalHoursLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
@@ -97,7 +97,7 @@
         <q-card>
           <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
             :pagination.sync="administrativeDocumentsPagination" :loading="administrativeDocumentsLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
@@ -125,7 +125,7 @@
         <q-card>
           <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorsPagination"
             :loading="sectorsLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">

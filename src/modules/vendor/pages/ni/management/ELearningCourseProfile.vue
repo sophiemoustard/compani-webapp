@@ -3,7 +3,7 @@
     <ni-profile-header :title="courseName" />
     <ni-table-list :data="learners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @go-to="goToLearnerProfile">
-      <template v-slot:body="{ col }">
+      <template #body="{ col }">
         <q-item v-if="col.name === 'progress'">
           <ni-progress :value="col.value" />
         </q-item>

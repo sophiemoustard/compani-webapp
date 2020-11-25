@@ -7,7 +7,7 @@
         <q-card>
           <ni-responsive-table :data="surcharges" :columns="surchargesColumns" :pagination.sync="pagination"
             :loading="surchargesLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
@@ -35,7 +35,7 @@
         <q-card>
           <ni-responsive-table :data="services" :columns="serviceColumns" :pagination.sync="pagination"
             :visible-columns="servicesVisibleColumns" :loading="servicesLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
@@ -82,7 +82,7 @@
         <q-card>
           <ni-responsive-table :data="thirdPartyPayers" :columns="thirdPartyPayersColumns" :loading="tppsLoading"
             :pagination.sync="pagination">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">

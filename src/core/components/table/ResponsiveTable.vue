@@ -3,14 +3,14 @@
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
       binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="separator" hide-bottom
       :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm" v-on="$listeners">
-      <template v-slot:header="props">
+      <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           </q-tr>
         </slot>
       </template>
-      <template v-slot:body="props">
+      <template #body="props">
         <slot name="body" :props="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
