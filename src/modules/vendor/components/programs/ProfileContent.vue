@@ -525,6 +525,15 @@ export default {
       el.scrollIntoView({ behavior: 'smooth' });
     },
     validateSubProgramPublishment (subProgram) {
+      const eLearningSubProgramAlreadyPublished = this.program.subPrograms.some(
+        sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
+      );
+      if (subProgram.isStrictlyELearning && eLearningSubProgramAlreadyPublished) {
+        return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
+      }
+
+      if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
+
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
@@ -537,14 +546,6 @@ export default {
     },
     async publishSubProgram (subProgram) {
       try {
-        if (subProgram.isStrictlyELearning && this.program.subPrograms.some(
-          sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
-        )) {
-          return NotifyWarning('Un programme ne peut contenir qu\'un seul sous programme eLearning publié');
-        }
-
-        if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
-
         await SubPrograms.update(subProgram._id, { status: PUBLISHED });
         NotifyPositive('Sous programme publié');
         this.refreshProgram();
