@@ -103,6 +103,9 @@
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
       :type-options="activityTypeOptions" />
+
+    <sub-program-publication-modal v-model="subProgramPublicationModal"
+      @submit="validateSubProgramPublicationModal" :company-options="companyOptions" />
   </div>
 </template>
 
@@ -117,6 +120,7 @@ import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Activities from '@api/Activities';
+import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
@@ -135,13 +139,16 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
+import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
+import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   name: 'ProfileContent',
   props: {
     profileId: { type: String, required: true },
   },
+  mixins: [companyMixin],
   components: {
     'ni-input': Input,
     'ni-button': Button,
@@ -151,6 +158,7 @@ export default {
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
+    'sub-program-publication-modal': SubProgramPublicationModal,
     draggable,
     'published-dot': PublishedDot,
   },
@@ -183,6 +191,10 @@ export default {
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
+      subProgramPublicationModal: false,
+      companyOptions: [],
+      subProgramToPublish: null,
+      accessCompany: null,
     };
   },
   validations () {
@@ -524,7 +536,9 @@ export default {
       const el = document.getElementById(openedStep);
       el.scrollIntoView({ behavior: 'smooth' });
     },
-    validateSubProgramPublishment (subProgram) {
+    async validateSubProgramPublishment (subProgram) {
+      this.subProgramToPublish = subProgram;
+
       const eLearningSubProgramAlreadyPublished = this.program.subPrograms.some(
         sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
       );
@@ -534,6 +548,11 @@ export default {
 
       if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
 
+      if (subProgram.isStrictlyELearning) return this.openSubProgramPublicationModal();
+
+      return this.openSubProgramPublicationConfirmationDialog();
+    },
+    openSubProgramPublicationConfirmationDialog () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
@@ -541,14 +560,18 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.publishSubProgram(subProgram))
+      }).onOk(this.publishSubProgram)
         .onCancel(() => NotifyPositive('Publication annulée.'));
     },
-    async publishSubProgram (subProgram) {
+    async publishSubProgram () {
+      const payload = this.accessCompany
+        ? { status: PUBLISHED, accessCompany: this.accessCompany }
+        : { status: PUBLISHED };
       try {
-        await SubPrograms.update(subProgram._id, { status: PUBLISHED });
+        await SubPrograms.update(this.subProgramToPublish._id, payload);
         NotifyPositive('Sous programme publié');
         this.refreshProgram();
+        this.subProgramToPublish = null;
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
@@ -556,6 +579,7 @@ export default {
         }
 
         NotifyNegative('Erreur lors de la publication du sous-programme');
+        this.subProgramToPublish = null;
       }
     },
     isPublished (element) {
@@ -566,6 +590,21 @@ export default {
     },
     isStepValid (step) {
       return step.areActivitiesValid && !step.activities.some(activity => activity.cards.length === 0);
+    },
+    async openSubProgramPublicationModal () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = this.formatCompanyOptions(companies);
+        this.subProgramPublicationModal = true;
+      } catch (e) {
+        console.error(e);
+        this.subProgramToPublish = null;
+      }
+    },
+    validateSubProgramPublicationModal (accessCompany) {
+      this.accessCompany = accessCompany;
+      this.subProgramPublicationModal = false;
+      this.openSubProgramPublicationConfirmationDialog();
     },
   },
 };
