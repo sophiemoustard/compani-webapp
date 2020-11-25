@@ -2,8 +2,7 @@ import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
   async create (payload) {
-    const internalHours = await alenviAxios.post(`${process.env.API_HOSTNAME}/internalhours`, payload);
-    return internalHours.data.data.internalHour;
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/internalhours`, payload);
   },
   async list (params) {
     const internalHours = await alenviAxios.get(`${process.env.API_HOSTNAME}/internalhours`, { params });
