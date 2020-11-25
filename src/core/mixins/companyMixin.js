@@ -86,5 +86,8 @@ export const companyMixin = {
 
       return '';
     },
+    formatCompanyOptions (companies) {
+      return companies.map(c => ({ label: c.name, value: c._id })).sort((a, b) => a.label.localeCompare(b.label));
+    },
   },
 };

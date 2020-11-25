@@ -59,10 +59,11 @@ import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
+import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   name: 'TraineeTable',
-  mixins: [userMixin, courseMixin],
+  mixins: [userMixin, courseMixin, companyMixin],
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -170,9 +171,7 @@ export default {
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.name, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        this.companyOptions = this.formatCompanyOptions(companies);
       } catch (e) {
         console.error(e);
         this.companyOptions = [];

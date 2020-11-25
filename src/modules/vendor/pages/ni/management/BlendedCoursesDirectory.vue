@@ -43,11 +43,12 @@ import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B, BLENDED } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
+import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   metaInfo: { title: 'Catalogue' },
   name: 'BlendedCoursesDirectory',
-  mixins: [courseFiltersMixin],
+  mixins: [courseFiltersMixin, companyMixin],
   components: {
     'ni-title-header': TitleHeader,
     'ni-select': Select,
@@ -110,9 +111,7 @@ export default {
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.name, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        this.companyOptions = this.formatCompanyOptions(companies);
       } catch (e) {
         console.error(e);
         this.companyOptions = [];
