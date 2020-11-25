@@ -6,7 +6,7 @@
     </template>
     <ni-responsive-table class="q-mb-sm" :data="selected.versions" :columns="subscriptionHistoryColumns"
       :pagination.sync="paginationHistory">
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
             <template>{{ col.value }}</template>

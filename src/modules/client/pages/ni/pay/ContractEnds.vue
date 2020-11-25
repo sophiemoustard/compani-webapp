@@ -11,7 +11,7 @@
     </ni-title-header>
     <ni-large-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
-      <template v-slot:header="{ props }">
+      <template #header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :style="col.style" :key="col.name" :props="props">{{ col.label }}</q-th>
           <th>
@@ -19,7 +19,7 @@
           </th>
         </q-tr>
       </template>
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
             :style="col.style">

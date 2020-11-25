@@ -2,7 +2,7 @@
   <q-page padding class="vendor-background">
     <template v-if="activity">
       <ni-profile-header :title="activity.name">
-        <template v-slot:body>
+        <template #body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
               <q-item-section side>

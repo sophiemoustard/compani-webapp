@@ -4,20 +4,20 @@
       class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey"
       :selected="selected" :visible-columns="formattedVisibleColumns"
       @update:pagination="$emit('update:pagination', $event)" @update:selected="$emit('update:selected', $event)">
-      <template v-slot:header="props">
+      <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           </q-tr>
         </slot>
       </template>
-      <template v-slot:body="props">
+      <template #body="props">
         <slot name="body" :props="props" />
       </template>
-      <template v-slot:bottom="props">
+      <template #bottom="props">
         <ni-pagination :props="props" :pagination.sync="pagination" :data="data" />
       </template>
-      <template v-slot:no-data>
+      <template #no-data>
         <div v-show="!loading" class="full-width row q-gutter-sm grey-text">
           <span>Pas de données disponibles</span>
         </div>

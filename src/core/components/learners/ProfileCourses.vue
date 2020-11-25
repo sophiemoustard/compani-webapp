@@ -3,7 +3,7 @@
     <p class="text-weight-bold q-mb-none">Formations suivies</p>
     <ni-table-list :data="courses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin"
       :pagination.sync="pagination" :disabled="!isVendorInterface">
-      <template v-slot:body="{ col }">
+      <template #body="{ col }">
         <q-item v-if="col.name === 'progress'">
           <ni-progress :value="col.value" />
         </q-item>

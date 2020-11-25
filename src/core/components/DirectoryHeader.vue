@@ -7,7 +7,7 @@
     <div :class="['col-xs-12', { 'col-md-5': displayToggle }, { 'col-md-6': !displayToggle }]">
       <q-input class="no-border" :value="search" :placeholder="searchPlaceholder" dense borderless
         @input="input" debounce="0" type="search" bg-color="white">
-        <template v-slot:prepend>
+        <template #prepend>
           <q-icon size="xs" name="search" />
         </template>
       </q-input>

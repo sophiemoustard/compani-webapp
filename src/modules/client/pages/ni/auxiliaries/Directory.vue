@@ -4,7 +4,7 @@
       @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @go-to="goToUserProfile">
-      <template v-slot:body="{ props, col }">
+      <template #body="{ props, col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
             <img class="avatar" :src="getAvatar(col.value.picture)">

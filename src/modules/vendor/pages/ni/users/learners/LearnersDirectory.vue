@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire apprenants" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredLearners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @go-to="goToLearnerProfile">
-      <template v-slot:body="{ col }">
+      <template #body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
             <img class="avatar" :src="getAvatar(col.value.picture)">

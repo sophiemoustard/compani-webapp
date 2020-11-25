@@ -8,7 +8,7 @@
         <q-card v-if="subscriptions.length > 0" class="contract-cell">
           <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading"
             data-cy="subscriptions-table">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style" :data-cy="`col-${col.name}`">
@@ -69,7 +69,7 @@
         <q-card v-if="isValidPayment && customer.payment.mandates.length > 0" class="contract-cell">
           <ni-responsive-table :data="customer.payment.mandates" :columns="mandatesColumns" :loading="mandatesLoading"
             :pagination.sync="pagination" :visible-columns="mandatesVisibleColumns" data-cy="mandate-table">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
