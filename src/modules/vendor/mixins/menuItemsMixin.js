@@ -33,6 +33,7 @@ export const menuItemsMixin = {
           label: 'Configuration',
           children: [
             { name: 'ni config programs', icon: 'view_headline', label: 'Catalogue' },
+            { name: 'ni config categories', icon: 'category', label: 'Catégories' },
           ],
         },
       ],
