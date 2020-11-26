@@ -104,8 +104,8 @@
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
       :type-options="activityTypeOptions" />
 
-    <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublishment"
-      :company-options="companyOptions" />
+    <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
+      :company-options="companyOptions" @hide="resetPublication" />
   </div>
 </template>
 
@@ -545,11 +545,11 @@ export default {
 
       if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
 
-      if (subProgram.isStrictlyELearning) return this.openSubProgramPublicationModal();
-
-      return this.validateSubProgramPublishment();
+      return subProgram.isStrictlyELearning
+        ? this.openSubProgramPublicationModal()
+        : this.validateSubProgramPublication();
     },
-    validateSubProgramPublishment (accessCompany = null) {
+    validateSubProgramPublication (accessCompany = null) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
@@ -566,7 +566,6 @@ export default {
         await SubPrograms.update(this.subProgramToPublish._id, payload);
         NotifyPositive('Sous programme publié');
         this.refreshProgram();
-        this.subProgramToPublish = null;
         this.subProgramPublicationModal = false;
       } catch (e) {
         console.error(e);
@@ -575,8 +574,6 @@ export default {
         }
 
         NotifyNegative('Erreur lors de la publication du sous-programme');
-        this.subProgramToPublish = null;
-        this.subProgramPublicationModal = false;
       }
     },
     isPublished (element) {
@@ -595,9 +592,12 @@ export default {
         this.subProgramPublicationModal = true;
       } catch (e) {
         console.error(e);
-        this.subProgramToPublish = null;
+        this.subProgramPublicationModal = false;
         this.companyOptions = [];
       }
+    },
+    resetPublication () {
+      this.subProgramToPublish = null;
     },
   },
 };
