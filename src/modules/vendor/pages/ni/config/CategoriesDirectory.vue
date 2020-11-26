@@ -10,7 +10,7 @@
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <ni-button icon="edit" disabled="true" />
-                  <ni-button icon="close" disabled="true" />
+                  <ni-button icon="delete" disabled="true" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -77,6 +77,7 @@ export default {
         this.categories = await Categories.list();
       } catch (e) {
         console.error(e);
+        this.categories = [];
         NotifyNegative('Erreur lors de la récupération des catégories.');
       } finally {
         this.tableLoading = false;
@@ -92,13 +93,14 @@ export default {
         if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
-        await Categories.create({ ...this.newCategory });
+        await Categories.create({ name: this.newCategory.name.trim() });
 
         this.categoryCreationModal = false;
         NotifyPositive('Catégorie créée.');
         await this.refreshCategories();
       } catch (e) {
         console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative('Cette catégorie existe déjà.');
         NotifyNegative('Erreur lors de la création de la catégorie.');
       } finally {
         this.modalLoading = false;

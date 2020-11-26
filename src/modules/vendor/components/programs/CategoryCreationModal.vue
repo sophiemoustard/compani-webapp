@@ -3,7 +3,7 @@
     <template slot="title">
       Créer une nouvelle <span class="text-weight-bold">catégorie</span>
     </template>
-    <ni-input in-modal v-model.trim="newCategory.name" :error="validations.name.$error"
+    <ni-input in-modal v-model="newCategory.name" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Nom" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la catégorie" color="primary" :loading="loading"
