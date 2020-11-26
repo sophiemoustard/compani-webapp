@@ -73,7 +73,7 @@
       </draggable>
       <div class="q-my-md sub-program-footer">
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
-          @click="validateSubProgramPublishment(subProgram)" :flat="false" />
+          @click="checkPublicationAndOpenModal(subProgram)" :flat="false" />
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
           @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
       </div>
@@ -103,6 +103,9 @@
     <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
       :type-options="activityTypeOptions" />
+
+    <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
+      :company-options="companyOptions" @hide="resetPublication" />
   </div>
 </template>
 
@@ -117,6 +120,7 @@ import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
 import Steps from '@api/Steps';
 import Activities from '@api/Activities';
+import Companies from '@api/Companies';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import {
@@ -127,7 +131,7 @@ import {
   PUBLISHED_DOT_ACTIVE,
   PUBLISHED_DOT_WARNING,
 } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatAndSortOptions } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
@@ -135,6 +139,7 @@ import StepEditionModal from 'src/modules/vendor/components/programs/StepEdition
 import ActivityCreationModal from 'src/modules/vendor/components/programs/ActivityCreationModal';
 import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityReuseModal';
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
+import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
 
 export default {
@@ -151,6 +156,7 @@ export default {
     'activity-creation-modal': ActivityCreationModal,
     'activity-reuse-modal': ActivityReuseModal,
     'activity-edition-modal': ActivityEditionModal,
+    'sub-program-publication-modal': SubProgramPublicationModal,
     draggable,
     'published-dot': PublishedDot,
   },
@@ -183,6 +189,9 @@ export default {
       PUBLISHED,
       PUBLISHED_DOT_ACTIVE,
       PUBLISHED_DOT_WARNING,
+      subProgramPublicationModal: false,
+      companyOptions: [],
+      subProgramToPublish: null,
     };
   },
   validations () {
@@ -524,7 +533,9 @@ export default {
       const el = document.getElementById(openedStep);
       el.scrollIntoView({ behavior: 'smooth' });
     },
-    validateSubProgramPublishment (subProgram) {
+    async checkPublicationAndOpenModal (subProgram) {
+      this.subProgramToPublish = subProgram;
+
       const eLearningSubProgramAlreadyPublished = this.program.subPrograms.some(
         sp => sp.isStrictlyELearning && sp._id !== subProgram._id && sp.status === PUBLISHED
       );
@@ -534,6 +545,11 @@ export default {
 
       if (!subProgram.areStepsValid) return NotifyWarning('Le sous-programme n\'est pas valide');
 
+      return subProgram.isStrictlyELearning
+        ? this.openSubProgramPublicationModal()
+        : this.validateSubProgramPublication();
+    },
+    validateSubProgramPublication (accessCompany = null) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
@@ -541,14 +557,16 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.publishSubProgram(subProgram))
+      }).onOk(() => this.publishSubProgram(accessCompany))
         .onCancel(() => NotifyPositive('Publication annulée.'));
     },
-    async publishSubProgram (subProgram) {
+    async publishSubProgram (accessCompany) {
+      const payload = accessCompany ? { status: PUBLISHED, accessCompany } : { status: PUBLISHED };
       try {
-        await SubPrograms.update(subProgram._id, { status: PUBLISHED });
+        await SubPrograms.update(this.subProgramToPublish._id, payload);
         NotifyPositive('Sous programme publié');
         this.refreshProgram();
+        this.subProgramPublicationModal = false;
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
@@ -566,6 +584,20 @@ export default {
     },
     isStepValid (step) {
       return step.areActivitiesValid && !step.activities.some(activity => activity.cards.length === 0);
+    },
+    async openSubProgramPublicationModal () {
+      try {
+        const companies = await Companies.list();
+        this.companyOptions = formatAndSortOptions(companies, 'name');
+        this.subProgramPublicationModal = true;
+      } catch (e) {
+        console.error(e);
+        this.subProgramPublicationModal = false;
+        this.companyOptions = [];
+      }
+    },
+    resetPublication () {
+      this.subProgramToPublish = null;
     },
   },
 };

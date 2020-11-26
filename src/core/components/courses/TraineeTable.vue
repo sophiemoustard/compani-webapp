@@ -50,7 +50,7 @@ import Users from '@api/Users';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import { INTER_B2B } from '@data/constants';
-import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
+import { formatPhone, clear, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -170,9 +170,7 @@ export default {
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.name, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        this.companyOptions = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
         this.companyOptions = [];

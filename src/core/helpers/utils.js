@@ -1,6 +1,7 @@
 import moment from 'moment';
 import transform from 'lodash/transform';
 import isObject from 'lodash/isObject';
+import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
 
 export const extend = (...sources) => {
@@ -128,3 +129,7 @@ export const formatQuantity = (itemLabel, quantity) => {
 };
 
 export const sortStrings = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase());
+
+export const formatAndSortOptions = (array, field) => array
+  .map(element => ({ label: get(element, field), value: element._id }))
+  .sort((a, b) => a.label.localeCompare(b.label));

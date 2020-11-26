@@ -27,6 +27,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
 import { COURSE_TYPES } from '@data/constants';
+import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
   name: 'CourseCreationModal',
@@ -65,9 +66,7 @@ export default {
 
       if (get(selectedProgram, 'subPrograms.length')) {
         this.disableSubProgram = false;
-        this.subProgramOptions = selectedProgram.subPrograms
-          .map(p => ({ label: p.name, value: p._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        this.subProgramOptions = formatAndSortOptions(selectedProgram.subPrograms, 'name');
 
         if (this.subProgramOptions.length === 1) this.newCourse.subProgram = this.subProgramOptions[0].value;
       } else {
