@@ -50,7 +50,7 @@ import Users from '@api/Users';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import { INTER_B2B } from '@data/constants';
-import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
+import { formatPhone, clear, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -59,11 +59,10 @@ import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
-import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   name: 'TraineeTable',
-  mixins: [userMixin, courseMixin, companyMixin],
+  mixins: [userMixin, courseMixin],
   props: {
     canEdit: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
@@ -171,7 +170,7 @@ export default {
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = this.formatCompanyOptions(companies);
+        this.companyOptions = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
         this.companyOptions = [];

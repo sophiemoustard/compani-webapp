@@ -57,7 +57,7 @@ export default {
     submit () {
       this.$emit('submit', this.accessCompany);
     },
-    changeAccess () {
+    resetAccess () {
       this.accessCompany = null;
     },
   },

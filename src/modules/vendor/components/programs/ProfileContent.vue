@@ -73,7 +73,7 @@
       </draggable>
       <div class="q-my-md sub-program-footer">
         <ni-button v-if="!isPublished(subProgram)" color="primary" label="Publier" icon="vertical_align_top"
-          @click="validateSubProgramPublishment(subProgram)" :flat="false" />
+          @click="checkPublicationAndOpenModal(subProgram)" :flat="false" />
         <ni-button v-if="!isPublished(subProgram)" class="add-step-button" color="primary" icon="add"
           @click="openStepCreationModal(subProgram._id)" label="Ajouter une étape" />
       </div>
@@ -104,8 +104,8 @@
       :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
       :type-options="activityTypeOptions" />
 
-    <sub-program-publication-modal v-model="subProgramPublicationModal"
-      @submit="validateSubProgramPublicationModal" :company-options="companyOptions" />
+    <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublishment"
+      :company-options="companyOptions" />
   </div>
 </template>
 
@@ -131,7 +131,7 @@ import {
   PUBLISHED_DOT_ACTIVE,
   PUBLISHED_DOT_WARNING,
 } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatAndSortOptions } from '@helpers/utils';
 import Button from '@components/Button';
 import SubProgramCreationModal from 'src/modules/vendor/components/programs/SubProgramCreationModal';
 import StepCreationModal from 'src/modules/vendor/components/programs/StepCreationModal';
@@ -141,14 +141,12 @@ import ActivityReuseModal from 'src/modules/vendor/components/programs/ActivityR
 import ActivityEditionModal from 'src/modules/vendor/components/programs/ActivityEditionModal';
 import SubProgramPublicationModal from 'src/modules/vendor/components/programs/SubProgramPublicationModal';
 import PublishedDot from 'src/modules/vendor/components/programs/PublishedDot';
-import { companyMixin } from '@mixins/companyMixin';
 
 export default {
   name: 'ProfileContent',
   props: {
     profileId: { type: String, required: true },
   },
-  mixins: [companyMixin],
   components: {
     'ni-input': Input,
     'ni-button': Button,
@@ -194,7 +192,6 @@ export default {
       subProgramPublicationModal: false,
       companyOptions: [],
       subProgramToPublish: null,
-      accessCompany: null,
     };
   },
   validations () {
@@ -536,7 +533,7 @@ export default {
       const el = document.getElementById(openedStep);
       el.scrollIntoView({ behavior: 'smooth' });
     },
-    async validateSubProgramPublishment (subProgram) {
+    async checkPublicationAndOpenModal (subProgram) {
       this.subProgramToPublish = subProgram;
 
       const eLearningSubProgramAlreadyPublished = this.program.subPrograms.some(
@@ -550,9 +547,9 @@ export default {
 
       if (subProgram.isStrictlyELearning) return this.openSubProgramPublicationModal();
 
-      return this.openSubProgramPublicationConfirmationDialog();
+      return this.validateSubProgramPublishment();
     },
-    openSubProgramPublicationConfirmationDialog () {
+    validateSubProgramPublishment (accessCompany = null) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Une fois le sous-programme publié, tu ne pourras plus le modifier.<br />'
@@ -560,18 +557,17 @@ export default {
         html: true,
         ok: true,
         cancel: 'Annuler',
-      }).onOk(this.publishSubProgram)
+      }).onOk(() => this.publishSubProgram(accessCompany))
         .onCancel(() => NotifyPositive('Publication annulée.'));
     },
-    async publishSubProgram () {
-      const payload = this.accessCompany
-        ? { status: PUBLISHED, accessCompany: this.accessCompany }
-        : { status: PUBLISHED };
+    async publishSubProgram (accessCompany) {
+      const payload = accessCompany ? { status: PUBLISHED, accessCompany } : { status: PUBLISHED };
       try {
         await SubPrograms.update(this.subProgramToPublish._id, payload);
         NotifyPositive('Sous programme publié');
         this.refreshProgram();
         this.subProgramToPublish = null;
+        this.subProgramPublicationModal = false;
       } catch (e) {
         console.error(e);
         if (e.status === 409) {
@@ -580,6 +576,7 @@ export default {
 
         NotifyNegative('Erreur lors de la publication du sous-programme');
         this.subProgramToPublish = null;
+        this.subProgramPublicationModal = false;
       }
     },
     isPublished (element) {
@@ -594,17 +591,13 @@ export default {
     async openSubProgramPublicationModal () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = this.formatCompanyOptions(companies);
+        this.companyOptions = formatAndSortOptions(companies, 'name');
         this.subProgramPublicationModal = true;
       } catch (e) {
         console.error(e);
         this.subProgramToPublish = null;
+        this.companyOptions = [];
       }
-    },
-    validateSubProgramPublicationModal (accessCompany) {
-      this.accessCompany = accessCompany;
-      this.subProgramPublicationModal = false;
-      this.openSubProgramPublicationConfirmationDialog();
     },
   },
 };
