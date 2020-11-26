@@ -2,7 +2,7 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Catégories" class="row q-mb-xl" />
     <q-card>
-      <ni-responsive-table :data="categories" :columns="columns">
+      <ni-responsive-table :data="categories" :columns="columns" :pagination.sync="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -58,6 +58,7 @@ export default {
         { name: 'actions', label: '', field: '_id' },
       ],
       categoryCreationModal: false,
+      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
     };
   },
   validations () {
