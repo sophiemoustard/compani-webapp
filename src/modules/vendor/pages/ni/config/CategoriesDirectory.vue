@@ -42,6 +42,7 @@ import CategoryCreationModal from 'src/modules/vendor/components/programs/Catego
 import CategoryEditionModal from 'src/modules/vendor/components/programs/CategoryEditionModal';
 import Button from '@components/Button';
 import Categories from '@api/Categories';
+import { upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catégories' },
@@ -61,7 +62,14 @@ export default {
       newCategory: { name: '' },
       editedCategory: { name: '' },
       columns: [
-        { name: 'name', label: 'Nom', align: 'left', field: 'name', classes: 'capitalize', style: 'width: 85%' },
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'name',
+          format: upperCaseFirstLetter,
+          style: 'width: 85%',
+        },
         { name: 'actions', label: '', field: '_id' },
       ],
       categoryCreationModal: false,
@@ -167,10 +175,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-
-.capitalize::first-letter
-  text-transform: capitalize
-
-</style>
