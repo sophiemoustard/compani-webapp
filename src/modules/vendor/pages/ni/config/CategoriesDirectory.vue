@@ -61,7 +61,7 @@ export default {
       newCategory: { name: '' },
       editedCategory: { name: '' },
       columns: [
-        { name: 'name', label: 'Nom', align: 'left', field: 'name', classes: 'text-capitalize', style: 'width: 85%' },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name', classes: 'capitalize', style: 'width: 85%' },
         { name: 'actions', label: '', field: '_id' },
       ],
       categoryCreationModal: false,
@@ -147,10 +147,10 @@ export default {
         message: 'Es-tu sûr(e) de vouloir supprimer cette catégorie ?',
         ok: true,
         cancel: 'Annuler',
-      }).onOk(() => this.delete(category._id))
+      }).onOk(() => this.deleteCategory(category._id))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
-    async delete (categoryId) {
+    async deleteCategory (categoryId) {
       try {
         this.modalLoading = true;
         await Categories.delete(categoryId);
@@ -167,3 +167,10 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+
+.capitalize::first-letter
+  text-transform: capitalize
+
+</style>
