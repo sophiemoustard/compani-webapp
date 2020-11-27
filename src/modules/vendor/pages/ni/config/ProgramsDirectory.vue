@@ -57,6 +57,7 @@ export default {
     return {
       newProgram: {
         name: { required },
+        category: { required },
       },
     };
   },
