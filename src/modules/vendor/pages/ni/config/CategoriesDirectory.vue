@@ -10,7 +10,7 @@
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <ni-button icon="edit" @click="openCategoryEditionModal(props.row)" />
-                  <ni-button icon="delete" disabled="true" />
+                  <ni-button icon="delete" @click="validateCategoryDeletion(props.row)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -140,6 +140,29 @@ export default {
     async openCategoryEditionModal (category) {
       this.editedCategory = pick(category, ['_id', 'name']);
       this.categoryEditionModal = true;
+    },
+    validateCategoryDeletion (category) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette catégorie ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.delete(category._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async delete (categoryId) {
+      try {
+        this.modalLoading = true;
+        await Categories.delete(categoryId);
+
+        NotifyPositive('Catégorie supprimée.');
+        await this.refreshCategories();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppresion de la catégorie.');
+      } finally {
+        this.modalLoading = false;
+      }
     },
   },
 };
