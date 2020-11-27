@@ -9,7 +9,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="edit" disabled="true" />
+                  <ni-button icon="edit" @click="openCategoryEditionModal(props.row)" />
                   <ni-button icon="delete" disabled="true" />
                 </div>
               </template>
@@ -26,15 +26,20 @@
 
     <category-creation-modal v-model="categoryCreationModal" @hide="resetCreationModal" @submit="createCategory"
       :new-category="newCategory" :validations="$v.newCategory" :loading="modalLoading" />
+
+    <category-edition-modal v-model="categoryEditionModal" @hide="resetEditionModal" @submit="updateCategory"
+      :edited-category="editedCategory" :validations="$v.editedCategory" :loading="modalLoading" />
   </q-page>
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import { required } from 'vuelidate/lib/validators';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import CategoryCreationModal from 'src/modules/vendor/components/programs/CategoryCreationModal';
+import CategoryEditionModal from 'src/modules/vendor/components/programs/CategoryEditionModal';
 import Button from '@components/Button';
 import Categories from '@api/Categories';
 
@@ -46,6 +51,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'ni-button': Button,
     'category-creation-modal': CategoryCreationModal,
+    'category-edition-modal': CategoryEditionModal,
   },
   data () {
     return {
@@ -53,19 +59,20 @@ export default {
       modalLoading: false,
       categories: [],
       newCategory: { name: '' },
+      editedCategory: { name: '' },
       columns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name', classes: 'text-capitalize', style: 'width: 85%' },
         { name: 'actions', label: '', field: '_id' },
       ],
       categoryCreationModal: false,
+      categoryEditionModal: false,
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
     };
   },
   validations () {
     return {
-      newCategory: {
-        name: { required },
-      },
+      newCategory: { name: { required } },
+      editedCategory: { name: { required } },
     };
   },
   async created () {
@@ -88,6 +95,10 @@ export default {
       this.$v.newCategory.$reset();
       this.newCategory = { name: '' };
     },
+    resetEditionModal () {
+      this.$v.editedCategory.$reset();
+      this.editedCategory = { name: '' };
+    },
     async createCategory () {
       try {
         this.$v.newCategory.$touch();
@@ -106,6 +117,29 @@ export default {
       } finally {
         this.modalLoading = false;
       }
+    },
+    async updateCategory () {
+      try {
+        this.$v.editedCategory.$touch();
+        if (this.$v.editedCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.modalLoading = true;
+        await Categories.update(this.editedCategory._id, { name: this.editedCategory.name.trim() });
+
+        this.categoryEditionModal = false;
+        NotifyPositive('Catégorie modifiée.');
+        await this.refreshCategories();
+      } catch (e) {
+        console.error(e);
+        if (e.data.statusCode === 409) return NotifyNegative('Le nouveau nom de catégorie existe déjà.');
+        NotifyNegative('Erreur lors de la modification de la catégorie.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    async openCategoryEditionModal (category) {
+      this.editedCategory = pick(category, ['_id', 'name']);
+      this.categoryEditionModal = true;
     },
   },
 };
