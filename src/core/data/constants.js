@@ -1,4 +1,4 @@
-export const TOKEN_EXPIRE_TIME = 1; // in days
+export const TOKEN_EXPIRE_DAY = 1; // in days
 
 // MEDIA
 export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
