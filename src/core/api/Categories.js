@@ -11,4 +11,7 @@ export default {
   async update (categoryId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/categories/${categoryId}`, payload);
   },
+  async delete (categoryId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/categories/${categoryId}`);
+  },
 };

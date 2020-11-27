@@ -10,7 +10,7 @@
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <ni-button icon="edit" @click="openCategoryEditionModal(props.row)" />
-                  <ni-button icon="delete" disabled="true" />
+                  <ni-button icon="delete" @click="validateCategoryDeletion(props.row)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -42,6 +42,7 @@ import CategoryCreationModal from 'src/modules/vendor/components/programs/Catego
 import CategoryEditionModal from 'src/modules/vendor/components/programs/CategoryEditionModal';
 import Button from '@components/Button';
 import Categories from '@api/Categories';
+import { upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catégories' },
@@ -61,7 +62,14 @@ export default {
       newCategory: { name: '' },
       editedCategory: { name: '' },
       columns: [
-        { name: 'name', label: 'Nom', align: 'left', field: 'name', classes: 'text-capitalize', style: 'width: 85%' },
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'name',
+          format: upperCaseFirstLetter,
+          style: 'width: 85%',
+        },
         { name: 'actions', label: '', field: '_id' },
       ],
       categoryCreationModal: false,
@@ -140,6 +148,29 @@ export default {
     async openCategoryEditionModal (category) {
       this.editedCategory = pick(category, ['_id', 'name']);
       this.categoryEditionModal = true;
+    },
+    validateCategoryDeletion (category) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette catégorie ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteCategory(category._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteCategory (categoryId) {
+      try {
+        this.modalLoading = true;
+        await Categories.delete(categoryId);
+
+        NotifyPositive('Catégorie supprimée.');
+        await this.refreshCategories();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppresion de la catégorie.');
+      } finally {
+        this.modalLoading = false;
+      }
     },
   },
 };
