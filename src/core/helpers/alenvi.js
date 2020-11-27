@@ -2,7 +2,7 @@ import { Cookies } from 'quasar';
 import moment from 'moment';
 import User from '@api/Users';
 import store from 'src/store/index';
-import { TOKEN_EXPIRE_TIME } from '@data/constants';
+import { TOKEN_EXPIRE_DAY } from '@data/constants';
 
 export const canNavigate = async () => {
   const { loggedUser } = store.state.main;
@@ -18,6 +18,8 @@ export const canNavigate = async () => {
   return true;
 };
 
+export const cookieExpirationDate = () => moment().add(TOKEN_EXPIRE_DAY, 'day').toDate();
+
 export const refreshAlenviCookies = async () => {
   try {
     const refreshToken = Cookies.get('refresh_token');
@@ -25,7 +27,7 @@ export const refreshAlenviCookies = async () => {
       const newToken = await User.refreshToken({ refreshToken });
       const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Strict' };
 
-      const expireDate = moment().add(TOKEN_EXPIRE_TIME, 'day').toDate();
+      const expireDate = cookieExpirationDate();
       Cookies.set('alenvi_token', newToken.token, { ...options, expires: expireDate });
       Cookies.set('refresh_token', newToken.refreshToken, { ...options, expires: 365 });
       Cookies.set('user_id', newToken.user._id, { ...options, expires: expireDate });

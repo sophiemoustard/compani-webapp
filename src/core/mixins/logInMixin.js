@@ -1,7 +1,6 @@
 import { mapGetters, mapState } from 'vuex';
-import moment from 'moment';
 import Users from '@api/Users';
-import { TOKEN_EXPIRE_TIME } from '@data/constants';
+import { cookieExpirationDate } from '../helpers/alenvi';
 
 export const logInMixin = {
   computed: {
@@ -16,7 +15,7 @@ export const logInMixin = {
       const auth = await Users.authenticate(authenticationPayload);
 
       const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Strict' };
-      const expireDate = moment().add(TOKEN_EXPIRE_TIME, 'day').toDate();
+      const expireDate = cookieExpirationDate();
 
       this.$q.cookies.set('alenvi_token', auth.token, { ...options, expires: expireDate });
       this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
