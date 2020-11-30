@@ -88,20 +88,26 @@ export const INTERVENTION = 'intervention';
 export const ABSENCE = 'absence';
 export const UNAVAILABILITY = 'unavailability';
 export const INTERNAL_HOUR = 'internalHour';
+
+export const PAID_LEAVE = 'leave';
+export const UNPAID_LEAVE = 'unpaid leave';
+export const MATERNITY_LEAVE = 'maternity leave';
+export const PATERNITY_LEAVE = 'paternity_leave';
+export const PARENTAL_LEAVE = 'parental_leave';
+export const WORK_ACCIDENT = 'work accident';
+export const TRANSPORT_ACCIDENT = 'transport_accident';
 export const ILLNESS = 'illness';
 export const UNJUSTIFIED = 'unjustified absence';
-export const PAID_LEAVE = 'leave';
-export const WORK_ACCIDENT = 'work accident';
 export const CESSATION_OF_WORK_CHILD = 'cessation_of_work_child';
 export const CESSATION_OF_WORK_RISK = 'cessation_of_work_risk';
 export const ABSENCE_TYPES = [
   { label: 'Congé', value: PAID_LEAVE },
-  { label: 'Congé sans solde', value: 'unpaid leave' },
-  { label: 'Congé maternité', value: 'maternity leave' },
-  { label: 'Congé paternité', value: 'paternity_leave' },
-  { label: 'Congé parental', value: 'parental_leave' },
+  { label: 'Congé sans solde', value: UNPAID_LEAVE },
+  { label: 'Congé maternité', value: MATERNITY_LEAVE },
+  { label: 'Congé paternité', value: PATERNITY_LEAVE },
+  { label: 'Congé parental', value: PARENTAL_LEAVE },
   { label: 'Accident du travail', value: WORK_ACCIDENT },
-  { label: 'Accident de trajet', value: 'transport_accident' },
+  { label: 'Accident de trajet', value: TRANSPORT_ACCIDENT },
   { label: 'Maladie', value: ILLNESS },
   { label: 'Absence injustifiée', value: UNJUSTIFIED },
   { label: 'Arrêt de travail - garde d’enfant', value: CESSATION_OF_WORK_CHILD },
