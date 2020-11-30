@@ -1,5 +1,6 @@
 <template>
-  <q-page class="vendor-background" padding>
+  <div>
+    <p class="text-weight-bold q-mb-none">Participants</p>
     <ni-table-list :data="learners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @go-to="goToLearnerProfile">
       <template #body="{ col }">
@@ -8,7 +9,7 @@
         </q-item>
       </template>
     </ni-table-list>
-  </q-page>
+  </div>
 </template>
 
 <script>
@@ -16,10 +17,9 @@ import Courses from '@api/Courses';
 import TableList from '@components/table/TableList';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
-import { courseFollowUpMixin } from '@mixins/courseFollowUpMixin';
 
 export default {
-  name: 'ELearningCoursesFollowUp',
+  name: 'ProfileFollowUp',
   components: {
     'ni-table-list': TableList,
     'ni-progress': Progress,
@@ -27,7 +27,6 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  mixins: [courseFollowUpMixin],
   data () {
     return {
       tableLoading: false,
@@ -40,7 +39,7 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'min-width: 200px; width: 70%',
+          style: 'min-width: 200px; width: 90%',
         },
         {
           name: 'progress',
@@ -48,7 +47,7 @@ export default {
           field: 'progress',
           align: 'left',
           sortable: true,
-          style: 'min-width: 110px; width: 10%',
+          style: 'min-width: 110px;',
         },
       ],
       learners: [],
@@ -65,19 +64,18 @@ export default {
       return {
         _id: trainee._id,
         identity: { ...trainee.identity, fullName: formattedName },
-        progress: this.getCourseProgress(trainee.steps),
+        progress: trainee.progress,
       };
     },
     async getLearnersList () {
       try {
         this.tableLoading = true;
         const course = await Courses.getFollowUp(this.profileId);
-        if (course) {
-          this.learners = Object.freeze(course.trainees.map(this.formatRow));
-        }
+
+        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
       } catch (e) {
         console.error(e);
-        this.learnerList = [];
+        this.learners = [];
       } finally {
         this.tableLoading = false;
       }

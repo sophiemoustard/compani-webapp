@@ -161,6 +161,15 @@ const routes = [
         path: 'ni/management/elearning-courses/:courseId',
         name: 'ni management elearning courses info',
         component: () => import('src/modules/vendor/pages/ni/management/ELearningCourseProfile.vue'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni users learners info') to.params.defaultTab = 'followUp';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

@@ -6,12 +6,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import get from 'lodash/get';
-import Courses from '@api/Courses';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
-import ELearningCourseFollowUp from './ELearningCourseFollowUp';
-import ELearningCourseAccess from './ELearningCourseAccess';
+import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
+import { NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'ELearningCoursesProfile',
@@ -23,23 +24,37 @@ export default {
     courseId: { type: String, required: true },
     defaultTab: { type: String, default: 'followUp' },
   },
+  computed: {
+    ...mapState('course', ['course']),
+    courseName () {
+      return get(this.course, 'subProgram.program.name');
+    },
+  },
   data () {
     return {
-      courseName: '',
       tabsContent: [
         {
           label: 'Suivi',
           name: 'followUp',
           default: this.defaultTab === 'followUp',
-          component: ELearningCourseFollowUp,
+          component: ProfileFollowUp,
         },
-        { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: ELearningCourseAccess },
+        { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: ProfileAccess },
       ],
     };
   },
   async created () {
-    const course = await Courses.getById(this.courseId);
-    this.courseName = get(course, 'subProgram.program.name');
+    await this.refreshCourse();
+  },
+  methods: {
+    async refreshCourse () {
+      try {
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération de la formation.');
+      }
+    },
   },
 };
 </script>
