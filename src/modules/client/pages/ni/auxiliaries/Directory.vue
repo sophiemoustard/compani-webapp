@@ -332,7 +332,7 @@ export default {
         this.auxiliaryCreationModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant.');
+        if (e.status === 409) return NotifyNegative('Email déjà existant.');
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
       } finally {
         this.loading = false;
@@ -341,7 +341,7 @@ export default {
         if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
+        if (e.status === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
         NotifyNegative('Erreur lors de l\'envoi de SMS');
       }
     },

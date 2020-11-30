@@ -684,7 +684,7 @@ export default {
         NotifyPositive('Souscription ajoutée');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de la souscription.');
       } finally {
         this.loading = false;
@@ -922,7 +922,7 @@ export default {
         NotifyPositive('Financement ajoutée');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout d\'un financement');
       } finally {
         this.loading = false;

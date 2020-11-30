@@ -92,7 +92,7 @@ export default {
         await this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
       } catch (e) {
         console.error(e);
-        if (get(e, 'response.data.statusCode')) return NotifyNegative('Identifiant ou mot de passe invalide');
+        if (get(e, 'response.status') === 401) return NotifyNegative('Identifiant ou mot de passe invalide');
         NotifyNegative('Impossible de se connecter.');
       }
     },
