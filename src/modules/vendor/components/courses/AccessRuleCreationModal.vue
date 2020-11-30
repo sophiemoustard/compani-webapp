@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input">
+  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
     <template slot="title">
       Ajouter une <span class="text-weight-bold">règle d'accès</span>
     </template>
