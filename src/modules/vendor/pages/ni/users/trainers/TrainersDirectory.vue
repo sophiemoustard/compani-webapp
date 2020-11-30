@@ -147,7 +147,7 @@ export default {
         await this.refreshTrainers();
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Formateur déjà existant.');
+        if (e.status === 409) return NotifyNegative('Formateur déjà existant.');
         NotifyNegative('Erreur lors de la création du formateur.');
       } finally {
         this.modalLoading = false;

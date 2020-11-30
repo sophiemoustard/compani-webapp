@@ -102,7 +102,7 @@ export default {
         await this.refreshCompanies();
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Structure déjà existante.');
+        if (e.status === 409) return NotifyNegative('Structure déjà existante.');
         NotifyNegative('Erreur lors de la création de la structure.');
       } finally {
         this.modalLoading = false;

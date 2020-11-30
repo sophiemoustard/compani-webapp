@@ -340,6 +340,7 @@ export default {
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
         console.error(e);
+        if (e.status) return NotifyNegative('Cette heure interne est rattachée à des évènements.');
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
     },
@@ -359,7 +360,6 @@ export default {
         this.sectors = await Sectors.list();
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode) return NotifyNegative('Cette heure interne est rattachée à des évènements.');
         NotifyNegative('Erreur lors de la récupération des équipes.');
       } finally {
         this.sectorsLoading = false;
