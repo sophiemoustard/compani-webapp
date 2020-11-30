@@ -167,6 +167,9 @@ export default {
         await this.refreshCategories();
       } catch (e) {
         console.error(e);
+        if (e.data.statusCode === 403) {
+          return NotifyNegative('Certains programmes sont encore rattachés à cette catégorie.');
+        }
         NotifyNegative('Erreur lors de la suppresion de la catégorie.');
       } finally {
         this.modalLoading = false;
