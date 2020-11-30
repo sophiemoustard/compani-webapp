@@ -46,6 +46,9 @@ export default {
   async created () {
     await this.refreshCourse();
   },
+  beforeDestroy () {
+    this.$store.dispatch('course/resetCourse');
+  },
   methods: {
     async refreshCourse () {
       try {

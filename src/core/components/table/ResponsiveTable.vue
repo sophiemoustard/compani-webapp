@@ -1,7 +1,8 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
-      binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="separator" :hide-bottom="hideBottom"
+      binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="data.length ? separator : 'none'"
+      :hide-bottom="hideBottom" :color="'#ff0000'"
       :rows-per-page-options="rowsPerPageOptions" v-on="$listeners" class="table-responsive q-pa-sm">
       <template #header="props">
         <slot name="header" :props="props">
@@ -21,8 +22,9 @@
         </slot>
       </template>
       <template #no-data>
-        <div class="full-width row q-gutter-sm grey-text noData">
+        <div class="full-width row q-gutter-sm grey-text justify-center">
           <span class="text-italic">{{ noDataLabel }}</span>
+          <q-separator />
         </div>
       </template>
     </q-table>
@@ -55,10 +57,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  .noData
-    justify-content: center;
-    padding-bottom: 8px;
-    border-bottom: 1px solid $middle-grey;
-</style>

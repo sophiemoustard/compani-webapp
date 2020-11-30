@@ -1,9 +1,9 @@
 <template>
   <div>
-    <p class="text-weight-bold q-mb-xs">Règle d'accès</p>
+    <p class="text-weight-bold">Règle d'accès</p>
     <q-card>
       <ni-responsive-table :data="accessRules" :columns="columns" :pagination.sync="pagination"
-        :no-data-label="'Pas de règle - la formation est en libre accès'" :hide-bottom="!!accessRules.length">
+        no-data-label="Pas de règle - la formation est en libre accès" :hide-bottom="!!accessRules.length">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
