@@ -21,7 +21,7 @@
       </template>
     </ni-title-header>
     <div class="q-mx-md">
-      <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT)" label="Données contrat" />
+      <ni-button icon="save_alt" color="primary" @click="exportTxt(IDENTIFICATION)" label="Données d'identification" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_VERSION)" label="Données avenants" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(ABSENCE)" label="Données absences" />
     </div>
@@ -103,7 +103,7 @@ import SelectSector from '@components/form/SelectSector';
 import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import EditableTd from '@components/table/EditableTd';
-import { CONTRACT, ABSENCE, CONTRACT_VERSION } from '@data/constants';
+import { IDENTIFICATION, ABSENCE, CONTRACT_VERSION } from '@data/constants';
 import { downloadFile } from '@helpers/file';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
@@ -168,7 +168,7 @@ export default {
         { label: 'Frais téléphoniques', value: 'phoneFees', path: 'phoneFees' },
       ],
       sortOption: 'auxiliary',
-      CONTRACT,
+      IDENTIFICATION,
       CONTRACT_VERSION,
       ABSENCE,
     };
