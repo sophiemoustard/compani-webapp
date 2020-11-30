@@ -89,8 +89,7 @@ export const CONTRACT_CREATION_MANDATORY_INFO = {
 export const INTERVENTION = 'intervention';
 export const ABSENCE = 'absence';
 export const UNAVAILABILITY = 'unavailability';
-export const INTERNAL_HOUR = 'internalHour';
-
+export const INTERNAL_HOUR = 'internal_hour';
 export const PAID_LEAVE = 'leave';
 export const UNPAID_LEAVE = 'unpaid_leave';
 export const MATERNITY_LEAVE = 'maternity_leave';
