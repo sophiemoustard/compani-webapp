@@ -46,9 +46,6 @@ export default {
   async created () {
     await this.refreshCourse();
   },
-  beforeDestroy () {
-    this.$store.dispatch('course/resetCourse');
-  },
   methods: {
     async refreshCourse () {
       try {
@@ -58,6 +55,9 @@ export default {
         NotifyNegative('Erreur lors de la récupération de la formation.');
       }
     },
+  },
+  beforeDestroy () {
+    this.$store.dispatch('course/resetCourse');
   },
 };
 </script>

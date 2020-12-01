@@ -22,8 +22,8 @@
         </slot>
       </template>
       <template #no-data>
-        <div class="full-width row q-gutter-sm grey-text justify-center">
-          <span class="text-italic">{{ noDataLabel }}</span>
+        <div class="full-width row grey-text justify-center">
+          <span class="text-italic q-pb-sm" style="font-size: 0.8rem">{{ noDataLabel }}</span>
           <q-separator />
         </div>
       </template>
