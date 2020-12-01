@@ -1,7 +1,7 @@
 <template>
   <div v-if="program">
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Informations générales</p>
+      <p class="text-weight-bold">Identité</p>
       <div class="row gutter-profile">
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
           :error="$v.program.name.$error" required-field />
@@ -15,7 +15,26 @@
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
           :error="$v.program.learningGoals.$error" />
       </div>
-    </div>
+      <p class="text-weight-bold">Catégories</p>
+      <q-card class="no-shadow">
+        <ni-responsive-table :data="program.categories" :columns="columns">
+          <template #body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'actions'">
+                  <ni-button class="row no-wrap table-actions" icon="close" />
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
+        <q-card-actions align="right">
+          <ni-button color="primary" icon="add" label="Ajouter une catégorie" />
+        </q-card-actions>
+      </q-card>
+</div>
   </div>
 </template>
 
@@ -28,7 +47,10 @@ import Programs from '@api/Programs';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import ResponsiveTable from '@components/table/ResponsiveTable';
+import Button from '@components/Button';
 import { IMAGE_EXTENSIONS } from '@data/constants';
+import { upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
   name: 'ProfileInfo',
@@ -38,12 +60,26 @@ export default {
   components: {
     'ni-input': Input,
     'ni-file-uploader': FileUploader,
+    'ni-button': Button,
+    'ni-responsive-table': ResponsiveTable,
   },
   data () {
     return {
       tmpInput: '',
       extensions: IMAGE_EXTENSIONS,
       maxFileSize: 500 * 1000,
+      categories: [],
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'name',
+          format: upperCaseFirstLetter,
+          style: 'width: 92%',
+        },
+        { name: 'actions', label: '', field: '_id' },
+      ],
     };
   },
   validations () {
