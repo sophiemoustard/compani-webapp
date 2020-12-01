@@ -340,7 +340,7 @@ export default {
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
         console.error(e);
-        if (e.status) return NotifyNegative('Cette heure interne est rattachée à des évènements.');
+        if (e.status === 403) return NotifyNegative('Cette heure interne est rattachée à des évènements.');
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
     },
