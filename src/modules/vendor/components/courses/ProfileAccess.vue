@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -55,7 +56,7 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     accessRules () {
-      return this.course.accessRules;
+      return this.course.accessRules || [];
     },
   },
   data () {
@@ -66,7 +67,7 @@ export default {
         { name: 'actions', label: '', field: '_id' },
       ],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
-      newAccessRule: '',
+      newAccessRule: { company: '' },
       companyOptions: [],
       accessRuleCreationModal: false,
       modalLoading: false,
@@ -74,7 +75,7 @@ export default {
   },
   validations () {
     return {
-      newAccessRule: { required },
+      newAccessRule: { company: { required } },
     };
   },
   methods: {
@@ -102,20 +103,19 @@ export default {
     },
     resetAccessRuleCreationModal () {
       this.companyOptions = [];
-      this.newAccessRule = '';
+      this.newAccessRule = { company: '' };
       this.$v.newAccessRule.$reset();
     },
-    async addAccessRule (accessRule) {
-      this.newAccessRule = accessRule;
+    async addAccessRule () {
       try {
         this.$v.newAccessRule.$touch();
-        if (this.$v.newAccessRule.$error) return NotifyWarning('Une règle d\'accès est requise');
+        if (this.$v.newAccessRule.company.$error) return NotifyWarning('Une règle d\'accès est requise');
 
         this.modalLoading = true;
-        await Courses.addAccessRule(this.profileId, { company: accessRule });
+        await Courses.addAccessRule(this.profileId, { company: get(this.newAccessRule, 'company') });
 
         this.accessRuleCreationModal = false;
-        NotifyPositive('Règle d\'accès créé.');
+        NotifyPositive('Règle d\'accès créée.');
 
         this.refreshCourse();
       } catch (e) {
