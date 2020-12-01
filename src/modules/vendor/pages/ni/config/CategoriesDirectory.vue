@@ -150,6 +150,9 @@ export default {
       this.categoryEditionModal = true;
     },
     validateCategoryDeletion (category) {
+      if (category.programsCount) {
+        return NotifyWarning('Certains programmes sont encore rattachés à cette catégorie.');
+      }
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer cette catégorie ?',
@@ -167,6 +170,7 @@ export default {
         await this.refreshCategories();
       } catch (e) {
         console.error(e);
+        if (e.status === 403) return NotifyNegative('Certains programmes sont encore rattachés à cette catégorie.');
         NotifyNegative('Erreur lors de la suppresion de la catégorie.');
       } finally {
         this.modalLoading = false;
