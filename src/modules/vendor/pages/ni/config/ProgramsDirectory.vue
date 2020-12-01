@@ -48,7 +48,7 @@ export default {
       programs: [],
       modalLoading: false,
       programCreationModal: false,
-      newProgram: {},
+      newProgram: { name: '', category: '' },
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
     };
