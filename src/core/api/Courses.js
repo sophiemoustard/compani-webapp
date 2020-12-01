@@ -54,4 +54,7 @@ export default {
     return `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates?x-access-token=`
       + `${Cookies.get('alenvi_token')}`;
   },
+  async addAccessRule (courseId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules`, payload);
+  },
 };
