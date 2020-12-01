@@ -1,96 +1,63 @@
 <template>
-  <q-page class="vendor-background" padding>
-    <ni-profile-header :title="courseName" />
-    <ni-table-list :data="learners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @go-to="goToLearnerProfile">
-      <template #body="{ col }">
-        <q-item v-if="col.name === 'progress'">
-          <ni-progress :value="col.value" />
-        </q-item>
-      </template>
-    </ni-table-list>
-  </q-page>
+    <q-page class="vendor-background" padding>
+      <ni-profile-header :title="courseName" />
+      <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
+    </q-page>
 </template>
 
 <script>
-import Courses from '@api/Courses';
+import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
-import TableList from '@components/table/TableList';
-import { sortStrings, formatIdentity } from '@helpers/utils';
-import Progress from '@components/CourseProgress';
-import { courseFollowUpMixin } from '@mixins/courseFollowUpMixin';
+import ProfileTabs from '@components/ProfileTabs';
+import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
+import { NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'ELearningCoursesProfile',
   components: {
     'ni-profile-header': ProfileHeader,
-    'ni-table-list': TableList,
-    'ni-progress': Progress,
+    'profile-tabs': ProfileTabs,
   },
   props: {
     courseId: { type: String, required: true },
+    defaultTab: { type: String, default: 'followUp' },
   },
-  mixins: [courseFollowUpMixin],
+  computed: {
+    ...mapState('course', ['course']),
+    courseName () {
+      return get(this.course, 'subProgram.program.name');
+    },
+  },
   data () {
     return {
-      tableLoading: false,
-      columns: [
+      tabsContent: [
         {
-          name: 'name',
-          label: 'Nom',
-          field: 'identity',
-          format: value => (value ? value.fullName : ''),
-          align: 'left',
-          sortable: true,
-          sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'min-width: 200px; width: 70%',
+          label: 'Suivi',
+          name: 'followUp',
+          default: this.defaultTab === 'followUp',
+          component: ProfileFollowUp,
         },
-        {
-          name: 'progress',
-          label: 'Progression',
-          field: 'progress',
-          align: 'left',
-          sortable: true,
-          style: 'min-width: 110px; width: 10%',
-        },
+        { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: ProfileAccess },
       ],
-      learners: [],
-      pagination: { sortBy: 'identity', ascending: true, page: 1, rowsPerPage: 15 },
-      courseName: '',
     };
   },
   async created () {
-    await this.getLearnersList();
+    await this.refreshCourse();
   },
   methods: {
-    formatRow (trainee) {
-      const formattedName = formatIdentity(trainee.identity, 'FL');
-
-      return {
-        _id: trainee._id,
-        identity: { ...trainee.identity, fullName: formattedName },
-        progress: this.getCourseProgress(trainee.steps),
-      };
-    },
-    async getLearnersList () {
+    async refreshCourse () {
       try {
-        this.tableLoading = true;
-        const course = await Courses.getFollowUp(this.courseId);
-        if (course) {
-          this.courseName = get(course, 'subProgram.program.name');
-          this.learners = Object.freeze(course.trainees.map(this.formatRow));
-        }
+        await this.$store.dispatch('course/fetchCourse', { courseId: this.courseId });
       } catch (e) {
         console.error(e);
-        this.learnerList = [];
-      } finally {
-        this.tableLoading = false;
+        NotifyNegative('Erreur lors de la récupération de la formation.');
       }
     },
-    goToLearnerProfile (row) {
-      this.$router.push({ name: 'ni users learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
-    },
+  },
+  beforeDestroy () {
+    this.$store.dispatch('course/resetCourse');
   },
 };
 </script>

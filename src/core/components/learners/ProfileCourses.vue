@@ -20,7 +20,6 @@ import TableList from '@components/table/TableList';
 import { BLENDED } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
-import { courseFollowUpMixin } from '@mixins/courseFollowUpMixin';
 
 export default {
   name: 'ProfileCourses',
@@ -28,7 +27,6 @@ export default {
     'ni-table-list': TableList,
     'ni-progress': Progress,
   },
-  mixins: [courseFollowUpMixin],
   data () {
     return {
       isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
@@ -75,8 +73,12 @@ export default {
     ...mapState('userProfile', ['userProfile']),
   },
   async created () {
-    const courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
-    this.courses = courses.map(c => ({ ...c, progress: this.getCourseProgress(c.subProgram.steps) }));
+    try {
+      this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+    } catch (e) {
+      console.error(e);
+      this.courses = [];
+    }
   },
   methods: {
     goToBlendedCourseProfileAdmin (row) {
