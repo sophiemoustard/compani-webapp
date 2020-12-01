@@ -26,7 +26,7 @@ export default {
       this.$emit('click', event);
     },
     handleCopySuccess () {
-      this.$emit('handleCopySuccess');
+      this.$emit('handle-copy-success');
     },
   },
 };

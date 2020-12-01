@@ -4,7 +4,7 @@
       <div class="row">
         <p style="flex: 1" class="text-weight-bold">{{ tableTitle }}</p>
         <ni-multi-color-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail" size="sm"
-          :value-to-copy="traineesEmail" @handleCopySuccess="handleCopySuccess" />
+          :value-to-copy="traineesEmails" @handle-copy-success="handleCopySuccess" />
       </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
@@ -168,7 +168,7 @@ export default {
       if (this.isIntraCourse) return visibleColumns;
       return ['company', ...visibleColumns];
     },
-    traineesEmail () {
+    traineesEmails () {
       if (!this.course.trainees) return '';
 
       const traineesEmails = this.course.trainees.map(trainee => trainee.local.email);
