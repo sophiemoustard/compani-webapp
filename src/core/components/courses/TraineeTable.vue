@@ -1,7 +1,11 @@
 <template>
   <div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">{{ tableTitle }}</p>
+      <div class="row">
+        <p style="flex: 1" class="text-weight-bold">{{ tableTitle }}</p>
+        <ni-multi-color-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail" size="sm"
+          :value-to-copy="traineesEmail" @handleCopySuccess="handleCopySuccess" />
+      </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
           :visible-columns="traineesVisibleColumns">
@@ -59,6 +63,7 @@ import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
+import MultiColorsButton from '@components/MultiColorsButton';
 
 export default {
   name: 'TraineeTable',
@@ -72,6 +77,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'learner-creation-modal': LearnerCreationModal,
     'trainee-edition-modal': TraineeEditionModal,
+    'ni-multi-color-button': MultiColorsButton,
   },
   data () {
     return {
@@ -161,6 +167,14 @@ export default {
       if (this.canEdit) visibleColumns.push('actions');
       if (this.isIntraCourse) return visibleColumns;
       return ['company', ...visibleColumns];
+    },
+    traineesEmail () {
+      if (!this.course.trainees) return '';
+
+      const traineesEmails = this.course.trainees.map(trainee => trainee.local.email);
+      const formattedTraineesEmails = traineesEmails.reduce((acc, value) => `${acc},${value}`);
+
+      return formattedTraineesEmails;
     },
   },
   async created () {
@@ -298,6 +312,9 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression du stagiaire.');
       }
+    },
+    handleCopySuccess () {
+      NotifyPositive('Adresses mail copiées !');
     },
   },
 };
