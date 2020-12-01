@@ -167,6 +167,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import omit from 'lodash/omit';
 import { required, numeric, requiredIf, email } from 'vuelidate/lib/validators';
 import Services from '@api/Services';
 import Surcharges from '@api/Surcharges';
@@ -687,7 +688,7 @@ export default {
       };
       this.$v.newSurcharge.$reset();
     },
-    getSurchargePayload (surcharge) {
+    formatSurchargePayload (surcharge) {
       const payload = cloneDeep(surcharge);
       if (surcharge.eveningStartTime) {
         payload.eveningStartTime = this.$moment(surcharge.eveningStartTime, 'HH:mm').format('HH:mm');
@@ -702,7 +703,7 @@ export default {
         payload.customEndTime = this.$moment(surcharge.customEndTime, 'HH:mm').format('HH:mm');
       }
 
-      return payload;
+      return omit(payload, ['_id', 'company']);
     },
     async createNewSurcharge () {
       try {
@@ -710,7 +711,7 @@ export default {
         if (this.$v.newSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.loading = true;
 
-        const payload = this.getSurchargePayload(this.newSurcharge);
+        const payload = this.formatSurchargePayload(this.newSurcharge);
         await Surcharges.create(payload);
         NotifyPositive('Plan de majoration créé.');
         this.surchargeCreationModal = false;
@@ -766,12 +767,11 @@ export default {
       try {
         this.$v.editedSurcharge.$touch();
         if (this.$v.editedSurcharge.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         this.loading = true;
-        const surchargeId = this.editedSurcharge._id;
-        const payload = this.getSurchargePayload(this.editedSurcharge);
-        delete payload._id;
-        delete payload.company;
-        await Surcharges.updateById(surchargeId, payload);
+        const payload = this.formatSurchargePayload(this.editedSurcharge);
+        await Surcharges.updateById(this.editedSurcharge._id, payload);
+
         NotifyPositive('Plan de majoration modifié.');
         this.surchargeEditionModal = false;
         await this.refreshSurcharges();
