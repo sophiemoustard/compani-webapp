@@ -23,7 +23,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <ni-button class="row no-wrap table-actions" icon="close" />
+                  <ni-button class="row no-wrap table-actions" icon="close" :disable="program.categories.length <= 1" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -31,10 +31,13 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter une catégorie" />
+          <ni-button color="primary" icon="add" label="Ajouter une catégorie" @click="categoryAdditionModal = true" />
         </q-card-actions>
       </q-card>
-</div>
+
+    <category-addition-modal v-model="categoryAdditionModal" @hide="resetModal" @submit="addCategory"
+      :new-category="newCategory" :validations="$v.newCategory" :loading="loading" :categories="program.categories" />
+    </div>
   </div>
 </template>
 
@@ -48,6 +51,7 @@ import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import CategoryAdditionModal from 'src/modules/vendor/components/programs/CategoryAdditionModal';
 import Button from '@components/Button';
 import { IMAGE_EXTENSIONS } from '@data/constants';
 import { upperCaseFirstLetter } from '@helpers/utils';
@@ -62,12 +66,14 @@ export default {
     'ni-file-uploader': FileUploader,
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
+    'category-addition-modal': CategoryAdditionModal,
   },
   data () {
     return {
       tmpInput: '',
       extensions: IMAGE_EXTENSIONS,
       maxFileSize: 500 * 1000,
+      newCategory: { name: '' },
       categories: [],
       columns: [
         {
@@ -80,6 +86,8 @@ export default {
         },
         { name: 'actions', label: '', field: '_id' },
       ],
+      categoryAdditionModal: false,
+      loading: false,
     };
   },
   validations () {
@@ -89,6 +97,7 @@ export default {
         description: { required },
         learningGoals: { required },
       },
+      newCategory: { name: { required } },
     };
   },
   computed: {
@@ -115,6 +124,11 @@ export default {
         console.error(e);
       }
     },
+    formatCategoryPayload () {
+      const payload = { categories: this.program.categories.map(c => c._id) };
+      payload.categories.push(this.newCategory.name);
+      return payload;
+    },
     async updateProgram (path) {
       try {
         const value = get(this.program, path);
@@ -122,8 +136,8 @@ export default {
 
         get(this.$v.program, path).$touch();
         if (get(this.$v.program, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+        const payload = (path === 'categories') ? this.formatCategoryPayload() : set({}, path, value.trim());
 
-        const payload = set({}, path, value.trim());
         await Programs.update(this.profileId, payload);
         NotifyPositive('Modification enregistrée.');
 
@@ -160,6 +174,15 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'image.');
       }
+    },
+    resetModal () {
+      this.$v.newCategory.$reset();
+      this.newCategory = { name: '' };
+    },
+    async addCategory () {
+      this.$v.newCategory.$touch();
+      if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
+      await this.updateProgram('categories');
     },
   },
 };
