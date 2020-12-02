@@ -195,7 +195,7 @@ export default {
         color: $primary
         font-weight: bold
         @media screen and (min-width: 768px)
-          margin-bottom: 20px !importants
+          margin-bottom: 20px !important
   &-img
     height: 110px
     margin-right: 10px

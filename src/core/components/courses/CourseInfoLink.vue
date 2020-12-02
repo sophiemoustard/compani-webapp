@@ -1,10 +1,10 @@
 <template>
   <div class="course-link">
-    <ni-bi-color-button icon="info" label="Convocation papier" :disable="disableLink" :href="courseLink"
+    <ni-bi-color-button icon="info" label="Convocation papier" :disable="disableLink" :href="courseLink()"
       size="16px" type="a" />
     <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
-      v-clipboard:copy="!disableLink && courseLink" v-clipboard:success="handleCopySuccess" />
-  </div>
+      v-clipboard:copy="!disableLink && courseLink()" v-clipboard:success="handleCopySuccess" />
+</div>
 </template>
 
 <script>
@@ -12,6 +12,7 @@ import { mapState } from 'vuex';
 import { NotifyPositive } from '@components/popup/notify';
 import Button from '@components/Button';
 import BiColorButton from '@components/BiColorButton';
+import Courses from '@api/Courses';
 
 export default {
   name: 'CourseInfoLink',
@@ -24,14 +25,13 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    courseLink () {
-      return `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/`
-        + `trainees/courses/${this.course._id}`;
-    },
   },
   methods: {
     handleCopySuccess () {
       return NotifyPositive('Lien copié !');
+    },
+    courseLink () {
+      return Courses.getPdfUrl(this.course._id);
     },
   },
 };
