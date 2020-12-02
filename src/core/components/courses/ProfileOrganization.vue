@@ -9,7 +9,7 @@
         <ni-course-info-link :disable-link="followUpDisabled" />
       </div>
       <div v-else class="profile-container">
-        <ni-multi-color-button icon="history" label="Historique" @click="toggleHistory" />
+        <ni-bi-color-button class="button-history" icon="history" label="Historique" @click="toggleHistory" />
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
@@ -52,7 +52,7 @@ import {
 import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
-import MultiColorsButton from '@components/MultiColorsButton';
+import BiColorButton from '@components/BiColorButton';
 
 export default {
   name: 'ProfileOrganization',
@@ -68,7 +68,7 @@ export default {
     'ni-course-info-link': CourseInfoLink,
     'ni-banner': Banner,
     'course-history-feed': CourseHistoryFeed,
-    'ni-multi-color-button': MultiColorsButton,
+    'ni-bi-color-button': BiColorButton,
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
@@ -177,5 +177,8 @@ export default {
   .profile-container
     display: flex
     flex-direction: column
+
+  .button-history
+    align-self: flex-end
 
 </style>
