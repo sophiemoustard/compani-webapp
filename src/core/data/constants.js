@@ -1,6 +1,7 @@
 export const TOKEN_EXPIRE_DAY = 1; // in days
 
 export const IDENTIFICATION = 'identification';
+export const CONTRACT_END = 'contract_end';
 
 // MEDIA
 export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'

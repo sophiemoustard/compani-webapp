@@ -104,7 +104,6 @@ import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import EditableTd from '@components/table/EditableTd';
 import { IDENTIFICATION, ABSENCE, CONTRACT_VERSION } from '@data/constants';
-import { downloadFile } from '@helpers/file';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
@@ -275,17 +274,6 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création des fiches de paie.');
-      }
-    },
-    async exportTxt (type) {
-      try {
-        const txt = await Pay.export(type, this.dates);
-        await downloadFile(txt, `${type}_${this.$moment(this.dates.startDate).format('MM_YYYY')}.txt`);
-
-        NotifyPositive('Document téléchargé.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
   },
