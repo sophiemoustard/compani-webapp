@@ -9,10 +9,7 @@
         <ni-course-info-link :disable-link="followUpDisabled" />
       </div>
       <div v-else class="profile-container">
-        <div class="button-container">
-          <ni-button class="button" flat icon="history" color="primary" @click="toggleHistory" />
-          <ni-button class="button" flat label="Historique" color="black" @click="toggleHistory" />
-        </div>
+        <ni-bi-color-button class="button-history" icon="history" label="Historique" @click="toggleHistory" />
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
@@ -39,7 +36,6 @@ import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
 import Input from '@components/form/Input';
-import Button from '@components/Button';
 import Select from '@components/form/Select';
 import SlotContainer from '@components/courses/SlotContainer';
 import TraineeTable from '@components/courses/TraineeTable';
@@ -56,6 +52,7 @@ import {
 import { formatIdentity } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
+import BiColorButton from '@components/BiColorButton';
 
 export default {
   name: 'ProfileOrganization',
@@ -70,8 +67,8 @@ export default {
     'ni-trainee-table': TraineeTable,
     'ni-course-info-link': CourseInfoLink,
     'ni-banner': Banner,
-    'ni-button': Button,
     'course-history-feed': CourseHistoryFeed,
+    'ni-bi-color-button': BiColorButton,
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
@@ -181,11 +178,7 @@ export default {
     display: flex
     flex-direction: column
 
-  .button-container
+  .button-history
     align-self: flex-end
-
-  .button
-    margin: -4px
-    align-self: center
 
 </style>
