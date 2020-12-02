@@ -5,14 +5,15 @@
       <div class="row gutter-profile">
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
           :error="$v.program.name.$error" required-field />
-      </div>
-      <div class="row gutter-profile">
-        <ni-input caption="Description" v-model.trim="program.description" type="textarea"
-          @focus="saveTmp('description')" @blur="updateProgram('description')" required-field
-          :error="$v.program.description.$error" />
         <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinary-storage
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
           :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :max-file-size="maxFileSize" />
+        <ni-input caption="Description" v-model="program.description" type="textarea"
+          @focus="saveTmp('description')" @blur="updateProgram('description')" required-field
+          :error="$v.program.description.$error" />
+        <ni-input caption="Objectifs pédagogiques" v-model="program.learningGoals" type="textarea"
+          @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
+          :error="$v.program.learningGoals.$error" />
       </div>
     </div>
   </div>
@@ -47,7 +48,11 @@ export default {
   },
   validations () {
     return {
-      program: { name: { required }, description: { required } },
+      program: {
+        name: { required },
+        description: { required },
+        learningGoals: { required },
+      },
     };
   },
   computed: {
@@ -78,17 +83,17 @@ export default {
       try {
         const value = get(this.program, path);
         if (this.tmpInput === value) return;
-        this.$v.program.$touch();
-        if (this.$v.program.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = set({}, path, value);
+        get(this.$v.program, path).$touch();
+        if (get(this.$v.program, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        const payload = set({}, path, value.trim());
         await Programs.update(this.profileId, payload);
         NotifyPositive('Modification enregistrée.');
 
         await this.refreshProgram();
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
