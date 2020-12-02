@@ -31,16 +31,12 @@
       <ni-course-info-link :disable-link="followUpDisabled" />
 
       <q-item>
-        <ni-button color="primary" :disable="followUpDisabled" icon="file_download" type="a"
-          :href="downloadAttendanceSheet()" />
-        <ni-button color="black" :disable="followUpDisabled" :href="downloadAttendanceSheet()"
-          label="Télécharger les feuilles d'émargement" size="16px" type="a" />
+        <ni-bi-color-button icon="file_download" label="Télécharger les feuilles d'émargement"
+          :disable="followUpDisabled" :href="downloadAttendanceSheet()" size="16px" type="a" />
       </q-item>
       <q-item>
-        <ni-button color="primary" :disable="disableDownloadCompletionCertificates" icon="file_download" type="a"
-          :href="downloadCompletionCertificates()" />
-        <ni-button color="black" :disable="disableDownloadCompletionCertificates" type="a" size="16px"
-          :href="downloadCompletionCertificates()" label="Télécharger les attestations de fin de formation" />
+        <ni-bi-color-button icon="file_download" label="Télécharger les attestations de fin de formation" type="a"
+          :disable="disableDownloadCompletionCertificates" :href="downloadCompletionCertificates()" size="16px" />
       </q-item>
     </div>
     <div class="q-mb-xl">
@@ -112,6 +108,7 @@ import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
+import BiColorButton from '@components/BiColorButton';
 
 export default {
   name: 'ProfileAdmin',
@@ -123,6 +120,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
+    'ni-bi-color-button': BiColorButton,
   },
   mixins: [courseMixin],
   props: {

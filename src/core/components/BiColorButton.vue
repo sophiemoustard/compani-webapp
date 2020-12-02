@@ -1,7 +1,9 @@
 <template>
   <div>
-    <ni-button class="button" flat :icon="icon" color="primary" @click="click" :size="size" />
-    <ni-button class="button" flat :label="label" color="black" @click="click" :size="size" />
+    <ni-button class="button" flat :icon="icon" color="primary" @click="click" :size="size" :href="!disable && href"
+      :disable="disable" :type="type" />
+    <ni-button class="button" flat :label="label" color="black" @click="click" :size="size" :href="!disable && href"
+      :disable="disable" :type="type" />
   </div>
 </template>
 
@@ -14,6 +16,9 @@ export default {
     icon: { type: String, default: '' },
     label: { type: String, default: '' },
     size: { type: String, default: 'md' },
+    href: { type: String, default: '' },
+    disable: { type: Boolean, default: false },
+    type: { type: String, default: '' },
   },
   components: {
     'ni-button': Button,

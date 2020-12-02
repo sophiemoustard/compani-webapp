@@ -1,8 +1,7 @@
 <template>
   <div class="course-link">
-    <ni-button :disable="disableLink" type="a" :href="courseLink" color="primary" icon="info" />
-    <ni-button :disable="disableLink" type="a" :href="courseLink"
-      label="Page info formation" color="black" size="16px" />
+    <ni-bi-color-button icon="info" label="Page info formation" :disable="disableLink" :href="courseLink"
+      size="16px" type="a" />
     <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
       v-clipboard:copy="!disableLink && courseLink" v-clipboard:success="handleCopySuccess" />
   </div>
@@ -12,11 +11,13 @@
 import { mapState } from 'vuex';
 import { NotifyPositive } from '@components/popup/notify';
 import Button from '@components/Button';
+import BiColorButton from '@components/BiColorButton';
 
 export default {
   name: 'CourseInfoLink',
   components: {
     'ni-button': Button,
+    'ni-bi-color-button': BiColorButton,
   },
   props: {
     disableLink: { type: Boolean, default: true },
