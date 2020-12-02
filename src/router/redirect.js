@@ -3,7 +3,7 @@ import store from 'src/store/index';
 import { Cookies, LocalStorage } from 'quasar';
 
 export const logOutAndRedirectToLogin = (params) => {
-  const options = { path: '/', sameSite: 'Strict' };
+  const options = { path: '/', sameSite: 'Lax' };
   Cookies.remove('alenvi_token', options);
   Cookies.remove('refresh_token', options);
   Cookies.remove('user_id', options);
