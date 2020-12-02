@@ -134,8 +134,9 @@ export default {
         const value = get(this.program, path);
         if (this.tmpInput === value) return;
 
-        get(this.$v.program, path).$touch();
-        if (get(this.$v.program, path).$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.program.$touch();
+        if (this.$v.program.$error) return NotifyWarning('Champ(s) invalide(s)');
+
         const payload = (path === 'categories') ? this.formatCategoryPayload() : set({}, path, value.trim());
 
         await Programs.update(this.profileId, payload);
