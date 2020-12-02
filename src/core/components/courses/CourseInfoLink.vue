@@ -1,6 +1,6 @@
 <template>
   <div class="course-link">
-    <ni-bi-color-button icon="info" label="Page info formation" :disable="disableLink" :href="courseLink"
+    <ni-bi-color-button icon="info" label="Convocation papier" :disable="disableLink" :href="courseLink"
       size="16px" type="a" />
     <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
       v-clipboard:copy="!disableLink && courseLink" v-clipboard:success="handleCopySuccess" />
