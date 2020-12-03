@@ -15,6 +15,8 @@
           @focus="saveTmp('learningGoals')" @blur="updateProgram('learningGoals')" required-field
           :error="$v.program.learningGoals.$error" />
       </div>
+    </div>
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Catégories</p>
       <q-card class="no-shadow">
         <ni-responsive-table :data="program.categories" :columns="columns">
@@ -34,10 +36,10 @@
           <ni-button color="primary" icon="add" label="Ajouter une catégorie" @click="categoryAdditionModal = true" />
         </q-card-actions>
       </q-card>
-
-    <category-addition-modal v-model="categoryAdditionModal" @hide="resetModal" @submit="addCategory"
-      :new-category="newCategory" :validations="$v.newCategory" :loading="loading" :categories="program.categories" />
     </div>
+
+    <category-addition-modal v-model="categoryAdditionModal" :new-category="newCategory" :validations="$v.newCategory"
+      @hide="resetModal" @submit="addCategory" :loading="loading" :category-options="categoryOptions" />
   </div>
 </template>
 
@@ -47,6 +49,7 @@ import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Programs from '@api/Programs';
+import Categories from '@api/Categories';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
@@ -108,6 +111,15 @@ export default {
     imageFileName () {
       return this.program.name.replace(/ /g, '');
     },
+    categoryOptions () {
+      return this.categories
+        .filter(c => !this.program.categories.find(e => e._id === c._id))
+        .map(c => ({ label: c.name, value: c._id }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+    },
+  },
+  async created () {
+    this.categories = await Categories.list();
   },
   async mounted () {
     if (!this.program) await this.refreshProgram();
@@ -125,9 +137,7 @@ export default {
       }
     },
     formatCategoryPayload () {
-      const payload = { categories: this.program.categories.map(c => c._id) };
-      payload.categories.push(this.newCategory.name);
-      return payload;
+      return { categories: (this.program.categories.map(c => c._id)).push(this.newCategory.name) };
     },
     async updateProgram (path) {
       try {
