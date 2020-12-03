@@ -28,7 +28,6 @@
 
 <script>
 import 'vue-croppa/dist/vue-croppa.css';
-import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import Users from '@api/Users';
 import cloudinary from '@api/Cloudinary';
@@ -53,9 +52,6 @@ export default {
     hasPicture () {
       return !!this.pictureLink;
     },
-    pictureUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.user._id}/upload`;
-    },
     pictureLink () {
       return get(this.user, 'picture.link') || '';
     },
@@ -70,22 +66,23 @@ export default {
     },
   },
   methods: {
+    async formatImagePayload () {
+      const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
+
+      const data = new FormData();
+      data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
+      data.append('file', blob);
+
+      return data;
+    },
     async uploadImage () {
       try {
-        if (this.hasPicture && !this.fileChosen) {
-          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
-        }
-        this.loadingImage = true;
-        const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
-        const data = new FormData();
-        data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
-        data.append('file', blob);
+        if (this.hasPicture && !this.fileChosen) await cloudinary.deleteImageById({ id: this.user.picture.publicId });
 
-        await this.$axios.post(
-          this.pictureUploadUrl,
-          data,
-          { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } }
-        );
+        this.loadingImage = true;
+
+        const paylaod = await this.formatImagePayload();
+        await Users.uploadImage(this.user._id, paylaod);
         await this.refreshPicture();
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
