@@ -1,8 +1,8 @@
 <template>
   <div>
-    <ni-button class="button" flat :icon="icon" color="primary" @click="click" :size="size" :href="!disable && href"
+    <ni-button class="button" flat :icon="icon" color="primary" @click="click" :size="size" :href="href"
       :disable="disable" :type="type" />
-    <ni-button class="button" flat :label="label" color="black" @click="click" :size="size" :href="!disable && href"
+    <ni-button class="button" flat :label="label" color="black" @click="click" :size="size" :href="href"
       :disable="disable" :type="type" />
   </div>
 </template>

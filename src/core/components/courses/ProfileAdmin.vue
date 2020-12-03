@@ -30,14 +30,10 @@
 
       <ni-course-info-link :disable-link="followUpDisabled" />
 
-      <q-item>
-        <ni-bi-color-button icon="file_download" label="Télécharger les feuilles d'émargement"
-          :disable="followUpDisabled" :href="downloadAttendanceSheet()" size="16px" type="a" />
-      </q-item>
-      <q-item>
-        <ni-bi-color-button icon="file_download" label="Télécharger les attestations de fin de formation" type="a"
-          :disable="disableDownloadCompletionCertificates" :href="downloadCompletionCertificates()" size="16px" />
-      </q-item>
+      <ni-bi-color-button icon="file_download" label="Télécharger les feuilles d'émargement"
+        :disable="followUpDisabled" :href="downloadAttendanceSheet()" size="16px" type="a" />
+      <ni-bi-color-button icon="file_download" label="Télécharger les attestations de fin de formation" type="a"
+        :disable="disableDownloadCompletionCertificates" :href="downloadCompletionCertificates()" size="16px" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
@@ -74,11 +70,8 @@
           {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
         </template>
       </ni-banner>
-      <q-item>
-          <ni-button color="primary" :disable="disableSms" icon="mdi-cellphone-message" @click="openSmsModal" />
-          <ni-button color="black" :disable="disableSms" @click="openSmsModal" size="16px"
-            label="Envoyer un SMS de convocation ou de rappel aux stagiaires" />
-      </q-item>
+      <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
+        label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
     </div>
 
     <!-- Modal envoi message -->
