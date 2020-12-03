@@ -30,7 +30,6 @@
 import 'vue-croppa/dist/vue-croppa.css';
 import get from 'lodash/get';
 import Users from '@api/Users';
-import cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
 
@@ -53,7 +52,7 @@ export default {
       return !!this.pictureLink;
     },
     pictureLink () {
-      return get(this.user, 'picture.link') || '';
+      return get(this.user, 'picture.link') || null;
     },
     canvasColor () {
       return /\/ad\//.test(this.$router.currentRoute.path) ? '#FFEDDA' : '#EEE';
@@ -77,12 +76,12 @@ export default {
     },
     async uploadImage () {
       try {
-        if (this.hasPicture && !this.fileChosen) await cloudinary.deleteImageById({ id: this.user.picture.publicId });
+        if (this.hasPicture && !this.fileChosen) await Users.deleteImage(this.user._id);
 
         this.loadingImage = true;
-
         const paylaod = await this.formatImagePayload();
         await Users.uploadImage(this.user._id, paylaod);
+
         await this.refreshPicture();
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
@@ -96,9 +95,9 @@ export default {
     async deleteImage () {
       try {
         if (get(this.user, 'picture.publicId')) {
-          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
+          await Users.deleteImage(this.user._id);
           this.croppa.remove();
-          await Users.updateById(this.user._id, { picture: { link: null, publicId: null } });
+
           await this.refreshPicture();
           NotifyPositive('Photo supprimée');
         } else NotifyNegative('Erreur lors de la suppression de la photo.');

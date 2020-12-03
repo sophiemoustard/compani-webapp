@@ -95,4 +95,7 @@ export default {
   async uploadImage (userId, paylaod) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/upload`, paylaod);
   },
+  async deleteImage (userId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${userId}/upload`);
+  },
 };
