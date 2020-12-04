@@ -13,7 +13,6 @@ export const learnerDirectoryMixin = {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'min-width: 200px; width: 35%',
         },
         {
           name: 'blendedCoursesCount',
@@ -21,8 +20,6 @@ export const learnerDirectoryMixin = {
           field: 'blendedCoursesCount',
           align: 'center',
           sortable: true,
-          style: 'min-width: 110px; width: 15%',
-          sort: (a, b) => b - a,
         },
         {
           name: 'eLearningCoursesCount',
@@ -30,8 +27,6 @@ export const learnerDirectoryMixin = {
           field: 'eLearningCoursesCount',
           align: 'center',
           sortable: true,
-          style: 'min-width: 110px; width: 15%',
-          sort: (a, b) => b - a,
         },
       ],
     };
