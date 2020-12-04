@@ -92,4 +92,10 @@ export default {
   async createDriveFolder (userId) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`);
   },
+  async uploadImage (userId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/upload`, payload);
+  },
+  async deleteImage (userId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${userId}/upload`);
+  },
 };

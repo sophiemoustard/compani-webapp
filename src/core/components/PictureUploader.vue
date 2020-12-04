@@ -28,10 +28,8 @@
 
 <script>
 import 'vue-croppa/dist/vue-croppa.css';
-import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import Users from '@api/Users';
-import cloudinary from '@api/Cloudinary';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { removeDiacritics } from '@helpers/utils';
 
@@ -53,9 +51,6 @@ export default {
     hasPicture () {
       return !!this.pictureLink;
     },
-    pictureUploadUrl () {
-      return `${process.env.API_HOSTNAME}/users/${this.user._id}/cloudinary/upload`;
-    },
     pictureLink () {
       return get(this.user, 'picture.link') || null;
     },
@@ -63,29 +58,30 @@ export default {
       return /\/ad\//.test(this.$router.currentRoute.path) ? '#FFEDDA' : '#EEE';
     },
     noDiacriticLastname () {
-      return removeDiacritics(get(this.user, 'identity.lastname')) || '';
+      return removeDiacritics(get(this.user, 'identity.lastname') || '');
     },
     noDiacriticFirstname () {
-      return removeDiacritics(get(this.user, 'identity.firstname')) || '';
+      return removeDiacritics(get(this.user, 'identity.firstname') || '');
     },
   },
   methods: {
+    async formatImagePayload () {
+      const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
+
+      const data = new FormData();
+      data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
+      data.append('file', blob);
+
+      return data;
+    },
     async uploadImage () {
       try {
-        if (this.hasPicture && !this.fileChosen) {
-          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
-        }
-        this.loadingImage = true;
-        const blob = await this.croppa.promisedBlob('image/jpeg', 0.8);
-        const data = new FormData();
-        data.append('fileName', `photo_${this.noDiacriticFirstname}_${this.noDiacriticLastname}`);
-        data.append('picture', blob);
+        if (this.hasPicture && !this.fileChosen) await Users.deleteImage(this.user._id);
 
-        await this.$axios.post(
-          this.pictureUploadUrl,
-          data,
-          { headers: { 'content-type': 'multipart/form-data', 'x-access-token': Cookies.get('alenvi_token') || '' } }
-        );
+        this.loadingImage = true;
+        const payload = await this.formatImagePayload();
+        await Users.uploadImage(this.user._id, payload);
+
         await this.refreshPicture();
         this.closePictureEdition();
         NotifyPositive('Modification enregistrée');
@@ -99,9 +95,9 @@ export default {
     async deleteImage () {
       try {
         if (get(this.user, 'picture.publicId')) {
-          await cloudinary.deleteImageById({ id: this.user.picture.publicId });
+          await Users.deleteImage(this.user._id);
           this.croppa.remove();
-          await Users.updateById(this.user._id, { picture: { link: null, publicId: null } });
+
           await this.refreshPicture();
           NotifyPositive('Photo supprimée');
         } else NotifyNegative('Erreur lors de la suppression de la photo.');
