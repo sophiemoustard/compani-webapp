@@ -9,6 +9,9 @@
         </div>
       </template>
     </ni-title-header>
+    <div class="q-mx-md">
+      <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_END)" label="Données fin de contrats" />
+    </div>
     <ni-large-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
       <template #header="{ props }">
@@ -80,11 +83,13 @@
 
 <script>
 import FinalPay from '@api/FinalPay';
+import Button from '@components/Button';
 import EditableTd from '@components/table/EditableTd';
 import LargeTable from '@components/table/LargeTable';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { CONTRACT_END } from '@data/constants';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
@@ -99,6 +104,7 @@ export default {
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
     'ni-title-header': TitleHeader,
     'ni-select': Select,
+    'ni-button': Button,
   },
   data () {
     return {
@@ -110,6 +116,7 @@ export default {
       surchargeDetails: {},
       pay: {},
       surchargeDetailKey: '',
+      CONTRACT_END,
     };
   },
   computed: {
