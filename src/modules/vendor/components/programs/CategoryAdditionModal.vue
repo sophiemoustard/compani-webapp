@@ -3,8 +3,8 @@
     <template slot="title">
       Ajouter une <span class="text-weight-bold">catégorie</span>
     </template>
-    <ni-select in-modal v-model="newCategory.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field caption="Catégorie" :options="categoryOptions" />
+    <ni-select in-modal v-model="newCategory.categoryId" :error="validations.categoryId.$error"
+        @blur="validations.categoryId.$touch" required-field caption="Catégorie" :options="categoryOptions" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la catégorie" color="primary" :loading="loading"
         icon-right="add" @click="submit" />

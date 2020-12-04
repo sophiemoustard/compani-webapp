@@ -77,7 +77,7 @@ export default {
       tmpInput: '',
       extensions: IMAGE_EXTENSIONS,
       maxFileSize: 500 * 1000,
-      newCategory: { name: '' },
+      newCategory: { categoryId: '' },
       categories: [],
       columns: [
         {
@@ -101,7 +101,7 @@ export default {
         description: { required },
         learningGoals: { required },
       },
-      newCategory: { name: { required } },
+      newCategory: { categoryId: { required } },
     };
   },
   computed: {
@@ -188,8 +188,22 @@ export default {
       this.newCategory = { name: '' };
     },
     async addCategory () {
-      // eslint-disable-next-line no-console
-      console.log(this.newCategory.name);
+      try {
+        this.$v.newCategory.$touch();
+        if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.loading = true;
+        await Programs.addCategory(this.program._id, { categoryId: this.newCategory.categoryId });
+
+        this.categoryAdditionModal = false;
+        NotifyPositive('Catégorie ajoutée.');
+        await this.refreshProgram();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de la catégorie.');
+      } finally {
+        this.loading = false;
+      }
     },
     async removeCategory (categoryId) {
       // eslint-disable-next-line no-console

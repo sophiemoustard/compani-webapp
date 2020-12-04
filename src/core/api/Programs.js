@@ -21,4 +21,7 @@ export default {
   async deleteImage (programId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/programs/${programId}/upload`);
   },
+  async addCategory (programId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/categories`, payload);
+  },
 };
