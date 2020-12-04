@@ -39,8 +39,8 @@
       </q-card>
     </div>
 
-    <category-addition-modal v-model="categoryAdditionModal" :new-category="newCategory" :validations="$v.newCategory"
-      @hide="resetModal" @submit="addCategory" :loading="loading" :category-options="categoryOptions" />
+    <category-addition-modal v-model="categoryAdditionModal" :new-category.sync="newCategory" :loading="loading"
+      @hide="resetModal" @submit="addCategory" :category-options="categoryOptions" :validations="$v.newCategory" />
   </div>
 </template>
 
@@ -58,7 +58,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import CategoryAdditionModal from 'src/modules/vendor/components/programs/CategoryAdditionModal';
 import Button from '@components/Button';
 import { IMAGE_EXTENSIONS } from '@data/constants';
-import { upperCaseFirstLetter } from '@helpers/utils';
+import { upperCaseFirstLetter, formatAndSortOptions } from '@helpers/utils';
 
 export default {
   name: 'ProfileInfo',
@@ -77,7 +77,7 @@ export default {
       tmpInput: '',
       extensions: IMAGE_EXTENSIONS,
       maxFileSize: 500 * 1000,
-      newCategory: { categoryId: '' },
+      newCategory: '',
       categories: [],
       columns: [
         {
@@ -101,7 +101,7 @@ export default {
         description: { required },
         learningGoals: { required },
       },
-      newCategory: { categoryId: { required } },
+      newCategory: { required },
     };
   },
   computed: {
@@ -113,10 +113,10 @@ export default {
       return this.program.name.replace(/ /g, '');
     },
     categoryOptions () {
-      return this.categories
-        .filter(c => !this.program.categories.find(e => e._id === c._id))
-        .map(c => ({ label: c.name, value: c._id }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      return formatAndSortOptions(
+        this.categories.filter(c => !this.program.categories.find(e => e._id === c._id)),
+        'name'
+      );
     },
   },
   async mounted () {
@@ -190,7 +190,7 @@ export default {
     },
     resetModal () {
       this.$v.newCategory.$reset();
-      this.newCategory = { name: '' };
+      this.newCategory = '';
     },
     async addCategory () {
       try {
@@ -198,7 +198,7 @@ export default {
         if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
-        await Programs.addCategory(this.program._id, { categoryId: this.newCategory.categoryId });
+        await Programs.addCategory(this.program._id, { categoryId: this.newCategory });
 
         this.categoryAdditionModal = false;
         NotifyPositive('Catégorie ajoutée.');
