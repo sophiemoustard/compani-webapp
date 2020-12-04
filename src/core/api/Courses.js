@@ -52,6 +52,9 @@ export default {
   async addAccessRule (courseId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules`, payload);
   },
+  async deleteAccessRule (courseId, accessRuleId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules/${accessRuleId}`);
+  },
   getConvocationUrl (courseId) {
     return `${process.env.API_HOSTNAME}/courses/${courseId}/convocations`;
   },
