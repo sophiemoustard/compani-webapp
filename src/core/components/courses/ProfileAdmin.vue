@@ -30,9 +30,9 @@
 
       <ni-course-info-link :disable-link="followUpDisabled" />
 
-      <ni-bi-color-button icon="file_download" label="Télécharger les feuilles d'émargement"
+      <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
         :disable="followUpDisabled" :href="downloadAttendanceSheet()" size="16px" type="a" />
-      <ni-bi-color-button icon="file_download" label="Télécharger les attestations de fin de formation" type="a"
+      <ni-bi-color-button icon="file_download" label="Attestations de fin de formation" type="a"
         :disable="disableDownloadCompletionCertificates" :href="downloadCompletionCertificates()" size="16px" />
     </div>
     <div class="q-mb-xl">
