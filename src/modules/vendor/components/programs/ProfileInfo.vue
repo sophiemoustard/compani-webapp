@@ -206,8 +206,19 @@ export default {
       }
     },
     async removeCategory (categoryId) {
-      // eslint-disable-next-line no-console
-      console.log(categoryId);
+      try {
+        this.loading = true;
+        await Programs.removeCategory(this.program._id, categoryId);
+
+        this.categoryAdditionModal = false;
+        NotifyPositive('Catégorie retirée.');
+        await this.refreshProgram();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du retrait de la catégorie.');
+      } finally {
+        this.loading = false;
+      }
     },
     validateCategoryRemoval (category) {
       this.$q.dialog({
