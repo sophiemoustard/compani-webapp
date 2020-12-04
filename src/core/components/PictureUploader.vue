@@ -79,8 +79,8 @@ export default {
         if (this.hasPicture && !this.fileChosen) await Users.deleteImage(this.user._id);
 
         this.loadingImage = true;
-        const paylaod = await this.formatImagePayload();
-        await Users.uploadImage(this.user._id, paylaod);
+        const payload = await this.formatImagePayload();
+        await Users.uploadImage(this.user._id, payload);
 
         await this.refreshPicture();
         this.closePictureEdition();
