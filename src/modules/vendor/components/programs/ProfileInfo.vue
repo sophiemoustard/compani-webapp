@@ -25,7 +25,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <ni-button class="row no-wrap table-actions" icon="close" :disable="program.categories.length <= 1" />
+                  <ni-button class="row no-wrap table-actions" icon="close" :disable="program.categories.length <= 1"
+                    @click="validateCategoryRemoval(props.row)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -136,19 +137,15 @@ export default {
         console.error(e);
       }
     },
-    formatCategoryPayload () {
-      return { categories: (this.program.categories.map(c => c._id)).push(this.newCategory.name) };
-    },
     async updateProgram (path) {
       try {
         const value = get(this.program, path);
         if (this.tmpInput === value) return;
 
-        this.$v.program.$touch();
-        if (this.$v.program.$error) return NotifyWarning('Champ(s) invalide(s)');
+        get(this.$v.program, path).$touch();
+        if (get(this.$v.program, path).$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = (path === 'categories') ? this.formatCategoryPayload() : set({}, path, value.trim());
-
+        const payload = set({}, path, value.trim());
         await Programs.update(this.profileId, payload);
         NotifyPositive('Modification enregistrée.');
 
@@ -191,9 +188,21 @@ export default {
       this.newCategory = { name: '' };
     },
     async addCategory () {
-      this.$v.newCategory.$touch();
-      if (this.$v.newCategory.$error) return NotifyWarning('Champ(s) invalide(s)');
-      await this.updateProgram('categories');
+      // eslint-disable-next-line no-console
+      console.log(this.newCategory.name);
+    },
+    async removeCategory (categoryId) {
+      // eslint-disable-next-line no-console
+      console.log(categoryId);
+    },
+    validateCategoryRemoval (category) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir retirer cette catégorie ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.removeCategory(category._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 };
