@@ -57,7 +57,7 @@ export default {
   async addAccessRule (courseId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules`, payload);
   },
-  getPdfUrl (courseId) {
-    return `${process.env.API_HOSTNAME}/courses/${courseId}/pdfs?x-access-token=${Cookies.get('alenvi_token')}`;
+  getConvocationUrl (courseId) {
+    return `${process.env.API_HOSTNAME}/courses/${courseId}/convocations`;
   },
 };

@@ -31,7 +31,7 @@ export default {
       return NotifyPositive('Lien copié !');
     },
     courseLink () {
-      return Courses.getPdfUrl(this.course._id);
+      return Courses.getConvocationUrl(this.course._id);
     },
   },
 };
