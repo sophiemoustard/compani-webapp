@@ -18,7 +18,7 @@
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Catégories</p>
-      <q-card class="no-shadow">
+      <q-card>
         <ni-responsive-table :data="program.categories" :columns="columns">
           <template #body="{ props }">
             <q-tr :props="props">
@@ -119,10 +119,8 @@ export default {
         .sort((a, b) => a.label.localeCompare(b.label));
     },
   },
-  async created () {
-    this.categories = await Categories.list();
-  },
   async mounted () {
+    await this.refreshCategories();
     if (!this.program) await this.refreshProgram();
     this.$v.program.$touch();
   },
@@ -133,6 +131,13 @@ export default {
     async refreshProgram () {
       try {
         await this.$store.dispatch('program/fetchProgram', { programId: this.profileId });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshCategories () {
+      try {
+        this.categories = await Categories.list();
       } catch (e) {
         console.error(e);
       }
@@ -210,7 +215,6 @@ export default {
         this.loading = true;
         await Programs.removeCategory(this.program._id, categoryId);
 
-        this.categoryAdditionModal = false;
         NotifyPositive('Catégorie retirée.');
         await this.refreshProgram();
       } catch (e) {
@@ -227,7 +231,7 @@ export default {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.removeCategory(category._id))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
+        .onCancel(() => NotifyPositive('Retrait annulé.'));
     },
   },
 };
