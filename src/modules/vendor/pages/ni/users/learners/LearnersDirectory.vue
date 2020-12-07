@@ -22,8 +22,9 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
+import { removeDiacritics } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
+import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
 
 export default {
   metaInfo: { title: 'Répertoire apprenants' },
@@ -32,42 +33,12 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
-  mixins: [userMixin],
+  mixins: [userMixin, learnerDirectoryMixin],
   data () {
     return {
-      tableLoading: false,
       loading: false,
       learnerList: [],
       searchStr: '',
-      pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 },
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: row => row.learner,
-          align: 'left',
-          sortable: true,
-          sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'min-width: 200px; width: 35%',
-        },
-        {
-          name: 'company',
-          label: 'Structure',
-          field: 'company',
-          align: 'left',
-          sortable: true,
-          style: 'min-width: 100px; width: 15%',
-        },
-        {
-          name: 'blendedCoursesCount',
-          label: 'Formations suivies',
-          field: 'blendedCoursesCount',
-          align: 'center',
-          sortable: true,
-          style: 'min-width: 110px; width: 15%',
-          sort: (a, b) => b - a,
-        },
-      ],
     };
   },
   computed: {
@@ -85,21 +56,6 @@ export default {
     },
     updateSearch (value) {
       this.searchStr = value;
-    },
-    formatRow (user) {
-      const formattedName = formatIdentity(user.identity, 'FL');
-
-      return {
-        learner: {
-          _id: user._id,
-          fullName: formattedName,
-          lastname: user.identity.lastname,
-          picture: user.picture ? user.picture.link : null,
-          noDiacriticsName: removeDiacritics(formattedName),
-        },
-        company: user.company ? user.company.name : 'N/A',
-        blendedCoursesCount: user.blendedCoursesCount,
-      };
     },
     async getLearnerList () {
       try {
