@@ -52,17 +52,11 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  computed: {
-    ...mapState('course', ['course']),
-    accessRules () {
-      return this.course.accessRules || [];
-    },
-  },
   data () {
     return {
       tableLoading: false,
       columns: [
-        { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 85%' },
+        { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 92%' },
         { name: 'actions', label: '', field: '_id' },
       ],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
@@ -71,6 +65,12 @@ export default {
       accessRuleCreationModal: false,
       modalLoading: false,
     };
+  },
+  computed: {
+    ...mapState('course', ['course']),
+    accessRules () {
+      return this.course.accessRules || [];
+    },
   },
   validations () {
     return {
