@@ -10,7 +10,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="delete" @click="() => openConfirmDeletionModal(col.value)" />
+                  <ni-button icon="delete" @click="validateAccessRuleDeletion(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -116,7 +116,7 @@ export default {
         this.accessRuleCreationModal = false;
         NotifyPositive('Règle d\'accès créée.');
 
-        this.refreshCourse();
+        await this.refreshCourse();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la règle d\'accès.');
@@ -124,14 +124,14 @@ export default {
         this.modalLoading = false;
       }
     },
-    openConfirmDeletionModal (accessRuleId) {
+    validateAccessRuleDeletion (accessRuleId) {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir supprimer cette règle d\'accès ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteAccessRule(accessRuleId))
-        .onCancel(() => NotifyPositive('Retrait annulé.'));
+        .onCancel(() => NotifyPositive('Suppression annulé.'));
     },
     async deleteAccessRule (accessRuleId) {
       try {
@@ -139,7 +139,7 @@ export default {
 
         NotifyPositive('Règle d\'accès suprimée.');
 
-        this.refreshCourse();
+        await this.refreshCourse();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la règle d\'accès.');
