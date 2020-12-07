@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <ni-profile-header :title="companyName">
-      <template v-slot:body>
+      <template #body>
         <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
           <q-item>
             <q-item-section side><q-icon size="xs" name="bookmark_border" /></q-item-section>

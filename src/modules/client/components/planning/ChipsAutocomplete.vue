@@ -2,7 +2,7 @@
   <q-select dense borderless bg-color="white" multiple behavior="menu" use-chips use-input ref="refFilter" emit-value
     :value="value" :options="options" @filter="search" @input="input" @add="addEvent" @remove="removeEvent"
     input-debounce="0" :style="disable && { width: '40px'}" :data-cy="dataCy">
-    <template v-slot:prepend>
+    <template #prepend>
       <q-icon name="search" size="xs" />
     </template>
   </q-select>

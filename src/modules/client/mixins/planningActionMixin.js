@@ -243,7 +243,7 @@ export const planningActionMixin = {
         NotifyPositive('Évènement créé');
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 409) {
+        if (e.status === 409) {
           return NotifyNegative('Impossible de créer l\'évènement : '
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
@@ -301,7 +301,7 @@ export const planningActionMixin = {
         }
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 409) {
+        if (e.status === 409) {
           return NotifyNegative('Impossible de créer l\'évènement : '
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }
@@ -422,7 +422,7 @@ export const planningActionMixin = {
         NotifyPositive('Évènement modifié.');
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 409) {
+        if (e.status === 409) {
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de créer l\'évènement :  '
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
@@ -479,7 +479,7 @@ export const planningActionMixin = {
 
         NotifyPositive('Évènement modifié.');
       } catch (e) {
-        if (e.data && e.data.statusCode === 409) {
+        if (e.status === 409) {
           return NotifyNegative('Impossible de créer l\'évènement :  '
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
         }

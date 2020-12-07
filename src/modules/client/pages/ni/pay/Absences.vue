@@ -8,7 +8,7 @@
       </template>
     </ni-title-header>
     <ni-large-table :data="absences" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
             :style="col.style">

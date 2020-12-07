@@ -6,12 +6,10 @@ export default {
     return surcharges.data.data.surcharges;
   },
   async create (payload) {
-    const surcharges = await alenviAxios.post(`${process.env.API_HOSTNAME}/surcharges`, payload);
-    return surcharges.data.data.surcharges;
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/surcharges`, payload);
   },
   async updateById (id, payload) {
-    const surcharges = await alenviAxios.put(`${process.env.API_HOSTNAME}/surcharges/${id}`, payload);
-    return surcharges.data.data.surcharge;
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/surcharges/${id}`, payload);
   },
   async remove (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/surcharges/${id}`);

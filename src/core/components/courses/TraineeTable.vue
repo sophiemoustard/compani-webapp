@@ -1,11 +1,15 @@
 <template>
   <div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">{{ tableTitle }}</p>
+      <div class="row">
+        <p class="text-weight-bold table-title">{{ tableTitle }}</p>
+        <ni-copy-button class="q-mb-md" icon="content_copy" label="Copier les adresses e-mail"
+          :value-to-copy="traineesEmails" @copy-success="handleCopySuccess" />
+      </div>
       <q-card>
         <ni-responsive-table :data="course.trainees" :columns="traineesColumns" :pagination.sync="traineesPagination"
           :visible-columns="traineesVisibleColumns">
-          <template v-slot:body="{ props }">
+          <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
@@ -50,7 +54,7 @@ import Users from '@api/Users';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import { INTER_B2B } from '@data/constants';
-import { formatPhone, clear, formatPhoneForPayload } from '@helpers/utils';
+import { formatPhone, clear, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -59,6 +63,7 @@ import TraineeEditionModal from '@components/courses/TraineeEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
+import CopyButton from '@components/CopyButton';
 
 export default {
   name: 'TraineeTable',
@@ -72,6 +77,7 @@ export default {
     'ni-responsive-table': ResponsiveTable,
     'learner-creation-modal': LearnerCreationModal,
     'trainee-edition-modal': TraineeEditionModal,
+    'ni-copy-button': CopyButton,
   },
   data () {
     return {
@@ -152,7 +158,8 @@ export default {
       return this.course.trainees ? this.course.trainees.length : 0;
     },
     tableTitle () {
-      return this.canEdit ? `Participants (${this.traineesNumber})`
+      return this.canEdit
+        ? `Participants (${this.traineesNumber})`
         : `Participants de votre structure (${this.traineesNumber})`;
     },
     traineesVisibleColumns () {
@@ -160,6 +167,11 @@ export default {
       if (this.canEdit) visibleColumns.push('actions');
       if (this.isIntraCourse) return visibleColumns;
       return ['company', ...visibleColumns];
+    },
+    traineesEmails () {
+      if (!this.course.trainees) return '';
+
+      return this.course.trainees.map(trainee => trainee.local.email).reduce((acc, value) => `${acc},${value}`, '');
     },
   },
   async created () {
@@ -169,9 +181,7 @@ export default {
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.name, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        this.companyOptions = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
         this.companyOptions = [];
@@ -300,6 +310,15 @@ export default {
         NotifyNegative('Erreur lors de la suppression du stagiaire.');
       }
     },
+    handleCopySuccess () {
+      NotifyPositive('Adresses mail copiées !');
+    },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+  .table-title
+    flex: 1
+
+</style>

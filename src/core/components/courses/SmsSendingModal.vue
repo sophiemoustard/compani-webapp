@@ -43,7 +43,7 @@ export default {
       this.$emit('input', event);
     },
     updateType () {
-      this.$emit('updateType', this.newSms.type);
+      this.$emit('update-type', this.newSms.type);
     },
     send () {
       this.$emit('send', this.newSms);

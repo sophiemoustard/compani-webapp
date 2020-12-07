@@ -7,7 +7,7 @@
     <q-input borderless dense :value="inputDate" bg-color="white" @input="input" placeholder="jj/mm/yyyy" :error="error"
       :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage" @blur="blur" ref="dateInput"
       @focus="focus">
-      <template v-slot:append>
+      <template #append>
         <q-icon name="event" class="cursor-pointer" @click="focus">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
             <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable" />

@@ -1,7 +1,7 @@
 <template>
   <q-table class="q-mb-xl" :data="data" :columns="columns" hide-bottom flat grid :rows-per-page-options="[0]"
     :visible-columns="formattedVisibleColumns">
-    <template v-slot:item="props">
+    <template #item="props">
       <q-card class="full-width q-mb-md" flat bordered>
         <q-list separator dense>
           <q-item v-for="col in filterCols(props.cols)" :key="col.name">

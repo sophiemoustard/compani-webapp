@@ -16,13 +16,13 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Actions utiles</p>
       <ni-banner v-if="followUpDisabled">
-        <template v-slot:message>
+        <template #message>
           Il manque {{ formatQuantity('information', followUpMissingInfo.length ) }}
           pour assurer le suivi de la formation : {{ followUpMissingInfo.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-banner v-if="!get(this.course, 'subProgram.program.description')">
-        <template v-slot:message>
+      <ni-banner v-if="!get(this.course, 'subProgram.program.learningGoals')">
+        <template #message>
           Merci de renseigner les objectifs pédagogiques du programme pour pouvoir télécharger
           les attestations de fin de formation.
         </template>
@@ -30,25 +30,17 @@
 
       <ni-course-info-link :disable-link="followUpDisabled" />
 
-      <q-item>
-        <ni-button color="primary" :disable="followUpDisabled" icon="file_download" type="a"
-          :href="downloadAttendanceSheet()" />
-        <ni-button color="black" :disable="followUpDisabled" :href="downloadAttendanceSheet()"
-          label="Télécharger les feuilles d'émargement" size="16px" type="a" />
-      </q-item>
-      <q-item>
-        <ni-button color="primary" :disable="disableDownloadCompletionCertificates" icon="file_download" type="a"
-          :href="downloadCompletionCertificates()" />
-        <ni-button color="black" :disable="disableDownloadCompletionCertificates" type="a" size="16px"
-          :href="downloadCompletionCertificates()" label="Télécharger les attestations de fin de formation" />
-      </q-item>
+      <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
+        :disable="followUpDisabled" :href="downloadAttendanceSheet()" size="16px" type="a" />
+      <ni-bi-color-button icon="file_download" label="Attestations de fin de formation" type="a"
+        :disable="disableDownloadCompletionCertificates" :href="downloadCompletionCertificates()" size="16px" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
       <ni-simple-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
         :loading="smsLoading">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
@@ -63,31 +55,28 @@
         </template>
       </ni-simple-table>
       <ni-banner v-if="!followUpDisabled && isFinished">
-        <template v-slot:message>
+        <template #message>
           Vous ne pouvez pas envoyer de sms car la formation est terminée.
         </template>
       </ni-banner>
       <ni-banner v-else-if="!followUpDisabled && allFuturSlotsAreNotPlanned">
-        <template v-slot:message>
+        <template #message>
           Vous ne pouvez pas envoyer de sms car tous les prochains créneaux sont à planifier.
         </template>
       </ni-banner>
       <ni-banner v-else-if="missingTraineesPhone.length" icon="info_outline">
-        <template v-slot:message>
+        <template #message>
           Il manque le numéro de téléphone de {{ formatQuantity('stagiaire', missingTraineesPhone.length) }} sur
           {{ course.trainees.length }} : {{ missingTraineesPhone.join(', ') }}.
         </template>
       </ni-banner>
-      <q-item>
-          <ni-button color="primary" :disable="disableSms" icon="mdi-cellphone-message" @click="openSmsModal" />
-          <ni-button color="black" :disable="disableSms" @click="openSmsModal" size="16px"
-            label="Envoyer un SMS de convocation ou de rappel aux stagiaires" />
-      </q-item>
+      <ni-bi-color-button icon="mdi-cellphone-message" :disable="disableSms" @click="openSmsModal"
+        label="Envoyer un SMS de convocation ou de rappel aux stagiaires" size="16px" />
     </div>
 
     <!-- Modal envoi message -->
     <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
-      :new-sms="newSms" @send="sendMessage" @updateType="updateMessage" :loading="loading" @hide="resetSmsModal" />
+      :new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :loading="loading" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
@@ -112,6 +101,7 @@ import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
+import BiColorButton from '@components/BiColorButton';
 
 export default {
   name: 'ProfileAdmin',
@@ -123,6 +113,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
+    'ni-bi-color-button': BiColorButton,
   },
   mixins: [courseMixin],
   props: {
@@ -182,7 +173,7 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     disableDownloadCompletionCertificates () {
-      return this.followUpDisabled || !get(this.course, 'subProgram.program.description');
+      return this.followUpDisabled || !get(this.course, 'subProgram.program.learningGoals');
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate));

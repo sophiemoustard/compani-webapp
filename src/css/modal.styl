@@ -1,9 +1,10 @@
 .modal
   &-container-md
     background-color: $white
-    min-width: 45vw;
+    @media screen and (max-width: 767px)
+      min-width: 65vw;
     @media screen and (min-width: 768px)
-      max-width: 65vw
+      width: 45vw;
   &-container-sm
     background-color: $white
     min-width: 30vw

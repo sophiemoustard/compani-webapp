@@ -9,7 +9,7 @@
     </ni-title-header>
     <ni-large-table :data="filteredBalances" :columns="columns" row-key="rowId" :loading="tableLoading"
       selection="multiple" :pagination.sync="pagination" :selected.sync="selected">
-      <template v-slot:header="{ props }">
+      <template #header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <q-th auto-width>
@@ -18,7 +18,7 @@
           </q-th>
         </q-tr>
       </template>
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">

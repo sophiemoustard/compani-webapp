@@ -20,7 +20,7 @@
           {{ formatDate(bill.startDate) }}
           <q-menu>
             <q-date v-model="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal
-              @input="$emit('datetime:input')" />
+              @input="$emit('datetime-input')" />
           </q-menu>
         </div>
       </template>
@@ -33,7 +33,7 @@
       <template v-else-if="col.name === 'discount'">
         <ni-editable-td :props="bill" edited-field="discount" edition-boolean-name="discountEdition"
           :value="formatPrice(bill.discount)" @disable="disableDiscountEditing(bill)" :ref-name="bill._id"
-          @click="$emit('discount:click', $event)" @change="setDiscount" suffix="€" />
+          @click="$emit('discount-click', $event)" @change="setDiscount" suffix="€" />
       </template>
       <template v-else-if="col.name === 'exclTaxes'">{{ formatPrice(getNetExclTaxes(bill)) }}</template>
       <template v-else-if="col.name === 'inclTaxes'">{{ formatPrice(getNetInclTaxes(bill)) }}</template>
@@ -92,7 +92,7 @@ export default {
     },
     setDiscount ({ value, obj, path }) {
       obj[path] = !value || isNaN(value) ? 0 : value;
-      this.$emit('discount:input');
+      this.$emit('discount-input');
     },
     disableDiscountEditing (bill) {
       bill.discountEdition = false;

@@ -9,7 +9,7 @@
     </ni-title-header>
     <ni-large-table :data="versionsList" :columns="columns" :pagination.sync="pagination" row-key="name"
       :loading="contractsLoading">
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">

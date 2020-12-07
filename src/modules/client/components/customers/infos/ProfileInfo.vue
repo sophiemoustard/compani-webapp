@@ -38,7 +38,7 @@
       <p class="text-weight-bold">Souscriptions</p>
       <q-card>
         <ni-responsive-table :data="subscriptions" :columns="subscriptionsColumns" :loading="subscriptionsLoading">
-          <template v-slot:body="{ props }">
+          <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
@@ -78,7 +78,7 @@
       <q-card>
         <ni-responsive-table :data="sortedHelpers" :columns="helpersColumns" :pagination="helpersPagination"
           :loading="helpersLoading">
-          <template v-slot:body="{ props }">
+          <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
@@ -120,7 +120,7 @@
       <q-card>
         <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
           :visible-columns="mandatesVisibleColumns" class="mandate-table" :loading="mandatesLoading">
-          <template v-slot:body="{ props }">
+          <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
@@ -162,7 +162,7 @@
       <q-card>
         <ni-responsive-table :data="fundings" :columns="fundingsColumns" :visible-columns="fundingsVisibleColumns"
           :loading="fundingsLoading">
-          <template v-slot:body="{ props }">
+          <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
@@ -203,7 +203,7 @@
       <q-card>
         <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" :pagination.sync="pagination"
           :visible-columns="quotesVisibleColumns" :loading="quotesLoading">
-          <template v-slot:body="{ props }">
+          <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
@@ -684,7 +684,7 @@ export default {
         NotifyPositive('Souscription ajoutée');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout de la souscription.');
       } finally {
         this.loading = false;
@@ -922,7 +922,7 @@ export default {
         NotifyPositive('Financement ajoutée');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout d\'un financement');
       } finally {
         this.loading = false;

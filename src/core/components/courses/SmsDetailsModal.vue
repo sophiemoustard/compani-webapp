@@ -4,7 +4,7 @@
         Message envoyé le <span class="text-weight-bold">{{ $moment(smsHistory.date).format('DD/MM/YYYY') }}</span>
       </template>
       <ni-banner v-if="missingTraineesPhoneHistory.length" icon="info_outline">
-        <template v-slot:message>
+        <template #message>
           Pour cet envoi, il manquait le numéro de téléphone de
           {{ formatQuantity('stagiaire', missingTraineesPhoneHistory.length) }} :
           {{ missingTraineesPhoneHistory.join(', ') }}.

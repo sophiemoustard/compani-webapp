@@ -89,8 +89,13 @@ export default {
     const check = await axios.get(`${process.env.API_HOSTNAME}/users/check-reset-password/${resetToken}`);
     return check.data.data;
   },
-  async createDriveFolder (userId, data) {
-    const driveFolder = await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`, data);
-    return driveFolder;
+  async createDriveFolder (userId) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`);
+  },
+  async uploadImage (userId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/upload`, payload);
+  },
+  async deleteImage (userId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${userId}/upload`);
   },
 };
