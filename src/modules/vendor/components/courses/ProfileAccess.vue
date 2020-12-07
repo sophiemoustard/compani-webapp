@@ -2,7 +2,7 @@
   <div>
     <p class="text-weight-bold">Règle d'accès</p>
     <q-card>
-      <ni-responsive-table :data="accessRules" :columns="columns" :pagination.sync="pagination"
+      <ni-simple-table :data="accessRules" :columns="columns" :pagination.sync="pagination" class="q-mx-lg"
         no-data-label="Pas de règle - la formation est en libre accès" :hide-bottom="!!accessRules.length">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -10,15 +10,14 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="edit" disabled="true" />
-                  <ni-button icon="delete" disabled="true" />
+                  <ni-button icon="close" @click="validateAccessRuleDeletion(col.value)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </template>
-      </ni-responsive-table>
+      </ni-simple-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" label="Ajouter une règle" :disable="tableLoading"
           @click="openAddAccessRuleModal" />
@@ -35,7 +34,7 @@
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
-import ResponsiveTable from '@components/table/ResponsiveTable';
+import SimpleTable from '@components/table/SimpleTable';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -46,24 +45,18 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 export default {
   name: 'ProfileAccess',
   components: {
-    'ni-responsive-table': ResponsiveTable,
+    'ni-simple-table': SimpleTable,
     'ni-button': Button,
     'access-rule-creation-modal': AccessRuleCreationModal,
   },
   props: {
     profileId: { type: String, required: true },
   },
-  computed: {
-    ...mapState('course', ['course']),
-    accessRules () {
-      return this.course.accessRules || [];
-    },
-  },
   data () {
     return {
       tableLoading: false,
       columns: [
-        { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 85%' },
+        { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 100%' },
         { name: 'actions', label: '', field: '_id' },
       ],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
@@ -72,6 +65,12 @@ export default {
       accessRuleCreationModal: false,
       modalLoading: false,
     };
+  },
+  computed: {
+    ...mapState('course', ['course']),
+    accessRules () {
+      return this.course.accessRules || [];
+    },
   },
   validations () {
     return {
@@ -117,12 +116,33 @@ export default {
         this.accessRuleCreationModal = false;
         NotifyPositive('Règle d\'accès créée.');
 
-        this.refreshCourse();
+        await this.refreshCourse();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la règle d\'accès.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    validateAccessRuleDeletion (accessRuleId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette règle d\'accès ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteAccessRule(accessRuleId))
+        .onCancel(() => NotifyPositive('Suppression annulé.'));
+    },
+    async deleteAccessRule (accessRuleId) {
+      try {
+        await Courses.deleteAccessRule(this.profileId, accessRuleId);
+
+        NotifyPositive('Règle d\'accès suprimée.');
+
+        await this.refreshCourse();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la règle d\'accès.');
       }
     },
   },
