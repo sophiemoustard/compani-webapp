@@ -1,9 +1,11 @@
 import moment from 'moment';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
-import { formatPrice, formatIdentity, formatHours } from '@helpers/utils';
-import { downloadCsv } from '@helpers/file';
+import Pay from '@api/Pay';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { END_CONTRACT_REASONS, SURCHARGES } from '@data/constants';
+import { formatPrice, formatIdentity, formatHours } from '@helpers/utils';
+import { downloadCsv, downloadFile } from '@helpers/file';
 
 export const payMixin = {
   data () {
@@ -301,6 +303,17 @@ export const payMixin = {
       }
 
       return downloadCsv(csvData, `Paie_${moment().format('MM_YYYY')}.csv`);
+    },
+    async exportTxt (type) {
+      try {
+        const txt = await Pay.export(type, this.dates);
+        await downloadFile(txt, `${type}_${this.$moment(this.dates.startDate).format('MM_YYYY')}.txt`);
+
+        NotifyPositive('Document téléchargé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du document.');
+      }
     },
   },
 };

@@ -270,7 +270,7 @@ export default {
         this.$emit('refresh');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du créneau.');
       } finally {
         this.modalLoading = false;

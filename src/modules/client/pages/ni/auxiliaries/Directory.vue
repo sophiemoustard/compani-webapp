@@ -4,7 +4,7 @@
       @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       @go-to="goToUserProfile">
-      <template v-slot:body="{ props, col }">
+      <template #body="{ props, col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
             <img class="avatar" :src="getAvatar(col.value.picture)">
@@ -314,7 +314,7 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newUser);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        const folderId = get(this.company, 'auxiliariesFolderId', null);
+        const folderId = get(this.company, 'auxiliariesFolderId');
         if (!folderId) return NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
 
         const payload = await this.formatUserPayload();
@@ -325,14 +325,14 @@ export default {
         } else {
           editedUser = await Users.create(payload);
         }
-        await Users.createDriveFolder(editedUser._id, { parentFolderId: folderId });
+        await Users.createDriveFolder(editedUser._id);
         await this.getUserList();
         NotifyPositive('Fiche auxiliaire créée');
 
         this.auxiliaryCreationModal = false;
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return NotifyNegative('Email déjà existant.');
+        if (e.status === 409) return NotifyNegative('Email déjà existant.');
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
       } finally {
         this.loading = false;
@@ -341,7 +341,7 @@ export default {
         if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
+        if (e.status === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
         NotifyNegative('Erreur lors de l\'envoi de SMS');
       }
     },

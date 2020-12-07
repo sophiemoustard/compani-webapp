@@ -43,6 +43,7 @@ import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, INTER_B2B, BLENDED } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
+import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -110,9 +111,7 @@ export default {
     async refreshCompanies () {
       try {
         const companies = await Companies.list();
-        this.companyOptions = companies
-          .map(c => ({ label: c.name, value: c._id }))
-          .sort((a, b) => a.label.localeCompare(b.label));
+        this.companyOptions = formatAndSortOptions(companies, 'name');
       } catch (e) {
         console.error(e);
         this.companyOptions = [];

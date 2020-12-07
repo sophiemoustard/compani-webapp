@@ -5,7 +5,7 @@
     </div>
     <div class="q-pa-sm">
       <ni-large-table :data="directDebits" :columns="columns" :pagination.sync="pagination" :loading="loading">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
               <template v-if="col.name === 'download'">

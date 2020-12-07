@@ -92,9 +92,10 @@ export default {
         NotifyPositive('Les évènements ont bien étés supprimés');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) {
-          NotifyNegative('Vous n\'avez pas le droit de supprimer au moins l\'un des évènements.');
-        } else NotifyNegative('Problème lors de la suppression.');
+        if (e.status === 409) {
+          return NotifyNegative('Vous n\'avez pas le droit de supprimer au moins l\'un des évènements.');
+        }
+        NotifyNegative('Problème lors de la suppression.');
       }
     },
   },

@@ -9,7 +9,7 @@
       :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
       :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
-      <template v-slot:append>
+      <template #append>
         <ni-button v-if="value && !disable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon pink-icon" @click="$refs['selectInput'].showPopup()" />
       </template>

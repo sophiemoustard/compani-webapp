@@ -15,10 +15,10 @@
             </p>
           </div>
         </div>
-        <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup:enter="submit"
+        <ni-input data-cy="email" v-model.trim="credentials.email" caption="Email" @keyup-enter="submit"
          :error="$v.credentials.email.$error" :error-message="emailErrorMessage" @blur="$v.credentials.email.$touch" />
         <ni-input data-cy="password" v-model="credentials.password" caption="Mot de passe" type="password"
-          @keyup:enter="submit" :error="$v.credentials.password.$error" @blur="$v.credentials.password.$touch" />
+          @keyup-enter="submit" :error="$v.credentials.password.$error" @blur="$v.credentials.password.$touch" />
         <router-link class="row justify-end" :to="{ name: 'forgotPassword' }">
           <small>Mot de passe oublié ?</small>
         </router-link>
@@ -92,7 +92,7 @@ export default {
         await this.logInUser({ email: this.credentials.email.toLowerCase(), password: this.credentials.password });
       } catch (e) {
         console.error(e);
-        if (get(e, 'response.data.statusCode')) return NotifyNegative('Identifiant ou mot de passe invalide');
+        if (get(e, 'response.status') === 401) return NotifyNegative('Identifiant ou mot de passe invalide');
         NotifyNegative('Impossible de se connecter.');
       }
     },

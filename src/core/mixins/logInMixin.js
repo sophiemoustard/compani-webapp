@@ -14,7 +14,7 @@ export const logInMixin = {
     async logInUser (authenticationPayload) {
       const auth = await Users.authenticate(authenticationPayload);
 
-      const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Strict' };
+      const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Lax' };
       const expireDate = cookieExpirationDate();
 
       this.$q.cookies.set('alenvi_token', auth.token, { ...options, expires: expireDate });

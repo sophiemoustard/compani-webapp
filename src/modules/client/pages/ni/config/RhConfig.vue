@@ -7,16 +7,12 @@
         <q-card>
           <ni-responsive-table :data="internalHours" :columns="internalHoursColumns" :pagination.sync="pagination"
             :loading="internalHoursLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
-                  <template v-if="col.name === 'default'">
-                    <q-checkbox :disable="col.value" :value="col.value" dense
-                      @input="updateDefaultInternalHour(props.row._id)" />
-                  </template>
-                  <template v-else-if="col.name === 'actions'">
-                    <q-btn :disable="props.row.default" flat round small color="grey" icon="delete"
+                  <template v-if="col.name === 'actions'">
+                    <q-btn flat round small color="grey" icon="delete"
                       @click="validateInternalHourDeletion(props.row)" />
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -97,7 +93,7 @@
         <q-card>
           <ni-responsive-table :data="administrativeDocuments" :columns="administrativeDocumentsColumns"
             :pagination.sync="administrativeDocumentsPagination" :loading="administrativeDocumentsLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
@@ -125,7 +121,7 @@
         <q-card>
           <ni-responsive-table :data="sectors" :columns="sectorsColumns" :pagination.sync="sectorsPagination"
             :loading="sectorsLoading">
-            <template v-slot:body="{ props }">
+            <template #body="{ props }">
               <q-tr :props="props">
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
@@ -209,7 +205,6 @@ export default {
       internalHours: [],
       internalHoursColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
-        { name: 'default', label: 'Type par défaut', align: 'left', field: 'default' },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       internalHoursLoading: false,
@@ -322,9 +317,7 @@ export default {
         if (this.$v.newInternalHour.$error) return;
 
         this.loading = true;
-        if (!this.internalHours || this.internalHours.length === 0) this.newInternalHour.default = true;
-        const payload = pickBy(this.newInternalHour);
-        await InternalHours.create(payload);
+        await InternalHours.create(pickBy(this.newInternalHour));
         await this.refreshCompany();
 
         NotifyPositive('Heure interne créée');
@@ -347,6 +340,7 @@ export default {
         NotifyPositive('Heure interne supprimée.');
       } catch (e) {
         console.error(e);
+        if (e.status === 403) return NotifyNegative('Cette heure interne est rattachée à des évènements.');
         NotifyNegative('Erreur lors de la suppression d\'une heure interne.');
       }
     },
@@ -358,21 +352,6 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteInternalHour(internalHour))
         .onCancel(() => NotifyPositive('Suppression annulée'));
-    },
-    async updateDefaultInternalHour (internalHourId) {
-      try {
-        const defaultInternalHour = this.internalHours.find(internalHour => internalHour.default);
-        if (defaultInternalHour) await InternalHours.update(defaultInternalHour._id, { default: false });
-
-        await InternalHours.update(internalHourId, { default: true });
-        await this.refreshInternalHours();
-        await this.refreshCompany();
-
-        NotifyPositive('Heures internes mises à jour');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour des heures internes.');
-      }
     },
     // Sectors
     async getSectors () {
