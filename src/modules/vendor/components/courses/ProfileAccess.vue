@@ -2,7 +2,7 @@
   <div>
     <p class="text-weight-bold">Règle d'accès</p>
     <q-card>
-      <ni-simple-table :data="accessRules" :columns="columns" :pagination.sync="pagination" class="q-mx-lg"
+      <ni-responsive-table :data="accessRules" :columns="columns" :pagination.sync="pagination"
         no-data-label="Pas de règle - la formation est en libre accès" :hide-bottom="!!accessRules.length">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -17,7 +17,7 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-simple-table>
+      </ni-responsive-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" label="Ajouter une règle" :disable="tableLoading"
           @click="openAddAccessRuleModal" />
@@ -34,7 +34,7 @@
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
 import { mapState } from 'vuex';
-import SimpleTable from '@components/table/SimpleTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import Button from '@components/Button';
 import Companies from '@api/Companies';
 import Courses from '@api/Courses';
@@ -45,7 +45,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 export default {
   name: 'ProfileAccess',
   components: {
-    'ni-simple-table': SimpleTable,
+    'ni-responsive-table': ResponsiveTable,
     'ni-button': Button,
     'access-rule-creation-modal': AccessRuleCreationModal,
   },
@@ -56,7 +56,7 @@ export default {
     return {
       tableLoading: false,
       columns: [
-        { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 100%' },
+        { name: 'name', label: 'Structure', align: 'left', field: 'name', style: 'width: 92%' },
         { name: 'actions', label: '', field: '_id' },
       ],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 50 },
