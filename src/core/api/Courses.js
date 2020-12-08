@@ -1,6 +1,5 @@
 import { Cookies } from 'quasar';
 import { alenviAxios } from '@api/ressources/alenviAxios';
-import axios from 'axios';
 
 export default {
   async list (params) {
@@ -21,10 +20,6 @@ export default {
   async getFollowUp (courseId) {
     const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}/follow-up`);
     return course.data.data.followUp;
-  },
-  async getPublicInfosById (courseId) {
-    const course = await axios.get(`${process.env.API_HOSTNAME}/courses/${courseId}/public-infos`);
-    return course.data.data.course;
   },
   async update (courseId, payload) {
     const course = await alenviAxios.put(`${process.env.API_HOSTNAME}/courses/${courseId}`, payload);
@@ -53,5 +48,14 @@ export default {
   downloadCompletionCertificates (courseId) {
     return `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates?x-access-token=`
       + `${Cookies.get('alenvi_token')}`;
+  },
+  async addAccessRule (courseId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules`, payload);
+  },
+  async deleteAccessRule (courseId, accessRuleId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules/${accessRuleId}`);
+  },
+  getConvocationUrl (courseId) {
+    return `${process.env.API_HOSTNAME}/courses/${courseId}/convocations`;
   },
 };

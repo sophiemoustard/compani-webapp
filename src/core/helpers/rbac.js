@@ -82,6 +82,7 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni users learners' },
   { name: 'ni users learners info' },
   { name: 'ni config programs' },
+  { name: 'ni config categories' },
   { name: 'ni config programs info' },
   { name: 'ni config activity info' },
   { name: 'ni management blended courses' },

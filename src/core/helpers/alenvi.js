@@ -25,7 +25,7 @@ export const refreshAlenviCookies = async () => {
     const refreshToken = Cookies.get('refresh_token');
     if (refreshToken) {
       const newToken = await User.refreshToken({ refreshToken });
-      const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Strict' };
+      const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Lax' };
 
       const expireDate = cookieExpirationDate();
       Cookies.set('alenvi_token', newToken.token, { ...options, expires: expireDate });
@@ -34,7 +34,7 @@ export const refreshAlenviCookies = async () => {
 
       return true;
     }
-    const options = { path: '/', sameSite: 'Strict' };
+    const options = { path: '/' };
     Cookies.remove('alenvi_token', options);
     Cookies.remove('user_id', options);
 
@@ -42,7 +42,7 @@ export const refreshAlenviCookies = async () => {
   } catch (e) {
     console.error(e);
     if (e.response.status === 404) {
-      const options = { path: '/', sameSite: 'Strict' };
+      const options = { path: '/' };
       Cookies.remove('alenvi_token', options);
       Cookies.remove('refresh_token', options);
       Cookies.remove('user_id', options);

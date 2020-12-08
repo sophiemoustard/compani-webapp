@@ -8,7 +8,7 @@
       <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
         input-debounce="500" :options="options" :class="{ 'borders': inModal }" :disable="disable" behavior="menu"
         @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color">
-        <template v-if="value.fullAddress && !disable" v-slot:append>
+        <template v-if="value.fullAddress && !disable" #append>
           <ni-button icon="close" @click.stop="resetValue" size="sm" />
         </template>
       </q-select>

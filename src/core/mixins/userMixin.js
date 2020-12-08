@@ -66,7 +66,7 @@ export const userMixin = {
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
-        if (e.data.statusCode === 409) return this.emailErrorHandler(path);
+        if (e.status === 409) return this.emailErrorHandler(path);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';

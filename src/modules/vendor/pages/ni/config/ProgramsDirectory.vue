@@ -48,7 +48,7 @@ export default {
       programs: [],
       modalLoading: false,
       programCreationModal: false,
-      newProgram: { name: '' },
+      newProgram: { name: '', category: '' },
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       searchStr: '',
     };
@@ -57,6 +57,7 @@ export default {
     return {
       newProgram: {
         name: { required },
+        category: { required },
       },
     };
   },
@@ -99,7 +100,7 @@ export default {
         if (this.$v.newProgram.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
-        await Programs.create({ ...this.newProgram });
+        await Programs.create({ name: this.newProgram.name, categories: [this.newProgram.category] });
 
         this.programCreationModal = false;
         NotifyPositive('Programme créé.');

@@ -4,7 +4,7 @@
     <p v-if="documents.length == 0">Aucun document disponible</p>
     <ni-large-table :data="documents" :columns="columns" :pagination.sync="pagination" row-key="name"
       :loading="loading">
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">

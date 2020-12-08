@@ -21,14 +21,14 @@
       </template>
     </ni-title-header>
     <div class="q-mx-md">
-      <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT)" label="Données contrat" />
+      <ni-button icon="save_alt" color="primary" @click="exportTxt(IDENTIFICATION)" label="Données d'identification" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_VERSION)" label="Données avenants" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(ABSENCE)" label="Données absences" />
     </div>
     <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
       :visible-columns="visibleColumns">
-      <template v-slot:header="{ props }">
+      <template #header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">{{ col.label }}</q-th>
           <th>
@@ -36,7 +36,7 @@
           </th>
         </q-tr>
       </template>
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
@@ -103,8 +103,7 @@ import SelectSector from '@components/form/SelectSector';
 import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import EditableTd from '@components/table/EditableTd';
-import { CONTRACT, ABSENCE, CONTRACT_VERSION } from '@data/constants';
-import { downloadFile } from '@helpers/file';
+import { IDENTIFICATION, ABSENCE, CONTRACT_VERSION } from '@data/constants';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
@@ -168,7 +167,7 @@ export default {
         { label: 'Frais téléphoniques', value: 'phoneFees', path: 'phoneFees' },
       ],
       sortOption: 'auxiliary',
-      CONTRACT,
+      IDENTIFICATION,
       CONTRACT_VERSION,
       ABSENCE,
     };
@@ -275,17 +274,6 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création des fiches de paie.');
-      }
-    },
-    async exportTxt (type) {
-      try {
-        const txt = await Pay.export(type, this.dates);
-        await downloadFile(txt, `${type}_${this.$moment(this.dates.startDate).format('MM_YYYY')}.txt`);
-
-        NotifyPositive('Document téléchargé.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement du document.');
       }
     },
   },

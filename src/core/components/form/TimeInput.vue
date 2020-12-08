@@ -8,7 +8,7 @@
     <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
       :error-message="errorMessage" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time"
       data-cy="time-input">
-      <template v-slot:append>
+      <template #append>
         <q-icon name="far fa-clock" class="cursor-pointer icon-clock" @click.native="selectTime = !selectTime">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-list dense padding>

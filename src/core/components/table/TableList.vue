@@ -4,7 +4,7 @@
       :pagination="pagination" class="table-list" :hide-bottom="(!!data.length && pagination.rowsPerPage === 0)"
       :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
       :visible-columns="formattedVisibleColumns">
-      <template v-slot:body="props">
+      <template #body="props">
         <q-tr :no-hover="disabled" :props="props" @click="click(props.row)">
           <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
             :class="col.name">
@@ -14,7 +14,7 @@
           </q-td>
         </q-tr>
       </template>
-      <template v-slot:no-data>
+      <template #no-data>
         <div v-show="!loading" class="full-width row q-gutter-sm grey-text">
           <span>Pas de données disponibles</span>
         </div>

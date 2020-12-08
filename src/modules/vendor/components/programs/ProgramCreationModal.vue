@@ -5,6 +5,8 @@
     </template>
     <ni-input in-modal v-model.trim="newProgram.name" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Nom" />
+    <ni-select in-modal v-model.trim="newProgram.category" :error="validations.category.$error"
+        @blur="validations.category.$touch" required-field caption="Catégorie" :options="categoryOptions" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -15,6 +17,9 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import Select from '@components/form/Select';
+import Categories from '@api/Categories';
+import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
   name: 'ProgramCreationModal',
@@ -24,9 +29,24 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
+  data () {
+    return {
+      categoryOptions: [],
+    };
+  },
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'ni-select': Select,
+  },
+  async created () {
+    try {
+      const categories = await Categories.list();
+      this.categoryOptions = formatAndSortOptions(categories, 'name');
+    } catch (e) {
+      console.error(e);
+      this.categoryOptions = [];
+    }
   },
   methods: {
     hide () {

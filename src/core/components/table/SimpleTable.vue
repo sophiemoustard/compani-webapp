@@ -3,10 +3,10 @@
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination"
       :hide-bottom="(!!data.length && pagination.rowsPerPage === 0) || hideBottom" :rows-per-page-options="[]"
       :visible-columns="formattedVisibleColumns" v-on="$listeners" :class="[{'table-simple': responsive }]">
-      <template v-if="$scopedSlots['top-row']" v-slot:top-row="props">
+      <template v-if="$scopedSlots['top-row']" #top-row="props">
         <slot name="top-row" :props="props" />
       </template>
-      <template v-slot:body="props">
+      <template #body="props">
         <slot name="body" :props="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-label="col.label" :style="col.style"
@@ -16,10 +16,10 @@
           </q-tr>
         </slot>
       </template>
-      <template v-slot:bottom-row="props">
+      <template #bottom-row="props">
         <slot name="bottom-row" :props="props" />
       </template>
-      <template v-slot:no-data>
+      <template #no-data>
         <div v-show="!loading" class="full-width row q-gutter-sm grey-text">
           <span>Pas de données disponibles</span>
         </div>

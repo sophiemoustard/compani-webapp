@@ -132,7 +132,7 @@ export const contractMixin = {
         NotifyPositive('Contrat modifié.');
       } catch (e) {
         console.error(e);
-        if (e.data && e.data.statusCode === 422) {
+        if (e.status === 422) {
           this.$v.editedVersion.$reset();
           return NotifyNegative('La date de début du contrat doit etre antérieure aux évènements de l\'auxiliaire.');
         }

@@ -1,16 +1,17 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" :pagination="pagination"
-      binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="separator" hide-bottom
-      :rows-per-page-options="rowsPerPageOptions" class="table-responsive q-pa-sm" v-on="$listeners">
-      <template v-slot:header="props">
+      binary-state-sort :visible-columns="formattedVisibleColumns" flat :separator="data.length ? separator : 'none'"
+      :hide-bottom="hideBottom" :color="'#ff0000'"
+      :rows-per-page-options="rowsPerPageOptions" v-on="$listeners" class="table-responsive q-pa-sm">
+      <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           </q-tr>
         </slot>
       </template>
-      <template v-slot:body="props">
+      <template #body="props">
         <slot name="body" :props="props">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -19,6 +20,12 @@
             </q-td>
           </q-tr>
         </slot>
+      </template>
+      <template #no-data>
+        <div class="full-width row grey-text justify-center">
+          <span class="text-italic q-pb-sm" style="font-size: 0.8rem">{{ noDataLabel }}</span>
+          <q-separator />
+        </div>
       </template>
     </q-table>
     <div v-else class="loading-container" />
@@ -40,6 +47,8 @@ export default {
     visibleColumns: { type: Array, default: () => [] },
     separator: { type: String, default: 'horizontal' },
     loading: { type: Boolean, default: false },
+    hideBottom: { type: Boolean, default: true },
+    noDataLabel: { type: String, default: '' },
   },
   computed: {
     formattedVisibleColumns () {

@@ -4,7 +4,7 @@
       display-toggle @update-search="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
       @go-to="goToCustomerProfile" :loading="tableLoading">
-      <template v-slot:body="{ props, col }">
+      <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>
         </q-item>

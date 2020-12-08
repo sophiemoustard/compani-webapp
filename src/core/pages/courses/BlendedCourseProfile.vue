@@ -2,10 +2,10 @@
   <q-page padding :class="backgroundClass">
     <template v-if="course">
       <ni-profile-header :title="courseName" class="delete-container">
-        <template v-slot:title>
+        <template #title>
           <ni-button class="delete" icon="delete" @click="validateCourseDeletion" :disabled="disableCourseDeletion" />
         </template>
-        <template v-slot:body>
+        <template #body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
               <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>

@@ -51,7 +51,7 @@
       </div>
       <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
         :loading="helpersLoading">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
@@ -78,7 +78,7 @@
       </div>
       <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
         :loading="followUpLoading" :responsive="false">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">

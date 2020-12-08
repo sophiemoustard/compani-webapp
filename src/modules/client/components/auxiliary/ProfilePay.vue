@@ -6,7 +6,7 @@
       </div>
       <ni-large-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
         :pagination.sync="pagination" row-key="name" :loading="payDocumentsLoading">
-        <template v-slot:body="{ props }">
+        <template #body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">

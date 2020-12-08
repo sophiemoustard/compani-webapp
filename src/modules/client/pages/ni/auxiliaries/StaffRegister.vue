@@ -5,7 +5,7 @@
     </div>
     <ni-large-table :data="staffRegister" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="_id">
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
             :style="col.style">

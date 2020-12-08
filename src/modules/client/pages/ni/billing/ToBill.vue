@@ -13,7 +13,7 @@
     <ni-large-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
       :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected"
       data-cy="client-table" separator="none">
-      <template v-slot:header="{ props }">
+      <template #header="{ props }">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
           <th>
@@ -21,10 +21,10 @@
           </th>
         </q-tr>
       </template>
-      <template v-slot:body="{ props }">
+      <template #body="{ props }">
         <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
-          @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
-          @discount:input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bill"
+          @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
+          @discount-input="computeTotalAmount(props.row.customerBills)" :index="index" :bill="bill"
           display-checkbox data-cy="bill-row" />
         <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
           <q-td colspan="10">
@@ -35,9 +35,9 @@
         </q-tr>
         <template v-if="props.row.thirdPartyPayerBills">
           <template v-for="tpp in props.row.thirdPartyPayerBills">
-            <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" :bill.sync="bill"
-              @discount:click="discountEdit($event, bill)" @datetime:input="refreshBill(props.row, bill)"
-              @discount:input="computeTotalAmount(tpp)" display-checkbox :index="index" data-cy="bill-row" />
+            <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" :bill="bill"
+              @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
+              @discount-input="computeTotalAmount(tpp)" display-checkbox :index="index" data-cy="bill-row" />
           </template>
         </template>
       </template>
@@ -183,9 +183,11 @@ export default {
         };
       } else {
         this.billingDates = {
-          endDate: this.$moment().date() > 15 ? this.$moment().date(15).endOf('d').toISOString()
+          endDate: this.$moment().date() > 15
+            ? this.$moment().date(15).endOf('d').toISOString()
             : this.$moment().subtract(1, 'M').endOf('month').toISOString(),
-          startDate: this.$moment().date() > 15 ? this.$moment().startOf('month').toISOString()
+          startDate: this.$moment().date() > 15
+            ? this.$moment().startOf('month').toISOString()
             : this.$moment().subtract(1, 'M').date(16).startOf('d')
               .toISOString(),
         };
