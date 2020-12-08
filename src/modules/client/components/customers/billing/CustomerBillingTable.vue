@@ -20,7 +20,8 @@
                 data-cy="link">
                   Facture {{ props.row.number }}
               </a>
-              <div v-else @click="downloadBillPdf(props.row)" class="download" data-cy="link">
+              <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
+                data-cy="link">
                 Facture {{ props.row.number }}
               </div>
             </template>
@@ -193,7 +194,12 @@ export default {
     getBillUrl (bill) {
       return get(bill, 'driveFile.link');
     },
+    canDownload (bill) {
+      return bill.origin === COMPANI;
+    },
     async downloadBillPdf (bill) {
+      if (!this.canDownload(bill)) return;
+
       try {
         const pdf = await Bills.getPDF(bill._id);
 
