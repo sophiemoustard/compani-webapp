@@ -49,6 +49,9 @@
                   </p>
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
+                <div v-if="isCustomerPlanning" class="event-number">
+                  <p class="event-number-label">8</p>
+                </div>
               </div>
             </div>
           </td>
@@ -69,10 +72,11 @@ import {
   PLANNING_VIEW_END_HOUR,
 } from '@data/constants';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
+import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
 export default {
   name: 'Agenda',
-  mixins: [planningEventMixin],
+  mixins: [planningEventMixin, planningActionMixin],
   props: {
     events: { type: Array, default: () => [] },
     days: { type: Array, default: () => [] },
@@ -129,6 +133,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+
   .agenda-table
     th
       @media screen and (min-width: 768px)
@@ -171,6 +176,20 @@ export default {
         background-color: $white;
         font-size: 12px;
         padding: 0 5px
+
+      .event-number
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        border: 2px solid $primary;
+        text-align: center;
+        background-color: white;
+        position: absolute;
+        bottom: 0em;
+        right: 0em;
+        &-label
+          line-height: 1;
+          color: $primary;
 
 thead
   vertical-align: baseline;
