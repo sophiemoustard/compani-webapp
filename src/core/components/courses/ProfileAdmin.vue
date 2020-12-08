@@ -27,9 +27,7 @@
           les attestations de fin de formation.
         </template>
       </ni-banner>
-
       <ni-course-info-link :disable-link="followUpDisabled" />
-
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
         :disable="followUpDisabled" :href="downloadAttendanceSheet()" size="16px" type="a" />
       <ni-bi-color-button icon="file_download" label="Attestations de fin de formation" type="a"
@@ -184,8 +182,7 @@ export default {
       return !slots.length;
     },
     courseLink () {
-      return `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/`
-        + `trainees/courses/${this.course._id}`;
+      return Courses.getConvocationUrl(this.course._id);
     },
     emailErrorcontact () {
       if (!this.$v.course.contact.email.email) return 'Email non valide';
