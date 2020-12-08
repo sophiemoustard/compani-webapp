@@ -15,14 +15,15 @@
           :data-label="col.label" :props="props">
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
-              <template v-if="props.row.number">
-                <a data-cy="link" v-if="canDownloadBill(props.row)"
-                  :href="billUrl(props.row)" target="_blank" class="download">
+              <div v-if="!props.row.number">Facture tiers</div>
+              <a v-else-if="getBillUrl(props.row)" :href="getBillUrl(props.row)" target="_blank" class="download"
+                data-cy="link">
                   Facture {{ props.row.number }}
-                </a>
-                <div v-else>Facture {{ props.row.number }}</div>
-              </template>
-              <div v-else>Facture tiers</div>
+              </a>
+              <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
+                data-cy="link">
+                Facture {{ props.row.number }}
+              </div>
             </template>
             <template v-else-if="props.row.type === CREDIT_NOTE">
               <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
@@ -70,6 +71,7 @@ import Bills from '@api/Bills';
 import CreditNotes from '@api/CreditNotes';
 import SimpleTable from '@components/table/SimpleTable';
 import { formatPrice } from '@helpers/utils';
+import { generatePdfUrl } from '@helpers/file';
 import {
   CREDIT_NOTE,
   BILL,
@@ -189,20 +191,36 @@ export default {
     openEditionModal (payment) {
       this.$emit('open-edition-modal', payment);
     },
-    canDownloadBill (bill) {
-      return (bill.number && bill.origin === COMPANI) || (bill.driveFile && bill.driveFile.link);
+    getBillUrl (bill) {
+      return get(bill, 'driveFile.link');
+    },
+    canDownload (bill) {
+      return bill.origin === COMPANI;
+    },
+    async downloadBillPdf (bill) {
+      if (!this.canDownload(bill)) return;
+
+      try {
+        const pdf = await Bills.getPDF(bill._id);
+
+        const windowRef = window.open();
+        const route = this.$router.resolve({
+          name: 'display file',
+          params: { fileName: bill.number },
+          query: { blobUrl: generatePdfUrl(pdf) },
+        });
+
+        windowRef.location = route.href;
+      } catch (e) {
+        console.error(e);
+      }
     },
     canDownloadCreditNote (creditNote) {
       return (creditNote.number && creditNote.origin === COMPANI) ||
         (creditNote.driveFile && creditNote.driveFile.link);
     },
-    billUrl (bill) {
-      return get(bill, 'driveFile.link') ? bill.driveFile.link : Bills.getPDFUrl(bill._id);
-    },
     creditNoteUrl (creditNote) {
-      return get(creditNote, 'driveFile.link')
-        ? creditNote.driveFile.link
-        : CreditNotes.getPDFUrl(creditNote._id);
+      return get(creditNote, 'driveFile.link') ? creditNote.driveFile.link : CreditNotes.getPDFUrl(creditNote._id);
     },
   },
 };
