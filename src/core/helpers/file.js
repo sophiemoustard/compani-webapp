@@ -26,5 +26,5 @@ export const downloadCsv = (data, fileName) => {
 
 export const generatePdfUrl = (pdf) => {
   const blob = new Blob([pdf.data], { type: 'application/pdf' });
-  return window.URL.createObjectURL(blob);
+  return URL.createObjectURL(blob);
 };
