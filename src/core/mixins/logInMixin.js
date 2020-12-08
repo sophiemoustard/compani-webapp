@@ -2,6 +2,8 @@ import { mapGetters, mapState } from 'vuex';
 import Users from '@api/Users';
 import { cookieExpirationDate } from '../helpers/alenvi';
 
+const WEBAPP = 'webapp';
+
 export const logInMixin = {
   computed: {
     ...mapGetters({
@@ -12,7 +14,7 @@ export const logInMixin = {
   },
   methods: {
     async logInUser (authenticationPayload) {
-      const auth = await Users.authenticate(authenticationPayload);
+      const auth = await Users.authenticate({ ...authenticationPayload, origin: WEBAPP });
 
       const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Lax' };
       const expireDate = cookieExpirationDate();
