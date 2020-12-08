@@ -1,8 +1,7 @@
 import { mapGetters, mapState } from 'vuex';
 import Users from '@api/Users';
 import { cookieExpirationDate } from '../helpers/alenvi';
-
-const WEBAPP = 'webapp';
+import { WEBAPP } from '../data/constants';
 
 export const logInMixin = {
   computed: {
