@@ -23,3 +23,8 @@ export const downloadCsv = (data, fileName) => {
 
   return downloadFile({ data: csvContent }, fileName);
 };
+
+export const generatePdfUrl = (pdf) => {
+  const blob = new Blob([pdf.data], { type: 'application/pdf' });
+  return window.URL.createObjectURL(blob);
+};
