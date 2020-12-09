@@ -73,11 +73,10 @@ import {
   PLANNING_VIEW_END_HOUR,
 } from '@data/constants';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
-import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 
 export default {
   name: 'Agenda',
-  mixins: [planningEventMixin, planningActionMixin],
+  mixins: [planningEventMixin],
   props: {
     events: { type: Array, default: () => [] },
     days: { type: Array, default: () => [] },
@@ -145,7 +144,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-
   .agenda-table
     th
       @media screen and (min-width: 768px)
