@@ -40,7 +40,7 @@
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
                   <q-btn data-cy="link" flat round small color="primary" type="a"
-                    :href="taxCertificatesUrl(props.row)" target="_blank" icon="file_download" />
+                    @click="downloadTaxCertificate(props.row)" icon="file_download" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
@@ -101,6 +101,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
+import { openPdf } from '@helpers/file';
 import {
   CREDIT_NOTE,
   BILL,
@@ -440,6 +441,15 @@ export default {
         NotifyNegative('Erreur lors de l\'envoi de l\'attestation fiscale.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    async downloadTaxCertificate (tc) {
+      try {
+        const pdf = await TaxCertificates.getPdf(tc._id);
+        openPdf(pdf, this.$q.platform);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de la facture');
       }
     },
     validateTaxCertificateDeletion (taxCertificateId, row) {
