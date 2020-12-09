@@ -30,8 +30,8 @@
       <ni-course-info-link :disable-link="followUpDisabled" />
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
         :disable="followUpDisabled" @click="downloadAttendanceSheet" size="16px" />
-      <ni-bi-color-button icon="file_download" label="Attestations de fin de formation" type="a"
-        :disable="disableDownloadCompletionCertificates" :href="downloadCompletionCertificates()" size="16px" />
+      <ni-bi-color-button icon="file_download" label="Attestations de fin de formation"
+        :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates" size="16px" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
@@ -96,7 +96,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { formatQuantity, formatIdentity } from '@helpers/utils';
-import { openPdf } from '@helpers/file';
+import { openPdf, downloadZip } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
@@ -323,9 +323,16 @@ export default {
         NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
       }
     },
-    downloadCompletionCertificates () {
+    async downloadCompletionCertificates () {
       if (this.disableDownloadCompletionCertificates) return;
-      return Courses.downloadCompletionCertificates(this.course._id);
+
+      try {
+        const pdf = await Courses.downloadCompletionCertificates(this.course._id);
+        downloadZip(pdf, 'attestations.zip', this.$q.platform);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement des attestations.');
+      }
     },
   },
 };

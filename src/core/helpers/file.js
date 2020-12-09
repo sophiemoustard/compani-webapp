@@ -31,3 +31,12 @@ export const openPdf = (pdf, platform) => {
   link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
   link.click();
 };
+
+export const downloadZip = (zip, fileName, platform) => {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([zip.data], { type: 'application/zip' }));
+  document.body.appendChild(link);
+  link.setAttribute('download', fileName);
+  link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
+  link.click();
+};

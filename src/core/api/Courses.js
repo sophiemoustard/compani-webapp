@@ -1,4 +1,3 @@
-import { Cookies } from 'quasar';
 import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
@@ -48,8 +47,10 @@ export default {
     );
   },
   downloadCompletionCertificates (courseId) {
-    return `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates?x-access-token=`
-      + `${Cookies.get('alenvi_token')}`;
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates`,
+      { responseType: 'arraybuffer', headers: { Accept: 'application/zip' } }
+    );
   },
   async addAccessRule (courseId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules`, payload);
