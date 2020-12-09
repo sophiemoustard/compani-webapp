@@ -1,17 +1,25 @@
 import gdrive from '@api/GoogleDrive';
 
-export const downloadFile = (file, fileName) => {
-  const url = window.URL.createObjectURL(new Blob([file.data]));
+export const downloadFile = (file, fileName, type = '') => {
   const link = document.createElement('a');
-  link.href = url;
+  link.href = URL.createObjectURL(new Blob([file.data], { type }));
   link.setAttribute('download', fileName);
   document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 };
 
 export const downloadDriveDocx = async (params, data, fileName) => {
   const file = await gdrive.generateDocx(params, data);
   downloadFile(file, fileName);
+};
+
+export const downloadZip = (zip, fileName) => {
+  downloadFile(zip, fileName, 'application/zip');
+};
+
+export const downloadDocx = (zip, fileName) => {
+  downloadFile(zip, fileName, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 };
 
 export const downloadCsv = (data, fileName) => {
@@ -28,27 +36,6 @@ export const openPdf = (pdf, platform) => {
   const link = document.createElement('a');
   link.href = URL.createObjectURL(new Blob([pdf.data], { type: 'application/pdf' }));
   document.body.appendChild(link);
-  link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
-  link.click();
-  document.body.removeChild(link);
-};
-
-export const downloadZip = (zip, fileName, platform) => {
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(new Blob([zip.data], { type: 'application/zip' }));
-  document.body.appendChild(link);
-  link.setAttribute('download', fileName);
-  link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
-  link.click();
-  document.body.removeChild(link);
-};
-export const downloadDocx = (zip, fileName, platform) => {
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(
-    new Blob([zip.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
-  );
-  document.body.appendChild(link);
-  link.setAttribute('download', fileName);
   link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
   link.click();
   document.body.removeChild(link);

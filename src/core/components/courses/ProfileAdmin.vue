@@ -328,7 +328,7 @@ export default {
 
       try {
         const pdf = await Courses.downloadCompletionCertificates(this.course._id);
-        downloadZip(pdf, 'attestations.zip', this.$q.platform);
+        downloadZip(pdf, 'attestations.zip');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');

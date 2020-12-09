@@ -100,7 +100,7 @@ export default {
     async billSlipUrl (id) {
       try {
         const docx = await BillSlip.getPDFUrl(id);
-        downloadDocx(docx, 'bordereau.docx', this.$q.platform);
+        downloadDocx(docx, 'bordereau.docx');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des bordereaux.');
