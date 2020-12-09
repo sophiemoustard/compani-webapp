@@ -16,7 +16,7 @@
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <div v-if="!props.row.number">Facture tiers</div>
-              <a v-else-if="getBillUrl(props.row)" :href="getBillUrl(props.row)" target="_blank" class="download"
+              <a v-else-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
                 data-cy="link">
                   Facture {{ props.row.number }}
               </a>
@@ -26,11 +26,14 @@
               </div>
             </template>
             <template v-else-if="props.row.type === CREDIT_NOTE">
-              <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
-                class="download">
-                Avoir {{ props.row.number }}
+              <a v-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
+                data-cy="link">
+                  Avoir {{ props.row.number }}
               </a>
-              <div v-else>Avoir {{ props.row.number }}</div>
+              <div v-else @click="downloadCreditNotePdf(props.row)" :class="{ 'download': canDownload(props.row) }"
+                data-cy="link">
+                Avoir {{ props.row.number }}
+              </div>
             </template>
             <div v-else>{{ getPaymentTitle(props.row) }}</div>
           </template>
@@ -192,11 +195,11 @@ export default {
     openEditionModal (payment) {
       this.$emit('open-edition-modal', payment);
     },
-    getBillUrl (bill) {
-      return get(bill, 'driveFile.link');
+    getUrl (doc) {
+      return get(doc, 'driveFile.link');
     },
-    canDownload (bill) {
-      return bill.origin === COMPANI;
+    canDownload (doc) {
+      return doc.origin === COMPANI;
     },
     async downloadBillPdf (bill) {
       if (!this.canDownload(bill)) return;
@@ -209,12 +212,16 @@ export default {
         NotifyNegative('Erreur lors du téléchargement de la facture');
       }
     },
-    canDownloadCreditNote (creditNote) {
-      return (creditNote.number && creditNote.origin === COMPANI) ||
-        (creditNote.driveFile && creditNote.driveFile.link);
-    },
-    creditNoteUrl (creditNote) {
-      return get(creditNote, 'driveFile.link') ? creditNote.driveFile.link : CreditNotes.getPDFUrl(creditNote._id);
+    async downloadCreditNotePdf (cn) {
+      if (!this.canDownload(cn)) return;
+
+      try {
+        const pdf = await CreditNotes.getPdf(cn._id);
+        openPdf(pdf, this.$q.platform);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de la facture');
+      }
     },
   },
 };
