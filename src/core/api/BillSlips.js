@@ -1,4 +1,3 @@
-import { Cookies } from 'quasar';
 import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
@@ -7,6 +6,12 @@ export default {
     return billSlips.data.data.billSlips;
   },
   getPDFUrl (id) {
-    return `${process.env.API_HOSTNAME}/billslips/${id}/docx?x-access-token=${Cookies.get('alenvi_token')}`;
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/billslips/${id}/docx`,
+      {
+        responseType: 'arraybuffer',
+        header: { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' },
+      }
+    );
   },
 };

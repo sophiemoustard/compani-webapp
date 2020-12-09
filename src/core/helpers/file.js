@@ -42,3 +42,14 @@ export const downloadZip = (zip, fileName, platform) => {
   link.click();
   document.body.removeChild(link);
 };
+export const downloadDocx = (zip, fileName, platform) => {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(
+    new Blob([zip.data], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' })
+  );
+  document.body.appendChild(link);
+  link.setAttribute('download', fileName);
+  link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
+  link.click();
+  document.body.removeChild(link);
+};
