@@ -6,10 +6,10 @@
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div class="q-my-lg answers">
-      <div v-for="(answer, i) in card.questionAnswers" :key="i" class="answers-container">
-        <ni-input :caption="`Réponse ${i + 1}`" v-model="card.questionAnswers[i].text" :disable="disableEdition"
-          @blur="updateQuestionAnswers(i)" @focus="saveTmp(`questionAnswers[${i}].text`)"
-          :error="$v.card.questionAnswers.$each[i].$error" class="answers-container-input" />
+      <div v-for="(answer, i) in card.qAnswers" :key="i" class="answers-container">
+        <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qAnswers[i].text" :disable="disableEdition"
+          @blur="updateQuestionAnswers(i)" @focus="saveTmp(`qAnswers[${i}].text`)"
+          :error="$v.card.qAnswers.$each[i].$error" class="answers-container-input" />
         <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" />
       </div>
       <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
@@ -49,7 +49,7 @@ export default {
     return {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
-        questionAnswers: {
+        qAnswers: {
           required,
           minLength: minArrayLength(QUESTION_ANSWER_MIN_ANSWERS_COUNT),
           maxLength: maxArrayLength(QUESTION_ANSWER_MAX_ANSWERS_COUNT),
@@ -60,22 +60,22 @@ export default {
   },
   computed: {
     disableAnswerCreation () {
-      return this.card.questionAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
+      return this.card.qAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
         this.disableEdition || this.activity.status === PUBLISHED;
     },
     disableAnswerDeletion () {
-      return this.card.questionAnswers.length <= QUESTION_ANSWER_MIN_ANSWERS_COUNT ||
+      return this.card.qAnswers.length <= QUESTION_ANSWER_MIN_ANSWERS_COUNT ||
         this.disableEdition || this.activity.status === PUBLISHED;
     },
   },
   methods: {
     async updateQuestionAnswers (index) {
       try {
-        const editedAnswer = get(this.card, `questionAnswers[${index}]`);
+        const editedAnswer = get(this.card, `qAnswers[${index}]`);
         if (this.tmpInput === editedAnswer.text) return;
 
-        this.$v.card.questionAnswers.$touch();
-        if (this.$v.card.questionAnswers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s).');
+        this.$v.card.qAnswers.$touch();
+        if (this.$v.card.qAnswers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s).');
 
         await Cards.updateAnswer(
           { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
@@ -101,7 +101,7 @@ export default {
     },
     async deleteQuestionAnswer (index) {
       try {
-        const answerId = get(this.card, `questionAnswers[${index}]._id`);
+        const answerId = get(this.card, `qAnswers[${index}]._id`);
         if (!answerId) return;
         await Cards.deleteAnswer({ cardId: this.card._id, answerId });
 
