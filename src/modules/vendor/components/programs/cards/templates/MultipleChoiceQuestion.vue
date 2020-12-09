@@ -20,7 +20,6 @@
 <script>
 import get from 'lodash/get';
 import { required, maxLength } from 'vuelidate/lib/validators';
-import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { REQUIRED_LABEL, QUESTION_MAX_LENGTH, QC_ANSWER_MAX_LENGTH } from '@data/constants';
@@ -62,9 +61,6 @@ export default {
       return this.card.qcAnswers.filter(a => a.correct).length === 1 && this.card.qcAnswers[index].correct &&
         !this.card.qcAnswers[index].text;
     },
-    formatAnswersPayload () {
-      return { qcAnswers: this.card.qcAnswers.filter(a => !!a.text).map(a => ({ ...a, text: a.text.trim() })) };
-    },
     async updateAnswer (index) {
       try {
         if (this.tmpInput === get(this.card, `qcAnswers[${index}].text`)) return;
@@ -76,8 +72,6 @@ export default {
         if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
           return NotifyWarning('Une bonne réponse est nécessaire.');
         }
-
-        await Cards.updateById(this.card._id, this.formatAnswersPayload());
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');
@@ -92,8 +86,6 @@ export default {
           return NotifyWarning('Champ(s) invalide(s)');
         }
         if (this.requiredOneCorrectAnswer(index)) return NotifyWarning('Une bonne réponse est nécessaire.');
-
-        await Cards.updateById(this.card._id, this.formatAnswersPayload());
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');

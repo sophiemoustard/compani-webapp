@@ -20,7 +20,6 @@
 <script>
 import get from 'lodash/get';
 import { required, maxLength } from 'vuelidate/lib/validators';
-import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { REQUIRED_LABEL, QUESTION_MAX_LENGTH, QC_ANSWER_MAX_LENGTH } from '@data/constants';
@@ -76,17 +75,12 @@ export default {
 
       return exceedCharLength || missingField;
     },
-    formatQcuFalsyAnswersPayload () {
-      return { qcAnswers: this.card.qcAnswers.filter(a => !!a.text).map(a => ({ ...a, text: a.text.trim() })) };
-    },
     async updateFalsyAnswer (index) {
       try {
         if (this.tmpInput === get(this.card, `qcAnswers[${index}].text`)) return;
 
         this.$v.card.qcAnswers.$touch();
         if (this.qcuFalsyAnswerError(index)) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Cards.updateById(this.card._id, this.formatQcuFalsyAnswersPayload());
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');
