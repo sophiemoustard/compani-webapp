@@ -430,3 +430,6 @@ export const ACCESS_OPTIONS = [
   { label: 'Libre accès', value: FREE_ACCESS },
   { label: 'Choisir une structure', value: RESTRICTED_ACCESS },
 ];
+
+// ORIGIN
+export const WEBAPP = 'webapp';
