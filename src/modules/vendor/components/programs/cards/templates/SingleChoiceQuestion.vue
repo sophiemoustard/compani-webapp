@@ -7,9 +7,9 @@
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
     <div class="q-my-lg">
-      <ni-input v-for="(answer, i) in card.qAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
-        v-model="card.qAnswers[i].text" :required-field="i === 0" :error="qcuFalsyAnswerError(i)"
-        :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qAnswers[${i}].text`)"
+      <ni-input v-for="(answer, i) in card.qcAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
+        v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="qcuFalsyAnswerError(i)"
+        :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
         @blur="updateFalsyAnswer(i)" :disable="disableEdition" />
     </div>
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
@@ -42,7 +42,7 @@ export default {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcuGoodAnswer: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) },
-        qAnswers: {
+        qcAnswers: {
           minLength: minTextArrayLength(1),
           minOneCorrectAnswer,
           $each: {
@@ -64,26 +64,26 @@ export default {
   },
   methods: {
     qcuFalsyAnswerErrorMsg (index) {
-      if (!this.$v.card.qAnswers.$each[index].text.maxLength) {
+      if (!this.$v.card.qcAnswers.$each[index].text.maxLength) {
         return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
       }
       return '';
     },
     qcuFalsyAnswerError (index) {
-      const exceedCharLength = this.$v.card.qAnswers.$each[index].text.$error;
-      const missingField = this.$v.card.qAnswers.$error &&
-        !this.$v.card.qAnswers.minLength && index === 0 && !this.card.qAnswers[index].text;
+      const exceedCharLength = this.$v.card.qcAnswers.$each[index].text.$error;
+      const missingField = this.$v.card.qcAnswers.$error &&
+        !this.$v.card.qcAnswers.minLength && index === 0 && !this.card.qcAnswers[index].text;
 
       return exceedCharLength || missingField;
     },
     formatQcuFalsyAnswersPayload () {
-      return { qAnswers: this.card.qAnswers.filter(a => !!a.text).map(a => ({ ...a, text: a.text.trim() })) };
+      return { qcAnswers: this.card.qcAnswers.filter(a => !!a.text).map(a => ({ ...a, text: a.text.trim() })) };
     },
     async updateFalsyAnswer (index) {
       try {
-        if (this.tmpInput === get(this.card, `qAnswers[${index}].text`)) return;
+        if (this.tmpInput === get(this.card, `qcAnswers[${index}].text`)) return;
 
-        this.$v.card.qAnswers.$touch();
+        this.$v.card.qcAnswers.$touch();
         if (this.qcuFalsyAnswerError(index)) return NotifyWarning('Champ(s) invalide(s)');
 
         await Cards.updateById(this.card._id, this.formatQcuFalsyAnswersPayload());
