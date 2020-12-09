@@ -29,7 +29,7 @@
       </ni-banner>
       <ni-course-info-link :disable-link="followUpDisabled" />
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
-        :disable="followUpDisabled" :href="downloadAttendanceSheet()" size="16px" type="a" />
+        :disable="followUpDisabled" @click="downloadAttendanceSheet" size="16px" />
       <ni-bi-color-button icon="file_download" label="Attestations de fin de formation" type="a"
         :disable="disableDownloadCompletionCertificates" :href="downloadCompletionCertificates()" size="16px" />
     </div>
@@ -87,7 +87,6 @@ import { mapState } from 'vuex';
 import { required, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import { formatQuantity, formatIdentity } from '@helpers/utils';
 import Input from '@components/form/Input';
 import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
@@ -96,6 +95,8 @@ import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
+import { formatQuantity, formatIdentity } from '@helpers/utils';
+import { openPdf } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { courseMixin } from '@mixins/courseMixin';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
@@ -311,9 +312,16 @@ export default {
         this.setDefaultMessageType();
       }
     },
-    downloadAttendanceSheet () {
+    async downloadAttendanceSheet () {
       if (this.followUpDisabled) return;
-      return Courses.downloadAttendanceSheet(this.course._id);
+
+      try {
+        const pdf = await Courses.downloadAttendanceSheet(this.course._id);
+        openPdf(pdf, this.$q.platform);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
+      }
     },
     downloadCompletionCertificates () {
       if (this.disableDownloadCompletionCertificates) return;
