@@ -70,8 +70,9 @@ import get from 'lodash/get';
 import Bills from '@api/Bills';
 import CreditNotes from '@api/CreditNotes';
 import SimpleTable from '@components/table/SimpleTable';
+import { NotifyNegative } from '@components/popup/notify';
 import { formatPrice } from '@helpers/utils';
-import { generatePdfUrl } from '@helpers/file';
+import { openPdf } from '@helpers/file';
 import {
   CREDIT_NOTE,
   BILL,
@@ -201,18 +202,11 @@ export default {
       if (!this.canDownload(bill)) return;
 
       try {
-        const pdf = await Bills.getPDF(bill._id);
-
-        const windowRef = window.open();
-        const route = this.$router.resolve({
-          name: 'display file',
-          params: { fileName: bill.number },
-          query: { blobUrl: generatePdfUrl(pdf) },
-        });
-
-        windowRef.location = route.href;
+        const pdf = await Bills.getPdf(bill._id);
+        openPdf(pdf, this.$q.platform);
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de la facture');
       }
     },
     canDownloadCreditNote (creditNote) {

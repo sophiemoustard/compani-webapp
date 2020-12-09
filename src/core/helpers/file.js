@@ -24,7 +24,10 @@ export const downloadCsv = (data, fileName) => {
   return downloadFile({ data: csvContent }, fileName);
 };
 
-export const generatePdfUrl = (pdf) => {
-  const blob = new Blob([pdf.data], { type: 'application/pdf' });
-  return URL.createObjectURL(blob);
+export const openPdf = (pdf, platform) => {
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(new Blob([pdf.data], { type: 'application/pdf' }));
+  document.body.appendChild(link);
+  link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
+  link.click();
 };
