@@ -9,7 +9,7 @@ export const downloadFile = (file, fileName) => {
   link.click();
 };
 
-export const downloadDocxFile = async (params, data, fileName) => {
+export const downloadDriveDocx = async (params, data, fileName) => {
   const file = await gdrive.generateDocx(params, data);
   downloadFile(file, fileName);
 };
