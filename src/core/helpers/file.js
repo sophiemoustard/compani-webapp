@@ -30,6 +30,7 @@ export const openPdf = (pdf, platform) => {
   document.body.appendChild(link);
   link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
   link.click();
+  document.body.removeChild(link);
 };
 
 export const downloadZip = (zip, fileName, platform) => {
@@ -39,4 +40,5 @@ export const downloadZip = (zip, fileName, platform) => {
   link.setAttribute('download', fileName);
   link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
   link.click();
+  document.body.removeChild(link);
 };
