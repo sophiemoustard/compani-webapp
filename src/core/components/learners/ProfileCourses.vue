@@ -23,8 +23,15 @@
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
             <q-td auto-width />
-            <q-td colspan="100%" @click="sendData(props.row)">
-              <div>Contenu déplié</div>
+            <q-td colspan="100%">
+              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
+                class="q-ma-sm step">
+                <div>
+                  <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
+                  {{ stepIndex+1 }} - {{ step.name }}
+                </div>
+                <ni-progress :value="step.progress" />
+              </div>
             </q-td>
           </q-tr>
         </template>
@@ -37,7 +44,7 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import { BLENDED } from '@data/constants';
+import { BLENDED, E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
 
@@ -84,6 +91,7 @@ export default {
         },
         { name: 'expand', label: '', field: '_id' },
       ],
+      E_LEARNING,
     };
   },
   computed: {
@@ -108,3 +116,8 @@ export default {
   },
 };
 </script>
+<style lang="stylus" scoped>
+.step
+  display: flex
+  justify-content: space-between
+</style>
