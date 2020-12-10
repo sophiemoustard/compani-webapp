@@ -91,18 +91,30 @@ export default {
           endDate: this.endOfWeek,
           customer: this.customer._id,
         });
+        this.events.map(event => (event.inConflictEvents = this.getInConflictEvents(event)));
+        this.getInConflictEvents(this.events[0]);
       } catch (e) {
         this.events = [];
       }
     },
     formatIdentity,
-    openConflictModal (events) {
-      this.conflictingEvents = events;
-      this.conflictModal = true;
+    openConflictModal (event) {
+      if (event.inConflictEvents.length !== 1) {
+        this.conflictingEvents = event.inConflictEvents;
+        this.conflictModal = true;
+      }
     },
     closeConflictModal () {
       this.conflictModal = false;
       this.conflictingEvents = [];
+    },
+    getInConflictEvents (event) {
+      const dailyEvents = this.events.filter(ev => this.$moment(ev.startDate).isSame(event.startDate, 'day'));
+      const conflictingEvents = dailyEvents.filter(
+        ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate) ||
+          this.$moment(ev.endDate).isBetween(event.startDate, event.endDate)
+      );
+      return [event, ...conflictingEvents];
     },
   },
 };

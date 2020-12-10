@@ -33,9 +33,6 @@ export default {
     hide () {
       this.$emit('hide');
     },
-    submit () {
-      this.$emit('submit');
-    },
   },
 };
 </script>

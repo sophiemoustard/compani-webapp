@@ -26,7 +26,7 @@
                 </template>
               </template>
               <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)"
-                :key="eventId" @click.stop="openEventInfoModal(event, getConflictEvents(event))"
+                :key="eventId" @click.stop="openEventInfoModal(event)"
                 class="event" :class="getEventClass(event)" data-cy="agenda-event">
                 <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                   <div class="col-12 event-title">
@@ -49,9 +49,9 @@
                   </p>
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
-                <div v-if="isCustomerPlanning && getConflictEvents(event).length !== 1"
+                <div v-if="isCustomerPlanning && event.inConflictEvents.length !== 1"
                   class="event-number">
-                  <p class="event-number-label">{{ getConflictEvents(event).length }}</p>
+                  <p class="event-number-label">{{ event.inConflictEvents.length }}</p>
                 </div>
               </div>
             </div>
@@ -125,17 +125,8 @@ export default {
     openEventCreationModal (value) {
       this.$emit('open-creation-modal', value);
     },
-    openEventInfoModal (event, conflictingEvents) {
-      const value = this.isCustomerPlanning ? conflictingEvents : event;
+    openEventInfoModal (value) {
       this.$emit('open-info-modal', value);
-    },
-    getConflictEvents (event) {
-      const dailyEvents = this.getOneDayEvents(this.$moment(event.startDate));
-      const conflictingEvents = dailyEvents.filter(
-        ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate) ||
-          this.$moment(ev.endDate).isBetween(event.startDate, event.endDate)
-      );
-      return [event, ...conflictingEvents];
     },
   },
 };
