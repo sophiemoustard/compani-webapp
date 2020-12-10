@@ -53,11 +53,6 @@ Router.beforeEach(async (to, from, next) => {
       }
     }
   } else {
-    if (['/login', '/forgot-password'].includes(to.path) && Cookies.get('refresh_token') && Cookies.get('user_id')) {
-      await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
-      const loggedUser = store.getters['main/getLoggedUser'];
-      if (loggedUser) next({ path: '/' });
-    }
     next();
   }
 });

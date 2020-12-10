@@ -19,6 +19,9 @@ export default {
     );
     return auth.data.data;
   },
+  async logOut () {
+    await axios.post(`${process.env.API_HOSTNAME}/users/logout`, null, { withCredentials: true });
+  },
   async list (params = null) {
     try {
       const usersRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users`, { params });

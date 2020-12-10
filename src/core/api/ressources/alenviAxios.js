@@ -1,6 +1,7 @@
 import axios from 'axios';
 import qs from 'qs';
-import { refreshAlenviCookies } from '../../helpers/alenvi';
+import { refreshAlenviCookies } from '@helpers/alenvi';
+import { logOutAndRedirectToLogin } from 'src/router/redirect';
 
 const instance = axios.create({
   withCredentials: true,
@@ -12,10 +13,11 @@ instance.interceptors.request.use(async config => config, err => Promise.reject(
 instance.interceptors.response.use(
   response => response,
   async (error) => {
-    console.log(error.response);
     if (error.response.status === 401) {
-      await refreshAlenviCookies();
-      return axios.request(error.config);
+      const refresh = await refreshAlenviCookies();
+
+      if (refresh) return axios.request(error.config);
+      return logOutAndRedirectToLogin();
     }
     return Promise.reject(error.response);
   }

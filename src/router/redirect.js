@@ -1,11 +1,10 @@
+import { LocalStorage } from 'quasar';
 import router from 'src/router/index';
 import store from 'src/store/index';
-import { Cookies, LocalStorage } from 'quasar';
+import Users from 'src/core/api/Users';
 
-export const logOutAndRedirectToLogin = (params) => {
-  const options = { path: '/' };
-  Cookies.remove('refresh_token', options);
-  Cookies.remove('user_id', options);
+export const logOutAndRedirectToLogin = async (params) => {
+  await Users.logOut();
   LocalStorage.clear();
 
   store.dispatch('course/resetCourse');
