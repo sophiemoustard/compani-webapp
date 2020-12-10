@@ -28,7 +28,6 @@ export const refreshAlenviCookies = async () => {
       const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Lax' };
 
       const expireDate = cookieExpirationDate();
-      Cookies.set('refresh_token', newToken.refreshToken, { ...options, expires: 365 });
       Cookies.set('user_id', newToken.user._id, { ...options, expires: expireDate });
 
       return true;

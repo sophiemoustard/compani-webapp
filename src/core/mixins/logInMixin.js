@@ -18,7 +18,6 @@ export const logInMixin = {
       const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Lax' };
       const expireDate = cookieExpirationDate();
 
-      this.$q.cookies.set('refresh_token', auth.refreshToken, { ...options, expires: 365 });
       this.$q.cookies.set('user_id', auth.user._id, { ...options, expires: expireDate });
 
       await this.$store.dispatch('main/fetchLoggedUser', auth.user._id);
