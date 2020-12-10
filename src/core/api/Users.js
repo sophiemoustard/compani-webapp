@@ -8,7 +8,11 @@ export default {
     return refreshToken.data.data;
   },
   async authenticate (data) {
-    const auth = await axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, data);
+    const auth = await axios.post(
+      `${process.env.API_HOSTNAME}/users/authenticate`,
+      data,
+      { withCredentials: true }
+    );
     return auth.data.data;
   },
   async list (params = null) {

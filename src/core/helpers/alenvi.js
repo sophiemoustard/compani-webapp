@@ -28,14 +28,12 @@ export const refreshAlenviCookies = async () => {
       const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Lax' };
 
       const expireDate = cookieExpirationDate();
-      Cookies.set('alenvi_token', newToken.token, { ...options, expires: expireDate });
       Cookies.set('refresh_token', newToken.refreshToken, { ...options, expires: 365 });
       Cookies.set('user_id', newToken.user._id, { ...options, expires: expireDate });
 
       return true;
     }
     const options = { path: '/' };
-    Cookies.remove('alenvi_token', options);
     Cookies.remove('user_id', options);
 
     return false;
@@ -43,7 +41,6 @@ export const refreshAlenviCookies = async () => {
     console.error(e);
     if (e.response.status === 404) {
       const options = { path: '/' };
-      Cookies.remove('alenvi_token', options);
       Cookies.remove('refresh_token', options);
       Cookies.remove('user_id', options);
     }
