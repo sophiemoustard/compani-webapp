@@ -8,7 +8,7 @@ export default {
   async create (data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/bills`, data);
   },
-  async getPDF (id) {
+  async getPdf (id) {
     return alenviAxios.get(
       `${process.env.API_HOSTNAME}/bills/${id}/pdfs`,
       { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }

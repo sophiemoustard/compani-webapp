@@ -16,9 +16,9 @@
           <template v-if="col.name === 'document'">
             <template v-if="props.row.type === BILL">
               <div v-if="!props.row.number">Facture tiers</div>
-              <a v-else-if="getBillUrl(props.row)" :href="getBillUrl(props.row)" target="_blank" class="download"
+              <a v-else-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
                 data-cy="link">
-                  Facture {{ props.row.number }}
+                Facture {{ props.row.number }}
               </a>
               <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
@@ -26,11 +26,14 @@
               </div>
             </template>
             <template v-else-if="props.row.type === CREDIT_NOTE">
-              <a v-if="canDownloadCreditNote(props.row)" :href="creditNoteUrl(props.row)" target="_blank"
-                class="download">
+              <a v-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
+                data-cy="link">
                 Avoir {{ props.row.number }}
               </a>
-              <div v-else>Avoir {{ props.row.number }}</div>
+              <div v-else @click="downloadCreditNotePdf(props.row)" :class="{ 'download': canDownload(props.row) }"
+                data-cy="link">
+                Avoir {{ props.row.number }}
+              </div>
             </template>
             <div v-else>{{ getPaymentTitle(props.row) }}</div>
           </template>
@@ -70,8 +73,9 @@ import get from 'lodash/get';
 import Bills from '@api/Bills';
 import CreditNotes from '@api/CreditNotes';
 import SimpleTable from '@components/table/SimpleTable';
+import { NotifyNegative } from '@components/popup/notify';
 import { formatPrice } from '@helpers/utils';
-import { generatePdfUrl } from '@helpers/file';
+import { openPdf } from '@helpers/file';
 import {
   CREDIT_NOTE,
   BILL,
@@ -191,36 +195,33 @@ export default {
     openEditionModal (payment) {
       this.$emit('open-edition-modal', payment);
     },
-    getBillUrl (bill) {
-      return get(bill, 'driveFile.link');
+    getUrl (doc) {
+      return get(doc, 'driveFile.link');
     },
-    canDownload (bill) {
-      return bill.origin === COMPANI;
+    canDownload (doc) {
+      return doc.origin === COMPANI;
     },
     async downloadBillPdf (bill) {
       if (!this.canDownload(bill)) return;
 
       try {
-        const pdf = await Bills.getPDF(bill._id);
-
-        const windowRef = window.open();
-        const route = this.$router.resolve({
-          name: 'display file',
-          params: { fileName: bill.number },
-          query: { blobUrl: generatePdfUrl(pdf) },
-        });
-
-        windowRef.location = route.href;
+        const pdf = await Bills.getPdf(bill._id);
+        openPdf(pdf);
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de la facture');
       }
     },
-    canDownloadCreditNote (creditNote) {
-      return (creditNote.number && creditNote.origin === COMPANI) ||
-        (creditNote.driveFile && creditNote.driveFile.link);
-    },
-    creditNoteUrl (creditNote) {
-      return get(creditNote, 'driveFile.link') ? creditNote.driveFile.link : CreditNotes.getPDFUrl(creditNote._id);
+    async downloadCreditNotePdf (cn) {
+      if (!this.canDownload(cn)) return;
+
+      try {
+        const pdf = await CreditNotes.getPdf(cn._id);
+        openPdf(pdf);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de l\'avoir');
+      }
     },
   },
 };
