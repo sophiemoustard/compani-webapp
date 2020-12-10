@@ -24,7 +24,7 @@ const Router = new VueRouter({
 
 Router.beforeEach(async (to, from, next) => {
   if (to.meta.cookies) {
-    if (!Cookies.get('alenvi_token') || !Cookies.get('user_id')) {
+    if (!Cookies.get('user_id')) {
       const refresh = await refreshAlenviCookies();
       if (refresh) {
         if (store.state.main.refreshState) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));

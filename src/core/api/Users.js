@@ -4,7 +4,11 @@ import { WEBAPP } from '@data/constants';
 
 export default {
   async refreshToken (data) {
-    const refreshToken = await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
+    const refreshToken = await axios.post(
+      `${process.env.API_HOSTNAME}/users/refreshToken`,
+      data,
+      { withCredentials: true }
+    );
     return refreshToken.data.data;
   },
   async authenticate (data) {
