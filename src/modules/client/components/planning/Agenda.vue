@@ -26,8 +26,8 @@
                 </template>
               </template>
               <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)"
-                :key="eventId" @click.stop="openEventEditionModal(event)" class="event" :class="getEventClass(event)"
-                data-cy="agenda-event">
+                :key="eventId" @click.stop="openEventInfoModal(event)"
+                class="event" :class="getEventClass(event)" data-cy="agenda-event">
                 <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                   <div class="col-12 event-title">
                     <p data-cy="event-title" v-if="event.type === INTERVENTION"
@@ -48,6 +48,10 @@
                     {{ getEventHours(event) }}
                   </p>
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
+                </div>
+                <div v-if="isCustomerPlanning && event.inConflictEvents.length !== 1"
+                  class="event-number">
+                  <p class="event-number-label">{{ event.inConflictEvents.length }}</p>
                 </div>
               </div>
             </div>
@@ -94,7 +98,7 @@ export default {
   methods: {
     getEventClass (event) {
       return [
-        !this.isCustomerPlanning && 'cursor-pointer',
+        event.inConflictEvents.length === 1 ? '' : 'cursor-pointer',
         event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
       ];
     },
@@ -121,8 +125,8 @@ export default {
     openEventCreationModal (value) {
       this.$emit('open-creation-modal', value);
     },
-    openEventEditionModal (value) {
-      this.$emit('open-edition-modal', value);
+    openEventInfoModal (value) {
+      this.$emit('open-info-modal', value);
     },
   },
 };
@@ -171,6 +175,21 @@ export default {
         background-color: $white;
         font-size: 12px;
         padding: 0 5px
+
+      .event-number
+        border-radius: 50%;
+        width: 16px;
+        height: 16px;
+        border: 1px solid $primary;
+        text-align: center;
+        background-color: white;
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        &-label
+          line-height: 1;
+          color: $primary;
+          font-size: 14px;
 
 thead
   vertical-align: baseline;
