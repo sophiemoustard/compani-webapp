@@ -6,7 +6,7 @@
     <div class="q-my-xl">
       <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2"
-          @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateQcmAnswer(i)" :error-message="answersErrorMsg(i)"
+          @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
           :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />
         <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
           :disable="!card.qcAnswers[i].text || disableEdition" />
@@ -21,7 +21,7 @@
 import get from 'lodash/get';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { REQUIRED_LABEL, QUESTION_MAX_LENGTH, QC_ANSWER_MAX_LENGTH } from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
@@ -54,34 +54,13 @@ export default {
     requiredOneCorrectAnswer (index) {
       return !this.$v.card.qcAnswers.minOneCorrectAnswer && !!this.card.qcAnswers[index].text;
     },
-    removeSingleCorrectAnswer (index) {
-      return this.card.qcAnswers.filter(a => a.correct).length === 1 && this.card.qcAnswers[index].correct &&
-        !this.card.qcAnswers[index].text;
-    },
-    async updateQcmAnswer (index) {
-      this.$v.card.qcAnswers.$touch();
-
-      if (this.requiredOneCorrectAnswer(index) || this.removeSingleCorrectAnswer(index)) {
-        return NotifyWarning('Une bonne réponse est nécessaire.');
-      }
-
-      await this.updateTextAnswer(index);
-    },
     async updateCorrectAnswer (index) {
       try {
         const editedAnswer = get(this.card, `qcAnswers[${index}]`);
 
-        this.$v.card.qcAnswers.$touch();
-
-        if (!editedAnswer.text || this.$v.card.qcAnswers.$each[index].$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
-
-        if (this.requiredOneCorrectAnswer(index)) return NotifyWarning('Une bonne réponse est nécessaire.');
-
         await Cards.updateAnswer(
           { cardId: this.card._id, answerId: editedAnswer._id },
-          { text: editedAnswer.text, correct: editedAnswer.correct }
+          { correct: editedAnswer.correct }
         );
 
         await this.refreshCard();
