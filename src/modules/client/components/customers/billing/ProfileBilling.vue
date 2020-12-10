@@ -446,10 +446,10 @@ export default {
     async downloadTaxCertificate (tc) {
       try {
         const pdf = await TaxCertificates.getPdf(tc._id);
-        openPdf(pdf, this.$q.platform);
+        openPdf(pdf);
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la facture');
+        NotifyNegative('Erreur lors du téléchargement de l\'attestation fiscale');
       }
     },
     validateTaxCertificateDeletion (taxCertificateId, row) {

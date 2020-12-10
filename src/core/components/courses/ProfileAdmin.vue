@@ -317,7 +317,7 @@ export default {
 
       try {
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
-        openPdf(pdf, this.$q.platform);
+        openPdf(pdf);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');

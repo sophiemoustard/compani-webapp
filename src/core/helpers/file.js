@@ -1,3 +1,4 @@
+import { Platform } from 'quasar';
 import gdrive from '@api/GoogleDrive';
 
 export const downloadFile = (file, fileName, type = '') => {
@@ -18,8 +19,8 @@ export const downloadZip = (zip, fileName) => {
   downloadFile(zip, fileName, 'application/zip');
 };
 
-export const downloadDocx = (zip, fileName) => {
-  downloadFile(zip, fileName, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+export const downloadDocx = (docx, fileName) => {
+  downloadFile(docx, fileName, 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
 };
 
 export const downloadCsv = (data, fileName) => {
@@ -32,11 +33,11 @@ export const downloadCsv = (data, fileName) => {
   return downloadFile({ data: csvContent }, fileName);
 };
 
-export const openPdf = (pdf, platform) => {
+export const openPdf = (pdf) => {
   const link = document.createElement('a');
   link.href = URL.createObjectURL(new Blob([pdf.data], { type: 'application/pdf' }));
   document.body.appendChild(link);
-  link.setAttribute('target', platform.is.safari ? '_self' : '_blank');
+  link.setAttribute('target', Platform.is.safari ? '_self' : '_blank');
   link.click();
   document.body.removeChild(link);
 };

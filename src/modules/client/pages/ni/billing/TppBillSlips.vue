@@ -8,7 +8,7 @@
             :style="col.style" class="text-capitalize">
             <template v-if="col.name === 'document'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" @click="billSlipUrl(col.value)" icon="file_download" />
+                <q-btn flat round small color="primary" @click="downloadBillSlip(col.value)" icon="file_download" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -97,9 +97,9 @@ export default {
         this.loading = false;
       }
     },
-    async billSlipUrl (id) {
+    async downloadBillSlip (id) {
       try {
-        const docx = await BillSlip.getPDFUrl(id);
+        const docx = await BillSlip.getDocx(id);
         downloadDocx(docx, 'bordereau.docx');
       } catch (e) {
         console.error(e);

@@ -5,7 +5,7 @@ export default {
     const billSlips = await alenviAxios.get(`${process.env.API_HOSTNAME}/billslips`, { params });
     return billSlips.data.data.billSlips;
   },
-  getPDFUrl (id) {
+  getDocx (id) {
     return alenviAxios.get(
       `${process.env.API_HOSTNAME}/billslips/${id}/docx`,
       {

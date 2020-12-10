@@ -18,7 +18,7 @@
               <div v-if="!props.row.number">Facture tiers</div>
               <a v-else-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
                 data-cy="link">
-                  Facture {{ props.row.number }}
+                Facture {{ props.row.number }}
               </a>
               <div v-else @click="downloadBillPdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
@@ -28,7 +28,7 @@
             <template v-else-if="props.row.type === CREDIT_NOTE">
               <a v-if="getUrl(props.row)" :href="getUrl(props.row)" target="_blank" class="download"
                 data-cy="link">
-                  Avoir {{ props.row.number }}
+                Avoir {{ props.row.number }}
               </a>
               <div v-else @click="downloadCreditNotePdf(props.row)" :class="{ 'download': canDownload(props.row) }"
                 data-cy="link">
@@ -206,7 +206,7 @@ export default {
 
       try {
         const pdf = await Bills.getPdf(bill._id);
-        openPdf(pdf, this.$q.platform);
+        openPdf(pdf);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture');
@@ -217,10 +217,10 @@ export default {
 
       try {
         const pdf = await CreditNotes.getPdf(cn._id);
-        openPdf(pdf, this.$q.platform);
+        openPdf(pdf);
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la facture');
+        NotifyNegative('Erreur lors du téléchargement de l\'avoir');
       }
     },
   },
