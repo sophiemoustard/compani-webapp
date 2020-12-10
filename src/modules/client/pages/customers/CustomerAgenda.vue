@@ -109,12 +109,10 @@ export default {
       this.conflictingEvents = [];
     },
     getInConflictEvents (event) {
-      event.displayedStartDate = event.startDate;
-      event.displayedEndDate = event.endDate;
       return this.events.filter(
         ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
           this.$moment(ev.endDate).isBetween(event.startDate, event.endDate, 'minutes', '[]')
-      );
+      ).map(ev => ({ ...ev, displayedStartDate: ev.startDate, displayedEndDate: ev.endDate }));
     },
   },
 };
