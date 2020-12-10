@@ -12,7 +12,8 @@
     </div>
   </div>
   <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" @click.stop="click(event)"
-    :class="['row', 'cursor-pointer', 'event', event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
+    :class="['row', !inModal ? 'cursor-pointer': '', 'event',
+    event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
     <div class="event-container">
       <div class="event-title">
         <p v-if="event.type === INTERVENTION" class="no-margin overflow-hidden-nowrap" data-cy="event-title">
@@ -53,6 +54,7 @@ export default {
     event: { type: Object, default: () => ({}) },
     canDrag: { type: Function, default: () => {} },
     personKey: { type: String, default: AUXILIARY },
+    inModal: { type: Boolean, default: false },
   },
   data () {
     return {

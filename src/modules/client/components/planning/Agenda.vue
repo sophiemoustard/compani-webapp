@@ -98,7 +98,7 @@ export default {
   methods: {
     getEventClass (event) {
       return [
-        !this.isCustomerPlanning && 'cursor-pointer',
+        event.inConflictEvents.length === 1 ? '' : 'cursor-pointer',
         event.isCancelled ? 'event-cancelled' : `event-${event.type}`,
       ];
     },

@@ -4,7 +4,8 @@
       Interventions <span class="text-weight-bold">simultanées</span>
     </template>
     <div class="q-mb-md">
-      <planning-event v-for="(event, eventIndex) in events" :key="eventIndex" :event="event" :person-key="CUSTOMER" />
+      <planning-event v-for="(event, eventIndex) in events" :key="eventIndex" :event="event" :person-key="CUSTOMER"
+        :in-modal="true" />
     </div>
   </ni-modal>
 </template>
