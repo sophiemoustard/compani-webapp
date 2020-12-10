@@ -5,7 +5,7 @@
     </template>
     <div class="q-mb-md">
       <planning-event v-for="(event, eventIndex) in events" :key="eventIndex" :event="event" :person-key="CUSTOMER"
-        :in-modal="true" />
+        in-modal />
     </div>
   </ni-modal>
 </template>

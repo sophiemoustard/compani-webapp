@@ -12,7 +12,7 @@
     </div>
   </div>
   <div v-else :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)" @click.stop="click(event)"
-    :class="['row', !inModal ? 'cursor-pointer': '', 'event',
+    :class="['row', inModal ? '': 'cursor-pointer', 'event',
     event.isCancelled ? 'event-cancelled' : `event-${event.type}`]">
     <div class="event-container">
       <div class="event-title">
