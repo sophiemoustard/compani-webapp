@@ -17,7 +17,7 @@
         @open-info-modal="openConflictModal($event)" />
     </div>
 
-    <conflict-modal v-model="conflictModal" :events="conflictingEvents" @hide="closeConflictModal" />
+    <event-conflict-modal v-model="conflictModal" :events="conflictingEvents" @hide="closeConflictModal" />
   </q-page>
 </template>
 
@@ -29,7 +29,7 @@ import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '@data/constants';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import Agenda from 'src/modules/client/components/planning/Agenda';
-import ConflictModal from 'src/modules/client/components/customers/ConflictModal';
+import EventConflictModal from 'src/modules/client/components/customers/EventConflictModal';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
 
 export default {
@@ -38,7 +38,7 @@ export default {
   components: {
     agenda: Agenda,
     'planning-navigation': PlanningNavigation,
-    'conflict-modal': ConflictModal,
+    'event-conflict-modal': EventConflictModal,
   },
   mixins: [planningTimelineMixin],
   data () {

@@ -4,18 +4,18 @@
       Interventions <span class="text-weight-bold">simultanées</span>
     </template>
     <div class="q-mb-md">
-      <ni-event-cell v-for="(event, eventIndex) in events" :key="eventIndex" :event="event" :person-key="CUSTOMER" />
+      <planning-event v-for="(event, eventIndex) in events" :key="eventIndex" :event="event" :person-key="CUSTOMER" />
     </div>
   </ni-modal>
 </template>
 
 <script>
 import Modal from '@components/modal/Modal';
-import EventCell from 'src/modules/client/components/planning/PlanningEvent';
+import PlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
 import { CUSTOMER } from '@data/constants';
 
 export default {
-  name: 'ConflictModal',
+  name: 'EventConflictModal',
   props: {
     value: { type: Boolean, default: false },
     events: { type: Array, default: () => [] },
@@ -27,7 +27,7 @@ export default {
   },
   components: {
     'ni-modal': Modal,
-    'ni-event-cell': EventCell,
+    'planning-event': PlanningEvent,
   },
   methods: {
     hide () {

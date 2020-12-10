@@ -26,7 +26,7 @@
                 </template>
               </template>
               <div v-for="(event, eventId) in getOneDayEvents(days[dayIndex])" :style="getEventStyle(event)"
-                :key="eventId" @click.stop="openEventInfoModal(event, getConflictEvents(event, dayIndex))"
+                :key="eventId" @click.stop="openEventInfoModal(event, getConflictEvents(event))"
                 class="event" :class="getEventClass(event)" data-cy="agenda-event">
                 <div class="event-container" :style="{ top: event.staffingDuration < 90 ? '10%' : '6px' }">
                   <div class="col-12 event-title">
@@ -49,9 +49,9 @@
                   </p>
                   <p v-if="event.isBilled" class="no-margin event-subtitle event-billed">F</p>
                 </div>
-                <div v-if="isCustomerPlanning && getConflictEvents(event, dayIndex).length !== 0"
+                <div v-if="isCustomerPlanning && getConflictEvents(event).length !== 1"
                   class="event-number">
-                  <p class="event-number-label">{{ getConflictEvents(event, dayIndex).length }}</p>
+                  <p class="event-number-label">{{ getConflictEvents(event).length }}</p>
                 </div>
               </div>
             </div>
@@ -129,12 +129,10 @@ export default {
       const value = this.isCustomerPlanning ? conflictingEvents : event;
       this.$emit('open-info-modal', value);
     },
-    getConflictEvents (event, dayIndex) {
-      const dailyEvents = this.getOneDayEvents(this.days[dayIndex]);
+    getConflictEvents (event) {
+      const dailyEvents = this.getOneDayEvents(this.$moment(event.startDate));
       const conflictingEvents = dailyEvents.filter(
         ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate) ||
-          this.$moment(ev.startDate).isBetween(event.startDate, event.endDate) ||
-          this.$moment(event.endDate).isBetween(event.startDate, event.endDate) ||
           this.$moment(ev.endDate).isBetween(event.startDate, event.endDate)
       );
       return [event, ...conflictingEvents];
@@ -189,17 +187,18 @@ export default {
 
       .event-number
         border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        border: 2px solid $primary;
+        width: 16px;
+        height: 16px;
+        border: 1px solid $primary;
         text-align: center;
         background-color: white;
         position: absolute;
-        bottom: 0em;
-        right: 0em;
+        bottom: 0;
+        right: 0;
         &-label
           line-height: 1;
           color: $primary;
+          font-size: 14px;
 
 thead
   vertical-align: baseline;
