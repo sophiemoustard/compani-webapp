@@ -109,12 +109,10 @@ export default {
       this.conflictingEvents = [];
     },
     getInConflictEvents (event) {
-      const dailyEvents = this.events.filter(ev => this.$moment(ev.startDate).isSame(event.startDate, 'day'));
-      const conflictingEvents = dailyEvents.filter(
-        ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate) ||
-          this.$moment(ev.endDate).isBetween(event.startDate, event.endDate)
+      return this.events.filter(
+        ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
+          this.$moment(ev.endDate).isBetween(event.startDate, event.endDate, 'minutes', '[]')
       );
-      return [event, ...conflictingEvents];
     },
   },
 };
