@@ -1,7 +1,7 @@
 <template>
   <div class="row no-wrap container">
     <q-linear-progress class="linear-progress" size="8px" :value="value" color="primary" />
-    <div class="q-mx-md percentage">{{ percentage }}</div>
+    <div class="q-mx-xs percentage">{{ percentage }}</div>
   </div>
 </template>
 
@@ -33,4 +33,5 @@ export default {
 
 .percentage
   color: $primary
+  width: 60px
 </style>

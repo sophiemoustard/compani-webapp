@@ -125,4 +125,6 @@ export default {
   justify-content: space-between
 .sub-progress
   width: 16%
+  @media screen and (max-width: 767px)
+    width: 110px
 </style>
