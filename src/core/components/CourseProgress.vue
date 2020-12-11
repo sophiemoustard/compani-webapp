@@ -27,10 +27,8 @@ export default {
   align-items: center;
 
 .linear-progress
-  border-radius: 100px
+  border-radius: 4px
   background-color: $primary-light
-  @media (max-width: 767px)
-    border-radius: 2px
 
 .percentage
   color: $primary
