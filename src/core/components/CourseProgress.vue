@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="row no-wrap table-actions container">
     <q-linear-progress class="linear-progress" size="8px" :value="value" color="primary" />
     <a class="q-mx-md percentage">{{ percentage }}</a>
   </div>
@@ -23,10 +23,10 @@ export default {
 
 <style lang="stylus" scoped>
 .container
-  display: ruby
+  justify-content: center;
+  align-items: center;
 
 .linear-progress
-  width: 104px
   border-radius: 100px
   background-color: $primary-light
 </style>
