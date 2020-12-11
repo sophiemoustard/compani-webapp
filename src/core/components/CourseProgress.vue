@@ -26,10 +26,11 @@ export default {
   justify-content: center;
   align-items: center;
 
-@media (min-width: 767px)
-  .linear-progress
-    border-radius: 100px
-    background-color: $primary-light
+.linear-progress
+  border-radius: 100px
+  background-color: $primary-light
+  @media (max-width: 767px)
+    border-radius: 2px
 
 .percentage
   color: $primary

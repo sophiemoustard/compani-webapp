@@ -32,7 +32,7 @@
                   <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
                   {{ stepIndex + 1 }} - {{ step.name }}
                 </div>
-                <ni-progress class="q-mr-xl sub-progress" :value="step.progress" />
+                <ni-progress class="sub-progress" :value="step.progress" />
               </div>
             </q-td>
           </q-tr>
@@ -90,7 +90,7 @@ export default {
           field: 'progress',
           align: 'center',
           sortable: true,
-          style: 'width: 20%',
+          style: 'min-width: 150px; width: 20%',
         },
         { name: 'expand', label: '', field: '_id' },
       ],
@@ -124,7 +124,6 @@ export default {
   display: flex
   justify-content: space-between
 .sub-progress
+  min-width: 100px
   width: 16%
-  @media screen and (max-width: 767px)
-    width: 110px
 </style>
