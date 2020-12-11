@@ -11,6 +11,8 @@
         <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
           :disable="!card.qcAnswers[i].text || disableEdition" />
       </div>
+      <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+        :disable="disableAnswerCreation" />
     </div>
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
@@ -22,10 +24,17 @@ import get from 'lodash/get';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { REQUIRED_LABEL, QUESTION_MAX_LENGTH, QC_ANSWER_MAX_LENGTH } from '@data/constants';
+import {
+  REQUIRED_LABEL,
+  QUESTION_MAX_LENGTH,
+  QC_ANSWER_MAX_LENGTH,
+  PUBLISHED,
+  MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
+} from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import Button from '@components/Button';
 
 export default {
   name: 'MultipleChoiceQuestion',
@@ -34,6 +43,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
   },
   mixins: [templateMixin],
   validations () {
@@ -49,6 +59,12 @@ export default {
         explanation: { required },
       },
     };
+  },
+  computed: {
+    disableAnswerCreation () {
+      return this.card.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
+    },
   },
   methods: {
     requiredOneCorrectAnswer (index) {
