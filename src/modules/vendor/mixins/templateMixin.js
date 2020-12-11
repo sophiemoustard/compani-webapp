@@ -99,7 +99,7 @@ export const templateMixin = {
 
         if (this.tmpInput === editedAnswer.text) return;
 
-        get(this.$v, `card.${key}`).$touch();
+        get(this.$v, `card.${key}.$each[${index}]`).$touch();
         if (get(this.$v, `card.${key}.$each[${index}].text.$error`)) return NotifyWarning('Champ(s) invalide(s).');
 
         await Cards.updateAnswer(
