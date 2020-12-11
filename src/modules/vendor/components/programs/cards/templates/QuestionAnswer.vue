@@ -8,8 +8,8 @@
     <div class="q-my-lg answers">
       <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers-container">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
-          @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
-          :error="$v.card.qcAnswers.$each[i].$error" class="answers-container-input" />
+          @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="answers-container-input"
+          :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
         <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" />
       </div>
       <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
@@ -30,6 +30,8 @@ import {
   QUESTION_ANSWER_MAX_ANSWERS_COUNT,
   QUESTION_ANSWER_MIN_ANSWERS_COUNT,
   PUBLISHED,
+  QC_ANSWER_MAX_LENGTH,
+  REQUIRED_LABEL,
 } from '@data/constants';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
@@ -49,7 +51,7 @@ export default {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcAnswers: {
-          $each: { text: { required } },
+          $each: { text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) } },
         },
       },
     };
@@ -78,19 +80,25 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la réponse.');
       }
     },
+    questionAnswerErrorMsg (index) {
+      if (!this.$v.card.qcAnswers.$each[index].text.required) return REQUIRED_LABEL;
+      if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+
+      return '';
+    },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-.answers
-  display: flex
-  flex-direction: column
-  &-container
+  .answers
     display: flex
-    justify-content: space-between
-    &-input
-      flex: 1
-.add-button
-  align-self: end
+    flex-direction: column
+    &-container
+      display: flex
+      justify-content: space-between
+      &-input
+        flex: 1
+  .add-button
+    align-self: flex-end
 </style>

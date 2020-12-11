@@ -6,7 +6,7 @@
     <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-my-lg"
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
-    <div class="q-my-lg">
+    <div class="q-my-lg answers">
       <ni-input v-for="(answer, i) in card.qcAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
         v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
@@ -79,3 +79,11 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.answers
+  display: flex
+  flex-direction: column
+.add-button
+  align-self: flex-end
+</style>

@@ -3,7 +3,7 @@
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
-    <div class="q-my-xl">
+    <div class="q-my-lg answers-container">
       <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2"
           @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
@@ -101,6 +101,11 @@ export default {
   .answers
     display: flex
     flex-direction: row
+    &-container
+      display: flex
+      flex-direction: column
   .input
     flex: 1
+  .add-button
+    align-self: flex-end
 </style>
