@@ -14,13 +14,13 @@
           <q-tr :props="props" @click="props.expand = !props.expand" class="cursor-pointer">
             <q-td auto-width />
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <template v-if="col.name === 'name' || col.name === 'type'">{{ col.value }}</template>
               <template v-if="col.name === 'progress'">
-                <ni-progress class="q-ml-lg progress" :value="col.value" />
+                <ni-progress class="q-ml-lg" :value="col.value" />
               </template>
-              <template v-if="col.name === 'expand'">
+              <template v-else-if="col.name === 'expand'">
                 <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
               </template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
           <q-tr v-show="props.expand" :props="props">
@@ -30,7 +30,7 @@
                 class="q-ma-sm step">
                 <div>
                   <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
-                  {{ stepIndex+1 }} - {{ step.name }}
+                  {{ stepIndex + 1 }} - {{ step.name }}
                 </div>
                 <ni-progress class="q-mr-xl sub-progress" :value="step.progress" />
               </div>
@@ -90,6 +90,7 @@ export default {
           field: 'progress',
           align: 'center',
           sortable: true,
+          style: 'width: 20%',
         },
         { name: 'expand', label: '', field: '_id' },
       ],
@@ -122,8 +123,6 @@ export default {
 .step
   display: flex
   justify-content: space-between
-.progress
-  width: 100%
 .sub-progress
   width: 16%
 </style>

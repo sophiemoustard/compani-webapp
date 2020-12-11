@@ -1,7 +1,7 @@
 <template>
-  <div class="row no-wrap table-actions container">
+  <div class="row no-wrap container">
     <q-linear-progress class="linear-progress" size="8px" :value="value" color="primary" />
-    <a class="q-mx-md percentage">{{ percentage }}</a>
+    <div class="q-mx-md percentage">{{ percentage }}</div>
   </div>
 </template>
 
@@ -26,7 +26,11 @@ export default {
   justify-content: center;
   align-items: center;
 
-.linear-progress
-  border-radius: 100px
-  background-color: $primary-light
+@media (min-width: 767px)
+  .linear-progress
+    border-radius: 100px
+    background-color: $primary-light
+
+.percentage
+  color: $primary
 </style>
