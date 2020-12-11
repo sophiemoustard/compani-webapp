@@ -8,7 +8,7 @@
     <div class="q-my-lg answers">
       <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers-container">
         <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
-          @blur="updateQuestionAnswers(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
+          @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
           :error="$v.card.qcAnswers.$each[i].$error" class="answers-container-input" />
         <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" />
       </div>
@@ -24,14 +24,13 @@ import { required, maxLength } from 'vuelidate/lib/validators';
 import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   QUESTION_MAX_LENGTH,
   QUESTION_ANSWER_MAX_ANSWERS_COUNT,
   QUESTION_ANSWER_MIN_ANSWERS_COUNT,
   PUBLISHED,
 } from '@data/constants';
-import { minArrayLength, maxArrayLength } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -50,9 +49,6 @@ export default {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcAnswers: {
-          required,
-          minLength: minArrayLength(QUESTION_ANSWER_MIN_ANSWERS_COUNT),
-          maxLength: maxArrayLength(QUESTION_ANSWER_MAX_ANSWERS_COUNT),
           $each: { text: { required } },
         },
       },
@@ -69,25 +65,6 @@ export default {
     },
   },
   methods: {
-    async updateQuestionAnswers (index) {
-      try {
-        const editedAnswer = get(this.card, `qcAnswers[${index}]`);
-        if (this.tmpInput === editedAnswer.text) return;
-
-        this.$v.card.qcAnswers.$touch();
-        if (this.$v.card.qcAnswers.$each[index].$error) return NotifyWarning('Champ(s) invalide(s).');
-
-        await Cards.updateAnswer(
-          { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
-        );
-
-        await this.refreshCard();
-        NotifyPositive('Carte mise à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour de la carte.');
-      }
-    },
     async addAnswer () {
       try {
         await Cards.addAnswer(this.card._id);

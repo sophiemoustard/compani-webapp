@@ -11,6 +11,9 @@ import {
   UPLOAD_IMAGE,
   UPLOAD_VIDEO,
   UPLOAD_AUDIO,
+  MULTIPLE_CHOICE_QUESTION,
+  SINGLE_CHOICE_QUESTION,
+  QUESTION_ANSWER,
 } from '../../../core/data/constants';
 
 export const templateMixin = {
@@ -89,6 +92,27 @@ export const templateMixin = {
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
       }
     },
+    async updateTextAnswer (index) {
+      try {
+        const key = this.getAnswerKeyToUpdate(this.card.template);
+        const editedAnswer = get(this.card, `${key}[${index}]`);
+
+        if (this.tmpInput === editedAnswer.text) return;
+
+        get(this.$v, `card.${key}.$each[${index}]`).$touch();
+        if (get(this.$v, `card.${key}.$each[${index}].text.$error`)) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Cards.updateAnswer(
+          { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
+        );
+
+        await this.refreshCard();
+        NotifyPositive('Carte mise à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la carte.');
+      }
+    },
     async refreshCard () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
@@ -127,6 +151,11 @@ export const templateMixin = {
         cancel: 'Annuler',
       }).onOk(() => this.deleteMedia(path))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    getAnswerKeyToUpdate (template) {
+      if ([MULTIPLE_CHOICE_QUESTION, SINGLE_CHOICE_QUESTION, QUESTION_ANSWER].includes(template)) return 'qcAnswers';
+
+      return '';
     },
   },
 };
