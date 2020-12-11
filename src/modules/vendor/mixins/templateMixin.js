@@ -113,6 +113,17 @@ export const templateMixin = {
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
       }
     },
+    async addAnswer () {
+      try {
+        await Cards.addAnswer(this.card._id);
+        await this.refreshCard();
+
+        NotifyPositive('Réponse ajoutée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de la réponse.');
+      }
+    },
     async refreshCard () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });

@@ -65,17 +65,6 @@ export default {
     },
   },
   methods: {
-    async addAnswer () {
-      try {
-        await Cards.addAnswer(this.card._id);
-        await this.refreshCard();
-
-        NotifyPositive('Réponse ajoutée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de la réponse.');
-      }
-    },
     async deleteQuestionAnswer (index) {
       try {
         const answerId = get(this.card, `qcAnswers[${index}]._id`);
