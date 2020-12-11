@@ -11,6 +11,8 @@
         v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
         @blur="updateTextAnswer(i)" :disable="disableEdition" />
+      <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+        :disable="disableAnswerCreation" />
     </div>
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
@@ -20,9 +22,16 @@
 <script>
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
-import { REQUIRED_LABEL, QUESTION_MAX_LENGTH, QC_ANSWER_MAX_LENGTH } from '@data/constants';
+import {
+  REQUIRED_LABEL,
+  QUESTION_MAX_LENGTH,
+  QC_ANSWER_MAX_LENGTH,
+  SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT,
+  PUBLISHED,
+} from '@data/constants';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import Button from '@components/Button';
 
 export default {
   name: 'SingleChoiceQuestion',
@@ -31,6 +40,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
   },
   mixins: [templateMixin, validationMixin],
   validations () {
@@ -53,6 +63,10 @@ export default {
       if (!this.$v.card.qcuGoodAnswer.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
+    },
+    disableAnswerCreation () {
+      return this.card.qcAnswers.length >= SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
     },
   },
   methods: {
