@@ -2,7 +2,7 @@
   <div class="q-mb-xl">
     <p class="text-weight-bold">Formations suivies</p>
     <q-card>
-      <q-table :data="courses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin" hide-bottom>
+      <q-table :data="courses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin" hide-bottom class="q-pa-md">
         <template #header="props">
           <q-tr :props="props">
             <q-th auto-width />
