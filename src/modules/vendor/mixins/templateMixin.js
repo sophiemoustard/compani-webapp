@@ -124,6 +124,21 @@ export const templateMixin = {
         NotifyNegative('Erreur lors de l\'ajout de la réponse.');
       }
     },
+    async deleteAnswer (index) {
+      try {
+        const key = this.getAnswerKeyToUpdate(this.card.template);
+        const answerId = get(this.card, `${key}[${index}]._id`);
+        if (!answerId) return;
+
+        await Cards.deleteAnswer({ cardId: this.card._id, answerId });
+
+        await this.refreshCard();
+        NotifyPositive('Réponse supprimée avec succès.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la réponse.');
+      }
+    },
     async refreshCard () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
