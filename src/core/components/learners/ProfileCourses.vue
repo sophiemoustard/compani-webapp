@@ -2,42 +2,32 @@
   <div class="q-mb-xl">
     <p class="text-weight-bold">Formations suivies</p>
     <q-card>
-      <q-table :data="courses" :columns="columns" @go-to="goToBlendedCourseProfileAdmin" hide-bottom class="q-pa-md">
-        <template #header="props">
-          <q-tr :props="props">
-            <q-th auto-width />
-            <q-th v-for="col in props.cols" :key="col.name" :props="props"> {{ col.label }} </q-th>
-          </q-tr>
+      <expanding-table :data="courses" :columns="columns">
+        <template #row="{ props }">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <template v-if="col.name === 'progress'">
+              <ni-progress class="q-ml-lg" :value="col.value" />
+            </template>
+            <template v-else-if="col.name === 'expand'">
+              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+            </template>
+            <template v-else>{{ col.value }}</template>
+          </q-td>
         </template>
-
-        <template #body="props">
-          <q-tr :props="props" @click="props.expand = !props.expand" class="cursor-pointer">
-            <q-td auto-width />
-            <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <template v-if="col.name === 'progress'">
-                <ni-progress class="q-ml-lg" :value="col.value" />
-              </template>
-              <template v-else-if="col.name === 'expand'">
-                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
-              </template>
-              <template v-else>{{ col.value }}</template>
-            </q-td>
-          </q-tr>
-          <q-tr v-show="props.expand" :props="props">
-            <q-td auto-width />
-            <q-td colspan="100%">
-              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-                class="q-ma-sm step">
-                <div>
-                  <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
-                  {{ stepIndex + 1 }} - {{ step.name }}
-                </div>
-                <ni-progress class="sub-progress" :value="step.progress" />
+        <template #expanding-row="{ props }">
+          <q-td auto-width />
+          <q-td colspan="100%">
+            <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
+              class="q-ma-sm step">
+              <div>
+                <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
+                {{ stepIndex + 1 }} - {{ step.name }}
               </div>
-            </q-td>
-          </q-tr>
+              <ni-progress class="sub-progress" :value="step.progress" />
+            </div>
+          </q-td>
         </template>
-      </q-table>
+      </expanding-table>
     </q-card>
   </div>
 </template>
@@ -49,11 +39,13 @@ import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
+import ExpandingTable from '@components/table/ExpandingTable';
 
 export default {
   name: 'ProfileCourses',
   components: {
     'ni-progress': Progress,
+    'expanding-table': ExpandingTable,
   },
   data () {
     return {
@@ -74,6 +66,7 @@ export default {
           sortable: true,
           format: value => (get(value, 'subProgram.program.name') || '') + (value.misc ? ` - ${value.misc}` : ''),
           sort: (a, b) => sortStrings(get(a, 'subProgram.program.name') || '', get(b, 'subProgram.program.name') || ''),
+          style: 'width: 30%',
         },
         {
           name: 'type',
