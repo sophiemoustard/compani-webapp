@@ -15,7 +15,6 @@
           </q-td>
         </template>
         <template #expanding-row="{ props }">
-          <q-td auto-width />
           <q-td colspan="100%">
             <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
               class="q-ma-sm step">
