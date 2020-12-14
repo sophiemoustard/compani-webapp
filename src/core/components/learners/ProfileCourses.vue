@@ -2,7 +2,7 @@
   <div class="q-mb-xl">
     <p class="text-weight-bold">Formations suivies</p>
     <q-card>
-      <expanding-table :data="courses" :columns="columns">
+      <ni-expanding-table :data="courses" :columns="columns">
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'progress'">
@@ -27,7 +27,7 @@
             </div>
           </q-td>
         </template>
-      </expanding-table>
+      </ni-expanding-table>
     </q-card>
   </div>
 </template>
@@ -45,7 +45,7 @@ export default {
   name: 'ProfileCourses',
   components: {
     'ni-progress': Progress,
-    'expanding-table': ExpandingTable,
+    'ni-expanding-table': ExpandingTable,
   },
   data () {
     return {
