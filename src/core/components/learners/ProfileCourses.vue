@@ -23,7 +23,9 @@
                 <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
                 {{ stepIndex + 1 }} - {{ step.name }}
               </div>
-              <ni-progress class="sub-progress" :value="step.progress" />
+              <div class="progress-container">
+                <ni-progress class="sub-progress" :value="step.progress" />
+              </div>
             </div>
           </q-td>
         </template>
@@ -118,5 +120,8 @@ export default {
   justify-content: space-between
 .sub-progress
   min-width: 100px
-  width: 16%
+  width: 10%
+.progress-container
+  max-width: 230px
+  width: 25%
 </style>

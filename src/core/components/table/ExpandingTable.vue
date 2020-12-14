@@ -13,7 +13,7 @@
           <slot name="row" :props="props" />
         </q-tr>
         <q-tr v-show="props.expand" :props="props">
-          <slot name="expanding-row" v-show="props.expand" :props="props" />
+          <slot name="expanding-row" :props="props" />
         </q-tr>
       </template>
     </q-table>
