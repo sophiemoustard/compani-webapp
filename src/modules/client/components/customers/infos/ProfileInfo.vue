@@ -132,7 +132,7 @@
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
                   <div v-if="!props.row.drive || !getMandateLink(props.row)" class="row justify-center table-actions">
-                    <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
+                    <q-uploader flat :url="docsUploadUrl" with-credentials :form-fields="mandateFormFields(props.row)"
                       field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
@@ -212,7 +212,7 @@
                 </template>
                 <template v-else-if="col.name === 'signedQuote'">
                   <div v-if="!props.row.drive || !getQuoteLink(props.row)" class="row justify-center table-actions">
-                    <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
+                    <q-uploader flat :url="docsUploadUrl" with-credentials :form-fields="quoteFormFields(props.row)"
                       field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
                       @failed="failMsg" />
                   </div>
@@ -278,7 +278,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
@@ -458,9 +457,6 @@ export default {
 
       return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}`
         + '/upload';
-    },
-    headers () {
-      return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
     },
     company () {
       return this.$store.getters['main/getCompany'];

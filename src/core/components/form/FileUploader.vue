@@ -14,7 +14,7 @@
       </div>
     </div>
     <q-field borderless v-else :error="error" :error-message="errorMessage">
-      <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
+      <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" with-credentials
         text-color="black" @failed="failMsg" :form-fields="additionalFields" :max-file-size="maxFileSize"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"
         @rejected="rejected" :disable="disable" @start="uploadStarted" @finish="uploadFinished" />
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { Cookies, openURL } from 'quasar';
+import { openURL } from 'quasar';
 import get from 'lodash/get';
 import CustomImg from '@components/form/CustomImg';
 import { NotifyNegative } from '@components/popup/notify';
@@ -52,11 +52,6 @@ export default {
     label: { type: String, default: 'Pas de document' },
     cloudinaryStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
-  },
-  data () {
-    return {
-      headers: [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }],
-    };
   },
   computed: {
     additionalFields () {
