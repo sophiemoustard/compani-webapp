@@ -2,7 +2,7 @@
   <div class="q-mb-xl">
     <p class="text-weight-bold">Formations suivies</p>
     <q-card>
-      <ni-expanding-table :data="courses" :columns="columns">
+      <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'progress'">
@@ -40,6 +40,7 @@ import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
+import { NotifyNegative } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
 
 export default {
@@ -52,6 +53,7 @@ export default {
     return {
       isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
       courses: [],
+      loading: false,
       pagination: {
         sortBy: 'name',
         descending: false,
@@ -96,10 +98,14 @@ export default {
   },
   async created () {
     try {
+      this.loading = true;
       this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
     } catch (e) {
+      NotifyNegative('Erreur lors de la récupération des formations');
       console.error(e);
       this.courses = [];
+    } finally {
+      this.loading = false;
     }
   },
   methods: {

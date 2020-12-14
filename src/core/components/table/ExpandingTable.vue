@@ -1,5 +1,6 @@
 <template>
-  <q-table :data="data" :columns="columns" hide-bottom class="q-pa-md">
+  <div class="relative-position table-spinner-container">
+    <q-table v-if="!loading" :data="data" :columns="columns" hide-bottom class="q-pa-md">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props"> {{ col.label }} </q-th>
@@ -14,6 +15,11 @@
         </q-tr>
       </template>
     </q-table>
+    <div v-else class="loading-container" />
+    <q-inner-loading :showing="loading">
+      <q-spinner-facebook size="30px" color="primary" />
+    </q-inner-loading>
+  </div>
 </template>
 
 <script>
@@ -22,6 +28,7 @@ export default {
   props: {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
+    loading: { type: Boolean, default: false },
   },
 };
 </script>
