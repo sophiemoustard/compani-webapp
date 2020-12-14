@@ -6,7 +6,7 @@
     <div class="q-mb-lg">
       <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
         v-model="card.orderedAnswers[i].text" @focus="saveTmp(`orderedAnswers[${i}].text`)" :required-field="i < 2"
-        @blur="updateOrderedAnswer(i)" :disable="disableEdition" />
+        @blur="updateTextAnswer(i)" :disable="disableEdition" :error="$v.card.orderedAnswers.$each[i].$error" />
     </div>
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
@@ -16,7 +16,6 @@
 <script>
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { QUESTION_MAX_LENGTH } from '@data/constants';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -37,19 +36,6 @@ export default {
         explanation: { required },
       },
     };
-  },
-  methods: {
-    async updateOrderedAnswer (index) {
-      try {
-        if (this.tmpInput === this.card.orderedAnswers[index].text) return;
-
-        await this.refreshCard();
-        NotifyPositive('Carte mise à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour de la carte.');
-      }
-    },
   },
 };
 </script>
