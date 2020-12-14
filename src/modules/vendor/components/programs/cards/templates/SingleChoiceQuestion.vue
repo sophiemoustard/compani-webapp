@@ -6,8 +6,8 @@
     <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-mt-lg"
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
-    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="q-mt-lg">
-      <ni-input :caption="`Mauvaise réponse ${i + 1}`"
+    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers q-mt-lg">
+      <ni-input :caption="`Mauvaise réponse ${i + 1}`" class="input"
         v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
         @blur="updateTextAnswer(i)" :disable="disableEdition" />
@@ -87,14 +87,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.container
-  display: flex
-  flex-direction: column
-  &-container
+  .container
+    display: flex
+    flex-direction: column
+  .answers
     display: flex
     justify-content: space-between
-    &-input
-      flex: 1
-.add-button
-  align-self: flex-end
+  .input
+    flex: 1
+  .add-button
+    align-self: flex-end
 </style>

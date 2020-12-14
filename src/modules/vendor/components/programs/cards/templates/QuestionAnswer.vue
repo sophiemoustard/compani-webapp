@@ -7,7 +7,7 @@
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
-        @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="answers-input"
+        @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="input"
         :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
       <ni-button icon="delete" @click="deleteAnswer(i)" :disable="disableAnswerDeletion" />
     </div>
@@ -79,8 +79,8 @@ export default {
   .answers
     display: flex
     justify-content: space-between
-    &-input
-      flex: 1
+  .input
+    flex: 1
   .add-button
     align-self: flex-end
 </style>
