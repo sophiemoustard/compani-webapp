@@ -1,20 +1,18 @@
 <template>
-  <div>
+  <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       size="sm" :disable="disableEdition" label="Sélection multiple" />
-    <div class="q-my-lg answers">
-      <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers-container">
-        <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
-          @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
-          :error="$v.card.qcAnswers.$each[i].$error" class="answers-container-input" />
-        <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" />
-      </div>
-      <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
-        :disable="disableAnswerCreation" />
+    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
+        @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="answers-input"
+        :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
+      <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" class="q-mb-lg" />
     </div>
+    <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+      :disable="disableAnswerCreation" />
   </div>
 </template>
 
@@ -30,6 +28,8 @@ import {
   QUESTION_ANSWER_MAX_ANSWERS_COUNT,
   QUESTION_ANSWER_MIN_ANSWERS_COUNT,
   PUBLISHED,
+  QC_ANSWER_MAX_LENGTH,
+  REQUIRED_LABEL,
 } from '@data/constants';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
@@ -49,7 +49,7 @@ export default {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
         qcAnswers: {
-          $each: { text: { required } },
+          $each: { text: { required, maxLength: maxLength(QC_ANSWER_MAX_LENGTH) } },
         },
       },
     };
@@ -65,17 +65,6 @@ export default {
     },
   },
   methods: {
-    async addAnswer () {
-      try {
-        await Cards.addAnswer(this.card._id);
-        await this.refreshCard();
-
-        NotifyPositive('Réponse ajoutée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout de la réponse.');
-      }
-    },
     async deleteQuestionAnswer (index) {
       try {
         const answerId = get(this.card, `qcAnswers[${index}]._id`);
@@ -89,19 +78,25 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la réponse.');
       }
     },
+    questionAnswerErrorMsg (index) {
+      if (!this.$v.card.qcAnswers.$each[index].text.required) return REQUIRED_LABEL;
+      if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
+
+      return '';
+    },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
-.answers
-  display: flex
-  flex-direction: column
-  &-container
+  .container
+    display: flex
+    flex-direction: column
+  .answers
     display: flex
     justify-content: space-between
     &-input
       flex: 1
-.add-button
-  align-self: end
+  .add-button
+    align-self: flex-end
 </style>

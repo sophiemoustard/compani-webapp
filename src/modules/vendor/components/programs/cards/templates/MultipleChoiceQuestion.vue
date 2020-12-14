@@ -1,17 +1,17 @@
 <template>
-  <div>
+  <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
-    <div class="q-my-xl">
-      <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
-        <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2"
-          @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
-          :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />
-        <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
-          :disable="!card.qcAnswers[i].text || disableEdition" />
-      </div>
+    <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2"
+        @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
+        :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />
+      <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
+        :disable="!card.qcAnswers[i].text || disableEdition" />
     </div>
+    <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+      :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
@@ -22,10 +22,17 @@ import get from 'lodash/get';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { REQUIRED_LABEL, QUESTION_MAX_LENGTH, QC_ANSWER_MAX_LENGTH } from '@data/constants';
+import {
+  REQUIRED_LABEL,
+  QUESTION_MAX_LENGTH,
+  QC_ANSWER_MAX_LENGTH,
+  PUBLISHED,
+  MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
+} from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import Button from '@components/Button';
 
 export default {
   name: 'MultipleChoiceQuestion',
@@ -34,6 +41,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
   },
   mixins: [templateMixin],
   validations () {
@@ -49,6 +57,12 @@ export default {
         explanation: { required },
       },
     };
+  },
+  computed: {
+    disableAnswerCreation () {
+      return this.card.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
+    },
   },
   methods: {
     requiredOneCorrectAnswer (index) {
@@ -82,9 +96,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .container
+    display: flex
+    flex-direction: column
   .answers
     display: flex
     flex-direction: row
   .input
     flex: 1
+  .add-button
+    align-self: flex-end
 </style>

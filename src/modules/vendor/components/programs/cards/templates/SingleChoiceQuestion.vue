@@ -1,17 +1,17 @@
 <template>
-  <div>
+  <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
-    <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-my-lg"
+    <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-mt-lg"
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
-    <div class="q-my-lg">
-      <ni-input v-for="(answer, i) in card.qcAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
-        v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
-        :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
-        @blur="updateTextAnswer(i)" :disable="disableEdition" />
-    </div>
+    <ni-input v-for="(answer, i) in card.qcAnswers" :key="i" :caption="`Mauvaise réponse ${i + 1}`"
+      v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
+      :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
+      @blur="updateTextAnswer(i)" :disable="disableEdition" class="q-mt-lg" />
+    <ni-button class="add-button q-mb-lg" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+      :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
@@ -20,9 +20,16 @@
 <script>
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Input from '@components/form/Input';
-import { REQUIRED_LABEL, QUESTION_MAX_LENGTH, QC_ANSWER_MAX_LENGTH } from '@data/constants';
+import {
+  REQUIRED_LABEL,
+  QUESTION_MAX_LENGTH,
+  QC_ANSWER_MAX_LENGTH,
+  SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT,
+  PUBLISHED,
+} from '@data/constants';
 import { validationMixin } from '@mixins/validationMixin';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import Button from '@components/Button';
 
 export default {
   name: 'SingleChoiceQuestion',
@@ -31,6 +38,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
   },
   mixins: [templateMixin, validationMixin],
   validations () {
@@ -54,6 +62,10 @@ export default {
 
       return '';
     },
+    disableAnswerCreation () {
+      return this.card.qcAnswers.length >= SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
+    },
   },
   methods: {
     qcuFalsyAnswerErrorMsg (index) {
@@ -65,3 +77,11 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.container
+  display: flex
+  flex-direction: column
+.add-button
+  align-self: flex-end
+</style>
