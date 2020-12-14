@@ -1,20 +1,18 @@
 <template>
-  <div>
+  <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       size="sm" :disable="disableEdition" label="Sélection multiple" />
-    <div class="q-my-lg answers">
-      <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers-container">
-        <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
-          @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="answers-container-input"
-          :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
-        <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" />
-      </div>
-      <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
-        :disable="disableAnswerCreation" />
+    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
+        @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="answers-input"
+        :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
+      <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" class="q-mb-lg" />
     </div>
+    <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+      :disable="disableAnswerCreation" />
   </div>
 </template>
 
@@ -91,14 +89,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .answers
+  .container
     display: flex
     flex-direction: column
-    &-container
-      display: flex
-      justify-content: space-between
-      &-input
-        flex: 1
+  .answers
+    display: flex
+    justify-content: space-between
+    &-input
+      flex: 1
   .add-button
     align-self: flex-end
 </style>

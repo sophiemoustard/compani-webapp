@@ -1,19 +1,17 @@
 <template>
-  <div>
+  <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
-    <div class="q-my-lg answers-container">
-      <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
-        <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2"
-          @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
-          :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />
-        <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
-          :disable="!card.qcAnswers[i].text || disableEdition" />
-      </div>
-      <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
-        :disable="disableAnswerCreation" />
+    <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2"
+        @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
+        :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />
+      <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
+        :disable="!card.qcAnswers[i].text || disableEdition" />
     </div>
+    <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+      :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
@@ -98,12 +96,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .container
+    display: flex
+    flex-direction: column
   .answers
     display: flex
     flex-direction: row
-    &-container
-      display: flex
-      flex-direction: column
   .input
     flex: 1
   .add-button
