@@ -38,7 +38,6 @@ export default {
     return {
       password: '',
       passwordConfirm: '',
-      token: null,
       userId: null,
       timeout: null,
       userEmail: '',
@@ -69,7 +68,6 @@ export default {
   },
   methods: {
     setData (checkToken) {
-      this.token = checkToken.token;
       this.userId = checkToken.user._id;
       this.userEmail = checkToken.user.email;
     },
@@ -83,7 +81,7 @@ export default {
     },
     async submit () {
       try {
-        await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true }, this.token);
+        await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true });
 
         NotifyPositive('Mot de passe changé. Connexion en cours...');
         this.timeout = setTimeout(() => this.logIn(), 2000);
