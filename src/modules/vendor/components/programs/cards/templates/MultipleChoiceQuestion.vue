@@ -4,11 +4,12 @@
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
     <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
-      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2"
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2" class="input"
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
         :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />
       <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
         :disable="!card.qcAnswers[i].text || disableEdition" />
+      <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
@@ -28,6 +29,7 @@ import {
   QC_ANSWER_MAX_LENGTH,
   PUBLISHED,
   MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT,
+  MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT,
 } from '@data/constants';
 import { minOneCorrectAnswer } from '@helpers/vuelidateCustomVal';
 import Cards from '@api/Cards';
@@ -61,6 +63,10 @@ export default {
   computed: {
     disableAnswerCreation () {
       return this.card.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
+    },
+    disableAnswerDeletion () {
+      return this.card.qcAnswers.length <= MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT ||
         this.disableEdition || this.activity.status === PUBLISHED;
     },
   },

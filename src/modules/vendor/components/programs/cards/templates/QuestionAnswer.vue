@@ -7,9 +7,9 @@
       size="sm" :disable="disableEdition" label="Sélection multiple" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
-        @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="answers-input"
+        @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="input"
         :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
-      <ni-button icon="delete" @click="deleteQuestionAnswer(i)" :disable="disableAnswerDeletion" class="q-mb-lg" />
+      <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
@@ -17,12 +17,9 @@
 </template>
 
 <script>
-import get from 'lodash/get';
 import { required, maxLength } from 'vuelidate/lib/validators';
-import Cards from '@api/Cards';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   QUESTION_MAX_LENGTH,
   QUESTION_ANSWER_MAX_ANSWERS_COUNT,
@@ -65,19 +62,6 @@ export default {
     },
   },
   methods: {
-    async deleteQuestionAnswer (index) {
-      try {
-        const answerId = get(this.card, `qcAnswers[${index}]._id`);
-        if (!answerId) return;
-        await Cards.deleteAnswer({ cardId: this.card._id, answerId });
-
-        await this.refreshCard();
-        NotifyPositive('Réponse supprimée avec succès.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la réponse.');
-      }
-    },
     questionAnswerErrorMsg (index) {
       if (!this.$v.card.qcAnswers.$each[index].text.required) return REQUIRED_LABEL;
       if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
@@ -95,8 +79,8 @@ export default {
   .answers
     display: flex
     justify-content: space-between
-    &-input
-      flex: 1
+  .input
+    flex: 1
   .add-button
     align-self: flex-end
 </style>
