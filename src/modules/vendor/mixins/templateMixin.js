@@ -124,6 +124,15 @@ export const templateMixin = {
         NotifyNegative('Erreur lors de l\'ajout de la réponse.');
       }
     },
+    validateAnswerDeletion (index) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette réponse ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteAnswer(index))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
     async deleteAnswer (index) {
       try {
         const key = this.getAnswerKeyToUpdate(this.card.template);

@@ -11,7 +11,7 @@
         v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
         @blur="updateTextAnswer(i)" :disable="disableEdition" />
-      <ni-button icon="delete" @click="deleteAnswer(i)" :disable="disableAnswerDeletion" />
+      <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="add-button q-mb-lg" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />

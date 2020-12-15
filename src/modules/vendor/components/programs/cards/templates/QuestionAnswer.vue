@@ -9,11 +9,11 @@
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
         @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="input"
         :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
-      <ni-button icon="delete" @click="deleteAnswer(i)" :disable="disableAnswerDeletion" />
+      <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
-</div>
+  </div>
 </template>
 
 <script>
