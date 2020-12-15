@@ -152,7 +152,7 @@ export default {
       const payload = removeEmptyProps(this.newLearner);
       if (get(payload, 'contact.phone')) payload.contact.phone = formatPhoneForPayload(this.newLearner.contact.phone);
 
-      return ({ ...payload, company: this.company._id });
+      return payload;
     },
     async createLearner () {
       try {
