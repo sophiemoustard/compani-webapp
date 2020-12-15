@@ -3,11 +3,11 @@
     <ni-input class="q-mb-lg" caption="Texte" v-model="card.gappedText" required-field
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
-    <div class="answers">
-      <ni-input v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-xs-12 col-md-6" :required-field="i < 2"
-        @blur="updateTextAnswer(i)" v-model="card.falsyGapAnswers[i].text"
+    <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="answers">
+      <ni-input class="input" :required-field="i < 2" @blur="updateTextAnswer(i)" v-model="card.falsyGapAnswers[i].text"
         :caption="`Mot ${i + 1}`" :disable="disableEdition" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
         :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)" />
+      <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="add-button q-mb-lg" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
@@ -19,7 +19,13 @@
 <script>
 import Input from '@components/form/Input';
 import { required, maxLength } from 'vuelidate/lib/validators';
-import { REQUIRED_LABEL, GAP_ANSWER_MAX_LENGTH, PUBLISHED, FILL_THE_GAPS_MAX_ANSWERS_COUNT } from '@data/constants';
+import {
+  REQUIRED_LABEL,
+  GAP_ANSWER_MAX_LENGTH,
+  PUBLISHED,
+  FILL_THE_GAPS_MAX_ANSWERS_COUNT,
+  FILL_THE_GAPS_MIN_ANSWERS_COUNT,
+} from '@data/constants';
 import {
   validTagging,
   validAnswerInTag,
@@ -79,6 +85,10 @@ export default {
       return this.card.falsyGapAnswers.length >= FILL_THE_GAPS_MAX_ANSWERS_COUNT ||
         this.disableEdition || this.activity.status === PUBLISHED;
     },
+    disableAnswerDeletion () {
+      return this.card.falsyGapAnswers.length <= FILL_THE_GAPS_MIN_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
+    },
   },
   methods: {
     falsyGapAnswersErrorMsg (index) {
@@ -101,8 +111,10 @@ export default {
     display: flex
     flex-direction: column
   .answers
-    > div
-      padding-top: 0
+    display: flex
+    flex-direction: row
+  .input
+    flex: 1
   .add-button
     align-self: flex-end
 </style>
