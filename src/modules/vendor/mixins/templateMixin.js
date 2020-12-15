@@ -14,6 +14,7 @@ import {
   MULTIPLE_CHOICE_QUESTION,
   SINGLE_CHOICE_QUESTION,
   QUESTION_ANSWER,
+  ORDER_THE_SEQUENCE,
 } from '../../../core/data/constants';
 
 export const templateMixin = {
@@ -189,6 +190,7 @@ export const templateMixin = {
     },
     getAnswerKeyToUpdate (template) {
       if ([MULTIPLE_CHOICE_QUESTION, SINGLE_CHOICE_QUESTION, QUESTION_ANSWER].includes(template)) return 'qcAnswers';
+      if (template === ORDER_THE_SEQUENCE) return 'orderedAnswers';
 
       return '';
     },
