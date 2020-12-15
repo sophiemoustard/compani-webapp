@@ -1,13 +1,13 @@
 <template>
-  <div v-if="falsyGapAnswersInitialized">
+  <div>
     <ni-input class="q-mb-lg" caption="Texte" v-model="card.gappedText" required-field
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="q-mb-lg row gutter-profile answers">
       <ni-input v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-xs-12 col-md-6" :required-field="i < 2"
-        @blur="updateFalsyGapAnswer(i)" v-model="card.falsyGapAnswers[i]" @focus="saveTmp(`falsyGapAnswers[${i}]`)"
-        :caption="`Mot ${i + 1}`" :error="falsyGapAnswersError(i)" :error-message="falsyGapAnswersErrorMsg(i)"
-        :disable="disableEdition" />
+        @blur="updateFalsyGapAnswer(i)" v-model="card.falsyGapAnswers[i].text"
+        :caption="`Mot ${i + 1}`" :disable="disableEdition" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
+        :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)" />
     </div>
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
@@ -16,12 +16,10 @@
 
 <script>
 import Input from '@components/form/Input';
-import times from 'lodash/times';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
-import Cards from '@api/Cards';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { REQUIRED_LABEL, FILL_THE_GAPS_MAX_ANSWERS_COUNT, GAP_ANSWER_MAX_LENGTH } from '@data/constants';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { REQUIRED_LABEL, GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 import {
   validTagging,
   validAnswerInTag,
@@ -29,7 +27,6 @@ import {
   validTagLength,
   validTagsCount,
   validCaracters,
-  minArrayLength,
 } from '@helpers/vuelidateCustomVal';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
 
@@ -47,8 +44,9 @@ export default {
       card: {
         gappedText: { required, validTagging, validCaractersTags, validTagLength, validTagsCount, validAnswerInTag },
         falsyGapAnswers: {
-          minLength: minArrayLength(2),
-          $each: { validCaracters, maxLength: maxLength(GAP_ANSWER_MAX_LENGTH) },
+          $each: {
+            text: { required, validCaracters, maxLength: maxLength(GAP_ANSWER_MAX_LENGTH) },
+          },
         },
         explanation: { required },
       },
@@ -75,51 +73,22 @@ export default {
       }
       return '';
     },
-    falsyGapAnswersInitialized () {
-      return this.card.falsyGapAnswers.length === FILL_THE_GAPS_MAX_ANSWERS_COUNT;
-    },
-  },
-  watch: {
-    card: {
-      handler: 'initializeFalsyGapAnswers',
-      immediate: true,
-    },
   },
   methods: {
-    initializeFalsyGapAnswers () {
-      this.card.falsyGapAnswers = times(FILL_THE_GAPS_MAX_ANSWERS_COUNT, i => this.card.falsyGapAnswers[i] || '');
-    },
-    falsyGapAnswersError (index) {
-      return this.$v.card.falsyGapAnswers.$each[index].$error || this.requiredFalsyAnswerIsMissing(index);
-    },
     falsyGapAnswersErrorMsg (index) {
-      if (!this.$v.card.falsyGapAnswers.$each[index].maxLength) {
+      if (!this.$v.card.falsyGapAnswers.$each[index].text.required) return REQUIRED_LABEL;
+      if (!this.$v.card.falsyGapAnswers.$each[index].text.maxLength) {
         return `${GAP_ANSWER_MAX_LENGTH} caractères maximum.`;
       }
-      if (!this.$v.card.falsyGapAnswers.$each[index].validCaracters) {
+      if (!this.$v.card.falsyGapAnswers.$each[index].text.validCaracters) {
         return 'Caractère invalide détecté (seuls - \' ESPACE permis)';
       }
-      if (this.requiredFalsyAnswerIsMissing(index)) return REQUIRED_LABEL;
 
       return '';
     },
-    requiredFalsyAnswerIsMissing (index) {
-      return this.$v.card.falsyGapAnswers.$error && !this.$v.card.falsyGapAnswers.minLength && index < 2 &&
-        !this.card.falsyGapAnswers[index];
-    },
-    formatFalsyGapAnswerPayload () {
-      return { falsyGapAnswers: this.card.falsyGapAnswers.filter(a => !!a).map(a => a.trim()) };
-    },
     async updateFalsyGapAnswer (index) {
       try {
-        if (this.tmpInput === get(this.card, `falsyGapAnswers[${index}]`)) return;
-
-        this.$v.card.falsyGapAnswers.$touch();
-        if (this.$v.card.falsyGapAnswers.$each[index].$error || this.requiredFalsyAnswerIsMissing(index)) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
-
-        await Cards.updateById(this.card._id, this.formatFalsyGapAnswerPayload());
+        if (this.tmpInput === get(this.card, `falsyGapAnswers[${index}].text`)) return;
 
         await this.refreshCard();
         NotifyPositive('Carte mise à jour.');
