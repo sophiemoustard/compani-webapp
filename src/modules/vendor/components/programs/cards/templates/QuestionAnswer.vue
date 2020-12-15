@@ -2,10 +2,10 @@
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
-      :disable="disableEdition" />
+      :disable="disableEdition" class="q-mb-lg" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
-      size="sm" :disable="disableEdition" label="Sélection multiple" />
-    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
+      size="sm" :disable="disableEdition" label="Sélection multiple" class="q-mb-lg" />
+    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
         @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="input"
         :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />

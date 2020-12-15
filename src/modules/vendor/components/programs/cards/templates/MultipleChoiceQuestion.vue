@@ -2,8 +2,8 @@
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
-      type="textarea" :disable="disableEdition" />
-    <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="q-mt-lg answers">
+      type="textarea" :disable="disableEdition" class="q-mb-lg" />
+    <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2" class="input"
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
         :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />

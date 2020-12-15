@@ -2,11 +2,11 @@
   <div class="container">
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
-      type="textarea" :disable="disableEdition" />
-    <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-mt-lg"
+      type="textarea" :disable="disableEdition" class="q-mb-lg" />
+    <ni-input caption="Bonne réponse" v-model="card.qcuGoodAnswer" required-field class="q-mb-lg"
       @focus="saveTmp('qcuGoodAnswer')" :error="$v.card.qcuGoodAnswer.$error" :error-message="goodAnswerErrorMsg"
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
-    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers q-mt-lg">
+    <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Mauvaise réponse ${i + 1}`" class="input"
         v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
