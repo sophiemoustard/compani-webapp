@@ -5,7 +5,7 @@
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="q-mb-lg row gutter-profile answers">
       <ni-input v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-xs-12 col-md-6" :required-field="i < 2"
-        @blur="updateFalsyGapAnswer(i)" v-model="card.falsyGapAnswers[i].text"
+        @blur="updateTextAnswer(i)" v-model="card.falsyGapAnswers[i].text"
         :caption="`Mot ${i + 1}`" :disable="disableEdition" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
         :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)" />
     </div>
@@ -17,8 +17,6 @@
 <script>
 import Input from '@components/form/Input';
 import { required, maxLength } from 'vuelidate/lib/validators';
-import get from 'lodash/get';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { REQUIRED_LABEL, GAP_ANSWER_MAX_LENGTH } from '@data/constants';
 import {
   validTagging,
@@ -85,17 +83,6 @@ export default {
       }
 
       return '';
-    },
-    async updateFalsyGapAnswer (index) {
-      try {
-        if (this.tmpInput === get(this.card, `falsyGapAnswers[${index}].text`)) return;
-
-        await this.refreshCard();
-        NotifyPositive('Carte mise à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour de la carte.');
-      }
     },
   },
 };
