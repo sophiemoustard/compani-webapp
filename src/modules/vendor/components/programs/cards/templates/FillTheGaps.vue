@@ -4,9 +4,9 @@
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="row gutter-profile">
-      <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="answers">
-        <ni-input :required-field="i < 2" @blur="updateTextAnswer(i)" v-model="card.falsyGapAnswers[i].text"
-          :caption="`Mot ${i + 1}`" :disable="disableEdition" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
+      <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-md-6 col-xs-12 answers">
+        <ni-input class="input" v-model="card.falsyGapAnswers[i].text" :required-field="i < 2" :disable="disableEdition"
+          @blur="updateTextAnswer(i)" :caption="`Mot ${i + 1}`" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
           :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)" />
         <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
       </div>
@@ -114,7 +114,9 @@ export default {
     flex-direction: column
   .answers
     display: flex
-    width: 50%
+    align-items: center
+  .input
+    flex: 1
   .add-button
     align-self: flex-end
 </style>
