@@ -3,11 +3,13 @@
     <ni-input class="q-mb-lg" caption="Texte" v-model="card.gappedText" required-field
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
-    <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="answers">
-      <ni-input class="input" :required-field="i < 2" @blur="updateTextAnswer(i)" v-model="card.falsyGapAnswers[i].text"
-        :caption="`Mot ${i + 1}`" :disable="disableEdition" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
-        :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)" />
-      <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
+    <div class="row gutter-profile">
+      <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="answers">
+        <ni-input :required-field="i < 2" @blur="updateTextAnswer(i)" v-model="card.falsyGapAnswers[i].text"
+          :caption="`Mot ${i + 1}`" :disable="disableEdition" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
+          :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)" />
+        <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
+      </div>
     </div>
     <ni-button class="add-button q-mb-lg" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
       :disable="disableAnswerCreation" />
@@ -112,9 +114,7 @@ export default {
     flex-direction: column
   .answers
     display: flex
-    flex-direction: row
-  .input
-    flex: 1
+    width: 50%
   .add-button
     align-self: flex-end
 </style>
