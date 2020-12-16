@@ -8,7 +8,8 @@
       @click="programCreationModal = true" :disable="tableLoading" />
 
     <program-creation-modal v-model="programCreationModal" @hide="resetCreationModal" @submit="createProgram"
-      :new-program="newProgram" :validations="$v.newProgram" :loading="modalLoading" />
+      :validations="$v.newProgram" :loading="modalLoading" :name.sync="newProgram.name"
+      :category.sync="newProgram.category" />
   </q-page>
 </template>
 
