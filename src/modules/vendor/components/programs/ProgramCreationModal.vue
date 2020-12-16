@@ -3,7 +3,7 @@
     <template slot="title">
       Créer un nouveau <span class="text-weight-bold">programme</span>
     </template>
-    <ni-input in-modal :value="newProgram.name" @input="update($event, 'name')" :error="validations.name.$error"
+    <ni-input in-modal :value="newProgram.name" @input="update($event.trim(), 'name')" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Nom" />
     <ni-select in-modal :value="newProgram.category" @input="update($event, 'category')" :options="categoryOptions"
       :error="validations.category.$error" @blur="validations.category.$touch" required-field caption="Catégorie" />
@@ -59,7 +59,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newProgram', { ...this.newProgram, [prop]: event.trim() });
+      this.$emit('update:newProgram', { ...this.newProgram, [prop]: event });
     },
   },
 };
