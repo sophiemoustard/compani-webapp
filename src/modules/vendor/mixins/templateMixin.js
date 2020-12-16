@@ -15,6 +15,7 @@ import {
   SINGLE_CHOICE_QUESTION,
   QUESTION_ANSWER,
   ORDER_THE_SEQUENCE,
+  FILL_THE_GAPS,
 } from '../../../core/data/constants';
 
 export const templateMixin = {
@@ -191,6 +192,7 @@ export const templateMixin = {
     getAnswerKeyToUpdate (template) {
       if ([MULTIPLE_CHOICE_QUESTION, SINGLE_CHOICE_QUESTION, QUESTION_ANSWER].includes(template)) return 'qcAnswers';
       if (template === ORDER_THE_SEQUENCE) return 'orderedAnswers';
+      if (template === FILL_THE_GAPS) return 'falsyGapAnswers';
 
       return '';
     },
