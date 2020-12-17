@@ -6,7 +6,7 @@
     </div>
     <div v-if="document && imageSource" class="row justify-between" style="background: white">
       <div class="doc-thumbnail">
-        <ni-custom-img :cloudinary-storage="cloudinaryStorage" :image-source="imageSource" :alt="alt" />
+        <ni-custom-img :image-source="imageSource" :alt="alt" />
       </div>
       <div class="self-end doc-delete">
         <q-btn color="primary" round flat icon="delete" size="1rem" :disable="disable" @click.native="deleteDocument" />
