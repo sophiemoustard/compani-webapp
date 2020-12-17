@@ -22,7 +22,7 @@
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
                   </div>
                   <published-dot :is-published="isPublished(step)"
-                    :status="isStepValid(step) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
+                    :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
@@ -48,7 +48,7 @@
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
                     <published-dot :is-published="isPublished(activity)"
-                      :status="isActivityValid(activity) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
+                      :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -578,12 +578,6 @@ export default {
     },
     isPublished (element) {
       return element.status === PUBLISHED;
-    },
-    isActivityValid (activity) {
-      return activity.areCardsValid && activity.cards.length > 0;
-    },
-    isStepValid (step) {
-      return step.areActivitiesValid && !step.activities.some(activity => activity.cards.length === 0);
     },
     async openSubProgramPublicationModal () {
       try {
