@@ -3,8 +3,8 @@
     <template slot="title">
       Créer un nouveau <span class="text-weight-bold">sous-programme</span>
     </template>
-    <ni-input in-modal v-model.trim="newSubProgram.name" :error="validations.name.$error"
-      @blur="validations.name.$touch" required-field caption="Nom" />
+    <ni-input in-modal :value="newSubProgram.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field caption="Nom" @input="update($event.trim(), 'name')" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer le sous-programme" color="primary"
         icon-right="add" @click="submit" :loading="loading" />
@@ -37,6 +37,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newSubProgram', { ...this.newSubProgram, [prop]: event });
     },
   },
 };
