@@ -3,10 +3,10 @@
     <template slot="title">
       Créer une nouvelle <span class="text-weight-bold">activité</span>
     </template>
-    <ni-input in-modal v-model.trim="newActivity.name" :error="validations.name.$error"
+    <ni-input in-modal :value="newActivity.name" :error="validations.name.$error" @input="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Nom" />
-    <ni-select in-modal caption="Type" :options="typeOptions" v-model="newActivity.type" required-field
-      :error="validations.type.$error" />
+    <ni-select in-modal caption="Type" :options="typeOptions" :value="newActivity.type" required-field
+      :error="validations.type.$error" @input="update($event, 'type')" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer l'activité" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -42,6 +42,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newActivity', { ...this.newActivity, [prop]: event });
     },
   },
 };
