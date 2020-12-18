@@ -137,6 +137,6 @@ export const minArrayLength = minLength => value => value.filter(a => !!a).lengt
 
 export const maxArrayLength = maxLength => value => value.filter(a => !!a).length <= maxLength;
 
-export const minLabelArrayLength = minLength => value => value.filter(a => !!a.label).length >= minLength;
+export const minTextArrayLength = minLength => value => value.filter(a => !!a.text).length >= minLength;
 
 export const minOneCorrectAnswer = value => value.filter(a => a.correct).length >= 1;

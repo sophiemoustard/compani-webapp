@@ -22,7 +22,7 @@
                     <span>{{ stepIndex + 1 }} - {{ step.name }}</span>
                   </div>
                   <published-dot :is-published="isPublished(step)"
-                    :status="isStepValid(step) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
+                    :status="step.areActivitiesValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                 </div>
                 <div class="step-subtitle">
                   {{ getStepTypeLabel(step.type) }} - {{ formatQuantity('activité', step.activities.length) }}
@@ -48,7 +48,7 @@
                       {{ formatQuantity('carte', activity.cards.length) }}
                     </div>
                     <published-dot :is-published="isPublished(activity)"
-                      :status="isActivityValid(activity) ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
+                      :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
                     <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
@@ -84,24 +84,24 @@
       @click="subProgramCreationModal = true" />
 
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
-      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program="newSubProgram" />
+      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program.sync="newSubProgram" />
 
-    <step-creation-modal v-model="stepCreationModal" :new-step="newStep" :step-type-options="stepTypeOptions"
+    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :step-type-options="stepTypeOptions"
       :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
 
-    <step-edition-modal v-model="stepEditionModal" :edited-step="editedStep" :validations="$v.editedStep"
+    <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
-    <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
+    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity"
       :type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
-      :loading="modalLoading" />
+      :loading="modalLoading" :validations="$v.newActivity" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
       :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
-    <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
-      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
+    <activity-edition-modal v-model="activityEditionModal" :edited-activity.sync="editedActivity"
+      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" :loading="modalLoading"
       :type-options="activityTypeOptions" />
 
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
@@ -578,12 +578,6 @@ export default {
     },
     isPublished (element) {
       return element.status === PUBLISHED;
-    },
-    isActivityValid (activity) {
-      return activity.areCardsValid && activity.cards.length > 0;
-    },
-    isStepValid (step) {
-      return step.areActivitiesValid && !step.activities.some(activity => activity.cards.length === 0);
     },
     async openSubProgramPublicationModal () {
       try {

@@ -3,7 +3,7 @@
     <template slot="title">
       Éditer une <span class="text-weight-bold">étape</span>
     </template>
-    <ni-input in-modal v-model.trim="editedStep.name" :error="validations.name.$error"
+    <ni-input in-modal :value="editedStep.name" :error="validations.name.$error" @input="update($event.trim(), 'name')"
       @blur="validations.name.$touch" required-field caption="Nom" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer l'étape" color="primary" :loading="loading"
@@ -37,6 +37,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:editedStep', { ...this.editedStep, [prop]: event });
     },
   },
 };

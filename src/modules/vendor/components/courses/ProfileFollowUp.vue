@@ -5,7 +5,7 @@
       @go-to="goToLearnerProfile">
       <template #body="{ col }">
         <q-item v-if="col.name === 'progress'">
-          <ni-progress :value="col.value" />
+          <ni-progress class="progress" :value="col.value" />
         </q-item>
       </template>
     </ni-table-list>
@@ -39,7 +39,7 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'min-width: 200px; width: 90%',
+          style: 'min-width: 200px; width: 80%',
         },
         {
           name: 'progress',
@@ -47,7 +47,6 @@ export default {
           field: 'progress',
           align: 'left',
           sortable: true,
-          style: 'min-width: 110px;',
         },
       ],
       learners: [],
@@ -86,3 +85,7 @@ export default {
   },
 };
 </script>
+<style lang="stylus" scoped>
+.progress
+  width: 100%
+</style>

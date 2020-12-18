@@ -1,4 +1,3 @@
-import { Cookies } from 'quasar';
 import { alenviAxios } from '@api/ressources/alenviAxios';
 
 export default {
@@ -42,12 +41,16 @@ export default {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/courses/${courseId}/trainees/${traineeId}`);
   },
   downloadAttendanceSheet (courseId) {
-    return `${process.env.API_HOSTNAME}/courses/${courseId}/attendance-sheets?x-access-token=`
-      + `${Cookies.get('alenvi_token')}`;
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/courses/${courseId}/attendance-sheets`,
+      { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
+    );
   },
   downloadCompletionCertificates (courseId) {
-    return `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates?x-access-token=`
-      + `${Cookies.get('alenvi_token')}`;
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/courses/${courseId}/completion-certificates`,
+      { responseType: 'arraybuffer', headers: { Accept: 'application/zip' } }
+    );
   },
   async addAccessRule (courseId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/courses/${courseId}/accessrules`, payload);

@@ -391,8 +391,12 @@ export const TEMPLATE_TYPES = {
 };
 
 export const SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT = 3;
+export const SINGLE_CHOICE_QUESTION_MIN_FALSY_ANSWERS_COUNT = 1;
 export const MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT = 4;
+export const MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT = 2;
+export const FILL_THE_GAPS_MIN_ANSWERS_COUNT = 2;
 export const FILL_THE_GAPS_MAX_ANSWERS_COUNT = 6;
+export const ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT = 2;
 export const ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT = 3;
 export const SURVEY_LABEL_MAX_LENGTH = 25;
 export const QUESTION_MAX_LENGTH = 170;
@@ -430,3 +434,6 @@ export const ACCESS_OPTIONS = [
   { label: 'Libre accès', value: FREE_ACCESS },
   { label: 'Choisir une structure', value: RESTRICTED_ACCESS },
 ];
+
+// ORIGIN
+export const WEBAPP = 'webapp';

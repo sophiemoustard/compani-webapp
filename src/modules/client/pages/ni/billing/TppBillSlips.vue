@@ -8,7 +8,7 @@
             :style="col.style" class="text-capitalize">
             <template v-if="col.name === 'document'">
               <div class="row justify-center table-actions">
-                <q-btn flat round small color="primary" type="a" :href="billSlipUrl(col.value)" icon="file_download" />
+                <q-btn flat round small color="primary" @click="downloadBillSlip(col.value)" icon="file_download" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -26,6 +26,7 @@ import LargeTable from '@components/table/LargeTable';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { formatPrice } from '@helpers/utils';
+import { downloadDocx } from '@helpers/file';
 
 export default {
   name: 'TppBillSlips',
@@ -96,8 +97,14 @@ export default {
         this.loading = false;
       }
     },
-    billSlipUrl (id) {
-      return BillSlip.getPDFUrl(id);
+    async downloadBillSlip (id) {
+      try {
+        const docx = await BillSlip.getDocx(id);
+        downloadDocx(docx, 'bordereau.docx');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement des bordereaux.');
+      }
     },
   },
 };

@@ -1,27 +1,32 @@
-<template v-if="orderedAnswersInitialized">
-  <div>
+<template>
+  <div class="container">
     <ni-input class="q-mb-lg" caption="Question" v-model="card.question" required-field :disable="disableEdition"
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea"
       :error-message="questionErrorMsg" />
-    <div class="q-mb-lg">
-      <ni-input v-for="(answer, i) in card.orderedAnswers" :key="i" :caption="`Réponse ${i + 1}`"
-        v-model="card.orderedAnswers[i]" @focus="saveTmp(`orderedAnswers[${i}]`)" :required-field="i < 2"
-        @blur="updateOrderedAnswer(i)" :error="requiredOrderedAnswerIsMissing(i)" :disable="disableEdition" />
+    <div v-for="(orderedAnswers, i) in card.orderedAnswers" :key="i" class="answers">
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.orderedAnswers[i].text"
+        @focus="saveTmp(`orderedAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :disable="disableEdition"
+        :error="$v.card.orderedAnswers.$each[i].$error" class="input" :required-field="answerIsRequired(i)" />
+      <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
+    <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
+    :disable="disableAnswerCreation" />
     <ni-input caption="Correction" v-model="card.explanation" required-field @focus="saveTmp('explanation')"
       @blur="updateCard('explanation')" :error="$v.card.explanation.$error" type="textarea" :disable="disableEdition" />
   </div>
 </template>
 
 <script>
-import times from 'lodash/times';
 import { required, maxLength } from 'vuelidate/lib/validators';
-import Cards from '@api/Cards';
 import Input from '@components/form/Input';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT, QUESTION_MAX_LENGTH } from '@data/constants';
-import { minArrayLength } from '@helpers/vuelidateCustomVal';
+import {
+  QUESTION_MAX_LENGTH,
+  ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT,
+  ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT,
+  PUBLISHED,
+} from '@data/constants';
 import { templateMixin } from 'src/modules/vendor/mixins/templateMixin';
+import Button from '@components/Button';
 
 export default {
   name: 'OrderTheSequence',
@@ -30,55 +35,44 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-button': Button,
   },
   mixins: [templateMixin],
   validations () {
     return {
       card: {
         question: { required, maxLength: maxLength(QUESTION_MAX_LENGTH) },
-        orderedAnswers: { minLength: minArrayLength(2) },
+        orderedAnswers: { $each: { text: { required } } },
         explanation: { required },
       },
     };
   },
   computed: {
-    orderedAnswersInitialized () {
-      return this.card.orderedAnswers.length === ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT;
+    disableAnswerCreation () {
+      return this.card.orderedAnswers.length >= ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
     },
-  },
-  watch: {
-    card: {
-      handler: 'initializeOrderedAnswers',
-      immediate: true,
+    disableAnswerDeletion () {
+      return this.card.orderedAnswers.length <= ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT ||
+        this.disableEdition || this.activity.status === PUBLISHED;
     },
   },
   methods: {
-    initializeOrderedAnswers () {
-      this.card.orderedAnswers = times(ORDER_THE_SEQUENCE_MAX_ANSWERS_COUNT, i => this.card.orderedAnswers[i] || '');
-    },
-    requiredOrderedAnswerIsMissing (index) {
-      return this.$v.card.orderedAnswers.$error && !this.$v.card.orderedAnswers.minLength && index < 2 &&
-        !this.card.orderedAnswers[index];
-    },
-    formatOrderedAnswerPayload () {
-      return { orderedAnswers: this.card.orderedAnswers.filter(a => !!a).map(a => a.trim()) };
-    },
-    async updateOrderedAnswer (index) {
-      try {
-        if (this.tmpInput === this.card.orderedAnswers[index]) return;
-
-        this.$v.card.orderedAnswers.$touch();
-        if (this.requiredOrderedAnswerIsMissing(index)) return NotifyWarning('Champ(s) invalide(s)');
-
-        await Cards.updateById(this.card._id, this.formatOrderedAnswerPayload());
-
-        await this.refreshCard();
-        NotifyPositive('Carte mise à jour.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la mise à jour de la carte.');
-      }
+    answerIsRequired (index) {
+      return index < ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT;
     },
   },
 };
 </script>
+<style lang="stylus" scoped>
+.container
+  display: flex
+  flex-direction: column
+.answers
+  display: flex
+  justify-content: space-between
+.input
+  flex: 1
+.add-button
+  align-self: flex-end
+</style>

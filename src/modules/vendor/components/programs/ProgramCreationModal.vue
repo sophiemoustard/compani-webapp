@@ -3,10 +3,10 @@
     <template slot="title">
       Créer un nouveau <span class="text-weight-bold">programme</span>
     </template>
-    <ni-input in-modal v-model.trim="newProgram.name" :error="validations.name.$error"
+    <ni-input in-modal :value="newProgram.name" @input="update($event.trim(), 'name')" :error="validations.name.$error"
       @blur="validations.name.$touch" required-field caption="Nom" />
-    <ni-select in-modal v-model.trim="newProgram.category" :error="validations.category.$error"
-        @blur="validations.category.$touch" required-field caption="Catégorie" :options="categoryOptions" />
+    <ni-select in-modal :value="newProgram.category" @input="update($event, 'category')" :options="categoryOptions"
+      :error="validations.category.$error" @blur="validations.category.$touch" required-field caption="Catégorie" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer le programme" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -25,9 +25,9 @@ export default {
   name: 'ProgramCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    newProgram: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    newProgram: { type: Object, default: () => ({}) },
   },
   data () {
     return {
@@ -57,6 +57,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newProgram', { ...this.newProgram, [prop]: event });
     },
   },
 };

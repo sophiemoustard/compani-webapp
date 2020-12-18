@@ -3,7 +3,7 @@
     <template slot="title">
       Éditer la <span class="text-weight-bold">catégorie</span>
     </template>
-    <ni-input in-modal v-model="editedCategory.name" :error="validations.name.$error"
+    <ni-input in-modal :value="editedCategory.name" :error="validations.name.$error" @input="update($event, 'name')"
       @blur="validations.name.$touch" required-field caption="Nom" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer la catégorie" color="primary" :loading="loading"
@@ -37,6 +37,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:editedCategory', { ...this.editedCategory, [prop]: event });
     },
   },
 };

@@ -1,10 +1,10 @@
 <template>
   <div style="width: 100vw; height: 100vh">
     <object :data="blobUrl" :name="fileName" type="application/pdf" width="100%" height="100%" />
-    <big>
-      Votre navigateur ne peut pas charger l'aperçu, vous pouvez télécharger votre document en cliquant
-      <a :href="blobUrl" :download="fileName">ici</a>
-    </big>
+    <div class="info">
+      Si votre navigateur ne peut pas charger l'aperçu, vous pouvez télécharger votre document&nbsp;
+      <a :href="blobUrl" :download="fileName">en cliquant ici </a>
+    </div>
   </div>
 </template>
 
@@ -17,3 +17,8 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.info
+  text-align: center;
+</style>
