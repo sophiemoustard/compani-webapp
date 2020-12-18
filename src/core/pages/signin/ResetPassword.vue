@@ -24,6 +24,7 @@ import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Users from '@api/Users';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { isUserLogged } from '@helpers/alenvi';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { logInMixin } from '@mixins/logInMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
@@ -45,6 +46,9 @@ export default {
   },
   async beforeRouteEnter (to, from, next) {
     try {
+      const isLogged = await isUserLogged();
+      if (isLogged) next({ path: '/' });
+
       if (to.params.token) {
         const checkToken = await Users.checkResetPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));

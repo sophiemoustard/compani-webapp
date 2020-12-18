@@ -35,17 +35,14 @@
 
 <script>
 import get from 'lodash/get';
-import { Cookies } from 'quasar';
 import { required, email } from 'vuelidate/lib/validators';
-import Users from '@api/Users';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { NotifyNegative } from '@components/popup/notify';
 import { AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY, REQUIRED_LABEL } from '@data/constants';
-import { refreshAlenviCookies } from '@helpers/alenvi';
+import { isUserLogged } from '@helpers/alenvi';
 import { logInMixin } from '@mixins/logInMixin';
-import store from 'src/store/index';
 
 export default {
   metaInfo: {
@@ -89,17 +86,9 @@ export default {
     },
   },
   async beforeRouteEnter (to, from, next) {
-    const refresh = await refreshAlenviCookies();
-    if (refresh) {
-      await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
-
-      const loggedUser = store.getters['main/getLoggedUser'];
-      if (loggedUser) next({ path: '/' });
-      else {
-        await Users.logOut();
-        next();
-      }
-    } else next();
+    const isLogged = await isUserLogged();
+    if (isLogged) next({ path: '/' });
+    else next();
   },
   methods: {
     async submit () {

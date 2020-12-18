@@ -23,9 +23,7 @@ import Users from '@api/Users';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
-import { refreshAlenviCookies } from '@helpers/alenvi';
-import { Cookies } from 'quasar';
-import store from 'src/store/index';
+import { isUserLogged } from '@helpers/alenvi';
 
 export default {
   components: {
@@ -41,17 +39,9 @@ export default {
     email: { email, required },
   },
   async beforeRouteEnter (to, from, next) {
-    const refresh = await refreshAlenviCookies();
-    if (refresh) {
-      await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
-
-      const loggedUser = store.getters['main/getLoggedUser'];
-      if (loggedUser) next({ path: '/' });
-      else {
-        await Users.logOut();
-        next();
-      }
-    } else next();
+    const isLogged = await isUserLogged();
+    if (isLogged) next({ path: '/' });
+    else next();
   },
   methods: {
     async submit () {
