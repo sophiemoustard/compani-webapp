@@ -84,24 +84,24 @@
       @click="subProgramCreationModal = true" />
 
     <sub-program-creation-modal v-model="subProgramCreationModal" :loading="modalLoading" @submit="createSubProgram"
-      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program="newSubProgram" />
+      :validations="$v.newSubProgram" @hide="resetSubProgramCreationModal" :new-sub-program.sync="newSubProgram" />
 
-    <step-creation-modal v-model="stepCreationModal" :new-step="newStep" :step-type-options="stepTypeOptions"
+    <step-creation-modal v-model="stepCreationModal" :new-step.sync="newStep" :step-type-options="stepTypeOptions"
       :validations="$v.newStep" @hide="resetStepCreationModal" @submit="createStep" :loading="modalLoading" />
 
-    <step-edition-modal v-model="stepEditionModal" :edited-step="editedStep" :validations="$v.editedStep"
+    <step-edition-modal v-model="stepEditionModal" :edited-step.sync="editedStep" :validations="$v.editedStep"
       @hide="resetStepEditionModal" @submit="editStep" :loading="modalLoading" />
 
-    <activity-creation-modal v-model="activityCreationModal" :new-activity="newActivity" :validations="$v.newActivity"
+    <activity-creation-modal v-model="activityCreationModal" :new-activity.sync="newActivity"
       :type-options="activityTypeOptions" @hide="resetActivityCreationModal" @submit="createActivity"
-      :loading="modalLoading" />
+      :loading="modalLoading" :validations="$v.newActivity" />
 
     <activity-reuse-modal v-model="activityReuseModal" @submit-reuse="reuseActivity" :program-options="programOptions"
       :loading="modalLoading" :validations="$v.reusedActivity" :same-step-activities="sameStepActivities"
       :reused-activity.sync="reusedActivity" @hide="resetActivityReuseModal" @submit-duplication="duplicateActivity" />
 
-    <activity-edition-modal v-model="activityEditionModal" :edited-activity="editedActivity" :loading="modalLoading"
-      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity"
+    <activity-edition-modal v-model="activityEditionModal" :edited-activity.sync="editedActivity"
+      :validations="$v.editedActivity" @hide="resetActivityEditionModal" @submit="editActivity" :loading="modalLoading"
       :type-options="activityTypeOptions" />
 
     <sub-program-publication-modal v-model="subProgramPublicationModal" @submit="validateSubProgramPublication"
