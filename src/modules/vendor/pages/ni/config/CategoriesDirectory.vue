@@ -25,10 +25,10 @@
     </q-card>
 
     <category-creation-modal v-model="categoryCreationModal" @hide="resetCreationModal" @submit="createCategory"
-      :new-category="newCategory" :validations="$v.newCategory" :loading="modalLoading" />
+      :new-category.sync="newCategory" :validations="$v.newCategory" :loading="modalLoading" />
 
     <category-edition-modal v-model="categoryEditionModal" @hide="resetEditionModal" @submit="updateCategory"
-      :edited-category="editedCategory" :validations="$v.editedCategory" :loading="modalLoading" />
+      :edited-category.sync="editedCategory" :validations="$v.editedCategory" :loading="modalLoading" />
   </q-page>
 </template>
 
