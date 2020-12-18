@@ -4,9 +4,9 @@
       @focus="saveTmp('question')" @blur="updateCard('question')" :error="$v.card.question.$error" type="textarea"
       :error-message="questionErrorMsg" />
     <div v-for="(orderedAnswers, i) in card.orderedAnswers" :key="i" class="answers">
-      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.orderedAnswers[i].text" :required-field="i < 2"
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.orderedAnswers[i].text"
         @focus="saveTmp(`orderedAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :disable="disableEdition"
-        :error="$v.card.orderedAnswers.$each[i].$error" class="input" />
+        :error="$v.card.orderedAnswers.$each[i].$error" class="input" :required-field="answerIsRequired(i)" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="q-mb-lg add-button" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
@@ -55,6 +55,11 @@ export default {
     disableAnswerDeletion () {
       return this.card.orderedAnswers.length <= ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT ||
         this.disableEdition || this.activity.status === PUBLISHED;
+    },
+  },
+  methods: {
+    answerIsRequired (index) {
+      return index < ORDER_THE_SEQUENCE_MIN_ANSWERS_COUNT;
     },
   },
 };
