@@ -3,10 +3,10 @@
     <template slot="title">
         Éditer une <span class="text-weight-bold">activité</span>
       </template>
-      <ni-input in-modal v-model.trim="editedActivity.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field caption="Nom" />
-      <ni-select caption="Type" :options="typeOptions" v-model="editedActivity.type" required-field in-modal last
-        :error="validations.type.$error" />
+      <ni-input in-modal :value="editedActivity.name" :error="validations.name.$error"
+        @blur="validations.name.$touch" required-field caption="Nom" @input="update($event.trim(), 'name')" />
+      <ni-select caption="Type" :options="typeOptions" :value="editedActivity.type" required-field in-modal last
+        :error="validations.type.$error" @input="update($event, 'type')" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
@@ -42,6 +42,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:editedActivity', { ...this.editedActivity, [prop]: event });
     },
   },
 };
