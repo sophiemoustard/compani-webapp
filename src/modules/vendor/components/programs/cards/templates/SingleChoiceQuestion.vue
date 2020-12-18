@@ -8,9 +8,9 @@
       @blur="updateCard('qcuGoodAnswer')" :disable="disableEdition" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
       <ni-input :caption="`Mauvaise réponse ${i + 1}`" class="input"
-        v-model="card.qcAnswers[i].text" :required-field="i === 0" :error="$v.card.qcAnswers.$each[i].$error"
+        v-model="card.qcAnswers[i].text" :error="$v.card.qcAnswers.$each[i].$error"
         :error-message="qcuFalsyAnswerErrorMsg(i)" @focus="saveTmp(`qcAnswers[${i}].text`)"
-        @blur="updateTextAnswer(i)" :disable="disableEdition" />
+        @blur="updateTextAnswer(i)" :disable="disableEdition" :required-field="answerIsRequired(i)" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
     <ni-button class="add-button q-mb-lg" icon="add" label="Ajouter une réponse" color="primary" @click="addAnswer"
@@ -81,6 +81,9 @@ export default {
       if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
+    },
+    answerIsRequired (index) {
+      return index < SINGLE_CHOICE_QUESTION_MIN_FALSY_ANSWERS_COUNT;
     },
   },
 };

@@ -5,9 +5,10 @@
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
     <div class="row gutter-profile">
       <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-md-6 col-xs-12 answers">
-        <ni-input class="input" v-model="card.falsyGapAnswers[i].text" :required-field="i < 2" :disable="disableEdition"
+        <ni-input class="input" v-model="card.falsyGapAnswers[i].text" :disable="disableEdition"
           @blur="updateTextAnswer(i)" :caption="`Mot ${i + 1}`" @focus="saveTmp(`falsyGapAnswers[${i}].text`)"
-          :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)" />
+          :error="$v.card.falsyGapAnswers.$each[i].text.$error" :error-message="falsyGapAnswersErrorMsg(i)"
+          :required-field="answerIsRequired(i)" />
         <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
       </div>
     </div>
@@ -103,6 +104,9 @@ export default {
       }
 
       return '';
+    },
+    answerIsRequired (index) {
+      return index < FILL_THE_GAPS_MIN_ANSWERS_COUNT;
     },
   },
 };

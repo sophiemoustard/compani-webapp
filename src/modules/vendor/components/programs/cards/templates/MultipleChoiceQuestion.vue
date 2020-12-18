@@ -4,9 +4,10 @@
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" class="q-mb-lg" />
     <div v-for="(qcAnswer, i) in card.qcAnswers" :key="i" class="answers">
-      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :required-field="i < 2" class="input"
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" class="input"
         @focus="saveTmp(`qcAnswers[${i}].text`)" @blur="updateTextAnswer(i)" :error-message="answersErrorMsg(i)"
-        :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition" />
+        :error="$v.card.qcAnswers.$each[i].$error || requiredOneCorrectAnswer(i)" :disable="disableEdition"
+        :required-field="answerIsRequired(i)" />
       <q-checkbox v-model="card.qcAnswers[i].correct" @input="updateCorrectAnswer(i)"
         :disable="!card.qcAnswers[i].text || disableEdition" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
@@ -96,6 +97,9 @@ export default {
       if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
+    },
+    answerIsRequired (index) {
+      return index < MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT;
     },
   },
 };

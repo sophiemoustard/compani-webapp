@@ -6,8 +6,8 @@
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       size="sm" :disable="disableEdition" label="Sélection multiple" class="q-mb-lg" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
-      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" :disable="disableEdition"
-        @blur="updateTextAnswer(i)" @focus="saveTmp(`qcAnswers[${i}].text`)" class="input"
+      <ni-input :caption="`Réponse ${i + 1}`" v-model="card.qcAnswers[i].text" @focus="saveTmp(`qcAnswers[${i}].text`)"
+        @blur="updateTextAnswer(i)" class="input" :disable="disableEdition" :required-field="answerIsRequired(i)"
         :error="$v.card.qcAnswers.$each[i].$error" :error-message="questionAnswerErrorMsg(i)" />
       <ni-button icon="delete" @click="validateAnswerDeletion(i)" :disable="disableAnswerDeletion" />
     </div>
@@ -67,6 +67,9 @@ export default {
       if (!this.$v.card.qcAnswers.$each[index].text.maxLength) return `${QC_ANSWER_MAX_LENGTH} caractères maximum.`;
 
       return '';
+    },
+    answerIsRequired (index) {
+      return index < QUESTION_ANSWER_MIN_ANSWERS_COUNT;
     },
   },
 };
