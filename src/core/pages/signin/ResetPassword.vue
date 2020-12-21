@@ -47,7 +47,7 @@ export default {
   async beforeRouteEnter (to, from, next) {
     try {
       const isLogged = await isUserLogged();
-      if (isLogged) next({ path: '/' });
+      if (isLogged) return next({ path: '/' });
 
       if (to.params.token) {
         const checkToken = await Users.checkResetPasswordToken(to.params.token);
