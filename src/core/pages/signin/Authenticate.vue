@@ -41,6 +41,7 @@ import Input from '@components/form/Input';
 import Button from '@components/Button';
 import { NotifyNegative } from '@components/popup/notify';
 import { AUXILIARY_ROLES, AUXILIARY_WITHOUT_COMPANY, REQUIRED_LABEL } from '@data/constants';
+import { isUserLogged } from '@helpers/alenvi';
 import { logInMixin } from '@mixins/logInMixin';
 
 export default {
@@ -83,6 +84,11 @@ export default {
       if (!this.$v.credentials.email.required) return REQUIRED_LABEL;
       return 'Email invalide';
     },
+  },
+  async beforeRouteEnter (to, from, next) {
+    const isLogged = await isUserLogged();
+    if (isLogged) next({ path: '/' });
+    else next();
   },
   methods: {
     async submit () {

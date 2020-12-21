@@ -25,9 +25,9 @@
                 </div>
                 <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
                   class="row justify-center table-actions">
-                  <q-uploader flat :url="docsUploadUrl(contract._id)" :headers="headers"
+                  <q-uploader flat :url="docsUploadUrl(contract._id)" with-credentials auto-upload @uploaded="refresh"
                     :form-fields="getFormFields(contract, props.row)" field-name="file" :accept="extensions"
-                    auto-upload @uploaded="refresh" @fail="failMsg" />
+                    @fail="failMsg" />
                 </div>
                 <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                   <q-btn flat round small color="primary" type="a" :href="getContractLink(props.row)" target="_blank"
@@ -81,7 +81,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import esign from '@api/Esign';
@@ -151,9 +150,6 @@ export default {
     sortedContracts () {
       const { contracts } = this;
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
-    },
-    headers () {
-      return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
     },
   },
   methods: {

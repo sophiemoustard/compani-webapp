@@ -4,12 +4,31 @@ import { WEBAPP } from '@data/constants';
 
 export default {
   async refreshToken (data) {
-    const refreshToken = await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data);
-    return refreshToken.data.data;
+    await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data, { withCredentials: true });
   },
   async authenticate (data) {
-    const auth = await axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, data);
+    const auth = await axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, data, { withCredentials: true });
     return auth.data.data;
+  },
+  async logOut () {
+    await axios.post(`${process.env.API_HOSTNAME}/users/logout`, null, { withCredentials: true });
+  },
+  async forgotPassword (data) {
+    await axios.post(`${process.env.API_HOSTNAME}/users/forgot-password`, data);
+  },
+  async checkResetPasswordToken (resetToken) {
+    const check = await axios.get(
+      `${process.env.API_HOSTNAME}/users/check-reset-password/${resetToken}`,
+      { withCredentials: true }
+    );
+    return check.data.data;
+  },
+  async createPasswordToken (id, data) {
+    const passwordToken = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${id}/create-password-token`, data);
+    return passwordToken.data.data.passwordToken;
+  },
+  async updatePassword (userId, data) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/password`, data);
   },
   async list (params = null) {
     try {
@@ -55,10 +74,6 @@ export default {
     const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, { ...data, origin: WEBAPP });
     return newUser.data.data.user;
   },
-  async createPasswordToken (id, data) {
-    const passwordToken = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${id}/create-password-token`, data);
-    return passwordToken.data.data.passwordToken;
-  },
   async deleteById (id) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/users/${id}`);
   },
@@ -66,29 +81,8 @@ export default {
     const updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}`, data);
     return updatedUser;
   },
-  async updatePassword (userId, data, token = null) {
-    let updatedUser;
-    if (token) {
-      updatedUser = await axios.put(
-        `${process.env.API_HOSTNAME}/users/${userId}/password`,
-        data,
-        { headers: { 'x-access-token': token } }
-      );
-    } else {
-      updatedUser = await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/password`, data);
-    }
-    return updatedUser;
-  },
   async updateCertificates (userId, data) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/users/${userId}/certificates`, data);
-  },
-  async forgotPassword (data) {
-    const mailInfo = await axios.post(`${process.env.API_HOSTNAME}/users/forgot-password`, data);
-    return mailInfo.data.data.mailInfo;
-  },
-  async checkResetPasswordToken (resetToken) {
-    const check = await axios.get(`${process.env.API_HOSTNAME}/users/check-reset-password/${resetToken}`);
-    return check.data.data;
   },
   async createDriveFolder (userId) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/users/${userId}/drivefolder`);

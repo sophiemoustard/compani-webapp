@@ -23,8 +23,7 @@
           <q-separator :key="`separator-${route.ref}`" />
           </template>
         </template>
-        <ni-side-menu-footer :label="footerLabel" :user-id="loggedUser._id" :interface-type="interfaceType"
-          @click="connectToBotMessenger" />
+        <ni-side-menu-footer :label="footerLabel" :user-id="loggedUser._id" :interface-type="interfaceType" />
       </q-list>
       <div :class="chevronContainerClasses">
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
@@ -40,7 +39,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import { layoutMixin } from '@mixins/layoutMixin';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
@@ -67,12 +65,6 @@ export default {
     footerLabel () {
       if (this.isCoach || this.isAuxiliary) return this.userFirstname;
       return this.loggedUser.identity.lastname;
-    },
-  },
-  methods: {
-    connectToBotMessenger () {
-      const token = Cookies.get('alenvi_token');
-      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`;
     },
   },
 };

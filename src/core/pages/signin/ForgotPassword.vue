@@ -23,6 +23,7 @@ import Users from '@api/Users';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { isUserLogged } from '@helpers/alenvi';
 
 export default {
   components: {
@@ -36,6 +37,11 @@ export default {
   },
   validations: {
     email: { email, required },
+  },
+  async beforeRouteEnter (to, from, next) {
+    const isLogged = await isUserLogged();
+    if (isLogged) next({ path: '/' });
+    else next();
   },
   methods: {
     async submit () {
