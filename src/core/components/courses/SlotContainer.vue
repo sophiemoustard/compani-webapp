@@ -41,11 +41,11 @@
     </div>
 
     <!-- Course slot creation modal -->
-    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
+    <slot-creation-modal v-model="creationModal" :new-course-slot.sync="newCourseSlot" :validations="$v.newCourseSlot"
       :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
 
     <!-- Course slot edition modal -->
-    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
+    <slot-edition-modal v-model="editionModal" :edited-course-slot.sync="editedCourseSlot" :step-options="stepOptions"
       :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" />
 </div>

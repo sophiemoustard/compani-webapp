@@ -23,9 +23,9 @@
       @click="courseCreationModal = true" />
 
     <!-- Course creation modal -->
-    <course-creation-modal v-model="courseCreationModal" :new-course="newCourse" :is-intra-course="isIntraCourse"
+    <course-creation-modal v-model="courseCreationModal" :new-course.sync="newCourse" :is-intra-course="isIntraCourse"
       :programs="programs" :company-options="companyOptions" :validations="$v.newCourse" :loading="modalLoading"
-      @hide="resetCreationModal" @submit="createCourse" @update="updateCourseCompany" />
+      @hide="resetCreationModal" @submit="createCourse" />
   </q-page>
 </template>
 
@@ -41,7 +41,7 @@ import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, INTER_B2B, BLENDED } from '@data/constants';
+import { INTRA, COURSE_TYPES, BLENDED } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
 import { formatAndSortOptions } from '@helpers/utils';
 
@@ -116,9 +116,6 @@ export default {
         console.error(e);
         this.companyOptions = [];
       }
-    },
-    updateCourseCompany () {
-      if (this.newCourse.type === INTER_B2B) delete this.newCourse.company;
     },
     resetCreationModal () {
       this.$v.newCourse.$reset();
