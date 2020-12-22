@@ -16,7 +16,7 @@
         </div>
       </div>
       <agenda :events="filteredEvents" :days="days" :person-key="personKey" @open-creation-modal="openCreationModal"
-        @open-edition-modal="openEditionModal" />
+        @open-info-modal="openEditionModal" />
     </div>
 
     <!-- Event creation modal -->

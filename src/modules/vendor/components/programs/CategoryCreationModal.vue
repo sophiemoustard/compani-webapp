@@ -3,7 +3,7 @@
     <template slot="title">
       Créer une nouvelle <span class="text-weight-bold">catégorie</span>
     </template>
-    <ni-input in-modal v-model="newCategory.name" :error="validations.name.$error"
+    <ni-input in-modal :value="newCategory.name" :error="validations.name.$error" @input="update($event, 'name')"
       @blur="validations.name.$touch" required-field caption="Nom" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer la catégorie" color="primary" :loading="loading"
@@ -37,6 +37,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newCategory', { ...this.newCategory, [prop]: event });
     },
   },
 };

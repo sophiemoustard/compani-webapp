@@ -3,9 +3,9 @@
     <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">étape</span>
       </template>
-      <ni-option-group inline caption="Type" v-model="newStep.type" type="radio" :options="stepTypeOptions"
-        required-field />
-      <ni-input in-modal v-model.trim="newStep.name" :error="validations.name.$error"
+      <ni-option-group inline caption="Type" :value="newStep.type" type="radio" :options="stepTypeOptions"
+        required-field @input="update($event, 'type')" />
+      <ni-input in-modal :value="newStep.name" :error="validations.name.$error" @input="update($event.trim(), 'name')"
         @blur="validations.name.$touch" required-field caption="Nom" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'étape" color="primary" :loading="loading"
@@ -42,6 +42,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newStep', { ...this.newStep, [prop]: event });
     },
   },
 };

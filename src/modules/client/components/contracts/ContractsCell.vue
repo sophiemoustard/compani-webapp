@@ -89,7 +89,7 @@ import Contracts from '@api/Contracts';
 import Button from '@components/Button';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { downloadDocxFile, downloadFile } from '@helpers/file';
+import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
@@ -254,7 +254,7 @@ export default {
             : this.user.company.rhConfig.templates.contractVersion.driveId,
         };
 
-        await downloadDocxFile(params, data, 'contrat.docx');
+        await downloadDriveDocx(params, data, 'contrat.docx');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du document.');

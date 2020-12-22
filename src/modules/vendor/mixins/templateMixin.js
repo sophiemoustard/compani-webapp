@@ -11,6 +11,11 @@ import {
   UPLOAD_IMAGE,
   UPLOAD_VIDEO,
   UPLOAD_AUDIO,
+  MULTIPLE_CHOICE_QUESTION,
+  SINGLE_CHOICE_QUESTION,
+  QUESTION_ANSWER,
+  ORDER_THE_SEQUENCE,
+  FILL_THE_GAPS,
 } from '../../../core/data/constants';
 
 export const templateMixin = {
@@ -89,6 +94,62 @@ export const templateMixin = {
         NotifyNegative('Erreur lors de la mise à jour de la carte.');
       }
     },
+    async updateTextAnswer (index) {
+      try {
+        const key = this.getAnswerKeyToUpdate(this.card.template);
+        const editedAnswer = get(this.card, `${key}[${index}]`);
+
+        if (this.tmpInput === editedAnswer.text) return;
+
+        get(this.$v, `card.${key}.$each[${index}]`).$touch();
+        if (get(this.$v, `card.${key}.$each[${index}].text.$error`)) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Cards.updateAnswer(
+          { cardId: this.card._id, answerId: editedAnswer._id }, { text: editedAnswer.text.trim() }
+        );
+
+        await this.refreshCard();
+        NotifyPositive('Carte mise à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la carte.');
+      }
+    },
+    async addAnswer () {
+      try {
+        await Cards.addAnswer(this.card._id);
+        await this.refreshCard();
+
+        NotifyPositive('Réponse ajoutée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de la réponse.');
+      }
+    },
+    validateAnswerDeletion (index) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer cette réponse ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteAnswer(index))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteAnswer (index) {
+      try {
+        const key = this.getAnswerKeyToUpdate(this.card.template);
+        const answerId = get(this.card, `${key}[${index}]._id`);
+        if (!answerId) return;
+
+        await Cards.deleteAnswer({ cardId: this.card._id, answerId });
+
+        await this.refreshCard();
+        NotifyPositive('Réponse supprimée avec succès.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la réponse.');
+      }
+    },
     async refreshCard () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
@@ -127,6 +188,13 @@ export const templateMixin = {
         cancel: 'Annuler',
       }).onOk(() => this.deleteMedia(path))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    getAnswerKeyToUpdate (template) {
+      if ([MULTIPLE_CHOICE_QUESTION, SINGLE_CHOICE_QUESTION, QUESTION_ANSWER].includes(template)) return 'qcAnswers';
+      if (template === ORDER_THE_SEQUENCE) return 'orderedAnswers';
+      if (template === FILL_THE_GAPS) return 'falsyGapAnswers';
+
+      return '';
     },
   },
 };

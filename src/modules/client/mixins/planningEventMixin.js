@@ -1,5 +1,6 @@
 import { formatIdentity } from '@helpers/utils';
 import {
+  CUSTOMER,
   ABSENCE_TYPES,
   DAILY,
   ABSENCE,
@@ -25,7 +26,7 @@ export const planningEventMixin = {
       }));
     },
     isCustomerPlanning () {
-      return this.personKey === 'customer';
+      return this.personKey === CUSTOMER;
     },
   },
   methods: {

@@ -1,5 +1,6 @@
-import { alenviAxios } from '@api/ressources/alenviAxios';
 import axios from 'axios';
+import { alenviAxios } from '@api/ressources/alenviAxios';
+import { WEBAPP } from '@data/constants';
 
 export default {
   async refreshToken (data) {
@@ -51,7 +52,7 @@ export default {
     return exists.data.data;
   },
   async create (data) {
-    const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, data);
+    const newUser = await alenviAxios.post(`${process.env.API_HOSTNAME}/users`, { ...data, origin: WEBAPP });
     return newUser.data.data.user;
   },
   async createPasswordToken (id, data) {

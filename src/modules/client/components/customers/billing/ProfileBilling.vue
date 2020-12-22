@@ -39,8 +39,10 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row justify-center table-actions">
-                  <q-btn data-cy="link" flat round small color="primary" type="a"
-                    :href="taxCertificatesUrl(props.row)" target="_blank" icon="file_download" />
+                  <q-btn v-if="!!getUrl(props.row)" data-cy="link" flat round small color="primary" type="a"
+                    :href="getUrl(props.row)" icon="file_download" target="_blank" />
+                  <q-btn v-else data-cy="link" flat round small color="primary" icon="file_download"
+                    @click="downloadTaxCertificate(props.row)" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
@@ -101,6 +103,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { formatIdentity } from '@helpers/utils';
+import { openPdf } from '@helpers/file';
 import {
   CREDIT_NOTE,
   BILL,
@@ -393,11 +396,6 @@ export default {
       }
     },
     // Tax certificates
-    taxCertificatesUrl (certificate) {
-      return get(certificate, 'driveFile.link')
-        ? certificate.driveFile.link
-        : TaxCertificates.getPDFUrl(certificate._id);
-    },
     formatTaxCertificatePayload () {
       const { file, date, year } = this.taxCertificate;
       const form = new FormData();
@@ -440,6 +438,18 @@ export default {
         NotifyNegative('Erreur lors de l\'envoi de l\'attestation fiscale.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    getUrl (doc) {
+      return get(doc, 'driveFile.link');
+    },
+    async downloadTaxCertificate (tc) {
+      try {
+        const pdf = await TaxCertificates.getPdf(tc._id);
+        openPdf(pdf);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de l\'attestation fiscale');
       }
     },
     validateTaxCertificateDeletion (taxCertificateId, row) {

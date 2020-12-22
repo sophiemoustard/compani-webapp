@@ -296,7 +296,7 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { downloadDocxFile } from '@helpers/file';
+import { downloadDriveDocx } from '@helpers/file';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import { days } from '@data/days';
 import {
@@ -785,7 +785,7 @@ export default {
         };
         const params = { driveId: mandateDriveId };
 
-        await downloadDocxFile(params, data, 'mandat.docx');
+        await downloadDriveDocx(params, data, 'mandat.docx');
         NotifyPositive('Mandat téléchargé.');
       } catch (e) {
         console.error(e);
@@ -833,7 +833,7 @@ export default {
           downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
         };
         const params = { driveId: quoteDriveId };
-        await downloadDocxFile(params, data, 'devis.docx');
+        await downloadDriveDocx(params, data, 'devis.docx');
         NotifyPositive('Devis téléchargé.');
       } catch (e) {
         console.error(e);

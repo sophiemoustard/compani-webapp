@@ -13,8 +13,11 @@
             @go-to-today="goToToday" @go-to-week="goToWeek" @update-view-mode="updateViewMode" />
         </div>
       </div>
-      <agenda :events="events" :days="days" :person-key="personKey" />
+      <agenda :events="events" :days="days" :person-key="personKey"
+        @open-info-modal="openConflictModal($event)" />
     </div>
+
+    <event-conflict-modal v-model="conflictModal" :events="conflictingEvents" @hide="closeConflictModal" />
   </q-page>
 </template>
 
@@ -26,6 +29,7 @@ import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '@data/constants';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import Agenda from 'src/modules/client/components/planning/Agenda';
+import EventConflictModal from 'src/modules/client/components/customers/EventConflictModal';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
 
 export default {
@@ -34,17 +38,20 @@ export default {
   components: {
     agenda: Agenda,
     'planning-navigation': PlanningNavigation,
+    'event-conflict-modal': EventConflictModal,
   },
   mixins: [planningTimelineMixin],
   data () {
     return {
       startOfWeek: '',
       events: [],
+      conflictingEvents: [],
       height: 0,
       viewMode: WEEK_VIEW,
       AGENDA,
       personKey: CUSTOMER,
       DEFAULT_AVATAR,
+      conflictModal: false,
     };
   },
   computed: {
@@ -84,11 +91,29 @@ export default {
           endDate: this.endOfWeek,
           customer: this.customer._id,
         });
+        this.events.map(event => (event.inConflictEvents = this.getInConflictEvents(event)));
+        this.getInConflictEvents(this.events[0]);
       } catch (e) {
         this.events = [];
       }
     },
     formatIdentity,
+    openConflictModal (event) {
+      if (event.inConflictEvents.length !== 1) {
+        this.conflictingEvents = event.inConflictEvents;
+        this.conflictModal = true;
+      }
+    },
+    closeConflictModal () {
+      this.conflictModal = false;
+      this.conflictingEvents = [];
+    },
+    getInConflictEvents (event) {
+      return this.events.filter(
+        ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
+          this.$moment(ev.endDate).isBetween(event.startDate, event.endDate, 'minutes', '[]')
+      ).map(ev => ({ ...ev, displayedStartDate: ev.startDate, displayedEndDate: ev.endDate }));
+    },
   },
 };
 </script>
