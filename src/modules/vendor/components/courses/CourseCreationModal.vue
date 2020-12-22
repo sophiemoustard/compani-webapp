@@ -3,7 +3,7 @@
     <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
-      <ni-option-group :value="newCourse.type" @input="update($event, 'type')" type="radio" :options="courseTypes"
+      <ni-option-group :value="newCourse.type" @input="updateType($event)" type="radio" :options="courseTypes"
         caption="Type" required-field inline :error="validations.type.$error" />
       <ni-select in-modal :value="newCourse.program" @input="update($event, 'program')" :options="programOptions"
         @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error" />
@@ -28,7 +28,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES, INTER_B2B } from '@data/constants';
+import { COURSE_TYPES } from '@data/constants';
 import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
@@ -88,12 +88,12 @@ export default {
     submit () {
       this.$emit('submit');
     },
+    updateType (event) {
+      delete this.newCourse.company;
+      this.update(undefined, 'company');
+      this.update(event, 'type');
+    },
     update (event, prop) {
-      if (prop === 'type' && event === INTER_B2B) {
-        delete this.newCourse.company;
-        this.update(undefined, 'company');
-      }
-
       this.$emit('update:newCourse', { ...this.newCourse, [prop]: event });
     },
   },
