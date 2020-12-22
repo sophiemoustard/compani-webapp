@@ -92,7 +92,6 @@ export default {
           customer: this.customer._id,
         });
         this.events.map(event => (event.inConflictEvents = this.getInConflictEvents(event)));
-        this.getInConflictEvents(this.events[0]);
       } catch (e) {
         this.events = [];
       }
