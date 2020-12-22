@@ -28,7 +28,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Input from '@components/form/Input';
-import { COURSE_TYPES } from '@data/constants';
+import { COURSE_TYPES, INTER_B2B } from '@data/constants';
 import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
@@ -89,6 +89,11 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
+      if (prop === 'type' && event === INTER_B2B) {
+        delete this.newCourse.company;
+        this.update(undefined, 'company');
+      }
+
       this.$emit('update:newCourse', { ...this.newCourse, [prop]: event });
     },
   },

@@ -43,7 +43,7 @@ import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, BLENDED } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
-import { formatAndSortOptions, removeEmptyProps } from '@helpers/utils';
+import { formatAndSortOptions } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -125,10 +125,9 @@ export default {
       try {
         this.$v.newCourse.$touch();
         if (this.$v.newCourse.$error) return NotifyWarning('Champ(s) invalide(s)');
-        const payload = removeEmptyProps(this.newCourse);
 
         this.modalLoading = true;
-        await Courses.create(omit(payload, 'program'));
+        await Courses.create(omit(this.newCourse, 'program'));
 
         this.courseCreationModal = false;
         NotifyPositive('Formation créée.');
