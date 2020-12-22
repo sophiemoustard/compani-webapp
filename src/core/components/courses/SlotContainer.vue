@@ -41,7 +41,7 @@
     </div>
 
     <!-- Course slot creation modal -->
-    <slot-creation-modal v-model="creationModal" :new-course-slot="newCourseSlot" :validations="$v.newCourseSlot"
+    <slot-creation-modal v-model="creationModal" :new-course-slot.sync="newCourseSlot" :validations="$v.newCourseSlot"
       :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
 
     <!-- Course slot edition modal -->
