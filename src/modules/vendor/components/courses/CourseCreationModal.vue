@@ -24,6 +24,7 @@
 
 <script>
 import get from 'lodash/get';
+import omit from 'lodash/omit';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
@@ -89,9 +90,7 @@ export default {
       this.$emit('submit');
     },
     updateType (event) {
-      delete this.newCourse.company;
-      this.update(undefined, 'company');
-      this.update(event, 'type');
+      this.$emit('update:newCourse', { ...omit(this.newCourse, 'company'), type: event });
     },
     update (event, prop) {
       this.$emit('update:newCourse', { ...this.newCourse, [prop]: event });
