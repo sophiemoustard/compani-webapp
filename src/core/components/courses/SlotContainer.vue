@@ -45,7 +45,7 @@
       :step-options="stepOptions" :loading="modalLoading" @hide="resetCreationModal" @submit="addCourseSlot" />
 
     <!-- Course slot edition modal -->
-    <slot-edition-modal v-model="editionModal" :edited-course-slot="editedCourseSlot" :step-options="stepOptions"
+    <slot-edition-modal v-model="editionModal" :edited-course-slot.sync="editedCourseSlot" :step-options="stepOptions"
       :validations="$v.editedCourseSlot" @hide="resetEditionModal" :loading="modalLoading" @delete="deleteCourseSlot"
       @submit="updateCourseSlot" />
 </div>
