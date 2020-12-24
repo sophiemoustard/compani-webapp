@@ -57,7 +57,7 @@
 <script>
 import get from 'lodash/get';
 import { mapState } from 'vuex';
-import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import Sms from '@api/Sms';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
@@ -136,7 +136,7 @@ export default {
         + '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
       } else if (this.messageType === 'LA') {
         if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
-          this.userProfile.passwordToken = await Users.createPasswordToken(
+          this.userProfile.passwordToken = await Authentication.createPasswordToken(
             this.userProfile._id,
             { email: this.userProfile.local.email }
           );

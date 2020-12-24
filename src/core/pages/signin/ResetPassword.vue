@@ -22,7 +22,7 @@
 import { sameAs, required, requiredIf } from 'vuelidate/lib/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
-import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { isUserLogged } from '@helpers/alenvi';
 import { passwordMixin } from '@mixins/passwordMixin';
@@ -50,7 +50,7 @@ export default {
       if (isLogged) return next({ path: '/' });
 
       if (to.params.token) {
-        const checkToken = await Users.checkResetPasswordToken(to.params.token);
+        const checkToken = await Authentication.checkPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
         logOutAndRedirectToLogin();
@@ -85,7 +85,7 @@ export default {
     },
     async submit () {
       try {
-        await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true });
+        await Authentication.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true });
 
         NotifyPositive('Mot de passe changé. Connexion en cours...');
         this.timeout = setTimeout(() => this.logIn(), 2000);

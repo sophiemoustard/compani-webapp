@@ -1,10 +1,10 @@
 import { LocalStorage } from 'quasar';
 import router from 'src/router/index';
 import store from 'src/store/index';
-import Users from 'src/core/api/Users';
+import Authentication from 'src/core/api/Authentication';
 
 export const logOutAndRedirectToLogin = async (params) => {
-  await Users.logOut();
+  await Authentication.logOut();
   LocalStorage.clear();
 
   store.dispatch('course/resetCourse');

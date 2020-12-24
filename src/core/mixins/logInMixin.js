@@ -1,5 +1,5 @@
 import { mapGetters, mapState } from 'vuex';
-import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import { WEBAPP } from '../data/constants';
 
 export const logInMixin = {
@@ -12,7 +12,7 @@ export const logInMixin = {
   },
   methods: {
     async logInUser (authenticationPayload) {
-      const auth = await Users.authenticate({ ...authenticationPayload, origin: WEBAPP });
+      const auth = await Authentication.authenticate({ ...authenticationPayload, origin: WEBAPP });
 
       await this.$store.dispatch('main/fetchLoggedUser', auth.user._id);
 

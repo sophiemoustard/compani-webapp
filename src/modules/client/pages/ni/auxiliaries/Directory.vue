@@ -41,6 +41,7 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Roles from '@api/Roles';
 import Sms from '@api/Sms';
 import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/AuxiliaryCreationModal';
@@ -246,7 +247,7 @@ export default {
         return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
       }
 
-      const passwordToken = await Users.createPasswordToken(user._id, { email: user.local.email });
+      const passwordToken = await Authentication.createPasswordToken(user._id, { email: user.local.email });
       await Sms.send({
         tag: HR_SMS,
         recipient: `+33${user.contact.phone.substring(1)}`,
