@@ -8,7 +8,7 @@
       :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage" @blur="blur" ref="dateInput"
       @focus="focus">
       <template #append>
-        <q-icon name="event" class="cursor-pointer" @click="focus">
+        <q-icon name="event" class="cursor-pointer" @click="focus" color="grey-800">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
             <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable" />
           </q-menu>
