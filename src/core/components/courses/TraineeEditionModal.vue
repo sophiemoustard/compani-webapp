@@ -3,13 +3,15 @@
     <template slot="title">
         Éditer un <span class="text-weight-bold">stagiaire</span>
       </template>
-      <ni-input in-modal v-model="editedTrainee.local.email" caption="Email" disable />
-      <ni-input in-modal v-model="editedTrainee.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="editedTrainee.identity.lastname" :error="validations.identity.lastname.$error"
-        caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model.trim="editedTrainee.contact.phone" :error="validations.contact.phone.$error"
+      <ni-input in-modal :value="editedTrainee.local.email" caption="Email" disable />
+      <ni-input in-modal :value="editedTrainee.identity.firstname" @input="update($event, 'identity', 'firstname')"
+        caption="Prénom" />
+      <ni-input in-modal :value="editedTrainee.identity.lastname" @input="update($event, 'identity', 'lastname')"
+        :error="validations.identity.lastname.$error" caption="Nom" @blur="validations.identity.lastname.$touch"
+        required-field />
+      <ni-input in-modal :value="editedTrainee.contact.phone" @input="update($event.trim(), 'contact', 'phone')"
         caption="Téléphone" @blur="validations.contact.phone.$touch"
-        :error-message="phoneNbrError(validations)" />
+        :error-message="phoneNbrError(validations)" :error="validations.contact.phone.$error" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -21,6 +23,7 @@
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import { userMixin } from '@mixins/userMixin';
+import get from 'lodash/get';
 
 export default {
   name: 'TraineeEditionModal',
@@ -44,6 +47,12 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, firstField, secondField) {
+      this.$emit('update:editedTrainee', {
+        ...this.editedTrainee,
+        [firstField]: { ...get(this.editedTrainee, firstField), [secondField]: event },
+      });
     },
   },
 };

@@ -38,8 +38,9 @@
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
     <!-- Trainee edition modal -->
-    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee="editedTrainee" :validations="$v.editedTrainee"
-      @hide="resetTraineeEditionForm" @submit="updateTrainee" :loading="traineeEditionModalLoading" />
+    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee"
+      @hide="resetTraineeEditionForm" @submit="updateTrainee" :loading="traineeEditionModalLoading"
+      :validations="$v.editedTrainee" />
   </div>
 </template>
 
