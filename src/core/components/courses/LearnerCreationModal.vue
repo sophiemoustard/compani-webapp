@@ -3,20 +3,22 @@
     <template slot="title">
         Ajouter un <span class="text-weight-bold">apprenant</span>
       </template>
-      <ni-input :disable="!firstStep" in-modal v-model.trim="newUser.local.email" required-field :last="firstStep"
+      <ni-input in-modal :value="newUser.local.email" @input="update($event.trim(), 'local', 'email')"
         @blur="validations.local.email.$touch" caption="Email" :error-message="emailError(validations)"
-        :error="validations.local.email.$error" />
+        :error="validations.local.email.$error" required-field :last="firstStep" :disable="!firstStep" />
       <template v-if="!firstStep && identityStep">
-        <ni-input in-modal v-model="newUser.identity.firstname" caption="Prénom" />
-        <ni-input in-modal @blur="validations.identity.lastname.$touch" caption="Nom"
-          required-field v-model="newUser.identity.lastname" :error="validations.identity.lastname.$error" />
-        <ni-input in-modal v-model.trim="newUser.contact.phone"
+        <ni-input in-modal :value="newUser.identity.firstname" @input="update($event, 'identity', 'firstname')"
+          caption="Prénom" />
+        <ni-input in-modal :value="newUser.identity.lastname" @input="update($event, 'identity', 'lastname')"
+          required-field @blur="validations.identity.lastname.$touch" caption="Nom"
+          :error="validations.identity.lastname.$error" />
+        <ni-input in-modal :value="newUser.contact.phone" @input="update($event.trim(), 'contact', 'phone')"
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" :last="!companyStep" />
       </template>
-        <ni-select v-if="!firstStep && companyStep" in-modal v-model.trim="newUser.company" required-field
-          caption="Structure" :error="validations.company.$error" :options="companyOptions" :last="companyStep"
-          @blur="validations.company.$touch" />
+        <ni-select v-if="!firstStep && companyStep" in-modal :options="companyOptions" :value="newUser.company"
+          @input="update($event.trim(), 'company')" required-field caption="Structure"
+          @blur="validations.company.$touch" :error="validations.company.$error" :last="companyStep" />
       <template slot="footer">
         <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
           :loading="loading" icon-right="add" @click="nextStep" />
@@ -31,6 +33,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import { userMixin } from '@mixins/userMixin';
+import get from 'lodash/get';
 
 export default {
   name: 'LearnerCreationModal',
@@ -62,6 +65,12 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, firstField, secondField = '') {
+      this.$emit('update:newUser', {
+        ...this.newUser,
+        [firstField]: secondField ? { ...get(this.newUser, firstField), [secondField]: event } : event,
+      });
     },
   },
 };
