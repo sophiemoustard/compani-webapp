@@ -10,8 +10,8 @@
           {{ missingTraineesPhoneHistory.join(', ') }}.
         </template>
       </ni-banner>
-      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" v-model="smsHistory.type" disable />
-      <ni-input in-modal caption="Message" v-model="smsHistory.message" type="textarea" :rows="7" disable />
+      <ni-select in-modal caption="Modèle" :options="messageTypeOptions" :value="smsHistory.type" disable />
+      <ni-input in-modal caption="Message" :value="smsHistory.message" type="textarea" :rows="7" disable />
     </ni-modal>
 </template>
 
