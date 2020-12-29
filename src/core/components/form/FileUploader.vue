@@ -115,7 +115,7 @@ export default {
   /deep/ .q-uploader
     width: 100%
     &--bordered
-      border: 1px solid #d0d0d0
+      border: 1px solid $grey-300
     .q-uploader__list
       display: none
     .q-uploader__header-content

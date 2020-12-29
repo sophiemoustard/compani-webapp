@@ -51,9 +51,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .borders
-    border: 1px solid $grey-300
-
   /deep/ .q-field__append
     .text-negative
       display: none
