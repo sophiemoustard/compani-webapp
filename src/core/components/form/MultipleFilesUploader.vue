@@ -18,7 +18,8 @@
           <div class="col-md-6 col-xs-12" :key="index">
             <div v-if="certificate.driveId" class="justify-between row" style="background: white">
               <div class="doc-thumbnail">
-                <ni-custom-img :image-source="certificate.driveId" :alt="alt" :key="certificate.driveId" />
+                <ni-custom-img :image-source="certificate.driveId" :key="certificate.driveId" drive-storage
+                  :alt="alt" />
               </div>
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem"
