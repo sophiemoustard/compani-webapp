@@ -3,16 +3,16 @@
     <template slot="title">
         Ajouter un <span class="text-weight-bold">apprenant</span>
       </template>
-      <ni-input in-modal :value="newUser.local.email" @input="update($event.trim(), 'local', 'email')"
+      <ni-input in-modal :value="newUser.local.email" @input="update($event.trim(), 'local.email')"
         @blur="validations.local.email.$touch" caption="Email" :error-message="emailError(validations)"
         :error="validations.local.email.$error" required-field :last="firstStep" :disable="!firstStep" />
       <template v-if="!firstStep && identityStep">
-        <ni-input in-modal :value="newUser.identity.firstname" @input="update($event, 'identity', 'firstname')"
+        <ni-input in-modal :value="newUser.identity.firstname" @input="update($event, 'identity.firstname')"
           caption="Prénom" />
-        <ni-input in-modal :value="newUser.identity.lastname" @input="update($event, 'identity', 'lastname')"
+        <ni-input in-modal :value="newUser.identity.lastname" @input="update($event, 'identity.lastname')"
           required-field @blur="validations.identity.lastname.$touch" caption="Nom"
           :error="validations.identity.lastname.$error" />
-        <ni-input in-modal :value="newUser.contact.phone" @input="update($event.trim(), 'contact', 'phone')"
+        <ni-input in-modal :value="newUser.contact.phone" @input="update($event.trim(), 'contact.phone')"
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
           :error-message="phoneNbrError(validations)" :last="!companyStep" />
       </template>
@@ -33,7 +33,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import { userMixin } from '@mixins/userMixin';
-import get from 'lodash/get';
+import set from 'lodash/set';
 
 export default {
   name: 'LearnerCreationModal',
@@ -66,11 +66,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event, firstField, secondField = '') {
-      this.$emit('update:newUser', {
-        ...this.newUser,
-        [firstField]: secondField ? { ...get(this.newUser, firstField), [secondField]: event } : event,
-      });
+    update (event, fields) {
+      this.$emit('update:newUser', set({ ...this.newUser }, fields, event));
     },
   },
 };
