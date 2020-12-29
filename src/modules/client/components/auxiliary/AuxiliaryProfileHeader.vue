@@ -188,7 +188,7 @@ export default {
   .avatar
     width: 59px
     height: 59px
-    border: 1px solid $grey
+    border: 1px solid $grey-400
 
   .send-message-link
     color: $primary

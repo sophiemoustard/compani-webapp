@@ -189,7 +189,7 @@ h6
         width: 30%
         height: 30px
     .flashcard-right
-      background-color: $grey
+      background-color: $grey-400
     .flashcard-left
       background-color: $grey-300
 

@@ -417,7 +417,7 @@ export default {
     &:nth-child(2)
       color: $secondary
     &:nth-child(3)
-      color: $grey
+      color: $grey-400
   &-value
     font-size: 48px
     @media screen and (max-width: 767px)

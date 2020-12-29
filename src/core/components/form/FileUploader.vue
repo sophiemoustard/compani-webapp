@@ -123,7 +123,7 @@ export default {
       height: 38px
       margin: 0
       .q-btn__content
-        color: $grey
+        color: $grey-400
     .q-btn
       margin: 0
       padding: 0

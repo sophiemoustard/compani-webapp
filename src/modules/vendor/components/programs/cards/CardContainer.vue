@@ -184,7 +184,7 @@ export default {
   display: flex
   flex-direction: column
 .locked-unselected
-  color: $grey
+  color: $grey-400
 
 .card-cell
   background-color: $primary-light

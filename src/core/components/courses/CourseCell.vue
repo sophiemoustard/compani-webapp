@@ -160,7 +160,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     font-size: 12px;
-    color: $grey;
+    color: $grey-400;
   .item-section-container
     display: flex;
   .q-item__section--side
