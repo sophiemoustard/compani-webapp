@@ -1,8 +1,15 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" :data="data" :columns="columns" :row-key="rowKey" flat :pagination="pagination"
-      :hide-bottom="(!!data.length && pagination.rowsPerPage === 0) || hideBottom" :rows-per-page-options="[]"
-      :visible-columns="formattedVisibleColumns" v-on="$listeners" :class="[{'table-simple': responsive }]">
+    <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
+      class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey"
+      :selected="selected" :visible-columns="formattedVisibleColumns" v-on="$listeners" :hide-bottom="hideBottom">
+      <template #header="props">
+        <slot name="header" :props="props">
+          <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style">{{ col.label }}</q-th>
+          </q-tr>
+        </slot>
+      </template>
       <template v-if="$scopedSlots['top-row']" #top-row="props">
         <slot name="top-row" :props="props" />
       </template>
@@ -15,6 +22,9 @@
             </q-td>
           </q-tr>
         </slot>
+      </template>
+      <template #bottom="props">
+        <ni-pagination :props="props" :pagination.sync="pagination" :data="data" />
       </template>
       <template #bottom-row="props">
         <slot name="bottom-row" :props="props" />
@@ -33,17 +43,24 @@
 </template>
 
 <script>
+import Pagination from '@components/table/Pagination';
+
 export default {
   name: 'SimpleTable',
   props: {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
+    pagination: { type: Object, default: () => ({ page: 1, rowsPerPage: 15 }) },
+    loading: { type: Boolean, default: false },
     rowKey: { type: String, default: 'name' },
     visibleColumns: { type: Array, default: () => [] },
-    pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
-    loading: { type: Boolean, default: false },
-    responsive: { type: Boolean, default: true },
+    selection: { type: String, default: 'none' },
+    selected: { type: Array, default: () => [] },
+    separator: { type: String, default: 'horizontal' },
     hideBottom: { type: Boolean, default: false },
+  },
+  components: {
+    'ni-pagination': Pagination,
   },
   computed: {
     formattedVisibleColumns () {

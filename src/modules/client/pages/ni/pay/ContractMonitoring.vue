@@ -7,7 +7,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="versionsList" :columns="columns" :pagination.sync="pagination" row-key="name"
+    <ni-simple-table :data="versionsList" :columns="columns" :pagination.sync="pagination" row-key="name"
       :loading="contractsLoading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -25,7 +25,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
 
     <!-- Edition modal -->
     <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
@@ -39,7 +39,7 @@ import get from 'lodash/get';
 import Contracts from '@api/Contracts';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin';
@@ -53,7 +53,7 @@ export default {
     'ni-date-range': DateRange,
     'ni-title-header': TitleHeader,
     'version-edition-modal': VersionEditionModal,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {

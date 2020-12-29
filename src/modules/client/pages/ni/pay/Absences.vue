@@ -7,7 +7,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="absences" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+    <ni-simple-table :data="absences" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -27,7 +27,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
 
     <!-- Absence edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
@@ -42,7 +42,7 @@ import get from 'lodash/get';
 import Events from '@api/Events';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, formatHours } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -55,7 +55,7 @@ export default {
   metaInfo: { title: 'Absences' },
   components: {
     'ni-date-range': DateRange,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'ni-event-edition-modal': EventEditionModal,
     'ni-title-header': TitleHeader,
   },

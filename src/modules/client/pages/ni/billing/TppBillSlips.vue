@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Bordereaux tiers payeurs" padding />
-    <ni-large-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination" :loading="loading">
+    <ni-simple-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination" :loading="loading">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -15,14 +15,14 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
 import BillSlip from '@api/BillSlips';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { formatPrice } from '@helpers/utils';
@@ -33,7 +33,7 @@ export default {
   name: 'TppBillSlips',
   metaInfo: { title: 'Bordereaux tiers payeurs' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'ni-title-header': TitleHeader,
   },
   data () {

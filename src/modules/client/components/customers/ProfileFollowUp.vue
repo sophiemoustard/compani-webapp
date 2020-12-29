@@ -59,7 +59,7 @@
                 <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{ col.value }}</a>
                 <div v-else>{{ col.value }}</div>
               </template>
-             <template v-else>{{ col.value }}</template>
+             <template :class="col.name" v-else>{{ col.value }}</template>
            </q-td>
           </q-tr>
         </template>
@@ -69,15 +69,13 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
-        :responsive="false" />
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
-        :loading="followUpLoading" :responsive="false">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :loading="followUpLoading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -156,7 +154,6 @@ export default {
           field: row => moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
         },
       ],
-      followUpPagination: { rowsPerPage: 5 },
       fundingsMonitoring: [],
       fundingsLoading: false,
       fundingsMonitoringColumns: [

@@ -27,20 +27,12 @@ export default {
     props: { type: Object, default: () => ({}) },
     data: { type: Array, default: () => [] },
     pagination: { type: Object, default: () => ({}) },
-  },
-  data () {
-    return {
-      rowsPerPageOptions: [
-        { label: '15', value: 15 },
-        { label: '50', value: 50 },
-        { label: '100', value: 100 },
-        { label: '200', value: 200 },
-        { label: '300', value: 300 },
-        { label: 'Tous', value: 0 },
-      ],
-    };
+    options: { type: Array, default: () => [15, 50, 100, 200, 300] },
   },
   computed: {
+    rowsPerPageOptions () {
+      return [...this.options.map(o => ({ label: o, value: o })), { label: 'Tous', value: 0 }];
+    },
     firstRowIndex () {
       const { page, rowsPerPage } = this.pagination;
       return (page - 1) * rowsPerPage;
