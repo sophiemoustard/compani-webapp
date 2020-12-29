@@ -2,7 +2,7 @@
 <browserconfig>
     <msapplication>
         <tile>
-            <square150x150logo src="https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon/mstile-150x150.png?v=A0mxgJvdbx"/>
+            <square150x150logo src="https://storage.googleapis.com/compani-main/mstile-150x150.png"/>
             <TileColor>#ffffff</TileColor>
         </tile>
     </msapplication>

@@ -61,10 +61,8 @@ export default {
     },
     interfaceLogo () {
       return this.interfaceType === CLIENT
-        ? 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon'
-          + '/favicon_bordeaux-32x32.png'
-        : 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/favicon'
-          + '/favicon-32x32.png';
+        ? 'https://storage.googleapis.com/compani-main/favicon_bordeaux-32x32.png'
+        : 'https://storage.googleapis.com/compani-main/favicon-32x32.png';
     },
     accessBothInterface () {
       return this.clientRole && this.vendorRole;
