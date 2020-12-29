@@ -40,7 +40,7 @@
             :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
             :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
             :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)"
-            :extensions="extensions" />
+            :extensions="extensions" drive-storage />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" v-model="newEvent.internalHour"

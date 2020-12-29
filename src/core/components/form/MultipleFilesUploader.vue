@@ -6,7 +6,7 @@
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
             :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"
-            :extensions="extensions" />
+            :extensions="extensions" drive-storage />
         </div>
       </div>
     </template>
@@ -39,7 +39,7 @@
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
             :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"
-            :extensions="extensions" />
+            :extensions="extensions" drive-storage />
         </q-expansion-item>
       </div>
     </template>
