@@ -24,7 +24,7 @@ export default {
 
     return {
       interfaceType,
-      backgroundClass: interfaceType === CLIENT ? 'bg-grey-300' : 'beige-background',
+      backgroundClass: interfaceType === CLIENT ? 'bg-grey-300' : 'bg-peach-200',
     };
   },
   computed: {

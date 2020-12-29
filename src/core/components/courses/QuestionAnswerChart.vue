@@ -2,7 +2,7 @@
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
-    <div v-for="(line, index) in lines" :key="index" class="q-mt-sm bar-container">
+    <div v-for="(line, index) in lines" :key="index" class="q-mt-sm text-peach-200 bg-peach-200">
       <div class="q-mr-sm percentage">{{ formatPercentage(line.percentage) }}</div>
       <q-linear-progress size="40px" :value="line.percentage" rounded class="bar">
         <div class="bar-label">
@@ -58,10 +58,6 @@ export default {
 .bar-container
   display: flex
   align-items: center
-
-.bar
-  color: $middle-beige
-  background-color: $neutral-beige
 
 /deep/ .q-linear-progress__track
   opacity: 0

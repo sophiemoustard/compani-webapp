@@ -168,7 +168,7 @@ export default {
   &-selected
     justify-content: flex-end
     .card-cell
-      background-color: $light-purple
+      background-color: $pink-400
   &-locked
     .card-cell
       background-color: $grey-100
@@ -187,7 +187,7 @@ export default {
   color: $grey-400
 
 .card-cell
-  background-color: $primary-light
+  background-color: $pink-100
   border-radius: 4px
   height: fit-content
   @media screen and (min-width: 768px)

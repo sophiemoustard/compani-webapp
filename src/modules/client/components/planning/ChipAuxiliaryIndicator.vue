@@ -160,7 +160,7 @@ export default {
   .highlight:hover
     .avatar
     .q-chip
-      box-shadow: 0 0 1px 1px $primary-dark
+      box-shadow: 0 0 1px 1px $pink-800
   .q-chip
     cursor: pointer
   .q-tab-panel

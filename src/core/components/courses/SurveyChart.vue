@@ -5,8 +5,8 @@
     <div class="chart">
       <div class="bar-container">
         <div v-for="(line, index) in lines" :key="index">
-          <div class="bar">
-            <div class="bar-fill" :style="`height: ${line.percentage * 100}%`" />
+          <div class="bar bg-peach-200">
+            <div class="bar-fill bg-peach-200" :style="`height: ${line.percentage * 100}%`" />
             <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
           </div>
           <div class="percentage">{{ formatPercentage(line.percentage) }}</div>
@@ -75,7 +75,6 @@ export default {
 .bar
   position: relative
   border-radius: 8px
-  background-color: $neutral-beige
   width: 56px
   height: 160px
   @media screen and (max-width: 420px)
@@ -99,7 +98,6 @@ export default {
   position: absolute
   border-radius: 8px
   bottom: 0px
-  background-color: $middle-beige
   width: 100%
 
 .bar-label
