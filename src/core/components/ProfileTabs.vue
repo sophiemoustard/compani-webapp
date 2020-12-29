@@ -44,7 +44,7 @@ export default {
       & > .q-tab__indicator
         color: $primary
     /deep/.q-tab__indicator
-      color: $middle-grey
+      color: $grey-300
       opacity: 1
     & /deep/.q-tab-panels
       background-color: inherit
@@ -73,7 +73,7 @@ export default {
             max-width: 33%
           & .q-tab__content
             & .q-tab__label
-              color: $dark-grey
+              color: $grey-800
               font-size: 24px
             & .q-tab__alert
               background: $secondary

@@ -136,12 +136,12 @@ export default {
   .agenda-table
     th
       @media screen and (min-width: 768px)
-        top: 85px;
+        top: 85px
       @media screen and (max-width: 767px)
-        top: 100px;
+        top: 100px
     td
-      padding: 0px;
-      height: 100%;
+      padding: 0px
+      height: 100%
 
       .planning-background
         background: repeating-linear-gradient(
@@ -151,47 +151,47 @@ export default {
           $neutral-grey,
           $neutral-grey 13.3%
         )
-        height: 100%;
-        position: relative;
-        margin-top: 2px;
-        display: list-item;
-        list-style: none;
+        height: 100%
+        position: relative
+        margin-top: 2px
+        display: list-item
+        list-style: none
 
       .event
-        position: absolute;
-        left: 3px;
-        right: 3px;
-        margin: 0;
-        border: 1px solid $white;
-        overflow: hidden;
-        padding-top: 0;
-        padding-bottom: 0;
+        position: absolute
+        left: 3px
+        right: 3px
+        margin: 0
+        border: 1px solid $white
+        overflow: hidden
+        padding-top: 0
+        padding-bottom: 0
         &-container
-          height: auto;
+          height: auto
 
       .planning-hour
-        position: absolute;
-        color: $middle-grey;
-        background-color: $white;
-        font-size: 12px;
+        position: absolute
+        color: $grey-300
+        background-color: $white
+        font-size: 12px
         padding: 0 5px
 
       .event-number
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        border: 1px solid $primary;
-        text-align: center;
-        background-color: white;
-        position: absolute;
-        bottom: 0;
-        right: 0;
+        border-radius: 50%
+        width: 16px
+        height: 16px
+        border: 1px solid $primary
+        text-align: center
+        background-color: white
+        position: absolute
+        bottom: 0
+        right: 0
         &-label
-          line-height: 1;
-          color: $primary;
-          font-size: 14px;
+          line-height: 1
+          color: $primary
+          font-size: 14px
 
 thead
-  vertical-align: baseline;
+  vertical-align: baseline
 
 </style>

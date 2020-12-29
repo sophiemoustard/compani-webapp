@@ -175,7 +175,7 @@ export default {
   &-locked-selected
     justify-content: flex-end
     .card-cell
-      background-color: $dark-grey
+      background-color: $grey-800
       color: $white
   .dot
     margin: 0 0 0 3px

@@ -370,25 +370,25 @@ export default {
   font-style: italic
 
 .auxiliary
-  border-top: 1px solid $middle-grey
-  border-left: 1px solid $middle-grey
-  border-right: 1px solid $middle-grey
+  border-top: 1px solid $grey-300
+  border-left: 1px solid $grey-300
+  border-right: 1px solid $grey-300
   &:nth-child(2)
-    border-bottom: 1px solid $middle-grey
+    border-bottom: 1px solid $grey-300
   div
     padding: 5px
   &-cell
     display: flex
     flex-direction: column
     &:not(:nth-last-child(-n+2))
-      border-bottom: 1px solid $middle-grey
+      border-bottom: 1px solid $grey-300
     &-container
       margin: 0 16px
       @media screen and (max-width: 767px)
         margin: 0 8px
 
 .auxiliary-label
-  border-right: 1px solid $middle-grey
+  border-right: 1px solid $grey-300
 
 .auxiliary-value
   justify-content: flex-end
@@ -427,9 +427,9 @@ export default {
     text-align: center
 
 .spinner-container
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
+  display: flex
+  justify-content: center
+  margin-bottom: 10px
 
 .gauge-wrapper
   display: flex
@@ -444,6 +444,6 @@ export default {
   height: 100px
 
 .person-name
-  font-size: 14px !important;
+  font-size: 14px !important
 
 </style>

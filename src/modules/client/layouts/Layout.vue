@@ -78,7 +78,7 @@ export default {
 
   .chevron
     background-color: white
-    border: 1px solid $middle-grey
+    border: 1px solid $grey-300
     top: 5px
     position: fixed
     z-index: 5000
@@ -93,10 +93,10 @@ export default {
     color: $primary
 
   .q-btn
-    color: $dark-grey
+    color: $grey-800
     &:hover
       color: $primary
 
   .menu-icon
-    font-size: 17px;
+    font-size: 17px
 </style>

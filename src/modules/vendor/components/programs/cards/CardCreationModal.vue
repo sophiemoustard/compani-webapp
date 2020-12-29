@@ -161,7 +161,7 @@ h6
 
 .card-button
   background-color: $light-grey
-  color: $dark-grey
+  color: $grey-800
   border-radius: 10px
   font-size: 14px
   height: 120px
@@ -191,7 +191,7 @@ h6
     .flashcard-right
       background-color: $grey
     .flashcard-left
-      background-color: $middle-grey
+      background-color: $grey-300
 
   .fill-the-gaps
     font-size: 10px

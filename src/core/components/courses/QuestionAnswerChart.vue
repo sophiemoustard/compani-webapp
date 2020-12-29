@@ -48,7 +48,7 @@ export default {
   padding: 16px 32px
 
 .subtitle
-  color: $dark-grey
+  color: $grey-800
   font-size: 14px
 
 .percentage

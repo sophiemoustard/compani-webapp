@@ -74,14 +74,14 @@ export default {
 
 <style lang="stylus" scoped>
   .surcharge-line
-    display: flex;
-    flex-direction: row;
+    display: flex
+    flex-direction: row
     width: 100%;
-    border: 1px solid $middle-grey;
+    border: 1px solid $grey-300
     &:not(:nth-child(2)) // first-child is title
-      border-top: none;
+      border-top: none
 
   .surcharge-type
     width: 60%
-    border-right: 1px solid $middle-grey;
+    border-right: 1px solid $grey-300
 </style>
