@@ -1,5 +1,5 @@
 import { Cookies } from 'quasar';
-import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import store from 'src/store/index';
 
 export const canNavigate = async () => {
@@ -12,7 +12,7 @@ export const canNavigate = async () => {
 
 export const refreshAlenviCookies = async () => {
   try {
-    await Users.refreshToken();
+    await Authentication.refreshToken();
     return true;
   } catch (e) {
     console.error(e);
@@ -28,6 +28,6 @@ export const isUserLogged = async () => {
   const loggedUser = store.getters['main/getLoggedUser'];
   if (loggedUser) return true;
 
-  await Users.logOut();
+  await Authentication.logOut();
   return false;
 };
