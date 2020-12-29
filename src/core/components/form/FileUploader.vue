@@ -6,7 +6,7 @@
     </div>
     <div v-if="document && imageSource" class="row justify-between" style="background: white">
       <div class="doc-thumbnail">
-        <ni-custom-img :image-source="imageSource" :alt="alt" />
+        <ni-custom-img :image-source="imageSource" :alt="alt" :drive-storage="driveStorage" />
       </div>
       <div class="self-end doc-delete">
         <q-btn color="primary" round flat icon="delete" size="1rem" :disable="disable" @click.native="deleteDocument" />
@@ -50,20 +50,20 @@ export default {
     requiredField: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
     label: { type: String, default: 'Pas de document' },
-    cloudinaryStorage: { type: Boolean, default: false },
+    driveStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
   },
   computed: {
     additionalFields () {
       const fields = [{ name: 'fileName', value: removeDiacritics(this.additionalValue) }];
-      if (!this.cloudinaryStorage) fields.push({ name: 'type', value: this.name });
+      if (this.driveStorage) fields.push({ name: 'type', value: this.name });
       return fields;
     },
     document () {
       return get(this.entity, this.path);
     },
     imageSource () {
-      return this.cloudinaryStorage ? this.document.link : this.document.driveId;
+      return this.driveStorage ? this.document.driveId : this.document.link;
     },
   },
   methods: {
@@ -80,7 +80,7 @@ export default {
       this.$emit('uploaded', { file, xhr });
     },
     goToUrl (url) {
-      if (!this.cloudinaryStorage) url = `${url}?usp=sharing`;
+      if (this.driveStorage) url = `${url}?usp=sharing`;
       openURL(url);
     },
     failMsg () {

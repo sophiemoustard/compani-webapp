@@ -12,7 +12,7 @@ export default {
   props: {
     imageSource: { type: String, required: true },
     alt: { type: String, required: true },
-    cloudinaryStorage: { type: Boolean, default: false },
+    driveStorage: { type: Boolean, default: false },
   },
   data () {
     return {
@@ -28,7 +28,7 @@ export default {
   methods: {
     async getThumbnailUrl () {
       try {
-        if (!this.cloudinaryStorage) {
+        if (this.driveStorage) {
           const file = await gdrive.getFileById({ id: this.imageSource });
           this.link = file.data.data.file.thumbnailLink;
         } else this.link = this.imageSource;
