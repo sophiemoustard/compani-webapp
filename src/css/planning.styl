@@ -6,19 +6,19 @@
   margin-top: 6px
   &-container
     overflow: hidden
-    height: 100%;
-    width: stretch;
-    position: relative;
+    height: 100%
+    width: stretch
+    position: relative
   &-title
     font-size: 0.875rem
     font-weight: 600
   &-subtitle
-    display: flex;
-    flex-direction: row;
+    display: flex
+    flex-direction: row
     width: 100%
-    justify-content: space-between;
+    justify-content: space-between
     font-size: 0.6875rem
-    color: $dark-grey
+    color: $grey-800
   &-billed
     position: absolute;
     right: 0;
@@ -29,12 +29,12 @@
   &-internal_hour
     background: $light-purple
   &-absence
-    background: $neutral-grey
+    background: $grey-100
   &-unavailability
     background: repeating-linear-gradient(
       45deg,
-      $neutral-grey,
-      $neutral-grey 3px,
+      $grey-100,
+      $grey-100 3px,
       $white 3px,
       $white 7px
     )
@@ -55,15 +55,15 @@
   border-style: hidden;
 
   td
-    border-left: 1px solid $middle-grey;
-    border-right: 1px solid $middle-grey;
+    border-left: 1px solid $grey-300
+    border-right: 1px solid $grey-300
     padding: 0px 5px 5px 5px;
   tr:not(:first-child)
     td:before
       content: '';
       display: block;
       width: 98%;
-      border-bottom: 1px solid $middle-grey;
+      border-bottom: 1px solid $grey-300
 
   .days
     &-header
@@ -74,7 +74,7 @@
         align-items: center;
     &-name
       font-size: 1.125rem
-      color: $grey
+      color: $grey-400
     &-number
       font-size: 1.5rem
       font-weight: 600
@@ -92,115 +92,115 @@
     background: white;
     padding: 0 5px;
     th
-      background-color: white;
-      position: -webkit-sticky;
-      position: sticky;
-      z-index: 10;
+      background-color: white
+      position: -webkit-sticky
+      position: sticky
+      z-index: 10
       &:not(:first-child):before
-        content: '';
-        position: absolute;
+        content: ''
+        position: absolute
         left: 0;
         bottom: 0;
         top: 6px;
-        border-right: 1px solid $middle-grey;
+        border-right: 1px solid $grey-300;
     .bottom-border
       &:after
-        content: '';
-        position: absolute;
-        left: 6px;
-        right: 6px;
-        bottom: 0;
-        border-bottom: 1px solid $middle-grey;
+        content: ''
+        position: absolute
+        left: 6px
+        right: 6px
+        bottom: 0
+        border-bottom: 1px solid $grey-300;
   &-header
-    font-size: 1.2em;
-    position: -webkit-sticky;
-    position: sticky;
-    background-color: #eee;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    padding: 20px 20px 15px;
-    z-index: 10;
+    font-size: 1.2em
+    position: -webkit-sticky
+    position: sticky
+    background-color: $grey-100
+    top: 0
+    left: 0
+    right: 0
+    width: 100%
+    padding: 20px 20px 15px
+    z-index: 10
     @media screen and (max-width: 767px)
-      padding: 15px 10px 10px;
+      padding: 15px 10px 10px
   &-month
-    display: flex;
+    display: flex
     @media screen and (min-width: 768px)
-      justify-content: center;
+      justify-content: center
     @media screen and (max-width: 767px)
-      width: 60%;
+      width: 60%
     .q-icon
-      font-size: 0.8em;
-      margin: 5px;
+      font-size: 0.8em
+      margin: 5px
   &-search
-    display: flex;
-    align-items: center;
+    display: flex
+    align-items: center
     @media screen and (max-width: 767px)
-      margin-bottom: 10px;
+      margin-bottom: 10px
   &-actions
     display: flex
     justify-content: center
   &-navigation-actions
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
+    display: flex
+    align-items: center
+    flex-wrap: nowrap
     @media screen and (min-width: 768px)
       .q-btn
         margin: 0 5px
     @media screen and (max-width: 767px)
-      justify-content: space-around;
+      justify-content: space-around
       .q-btn
         width: 30px
     div:first-child
       flex-grow: 1
   &-view
-    padding: 4px;
+    padding: 4px
   &-hour
-    position: absolute;
-    color: $middle-grey;
-    font-size: 12px;
-    bottom: -3px;
+    position: absolute
+    color: $grey-300
+    font-size: 12px
+    bottom: -3px
 
 .person-name
   display: flex
   flex-direction: row
   align-items: center
-  font-weight: 600;
-  font-size: 14px;
+  font-weight: 600
+  font-size: 14px
   @media (min-width: 421px) and (max-width: 1023px)
-    font-size: 12px;
+    font-size: 12px
   @media (max-width: 420px)
-    font-size: 10px;
-  
+    font-size: 10px
+
 .customer-info
   .q-icon
-    display: none;
+    display: none
   .q-btn
-    margin-left: auto;
+    margin-left: auto
     .q-icon
-      display: flex !important;
+      display: flex !important
 
 .customer
   &-info
-    background: $middle-grey;
-    padding: 5px 25px;
+    background: $grey-300
+    padding: 5px 25px
     & .q-if-inverted
-      background: $middle-grey !important;
-      border: none;
+      background: $grey-300 !important
+      border: none
   &-address
     margin-right: 6px
 
 .person-inner-cell
-    margin-top: 4px;
+    margin-top: 4px
 
 .holiday
-  background-color: $primary;
-  color: $white;
-  font-size: 12px;
-  border-radius: 5px;
-  width: 20px;
-  margin-top: 10px;
+  background-color: $primary
+  color: $white
+  font-size: 12px
+  border-radius: 5px
+  width: 20px
+  margin-top: 10px
   @media (min-width: 768px)
-    margin-top: 0px;
-    margin-left: 10px;
+    margin-top: 0px
+    margin-left: 10px

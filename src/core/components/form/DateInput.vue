@@ -8,7 +8,7 @@
       :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage" @blur="blur" ref="dateInput"
       @focus="focus">
       <template #append>
-        <q-icon name="event" class="cursor-pointer" @click="focus">
+        <q-icon name="event" class="cursor-pointer" @click="focus" color="grey-600">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
             <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable" />
           </q-menu>
@@ -81,7 +81,7 @@ export default {
 <style lang="stylus" scoped>
   .borders
     /deep/ .q-field__control
-      border: 1px solid $middle-grey
+      border: 1px solid $grey-300
 
   .q-input
     /deep/ .q-field__control

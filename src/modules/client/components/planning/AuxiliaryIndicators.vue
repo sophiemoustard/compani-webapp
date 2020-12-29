@@ -95,23 +95,23 @@ export default {
 
 <style lang="stylus" scoped>
   .indicators-container
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    flex-grow: 1
+    display: flex
+    flex-direction: column
+    justify-content: space-between
 
   .indicator
     display: flex;
-    border-top: 1px solid $middle-grey
-    border-left: 1px solid $middle-grey
-    border-right: 1px solid $middle-grey
+    border-top: 1px solid $grey-300
+    border-left: 1px solid $grey-300
+    border-right: 1px solid $grey-300
     .indicator-title
       padding: 5px
     .indicator-hours
       padding: 5px
-      border-left:  1px solid $middle-grey
+      border-left:  1px solid $grey-300
     &:last-child
-      border-bottom: 1px solid $middle-grey
+      border-bottom: 1px solid $grey-300
 
   .highlight
     color: $primary
@@ -129,6 +129,6 @@ export default {
     border-left: 5px solid $primary !important
 
   .quality-indicators-item
-    border-top: 1px solid $middle-grey
+    border-top: 1px solid $grey-300
     padding: 10px 0
 </style>

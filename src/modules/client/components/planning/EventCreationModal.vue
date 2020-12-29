@@ -197,14 +197,14 @@ export default {
   /deep/ .q-btn-toggle
     width: 100%
     @media screen and (max-width: 767px)
-      display: inline-flex;
-      flex-wrap: wrap;
+      display: inline-flex
+      flex-wrap: wrap
     & .q-btn-item
-      width: 24%;
-      border-radius: 20px;
-      margin: 5px;
-      background-color: $middle-grey;
+      width: 24%
+      border-radius: 20px
+      margin: 5px
+      background-color: $grey-300
       @media screen and (max-width: 767px)
-        width: 45%;
+        width: 45%
 
 </style>

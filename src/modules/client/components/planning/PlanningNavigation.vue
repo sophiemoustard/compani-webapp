@@ -9,7 +9,7 @@
       <div data-cy="week-number" class="week-number"><span>{{ weekNumber }}</span></div>
     </div>
     <div class="planning-navigation-actions col-6">
-      <div>
+      <div class="text-grey-800">
         <q-btn data-cy="planning_before" icon="chevron_left" dense flat round @click="goToPreviousWeek()" />
         <q-btn data-cy="planning_after" icon="chevron_right" dense flat round @click="goToNextWeek()" />
         <q-btn data-cy="planning_today" icon="today" dense flat round @click="goToToday" />

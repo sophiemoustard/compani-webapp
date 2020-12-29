@@ -87,19 +87,19 @@ export default {
 
 <style lang="stylus" scoped>
   .modal-subtitle
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
+    display: flex
+    justify-content: space-between
+    margin-bottom: 16px
     .q-btn-toggle
-      margin-bottom: 0;
-      cursor: default;
-      width: 100%;
+      margin-bottom: 0
+      cursor: default
+      width: 100%
     & /deep/ .q-btn-toggle
-      border: none;
-      box-shadow: none;
+      border: none
+      box-shadow: none
       & .q-btn-item
         width: 50%
-        border-radius: 20px;
-        margin: 5px;
-        background-color: $middle-grey;
+        border-radius: 20px
+        margin: 5px
+        background-color: $grey-300
 </style>

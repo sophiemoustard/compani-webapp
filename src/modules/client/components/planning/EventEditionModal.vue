@@ -200,7 +200,7 @@ export default {
         width: 100%
 
   .light-checkbox
-    color: $grey
+    color: $grey-400
     font-size: 14px
 
 </style>

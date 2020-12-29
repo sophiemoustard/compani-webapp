@@ -171,11 +171,11 @@ export default {
       background-color: $light-purple
   &-locked
     .card-cell
-      background-color: $light-grey
+      background-color: $grey-100
   &-locked-selected
     justify-content: flex-end
     .card-cell
-      background-color: $dark-grey
+      background-color: $grey-800
       color: $white
   .dot
     margin: 0 0 0 3px
@@ -184,7 +184,7 @@ export default {
   display: flex
   flex-direction: column
 .locked-unselected
-  color: $grey
+  color: $grey-400
 
 .card-cell
   background-color: $primary-light

@@ -331,7 +331,7 @@ export default {
       .line
         width: 1px;
         height: 100%;
-        background: $neutral-grey;
+        background: $grey-100;
         margin: 0;
         position: absolute;
         z-index: -1;
