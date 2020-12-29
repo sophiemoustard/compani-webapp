@@ -4,8 +4,8 @@
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name" :extensions="extensions"
-            :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document" drive-storage />
+            :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption" :multiple="true"
+            :additional-value="additionalFieldsName" label="Choisir un document" :drive-storage="driveStorage" />
         </div>
       </div>
     </template>
@@ -18,8 +18,8 @@
           <div class="col-md-6 col-xs-12" :key="index">
             <div v-if="certificate.driveId" class="justify-between row" style="background: white">
               <div class="doc-thumbnail">
-                <ni-custom-img :image-source="certificate.driveId" :key="certificate.driveId" drive-storage
-                  :alt="alt" />
+                <ni-custom-img :image-source="certificate.driveId" :key="certificate.driveId" :alt="alt"
+                  :drive-storage="driveStorage" />
               </div>
               <div class="self-end doc-delete">
                 <q-btn color="primary" round flat icon="delete" size="1rem"
@@ -37,8 +37,8 @@
         <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
           class="col-md-6 col-xs-12">
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name" :extensions="extensions"
-            :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document" drive-storage />
+            :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption" :multiple="true"
+            :additional-value="additionalFieldsName" label="Choisir un document" :drive-storage="driveStorage" />
         </q-expansion-item>
       </div>
     </template>
@@ -69,6 +69,7 @@ export default {
     userProfile: { type: Object, default: () => ({}) },
     collapsibleLabel: { type: String, default: '' },
     extensions: { type: String, default: '' },
+    driveStorage: { type: Boolean, default: false },
   },
   data () {
     return {
