@@ -20,7 +20,7 @@
         <slot name="bottom-row" :props="props" />
       </template>
       <template #no-data>
-        <div v-show="!loading" class="full-width row q-gutter-sm grey-text">
+        <div v-show="!loading" class="full-width row q-gutter-sm text-grey-800">
           <span>Pas de données disponibles</span>
         </div>
       </template>
