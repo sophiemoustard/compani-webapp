@@ -3,10 +3,9 @@
     <template v-if="documents.length === 0">
       <div class="row gutter-profile">
         <div class="col-xs-12 col-md-6">
-          <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
+          <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name" :extensions="extensions"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"
-            :extensions="extensions" drive-storage />
+            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document" drive-storage />
         </div>
       </div>
     </template>
@@ -36,10 +35,9 @@
       <div class="row gutter-profile">
         <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
           class="col-md-6 col-xs-12">
-          <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name"
+          <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name" :extensions="extensions"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption"
-            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document"
-            :extensions="extensions" drive-storage />
+            :additional-value="additionalFieldsName" :multiple="true" label="Choisir un document" drive-storage />
         </q-expansion-item>
       </div>
     </template>
