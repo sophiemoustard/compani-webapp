@@ -171,7 +171,7 @@ export default {
       background-color: $light-purple
   &-locked
     .card-cell
-      background-color: $light-grey
+      background-color: $grey-100
   &-locked-selected
     justify-content: flex-end
     .card-cell
