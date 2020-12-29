@@ -73,8 +73,8 @@
     </div>
 
     <!-- Modal envoi message -->
-    <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
-      :new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :loading="loading" @hide="resetSmsModal" />
+    <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
+      :new-sms.sync="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"

@@ -8,7 +8,7 @@
       @click="trainerCreationModal = true" :disable="tableLoading" />
 
     <trainer-creation-modal v-model="trainerCreationModal" @hide="resetCreationModal" @submit="createTrainer"
-      :new-trainer="newTrainer" :validations="$v.newTrainer" :loading="modalLoading" @go-to-next-step="nextStep"
+      :new-trainer.sync="newTrainer" :validations="$v.newTrainer" :loading="modalLoading" @go-to-next-step="nextStep"
       :email-error="emailError($v.newTrainer)" :first-step="firstStep" />
 </q-page>
 </template>
