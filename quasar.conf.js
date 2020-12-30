@@ -5,8 +5,6 @@ const webpack = require('webpack');
 module.exports = function (ctx) {
   return {
     boot: [
-      'axios',
-      'alenviAxios',
       'vue-croppa',
       'vuelidate',
       'vueclipboard',
