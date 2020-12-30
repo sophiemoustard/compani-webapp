@@ -29,6 +29,7 @@ import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative } from '@components/popup/notify';
 import LargeTable from '@components/table/LargeTable';
+import moment from '@helpers/moment';
 
 export default {
   name: 'DebitArchive',
@@ -47,7 +48,7 @@ export default {
           label: 'Date de création',
           align: 'left',
           field: 'createdTime',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         { name: 'download', label: '', align: 'left', field: 'webViewLink' },
       ],

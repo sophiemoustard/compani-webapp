@@ -14,11 +14,12 @@
 <script>
 import Exports from '@api/Exports';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { downloadFile } from '@helpers/file';
 import Select from '@components/form/Select';
 import DateRange from '@components/form/DateRange';
-import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import { EXPORT_HISTORY_TYPES, WORKING_EVENT } from '@data/constants';
+import { minDate, maxDate } from '@helpers/vuelidateCustomVal';
+import { downloadFile } from '@helpers/file';
+import moment from '@helpers/moment';
 
 export default {
   name: 'History',
@@ -32,11 +33,11 @@ export default {
       exportTypeOptions: EXPORT_HISTORY_TYPES,
       type: WORKING_EVENT,
       dateRange: {
-        startDate: this.$moment().startOf('M').toISOString(),
-        endDate: this.$moment().endOf('M').toISOString(),
+        startDate: moment().startOf('M').toISOString(),
+        endDate: moment().endOf('M').toISOString(),
       },
-      min: this.$moment().endOf('M').subtract(1, 'year').toISOString(),
-      max: this.$moment().startOf('M').add(1, 'year').toISOString(),
+      min: moment().endOf('M').subtract(1, 'year').toISOString(),
+      max: moment().startOf('M').add(1, 'year').toISOString(),
       loading: false,
     };
   },
@@ -55,8 +56,8 @@ export default {
   },
   methods: {
     input (date) {
-      this.min = this.$moment(date.endDate).subtract(1, 'year').add(1, 'day').toISOString();
-      this.max = this.$moment(date.startDate).add(1, 'year').subtract(1, 'day').toISOString();
+      this.min = moment(date.endDate).subtract(1, 'year').add(1, 'day').toISOString();
+      this.max = moment(date.startDate).add(1, 'year').subtract(1, 'day').toISOString();
     },
     async exportCsv () {
       try {

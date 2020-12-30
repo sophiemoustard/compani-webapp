@@ -26,6 +26,7 @@
 
 <script>
 import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'NiTimeInput',
@@ -46,9 +47,9 @@ export default {
   },
   computed: {
     hoursOptions () {
-      const range = this.$moment.range(
-        this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
-        this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
+      const range = moment.range(
+        moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
+        moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
       );
 
       return Array.from(range.by('hours')).reduce(
@@ -56,13 +57,13 @@ export default {
           acc.push({
             label: hour.format('HH:mm'),
             value: hour.format('HH:mm'),
-            disable: this.min !== '' && hour.isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+            disable: this.min !== '' && hour.isSameOrBefore(moment(this.min, 'HH:mm')),
           });
           if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
             acc.push({
               label: hour.minutes(30).format('HH:mm'),
               value: hour.minutes(30).format('HH:mm'),
-              disable: this.min !== '' && hour.minutes(30).isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+              disable: this.min !== '' && hour.minutes(30).isSameOrBefore(moment(this.min, 'HH:mm')),
             });
           }
           return acc;

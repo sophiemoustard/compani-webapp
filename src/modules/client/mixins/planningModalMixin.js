@@ -8,7 +8,6 @@ import NiSelect from '@components/form/Select';
 import NiInput from '@components/form/Input';
 import SearchAddress from '@components/form/SearchAddress';
 import FileUploader from '@components/form/FileUploader';
-import { formatIdentity } from '@helpers/utils';
 import {
   INTERVENTION,
   ABSENCE,
@@ -37,6 +36,8 @@ import {
   SECTOR,
   DOC_EXTENSIONS,
 } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 import PlanningModalHeader from 'src/modules/client/components/planning/PlanningModalHeader';
 
 export const planningModalMixin = {
@@ -119,10 +120,10 @@ export const planningModalMixin = {
     },
     repetitionOptions () {
       const oneWeekRepetitionLabel = this.creationModal
-        ? `Tous les ${this.$moment(this.newEvent.dates.startDate).format('dddd')}s`
+        ? `Tous les ${moment(this.newEvent.dates.startDate).format('dddd')}s`
         : 'Tous les lundis';
       const twoWeeksRepetitionLabel = this.creationModal
-        ? `Le ${this.$moment(this.newEvent.dates.startDate).format('dddd')} une semaine sur deux`
+        ? `Le ${moment(this.newEvent.dates.startDate).format('dddd')} une semaine sur deux`
         : 'Le lundi une semaine sur deux';
 
       return [
@@ -164,8 +165,8 @@ export const planningModalMixin = {
     hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
-      return auxiliary.contracts.some(contract => this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate)));
+      return auxiliary.contracts.some(contract => moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || moment(contract.endDate).isAfter(startDate)));
     },
     customerAddressList (event) {
       const addresses = [];
@@ -224,14 +225,14 @@ export const planningModalMixin = {
         if ([WORK_ACCIDENT, ILLNESS].includes(event.absence)) {
           this.$emit(`update:${eventType}`, {
             ...event,
-            dates: { ...event.dates, endDate: this.$moment(event.dates.endDate).endOf('d').toISOString() },
+            dates: { ...event.dates, endDate: moment(event.dates.endDate).endOf('d').toISOString() },
           });
         } else {
           this.$emit(`update:${eventType}`, {
             ...event,
             dates: {
-              startDate: this.$moment(event.dates.startDate).startOf('d').toISOString(),
-              endDate: this.$moment(event.dates.endDate).endOf('d').toISOString(),
+              startDate: moment(event.dates.startDate).startOf('d').toISOString(),
+              endDate: moment(event.dates.endDate).endOf('d').toISOString(),
             },
           });
         }

@@ -28,6 +28,7 @@
 
 <script>
 import { AGENDA, PLANNING, THREE_DAYS_VIEW, WEEK_VIEW } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'PlanningNavigation',
@@ -55,10 +56,10 @@ export default {
       return this.viewMode === THREE_DAYS_VIEW;
     },
     date () {
-      return this.$moment(this.targetDate).format('YYYY/MM/DD');
+      return moment(this.targetDate).format('YYYY/MM/DD');
     },
     weekNumber () {
-      return this.$moment(this.targetDate).week();
+      return moment(this.targetDate).week();
     },
   },
   methods: {
@@ -69,7 +70,7 @@ export default {
       this.$emit('go-to-previous-week', value);
     },
     goToWeek (value) {
-      const momentValue = this.$moment(value, 'YYYY/MM/DD', true);
+      const momentValue = moment(value, 'YYYY/MM/DD', true);
       if (!momentValue.isValid()) return;
       this.$emit('go-to-week', momentValue.toISOString());
     },

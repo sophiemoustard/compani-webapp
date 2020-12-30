@@ -42,8 +42,9 @@ import Customers from '@api/Customers';
 import Events from '@api/Events';
 import Select from '@components/form/Select';
 import { NotifyWarning } from '@components/popup/notify';
-import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, INTERVENTION, NEVER, AGENDA, AUXILIARY, UNKNOWN_AVATAR, WEEK_VIEW } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 import Agenda from 'src/modules/client/components/planning/Agenda';
 import PlanningNavigation from 'src/modules/client/components/planning/PlanningNavigation';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
@@ -103,7 +104,7 @@ export default {
   },
   async mounted () {
     this.height = window.innerHeight;
-    this.startOfWeek = this.$moment().startOf('week').toISOString();
+    this.startOfWeek = moment().startOf('week').toISOString();
     this.selectedAuxiliary = this.loggedUser;
     this.getTimelineDays();
     await Promise.all([this.getAuxiliaries(), this.getCustomers(), this.refresh(), this.setInternalHours()]);
@@ -174,8 +175,8 @@ export default {
         auxiliary: this.selectedAuxiliary._id,
         sector: '',
         dates: {
-          startDate: this.$moment(selectedDay).hours(8).toISOString(),
-          endDate: this.$moment(selectedDay).hours(10).toISOString(),
+          startDate: moment(selectedDay).hours(8).toISOString(),
+          endDate: moment(selectedDay).hours(10).toISOString(),
         },
       };
 

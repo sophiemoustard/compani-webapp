@@ -46,6 +46,7 @@ import Contracts from '@api/Contracts';
 import Banner from '@components/Banner';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { minDate } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 import ContractsCell from 'src/modules/client/components/contracts/ContractsCell';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
 import VersionCreationModal from 'src/modules/client/components/contracts/VersionCreationModal';
@@ -174,18 +175,18 @@ export default {
 
       if (endedContracts.length === 0) return '';
 
-      return this.$moment(endedContracts[0].endDate).add(1, 'd').toISOString();
+      return moment(endedContracts[0].endDate).add(1, 'd').toISOString();
     },
     contractMinEndDate () {
       if (this.endContractModal) {
         const lastVersion = this.contractToEnd.contract.versions[this.contractToEnd.contract.versions.length - 1];
-        return this.$moment(lastVersion.startDate).add(1, 'day').toISOString();
+        return moment(lastVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
     },
     newVersionMinStartDate () {
       const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
-      return lastVersion ? this.$moment(lastVersion.startDate).toISOString() : '';
+      return lastVersion ? moment(lastVersion.startDate).toISOString() : '';
     },
   },
   async mounted () {
@@ -383,7 +384,7 @@ export default {
 
       return {
         ...omit(this.contractToEnd, omittedField),
-        endDate: this.$moment(this.contractToEnd.endDate).endOf('day').toISOString(),
+        endDate: moment(this.contractToEnd.endDate).endOf('day').toISOString(),
       };
     },
     async endExistingContract () {

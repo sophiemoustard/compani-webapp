@@ -26,6 +26,7 @@ import LargeTable from '@components/table/LargeTable';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { formatPrice } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { downloadDocx } from '@helpers/file';
 
 export default {
@@ -40,18 +41,13 @@ export default {
       billSlipList: [],
       loading: false,
       columns: [
-        {
-          name: 'number',
-          label: 'Numero',
-          align: 'left',
-          field: 'number',
-        },
+        { name: 'number', label: 'Numero', align: 'left', field: 'number' },
         {
           name: 'month',
           label: 'Mois',
           align: 'left',
           field: 'month',
-          format: value => this.$moment(value, 'MM-YYYY').format('MMMM YYYY'),
+          format: value => moment(value, 'MM-YYYY').format('MMMM YYYY'),
         },
         {
           name: 'thirdPartyPayer',
@@ -66,12 +62,7 @@ export default {
           field: 'netInclTaxes',
           format: value => formatPrice(value),
         },
-        {
-          name: 'document',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'document', label: '', align: 'left', field: '_id' },
       ],
       pagination: {
         sortBy: 'month',

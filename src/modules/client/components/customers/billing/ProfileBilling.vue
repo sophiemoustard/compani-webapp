@@ -102,8 +102,6 @@ import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { formatIdentity } from '@helpers/utils';
-import { openPdf } from '@helpers/file';
 import {
   CREDIT_NOTE,
   BILL,
@@ -119,6 +117,9 @@ import {
   HELPER,
   REQUIRED_LABEL,
 } from '@data/constants';
+import moment from '@helpers/moment';
+import { formatIdentity } from '@helpers/utils';
+import { openPdf } from '@helpers/file';
 import CustomerBillingTable from 'src/modules/client/components/customers/billing/CustomerBillingTable';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
 import PaymentEditionModal from 'src/modules/client/components/customers/billing/PaymentEditionModal';
@@ -148,7 +149,7 @@ export default {
       customerDocuments: [],
       balancesForCustomer: [],
       tppDocuments: [],
-      billingDates: { startDate: this.$moment().toISOString(), endDate: this.$moment().toISOString() },
+      billingDates: { startDate: moment().toISOString(), endDate: moment().toISOString() },
       balances: [],
       editedPayment: {},
       taxCertificates: [],
@@ -162,7 +163,7 @@ export default {
         {
           name: 'date',
           field: 'date',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
           align: 'left',
           label: 'Date',
         },
@@ -178,8 +179,8 @@ export default {
         rowsPerPage: 0,
       },
       taxCertificate: {
-        date: this.$moment().toISOString(),
-        year: this.$moment().subtract(1, 'y').format('YYYY'),
+        date: moment().toISOString(),
+        year: moment().subtract(1, 'y').format('YYYY'),
         file: null,
       },
       taxCertificateModal: false,
@@ -227,7 +228,7 @@ export default {
       return '';
     },
     yearOptions () {
-      const range = this.$moment.range(this.$moment('2000-01-01'), this.$moment('2099-12-31'));
+      const range = moment.range(moment('2000-01-01'), moment('2099-12-31'));
       const years = Array.from(range.by('years'));
       return years.map(year => ({ label: year.format('YYYY'), value: year.format('YYYY') }));
     },
@@ -240,8 +241,8 @@ export default {
   methods: {
     // Billing dates
     setBillingDates () {
-      this.billingDates.endDate = this.$moment().endOf('d').toISOString();
-      this.billingDates.startDate = this.$moment().subtract(2, 'M').startOf('M').toISOString();
+      this.billingDates.endDate = moment().endOf('d').toISOString();
+      this.billingDates.startDate = moment().subtract(2, 'M').startOf('M').toISOString();
     },
     // Compute balances
     getEndBalance (documents, tpp) {
@@ -399,7 +400,7 @@ export default {
     formatTaxCertificatePayload () {
       const { file, date, year } = this.taxCertificate;
       const form = new FormData();
-      const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
+      const formattedDate = moment(date).format('DD-MM-YYYY-HHmm');
       const customerName = formatIdentity(this.customer.identity, 'FL');
       const fileName = snakeCase(`attestation_fiscale_${customerName}_${formattedDate}`);
 
@@ -415,8 +416,8 @@ export default {
     },
     resetTaxCertificateModal () {
       this.taxCertificate = {
-        date: this.$moment().toISOString(),
-        year: this.$moment().subtract(1, 'y').format('YYYY'),
+        date: moment().toISOString(),
+        year: moment().subtract(1, 'y').format('YYYY'),
         file: null,
       };
       this.$v.taxCertificate.$reset();

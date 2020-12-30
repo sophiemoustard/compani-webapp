@@ -25,6 +25,7 @@ import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import moment from '@helpers/moment';
 
 export default {
   name: 'ProfileHeader',
@@ -46,11 +47,11 @@ export default {
       };
     },
     userStartDate () {
-      if (this.customer.createdAt) return this.$moment(this.customer.createdAt).format('DD/MM/YY');
+      if (this.customer.createdAt) return moment(this.customer.createdAt).format('DD/MM/YY');
       return 'N/A';
     },
     userRelativeStartDate () {
-      if (this.userStartDate !== 'N/A') return this.$moment(this.userStartDate, 'DD/MM/YY').toNow(true);
+      if (this.userStartDate !== 'N/A') return moment(this.userStartDate, 'DD/MM/YY').toNow(true);
       return '';
     },
   },

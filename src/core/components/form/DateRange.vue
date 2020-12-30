@@ -19,6 +19,7 @@
 <script>
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   components: {
@@ -30,8 +31,8 @@ export default {
       type: Object,
       default () {
         return {
-          startDate: this.$moment().startOf('d').toISOString(),
-          endDate: this.$moment().endOf('d').toISOString(),
+          startDate: moment().startOf('d').toISOString(),
+          endDate: moment().endOf('d').toISOString(),
         };
       },
     },

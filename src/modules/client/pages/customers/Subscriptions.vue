@@ -143,9 +143,10 @@ import Modal from '@components/modal/Modal';
 import HtmlModal from '@components/modal/HtmlModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
+import { REQUIRED_LABEL, DOC_EXTENSIONS } from '@data/constants';
 import { bic, iban } from '@helpers/vuelidateCustomVal';
 import { getLastVersion } from '@helpers/utils';
-import { REQUIRED_LABEL, DOC_EXTENSIONS } from '@data/constants';
+import moment from '@helpers/moment';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
@@ -184,8 +185,8 @@ export default {
           align: 'left',
           field: 'createdAt',
           sortable: true,
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
         },
         { name: '_id', field: '_id' },
       ],
@@ -228,7 +229,7 @@ export default {
     },
     agreement () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
+        return `(Accepté le ${moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
           + `par ${this.acceptedBy})`;
       }
       return '';
@@ -374,7 +375,7 @@ export default {
               iban: this.customer.payment.iban || '',
               companyName: this.helper.company.name || '',
               companyAddress: this.helper.company.address.fullAddress || '',
-              downloadDate: this.$moment().format('DD/MM/YYYY'),
+              downloadDate: moment().format('DD/MM/YYYY'),
             },
             ...this.esignRedirection,
           }

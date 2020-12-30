@@ -1,4 +1,5 @@
 import { FORTHCOMING, IN_PROGRESS, COMPLETED } from '@data/constants';
+import moment from '@helpers/moment';
 
 export const courseTimelineMixin = {
   computed: {
@@ -50,20 +51,20 @@ export const courseTimelineMixin = {
       if (!course.slots.length) return Number.MAX_SAFE_INTEGER;
 
       const firstSlot = course.slots[0];
-      return this.$moment(firstSlot[0].startDate).diff(this.$moment(), 'd', true);
+      return moment(firstSlot[0].startDate).diff(moment(), 'd', true);
     },
     getRangeNowToNextSlot (course) {
       const nextSlot = course.slots.filter(daySlots => !this.happened(daySlots))[0];
       if (!nextSlot) return 0;
 
-      return this.$moment(nextSlot[0].startDate).diff(this.$moment(), 'd', true);
+      return moment(nextSlot[0].startDate).diff(moment(), 'd', true);
     },
     getRangeNowToEndCourse (course) {
       const lastSlot = course.slots[course.slots.length - 1];
-      return this.$moment().diff(this.$moment(lastSlot[0].startDate), 'd', true);
+      return moment().diff(moment(lastSlot[0].startDate), 'd', true);
     },
     happened (sameDaySlots) {
-      return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
+      return moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
   },
 };

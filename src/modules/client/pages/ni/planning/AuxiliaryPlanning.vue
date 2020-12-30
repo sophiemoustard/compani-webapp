@@ -31,8 +31,9 @@ import Customers from '@api/Customers';
 import Events from '@api/Events';
 import EventHistories from '@api/EventHistories';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { formatIdentity } from '@helpers/utils';
 import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 import Planning from 'src/modules/client/components/planning/Planning';
@@ -105,20 +106,20 @@ export default {
     }),
     displayedAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => aux.sector && this.hasContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+        .filter(aux => aux.sector && this.hasContractOnEvent(aux, moment(this.startOfWeek), this.endOfWeek));
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeek).endOf('w').toISOString();
+      return moment(this.startOfWeek).endOf('w').toISOString();
     },
     activeAuxiliaries () {
       return this.filters
         .filter(f => f.type === PERSON)
-        .filter(aux => this.hasContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+        .filter(aux => this.hasContractOnEvent(aux, moment(this.startOfWeek), this.endOfWeek));
     },
     activeFilters () {
       return this.filters
         .filter(f => f.type === SECTOR ||
-          this.hasContractOnEvent(f, this.$moment(this.startOfWeek), this.endOfWeek) ||
+          this.hasContractOnEvent(f, moment(this.startOfWeek), this.endOfWeek) ||
           // add targeted auxiliary even if not active on strat of week to display future events
           (this.targetedAuxiliary && f._id === this.targetedAuxiliary._id));
     },
@@ -132,7 +133,7 @@ export default {
       const { startOfWeek } = vEvent;
       this.startOfWeek = startOfWeek;
 
-      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(6, 'd'));
+      const range = moment.range(this.startOfWeek, moment(this.startOfWeek).add(6, 'd'));
       this.days = Array.from(range.by('days'));
       if ((this.auxiliaries && this.auxiliaries.length) ||
         (this.filteredSectors && this.filteredSectors.length)) await this.refresh();
@@ -271,8 +272,8 @@ export default {
         auxiliary: person ? person._id : '',
         sector: person ? person.sector._id : sectorId,
         dates: {
-          startDate: this.$moment(selectedDay).hours(8).toISOString(),
-          endDate: this.$moment(selectedDay).hours(10).toISOString(),
+          startDate: moment(selectedDay).hours(8).toISOString(),
+          endDate: moment(selectedDay).hours(10).toISOString(),
         },
       };
       this.creationModal = true;
@@ -285,9 +286,9 @@ export default {
       if (!aux.sectorHistories) return null;
       const sectorHistory = aux.sectorHistories.find((sh) => {
         const isSameSector = sector ? sh.sector._id === sector._id : true;
-        const isStartDateBeforeEndOfWeek = this.$moment(sh.startDate).isSameOrBefore(this.endOfWeek);
+        const isStartDateBeforeEndOfWeek = moment(sh.startDate).isSameOrBefore(this.endOfWeek);
         const isEndDateAfterStartOfWeek = !sh.endDate ||
-          this.$moment(sh.endDate).isSameOrAfter(this.startOfWeek);
+          moment(sh.endDate).isSameOrAfter(this.startOfWeek);
         return isSameSector && isStartDateBeforeEndOfWeek && isEndDateAfterStartOfWeek;
       });
       return sectorHistory;

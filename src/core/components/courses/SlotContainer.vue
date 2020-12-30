@@ -58,14 +58,15 @@ import has from 'lodash/has';
 import groupBy from 'lodash/groupBy';
 import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import { formatQuantity } from '@helpers/utils';
 import CourseSlots from '@api/CourseSlots';
-import { E_LEARNING } from '@data/constants';
-import { frAddress } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import { E_LEARNING } from '@data/constants';
+import { formatQuantity } from '@helpers/utils';
+import { frAddress } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
 import { validationMixin } from '@mixins/validationMixin';
 
@@ -92,8 +93,8 @@ export default {
       creationModal: false,
       newCourseSlot: {
         dates: {
-          startDate: this.$moment().startOf('d').hours(9).toISOString(),
-          endDate: this.$moment().startOf('d').hours(12).toISOString(),
+          startDate: moment().startOf('d').hours(9).toISOString(),
+          endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
         step: null,
@@ -113,8 +114,8 @@ export default {
           startDate: { required },
           endDate: {
             required,
-            greaterThanStartDate (val, { startDate }) { return this.$moment(startDate).isBefore(val); },
-            onSameDayAsStartDate (val, { startDate }) { return this.$moment(startDate).isSame(val, 'day'); },
+            greaterThanStartDate (val, { startDate }) { return moment(startDate).isBefore(val); },
+            onSameDayAsStartDate (val, { startDate }) { return moment(startDate).isSame(val, 'day'); },
           },
         },
         address: {
@@ -139,8 +140,8 @@ export default {
       if (!this.course || !this.course.slots) return '0h';
 
       const total = this.course.slots.reduce(
-        (acc, slot) => acc.add(this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate))),
-        this.$moment.duration()
+        (acc, slot) => acc.add(moment.duration(moment(slot.endDate).diff(slot.startDate))),
+        moment.duration()
       );
 
       const paddedMinutes = this.padMinutes(total.minutes());
@@ -158,8 +159,8 @@ export default {
 
       let subtitle = '';
       if (slotList.length) {
-        const firstSlot = this.$moment(slotList[0][0].startDate).format('LL');
-        const lastSlot = this.$moment(slotList[slotList.length - 1][0].startDate).format('LL');
+        const firstSlot = moment(slotList[0][0].startDate).format('LL');
+        const lastSlot = moment(slotList[slotList.length - 1][0].startDate).format('LL');
         subtitle = `du ${firstSlot} au ${lastSlot}`;
       }
 
@@ -197,19 +198,19 @@ export default {
     groupByCourses () {
       this.courseSlots = groupBy(
         this.course.slots.filter(slot => !!slot.startDate),
-        s => this.$moment(s.startDate).format('DD/MM/YYYY')
+        s => moment(s.startDate).format('DD/MM/YYYY')
       );
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
     },
     getSlotDuration (slot) {
-      const duration = this.$moment.duration(this.$moment(slot.endDate).diff(slot.startDate));
+      const duration = moment.duration(moment(slot.endDate).diff(slot.startDate));
 
       const paddedMinutes = this.padMinutes(duration.minutes());
 
       return paddedMinutes ? `${duration.hours()}h${paddedMinutes}` : `${duration.hours()}h`;
     },
     formatSlotHour (slot) {
-      return `${this.$moment(slot.startDate).format('HH:mm')} - ${this.$moment(slot.endDate).format('HH:mm')}`;
+      return `${moment(slot.startDate).format('HH:mm')} - ${moment(slot.endDate).format('HH:mm')}`;
     },
     getSlotAddress (slot) {
       return get(slot, 'address.fullAddress') || 'Adresse non renseignée';
@@ -217,8 +218,8 @@ export default {
     resetCreationModal () {
       this.newCourseSlot = {
         dates: {
-          startDate: this.$moment().startOf('d').hours(9).toISOString(),
-          endDate: this.$moment().startOf('d').hours(12).toISOString(),
+          startDate: moment().startOf('d').hours(9).toISOString(),
+          endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
         step: null,
@@ -235,8 +236,8 @@ export default {
     openEditionModal (slot) {
       if (!this.canEdit) return;
       const defaultDate = {
-        startDate: this.$moment().startOf('d').hours(9).toISOString(),
-        endDate: this.$moment().startOf('d').hours(12).toISOString(),
+        startDate: moment().startOf('d').hours(9).toISOString(),
+        endDate: moment().startOf('d').hours(12).toISOString(),
       };
       this.editedCourseSlot = {
         _id: slot._id,

@@ -26,6 +26,7 @@ import { required } from 'vuelidate/lib/validators';
 import DateInput from '@components/form/DateInput';
 import TimeInput from '@components/form/TimeInput';
 import { minDate } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 
 export default {
   components: {
@@ -54,13 +55,13 @@ export default {
     hasError () {
       if (this.error || this.$v.value.$error) return true;
 
-      return this.$moment(this.value.startDate).isAfter(this.$moment(this.value.endDate));
+      return moment(this.value.startDate).isAfter(moment(this.value.endDate));
     },
     startHour () {
-      return this.$moment(this.value.startDate).format('HH:mm');
+      return moment(this.value.startDate).format('HH:mm');
     },
     endHour () {
-      return this.$moment(this.value.endDate).format('HH:mm');
+      return moment(this.value.endDate).format('HH:mm');
     },
   },
   methods: {
@@ -70,7 +71,7 @@ export default {
     },
     setDateHours (date, hour) {
       const splitHour = hour.split(':');
-      return this.$moment(date).set({
+      return moment(date).set({
         hours: Number.parseInt(splitHour[0], 10),
         minutes: Number.parseInt(splitHour[1], 10),
         seconds: 0,
@@ -79,16 +80,16 @@ export default {
     },
     update (date, key) {
       const hoursFields = ['hours', 'minutes', 'seconds', 'milliseconds'];
-      const dateObject = pick(this.$moment(this.value[key]).toObject(), hoursFields);
+      const dateObject = pick(moment(this.value[key]).toObject(), hoursFields);
       const dates = {
         ...this.value,
-        [key]: this.$moment(date).set({ ...dateObject }).toISOString(),
+        [key]: moment(date).set({ ...dateObject }).toISOString(),
       };
       if (key === 'startDate' && this.disableEndDate) {
-        const endDateObject = pick(this.$moment(this.value.endDate).toObject(), hoursFields);
-        dates.endDate = this.$moment(date).set({ ...endDateObject }).toISOString();
+        const endDateObject = pick(moment(this.value.endDate).toObject(), hoursFields);
+        dates.endDate = moment(date).set({ ...endDateObject }).toISOString();
       }
-      if (key === 'endDate') dates.endDate = this.$moment(dates.endDate).endOf('d').toISOString();
+      if (key === 'endDate') dates.endDate = moment(dates.endDate).endOf('d').toISOString();
       this.$emit('input', dates);
     },
     updateHours (value, key) {
@@ -96,9 +97,9 @@ export default {
       if (key === 'endHour') dates.endDate = this.setDateHours(dates.endDate, value);
       if (key === 'startHour') {
         dates.startDate = this.setDateHours(dates.startDate, value);
-        if (this.$moment(value, 'HH:mm').isSameOrAfter(this.$moment(this.endHour, 'HH:mm'))) {
-          const max = this.$moment(dates.startDate).endOf('d');
-          dates.endDate = this.$moment.min(this.$moment(dates.startDate).add(2, 'H'), max).toISOString();
+        if (moment(value, 'HH:mm').isSameOrAfter(moment(this.endHour, 'HH:mm'))) {
+          const max = moment(dates.startDate).endOf('d');
+          dates.endDate = moment.min(moment(dates.startDate).add(2, 'H'), max).toISOString();
         }
       }
       this.$emit('input', dates);

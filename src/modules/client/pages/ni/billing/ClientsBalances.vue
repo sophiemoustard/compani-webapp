@@ -109,27 +109,9 @@ export default {
           format: (value, row) => (row.thirdPartyPayer ? '' : roundFrenchPercentage(value)),
           sortable: true,
         },
-        {
-          name: 'billed',
-          label: 'Facturé TTC',
-          align: 'center',
-          field: 'billed',
-          format: val => formatPrice(val),
-        },
-        {
-          name: 'paid',
-          label: 'Payé TTC',
-          align: 'center',
-          field: 'paid',
-          format: val => formatPrice(val),
-        },
-        {
-          name: 'balance',
-          label: 'Solde',
-          align: 'center',
-          field: row => row.balance,
-          sortable: true,
-        },
+        { name: 'billed', label: 'Facturé TTC', align: 'center', field: 'billed', format: val => formatPrice(val) },
+        { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
+        { name: 'balance', label: 'Solde', align: 'center', field: row => row.balance, sortable: true },
         {
           name: 'toPay',
           label: 'A Prélever',
@@ -138,12 +120,7 @@ export default {
           format: value => formatPrice(value),
           sortable: true,
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: row => row.customer._id,
-        },
+        { name: 'actions', label: '', align: 'left', field: row => row.customer._id },
       ],
       pagination: { rowsPerPage: 0 },
       balancesOptions: [
@@ -207,7 +184,7 @@ export default {
           customerInfo: row.customer,
           netInclTaxes: row.toPay,
           type: this.PAYMENT_OPTIONS[0].value,
-          date: this.$moment().toDate(),
+          date: new Date(),
           rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
         }));
         await Payments.createList(payload);

@@ -44,13 +44,14 @@ import Users from '@api/Users';
 import Authentication from '@api/Authentication';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
-import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/AuxiliaryCreationModal';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { userMixin } from '@mixins/userMixin';
-import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 import { validationMixin } from '@mixins/validationMixin';
+import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/AuxiliaryCreationModal';
+import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
 
 export default {
   metaInfo: { title: 'Répertoire auxiliaires' },
@@ -119,8 +120,8 @@ export default {
           field: 'startDate',
           align: 'left',
           sortable: true,
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
           style: 'min-width: 110px; width: 15%',
         },
         {
@@ -129,8 +130,8 @@ export default {
           field: 'hiringDate',
           align: 'left',
           sortable: true,
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : null),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : null),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
           style: 'min-width: 110px; width: 15%',
         },
         {

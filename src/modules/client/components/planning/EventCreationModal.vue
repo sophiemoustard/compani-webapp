@@ -78,6 +78,7 @@
 
 <script>
 import get from 'lodash/get';
+import Button from '@components/Button';
 import {
   ABSENCE,
   INTERNAL_HOUR,
@@ -86,8 +87,8 @@ import {
   INTERVENTION,
   NEVER,
 } from '@data/constants';
+import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
-import Button from '@components/Button';
 
 export default {
   name: 'EventCreationModal',
@@ -109,7 +110,7 @@ export default {
     isEndDurationRequired () {
       if (this.newEvent.type !== ABSENCE) return false;
 
-      return this.$moment(this.newEvent.dates.endDate).isAfter(this.$moment(this.newEvent.dates.startDate));
+      return moment(this.newEvent.dates.endDate).isAfter(moment(this.newEvent.dates.startDate));
     },
     isContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;

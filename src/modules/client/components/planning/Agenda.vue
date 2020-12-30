@@ -72,6 +72,7 @@ import {
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
 } from '@data/constants';
+import moment from '@helpers/moment';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
 
 export default {
@@ -109,16 +110,16 @@ export default {
       };
     },
     getTimelineHours () {
-      const range = this.$moment.range(
-        this.$moment().hours(PLANNING_VIEW_START_HOUR).startOf('h'),
-        this.$moment().hours(PLANNING_VIEW_END_HOUR).startOf('h')
+      const range = moment.range(
+        moment().hours(PLANNING_VIEW_START_HOUR).startOf('h'),
+        moment().hours(PLANNING_VIEW_END_HOUR).startOf('h')
       );
       this.hours = Array.from(range.by('hours', { step: 2 }));
     },
     getOneDayEvents (day) {
       return this.events
-        .filter(event => this.$moment(day).isSameOrAfter(event.startDate, 'day') &&
-            this.$moment(day).isSameOrBefore(event.endDate, 'day'))
+        .filter(event => moment(day).isSameOrAfter(event.startDate, 'day') &&
+            moment(day).isSameOrBefore(event.endDate, 'day'))
         .map(event => this.getDisplayedEvent(event, day, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
