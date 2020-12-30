@@ -65,7 +65,7 @@ export default {
   },
   computed: {
     shouldHideBottom () {
-      return this.hideBottom || this.data.length <= this.rowsPerPage[0];
+      return this.hideBottom || (!!this.data.length && this.data.length <= this.rowsPerPage[0]);
     },
     paginationOptions () {
       return this.rowsPerPage.filter(o => o <= this.data.length);
