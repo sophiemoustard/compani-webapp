@@ -50,7 +50,7 @@
         <p class="text-weight-bold">Aidants</p>
       </div>
       <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
-        :loading="helpersLoading">
+        :loading="helpersLoading" :rows-per-page="rowsPerPage" :pagination.sync="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -69,13 +69,15 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
       </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading" />
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
+        :rows-per-page="rowsPerPage" :pagination.sync="pagination" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :loading="followUpLoading">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :loading="followUpLoading"
+        :rows-per-page="rowsPerPage" :pagination.sync="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -137,6 +139,8 @@ export default {
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
     return {
+      rowsPerPage: [5, 10, 15, 20],
+      pagination: { page: 1, rowsPerPage: 5 },
       auxiliaries: [],
       isLoaded: false,
       tmpInput: '',

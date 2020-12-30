@@ -1,8 +1,8 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
-      class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey"
-      :selected="selected" :visible-columns="formattedVisibleColumns" v-on="$listeners" :hide-bottom="hideBottom">
+      class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners"
+      :selected="selected" :visible-columns="formattedVisibleColumns" :hide-bottom="hideBottom || fewData">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
@@ -24,7 +24,7 @@
         </slot>
       </template>
       <template #bottom="props">
-        <ni-pagination :props="props" :pagination.sync="pagination" :data="data" />
+        <ni-pagination :props="props" :pagination.sync="pagination" :data="data" :options="paginationOptions" />
       </template>
       <template #bottom-row="props">
         <slot name="bottom-row" :props="props" />
@@ -58,11 +58,18 @@ export default {
     selected: { type: Array, default: () => [] },
     separator: { type: String, default: 'horizontal' },
     hideBottom: { type: Boolean, default: false },
+    rowsPerPage: { type: Array, default: () => [15, 50, 100, 200, 300] },
   },
   components: {
     'ni-pagination': Pagination,
   },
   computed: {
+    fewData () {
+      return this.data.length <= this.rowsPerPage[0];
+    },
+    paginationOptions () {
+      return this.rowsPerPage.filter(o => o <= this.data.length);
+    },
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
     },
