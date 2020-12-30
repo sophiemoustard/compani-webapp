@@ -14,7 +14,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="displayedCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading"
+    <ni-simple-table :data="displayedCustomersFundingsMonitoring" :columns="columns" :loading="tableLoading"
       row-key="_id" :pagination.sync="pagination">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -24,7 +24,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
   </q-page>
 </template>
 
@@ -32,7 +32,7 @@
 import get from 'lodash/get';
 import Stats from '@api/Stats';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import SelectSector from '@components/form/SelectSector';
@@ -43,7 +43,7 @@ export default {
   name: 'CustomersFundingsMonitoring',
   metaInfo: { title: 'Suivi des plans d\'aide' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'ni-title-header': TitleHeader,
     'ni-select': Select,
     'ni-select-sector': SelectSector,

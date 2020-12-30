@@ -25,7 +25,7 @@
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_VERSION)" label="Données avenants" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(ABSENCE)" label="Données absences" />
     </div>
-    <ni-large-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
+    <ni-simple-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
       :visible-columns="visibleColumns">
       <template #header="{ props }">
@@ -84,7 +84,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="validateCreation" />
 
@@ -101,7 +101,7 @@ import Button from '@components/Button';
 import Select from '@components/form/Select';
 import SelectSector from '@components/form/SelectSector';
 import TitleHeader from '@components/TitleHeader';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import EditableTd from '@components/table/EditableTd';
 import { IDENTIFICATION, ABSENCE, CONTRACT_VERSION } from '@data/constants';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
@@ -118,7 +118,7 @@ export default {
     'ni-editable-td': EditableTd,
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
     'ni-title-header': TitleHeader,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'ni-button': Button,
   },
   data () {

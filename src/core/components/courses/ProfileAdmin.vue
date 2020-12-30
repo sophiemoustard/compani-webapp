@@ -36,7 +36,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
-      <ni-simple-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
+      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
         :loading="smsLoading">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -51,7 +51,7 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-simple-table>
+      </ni-responsive-table>
       <ni-banner v-if="!followUpDisabled && isFinished">
         <template #message>
           Vous ne pouvez pas envoyer de sms car la formation est terminée.
@@ -92,7 +92,7 @@ import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
 import Button from '@components/Button';
-import SimpleTable from '@components/table/SimpleTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import BiColorButton from '@components/BiColorButton';
@@ -110,7 +110,7 @@ export default {
     'ni-button': Button,
     'sms-sending-modal': SmsSendingModal,
     'sms-details-modal': SmsDetailsModal,
-    'ni-simple-table': SimpleTable,
+    'ni-responsive-table': ResponsiveTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
     'ni-bi-color-button': BiColorButton,

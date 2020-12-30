@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <h4>Documents</h4>
     <p v-if="documents.length == 0">Aucun document disponible</p>
-    <ni-large-table :data="documents" :columns="columns" :pagination.sync="pagination" row-key="name"
+    <ni-simple-table :data="documents" :columns="columns" :pagination.sync="pagination" row-key="name"
       :loading="loading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -20,19 +20,19 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 
 export default {
   metaInfo: { title: 'Documents' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
   },
   async mounted () {
     try {

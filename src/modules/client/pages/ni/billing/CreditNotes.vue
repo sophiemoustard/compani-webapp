@@ -3,7 +3,7 @@
     <div class="title-padding">
       <h4>Avoirs</h4>
     </div>
-    <ni-large-table :data="creditNotes" :columns="creditNotesColumns" :pagination.sync="pagination"
+    <ni-simple-table :data="creditNotes" :columns="creditNotesColumns" :pagination.sync="pagination"
       :loading="tableLoading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -21,7 +21,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
       @click="creditNoteCreationModal = true" :disable="tableLoading" />
 
@@ -51,7 +51,7 @@ import pick from 'lodash/pick';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { COMPANI } from '@data/constants';
 import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
@@ -64,7 +64,7 @@ export default {
   name: 'CreditNotes',
   metaInfo: { title: 'Avoirs' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'credit-note-edition-modal': CreditNoteEditionModal,
     'credit-note-creation-modal': CreditNoteCreationModal,
   },

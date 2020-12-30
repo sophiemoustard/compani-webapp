@@ -4,7 +4,7 @@
       <div v-if="isCoach" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <ni-large-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
+      <ni-simple-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
         :pagination.sync="pagination" row-key="name" :loading="payDocumentsLoading">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -25,7 +25,7 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-large-table>
+      </ni-simple-table>
       <div v-else class="q-my-sm">
         <span class="no-document">Aucun document</span>
       </div>
@@ -55,7 +55,7 @@ import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import PayDocuments from '@api/PayDocuments';
 import Modal from '@components/modal/Modal';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
 import moment from '@helpers/moment';
@@ -68,7 +68,7 @@ export default {
   components: {
     'ni-document-upload': DocumentUpload,
     'ni-modal': Modal,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {
