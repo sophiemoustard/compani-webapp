@@ -1,7 +1,8 @@
 import capitalize from 'lodash/capitalize';
-import { getLastVersion } from '@helpers/utils';
 import { days } from '@data/days';
 import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants';
+import { getLastVersion } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export const fundingMixin = {
   data () {
@@ -14,7 +15,7 @@ export const fundingMixin = {
           name: 'startDate',
           label: 'Date de début de prise en charge',
           align: 'left',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
           field: 'startDate',
         },
         {
@@ -44,7 +45,7 @@ export const fundingMixin = {
           name: 'endDate',
           label: 'Date de fin de prise en charge',
           align: 'left',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : '∞'),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : '∞'),
           field: 'endDate',
         },
         {

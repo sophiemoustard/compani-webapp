@@ -65,6 +65,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { DEFAULT_AVATAR, HR_SMS } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'ProfileHeader',
@@ -109,11 +110,11 @@ export default {
       };
     },
     userStartDate () {
-      if (this.userProfile.createdAt) return this.$moment(this.userProfile.createdAt).format('DD/MM/YY');
+      if (this.userProfile.createdAt) return moment(this.userProfile.createdAt).format('DD/MM/YY');
       return 'N/A';
     },
     userRelativeStartDate () {
-      if (this.userStartDate !== 'N/A') return this.$moment(this.userStartDate, 'DD/MM/YY').toNow(true);
+      if (this.userStartDate !== 'N/A') return moment(this.userStartDate, 'DD/MM/YY').toNow(true);
       return '';
     },
     isExternalUser () {
@@ -135,7 +136,7 @@ export default {
         + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/auxiliaries/info`
         + '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
       } else if (this.messageType === 'LA') {
-        if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
+        if (!this.userProfile.passwordToken || moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
           this.userProfile.passwordToken = await Authentication.createPasswordToken(
             this.userProfile._id,
             { email: this.userProfile.local.email }

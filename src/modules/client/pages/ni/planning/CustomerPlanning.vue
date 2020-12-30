@@ -25,7 +25,6 @@ import Events from '@api/Events';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
 import { NotifyNegative } from '@components/popup/notify';
-import { formatIdentity } from '@helpers/utils';
 import {
   INTERVENTION,
   DEFAULT_AVATAR,
@@ -36,6 +35,8 @@ import {
   SECTOR,
   COACH_ROLES,
 } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 import Planning from 'src/modules/client/components/planning/Planning';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
@@ -99,11 +100,11 @@ export default {
       clientRole: 'main/getClientRole',
     }),
     endOfWeek () {
-      return this.$moment(this.startOfWeek).endOf('w').toISOString();
+      return moment(this.startOfWeek).endOf('w').toISOString();
     },
     activeAuxiliaries () {
       return this.auxiliaries
-        .filter(aux => this.hasContractOnEvent(aux, this.$moment(this.startOfWeek), this.endOfWeek));
+        .filter(aux => this.hasContractOnEvent(aux, moment(this.startOfWeek), this.endOfWeek));
     },
   },
   methods: {
@@ -115,7 +116,7 @@ export default {
       const { startOfWeek } = vEvent;
       this.startOfWeek = startOfWeek;
 
-      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).endOf('w'));
+      const range = moment.range(this.startOfWeek, moment(this.startOfWeek).endOf('w'));
       this.days = Array.from(range.by('days'));
       if (this.filteredSectors.length !== 0 || this.filteredCustomers.length !== 0) await this.refreshCustomers();
       if (this.customers.length !== 0) await this.refresh();
@@ -187,8 +188,8 @@ export default {
         auxiliary: '',
         sector: '',
         dates: {
-          startDate: this.$moment(selectedDay).hours(8).toISOString(),
-          endDate: this.$moment(selectedDay).hours(10).toISOString(),
+          startDate: moment(selectedDay).hours(8).toISOString(),
+          endDate: moment(selectedDay).hours(10).toISOString(),
         },
       };
       this.creationModal = true;

@@ -45,6 +45,7 @@ import TitleHeader from '@components/TitleHeader';
 import LargeTable from '@components/table/LargeTable';
 import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, formatHours } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '@data/constants';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
@@ -96,7 +97,7 @@ export default {
           name: 'startDate',
           label: 'Date de début',
           field: 'startDate',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => moment(value).format('DD/MM/YYYY'),
           align: 'center',
           sortable: true,
         },
@@ -104,14 +105,14 @@ export default {
           name: 'startHour',
           label: 'Heure de début',
           field: 'startDate',
-          format: value => this.$moment(value).format('HH:mm'),
+          format: value => moment(value).format('HH:mm'),
           align: 'center',
         },
         {
           name: 'endDate',
           label: 'Date de fin',
           field: 'endDate',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => moment(value).format('DD/MM/YYYY'),
           align: 'center',
           sortable: true,
         },
@@ -119,7 +120,7 @@ export default {
           name: 'endHour',
           label: 'Heure de fin',
           field: 'endDate',
-          format: value => this.$moment(value).format('HH:mm'),
+          format: value => moment(value).format('HH:mm'),
           align: 'center',
         },
         {
@@ -143,8 +144,8 @@ export default {
         { name: 'actions', label: '' },
       ],
       dates: {
-        startDate: this.$moment().startOf('M').toISOString(),
-        endDate: this.$moment().endOf('M').toISOString(),
+        startDate: moment().startOf('M').toISOString(),
+        endDate: moment().endOf('M').toISOString(),
       },
       datesHasError: false,
     };
@@ -163,7 +164,7 @@ export default {
     },
     getAbsenceDuration (absence) {
       if (absence.absenceNature === DAILY) {
-        const range = Array.from(this.$moment().range(absence.startDate, absence.endDate).by('days'));
+        const range = Array.from(moment().range(absence.startDate, absence.endDate).by('days'));
         const count = range.reduce(
           (acc, day) => { // startOf('day') is necessery to check fr holidays in business day
             if (day.startOf('d').isBusinessDay()) acc += 1;
@@ -175,7 +176,7 @@ export default {
         return `${count}j`;
       }
 
-      const duration = this.$moment(absence.endDate).diff(absence.startDate, 'm') / 60;
+      const duration = moment(absence.endDate).diff(absence.startDate, 'm') / 60;
       return formatHours(duration);
     },
     async refresh () {

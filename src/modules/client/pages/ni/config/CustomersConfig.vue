@@ -179,7 +179,6 @@ import Button from '@components/Button';
 import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
-import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import {
   BILLING_DIRECT,
   BILLING_INDIRECT,
@@ -189,6 +188,9 @@ import {
   FIXED,
   COMPANY,
 } from '@data/constants';
+import moment from '@helpers/moment';
+import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
+import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
 import ServiceEditionModal from 'src/modules/client/components/config/ServiceEditionModal';
 import SurchargeCreationModal from 'src/modules/client/components/config/SurchargeCreationModal';
@@ -196,7 +198,6 @@ import SurchargeEditionModal from 'src/modules/client/components/config/Surcharg
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
 import ThirdPartyPayerEditionModal from 'src/modules/client/components/config/ThirdPartyPayerEditionModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
-import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
@@ -329,13 +330,13 @@ export default {
           name: 'eveningStartTime',
           label: 'Début soirée',
           align: 'center',
-          field: row => (row.eveningStartTime ? this.$moment(row.eveningStartTime).format('HH:mm') : ''),
+          field: row => (row.eveningStartTime ? moment(row.eveningStartTime).format('HH:mm') : ''),
         },
         {
           name: 'eveningEndTime',
           label: 'Fin soirée',
           align: 'center',
-          field: row => (row.eveningEndTime ? this.$moment(row.eveningEndTime).format('HH:mm') : ''),
+          field: row => (row.eveningEndTime ? moment(row.eveningEndTime).format('HH:mm') : ''),
         },
         {
           name: 'custom',
@@ -347,13 +348,13 @@ export default {
           name: 'customStartTime',
           label: 'Début perso',
           align: 'center',
-          field: row => (row.customStartTime ? this.$moment(row.customStartTime).format('HH:mm') : ''),
+          field: row => (row.customStartTime ? moment(row.customStartTime).format('HH:mm') : ''),
         },
         {
           name: 'customEndTime',
           label: 'Fin perso',
           align: 'center',
-          field: row => (row.customEndTime ? this.$moment(row.customEndTime).format('HH:mm') : ''),
+          field: row => (row.customEndTime ? moment(row.customEndTime).format('HH:mm') : ''),
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -397,7 +398,7 @@ export default {
           name: 'startDate',
           label: 'Date d\'effet',
           align: 'left',
-          field: row => (row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : ''),
+          field: row => (row.startDate ? moment(row.startDate).format('DD/MM/YYYY') : ''),
         },
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
         {
@@ -588,7 +589,7 @@ export default {
     },
     minStartDate () {
       const selectedService = this.services.find(ser => ser._id === this.editedService._id);
-      return selectedService ? this.$moment(selectedService.startDate).add(1, 'd').toISOString() : '';
+      return selectedService ? moment(selectedService.startDate).add(1, 'd').toISOString() : '';
     },
   },
   async mounted () {
@@ -613,16 +614,16 @@ export default {
         this.surcharges = await Surcharges.list();
         for (let l = this.surcharges.length, i = 0; i < l; i++) {
           if (this.surcharges[i].eveningStartTime) {
-            this.surcharges[i].eveningStartTime = this.$moment(this.surcharges[i].eveningStartTime, 'HH:mm');
+            this.surcharges[i].eveningStartTime = moment(this.surcharges[i].eveningStartTime, 'HH:mm');
           }
           if (this.surcharges[i].eveningEndTime) {
-            this.surcharges[i].eveningEndTime = this.$moment(this.surcharges[i].eveningEndTime, 'HH:mm');
+            this.surcharges[i].eveningEndTime = moment(this.surcharges[i].eveningEndTime, 'HH:mm');
           }
           if (this.surcharges[i].customStartTime) {
-            this.surcharges[i].customStartTime = this.$moment(this.surcharges[i].customStartTime, 'HH:mm');
+            this.surcharges[i].customStartTime = moment(this.surcharges[i].customStartTime, 'HH:mm');
           }
           if (this.surcharges[i].customEndTime) {
-            this.surcharges[i].customEndTime = this.$moment(this.surcharges[i].customEndTime, 'HH:mm');
+            this.surcharges[i].customEndTime = moment(this.surcharges[i].customEndTime, 'HH:mm');
           }
           this.surchargesOptions.push({ label: this.surcharges[i].name, value: this.surcharges[i]._id });
         }
@@ -692,16 +693,16 @@ export default {
     formatSurchargePayload (surcharge) {
       const payload = cloneDeep(surcharge);
       if (surcharge.eveningStartTime) {
-        payload.eveningStartTime = this.$moment(surcharge.eveningStartTime, 'HH:mm').format('HH:mm');
+        payload.eveningStartTime = moment(surcharge.eveningStartTime, 'HH:mm').format('HH:mm');
       }
       if (surcharge.eveningEndTime) {
-        payload.eveningEndTime = this.$moment(surcharge.eveningEndTime, 'HH:mm').format('HH:mm');
+        payload.eveningEndTime = moment(surcharge.eveningEndTime, 'HH:mm').format('HH:mm');
       }
       if (surcharge.customStartTime) {
-        payload.customStartTime = this.$moment(surcharge.customStartTime, 'HH:mm').format('HH:mm');
+        payload.customStartTime = moment(surcharge.customStartTime, 'HH:mm').format('HH:mm');
       }
       if (surcharge.customEndTime) {
-        payload.customEndTime = this.$moment(surcharge.customEndTime, 'HH:mm').format('HH:mm');
+        payload.customEndTime = moment(surcharge.customEndTime, 'HH:mm').format('HH:mm');
       }
 
       return omit(payload, ['_id', 'company']);
@@ -740,10 +741,10 @@ export default {
       ];
       this.editedSurcharge = {
         ...pick(selectedSurcharge, pickedFields),
-        eveningStartTime: eveningStartTime ? this.$moment(eveningStartTime).format('HH:mm') : '',
-        eveningEndTime: eveningEndTime ? this.$moment(eveningEndTime).format('HH:mm') : '',
-        customStartTime: customStartTime ? this.$moment(customStartTime).format('HH:mm') : '',
-        customEndTime: customEndTime ? this.$moment(customEndTime).format('HH:mm') : '',
+        eveningStartTime: eveningStartTime ? moment(eveningStartTime).format('HH:mm') : '',
+        eveningEndTime: eveningEndTime ? moment(eveningEndTime).format('HH:mm') : '',
+        customStartTime: customStartTime ? moment(customStartTime).format('HH:mm') : '',
+        customEndTime: customEndTime ? moment(customEndTime).format('HH:mm') : '',
       };
       this.surchargeEditionModal = true;
     },
@@ -813,7 +814,7 @@ export default {
           defaultUnitAmount,
           exemptFromCharges,
           // first version does not have actual start date
-          startDate: this.$moment('1970-01-01').startOf('d').toISOString(),
+          startDate: moment('1970-01-01').startOf('d').toISOString(),
         }],
       };
       if (this.newService.surcharge && this.newService.surcharge !== '') {

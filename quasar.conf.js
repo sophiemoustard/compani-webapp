@@ -7,7 +7,6 @@ module.exports = function (ctx) {
     boot: [
       'axios',
       'alenviAxios',
-      'moment',
       'vue-croppa',
       'vuelidate',
       'vueclipboard',

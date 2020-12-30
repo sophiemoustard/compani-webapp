@@ -58,6 +58,7 @@ import Modal from '@components/modal/Modal';
 import LargeTable from '@components/table/LargeTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
+import moment from '@helpers/moment';
 import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -91,7 +92,7 @@ export default {
           label: 'Date',
           align: 'left',
           field: 'date',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],

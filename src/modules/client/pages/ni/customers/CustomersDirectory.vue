@@ -33,13 +33,14 @@ import escapeRegExp from 'lodash/escapeRegExp';
 import Customers from '@api/Customers';
 import { frAddress } from '@helpers/vuelidateCustomVal';
 import DirectoryHeader from '@components/DirectoryHeader';
-import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { CIVILITY_OPTIONS } from '@data/constants';
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
-import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
+import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
+import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
+import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 
 export default {
   name: 'CustomersDirectory',
@@ -96,8 +97,8 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : 'N/A'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : 'N/A'),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
           style: 'width: 85px',
         },
         {
@@ -106,7 +107,7 @@ export default {
           field: 'firstIntervention',
           align: 'left',
           sortable: false,
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
           style: 'width: 85px',
         },
         {

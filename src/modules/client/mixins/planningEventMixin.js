@@ -1,4 +1,3 @@
-import { formatIdentity } from '@helpers/utils';
 import {
   CUSTOMER,
   ABSENCE_TYPES,
@@ -9,6 +8,8 @@ import {
   ILLNESS,
   WORK_ACCIDENT,
 } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export const planningEventMixin = {
   data () {
@@ -20,8 +21,8 @@ export const planningEventMixin = {
     daysHeader () {
       if (!this.days) return [];
       return this.days.map(day => ({
-        name: this.$moment(day).format('dd'),
-        number: this.$moment(day).format('DD'),
+        name: moment(day).format('dd'),
+        number: moment(day).format('DD'),
         moment: day,
       }));
     },
@@ -31,14 +32,14 @@ export const planningEventMixin = {
   },
   methods: {
     isHoliday (day) {
-      return this.$moment(day).startOf('day').isHoliday();
+      return moment(day).startOf('day').isHoliday();
     },
     isCurrentDay (momentDay) {
-      return this.$moment(momentDay).isSame(new Date(), 'day');
+      return moment(momentDay).isSame(new Date(), 'day');
     },
     getEventHours (event) {
-      return `${this.$moment(event.displayedStartDate).format('HH:mm')} - `
-        + `${this.$moment(event.displayedEndDate).format('HH:mm')}`;
+      return `${moment(event.displayedStartDate).format('HH:mm')} - `
+        + `${moment(event.displayedEndDate).format('HH:mm')}`;
     },
     displayAbsenceType (value) {
       const absence = ABSENCE_TYPES.find(abs => abs.value === value);
@@ -53,8 +54,8 @@ export const planningEventMixin = {
     },
     getDisplayedEvent (event, day, startDisplay, endDisplay) {
       const dayEvent = { ...event };
-      const eventStartDate = this.$moment(event.startDate);
-      const eventEndDate = this.$moment(event.endDate);
+      const eventStartDate = moment(event.startDate);
+      const eventEndDate = moment(event.endDate);
       let displayedStartHour = eventStartDate.hours();
       let displayedEndHour = eventEndDate.hours();
       let displayedStartMinutes = eventStartDate.minutes();
@@ -62,7 +63,7 @@ export const planningEventMixin = {
       let staffingStartHour = displayedStartHour;
 
       if (event.type === ABSENCE && event.absenceNature === DAILY) {
-        if ([ILLNESS, WORK_ACCIDENT].includes(event.absence) && !this.$moment(event.startDate).isSame(day, 'day')) {
+        if ([ILLNESS, WORK_ACCIDENT].includes(event.absence) && !moment(event.startDate).isSame(day, 'day')) {
           displayedStartHour = eventStartDate.startOf('d').hours();
           staffingStartHour = STAFFING_VIEW_START_HOUR;
         }
@@ -76,7 +77,7 @@ export const planningEventMixin = {
         + displayedEndMinutes, (endDisplay - startDisplay) * 60
         + displayedEndMinutes);
 
-      dayEvent.displayedStartDate = this.$moment(day)
+      dayEvent.displayedStartDate = moment(day)
         .hour(displayedStartHour)
         .minutes(displayedStartMinutes)
         .toISOString();

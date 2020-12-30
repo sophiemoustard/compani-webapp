@@ -45,7 +45,6 @@
 <script>
 import Pay from '@api/Pay';
 import Stats from '@api/Stats';
-import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import {
   DEFAULT_AVATAR,
   PREV_MONTH_STATS,
@@ -55,6 +54,8 @@ import {
   MAX_WEEKLY_OCCUPATION_LEVEL,
   HIGH,
 } from '@data/constants';
+import moment from '@helpers/moment';
+import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import AuxiliaryIndicators from 'src/modules/client/components/planning/AuxiliaryIndicators';
 
 export default {
@@ -82,8 +83,8 @@ export default {
   },
   computed: {
     tabsContent () {
-      const currentMonthLabel = this.$moment(this.startOfWeek).startOf('month').format('MMMM YY');
-      const prevMonthLabel = this.$moment(this.startOfWeek).subtract(1, 'month').startOf('month').format('MMMM YY');
+      const currentMonthLabel = moment(this.startOfWeek).startOf('month').format('MMMM YY');
+      const prevMonthLabel = moment(this.startOfWeek).subtract(1, 'month').startOf('month').format('MMMM YY');
       return [
         { label: upperCaseFirstLetter(currentMonthLabel), default: true, name: MONTH_STATS },
         { label: upperCaseFirstLetter(prevMonthLabel), default: false, name: PREV_MONTH_STATS },
@@ -104,15 +105,15 @@ export default {
       return this.selectedTab === MONTH_STATS ? this.monthCustomersDetails : this.prevMonthCustomersDetails;
     },
     endOfWeek () {
-      return this.$moment(this.startOfWeek).endOf('w').toISOString();
+      return moment(this.startOfWeek).endOf('w').toISOString();
     },
     hasContractOnEvent () {
       if (!this.person.contracts || this.person.contracts.length === 0) return false;
 
-      return this.person.contracts.some(contract => (this.$moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.endOfWeek))) ||
-          (this.$moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(this.startOfWeek))));
+      return this.person.contracts.some(contract => (moment(contract.startDate).isSameOrBefore(this.endOfWeek) &&
+          (!contract.endDate || moment(contract.endDate).isAfter(this.endOfWeek))) ||
+          (moment(contract.startDate).isSameOrBefore(this.startOfWeek) &&
+          (!contract.endDate || moment(contract.endDate).isAfter(this.startOfWeek))));
     },
   },
   methods: {
@@ -126,7 +127,7 @@ export default {
       this.indicatorsModal = true;
     },
     async getMonthDetails () {
-      const month = this.$moment(this.startOfWeek).format('MM-YYYY');
+      const month = moment(this.startOfWeek).format('MM-YYYY');
       try {
         this.monthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
         const monthCustomersDetails = await Stats.getPaidInterventionStats({ auxiliary: this.person._id, month });
@@ -137,7 +138,7 @@ export default {
       }
     },
     async getPrevMonthDetails () {
-      const month = this.$moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
+      const month = moment(this.startOfWeek).subtract(1, 'M').format('MM-YYYY');
       try {
         this.prevMonthHoursDetails = await Pay.getHoursBalanceDetail({ auxiliary: this.person._id, month });
         const prevMonthCustomersDetails = await Stats.getPaidInterventionStats({ auxiliary: this.person._id, month });

@@ -29,6 +29,7 @@ import Contracts from '@api/Contracts';
 import LargeTable from '@components/table/LargeTable';
 import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'StaffRegister',
@@ -73,7 +74,7 @@ export default {
           label: 'Date de naissance',
           field: row => get(row, 'user.identity.birthDate') || '',
           align: 'left',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'nationality',
@@ -98,14 +99,14 @@ export default {
           label: 'Date de début',
           field: 'startDate',
           align: 'left',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'endDate',
           label: 'Date de fin',
           field: 'endDate',
           align: 'left',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'idCardOrResidencePermitRecto',

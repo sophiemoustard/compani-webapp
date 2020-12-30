@@ -1,9 +1,10 @@
 import pickBy from 'lodash/pickBy';
 import { required } from 'vuelidate/lib/validators';
-import { strictPositiveNumber, validYear } from '@helpers/vuelidateCustomVal';
 import Payments from '@api/Payments';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { PAYMENT, DIRECT_DEBIT, PAYMENT_OPTIONS } from '@data/constants';
+import { strictPositiveNumber, validYear } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 
 export const paymentMixin = {
   data () {
@@ -46,7 +47,7 @@ export const paymentMixin = {
       this.newPayment = {
         customer: customer._id,
         nature: PAYMENT,
-        date: this.$moment().toISOString(),
+        date: moment().toISOString(),
         netInclTaxes: 0,
         type: '',
       };
@@ -62,7 +63,7 @@ export const paymentMixin = {
       this.selectedTpp = {};
       this.newPayment = {
         nature: PAYMENT,
-        date: this.$moment().toISOString(),
+        date: moment().toISOString(),
         netInclTaxes: 0,
         type: '',
       };

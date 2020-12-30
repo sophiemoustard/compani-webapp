@@ -1,6 +1,6 @@
-import moment from 'moment';
 import { alenviAxios } from '@api/ressources/alenviAxios';
 import { downloadFile } from '@helpers/file';
+import moment from '@helpers/moment';
 
 export default {
   async create (data) {

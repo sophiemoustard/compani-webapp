@@ -113,8 +113,6 @@ import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { formatIdentity, formatHours } from '@helpers/utils';
 import {
   AUXILIARY,
   PLANNING_REFERENT,
@@ -123,8 +121,11 @@ import {
   UNKNOWN_AVATAR,
   SITUATION_OPTIONS,
 } from '@data/constants';
-import { customerMixin } from 'src/modules/client/mixins/customerMixin';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import { formatIdentity, formatHours } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
 
 export default {
@@ -152,7 +153,7 @@ export default {
           name: 'lastEvent',
           align: 'center',
           label: 'Dernière inter.',
-          field: row => this.$moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
+          field: row => moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
         },
       ],
       followUpPagination: { rowsPerPage: 5 },
