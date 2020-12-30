@@ -1,6 +1,6 @@
 <template>
   <div class="profile-tabs">
-    <q-tabs align="justify" color="transparent" text-color="primary" v-model="selectedTab">
+    <q-tabs align="justify" color="transparent" v-model="selectedTab" active-color="primary" no-caps>
       <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" :alert="alert(tab)" />
     </q-tabs>
     <q-tab-panels v-model="selectedTab" class="no-border" flat>
@@ -40,48 +40,34 @@ export default {
 
 <style lang="stylus" scoped>
   .profile-tabs
-    /deep/ .q-tab--active
+    /deep/ :not(.q-tab--active)
       & > .q-tab__indicator
-        color: $primary
-    /deep/.q-tab__indicator
-      color: $grey-300
-      opacity: 1
-    & /deep/.q-tab-panels
+        color: $grey-300
+        opacity: 1
+    .q-tab-panels
       background-color: inherit
       .scroll
         overflow: initial
-      .q-panel
-        .q-tab-panel
-          padding: 0
-          padding-top: 24px
     & /deep/ .q-tabs
-      & div:nth-last-child(1)
-        margin-right: 0 !important
       & .q-tabs__content
-        &:not(.scrollable)
-          @media (min-width: 992px)
-            padding: 0
         & .q-tab
           flex: 1 1 0
           padding-left: 0px
           justify-content: start
           margin-right: 24px
-          text-transform: none
           @media (max-width: 767px)
             max-width: 66%
           @media (min-width: 768px)
             max-width: 33%
           & .q-tab__content
             & .q-tab__label
-              color: $grey-800
               font-size: 24px
             & .q-tab__alert
               background: $secondary
           &:before
             background: none
-        & .q-tab--active
+        & :not(.q-tab--active)
           & .q-tab__content
             & .q-tab__label
-              color: $primary
-              font-weight: 700
+              color: $grey-800
 </style>
