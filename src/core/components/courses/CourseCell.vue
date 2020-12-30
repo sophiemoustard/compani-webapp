@@ -189,8 +189,8 @@ export default {
   .slots
     height: 10px;
     flex: 1;
-    background-color: $primary-light;
-    border: solid 1px $light-purple;
+    background-color: $pink-100;
+    border: solid 1px $pink-400;
     &-happened
       background-color: $primary;
       border: none;

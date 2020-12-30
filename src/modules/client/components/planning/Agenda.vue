@@ -19,7 +19,7 @@
             <div class="planning-background">
               <template v-if="dayIndex === 0">
                 <template v-for="(hour, hourIndex) in hours">
-                  <div v-if="hourIndex !== 0" class="planning-hour" :key="`hour_${hourIndex}`"
+                  <div v-if="hourIndex !== 0" class="planning-hour bg-white" :key="`hour_${hourIndex}`"
                     :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">
                     {{ hour.format('HH:mm') }}
                   </div>
@@ -147,8 +147,8 @@ export default {
       .planning-background
         background: repeating-linear-gradient(
           180deg,
-          $white,
-          $white 13.1%,
+          white,
+          white 13.1%,
           $grey-100,
           $grey-100 13.3%
         )
@@ -163,7 +163,7 @@ export default {
         left: 3px
         right: 3px
         margin: 0
-        border: 1px solid $white
+        border: 1px solid white
         overflow: hidden
         padding-top: 0
         padding-bottom: 0
@@ -173,7 +173,6 @@ export default {
       .planning-hour
         position: absolute
         color: $grey-300
-        background-color: $white
         font-size: 12px
         padding: 0 5px
 

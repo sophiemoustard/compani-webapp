@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-between full-width custom-bottom">
+  <div class="row justify-between full-width text-grey-600">
     <div class="row items-center">
       <q-btn-toggle class="on-left no-shadow" v-model="pagination.rowsPerPage" :options="rowsPerPageOptions"
         toggle-text-color="primary" toggle-color="white" no-caps dense size="12px" />
@@ -66,21 +66,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .custom-bottom
-    color: rgba(0, 0, 0, 0.54)
-
   /deep/ .q-btn-group
-    & button .q-btn-inner
-      font-size: 12px
     & > .q-btn-item:first-child
-      border: 1px solid rgba(0,0,0,0.12)
-    & > .q-btn-item:not(:last-child)
-      border-top: 1px solid rgba(0,0,0,0.12)
-      border-right: 1px solid rgba(0,0,0,0.12)
-      border-bottom: 1px solid rgba(0,0,0,0.12)
+      border: 1px solid $grey-300
+    & > .q-btn-item:not(:first-child)
+      border: 1px solid $grey-300
+      border-left: none
     & > .q-btn-item:last-child
-      border-top: 1px solid rgba(0,0,0,0.12)
-      border-right: 1px solid rgba(0,0,0,0.12)
-      border-bottom: 1px solid rgba(0,0,0,0.12)
       font-weight: bold
 </style>

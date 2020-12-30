@@ -124,7 +124,7 @@ export default {
       padding: 0 12px
 
   .economic-indicators
-    border-left: 5px solid $primary-dark !important
+    border-left: 5px solid $pink-800 !important
   .quality-indicators
     border-left: 5px solid $primary !important
 
