@@ -1,6 +1,6 @@
 <template>
   <div class="profile-tabs">
-    <q-tabs align="justify" color="transparent" v-model="selectedTab" active-color="primary" no-caps>
+    <q-tabs align="justify" color="transparent" v-model="selectedTab" no-caps>
       <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" :alert="alert(tab)" />
     </q-tabs>
     <q-tab-panels v-model="selectedTab" class="no-border" flat>
@@ -40,10 +40,12 @@ export default {
 
 <style lang="stylus" scoped>
   .profile-tabs
-    /deep/ :not(.q-tab--active)
+    /deep/ .q-tab--active
       & > .q-tab__indicator
-        color: $grey-300
-        opacity: 1
+        color: $primary
+    /deep/.q-tab__indicator
+      color: $grey-300
+      opacity: 1
     .q-tab-panels
       background-color: inherit
       .scroll
@@ -70,4 +72,8 @@ export default {
           & .q-tab__content
             & .q-tab__label
               color: $grey-800
+        & .q-tab--active
+          & .q-tab__content
+            & .q-tab__label
+              color: $primary
 </style>

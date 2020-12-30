@@ -2,7 +2,7 @@
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
       class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners"
-      :selected="selected" :visible-columns="formattedVisibleColumns" :hide-bottom="hideBottom || fewData">
+      :selected="selected" :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
@@ -64,8 +64,8 @@ export default {
     'ni-pagination': Pagination,
   },
   computed: {
-    fewData () {
-      return this.data.length <= this.rowsPerPage[0];
+    shouldHideBottom () {
+      return this.hideBottom || this.data.length <= this.rowsPerPage[0];
     },
     paginationOptions () {
       return this.rowsPerPage.filter(o => o <= this.data.length);
