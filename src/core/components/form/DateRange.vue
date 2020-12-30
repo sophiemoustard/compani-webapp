@@ -61,7 +61,7 @@ export default {
   .date-container
     width: 100%
     border-radius: 3px
-    background-color: $white
+    background-color: white
     & .delimiter
       margin: 0
       color: black

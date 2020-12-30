@@ -29,7 +29,7 @@
         <div class="relative-position">
           <q-icon size="36px" name="phone_iphone" color="grey-2" />
           <q-icon v-if="!userProfile.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
-          <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="accent" size="16px" />
+          <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="green-800" size="16px" />
         </div>
         <div>
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>

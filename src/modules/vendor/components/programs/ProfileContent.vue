@@ -3,7 +3,7 @@
     <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
       <div>
         <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
-        <span class="published-sub-program" v-if="isPublished(subProgram)">Publié</span>
+        <span class="published-sub-program bg-green-800" v-if="isPublished(subProgram)">Publié</span>
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
@@ -607,7 +607,6 @@ export default {
   justify-content: space-between
 
 .published-sub-program
-  background-color: $accent
   font-size: 14px
   border-radius: 15px
   padding: 1px 6px
