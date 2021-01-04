@@ -3,7 +3,7 @@
     <div v-for="(subProgram, index) of program.subPrograms" class="q-mb-xl sub-program-container" :key="index">
       <div>
         <span class="text-weight-bold">Sous-programme {{ index + 1 }}</span>
-        <span class="published-sub-program" v-if="isPublished(subProgram)">Publié</span>
+        <span class="published-sub-program bg-green-800" v-if="isPublished(subProgram)">Publié</span>
       </div>
       <ni-input v-model.trim="program.subPrograms[index].name" required-field caption="Nom" @focus="saveTmpName(index)"
         @blur="updateSubProgramName(index)" :error="$v.program.subPrograms.$each[index].name.$error"
@@ -35,7 +35,7 @@
                 :disable="isPublished(subProgram)" />
             </div>
           </q-card-section>
-          <div class="beige-background activity-container" v-if="isActivitiesShown[step._id]">
+          <div class="bg-peach-200 activity-container" v-if="isActivitiesShown[step._id]">
             <draggable v-model="step.activities" @change="dropActivity(subProgram._id, step._id)"
               class="activity-draggable" ghost-class="ghost" :disabled="$q.platform.is.mobile || isPublished(step)">
               <q-card v-for="(activity, actIndex) of step.activities" :key="actIndex" flat class="activity">
@@ -607,7 +607,6 @@ export default {
   justify-content: space-between
 
 .published-sub-program
-  background-color: $accent
   font-size: 14px
   border-radius: 15px
   padding: 1px 6px

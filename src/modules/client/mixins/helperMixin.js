@@ -8,8 +8,9 @@ import Roles from '@api/Roles';
 import Users from '@api/Users';
 import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
 import { HELPER } from '@data/constants';
+import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export const helperMixin = {
   data () {
@@ -43,8 +44,8 @@ export const helperMixin = {
           label: 'Depuis le...',
           field: 'createdAt',
           align: 'left',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
@@ -60,7 +61,7 @@ export const helperMixin = {
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        const approvalDate = this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY');
+        const approvalDate = moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY');
         return `le ${approvalDate} par ${this.acceptedBy}`;
       }
     },

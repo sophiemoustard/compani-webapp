@@ -3,11 +3,11 @@
     <template slot="title">
         Ajouter un <span class="text-weight-bold">créneau</span>
       </template>
-      <ni-select in-modal caption="Etape" :options="stepOptions" v-model="newCourseSlot.step" required-field
-        @blur="validations.step.$touch" :error="validations.step.$error" />
-      <ni-datetime-range caption="Dates et heures" v-model="newCourseSlot.dates" required-field disable-end-date
-        :error="validations.dates.$error" @blur="validations.dates.$touch" />
-      <ni-search-address v-model="newCourseSlot.address" :error-message="addressError"
+      <ni-select in-modal caption="Etape" :options="stepOptions" :value="newCourseSlot.step" required-field
+        @blur="validations.step.$touch" :error="validations.step.$error" @input="update($event, 'step')" />
+      <ni-datetime-range caption="Dates et heures" :value="newCourseSlot.dates" required-field disable-end-date
+        :error="validations.dates.$error" @blur="validations.dates.$touch" @input="update($event, 'dates')" />
+      <ni-search-address :value="newCourseSlot.address" @input="update($event, 'address')" :error-message="addressError"
         @blur="validations.address.$touch" :error="validations.address.$error" in-modal last />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un créneau" icon-right="add" color="primary"
@@ -53,6 +53,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newCourseSlot', { ...this.newCourseSlot, [prop]: event });
     },
   },
 };

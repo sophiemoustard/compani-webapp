@@ -32,6 +32,7 @@ import {
   TRAINEE_DELETION,
 } from '@data/constants';
 import Button from '@components/Button';
+import moment from '@helpers/moment';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 
 export default {
@@ -73,7 +74,7 @@ export default {
       }
     },
     historySignature () {
-      const date = this.$moment(this.courseHistory.createdAt).format('DD/MM');
+      const date = moment(this.courseHistory.createdAt).format('DD/MM');
       const hour = formatHoursWithMinutes(this.courseHistory.createdAt);
       const user = formatIdentity(this.courseHistory.createdBy.identity, 'FL');
 
@@ -88,7 +89,7 @@ export default {
       return get(user, 'picture.link') || DEFAULT_AVATAR;
     },
     getSlotCreationTitle () {
-      const date = this.$moment(this.courseHistory.slot.startDate).format('DD/MM');
+      const date = moment(this.courseHistory.slot.startDate).format('DD/MM');
       const startHour = formatHoursWithMinutes(this.courseHistory.slot.startDate);
       const endHour = formatHoursWithMinutes(this.courseHistory.slot.endDate);
       const infos = `${date} de ${startHour} à ${endHour}`;
@@ -99,7 +100,7 @@ export default {
       return get(this.courseHistory, 'slot.address.fullAddress', 'Pas d\'adresse renseignée.');
     },
     getSlotDeletionTitle () {
-      const date = this.$moment(this.courseHistory.slot.startDate).format('DD/MM');
+      const date = moment(this.courseHistory.slot.startDate).format('DD/MM');
 
       return { pre: 'Suppression du', type: 'créneau', post: 'du', infos: `${date}` };
     },
@@ -112,13 +113,13 @@ export default {
     },
     getSlotEditionTitle () {
       if (this.courseHistory.update.startDate) {
-        const from = this.$moment(this.courseHistory.update.startDate.from).format('DD/MM');
-        const to = this.$moment(this.courseHistory.update.startDate.to).format('DD/MM');
+        const from = moment(this.courseHistory.update.startDate.from).format('DD/MM');
+        const to = moment(this.courseHistory.update.startDate.to).format('DD/MM');
 
         return { type: 'Créneau', post: ' déplacé du', infos: `${from} au ${to}` };
       }
       if (this.courseHistory.update.startHour) {
-        const date = this.$moment(this.courseHistory.update.startHour.from).format('DD/MM');
+        const date = moment(this.courseHistory.update.startHour.from).format('DD/MM');
         const startHour = formatHoursWithMinutes(this.courseHistory.update.startHour.to);
         const endHour = formatHoursWithMinutes(this.courseHistory.update.endHour.to);
 

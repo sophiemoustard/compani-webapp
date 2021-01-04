@@ -4,7 +4,7 @@
       <div v-if="isCoach" class="row justify-between items-baseline">
         <p class="text-weight-bold">Documents</p>
       </div>
-      <ni-large-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
+      <ni-simple-table v-if="payDocuments.length !== 0 || payDocumentsLoading" :data="payDocuments" :columns="columns"
         :pagination.sync="pagination" row-key="name" :loading="payDocumentsLoading">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -25,7 +25,7 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-large-table>
+      </ni-simple-table>
       <div v-else class="q-my-sm">
         <span class="no-document">Aucun document</span>
       </div>
@@ -51,15 +51,14 @@
 <script>
 import { mapGetters, mapState } from 'vuex';
 import get from 'lodash/get';
-import snakeCase from 'lodash/snakeCase';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import PayDocuments from '@api/PayDocuments';
 import Modal from '@components/modal/Modal';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { formatIdentity } from '@helpers/utils';
-import { PAY_DOCUMENT_NATURES, OTHER, COACH_ROLES } from '@data/constants';
+import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
+import moment from '@helpers/moment';
 import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -69,7 +68,7 @@ export default {
   components: {
     'ni-document-upload': DocumentUpload,
     'ni-modal': Modal,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {
@@ -93,14 +92,9 @@ export default {
           label: 'Date',
           align: 'left',
           field: 'date',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: row => row,
-        },
+        { name: 'actions', label: '', align: 'left', field: row => row },
       ],
       pagination: {
         sortBy: 'date',
@@ -137,18 +131,10 @@ export default {
     formatDocumentPayload () {
       const { file, nature, date } = this.newDocument;
       const form = new FormData();
-      const formattedDate = this.$moment(date).format('DD-MM-YYYY-HHmm');
-      const documentOption = this.documentNatureOptions.find(option => option.value === this.newDocument.nature);
-      const fileName = documentOption && this.newDocument.nature !== OTHER
-        ? snakeCase(`${documentOption.label} ${formattedDate} ${formatIdentity(this.userProfile.identity, 'FL')}`)
-        : snakeCase(`document_paie_${formattedDate}`);
-
       form.append('nature', nature);
       form.append('date', date);
-      form.append('payDoc', file);
+      form.append('file', file);
       form.append('mimeType', file.type || 'application/octet-stream');
-      form.append('fileName', fileName);
-      form.append('driveFolderId', this.driveFolder);
       form.append('user', this.userProfile._id);
 
       return form;

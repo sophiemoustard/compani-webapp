@@ -25,8 +25,9 @@
 import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import Events from '@api/Events';
-import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, AGENDA, CUSTOMER, WEEK_VIEW, THREE_DAYS_VIEW } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { planningTimelineMixin } from 'src/modules/client/mixins/planningTimelineMixin';
 import Agenda from 'src/modules/client/components/planning/Agenda';
 import EventConflictModal from 'src/modules/client/components/customers/EventConflictModal';
@@ -62,7 +63,7 @@ export default {
   },
   async created () {
     this.viewMode = this.$q.platform.is.mobile ? THREE_DAYS_VIEW : WEEK_VIEW;
-    this.startOfWeek = this.$moment().startOf('week').toISOString();
+    this.startOfWeek = moment().startOf('week').toISOString();
     this.getTimelineDays();
     if (!this.customer) await this.refreshCustomer();
     await this.getEvents();
@@ -109,8 +110,8 @@ export default {
     },
     getInConflictEvents (event) {
       return this.events.filter(
-        ev => this.$moment(event.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
-          this.$moment(ev.endDate).isBetween(event.startDate, event.endDate, 'minutes', '[]')
+        ev => moment(event.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
+          moment(ev.endDate).isBetween(event.startDate, event.endDate, 'minutes', '[]')
       ).map(ev => ({ ...ev, displayedStartDate: ev.startDate, displayedEndDate: ev.endDate }));
     },
   },

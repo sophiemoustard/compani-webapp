@@ -10,7 +10,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
+    <ni-simple-table :data="filteredAndOrderedDraftBills" :columns="columns" :pagination.sync="pagination"
       :row-key="tableRowKey" :loading="tableLoading" selection="multiple" :selected.sync="selected"
       data-cy="client-table" separator="none">
       <template #header="{ props }">
@@ -41,7 +41,7 @@
           </template>
         </template>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       :label="totalToBillLabel" @click="validateBillListCreation" data-cy="to-bill-button" />
   </q-page>
@@ -53,12 +53,13 @@ import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import Bills from '@api/Bills';
 import DateRange from '@components/form/DateRange';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import Select from '@components/form/Select';
 import TitleHeader from '@components/TitleHeader';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { MONTH } from '@data/constants';
 import { formatPrice, formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 import ToBillRow from 'src/modules/client/components/table/ToBillRow';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -69,7 +70,7 @@ export default {
   components: {
     'ni-to-bill-row': ToBillRow,
     'ni-date-range': DateRange,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'ni-select': Select,
     'ni-title-header': TitleHeader,
   },
@@ -178,17 +179,17 @@ export default {
       const billingPeriod = get(this.company, 'customersConfig.billingPeriod');
       if (billingPeriod === MONTH) {
         this.billingDates = {
-          endDate: this.$moment().subtract(1, 'M').endOf('month').toISOString(),
-          startDate: this.$moment().subtract(1, 'M').startOf('month').toISOString(),
+          endDate: moment().subtract(1, 'M').endOf('month').toISOString(),
+          startDate: moment().subtract(1, 'M').startOf('month').toISOString(),
         };
       } else {
         this.billingDates = {
-          endDate: this.$moment().date() > 15
-            ? this.$moment().date(15).endOf('d').toISOString()
-            : this.$moment().subtract(1, 'M').endOf('month').toISOString(),
-          startDate: this.$moment().date() > 15
-            ? this.$moment().startOf('month').toISOString()
-            : this.$moment().subtract(1, 'M').date(16).startOf('d')
+          endDate: moment().date() > 15
+            ? moment().date(15).endOf('d').toISOString()
+            : moment().subtract(1, 'M').endOf('month').toISOString(),
+          startDate: moment().date() > 15
+            ? moment().startOf('month').toISOString()
+            : moment().subtract(1, 'M').date(16).startOf('d')
               .toISOString(),
         };
       }
@@ -199,8 +200,8 @@ export default {
       try {
         this.tableLoading = true;
         const params = {
-          endDate: this.$moment(this.billingDates.endDate).endOf('d').toISOString(),
-          billingStartDate: this.$moment(this.billingDates.startDate).startOf('d').toISOString(),
+          endDate: moment(this.billingDates.endDate).endOf('d').toISOString(),
+          billingStartDate: moment(this.billingDates.startDate).startOf('d').toISOString(),
           billingPeriod: get(this.company, 'customersConfig.billingPeriod'),
         };
 
@@ -267,8 +268,8 @@ export default {
 
         const draftBills = await Bills.getDraftBills({
           billingStartDate: startDate,
-          startDate: this.$moment(startDate).startOf('d').toISOString(),
-          endDate: this.$moment(endDate).endOf('d').toISOString(),
+          startDate: moment(startDate).startOf('d').toISOString(),
+          endDate: moment(endDate).endOf('d').toISOString(),
           billingPeriod: get(this.company, 'customersConfig.billingPeriod'),
           customer: customer._id,
         });

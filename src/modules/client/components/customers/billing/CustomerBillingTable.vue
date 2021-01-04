@@ -1,5 +1,5 @@
 <template>
-  <ni-simple-table :data="documents" :columns="columns" :loading="loading" :responsive="false" hide-bottom>
+  <ni-simple-table :data="documents" :columns="columns" :loading="loading" hide-bottom>
     <template #top-row="{ props }">
       <q-tr data-cy="start-period" :props="props">
         <q-td class="bold">{{ formatDate(billingDates.startDate) }}</q-td>
@@ -74,8 +74,6 @@ import Bills from '@api/Bills';
 import CreditNotes from '@api/CreditNotes';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative } from '@components/popup/notify';
-import { formatPrice } from '@helpers/utils';
-import { openPdf } from '@helpers/file';
 import {
   CREDIT_NOTE,
   BILL,
@@ -89,6 +87,9 @@ import {
   PAYMENT,
   COMPANI,
 } from '@data/constants';
+import moment from '@helpers/moment';
+import { formatPrice } from '@helpers/utils';
+import { openPdf } from '@helpers/file';
 
 export default {
   name: 'CustomerBillingTable',
@@ -115,13 +116,9 @@ export default {
           label: 'Date',
           align: 'left',
           field: 'date',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
-        {
-          name: 'document',
-          label: '',
-          align: 'left',
-        },
+        { name: 'document', label: '', align: 'left' },
         {
           name: 'inclTaxes',
           label: 'Montant TTC',
@@ -137,11 +134,7 @@ export default {
           style: 'width: 100px',
           format: value => formatPrice(value),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-        },
+        { name: 'actions', label: '', align: 'center' },
       ],
       pagination: { rowsPerPage: 0 },
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
@@ -167,7 +160,7 @@ export default {
       return `${titlePrefix}${typeLabel}`;
     },
     formatDate (value) {
-      return value ? `${this.$moment(value).format('DD/MM/YY')}` : '';
+      return value ? `${moment(value).format('DD/MM/YY')}` : '';
     },
     formatPrice (value) {
       return formatPrice(value);

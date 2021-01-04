@@ -1,7 +1,8 @@
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
-import { formatIdentity } from '@helpers/utils';
 import { INTER_B2B, INTRA } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export const courseFiltersMixin = {
   data () {
@@ -85,7 +86,7 @@ export const courseFiltersMixin = {
       return courses.map(course => ({
         ...course,
         slots: course.slots.length
-          ? Object.values(groupBy(course.slots, s => this.$moment(s.startDate).format('DD/MM/YYYY')))
+          ? Object.values(groupBy(course.slots, s => moment(s.startDate).format('DD/MM/YYYY')))
           : [],
         slotsToPlan: course.slotsToPlan || [],
       }));

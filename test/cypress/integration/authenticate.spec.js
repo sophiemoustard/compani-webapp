@@ -56,5 +56,5 @@ describe('Login page tests', () => {
       cy.getCookie('refresh_token').should('exist');
       cy.getCookie('user_id').should('exist');
     });
-  })
+  });
 });

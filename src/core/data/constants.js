@@ -4,8 +4,7 @@ export const IDENTIFICATION = 'identification';
 export const CONTRACT_END = 'contract_end';
 
 // MEDIA
-export const PINK_LOGO = 'https://res.cloudinary.com/alenvi/image/upload/v1546865717/images/business/Compani/'
-  + 'compani_texte_rose_1000.png';
+export const PINK_LOGO = 'https://storage.googleapis.com/compani-main/compani_texte_rose_1000.png';
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
 export const VIDEO_EXTENSIONS = 'video/*';
@@ -136,10 +135,8 @@ export const BILLING_INDIRECT = 'indirect';
 export const BILLING_DIRECT = 'direct';
 
 // AVATAR
-export const DEFAULT_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1513764284/'
-  + 'images/users/default_avatar.png';
-export const UNKNOWN_AVATAR = 'https://res.cloudinary.com/alenvi/image/upload/c_scale,h_400,q_auto,w_400/v1563288281/'
-  + 'images/users/unknown_avatar.png';
+export const DEFAULT_AVATAR = 'https://storage.googleapis.com/compani-main/default_avatar.png';
+export const UNKNOWN_AVATAR = 'https://storage.googleapis.com/compani-main/unknown_avatar.png';
 
 // REPETITION FREQUENCY
 export const NEVER = 'never';

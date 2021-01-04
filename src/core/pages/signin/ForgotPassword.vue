@@ -19,10 +19,11 @@
 
 <script>
 import { email, required } from 'vuelidate/lib/validators';
-import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { isUserLogged } from '@helpers/alenvi';
 
 export default {
   components: {
@@ -37,11 +38,16 @@ export default {
   validations: {
     email: { email, required },
   },
+  async beforeRouteEnter (to, from, next) {
+    const isLogged = await isUserLogged();
+    if (isLogged) next({ path: '/' });
+    else next();
+  },
   methods: {
     async submit () {
       try {
         const payload = { email: this.email.toLowerCase() };
-        await Users.forgotPassword(payload);
+        await Authentication.forgotPassword(payload);
         NotifyPositive('Un email a été envoyé à l\'adresse indiquée');
       } catch (e) {
         let content = '';

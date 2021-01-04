@@ -1,5 +1,5 @@
 <template>
-  <div class="card-list">
+  <div class="card-list bg-white">
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
@@ -154,7 +154,6 @@ export default {
 .card-list
   padding: 5px 5px 0 5px
   border-radius: 3px
-  background-color: $white
   display: flex
   flex-direction: column
 
@@ -168,15 +167,15 @@ export default {
   &-selected
     justify-content: flex-end
     .card-cell
-      background-color: $light-purple
+      background-color: $pink-400
   &-locked
     .card-cell
-      background-color: $light-grey
+      background-color: $grey-100
   &-locked-selected
     justify-content: flex-end
     .card-cell
-      background-color: $dark-grey
-      color: $white
+      background-color: $grey-800
+      color: white
   .dot
     margin: 0 0 0 3px
 
@@ -184,10 +183,10 @@ export default {
   display: flex
   flex-direction: column
 .locked-unselected
-  color: $grey
+  color: $grey-400
 
 .card-cell
-  background-color: $primary-light
+  background-color: $pink-100
   border-radius: 4px
   height: fit-content
   @media screen and (min-width: 768px)

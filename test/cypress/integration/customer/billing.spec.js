@@ -31,10 +31,10 @@ describe('Customer billing tests', () => {
       expect($th.eq(12)).to.have.text('');
     });
 
-    cy.get('[data-cy=date-input] input').eq(0).clear()
-    cy.get('[data-cy=date-input] input').eq(0).type(Cypress.moment().subtract(4, 'M').format('DD/MM/YYYY'))
-    cy.get('[data-cy=date-input] input').eq(1).clear()
-    cy.get('[data-cy=date-input] input').eq(1).type(Cypress.moment().add(4, 'M').format('DD/MM/YYYY'))
+    cy.get('[data-cy=date-input] input').eq(0).clear();
+    cy.get('[data-cy=date-input] input').eq(0).type(Cypress.moment().subtract(4, 'M').format('DD/MM/YYYY'));
+    cy.get('[data-cy=date-input] input').eq(1).clear();
+    cy.get('[data-cy=date-input] input').eq(1).type(Cypress.moment().add(4, 'M').format('DD/MM/YYYY'));
     cy.get('[data-cy=start-period] td').and(($tds) => {
       expect($tds.eq(0)).to.have.text(Cypress.moment().subtract(4, 'M').format('DD/MM/YY'));
     });
@@ -58,8 +58,10 @@ describe('Customer billing tests', () => {
     cy.get('[data-cy=col-date]').eq(2).should('contain', oneMonthBefore.date(5).format('DD/MM/YYYY'));
 
     cy.get('[data-cy=col-document]').eq(0).should('contain', `Facture FACT-101${twoMonthBefore.format('MMYY')}00002`);
-    cy.get('[data-cy=col-document]').eq(1).should('contain', `Paiement REG-101${oneMonthBefore.format('MMYY')}00201 (Prélèvement)`);
-    cy.get('[data-cy=col-document]').eq(2).should('contain', `Remboursement REMB-101${oneMonthBefore.format('MMYY')}00201 (Virement)`);
+    cy.get('[data-cy=col-document]').eq(1)
+      .should('contain', `Paiement REG-101${oneMonthBefore.format('MMYY')}00201 (Prélèvement)`);
+    cy.get('[data-cy=col-document]').eq(2)
+      .should('contain', `Remboursement REMB-101${oneMonthBefore.format('MMYY')}00201 (Virement)`);
 
     cy.get('[data-cy=col-inclTaxes]').eq(0).should('contain', '-10,00\u00A0€');
     cy.get('[data-cy=col-inclTaxes]').eq(1).should('contain', '10,00\u00A0€');
@@ -86,11 +88,10 @@ describe('Customer billing tests', () => {
       expect($tds.eq(4)).to.have.text('');
     });
 
-    cy.get('[data-cy=link]').eq(0).then(($a) => {
-      const href = $a.prop('href');
-      expect(href).to.match(/^http(s)?:\/\/.*\/bills\/[0-9a-fA-F]{24}\/pdfs\?x-access-token=.*$/);
-      cy.request(href).its('status').should('equal', 200);
-    });
+    cy.server();
+    cy.route('GET', '/bills/*/pdfs').as('pdf');
+    cy.get('[data-cy=link]').eq(0).click().wait('@pdf')
+      .then((xhr) => { expect(xhr.status).to.equal(200); });
   });
 
   it('should display correctly tpp billing table', () => {
@@ -107,7 +108,8 @@ describe('Customer billing tests', () => {
     cy.get('[data-cy=col-date]').eq(4).should('contain', oneMonthBefore.date(5).format('DD/MM/YYYY'));
 
     cy.get('[data-cy=col-document]').eq(3).should('contain', `Facture FACT-101${twoMonthBefore.format('MMYY')}00001`);
-    cy.get('[data-cy=col-document]').eq(4).should('contain', `Paiement REG-101${oneMonthBefore.format('MMYY')}00202 (Prélèvement)`);
+    cy.get('[data-cy=col-document]').eq(4)
+      .should('contain', `Paiement REG-101${oneMonthBefore.format('MMYY')}00202 (Prélèvement)`);
 
     cy.get('[data-cy=col-inclTaxes]').eq(3).should('contain', '-20,00\u00A0€');
     cy.get('[data-cy=col-inclTaxes]').eq(4).should('contain', '20,00\u00A0€');
@@ -129,11 +131,10 @@ describe('Customer billing tests', () => {
       expect($tds.eq(9)).to.have.text('');
     });
 
-    cy.get('[data-cy=link]').eq(1).then(($a) => {
-      const href = $a.prop('href');
-      expect(href).to.match(/^http(s)?:\/\/.*\/bills\/[0-9a-fA-F]{24}\/pdfs\?x-access-token=.*$/);
-      cy.request(href).its('status').should('equal', 200);
-    });
+    cy.server();
+    cy.route('GET', '/bills/*/pdfs').as('pdf');
+    cy.get('[data-cy=link]').eq(1).click().wait('@pdf')
+      .then((xhr) => { expect(xhr.status).to.equal(200); });
   });
 
   it('should correctly display tax certificate table', () => {
@@ -142,10 +143,10 @@ describe('Customer billing tests', () => {
       expect($tds.eq(1)).to.have.text(Cypress.moment().subtract(1, 'y').endOf('y').format('DD/MM/YYYY'));
       expect($tds.eq(2)).to.contain('file_download');
     });
-    cy.get('[data-cy=link]').eq(2).then(($a) => {
-      const href = $a.prop('href');
-      expect(href).to.match(/^http(s)?:\/\/.*\/taxcertificates\/[0-9a-fA-F]{24}\/pdfs\?x-access-token=.*$/);
-      cy.request(href).its('status').should('equal', 200);
-    })
-  })
+
+    cy.server();
+    cy.route('GET', '/taxcertificates/*/pdfs').as('pdf');
+    cy.get('[data-cy=link]').eq(2).click().wait('@pdf')
+      .then((xhr) => { expect(xhr.status).to.equal(200); });
+  });
 });

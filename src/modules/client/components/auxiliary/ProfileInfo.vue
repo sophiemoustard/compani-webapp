@@ -131,50 +131,50 @@
             :entity="userProfile" name="idCardRecto" @uploaded="documentUploaded" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.idCardRecto')"
             :error="$v.userProfile.administrative.idCardRecto.driveId.$error" :extensions="extensions"
-            :additional-value="documentTitle('cni_recto')" />
+            :additional-value="documentTitle('cni_recto')" drive-storage />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'cni'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Carte d'identité (verso)" path="administrative.idCardVerso" alt="cni verso"
             :entity="userProfile" :url="docsUploadUrl" name="idCardVerso" @uploaded="documentUploaded"
             @delete="validateDocumentDeletion('administrative.idCardVerso')"
-            :extensions="extensions" :additional-value="documentTitle('cni_verso')" />
+            :extensions="extensions" :additional-value="documentTitle('cni_verso')" drive-storage />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'pp'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Passeport" path="administrative.passport" alt="passeport" :url="docsUploadUrl"
             :entity="userProfile" name="passport" :additional-value="documentTitle('passport')"
             @delete="validateDocumentDeletion('administrative.passport')" @uploaded="documentUploaded"
-            :error="$v.userProfile.administrative.passport.driveId.$error" :extensions="extensions" />
+            :error="$v.userProfile.administrative.passport.driveId.$error" :extensions="extensions" drive-storage />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (recto)" path="administrative.residencePermitRecto"
             alt="titre de séjour (recto)" :entity="userProfile" @uploaded="documentUploaded" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.residencePermitRecto')" :extensions="extensions"
             :error="$v.userProfile.administrative.residencePermitRecto.driveId.$error" name="residencePermitRecto"
-            :additional-value="documentTitle('titre_de_séjour_recto')" />
+            :additional-value="documentTitle('titre_de_séjour_recto')" drive-storage />
         </div>
         <div v-if="userProfile.administrative.identityDocs === 'ts'" class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Titre de séjour (verso)" path="administrative.residencePermitVerso"
             alt="titre de séjour (verso)" name="residencePermitVerso" @uploaded="documentUploaded" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.residencePermitVerso')" :extensions="extensions"
-            :entity="userProfile" :additional-value="documentTitle('titre_de_séjour_verso')" />
+            :entity="userProfile" :additional-value="documentTitle('titre_de_séjour_verso')" drive-storage />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Attestation de sécurité sociale" path="administrative.healthAttest"
             alt="attestation secu" :entity="userProfile" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion('administrative.healthAttest')"
             name="healthAttest" @uploaded="documentUploaded" :additional-value="documentTitle('attestation_secu')"
-            :error="$v.userProfile.administrative.healthAttest.driveId.$error" />
+            :error="$v.userProfile.administrative.healthAttest.driveId.$error" drive-storage />
         </div>
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Facture téléphonique" path="administrative.phoneInvoice" alt="facture téléphone"
             :entity="userProfile" :url="docsUploadUrl" :extensions="extensions"
             @delete="validateDocumentDeletion('administrative.phoneInvoice')"
             name="phoneInvoice" @uploaded="documentUploaded" :additional-value="documentTitle('facture_telephone')"
-            :error="$v.userProfile.administrative.phoneInvoice.driveId.$error" />
+            :error="$v.userProfile.administrative.phoneInvoice.driveId.$error" drive-storage />
         </div>
         <div class="col-xs-12">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
-            alt="diplome" @delete="validateCertificateDeletion" name="certificates"
+            alt="diplome" @delete="validateCertificateDeletion" name="certificates" drive-storage
             collapsible-label="Ajouter un diplôme" :user-profile="userProfile" :url="docsUploadUrl"
             additional-fields-name="diplomes" @uploaded="documentUploaded" :extensions="extensions" />
         </div>
@@ -204,7 +204,7 @@
             caption="Merci de nous transmettre une attestation prouvant que tu es déjà affilié(e) à une autre mutuelle"
             path="administrative.mutualFund" alt="justif mutuelle" :entity="userProfile" :url="docsUploadUrl"
             @delete="validateDocumentDeletion('administrative.mutualFund')" :extensions="extensions" entity-url="users"
-            name="mutualFund" @uploaded="documentUploaded" :additional-value="documentTitle('mutuelle')"
+            name="mutualFund" @uploaded="documentUploaded" :additional-value="documentTitle('mutuelle')" drive-storage
             :error="$v.userProfile.administrative.mutualFund.driveId.$error" :display-caption="isAuxiliary" />
         </div>
       </div>
@@ -228,7 +228,7 @@
             alt="justif transport" :entity="userProfile" name="transportInvoice" @uploaded="documentUploaded"
             :error="$v.userProfile.administrative.transportInvoice.driveId.$error" :url="docsUploadUrl"
             :extensions="extensions" :additional-value="documentTitle('justif_transport')"
-            @delete="validateDocumentDeletion('administrative.transportInvoice')" />
+            @delete="validateDocumentDeletion('administrative.transportInvoice')" drive-storage />
         </div>
       </div>
     </div>
@@ -238,7 +238,7 @@
         <div class="col-xs-12 col-md-6">
           <ni-file-uploader caption="Certificat d'aptitude" path="administrative.medicalCertificate"
             alt="certificat médical" :entity="userProfile" name="medicalCertificate" @uploaded="documentUploaded"
-            @delete="validateDocumentDeletion('administrative.medicalCertificate')"
+            @delete="validateDocumentDeletion('administrative.medicalCertificate')" drive-storage
             :additional-value="documentTitle('certificat_medical')" :url="docsUploadUrl" :extensions="extensions" />
         </div>
       </div>
@@ -654,7 +654,7 @@ export default {
     color: $secondary
     &-ok
       font-size: 12px
-      color: $accent
+      color: $green-800
   /deep/ .q-field--standard.q-field--focused
     .q-field__control:after
       display: none;

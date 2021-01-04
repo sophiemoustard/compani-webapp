@@ -1,5 +1,6 @@
 import { mapState } from 'vuex';
 import { THREE_DAYS_VIEW } from '@data/constants';
+import moment from '@helpers/moment';
 
 export const planningTimelineMixin = {
   data () {
@@ -17,7 +18,7 @@ export const planningTimelineMixin = {
     },
     endOfWeek () {
       const gapDays = this.isThreeDaysView ? 2 : 6;
-      return this.$moment(this.startOfWeek).add(gapDays, 'd').endOf('d').toISOString();
+      return moment(this.startOfWeek).add(gapDays, 'd').endOf('d').toISOString();
     },
   },
   watch: {
@@ -31,46 +32,46 @@ export const planningTimelineMixin = {
   methods: {
     getTimelineDays () {
       const gapDays = this.isThreeDaysView ? 2 : 6;
-      const range = this.$moment.range(this.startOfWeek, this.$moment(this.startOfWeek).add(gapDays, 'd'));
+      const range = moment.range(this.startOfWeek, moment(this.startOfWeek).add(gapDays, 'd'));
       this.days = Array.from(range.by('days'));
     },
     timelineTitle () {
       if (this.startOfWeek === '') return '';
-      if (this.$moment(this.startOfWeek).month() === this.$moment(this.endOfWeek).month()) {
-        return this.$moment(this.startOfWeek).format('MMMM YYYY');
+      if (moment(this.startOfWeek).month() === moment(this.endOfWeek).month()) {
+        return moment(this.startOfWeek).format('MMMM YYYY');
       }
 
-      return `${this.$moment(this.startOfWeek).format('MMM')} - ${this.$moment(this.endOfWeek).format('MMM YYYY')}`;
+      return `${moment(this.startOfWeek).format('MMM')} - ${moment(this.endOfWeek).format('MMM YYYY')}`;
     },
     goToNextWeek () {
       const gapDays = this.isThreeDaysView ? 3 : 7;
-      this.startOfWeek = this.$moment(this.startOfWeek).add(gapDays, 'd').toISOString();
+      this.startOfWeek = moment(this.startOfWeek).add(gapDays, 'd').toISOString();
       this.updateTimeline();
     },
     goToPreviousWeek () {
       const gapDays = this.isThreeDaysView ? -3 : -7;
-      this.startOfWeek = this.$moment(this.startOfWeek).add(gapDays, 'd').toISOString();
+      this.startOfWeek = moment(this.startOfWeek).add(gapDays, 'd').toISOString();
       this.updateTimeline();
     },
     goToToday () {
       this.startOfWeek = this.isThreeDaysView
-        ? this.$moment().toISOString()
-        : this.$moment().startOf('week').toISOString();
+        ? moment().toISOString()
+        : moment().startOf('week').toISOString();
       this.updateTimeline();
     },
     goToWeek (value) {
       this.startOfWeek = this.isThreeDaysView
-        ? this.$moment(value).toISOString()
-        : this.$moment(value).startOf('week').toISOString();
+        ? moment(value).toISOString()
+        : moment(value).startOf('week').toISOString();
       this.updateTimeline();
       this.datimeModal = false;
     },
     updateViewMode (viewMode) {
-      const isCurrentWeek = this.$moment().isBetween(this.$moment(this.startOfWeek), this.$moment(this.endOfWeek));
+      const isCurrentWeek = moment().isBetween(moment(this.startOfWeek), moment(this.endOfWeek));
       this.viewMode = viewMode;
-      if (!this.isThreeDaysView) this.startOfWeek = this.$moment(this.startOfWeek).startOf('week').toISOString();
+      if (!this.isThreeDaysView) this.startOfWeek = moment(this.startOfWeek).startOf('week').toISOString();
       else if (isCurrentWeek) {
-        this.startOfWeek = this.$moment().toISOString();
+        this.startOfWeek = moment().toISOString();
       }
       this.updateTimeline();
     },

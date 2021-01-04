@@ -8,7 +8,7 @@
       :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage" @blur="blur" ref="dateInput"
       @focus="focus">
       <template #append>
-        <q-icon name="event" class="cursor-pointer" @click="focus">
+        <q-icon name="event" class="cursor-pointer" @click="focus" color="grey-600">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
             <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable" />
           </q-menu>
@@ -20,6 +20,7 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'NiDateInput',
@@ -38,30 +39,30 @@ export default {
   computed: {
     date () {
       if (!this.value) return '';
-      return this.$moment(this.value).format('YYYY/MM/DD');
+      return moment(this.value).format('YYYY/MM/DD');
     },
     inputDate () {
       if (!this.value) return '';
-      return this.$moment(this.value).format('DD/MM/YYYY');
+      return moment(this.value).format('DD/MM/YYYY');
     },
   },
   methods: {
     dateOptions (date) {
       let isBeforeMax = true;
       let isAfterMin = true;
-      if (this.min) isAfterMin = date >= this.$moment(this.min).format('YYYY/MM/DD');
-      if (this.max) isBeforeMax = date <= this.$moment(this.max).format('YYYY/MM/DD');
+      if (this.min) isAfterMin = date >= moment(this.min).format('YYYY/MM/DD');
+      if (this.max) isBeforeMax = date <= moment(this.max).format('YYYY/MM/DD');
       return isAfterMin && isBeforeMax;
     },
     select (value) {
-      const momentValue = this.$moment(value, 'YYYY/MM/DD', true);
+      const momentValue = moment(value, 'YYYY/MM/DD', true);
       if (!momentValue.isValid()) return;
       this.update(momentValue.toISOString());
       this.$refs.qDateMenu.hide();
       this.$refs.dateInput.blur();
     },
     input (value) {
-      const momentValue = this.$moment(value, 'DD/MM/YYYY', true);
+      const momentValue = moment(value, 'DD/MM/YYYY', true);
       if (!momentValue.isValid()) return;
       this.update(momentValue.toISOString());
     },
@@ -81,7 +82,7 @@ export default {
 <style lang="stylus" scoped>
   .borders
     /deep/ .q-field__control
-      border: 1px solid $middle-grey
+      border: 1px solid $grey-300
 
   .q-input
     /deep/ .q-field__control

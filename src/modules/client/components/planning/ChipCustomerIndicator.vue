@@ -17,6 +17,7 @@
 import get from 'lodash/get';
 import { formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'ChipCustomerIndicator',
@@ -32,7 +33,7 @@ export default {
       let weeklyHours = 0;
       this.events.forEach((event) => {
         if (event.auxiliary && !auxiliaries.includes(event.auxiliary._id)) auxiliaries.push(event.auxiliary._id);
-        weeklyHours += this.$moment(event.endDate).diff(event.startDate, 'h', true);
+        weeklyHours += moment(event.endDate).diff(event.startDate, 'h', true);
       });
       return { auxiliariesNumber: auxiliaries.length, weeklyHours: Math.round(weeklyHours) };
     },
@@ -40,8 +41,8 @@ export default {
   methods: {
     getReferent (person) {
       const referentHistory = person.referentHistories
-        .filter(rh => this.$moment(this.startOfWeek).isSameOrAfter(rh.startDate) &&
-          (!rh.endDate || this.$moment(this.startOfWeek).isBefore(rh.endDate)))
+        .filter(rh => moment(this.startOfWeek).isSameOrAfter(rh.startDate) &&
+          (!rh.endDate || moment(this.startOfWeek).isBefore(rh.endDate)))
         .sort((a, b) => a.startDate - b.startDate);
 
       return get(referentHistory[0], 'auxiliary.identity', {});

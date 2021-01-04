@@ -1,8 +1,8 @@
-import moment from 'moment';
 import transform from 'lodash/transform';
 import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
+import moment from '@helpers/moment';
 
 export const extend = (...sources) => {
   const extended = {};

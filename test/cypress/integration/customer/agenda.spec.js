@@ -5,22 +5,24 @@ describe('customers agenda tests', () => {
     cy.visit('/customers/agenda');
   });
 
-  it('should display correctly the agenda page', function () {
+  it('should display correctly the agenda page', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=customer-identity]').should('have.value', 'Romain BARDET');
 
     cy.get('[data-cy=week-number]').should('contain', Cypress.moment().subtract(1, 'day').week());
     cy.get('[data-cy=days-number]').eq(0).should(
       'contain',
-      Cypress.moment().subtract(1, 'day').startOf('week').add(1, 'day').format('DD')
+      Cypress.moment().subtract(1, 'day').startOf('week').add(1, 'day')
+        .format('DD')
     );
     cy.get('[data-cy=days-number]').eq(6).should(
       'contain',
-      Cypress.moment().subtract(1, 'day').endOf('week').add(1, 'day').format('DD')
+      Cypress.moment().subtract(1, 'day').endOf('week').add(1, 'day')
+        .format('DD')
     );
   });
 
-  it('should go through agenda and display events', function () {
+  it('should go through agenda and display events', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('.event-intervention').should('have.length', 1);
     cy.get('[data-cy=event-title]').eq(0).should('contain', 'Auxiliary T.');

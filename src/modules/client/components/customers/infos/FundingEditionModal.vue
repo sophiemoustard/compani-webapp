@@ -38,6 +38,7 @@ import Input from '@components/form/Input';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import { FIXED } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'FundingEditionModal',
@@ -61,7 +62,7 @@ export default {
   computed: {
     editedFundingMaxStartDate () {
       return this.editedFunding && this.editedFunding.endDate
-        ? this.$moment(this.editedFunding.endDate).subtract(1, 'day').toISOString()
+        ? moment(this.editedFunding.endDate).subtract(1, 'day').toISOString()
         : '';
     },
     isFixedFunding () {

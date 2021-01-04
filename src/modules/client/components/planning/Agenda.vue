@@ -19,7 +19,7 @@
             <div class="planning-background">
               <template v-if="dayIndex === 0">
                 <template v-for="(hour, hourIndex) in hours">
-                  <div v-if="hourIndex !== 0" class="planning-hour" :key="`hour_${hourIndex}`"
+                  <div v-if="hourIndex !== 0" class="planning-hour bg-white" :key="`hour_${hourIndex}`"
                     :style="{ top: `${(hourIndex * halfHourHeight * 4) - 1.5}%` }">
                     {{ hour.format('HH:mm') }}
                   </div>
@@ -72,6 +72,7 @@ import {
   PLANNING_VIEW_START_HOUR,
   PLANNING_VIEW_END_HOUR,
 } from '@data/constants';
+import moment from '@helpers/moment';
 import { planningEventMixin } from 'src/modules/client/mixins/planningEventMixin';
 
 export default {
@@ -109,16 +110,16 @@ export default {
       };
     },
     getTimelineHours () {
-      const range = this.$moment.range(
-        this.$moment().hours(PLANNING_VIEW_START_HOUR).startOf('h'),
-        this.$moment().hours(PLANNING_VIEW_END_HOUR).startOf('h')
+      const range = moment.range(
+        moment().hours(PLANNING_VIEW_START_HOUR).startOf('h'),
+        moment().hours(PLANNING_VIEW_END_HOUR).startOf('h')
       );
       this.hours = Array.from(range.by('hours', { step: 2 }));
     },
     getOneDayEvents (day) {
       return this.events
-        .filter(event => this.$moment(day).isSameOrAfter(event.startDate, 'day') &&
-            this.$moment(day).isSameOrBefore(event.endDate, 'day'))
+        .filter(event => moment(day).isSameOrAfter(event.startDate, 'day') &&
+            moment(day).isSameOrBefore(event.endDate, 'day'))
         .map(event => this.getDisplayedEvent(event, day, PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
     },
@@ -136,62 +137,61 @@ export default {
   .agenda-table
     th
       @media screen and (min-width: 768px)
-        top: 85px;
+        top: 85px
       @media screen and (max-width: 767px)
-        top: 100px;
+        top: 100px
     td
-      padding: 0px;
-      height: 100%;
+      padding: 0px
+      height: 100%
 
       .planning-background
         background: repeating-linear-gradient(
           180deg,
-          $white,
-          $white 13.1%,
-          $neutral-grey,
-          $neutral-grey 13.3%
+          white,
+          white 13.1%,
+          $grey-100,
+          $grey-100 13.3%
         )
-        height: 100%;
-        position: relative;
-        margin-top: 2px;
-        display: list-item;
-        list-style: none;
+        height: 100%
+        position: relative
+        margin-top: 2px
+        display: list-item
+        list-style: none
 
       .event
-        position: absolute;
-        left: 3px;
-        right: 3px;
-        margin: 0;
-        border: 1px solid $white;
-        overflow: hidden;
-        padding-top: 0;
-        padding-bottom: 0;
+        position: absolute
+        left: 3px
+        right: 3px
+        margin: 0
+        border: 1px solid white
+        overflow: hidden
+        padding-top: 0
+        padding-bottom: 0
         &-container
-          height: auto;
+          height: auto
 
       .planning-hour
-        position: absolute;
-        color: $middle-grey;
-        background-color: $white;
-        font-size: 12px;
+        position: absolute
+        color: $grey-300
+        font-size: 12px
         padding: 0 5px
 
       .event-number
-        border-radius: 50%;
-        width: 16px;
-        height: 16px;
-        border: 1px solid $primary;
-        text-align: center;
-        background-color: white;
-        position: absolute;
-        bottom: 0;
-        right: 0;
+        border-radius: 50%
+        width: 16px
+        height: 16px
+        border: 1px solid $primary
+        text-align: center
+        background-color: white
+        position: absolute
+        bottom: 0
+        right: 0
         &-label
-          line-height: 1;
-          color: $primary;
-          font-size: 14px;
+          line-height: 1
+          color: $primary
+          font-size: 14px
 
 thead
-  vertical-align: baseline;
+  vertical-align: baseline
 
 </style>

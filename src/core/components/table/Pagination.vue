@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-between full-width custom-bottom">
+  <div class="row justify-between full-width text-grey-600">
     <div class="row items-center">
       <q-btn-toggle class="on-left no-shadow" v-model="pagination.rowsPerPage" :options="rowsPerPageOptions"
         toggle-text-color="primary" toggle-color="white" no-caps dense size="12px" />
@@ -27,20 +27,12 @@ export default {
     props: { type: Object, default: () => ({}) },
     data: { type: Array, default: () => [] },
     pagination: { type: Object, default: () => ({}) },
-  },
-  data () {
-    return {
-      rowsPerPageOptions: [
-        { label: '15', value: 15 },
-        { label: '50', value: 50 },
-        { label: '100', value: 100 },
-        { label: '200', value: 200 },
-        { label: '300', value: 300 },
-        { label: 'Tous', value: 0 },
-      ],
-    };
+    options: { type: Array, default: () => [15, 50, 100, 200, 300] },
   },
   computed: {
+    rowsPerPageOptions () {
+      return [...this.options.map(o => ({ label: o, value: o })), { label: 'Tous', value: 0 }];
+    },
     firstRowIndex () {
       const { page, rowsPerPage } = this.pagination;
       return (page - 1) * rowsPerPage;
@@ -66,21 +58,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .custom-bottom
-    color: rgba(0, 0, 0, 0.54)
-
   /deep/ .q-btn-group
-    & button .q-btn-inner
-      font-size: 12px
     & > .q-btn-item:first-child
-      border: 1px solid rgba(0,0,0,0.12)
-    & > .q-btn-item:not(:last-child)
-      border-top: 1px solid rgba(0,0,0,0.12)
-      border-right: 1px solid rgba(0,0,0,0.12)
-      border-bottom: 1px solid rgba(0,0,0,0.12)
+      border: 1px solid $grey-300
+    & > .q-btn-item:not(:first-child)
+      border: 1px solid $grey-300
+      border-left: none
     & > .q-btn-item:last-child
-      border-top: 1px solid rgba(0,0,0,0.12)
-      border-right: 1px solid rgba(0,0,0,0.12)
-      border-bottom: 1px solid rgba(0,0,0,0.12)
       font-weight: bold
 </style>

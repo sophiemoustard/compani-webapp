@@ -216,7 +216,7 @@ export default {
 
 .info
   &-active
-    color: $accent
+    color: $green-800
   &-warning
     color: $warning
 </style>

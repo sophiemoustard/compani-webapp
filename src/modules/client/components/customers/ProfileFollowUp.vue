@@ -50,7 +50,7 @@
         <p class="text-weight-bold">Aidants</p>
       </div>
       <ni-simple-table :data="sortedHelpers" :columns="helpersColumns" :visible-columns="visibleColumns"
-        :loading="helpersLoading">
+        :loading="helpersLoading" :rows-per-page="rowsPerPage" :pagination.sync="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -59,7 +59,7 @@
                 <a v-if="col.value" class="text-primary" :href="getPhoneLink(col.value)">{{ col.value }}</a>
                 <div v-else>{{ col.value }}</div>
               </template>
-             <template v-else>{{ col.value }}</template>
+             <template :class="col.name" v-else>{{ col.value }}</template>
            </q-td>
           </q-tr>
         </template>
@@ -70,14 +70,14 @@
         <p class="text-weight-bold">Financements</p>
       </div>
       <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
-        :responsive="false" />
+        :rows-per-page="rowsPerPage" :pagination.sync="pagination" />
     </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
       </div>
-      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :pagination.sync="followUpPagination"
-        :loading="followUpLoading" :responsive="false">
+      <ni-simple-table :data="customerFollowUp" :columns="followUpColumns" :loading="followUpLoading"
+        :rows-per-page="rowsPerPage" :pagination.sync="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -113,8 +113,6 @@ import Select from '@components/form/Select';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { formatIdentity, formatHours } from '@helpers/utils';
 import {
   AUXILIARY,
   PLANNING_REFERENT,
@@ -123,8 +121,11 @@ import {
   UNKNOWN_AVATAR,
   SITUATION_OPTIONS,
 } from '@data/constants';
-import { customerMixin } from 'src/modules/client/mixins/customerMixin';
+import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import { formatIdentity, formatHours } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
 
 export default {
@@ -138,6 +139,8 @@ export default {
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
     return {
+      rowsPerPage: [5, 10, 15, 20],
+      pagination: { page: 1, rowsPerPage: 5 },
       auxiliaries: [],
       isLoaded: false,
       tmpInput: '',
@@ -152,10 +155,9 @@ export default {
           name: 'lastEvent',
           align: 'center',
           label: 'Dernière inter.',
-          field: row => this.$moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
+          field: row => moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
         },
       ],
-      followUpPagination: { rowsPerPage: 5 },
       fundingsMonitoring: [],
       fundingsLoading: false,
       fundingsMonitoringColumns: [

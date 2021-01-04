@@ -5,10 +5,11 @@ import pickBy from 'lodash/pickBy';
 import { required, minValue } from 'vuelidate/lib/validators';
 import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { minDate } from '@helpers/vuelidateCustomVal';
-import { formatIdentity } from '@helpers/utils';
 import nationalities from '@data/nationalities';
 import { REQUIRED_LABEL } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import { minDate } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 
 export const contractMixin = {
@@ -39,7 +40,7 @@ export const contractMixin = {
     ...mapState('main', ['loggedUser']),
     ...mapGetters({ company: 'main/getCompany' }),
     isPreviousPayImpacted () {
-      const startOfMonth = this.$moment().startOf('M');
+      const startOfMonth = moment().startOf('M');
       return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate);
     },
     editedVersionMinStartDate () {
@@ -49,7 +50,7 @@ export const contractMixin = {
       if (!index) return '';
 
       const previousVersion = this.selectedContract.versions[index - 1];
-      return this.$moment(previousVersion.startDate).add(1, 'd').toISOString();
+      return moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
     userFullName () {
       return `${this.auxiliary.identity.firstname} ${this.auxiliary.identity.lastname}`;
@@ -62,7 +63,7 @@ export const contractMixin = {
     },
     isVersionUpdated () {
       if (this.selectedVersion.grossHourlyRate !== this.editedVersion.grossHourlyRate) return true;
-      if (!this.$moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;
+      if (!moment(this.selectedVersion.startDate).isSame(this.editedVersion.startDate)) return true;
 
       return !!get(this.selectedVersion, 'signature.eversignId') !== this.editedVersion.shouldBeSigned;
     },

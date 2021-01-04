@@ -9,7 +9,7 @@
       :error-message="errorMessage" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time"
       data-cy="time-input">
       <template #append>
-        <q-icon name="far fa-clock" class="cursor-pointer icon-clock" @click.native="selectTime = !selectTime">
+        <q-icon name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime" color="grey-600">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-list dense padding>
               <q-item v-for="(hour, index) in hoursOptions" :key="index" clickable @click="select(hour.value)"
@@ -26,6 +26,7 @@
 
 <script>
 import { PLANNING_VIEW_START_HOUR, PLANNING_VIEW_END_HOUR } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'NiTimeInput',
@@ -46,9 +47,9 @@ export default {
   },
   computed: {
     hoursOptions () {
-      const range = this.$moment.range(
-        this.$moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
-        this.$moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
+      const range = moment.range(
+        moment().hours(PLANNING_VIEW_START_HOUR).minutes(0),
+        moment().hours(PLANNING_VIEW_END_HOUR).minutes(0)
       );
 
       return Array.from(range.by('hours')).reduce(
@@ -56,13 +57,13 @@ export default {
           acc.push({
             label: hour.format('HH:mm'),
             value: hour.format('HH:mm'),
-            disable: this.min !== '' && hour.isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+            disable: this.min !== '' && hour.isSameOrBefore(moment(this.min, 'HH:mm')),
           });
           if (hour.format('HH') !== `${PLANNING_VIEW_END_HOUR}`) {
             acc.push({
               label: hour.minutes(30).format('HH:mm'),
               value: hour.minutes(30).format('HH:mm'),
-              disable: this.min !== '' && hour.minutes(30).isSameOrBefore(this.$moment(this.min, 'HH:mm')),
+              disable: this.min !== '' && hour.minutes(30).isSameOrBefore(moment(this.min, 'HH:mm')),
             });
           }
           return acc;
@@ -87,9 +88,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .icon-clock
-    font-size: 16px
-    color: rgba(0,0,0,0.87)
   .q-list
     width: 100px
 </style>

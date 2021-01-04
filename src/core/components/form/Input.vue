@@ -124,7 +124,7 @@ export default {
       width: 100%
       font-size: 0
     &.borders
-      border: 1px solid $middle-grey
+      border: 1px solid $grey-300
   .file-error
     color: $secondary
     line-height: 1
