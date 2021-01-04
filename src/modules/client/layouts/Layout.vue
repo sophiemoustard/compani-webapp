@@ -39,7 +39,6 @@
 </template>
 
 <script>
-import get from 'lodash/get';
 import { layoutMixin } from '@mixins/layoutMixin';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
@@ -65,7 +64,7 @@ export default {
   computed: {
     footerLabel () {
       if (this.isCoach || this.isAuxiliary) return this.userFirstname;
-      return get(this.loggedUser, 'identity.lastname') || '';
+      return this.loggedUser.identity.lastname;
     },
   },
 };
