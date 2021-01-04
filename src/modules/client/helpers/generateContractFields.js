@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from '@helpers/moment';
 
 import { WEEKS_PER_MONTH, CIVILITY_OPTIONS } from '@data/constants';
 import nationalities from '@data/nationalities';

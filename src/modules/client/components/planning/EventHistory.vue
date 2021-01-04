@@ -24,7 +24,6 @@
 
 <script>
 import get from 'lodash/get';
-import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import {
   EVENT_CREATION,
   INTERNAL_HOUR,
@@ -43,6 +42,8 @@ import {
   EVENT_UPDATE,
   CANCELLATION_OPTIONS,
 } from '@data/constants';
+import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export default {
   name: 'EventHistory',
@@ -66,10 +67,10 @@ export default {
         formatIdentity(this.history.event.customer.identity, 'fL');
     },
     startDate () {
-      return this.$moment(this.history.event.startDate).format('DD/MM');
+      return moment(this.history.event.startDate).format('DD/MM');
     },
     endDate () {
-      return this.$moment(this.history.event.endDate).format('DD/MM');
+      return moment(this.history.event.endDate).format('DD/MM');
     },
     startHour () {
       return formatHoursWithMinutes(this.history.event.startDate);
@@ -78,7 +79,7 @@ export default {
       return formatHoursWithMinutes(this.history.event.endDate);
     },
     isOneDayEvent () {
-      return this.$moment(this.history.event.startDate).isSame(this.history.event.endDate, 'day');
+      return moment(this.history.event.startDate).isSame(this.history.event.endDate, 'day');
     },
     isRepetition () {
       const { repetition } = this.history.event;
@@ -91,7 +92,7 @@ export default {
       if (!this.isRepetition) return;
 
       const { repetition, startDate } = this.history.event;
-      const day = this.$moment(startDate).format('dddd');
+      const day = moment(startDate).format('dddd');
       switch (repetition.frequency) {
         case EVERY_DAY:
           return 'tous les jours';
@@ -153,7 +154,7 @@ export default {
       }
     },
     historySignature () {
-      const date = this.$moment(this.history.createdAt).format('DD/MM');
+      const date = moment(this.history.createdAt).format('DD/MM');
       const hour = formatHoursWithMinutes(this.history.createdAt);
       const user = formatIdentity(this.history.createdBy.identity, 'Fl');
 
@@ -245,8 +246,8 @@ export default {
       const pre = 'Changement de dates pour l\'';
       let post = this.customerName ? ` chez ${this.customerName}` : '';
       post += startDate && endDate
-        ? `\xa0: du ${this.$moment(startDate.to).format('DD/MM')} au ${this.$moment(endDate.to).format('DD/MM')}.`
-        : `\xa0: ${this.$moment(startDate.to).format('DD/MM')}.`;
+        ? `\xa0: du ${moment(startDate.to).format('DD/MM')} au ${moment(endDate.to).format('DD/MM')}.`
+        : `\xa0: ${moment(startDate.to).format('DD/MM')}.`;
 
       return { pre, post };
     },
@@ -259,7 +260,7 @@ export default {
       const pre = `Changement d'horaire pour ${pronom}`;
       let post = this.isRepetition ? ` ${this.repetitionFrequency}` : ` le ${this.startDate}`;
       if (this.customerName) post += ` chez ${this.customerName}`;
-      post += `\xa0:  ${this.$moment(startHourTo).format('HH:mm')} - ${this.$moment(endHourTo).format('HH:mm')}.`;
+      post += `\xa0:  ${moment(startHourTo).format('HH:mm')} - ${moment(endHourTo).format('HH:mm')}.`;
 
       return { pre, post };
     },
@@ -280,8 +281,8 @@ export default {
     },
     formatDatesUpdateDetails () {
       const { endDate, startDate } = this.history.update;
-      const startDateFrom = this.$moment(startDate.from).format('DD/MM');
-      const endDateFrom = endDate && this.$moment(endDate.from).format('DD/MM');
+      const startDateFrom = moment(startDate.from).format('DD/MM');
+      const endDateFrom = endDate && moment(endDate.from).format('DD/MM');
 
       let details;
       if (!this.isOneDayEvent) {

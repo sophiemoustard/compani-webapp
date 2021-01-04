@@ -7,7 +7,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="versionsList" :columns="columns" :pagination.sync="pagination" row-key="name"
+    <ni-simple-table :data="versionsList" :columns="columns" :pagination.sync="pagination" row-key="name"
       :loading="contractsLoading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -25,7 +25,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
 
     <!-- Edition modal -->
     <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
@@ -39,8 +39,9 @@ import get from 'lodash/get';
 import Contracts from '@api/Contracts';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
 
@@ -52,13 +53,13 @@ export default {
     'ni-date-range': DateRange,
     'ni-title-header': TitleHeader,
     'version-edition-modal': VersionEditionModal,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {
       dates: {
-        startDate: this.$moment().startOf('M').toISOString(),
-        endDate: this.$moment().endOf('M').toISOString(),
+        startDate: moment().startOf('M').toISOString(),
+        endDate: moment().endOf('M').toISOString(),
       },
       auxiliary: {},
       contractsList: [],
@@ -90,7 +91,7 @@ export default {
           name: 'startDate',
           label: 'Date de début',
           field: 'startDate',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => moment(value).format('DD/MM/YYYY'),
           align: 'center',
           sortable: true,
         },
@@ -100,7 +101,7 @@ export default {
           name: 'endDate',
           label: 'Date de fin',
           field: 'endDate',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : '∞'),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : '∞'),
           align: 'center',
           sortable: true,
         },
@@ -140,19 +141,19 @@ export default {
       this.auxiliary = version.user;
     },
     formatContractList () {
-      const startDate = this.$moment(this.dates.startDate);
-      const endDate = this.$moment(this.dates.endDate);
+      const startDate = moment(this.dates.startDate);
+      const endDate = moment(this.dates.endDate);
       this.versionsList = [];
 
       this.contractsList.forEach((contract) => {
         const { versions } = contract;
         for (let idx = 0; idx < versions.length; idx++) {
           const version = versions[idx];
-          const versionStartDate = this.$moment(version.startDate);
+          const versionStartDate = moment(version.startDate);
           let isInInterval = versionStartDate.isBetween(startDate, endDate, 'day', '[]');
           let contractType = idx ? 'Avenant' : 'Contrat';
           if (idx === versions.length - 1 && version.endDate) {
-            const versionEndDate = this.$moment(version.endDate);
+            const versionEndDate = moment(version.endDate);
             const isEndDateInInterval = versionEndDate.isBetween(startDate, endDate, 'day', '[]');
             if (isEndDateInInterval) {
               isInInterval = true;

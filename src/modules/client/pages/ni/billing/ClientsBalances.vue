@@ -7,7 +7,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-large-table :data="filteredBalances" :columns="columns" row-key="rowId" :loading="tableLoading"
+    <ni-simple-table :data="filteredBalances" :columns="columns" row-key="rowId" :loading="tableLoading"
       selection="multiple" :pagination.sync="pagination" :selected.sync="selected">
       <template #header="{ props }">
         <q-tr :props="props">
@@ -41,7 +41,7 @@
           <q-td v-else />
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
 
     <!-- Payment creation modal -->
     <ni-payment-creation-modal v-model="paymentCreationModal" :new-payment="newPayment" :validations="$v.newPayment"
@@ -59,7 +59,7 @@ import get from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
@@ -72,7 +72,7 @@ export default {
   name: 'ClientsBalances',
   metaInfo: { title: 'Balances clients' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'ni-prefixed-cell-content': PrefixedCellContent,
     'ni-payment-creation-modal': PaymentCreationModal,
     'ni-title-header': TitleHeader,
@@ -109,27 +109,9 @@ export default {
           format: (value, row) => (row.thirdPartyPayer ? '' : roundFrenchPercentage(value)),
           sortable: true,
         },
-        {
-          name: 'billed',
-          label: 'Facturé TTC',
-          align: 'center',
-          field: 'billed',
-          format: val => formatPrice(val),
-        },
-        {
-          name: 'paid',
-          label: 'Payé TTC',
-          align: 'center',
-          field: 'paid',
-          format: val => formatPrice(val),
-        },
-        {
-          name: 'balance',
-          label: 'Solde',
-          align: 'center',
-          field: row => row.balance,
-          sortable: true,
-        },
+        { name: 'billed', label: 'Facturé TTC', align: 'center', field: 'billed', format: val => formatPrice(val) },
+        { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
+        { name: 'balance', label: 'Solde', align: 'center', field: row => row.balance, sortable: true },
         {
           name: 'toPay',
           label: 'A Prélever',
@@ -138,12 +120,7 @@ export default {
           format: value => formatPrice(value),
           sortable: true,
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: row => row.customer._id,
-        },
+        { name: 'actions', label: '', align: 'left', field: row => row.customer._id },
       ],
       pagination: { rowsPerPage: 0 },
       balancesOptions: [
@@ -207,7 +184,7 @@ export default {
           customerInfo: row.customer,
           netInclTaxes: row.toPay,
           type: this.PAYMENT_OPTIONS[0].value,
-          date: this.$moment().toDate(),
+          date: new Date(),
           rum: getLastVersion(row.customer.payment.mandates, 'createdAt').rum,
         }));
         await Payments.createList(payload);

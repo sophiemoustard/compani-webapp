@@ -7,7 +7,7 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="companyCreationModal = true" :disable="tableLoading" />
 
-    <company-creation-modal v-model="companyCreationModal" :new-company="newCompany" :validations="$v.newCompany"
+    <company-creation-modal v-model="companyCreationModal" :new-company.sync="newCompany" :validations="$v.newCompany"
       :loading="modalLoading" :company-type-options="companyTypeOptions" @hide="resetCreationModal"
       @submit="createCompany" />
   </q-page>

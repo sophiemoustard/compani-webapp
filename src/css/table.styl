@@ -13,7 +13,7 @@
         margin: 0 5px
         cursor: pointer
         font-size: 21px
-      &:after 
+      &:after
         background: inherit
     & tr
       &.selected
@@ -66,6 +66,10 @@
   tr:hover
     .q-uploader__header
       background: rgba(0,0,0,0.07)
+
+  .thirdPartyPayer
+  .email
+    word-break: break-all
 
 .table-grid
   table
@@ -145,10 +149,6 @@
         font-size: 1.5rem
         cursor: pointer !important
 
-    .thirdPartyPayer
-    .email
-      word-break: break-all      
-
   @media screen and (min-width: 768px)
     .q-table__middle
       margin: 0 10px;
@@ -157,52 +157,6 @@
       margin: 0 10px
       padding: 0
 
-.table-list
-  margin-bottom: 25px
-  .q-table
-    border-spacing: 0 12px
-    border-collapse: separate
-  th
-    padding: 0px 12px
-  tbody
-    tr
-      background: $white
-      &:hover
-        background: $white
-      .avatar
-        border: 1px solid $grey
-        width: 30px
-        height: 30px
-      &:not(.q-tr--no-hover)
-        &:hover
-          cursor: pointer
-          background: $white !important
-          box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.2)
-          border: 1px solid $middle-grey
-    td
-      font-weight: 400
-      border: none
-      padding: 8px 12px
-      .q-item
-        min-height: 0
-        padding: 0
-      .q-item__section--main
-        font-size: 16px
-
-.table-spinner-container
-  height: fit-content;
-  .q-inner-loading
-    margin: 10px;
-    justify-content: flex-start;
-    height: fit-content;
-    background: unset;
-    transition: none;
-
-.loading-container
-  height: 50px;
-
-
-.table-simple, .table-responsive
   @media screen and (max-width: 767px)
     table
       border: 0
@@ -236,3 +190,47 @@
 
         & .table-actions
           justify-content: flex-end !important
+
+.table-list
+  margin-bottom: 25px
+  .q-table
+    border-spacing: 0 12px
+    border-collapse: separate
+  th
+    padding: 0px 12px
+  tbody
+    tr
+      background: white
+      &:hover
+        background: white
+      .avatar
+        border: 1px solid $grey-400
+        width: 30px
+        height: 30px
+      &:not(.q-tr--no-hover)
+        &:hover
+          cursor: pointer
+          background: white !important
+          box-shadow: 0px 0px 2px 0px rgba(0, 0, 0, 0.2)
+          border: 1px solid $grey-300
+    td
+      font-weight: 400
+      border: none
+      padding: 8px 12px
+      .q-item
+        min-height: 0
+        padding: 0
+      .q-item__section--main
+        font-size: 16px
+
+.table-spinner-container
+  height: fit-content;
+  .q-inner-loading
+    margin: 10px;
+    justify-content: flex-start;
+    height: fit-content;
+    background: unset;
+    transition: none;
+
+.loading-container
+  height: 50px;

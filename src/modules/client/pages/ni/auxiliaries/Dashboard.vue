@@ -117,8 +117,9 @@ import Pay from '@api/Pay';
 import Events from '@api/Events';
 import Stats from '@api/Stats';
 import { NotifyNegative } from '@components/popup/notify';
-import { formatHours, roundFrenchPercentage } from '@helpers/utils';
 import { AUXILIARY_ROLES, DEFAULT_AVATAR } from '@data/constants';
+import { formatHours, roundFrenchPercentage } from '@helpers/utils';
+import moment from '@helpers/moment';
 import Gauge from 'src/modules/client/components/Gauge';
 import ChipsAutocomplete from 'src/modules/client/components/planning/ChipsAutocomplete';
 import AuxiliaryIndicators from 'src/modules/client/components/planning/AuxiliaryIndicators';
@@ -133,7 +134,7 @@ export default {
   },
   data () {
     return {
-      selectedMonth: this.$moment().format('MM-YYYY'),
+      selectedMonth: moment().format('MM-YYYY'),
       terms: [],
       filteredSectors: [],
       unassignedHours: [],
@@ -157,14 +158,14 @@ export default {
     monthsOptions () {
       if (this.firstInterventionStartDate === '') {
         return [
-          { label: this.$moment().format('MMMM YY'), value: this.$moment().format('MM-YYYY') },
+          { label: moment().format('MMMM YY'), value: moment().format('MM-YYYY') },
           {
-            label: this.$moment().add(1, 'month').format('MMMM YY'),
-            value: this.$moment().add(1, 'month').format('MM-YYYY'),
+            label: moment().add(1, 'month').format('MMMM YY'),
+            value: moment().add(1, 'month').format('MM-YYYY'),
           },
         ];
       }
-      return Array.from(this.$moment().range(this.firstInterventionStartDate, this.$moment().add(1, 'M')).by('month'))
+      return Array.from(moment().range(this.firstInterventionStartDate, moment().add(1, 'M')).by('month'))
         .sort((a, b) => b.diff(a))
         .map(month => ({ label: month.format('MMMM YY'), value: month.format('MM-YYYY') }));
     },
@@ -281,7 +282,7 @@ export default {
     },
     shouldDisplayUnassignedHours (sectorId) {
       return this.unassignedHours.find(el => el.sector === sectorId) &&
-        this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month');
+        moment(this.selectedMonth, 'MM-YYYY').isAfter(moment().subtract(1, 'month'), 'month');
     },
     getUnassignedHours (sectorId) {
       return this.unassignedHours.find(el => el.sector === sectorId).duration;
@@ -310,7 +311,7 @@ export default {
           Events.getPaidTransportStatsBySector(params),
         ]);
 
-        if (this.$moment(this.selectedMonth, 'MM-YYYY').isAfter(this.$moment().subtract(1, 'month'), 'month')) {
+        if (moment(this.selectedMonth, 'MM-YYYY').isAfter(moment().subtract(1, 'month'), 'month')) {
           this.unassignedHours = await Events.getUnassignedHoursBySector(params);
         } else {
           this.unassignedHours = [];
@@ -370,25 +371,25 @@ export default {
   font-style: italic
 
 .auxiliary
-  border-top: 1px solid $middle-grey
-  border-left: 1px solid $middle-grey
-  border-right: 1px solid $middle-grey
+  border-top: 1px solid $grey-300
+  border-left: 1px solid $grey-300
+  border-right: 1px solid $grey-300
   &:nth-child(2)
-    border-bottom: 1px solid $middle-grey
+    border-bottom: 1px solid $grey-300
   div
     padding: 5px
   &-cell
     display: flex
     flex-direction: column
     &:not(:nth-last-child(-n+2))
-      border-bottom: 1px solid $middle-grey
+      border-bottom: 1px solid $grey-300
     &-container
       margin: 0 16px
       @media screen and (max-width: 767px)
         margin: 0 8px
 
 .auxiliary-label
-  border-right: 1px solid $middle-grey
+  border-right: 1px solid $grey-300
 
 .auxiliary-value
   justify-content: flex-end
@@ -417,7 +418,7 @@ export default {
     &:nth-child(2)
       color: $secondary
     &:nth-child(3)
-      color: $grey
+      color: $grey-400
   &-value
     font-size: 48px
     @media screen and (max-width: 767px)
@@ -427,9 +428,9 @@ export default {
     text-align: center
 
 .spinner-container
-  display: flex;
-  justify-content: center;
-  margin-bottom: 10px;
+  display: flex
+  justify-content: center
+  margin-bottom: 10px
 
 .gauge-wrapper
   display: flex
@@ -444,6 +445,6 @@ export default {
   height: 100px
 
 .person-name
-  font-size: 14px !important;
+  font-size: 14px !important
 
 </style>

@@ -3,8 +3,8 @@
     <template slot="title">
       Ajouter une <span class="text-weight-bold">règle d'accès</span>
     </template>
-    <ni-select in-modal v-model="newAccessRule.company" :error="validations.company.$error" required-field
-      caption="Structure" :options="companyOptions" last />
+    <ni-select in-modal :value="newAccessRule" @input="update" :error="validations.$error"
+      caption="Structure" :options="companyOptions" last required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la règle d'accès" color="primary" :loading="loading"
         icon-right="add" @click="submit" />
@@ -23,7 +23,7 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     companyOptions: { type: Array, default: () => [] },
-    newAccessRule: { type: Object, default: () => ({}) },
+    newAccessRule: { type: String, default: '' },
   },
   components: {
     'ni-select': Select,
@@ -38,6 +38,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (value) {
+      this.$emit('update:newAccessRule', value);
     },
   },
 };

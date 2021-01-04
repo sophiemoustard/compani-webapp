@@ -65,6 +65,7 @@ import { required, requiredIf, email, sameAs } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import HtmlModal from '@components/modal/HtmlModal';
@@ -163,7 +164,7 @@ export default {
 
         const value = get(this.userProfile, 'local.password');
         const payload = set({}, 'local.password', value);
-        await Users.updatePassword(this.userProfile._id, payload);
+        await Authentication.updatePassword(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée.');
         this.newPasswordModal = false;

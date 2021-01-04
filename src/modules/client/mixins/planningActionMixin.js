@@ -4,14 +4,12 @@ import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
 import cloneDeep from 'lodash/cloneDeep';
-import { subject } from '@casl/ability';
 import { required, requiredIf } from 'vuelidate/lib/validators';
+import { subject } from '@casl/ability';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { frAddress } from '@helpers/vuelidateCustomVal';
-import { defineAbilitiesFor } from '@helpers/ability';
 import {
   INTERNAL_HOUR,
   ABSENCE,
@@ -25,6 +23,9 @@ import {
   OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
+import { frAddress } from '@helpers/vuelidateCustomVal';
+import { defineAbilitiesFor } from '@helpers/ability';
+import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
 
 export const planningActionMixin = {
@@ -135,8 +136,8 @@ export const planningActionMixin = {
     hasContractOnEvent (auxiliary, startDate, endDate = startDate) {
       if (!auxiliary.contracts || auxiliary.contracts.length === 0) return false;
 
-      return auxiliary.contracts.some(contract => this.$moment(contract.startDate).isSameOrBefore(endDate) &&
-          (!contract.endDate || this.$moment(contract.endDate).isAfter(startDate)));
+      return auxiliary.contracts.some(contract => moment(contract.startDate).isSameOrBefore(endDate) &&
+          (!contract.endDate || moment(contract.endDate).isAfter(startDate)));
     },
     getRowEvents (rowId) {
       const rowEvents = this.events.find(group => group._id === rowId);
@@ -217,14 +218,14 @@ export const planningActionMixin = {
 
       return auxiliaryEvents.some((ev) => {
         if ((scheduledEvent._id && scheduledEvent._id === ev._id) || ev.isCancelled) return false;
-        return this.$moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
-          this.$moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
+        return moment(scheduledEvent.startDate).isBetween(ev.startDate, ev.endDate, 'minutes', '[]') ||
+          moment(ev.startDate).isBetween(scheduledEvent.startDate, scheduledEvent.endDate, 'minutes', '[]');
       });
     },
     getAuxiliaryEventsBetweenDates (auxiliaryId, startDate, endDate, type) {
       return this.getRowEvents(auxiliaryId)
-        .filter(event => (this.$moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
-            this.$moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')) &&
+        .filter(event => (moment(event.startDate).isBetween(startDate, endDate, 'minutes', '[)') ||
+            moment(startDate).isBetween(event.startDate, event.endDate, 'minutes', '[)')) &&
             (!type || type === event.type));
     },
     async createEvent () {
@@ -433,12 +434,12 @@ export const planningActionMixin = {
       }
     },
     getDragAndDropPayload (toDay, target, draggedObject) {
-      const daysBetween = this.$moment(draggedObject.endDate).diff(this.$moment(draggedObject.startDate), 'days');
+      const daysBetween = moment(draggedObject.endDate).diff(moment(draggedObject.startDate), 'days');
       const payload = {
-        startDate: this.$moment(toDay).hours(this.$moment(draggedObject.startDate).hours())
-          .minutes(this.$moment(draggedObject.startDate).minutes()).toISOString(),
-        endDate: this.$moment(toDay).add(daysBetween, 'days').hours(this.$moment(draggedObject.endDate).hours())
-          .minutes(this.$moment(draggedObject.endDate).minutes())
+        startDate: moment(toDay).hours(moment(draggedObject.startDate).hours())
+          .minutes(moment(draggedObject.startDate).minutes()).toISOString(),
+        endDate: moment(toDay).add(daysBetween, 'days').hours(moment(draggedObject.endDate).hours())
+          .minutes(moment(draggedObject.endDate).minutes())
           .toISOString(),
       };
 

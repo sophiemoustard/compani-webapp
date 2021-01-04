@@ -112,6 +112,7 @@ import {
   COACH_ROLES,
   NOT_INVOICED_AND_NOT_PAID,
 } from '@data/constants';
+import moment from '@helpers/moment';
 import NiPlanningEvent from 'src/modules/client/components/planning/PlanningEvent';
 import ChipAuxiliaryIndicator from 'src/modules/client/components/planning/ChipAuxiliaryIndicator';
 import ChipCustomerIndicator from 'src/modules/client/components/planning/ChipCustomerIndicator';
@@ -151,7 +152,7 @@ export default {
       terms: [],
       loading: false,
       draggedObject: {},
-      startOfWeek: this.$moment().startOf('week').toISOString(),
+      startOfWeek: moment().startOf('week').toISOString(),
       days: [],
       maxDays: 7,
       staffingView: false,
@@ -220,9 +221,9 @@ export default {
       }
     },
     getTimelineHours () {
-      const range = this.$moment.range(
-        this.$moment().hours(STAFFING_VIEW_START_HOUR).minutes(0),
-        this.$moment().hours(STAFFING_VIEW_END_HOUR).minutes(0)
+      const range = moment.range(
+        moment().hours(STAFFING_VIEW_START_HOUR).minutes(0),
+        moment().hours(STAFFING_VIEW_END_HOUR).minutes(0)
       );
       this.hours = Array.from(range.by('hours', { step: 2, excludeEnd: true }));
     },
@@ -238,7 +239,7 @@ export default {
     unassignedHourCount (sectorId) {
       const unassignedEvents = this.getPersonEvents({ _id: sectorId });
       const total = unassignedEvents.reduce(
-        (acc, event) => acc + this.$moment(event.endDate).diff(event.startDate, 'm', true),
+        (acc, event) => acc + moment(event.endDate).diff(event.startDate, 'm', true),
         0
       );
 
@@ -251,7 +252,7 @@ export default {
     },
     getCellEvents (cellId, day) {
       return this.getRowEvents(cellId)
-        .filter(event => this.$moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
+        .filter(event => moment(day).isBetween(event.startDate, event.endDate, 'day', '[]') &&
           (!this.staffingView || !event.isCancelled))
         .map(event => this.getDisplayedEvent(event, day, STAFFING_VIEW_START_HOUR, STAFFING_VIEW_END_HOUR))
         .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
@@ -331,7 +332,7 @@ export default {
       .line
         width: 1px;
         height: 100%;
-        background: $neutral-grey;
+        background: $grey-100;
         margin: 0;
         position: absolute;
         z-index: -1;

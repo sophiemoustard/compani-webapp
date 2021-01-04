@@ -6,7 +6,7 @@
         <q-card-section class="cursor-pointer" @click="showCards(activity._id)">
           <div class="text-weight-bold">{{ activityIndex + 1 }} - {{ activity.name }}</div>
         </q-card-section>
-        <div class="beige-background chart-container" v-if="areCardsDisplayed[activity._id]">
+        <div class="bg-peach-200 chart-container" v-if="areCardsDisplayed[activity._id]">
           <template v-for="(card, cardIndex) of activity.followUp">
             <survey-chart v-if="card.template === SURVEY" :key="cardIndex" class="chart" :card="card" />
             <open-question-chart v-if="card.template === OPEN_QUESTION" :key="cardIndex" class="chart" :card="card" />

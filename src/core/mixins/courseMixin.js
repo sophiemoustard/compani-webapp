@@ -2,9 +2,10 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
-import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
+import moment from '@helpers/moment';
 
 export const courseMixin = {
   computed: {
@@ -35,7 +36,7 @@ export const courseMixin = {
   },
   methods: {
     happened (sameDaySlots) {
-      return this.$moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
+      return moment().isSameOrAfter(sameDaySlots[sameDaySlots.length - 1].endDate);
     },
     padMinutes (minutes) {
       return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;

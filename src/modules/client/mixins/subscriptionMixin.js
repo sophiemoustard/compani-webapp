@@ -1,8 +1,8 @@
 import get from 'lodash/get';
 import capitalize from 'lodash/capitalize';
-import moment from 'moment';
-import { getLastVersion } from '@helpers/utils';
 import { MONTHLY, FIXED, ONCE, HOURLY, NATURE_OPTIONS, WEEKS_PER_MONTH } from '@data/constants';
+import { getLastVersion } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export const subscriptionMixin = {
   data () {
@@ -139,7 +139,7 @@ export const subscriptionMixin = {
     },
     getMatchingFunding (subscription) {
       return this.fundings.find(fd => fd.subscription === subscription._id &&
-        (fd.endDate ? this.$moment().isBetween(fd.startDate, fd.endDate) : this.$moment().isSameOrAfter(fd.startDate)));
+        (fd.endDate ? moment().isBetween(fd.startDate, fd.endDate) : moment().isSameOrAfter(fd.startDate)));
     },
     showHistory (id) {
       this.selectedSubscription = this.subscriptions.find(sub => sub._id === id);

@@ -1,5 +1,5 @@
 <template>
-  <div :class="['q-mx-md', 'card-edition', { 'edition-disabled': disableEdition }]">
+  <div :class="['q-mx-md', 'card-edition', 'bg-peach-200', { 'edition-disabled': disableEdition }]">
     <q-scroll-area :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
@@ -95,7 +95,6 @@ export default {
   height: 100%
 
 .card-edition
-  background-color: $middle-beige
   border-radius: 3px
   display: flex
   flex-direction: column

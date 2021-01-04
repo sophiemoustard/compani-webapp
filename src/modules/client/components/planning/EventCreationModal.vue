@@ -40,7 +40,7 @@
             :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
             :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
             :error="validations.attachment.link.$error" @delete="deleteDocument(newEvent.attachment.driveId)"
-            :extensions="extensions" />
+            :extensions="extensions" drive-storage />
         </template>
         <template v-if="newEvent.type === INTERNAL_HOUR">
           <ni-select in-modal caption="Type d'heure interne" v-model="newEvent.internalHour"
@@ -78,6 +78,7 @@
 
 <script>
 import get from 'lodash/get';
+import Button from '@components/Button';
 import {
   ABSENCE,
   INTERNAL_HOUR,
@@ -86,8 +87,8 @@ import {
   INTERVENTION,
   NEVER,
 } from '@data/constants';
+import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
-import Button from '@components/Button';
 
 export default {
   name: 'EventCreationModal',
@@ -109,7 +110,7 @@ export default {
     isEndDurationRequired () {
       if (this.newEvent.type !== ABSENCE) return false;
 
-      return this.$moment(this.newEvent.dates.endDate).isAfter(this.$moment(this.newEvent.dates.startDate));
+      return moment(this.newEvent.dates.endDate).isAfter(moment(this.newEvent.dates.startDate));
     },
     isContractValidForRepetition () {
       if (!this.selectedAuxiliary.contracts || this.selectedAuxiliary.contracts.length === 0) return false;
@@ -197,14 +198,14 @@ export default {
   /deep/ .q-btn-toggle
     width: 100%
     @media screen and (max-width: 767px)
-      display: inline-flex;
-      flex-wrap: wrap;
+      display: inline-flex
+      flex-wrap: wrap
     & .q-btn-item
-      width: 24%;
-      border-radius: 20px;
-      margin: 5px;
-      background-color: $middle-grey;
+      width: 24%
+      border-radius: 20px
+      margin: 5px
+      background-color: $grey-300
       @media screen and (max-width: 767px)
-        width: 45%;
+        width: 45%
 
 </style>

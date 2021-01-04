@@ -23,8 +23,7 @@
           <q-separator :key="`separator-${route.ref}`" />
           </template>
         </template>
-        <ni-side-menu-footer :label="footerLabel" :user-id="loggedUser._id" :interface-type="interfaceType"
-          @click="connectToBotMessenger" />
+        <ni-side-menu-footer :label="footerLabel" :user-id="loggedUser._id" :interface-type="interfaceType" />
       </q-list>
       <div :class="chevronContainerClasses">
         <q-btn :class="chevronClasses" dense round unelevated :icon="menuIcon" @click="isMini = !isMini" />
@@ -40,7 +39,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import { layoutMixin } from '@mixins/layoutMixin';
 import { sideMenuMixin } from '@mixins/sideMenuMixin';
 import SideMenuFooter from '@components/menu/SideMenuFooter';
@@ -69,12 +67,6 @@ export default {
       return this.loggedUser.identity.lastname;
     },
   },
-  methods: {
-    connectToBotMessenger () {
-      const token = Cookies.get('alenvi_token');
-      window.location.href = `${process.env.MESSENGER_LINK}?ref=${token}`;
-    },
-  },
 };
 </script>
 
@@ -86,7 +78,7 @@ export default {
 
   .chevron
     background-color: white
-    border: 1px solid $middle-grey
+    border: 1px solid $grey-300
     top: 5px
     position: fixed
     z-index: 5000
@@ -101,10 +93,10 @@ export default {
     color: $primary
 
   .q-btn
-    color: $dark-grey
+    color: $grey-800
     &:hover
       color: $primary
 
   .menu-icon
-    font-size: 17px;
+    font-size: 17px
 </style>

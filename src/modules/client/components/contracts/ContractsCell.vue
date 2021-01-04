@@ -25,9 +25,9 @@
                 </div>
                 <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
                   class="row justify-center table-actions">
-                  <q-uploader flat :url="docsUploadUrl(contract._id)" :headers="headers"
+                  <q-uploader flat :url="docsUploadUrl(contract._id)" with-credentials auto-upload @uploaded="refresh"
                     :form-fields="getFormFields(contract, props.row)" field-name="file" :accept="extensions"
-                    auto-upload @uploaded="refresh" @fail="failMsg" />
+                    @fail="failMsg" />
                 </div>
                 <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
                   <q-btn flat round small color="primary" type="a" :href="getContractLink(props.row)" target="_blank"
@@ -81,7 +81,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import esign from '@api/Esign';
@@ -89,9 +88,10 @@ import Contracts from '@api/Contracts';
 import Button from '@components/Button';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
-import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
+import moment from '@helpers/moment';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -124,14 +124,14 @@ export default {
           label: 'Date d\'effet',
           align: 'left',
           field: 'startDate',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'endDate',
           label: 'Date de fin',
           align: 'left',
           field: 'endDate',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : '∞'),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : '∞'),
         },
         { name: 'grossHourlyRate', label: 'Taux horaire', align: 'center', field: 'grossHourlyRate' },
         { name: 'contractEmpty', label: 'Word', align: 'center', field: 'contractEmpty' },
@@ -152,22 +152,19 @@ export default {
       const { contracts } = this;
       return contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
     },
-    headers () {
-      return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
-    },
   },
   methods: {
     cellTitle (contractEndDate) {
       if (!contractEndDate) return { msg: 'Contrat en cours', color: 'green' };
 
-      if (this.$moment().isBefore(contractEndDate)) {
+      if (moment().isBefore(contractEndDate)) {
         return {
-          msg: `Le contrat se termine le ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
+          msg: `Le contrat se termine le ${moment(contractEndDate).format('DD MMMM YYYY')}`,
           color: 'orange',
         };
       }
       return {
-        msg: `Contrat terminé le: ${this.$moment(contractEndDate).format('DD MMMM YYYY')}`,
+        msg: `Contrat terminé le: ${moment(contractEndDate).format('DD MMMM YYYY')}`,
         color: 'red',
       };
     },

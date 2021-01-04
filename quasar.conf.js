@@ -5,9 +5,6 @@ const webpack = require('webpack');
 module.exports = function (ctx) {
   return {
     boot: [
-      'axios',
-      'alenviAxios',
-      'moment',
       'vue-croppa',
       'vuelidate',
       'vueclipboard',
@@ -15,6 +12,7 @@ module.exports = function (ctx) {
     ],
     css: [
       'app.styl',
+      'colors.styl',
     ],
     extras: [
       'material-icons',
@@ -146,9 +144,6 @@ module.exports = function (ctx) {
         ENTERCODE_LINK: process.env.ENTERCODE_LINK,
         TOKEN_SECRET: process.env.TOKEN_SECRET,
         ALENVI_BOT_ID: process.env.ALENVI_BOT_ID,
-        CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
-        CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
-        CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
         GA_TRACKING_ID: process.env.GA_TRACKING_ID,
       },
     },

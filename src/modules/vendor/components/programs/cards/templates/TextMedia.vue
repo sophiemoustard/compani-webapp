@@ -6,9 +6,8 @@
        type="radio" :disable="isUploading || !!card.media.publicId" :error="$v.card.media.type.$error" />
     <ni-file-uploader class="file-uploader" caption="Média" path="media" alt="media" :entity="card" name="media"
       @uploaded="mediaUploaded()" @delete="validateMediaDeletion()" :error="$v.card.media.$error"
-      :extensions="extensions" cloudinary-storage :additional-value="mediaFileName" required-field
-      :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" @start="start" @finish="finish"
-      :disable="disableEdition" />
+      :extensions="extensions" :additional-value="mediaFileName" required-field :disable="disableEdition"
+      :url="mediaUploadUrl" label="Pas de média" :max-file-size="maxFileSize" @start="start" @finish="finish" />
   </div>
 </template>
 

@@ -1,9 +1,9 @@
 import { isValidIBAN, isValidBIC } from 'ibantools';
 import axios from 'axios';
-import moment from 'moment';
 import { workHealthServices } from '@data/workHealthServices';
 import { urssafCodes } from '@data/urssafCodes';
 import { GAP_ANSWER_MAX_LENGTH } from '@data/constants';
+import moment from '@helpers/moment';
 
 export const frPhoneNumber = (value) => {
   if (!value) return true;

@@ -36,7 +36,7 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Envoi de SMS</p>
       <p>Historique d'envoi </p>
-      <ni-simple-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
+      <ni-responsive-table :data="smsSent" :columns="smsSentColumns" :pagination.sync="pagination" class="q-mb-md"
         :loading="smsLoading">
         <template #body="{ props }">
           <q-tr :props="props">
@@ -51,7 +51,7 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-simple-table>
+      </ni-responsive-table>
       <ni-banner v-if="!followUpDisabled && isFinished">
         <template #message>
           Vous ne pouvez pas envoyer de sms car la formation est terminée.
@@ -73,8 +73,8 @@
     </div>
 
     <!-- Modal envoi message -->
-    <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions"
-      :new-sms="newSms" @send="sendMessage" @update-type="updateMessage" :loading="loading" @hide="resetSmsModal" />
+    <sms-sending-modal v-model="smsModal" :filtered-message-type-options="filteredMessageTypeOptions" :loading="loading"
+      :new-sms.sync="newSms" @send="sendMessage" @update-type="updateMessage" @hide="resetSmsModal" />
 
     <!-- Modal visualisation message -->
     <sms-details-modal v-model="smsHistoriesModal" :missing-trainees-phone-history="missingTraineesPhoneHistory"
@@ -92,15 +92,16 @@ import SmsSendingModal from '@components/courses/SmsSendingModal';
 import SmsDetailsModal from '@components/courses/SmsDetailsModal';
 import Banner from '@components/Banner';
 import Button from '@components/Button';
-import SimpleTable from '@components/table/SimpleTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import CourseInfoLink from '@components/courses/CourseInfoLink';
+import BiColorButton from '@components/BiColorButton';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { formatQuantity, formatIdentity } from '@helpers/utils';
 import { openPdf, downloadZip } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
-import CourseInfoLink from '@components/courses/CourseInfoLink';
-import BiColorButton from '@components/BiColorButton';
 
 export default {
   name: 'ProfileAdmin',
@@ -109,7 +110,7 @@ export default {
     'ni-button': Button,
     'sms-sending-modal': SmsSendingModal,
     'sms-details-modal': SmsDetailsModal,
-    'ni-simple-table': SimpleTable,
+    'ni-responsive-table': ResponsiveTable,
     'ni-banner': Banner,
     'ni-course-info-link': CourseInfoLink,
     'ni-bi-color-button': BiColorButton,
@@ -136,7 +137,7 @@ export default {
           label: 'Date d\'envoi',
           align: 'left',
           field: 'date',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'sender',
@@ -175,11 +176,11 @@ export default {
       return this.followUpDisabled || !get(this.course, 'subProgram.program.learningGoals');
     },
     isFinished () {
-      const slots = this.course.slots.filter(slot => this.$moment().isBefore(slot.startDate));
+      const slots = this.course.slots.filter(slot => moment().isBefore(slot.startDate));
       return !slots.length && !this.course.slotsToPlan.length;
     },
     courseNotStartedYet () {
-      const slots = this.course.slots.filter(slot => this.$moment().isAfter(slot.endDate));
+      const slots = this.course.slots.filter(slot => moment().isAfter(slot.endDate));
       return !slots.length;
     },
     courseLink () {
@@ -212,7 +213,7 @@ export default {
       return this.composeCourseName(this.course);
     },
     allFuturSlotsAreNotPlanned () {
-      const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => this.$moment().isBefore(s.startDate));
+      const futurSlots = this.course.slots.filter(s => s.startDate).filter(s => moment().isBefore(s.startDate));
       return !!this.course.slotsToPlan.length && !futurSlots.length;
     },
     disableSms () {
@@ -272,8 +273,8 @@ export default {
     },
     setConvocationMessage () {
       const slots = this.course.slots.filter(s => !!s.startDate).sort((a, b) => a.startDate - b.startDate);
-      const date = this.$moment(slots[0].startDate).format('DD/MM');
-      const hour = this.$moment(slots[0].startDate).format('HH:mm');
+      const date = moment(slots[0].startDate).format('DD/MM');
+      const hour = moment(slots[0].startDate).format('HH:mm');
 
       this.newSms.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `La première session a lieu le ${date} à ${hour}.\nMerci de vous `
@@ -283,10 +284,10 @@ export default {
     setReminderMessage () {
       const slots = this.course.slots
         .filter(s => !!s.startDate)
-        .filter(slot => this.$moment().isBefore(slot.startDate))
+        .filter(slot => moment().isBefore(slot.startDate))
         .sort((a, b) => a.startDate - b.startDate);
-      const date = this.$moment(slots[0].startDate).format('DD/MM');
-      const hour = this.$moment(slots[0].startDate).format('HH:mm');
+      const date = moment(slots[0].startDate).format('DD/MM');
+      const hour = moment(slots[0].startDate).format('HH:mm');
 
       this.newSms.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
       + `Votre prochaine session a lieu le ${date} à ${hour}.\nMerci de vous `

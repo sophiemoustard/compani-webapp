@@ -6,7 +6,7 @@
     </div>
     <div v-if="document && imageSource" class="row justify-between" style="background: white">
       <div class="doc-thumbnail">
-        <ni-custom-img :cloudinary-storage="cloudinaryStorage" :image-source="imageSource" :alt="alt" />
+        <ni-custom-img :image-source="imageSource" :alt="alt" :drive-storage="driveStorage" />
       </div>
       <div class="self-end doc-delete">
         <q-btn color="primary" round flat icon="delete" size="1rem" :disable="disable" @click.native="deleteDocument" />
@@ -14,7 +14,7 @@
       </div>
     </div>
     <q-field borderless v-else :error="error" :error-message="errorMessage">
-      <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" :headers="headers"
+      <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" with-credentials
         text-color="black" @failed="failMsg" :form-fields="additionalFields" :max-file-size="maxFileSize"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"
         @rejected="rejected" :disable="disable" @start="uploadStarted" @finish="uploadFinished" />
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import { Cookies, openURL } from 'quasar';
+import { openURL } from 'quasar';
 import get from 'lodash/get';
 import CustomImg from '@components/form/CustomImg';
 import { NotifyNegative } from '@components/popup/notify';
@@ -50,25 +50,20 @@ export default {
     requiredField: { type: Boolean, default: false },
     multiple: { type: Boolean, default: false },
     label: { type: String, default: 'Pas de document' },
-    cloudinaryStorage: { type: Boolean, default: false },
+    driveStorage: { type: Boolean, default: false },
     maxFileSize: { type: Number, default: 1000 * 1000 },
-  },
-  data () {
-    return {
-      headers: [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }],
-    };
   },
   computed: {
     additionalFields () {
       const fields = [{ name: 'fileName', value: removeDiacritics(this.additionalValue) }];
-      if (!this.cloudinaryStorage) fields.push({ name: 'type', value: this.name });
+      if (this.driveStorage) fields.push({ name: 'type', value: this.name });
       return fields;
     },
     document () {
       return get(this.entity, this.path);
     },
     imageSource () {
-      return this.cloudinaryStorage ? this.document.link : this.document.driveId;
+      return this.driveStorage ? this.document.driveId : this.document.link;
     },
   },
   methods: {
@@ -85,7 +80,7 @@ export default {
       this.$emit('uploaded', { file, xhr });
     },
     goToUrl (url) {
-      if (!this.cloudinaryStorage) url = `${url}?usp=sharing`;
+      if (this.driveStorage) url = `${url}?usp=sharing`;
       openURL(url);
     },
     failMsg () {
@@ -120,7 +115,7 @@ export default {
   /deep/ .q-uploader
     width: 100%
     &--bordered
-      border: 1px solid #d0d0d0
+      border: 1px solid $grey-300
     .q-uploader__list
       display: none
     .q-uploader__header-content
@@ -128,7 +123,7 @@ export default {
       height: 38px
       margin: 0
       .q-btn__content
-        color: $grey
+        color: $grey-400
     .q-btn
       margin: 0
       padding: 0

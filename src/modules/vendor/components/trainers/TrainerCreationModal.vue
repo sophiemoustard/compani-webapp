@@ -3,13 +3,15 @@
     <template slot="title">
       Créer un nouveau <span class="text-weight-bold">formateur</span>
     </template>
-    <ni-input :disable="!firstStep" in-modal v-model.trim="newTrainer.local.email" required-field
+    <ni-input in-modal :value="newTrainer.local.email" @input="update($event.trim(), 'local.email')" required-field
       @blur="validations.local.email.$touch" caption="Email" :error="validations.local.email.$error"
-      :error-message="emailError" :last="firstStep" />
+      :error-message="emailError" :last="firstStep" :disable="!firstStep" />
     <template v-if="!firstStep">
-      <ni-input in-modal v-model.trim="newTrainer.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model.trim="newTrainer.identity.lastname" :error="validations.identity.lastname.$error"
-      @blur="validations.identity.lastname.$touch" required-field caption="Nom" last />
+      <ni-input in-modal :value="newTrainer.identity.firstname" @input="update($event.trim(), 'identity.firstname')"
+        caption="Prénom" />
+      <ni-input in-modal :value="newTrainer.identity.lastname" @input="update($event.trim(), 'identity.lastname')"
+        :error="validations.identity.lastname.$error" @blur="validations.identity.lastname.$touch" required-field
+        caption="Nom" last />
     </template>
     <template slot="footer">
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
@@ -23,6 +25,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import set from 'lodash/set';
 
 export default {
   name: 'TrainerCreationModal',
@@ -50,6 +53,9 @@ export default {
     },
     goToNextStep () {
       this.$emit('go-to-next-step');
+    },
+    update (event, fields) {
+      this.$emit('update:newTrainer', set({ ...this.newTrainer }, fields, event));
     },
   },
 };

@@ -1,4 +1,4 @@
-import moment from 'moment';
+import moment from '@helpers/moment';
 
 export const getUserStartDate = (contracts) => {
   if (!contracts || !Array.isArray(contracts) || contracts.length === 0) return 'N/A';

@@ -1,12 +1,10 @@
+import { LocalStorage } from 'quasar';
 import router from 'src/router/index';
 import store from 'src/store/index';
-import { Cookies, LocalStorage } from 'quasar';
+import Authentication from 'src/core/api/Authentication';
 
-export const logOutAndRedirectToLogin = (params) => {
-  const options = { path: '/' };
-  Cookies.remove('alenvi_token', options);
-  Cookies.remove('refresh_token', options);
-  Cookies.remove('user_id', options);
+export const logOutAndRedirectToLogin = async (params) => {
+  await Authentication.logOut();
   LocalStorage.clear();
 
   store.dispatch('course/resetCourse');

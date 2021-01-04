@@ -22,7 +22,7 @@
         </slot>
       </template>
       <template #no-data>
-        <div class="full-width row grey-text justify-center">
+        <div class="full-width row text-grey-800 justify-center">
           <span class="text-italic q-pb-sm" style="font-size: 0.8rem">{{ noDataLabel }}</span>
           <q-separator />
         </div>
