@@ -14,7 +14,7 @@
     "lint": "eslint ./src --ext .js,.vue -c .eslintrc.js"
   },
   "dependencies": {
-    "@casl/ability": "^4.1.6",
+    "@casl/ability": "^5.1.2",
     "@casl/vue": "^1.1.1",
     "@quasar/extras": "^1.9.12",
     "axios": "^0.21.0",
