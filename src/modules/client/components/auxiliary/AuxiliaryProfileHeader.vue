@@ -110,10 +110,10 @@ export default {
       };
     },
     userStartDate () {
-      return this.userProfile.createdAt ? this.$moment(this.userProfile.createdAt).format('DD/MM/YY') : 'N/A';
+      return this.userProfile.createdAt ? moment(this.userProfile.createdAt).format('DD/MM/YY') : 'N/A';
     },
     userRelativeStartDate () {
-      return this.userStartDate !== 'N/A' ? this.$moment(this.userStartDate, 'DD/MM/YY').toNow(true) : '';
+      return this.userStartDate !== 'N/A' ? moment(this.userStartDate, 'DD/MM/YY').toNow(true) : '';
     },
     isExternalUser () {
       return this.userProfile._id !== this.loggedUser._id;
