@@ -1,9 +1,15 @@
 import axios from 'axios';
 import { alenviAxios } from '@api/ressources/alenviAxios';
+import { Cookies } from 'quasar';
 
 export default {
-  async refreshToken (data) {
-    await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, data, { withCredentials: true });
+  async refreshToken () {
+    const refreshToken = Cookies.get('refresh_token');
+    await axios.post(`${process.env.API_HOSTNAME}/users/refreshToken`, { refreshToken }, { withCredentials: true });
+    const option = { path: '/' };
+    Cookies.remove('refresh_token', option);
+    Cookies.remove('alenvi_token', option);
+    Cookies.remove('user_id', option);
   },
   async authenticate (data) {
     const auth = await axios.post(`${process.env.API_HOSTNAME}/users/authenticate`, data, { withCredentials: true });
