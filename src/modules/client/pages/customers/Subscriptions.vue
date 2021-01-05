@@ -75,8 +75,7 @@
                   :style="col.style">
                   <template v-if="col.name === 'sign'">
                     <p class="no-margin" v-if="props.row.signedAt">
-                      Mandat signé le
-                      {{ $moment(props.row.signedAt).format('DD/MM/YYYY') }}
+                      Mandat signé le {{ getSignatureDate(props.row) }}
                     </p>
                     <q-btn color="primary" @click="preOpenESignModal(props.row)" data-cy="open-mandate"
                       v-else-if="displaySignButton(props.row)">
@@ -266,6 +265,9 @@ export default {
     await this.checkMandates();
   },
   methods: {
+    getSignatureDate (mandate) {
+      return moment(mandate.signedAt).format('DD/MM/YYYY');
+    },
     displaySignButton (mandate) {
       return this.getRowIndex(this.customer.payment.mandates, mandate) === this.customer.payment.mandates.length - 1;
     },

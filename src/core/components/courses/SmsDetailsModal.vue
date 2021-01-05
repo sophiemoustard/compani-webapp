@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-        Message envoyé le <span class="text-weight-bold">{{ $moment(smsHistory.date).format('DD/MM/YYYY') }}</span>
+        Message envoyé le <span class="text-weight-bold">{{ smsDate }}</span>
       </template>
       <ni-banner v-if="missingTraineesPhoneHistory.length" icon="info_outline">
         <template #message>
@@ -21,6 +21,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Banner from '@components/Banner';
 import { formatQuantity } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export default {
   name: 'SmsDetailsModal',
@@ -35,6 +36,11 @@ export default {
     'ni-select': Select,
     'ni-input': Input,
     'ni-banner': Banner,
+  },
+  computed: {
+    smsDate () {
+      return moment(this.smsHistory.date).format('DD/MM/YYYY');
+    },
   },
   methods: {
     formatQuantity,

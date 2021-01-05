@@ -7,7 +7,7 @@
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="validations.startDate.$touch"
         :error="validations.startDate.$error" required-field />
       <ni-date-input v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
-        :min="$moment(editedFunding.startDate).add(1, 'day').toISOString()" />
+        :min="minEndDate" />
       <ni-input in-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
       <ni-input in-modal v-if="!isFixedFunding" v-model="editedFunding.unitTTCRate"
         caption="Prix unitaire TTC" type="number" @blur="validations.unitTTCRate.$touch"
@@ -67,6 +67,9 @@ export default {
     },
     isFixedFunding () {
       return this.editedFunding.nature === FIXED;
+    },
+    minEndDate () {
+      return moment(this.editedFunding.startDate).add(1, 'day').toISOString();
     },
   },
   methods: {
