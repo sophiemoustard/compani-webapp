@@ -9,7 +9,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions justify-end">
-                  <ni-button icon="download" color="primary" disabled />
+                  <ni-button icon="download" color="primary" type="a" :href="props.row.link" />
                   <ni-button icon="delete" color="primary" disabled />
                 </div>
               </template>
@@ -48,12 +48,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import moment from '@helpers/moment';
 import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import SurveyChart from '@components/courses/SurveyChart';
 import OpenQuestionChart from '@components/courses/OpenQuestionChart';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER } from '@data/constants';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
 import QuestionAnswerChart from '@components/courses/QuestionAnswerChart';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheets from '@api/AttendanceSheets';
@@ -77,22 +78,6 @@ export default {
       areCardsDisplayed: {},
       attendanceSheetsLoading: false,
       attendanceSheets: [],
-      columns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
-        {
-          name: 'trainee',
-          label: 'Nom de l\'apprenant',
-          align: 'left',
-          field: 'trainee',
-        },
-        { name: 'actions', label: '', align: 'left', field: row => row },
-      ],
       SURVEY,
       OPEN_QUESTION,
       QUESTION_ANSWER,
@@ -101,6 +86,31 @@ export default {
   async created () {
     await this.refreshFollowUp();
     await this.refreshAttendanceSheets();
+  },
+  computed: {
+    ...mapState('course', ['course']),
+    columns () {
+      return this.course.type === INTRA
+        ? [
+          {
+            name: 'date',
+            label: 'Date',
+            align: 'left',
+            field: 'date',
+            format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
+          },
+          { name: 'actions', label: '', align: 'left', field: row => row },
+        ]
+        : [
+          {
+            name: 'trainee',
+            label: 'Nom de l\'apprenant',
+            align: 'left',
+            field: 'trainee',
+          },
+          { name: 'actions', label: '', align: 'left', field: row => row },
+        ];
+    },
   },
   methods: {
     async refreshFollowUp () {
@@ -131,7 +141,7 @@ export default {
       try {
         await AttendanceSheets.create({
           course: this.profileId,
-          link: 'https://google.com',
+          link: 'https://www.google.com',
           trainee: this.profileId,
           date: moment(),
         });
@@ -144,6 +154,10 @@ export default {
       } finally {
         this.modalLoading = false;
       }
+    },
+    getLink (item) {
+      // eslint-disable-next-line no-console
+      console.log(item);
     },
   },
 };
