@@ -265,7 +265,7 @@ export default {
     }
   },
   methods: {
-    getSsignatureDate (mandate) {
+    getSignatureDate (mandate) {
       return moment(mandate.signedAt).format('DD/MM/YYYY');
     },
     displaySignButton (mandate) {
