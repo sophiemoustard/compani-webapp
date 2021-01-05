@@ -29,7 +29,7 @@
         <div class="relative-position">
           <q-icon size="36px" name="phone_iphone" color="grey-2" />
           <q-icon v-if="!userProfile.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
-          <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="accent" size="16px" />
+          <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="green-800" size="16px" />
         </div>
         <div>
           <div class="text-weight-bold">{{ isAccountConfirmed }}</div>
@@ -57,7 +57,7 @@
 <script>
 import get from 'lodash/get';
 import { mapState } from 'vuex';
-import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import Sms from '@api/Sms';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
@@ -65,6 +65,7 @@ import Select from '@components/form/Select';
 import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { DEFAULT_AVATAR, HR_SMS } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'ProfileHeader',
@@ -109,10 +110,10 @@ export default {
       };
     },
     userStartDate () {
-      return this.userProfile.createdAt ? this.$moment(this.userProfile.createdAt).format('DD/MM/YY') : 'N/A';
+      return this.userProfile.createdAt ? moment(this.userProfile.createdAt).format('DD/MM/YY') : 'N/A';
     },
     userRelativeStartDate () {
-      return this.userStartDate !== 'N/A' ? this.$moment(this.userStartDate, 'DD/MM/YY').toNow(true) : '';
+      return this.userStartDate !== 'N/A' ? moment(this.userStartDate, 'DD/MM/YY').toNow(true) : '';
     },
     isExternalUser () {
       return this.userProfile._id !== this.loggedUser._id;
@@ -133,8 +134,8 @@ export default {
         + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/auxiliaries/info`
         + '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
       } else if (this.messageType === 'LA') {
-        if (!this.userProfile.passwordToken || this.$moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
-          this.userProfile.passwordToken = await Users.createPasswordToken(
+        if (!this.userProfile.passwordToken || moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
+          this.userProfile.passwordToken = await Authentication.createPasswordToken(
             this.userProfile._id,
             { email: this.userProfile.local.email }
           );
@@ -187,7 +188,7 @@ export default {
   .avatar
     width: 59px
     height: 59px
-    border: 1px solid #979797
+    border: 1px solid $grey-400
 
   .send-message-link
     color: $primary

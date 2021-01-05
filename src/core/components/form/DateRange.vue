@@ -19,6 +19,7 @@
 <script>
 import DateInput from '@components/form/DateInput';
 import { REQUIRED_LABEL } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   components: {
@@ -30,8 +31,8 @@ export default {
       type: Object,
       default () {
         return {
-          startDate: this.$moment().startOf('d').toISOString(),
-          endDate: this.$moment().endOf('d').toISOString(),
+          startDate: moment().startOf('d').toISOString(),
+          endDate: moment().endOf('d').toISOString(),
         };
       },
     },
@@ -51,9 +52,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .borders
-    border: 1px solid $middle-grey
-
   /deep/ .q-field__append
     .text-negative
       display: none
@@ -64,7 +62,7 @@ export default {
   .date-container
     width: 100%
     border-radius: 3px
-    background-color: $white
+    background-color: white
     & .delimiter
       margin: 0
       color: black

@@ -43,9 +43,9 @@
         <p class="title">Justificatifs APA ou autres financements</p>
         <div class="row gutter-profile">
           <div class="col-xs-12">
-            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement" multiple
-              @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates" :url="docsUploadUrl"
-              collapsible-label="Ajouter un justificatif" :user-profile="customer" :extensions="extensions"
+            <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement" :url="docsUploadUrl"
+              @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates" drive-storage
+              collapsible-label="Ajouter un justificatif" :user-profile="customer" :extensions="extensions" multiple
               @delete="validateFinancialCertifDeletion($event)" additional-fields-name="justificatif_financement" />
           </div>
         </div>
@@ -75,8 +75,7 @@
                   :style="col.style">
                   <template v-if="col.name === 'sign'">
                     <p class="no-margin" v-if="props.row.signedAt">
-                      Mandat signé le
-                      {{ $moment(props.row.signedAt).format('DD/MM/YYYY') }}
+                      Mandat signé le {{ getSignatureDate(props.row) }}
                     </p>
                     <q-btn color="primary" @click="preOpenESignModal(props.row)" data-cy="open-mandate"
                       v-else-if="displaySignButton(props.row)">
@@ -143,9 +142,10 @@ import Modal from '@components/modal/Modal';
 import HtmlModal from '@components/modal/HtmlModal';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
+import { REQUIRED_LABEL, DOC_EXTENSIONS } from '@data/constants';
 import { bic, iban } from '@helpers/vuelidateCustomVal';
 import { getLastVersion } from '@helpers/utils';
-import { REQUIRED_LABEL, DOC_EXTENSIONS } from '@data/constants';
+import moment from '@helpers/moment';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
@@ -184,8 +184,8 @@ export default {
           align: 'left',
           field: 'createdAt',
           sortable: true,
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
         },
         { name: '_id', field: '_id' },
       ],
@@ -228,7 +228,7 @@ export default {
     },
     agreement () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `(Accepté le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
+        return `(Accepté le ${moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
           + `par ${this.acceptedBy})`;
       }
       return '';
@@ -265,6 +265,9 @@ export default {
     await this.checkMandates();
   },
   methods: {
+    getSignatureDate (mandate) {
+      return moment(mandate.signedAt).format('DD/MM/YYYY');
+    },
     displaySignButton (mandate) {
       return this.getRowIndex(this.customer.payment.mandates, mandate) === this.customer.payment.mandates.length - 1;
     },
@@ -374,7 +377,7 @@ export default {
               iban: this.customer.payment.iban || '',
               companyName: this.helper.company.name || '',
               companyAddress: this.helper.company.address.fullAddress || '',
-              downloadDate: this.$moment().format('DD/MM/YYYY'),
+              downloadDate: moment().format('DD/MM/YYYY'),
             },
             ...this.esignRedirection,
           }

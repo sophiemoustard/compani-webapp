@@ -3,7 +3,7 @@
     <div class="title-padding">
       <h4>Registre unique du personnel</h4>
     </div>
-    <ni-large-table :data="staffRegister" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-simple-table :data="staffRegister" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="_id">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -19,22 +19,23 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
 import Contracts from '@api/Contracts';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'StaffRegister',
   metaInfo: { title: 'Registre unique du personnel' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {
@@ -73,7 +74,7 @@ export default {
           label: 'Date de naissance',
           field: row => get(row, 'user.identity.birthDate') || '',
           align: 'left',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'nationality',
@@ -98,14 +99,14 @@ export default {
           label: 'Date de début',
           field: 'startDate',
           align: 'left',
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
+          format: value => moment(value).format('DD/MM/YYYY'),
         },
         {
           name: 'endDate',
           label: 'Date de fin',
           field: 'endDate',
           align: 'left',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'idCardOrResidencePermitRecto',

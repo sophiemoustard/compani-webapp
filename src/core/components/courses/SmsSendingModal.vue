@@ -3,9 +3,10 @@
     <template slot="title">
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
-      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" v-model="newSms.type"
+      <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :value="newSms.type"
         required-field @input="updateType" />
-      <ni-input in-modal caption="Message" v-model="newSms.content" type="textarea" :rows="7" required-field />
+      <ni-input in-modal caption="Message" :value="newSms.content" @input="update($event, 'content')" type="textarea"
+        :rows="7" required-field />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Envoyer message" icon-right="send" color="primary"
           :loading="loading" @click="send" />
@@ -47,6 +48,9 @@ export default {
     },
     send () {
       this.$emit('send', this.newSms);
+    },
+    update (event, prop) {
+      this.$emit('update:newSms', { ...this.newSms, [prop]: event });
     },
   },
 };

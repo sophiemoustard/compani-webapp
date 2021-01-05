@@ -1,53 +1,33 @@
 import { Cookies } from 'quasar';
-import moment from 'moment';
-import User from '@api/Users';
+import Authentication from '@api/Authentication';
 import store from 'src/store/index';
-import { TOKEN_EXPIRE_DAY } from '@data/constants';
 
 export const canNavigate = async () => {
   const { loggedUser } = store.state.main;
-  if (!loggedUser && !Cookies.get('user_id') && !Cookies.get('refresh_token')) return false;
-
-  if (!loggedUser && !Cookies.get('user_id')) {
-    const refresh = await refreshAlenviCookies(); // refresh Cookies.get('user_id')
-    if (!refresh) return false;
-  }
-
+  if (!loggedUser && !Cookies.get('user_id')) await refreshAlenviCookies();
   if (!loggedUser) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
 
   return true;
 };
 
-export const cookieExpirationDate = () => moment().add(TOKEN_EXPIRE_DAY, 'day').toDate();
-
 export const refreshAlenviCookies = async () => {
   try {
-    const refreshToken = Cookies.get('refresh_token');
-    if (refreshToken) {
-      const newToken = await User.refreshToken({ refreshToken });
-      const options = { path: '/', secure: process.env.NODE_ENV !== 'development', sameSite: 'Lax' };
-
-      const expireDate = cookieExpirationDate();
-      Cookies.set('alenvi_token', newToken.token, { ...options, expires: expireDate });
-      Cookies.set('refresh_token', newToken.refreshToken, { ...options, expires: 365 });
-      Cookies.set('user_id', newToken.user._id, { ...options, expires: expireDate });
-
-      return true;
-    }
-    const options = { path: '/' };
-    Cookies.remove('alenvi_token', options);
-    Cookies.remove('user_id', options);
-
-    return false;
+    await Authentication.refreshToken();
+    return true;
   } catch (e) {
     console.error(e);
-    if (e.response.status === 404) {
-      const options = { path: '/' };
-      Cookies.remove('alenvi_token', options);
-      Cookies.remove('refresh_token', options);
-      Cookies.remove('user_id', options);
-    }
-
     return false;
   }
+};
+
+export const isUserLogged = async () => {
+  const refresh = await refreshAlenviCookies();
+  if (!refresh) return false;
+
+  await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
+  const loggedUser = store.getters['main/getLoggedUser'];
+  if (loggedUser) return true;
+
+  await Authentication.logOut();
+  return false;
 };

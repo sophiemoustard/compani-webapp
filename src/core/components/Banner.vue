@@ -16,7 +16,7 @@ export default {
   data () {
     const interfaceType = /\/ad\//.test(this.$router.currentRoute.path) ? VENDOR : CLIENT;
     return {
-      backgroundClass: interfaceType === CLIENT ? 'grey-background' : 'beige-background',
+      backgroundClass: interfaceType === CLIENT ? 'bg-grey-300' : 'bg-peach-200',
     };
   },
 };

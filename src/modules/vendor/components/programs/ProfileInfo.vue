@@ -5,7 +5,7 @@
       <div class="row gutter-profile">
         <ni-input caption="Nom" v-model.trim="program.name" @focus="saveTmp('name')" @blur="updateProgram('name')"
           :error="$v.program.name.$error" required-field />
-        <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme" cloudinary-storage
+        <ni-file-uploader caption="Image" path="image" :entity="program" alt="image programme"
           :url="programsUploadUrl" @delete="validateProgramImageDeletion" @uploaded="programImageUploaded"
           :additional-value="imageFileName" label="Pas d'image" :extensions="extensions" :max-file-size="maxFileSize" />
         <ni-input caption="Description" v-model="program.description" type="textarea"

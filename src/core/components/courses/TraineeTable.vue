@@ -32,14 +32,14 @@
     </div>
 
     <!-- Add trainee modal -->
-    <learner-creation-modal v-model="traineeCreationModal" :new-user="newTrainee" :company-options="companyOptions"
+    <learner-creation-modal v-model="traineeCreationModal" :new-user.sync="newTrainee" :company-options="companyOptions"
       :first-step="firstStep" :identity-step="addNewTraineeIdentityStep" :company-step="!isIntraCourse"
       :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
     <!-- Trainee edition modal -->
-    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee="editedTrainee" :validations="$v.editedTrainee"
-      @hide="resetTraineeEditionForm" @submit="updateTrainee" :loading="traineeEditionModalLoading" />
+    <trainee-edition-modal v-model="traineeEditionModal" :edited-trainee.sync="editedTrainee" @submit="updateTrainee"
+      @hide="resetTraineeEditionForm" :loading="traineeEditionModalLoading" :validations="$v.editedTrainee" />
   </div>
 </template>
 

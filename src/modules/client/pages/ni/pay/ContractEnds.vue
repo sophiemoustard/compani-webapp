@@ -12,7 +12,7 @@
     <div class="q-mx-md">
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_END)" label="Données fin de contrats" />
     </div>
-    <ni-large-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
+    <ni-simple-table :data="draftFinalPay" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="auxiliaryId" selection="multiple" :selected.sync="selected">
       <template #header="{ props }">
         <q-tr :props="props">
@@ -72,7 +72,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
     <q-btn class="fixed fab-custom" :disable="!hasSelectedRows" no-caps rounded color="primary" icon="done"
       label="Payer" @click="validateFinalPayListCreation" />
 
@@ -85,7 +85,7 @@
 import FinalPay from '@api/FinalPay';
 import Button from '@components/Button';
 import EditableTd from '@components/table/EditableTd';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
@@ -100,7 +100,7 @@ export default {
   mixins: [payMixin, editableTdMixin],
   components: {
     'ni-editable-td': EditableTd,
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'ni-pay-surcharge-details-modal': PaySurchargeDetailsModal,
     'ni-title-header': TitleHeader,
     'ni-select': Select,

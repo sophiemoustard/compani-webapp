@@ -17,7 +17,7 @@
       @click="learnerCreationModal = true" :disable="tableLoading" />
 
       <!-- New learner modal -->
-    <learner-creation-modal v-model="learnerCreationModal" :new-user="newLearner" @hide="resetAddLearnerForm"
+    <learner-creation-modal v-model="learnerCreationModal" :new-user.sync="newLearner" @hide="resetAddLearnerForm"
       :first-step="!identityStep" :identity-step="identityStep" @next-step="nextStepLearnerCreationModal"
       :validations="$v.newLearner" :loading="learnerCreationModalLoading" @submit="createLearner" />
   </q-page>

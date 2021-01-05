@@ -4,7 +4,7 @@
       <h4>Archive Prélèvements</h4>
     </div>
     <div class="q-pa-sm">
-      <ni-large-table :data="directDebits" :columns="columns" :pagination.sync="pagination" :loading="loading">
+      <ni-simple-table :data="directDebits" :columns="columns" :pagination.sync="pagination" :loading="loading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props">
@@ -17,7 +17,7 @@
             </q-td>
           </q-tr>
         </template>
-      </ni-large-table>
+      </ni-simple-table>
     </div>
   </q-page>
 </template>
@@ -28,13 +28,14 @@ import { mapGetters } from 'vuex';
 import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative } from '@components/popup/notify';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
+import moment from '@helpers/moment';
 
 export default {
   name: 'DebitArchive',
   metaInfo: { title: 'Archive prélèvements' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
   },
   data () {
     return {
@@ -47,7 +48,7 @@ export default {
           label: 'Date de création',
           align: 'left',
           field: 'createdTime',
-          format: value => (value ? this.$moment(value).format('DD/MM/YYYY') : ''),
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
         },
         { name: 'download', label: '', align: 'left', field: 'webViewLink' },
       ],

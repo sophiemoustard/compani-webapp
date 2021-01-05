@@ -3,7 +3,7 @@
     <div class="title-padding">
       <h4>Avoirs</h4>
     </div>
-    <ni-large-table :data="creditNotes" :columns="creditNotesColumns" :pagination.sync="pagination"
+    <ni-simple-table :data="creditNotes" :columns="creditNotesColumns" :pagination.sync="pagination"
       :loading="tableLoading">
       <template #body="{ props }">
         <q-tr :props="props">
@@ -21,7 +21,7 @@
           </q-td>
         </q-tr>
       </template>
-    </ni-large-table>
+    </ni-simple-table>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un avoir"
       @click="creditNoteCreationModal = true" :disable="tableLoading" />
 
@@ -51,19 +51,20 @@ import pick from 'lodash/pick';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
-import LargeTable from '@components/table/LargeTable';
+import SimpleTable from '@components/table/SimpleTable';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { COMPANI } from '@data/constants';
+import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
+import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { strictPositiveNumber } from '@helpers/vuelidateCustomVal';
-import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
-import { COMPANI } from '@data/constants';
 
 export default {
   name: 'CreditNotes',
   metaInfo: { title: 'Avoirs' },
   components: {
-    'ni-large-table': LargeTable,
+    'ni-simple-table': SimpleTable,
     'credit-note-edition-modal': CreditNoteEditionModal,
     'credit-note-creation-modal': CreditNoteCreationModal,
   },
@@ -91,30 +92,25 @@ export default {
       editedCreditNote: {},
       creditNotes: [],
       creditNotesColumns: [
-        {
-          name: 'number',
-          label: '#',
-          align: 'left',
-          field: 'number',
-        },
+        { name: 'number', label: '#', align: 'left', field: 'number' },
         {
           name: 'date',
           label: 'Date de l\'avoir',
           align: 'left',
           field: row => (row.date ? row.date : null),
-          format: val => (val ? this.$moment(val).format('DD/MM/YYYY') : ''),
+          format: val => (val ? moment(val).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'startDate',
           label: 'Début',
           align: 'left',
-          field: row => (row.startDate ? this.$moment(row.startDate).format('DD/MM/YYYY') : ''),
+          field: row => (row.startDate ? moment(row.startDate).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'endDate',
           label: 'Fin',
           align: 'left',
-          field: row => (row.endDate ? this.$moment(row.endDate).format('DD/MM/YYYY') : ''),
+          field: row => (row.endDate ? moment(row.endDate).format('DD/MM/YYYY') : ''),
         },
         {
           name: 'customer',
@@ -143,12 +139,7 @@ export default {
           field: row => (row.thirdPartyPayer ? row.inclTaxesTpp : row.inclTaxesCustomer),
           format: value => formatPrice(value),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       pagination: {
         rowsPerPage: 0,
@@ -252,8 +243,8 @@ export default {
         .sort((e1, e2) => (new Date(e1.startDate)) - (new Date(e2.startDate)));
 
       return creditNoteEvents.map(cnEvent => ({
-        label: `${this.$moment(cnEvent.startDate).format('DD/MM/YYYY HH:mm')} - `
-          + `${this.$moment(cnEvent.endDate).format('HH:mm')}`,
+        label: `${moment(cnEvent.startDate).format('DD/MM/YYYY HH:mm')} - `
+          + `${moment(cnEvent.endDate).format('HH:mm')}`,
         value: cnEvent.eventId,
       }));
     },

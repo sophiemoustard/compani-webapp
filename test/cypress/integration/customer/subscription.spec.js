@@ -7,7 +7,7 @@ describe('customers subscription tests', () => {
     cy.visit('/customers/subscriptions');
   });
 
-  it('should display correctly the subscriptions part of the page', function () {
+  it('should display correctly the subscriptions part of the page', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('[data-cy=subscriptions-table]').within(() => {
       cy.get('th').should('have.length', 6).and(($th) => {
@@ -20,14 +20,14 @@ describe('customers subscription tests', () => {
       });
     });
 
-    cy.get('[data-cy=col-service]').should('contain', 'Service 1')
-    cy.get('[data-cy=col-nature]').should('contain', 'Horaire')
-    cy.get('[data-cy=col-unitTTCRate]').should('contain', '12.00€')
-    cy.get('[data-cy=col-estimatedWeeklyVolume]').should('contain', '12h')
-    cy.get('[data-cy=col-weeklyRate]').should('contain', '144.00€')
+    cy.get('[data-cy=col-service]').should('contain', 'Service 1');
+    cy.get('[data-cy=col-nature]').should('contain', 'Horaire');
+    cy.get('[data-cy=col-unitTTCRate]').should('contain', '12.00€');
+    cy.get('[data-cy=col-estimatedWeeklyVolume]').should('contain', '12h');
+    cy.get('[data-cy=col-weeklyRate]').should('contain', '144.00€');
   });
 
-  it('should interact correctly with the subscriptions part of the page', function () {
+  it('should interact correctly with the subscriptions part of the page', () => {
     cy.get('#q-app').click(500, 500);
     cy.get('.q-checkbox__inner').should('have.class', 'q-checkbox__inner--falsy');
     cy.get('.q-checkbox').click();
@@ -37,7 +37,7 @@ describe('customers subscription tests', () => {
     cy.get('[data-cy=agreement]').should(
       'contain',
       `(Accepté le ${moment().format('DD/MM/YYYY')} par Helper TEST)`
-    )
+    );
 
     cy.get('[data-cy=show-subscription-history]').click();
     cy.get('[data-cy=subscriptions-history]').within(() => {
@@ -82,7 +82,7 @@ describe('customers subscription tests', () => {
     });
   });
 
-  it('should display correctly the payment part and open the modal for the mandate', function () {
+  it('should display correctly the payment part and open the modal for the mandate', () => {
     cy.get('#q-app').click(500, 500);
 
     cy.get('[data-cy=bank-account-owner]').should('have.value', 'David gaudu');

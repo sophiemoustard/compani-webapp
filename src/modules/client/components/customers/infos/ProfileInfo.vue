@@ -132,7 +132,7 @@
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
                   <div v-if="!props.row.drive || !getMandateLink(props.row)" class="row justify-center table-actions">
-                    <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="mandateFormFields(props.row)"
+                    <q-uploader flat :url="docsUploadUrl" with-credentials :form-fields="mandateFormFields(props.row)"
                       field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
@@ -189,7 +189,7 @@
       <p class="text-weight-bold">Justificatifs APA ou autres financements</p>
       <div class="row gutter-profile q-mb-lg">
         <div class="col-xs-12">
-          <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement"
+          <ni-multiple-files-uploader path="financialCertificates" alt="justificatif financement" drive-storage
             @uploaded="documentUploaded" name="financialCertificates" collapsible-label="Ajouter un justificatif"
             :user-profile="customer" :url="docsUploadUrl" @delete="validateFinancialCertifDeletion($event)"
             additional-fields-name="financialCertificate" :extensions="extensions" />
@@ -212,7 +212,7 @@
                 </template>
                 <template v-else-if="col.name === 'signedQuote'">
                   <div v-if="!props.row.drive || !getQuoteLink(props.row)" class="row justify-center table-actions">
-                    <q-uploader flat :url="docsUploadUrl" :headers="headers" :form-fields="quoteFormFields(props.row)"
+                    <q-uploader flat :url="docsUploadUrl" with-credentials :form-fields="quoteFormFields(props.row)"
                       field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
                       @failed="failMsg" />
                   </div>
@@ -278,7 +278,6 @@
 </template>
 
 <script>
-import { Cookies } from 'quasar';
 import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
@@ -296,8 +295,6 @@ import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import { downloadDriveDocx } from '@helpers/file';
-import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import { days } from '@data/days';
 import {
   NATURE_OPTIONS,
@@ -308,7 +305,11 @@ import {
   CIVILITY_OPTIONS,
   DOC_EXTENSIONS,
 } from '@data/constants';
+import { downloadDriveDocx } from '@helpers/file';
+import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
 import { userMixin } from '@mixins/userMixin';
+import { validationMixin } from '@mixins/validationMixin';
 import HelperEditionModal from 'src/modules/client/components/customers/infos/HelperEditionModal';
 import HelperCreationModal from 'src/modules/client/components/customers/infos/HelperCreationModal';
 import SubscriptionCreationModal from 'src/modules/client/components/customers/infos/SubscriptionCreationModal';
@@ -320,7 +321,6 @@ import FundingEditionModal from 'src/modules/client/components/customers/infos/F
 import FundingCreationModal from 'src/modules/client/components/customers/infos/FundingCreationModal';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
-import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
@@ -381,8 +381,8 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
         },
       ],
       quotesLoading: false,
@@ -405,8 +405,8 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(a).toDate()) - (this.$moment(b).toDate()),
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
         },
       ],
       mandatesLoading: false,
@@ -459,9 +459,6 @@ export default {
       return `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}`
         + '/upload';
     },
-    headers () {
-      return [{ name: 'x-access-token', value: Cookies.get('alenvi_token') || '' }];
-    },
     company () {
       return this.$store.getters['main/getCompany'];
     },
@@ -492,7 +489,7 @@ export default {
     },
     acceptedByHelper () {
       if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `le ${this.$moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
+        return `le ${moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
           + `par ${this.acceptedBy}`;
       }
       return '';
@@ -775,7 +772,7 @@ export default {
         const data = {
           bankAccountOwner: this.customer.payment.bankAccountOwner || '',
           customerAddress: this.customer.contact.primaryAddress.fullAddress,
-          downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: moment(Date.now()).format('DD/MM/YYYY'),
           ics: this.company.ics,
           rum: doc.rum,
           bic: this.customer.payment.bic || '',
@@ -830,7 +827,7 @@ export default {
           companyAddress: this.company.address.fullAddress,
           rcs: this.company.rcs,
           subscriptions,
-          downloadDate: this.$moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: moment(Date.now()).format('DD/MM/YYYY'),
         };
         const params = { driveId: quoteDriveId };
         await downloadDriveDocx(params, data, 'devis.docx');
@@ -904,7 +901,7 @@ export default {
     formatCreatedFunding () {
       const cleanPayload = pickBy(this.newFunding);
       const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
-      if (version.endDate) version.endDate = this.$moment(version.endDate).endOf('d').toDate();
+      if (version.endDate) version.endDate = moment(version.endDate).endOf('d').toDate();
 
       return { nature, thirdPartyPayer, subscription, frequency, versions: [{ ...version }] };
     },
@@ -971,7 +968,7 @@ export default {
       else if (funding.nature === HOURLY) pickedFields.push('unitTTCRate', 'careHours');
       const payload = {
         ...pick(funding, pickedFields),
-        endDate: funding.endDate ? this.$moment(funding.endDate).endOf('d') : '',
+        endDate: funding.endDate ? moment(funding.endDate).endOf('d') : '',
       };
 
       return pickBy(payload);

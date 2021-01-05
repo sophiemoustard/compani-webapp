@@ -55,7 +55,7 @@
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additional-value="additionalValue" :disable="!selectedAuxiliary._id"
             :error="validations.attachment.$error" @delete="deleteDocument(editedEvent.attachment.driveId)" in-modal
-            :extensions="extensions" />
+            :extensions="extensions" drive-storage />
         </template>
         <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
           :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
@@ -200,7 +200,7 @@ export default {
         width: 100%
 
   .light-checkbox
-    color: $grey
+    color: $grey-400
     font-size: 14px
 
 </style>

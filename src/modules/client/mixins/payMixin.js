@@ -1,4 +1,3 @@
-import moment from 'moment';
 import get from 'lodash/get';
 import omit from 'lodash/omit';
 import Pay from '@api/Pay';
@@ -6,6 +5,7 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { END_CONTRACT_REASONS, SURCHARGES } from '@data/constants';
 import { formatPrice, formatIdentity, formatHours } from '@helpers/utils';
 import { downloadCsv, downloadFile } from '@helpers/file';
+import moment from '@helpers/moment';
 
 export const payMixin = {
   data () {
@@ -32,7 +32,7 @@ export const payMixin = {
           label: 'Début',
           align: 'left',
           field: 'startDate',
-          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
+          format: value => (value ? moment(value).format('DD/MM') : ''),
           sort: (a, b) => new Date(a) - new Date(b),
         },
         {
@@ -40,7 +40,7 @@ export const payMixin = {
           label: 'Date de notif',
           align: 'left',
           field: 'endNotificationDate',
-          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
+          format: value => (value ? moment(value).format('DD/MM') : ''),
         },
         {
           name: 'endReason',
@@ -57,7 +57,7 @@ export const payMixin = {
           label: 'Fin',
           align: 'left',
           field: 'endDate',
-          format: value => (value ? this.$moment(value).format('DD/MM') : ''),
+          format: value => (value ? moment(value).format('DD/MM') : ''),
         },
         {
           name: 'contractHours',
@@ -197,8 +197,8 @@ export const payMixin = {
         { label: 'Mois précédent', value: 1 },
       ],
       dates: {
-        startDate: this.$moment().startOf('M').toISOString(),
-        endDate: this.$moment().endOf('M').toISOString(),
+        startDate: moment().startOf('M').toISOString(),
+        endDate: moment().endOf('M').toISOString(),
       },
     };
   },
@@ -239,8 +239,8 @@ export const payMixin = {
     },
     setSelectedPeriod (offset) {
       this.dates = {
-        startDate: this.$moment().subtract(offset, 'M').startOf('M').toISOString(),
-        endDate: this.$moment().subtract(offset, 'M').endOf('M').toISOString(),
+        startDate: moment().subtract(offset, 'M').startOf('M').toISOString(),
+        endDate: moment().subtract(offset, 'M').endOf('M').toISOString(),
       };
     },
     formatNumberForCSV (number) {
@@ -279,8 +279,8 @@ export const payMixin = {
           get(auxiliary, 'identity.lastname') || '',
           get(auxiliary, 'identity.firstname') || '',
           get(auxiliary, 'sector.name') || '',
-          startDate ? this.$moment(startDate).format('DD/MM/YYYY') : '',
-          endDate ? this.$moment(endDate).format('DD/MM/YYYY') : '',
+          startDate ? moment(startDate).format('DD/MM/YYYY') : '',
+          endDate ? moment(endDate).format('DD/MM/YYYY') : '',
           this.formatNumberForCSV(draftPay.contractHours),
           this.formatNumberForCSV(draftPay.hoursToWork - draftPay.diff.absencesHours),
           this.formatHoursWithDiff(draftPay, 'workedHours'),
@@ -307,7 +307,7 @@ export const payMixin = {
     async exportTxt (type) {
       try {
         const txt = await Pay.export(type, this.dates);
-        await downloadFile(txt, `${type}_${this.$moment(this.dates.startDate).format('MM_YYYY')}.txt`);
+        await downloadFile(txt, `${type}_${moment(this.dates.startDate).format('MM_YYYY')}.txt`);
 
         NotifyPositive('Document téléchargé.');
       } catch (e) {

@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import pick from 'lodash/pick';
 import { REQUIRED_LABEL } from '@data/constants';
 import Button from '@components/Button';
@@ -46,7 +47,7 @@ export default {
       try {
         if (!terms) return;
 
-        const res = await this.$axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: terms } });
+        const res = await axios.get('https://api-adresse.data.gouv.fr/search', { params: { q: terms } });
         this.options = res.data.features.sort((a, b) => b.properties.score - a.properties.score).map(result => ({
           label: result.properties.label,
           fullAddress: result.properties.label,

@@ -3,16 +3,18 @@
     <template slot="title">
         Créer une nouvelle <span class="text-weight-bold">formation</span>
       </template>
-      <ni-option-group v-model="newCourse.type" type="radio" :options="courseTypes" :error="validations.type.$error"
-        caption="Type" required-field inline @input="update" />
-      <ni-select in-modal v-model.trim="newCourse.program" :error="validations.program.$error"
-        @blur="validations.program.$touch" required-field caption="Programme" :options="programOptions" />
-      <ni-select in-modal v-model.trim="newCourse.subProgram" :error="validations.subProgram.$error"
+      <ni-option-group :value="newCourse.type" @input="updateType($event)" type="radio" :options="courseTypes"
+        caption="Type" required-field inline :error="validations.type.$error" />
+      <ni-select in-modal :value="newCourse.program" @input="update($event, 'program')" :options="programOptions"
+        @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error" />
+      <ni-select in-modal :value="newCourse.subProgram" @input="update($event, 'subProgram')"
         @blur="validations.subProgram.$touch" required-field caption="Sous-programme" :options="subProgramOptions"
-        :disable="disableSubProgram" />
-      <ni-select v-if="isIntraCourse" in-modal v-model.trim="newCourse.company" :error="validations.company.$error"
-        @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions" />
-      <ni-input in-modal v-model.trim="newCourse.misc" caption="Informations Complémentaires" />
+        :disable="disableSubProgram" :error="validations.subProgram.$error" />
+      <ni-select v-if="isIntraCourse" in-modal :value="newCourse.company" @input="update($event, 'company')"
+        @blur="validations.company.$touch" required-field caption="Structure" :options="companyOptions"
+        :error="validations.company.$error" />
+      <ni-input in-modal :value="newCourse.misc" @input="update($event.trim(), 'misc')"
+        caption="Informations Complémentaires" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer la formation" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
@@ -22,6 +24,7 @@
 
 <script>
 import get from 'lodash/get';
+import omit from 'lodash/omit';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
@@ -86,8 +89,11 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update () {
-      this.$emit('update');
+    updateType (event) {
+      this.$emit('update:newCourse', { ...omit(this.newCourse, 'company'), type: event });
+    },
+    update (event, prop) {
+      this.$emit('update:newCourse', { ...this.newCourse, [prop]: event });
     },
   },
 };

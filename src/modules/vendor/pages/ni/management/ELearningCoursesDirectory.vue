@@ -13,8 +13,9 @@ import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative } from '@components/popup/notify';
-import { removeDiacritics } from '@helpers/utils';
 import { STRICTLY_E_LEARNING } from '@data/constants';
+import { removeDiacritics } from '@helpers/utils';
+import moment from '@helpers/moment';
 
 export default {
   metaInfo: { title: 'Repertoire formation eLearning' },
@@ -41,8 +42,8 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: value => this.$moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (this.$moment(b).toDate()) - (this.$moment(a).toDate()),
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => new Date(b) - new Date(a),
           style: 'min-width: 110px; width: 10%',
         },
       ],

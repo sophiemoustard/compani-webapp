@@ -22,8 +22,9 @@
 import { sameAs, required, requiredIf } from 'vuelidate/lib/validators';
 import CompaniHeader from '@components/CompaniHeader';
 import Input from '@components/form/Input';
-import Users from '@api/Users';
+import Authentication from '@api/Authentication';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { isUserLogged } from '@helpers/alenvi';
 import { passwordMixin } from '@mixins/passwordMixin';
 import { logInMixin } from '@mixins/logInMixin';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
@@ -38,7 +39,6 @@ export default {
     return {
       password: '',
       passwordConfirm: '',
-      token: null,
       userId: null,
       timeout: null,
       userEmail: '',
@@ -46,8 +46,11 @@ export default {
   },
   async beforeRouteEnter (to, from, next) {
     try {
+      const isLogged = await isUserLogged();
+      if (isLogged) return next({ path: '/' });
+
       if (to.params.token) {
-        const checkToken = await Users.checkResetPasswordToken(to.params.token);
+        const checkToken = await Authentication.checkPasswordToken(to.params.token);
         next(vm => vm.setData(checkToken));
       } else {
         logOutAndRedirectToLogin();
@@ -69,7 +72,6 @@ export default {
   },
   methods: {
     setData (checkToken) {
-      this.token = checkToken.token;
       this.userId = checkToken.user._id;
       this.userEmail = checkToken.user.email;
     },
@@ -83,7 +85,7 @@ export default {
     },
     async submit () {
       try {
-        await Users.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true }, this.token);
+        await Authentication.updatePassword(this.userId, { local: { password: this.password }, isConfirmed: true });
 
         NotifyPositive('Mot de passe changé. Connexion en cours...');
         this.timeout = setTimeout(() => this.logIn(), 2000);

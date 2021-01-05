@@ -47,6 +47,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import OptionGroup from '@components/form/OptionGroup';
 import { FIXED, FUNDING_FREQ_OPTIONS, ONCE, NATURE_OPTIONS } from '@data/constants';
+import moment from '@helpers/moment';
 
 export default {
   name: 'FundingCreationModal',
@@ -86,7 +87,7 @@ export default {
       return FUNDING_FREQ_OPTIONS;
     },
     minStartDate () {
-      return this.$moment(this.newFunding.startDate).add(1, 'day').toISOString();
+      return moment(this.newFunding.startDate).add(1, 'day').toISOString();
     },
   },
   watch: {
