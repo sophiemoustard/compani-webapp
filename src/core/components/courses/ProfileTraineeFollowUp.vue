@@ -106,7 +106,8 @@ export default {
             name: 'trainee',
             label: 'Nom de l\'apprenant',
             align: 'left',
-            field: 'trainee',
+            field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee)),
+            format: value => (value ? `${value.identity.firstname} ${value.identity.lastname}` : ''),
           },
           { name: 'actions', label: '', align: 'left', field: row => row },
         ];
@@ -142,7 +143,7 @@ export default {
         await AttendanceSheets.create({
           course: this.profileId,
           link: 'https://www.google.com',
-          trainee: this.profileId,
+          trainee: this.course.trainees[0]._id,
           date: moment(),
         });
 
@@ -154,10 +155,6 @@ export default {
       } finally {
         this.modalLoading = false;
       }
-    },
-    getLink (item) {
-      // eslint-disable-next-line no-console
-      console.log(item);
     },
   },
 };
