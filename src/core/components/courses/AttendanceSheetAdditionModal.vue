@@ -5,10 +5,12 @@
     </template>
     <ni-select v-if="course.type !== INTRA" :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
       :error="validations.trainee.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'trainee')" in-modal
-      :options="traineesOption" />
+      :options="traineesOption" caption="Apprenant" required-field />
     <ni-select v-if="course.type == INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch"
       :error="validations.date.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'date')" in-modal
-      :options="dateOption" />
+      :options="dateOption" caption="Date" required-field />
+    <ni-document-upload v-model="newAttendanceSheet.file" ref="documentUploadForm" @valid="formValid = $event" no-date
+      no-type in-modal />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la feuille d'émargement" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
@@ -19,6 +21,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
+import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
 import { REQUIRED_LABEL, INTRA } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -41,6 +44,7 @@ export default {
   components: {
     'ni-select': Select,
     'ni-modal': Modal,
+    'ni-document-upload': DocumentUpload,
   },
   computed: {
     traineesOption () {

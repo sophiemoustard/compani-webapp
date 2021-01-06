@@ -9,7 +9,7 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions justify-end">
-                  <ni-button icon="download" color="primary" type="a" :href="props.row.link" />
+                  <ni-button icon="download" color="primary" type="a" target="_self" :href="props.row.file.link" />
                   <ni-button icon="delete" color="primary" disabled />
                 </div>
               </template>
@@ -53,7 +53,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import moment from '@helpers/moment';
 import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -87,7 +87,7 @@ export default {
       modalLoading: false,
       attendanceSheetAdditionModal: false,
       attendanceSheets: [],
-      newAttendanceSheet: { course: this.profileId, link: '', trainee: undefined, date: undefined },
+      newAttendanceSheet: { course: this.profileId, file: null, trainee: undefined, date: undefined },
       SURVEY,
       OPEN_QUESTION,
       QUESTION_ANSWER,
@@ -96,9 +96,9 @@ export default {
   validations () {
     return {
       newAttendanceSheet: {
-        // link: { required },
-        trainee: { required: requiredIf(this.course.type !== INTRA) },
-        date: { required: requiredIf(this.course.type === INTRA) },
+        file: { required },
+        trainee: { required: requiredIf(() => this.course.type !== INTRA) },
+        date: { required: requiredIf(() => this.course.type === INTRA) },
       },
     };
   },
@@ -156,19 +156,27 @@ export default {
     },
     resetAttendanceSheetAdditionModal () {
       this.$v.newAttendanceSheet.$reset();
-      this.newAttendanceSheet = { course: this.profileId, link: '', trainee: undefined, date: undefined };
+      this.newAttendanceSheet = { course: this.profileId, file: null, trainee: undefined, date: undefined };
     },
     showCards (activityId) {
       this.$set(this.areCardsDisplayed, activityId, !this.areCardsDisplayed[activityId]);
     },
+    formatPayload () {
+      const { course, file, trainee, date } = this.newAttendanceSheet;
+      const form = new FormData();
+      this.course.type === INTRA ? form.append('date', date) : form.append('trainee', trainee);
+      form.append('course', course);
+      form.append('file', file.file);
+
+      return form;
+    },
     async addAttendanceSheet () {
       try {
-        this.newAttendanceSheet.link = 'https://www.google.cl';
         this.$v.newAttendanceSheet.$touch();
         if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
 
-        await AttendanceSheets.create(this.newAttendanceSheet);
+        await AttendanceSheets.create(this.formatPayload());
 
         this.attendanceSheetAdditionModal = false;
         NotifyPositive('Feuille d\'émargement ajoutée.');

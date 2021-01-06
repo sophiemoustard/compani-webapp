@@ -1,9 +1,9 @@
 <template>
   <div>
     <ni-select :in-modal="inModal" caption="Type" required-field :value="formValue.nature" :options="natureOptions"
-      @blur="onBlur('nature')" @input="update('nature', $event)" :error="$v.formValue.nature.$error" />
+      @blur="onBlur('nature')" @input="update('nature', $event)" :error="$v.formValue.nature.$error" v-if="!noType" />
     <ni-date-input :in-modal="inModal" caption="Date" required-field :value="formValue.date"
-      @input="update('date', $event)" />
+      @input="update('date', $event)" v-if="!noDate" />
     <ni-input :in-modal="inModal" caption="Document" required-field type="file" :value="formValue.file"
       @input="onBlur('file'); update('file', $event)" :error="$v.formValue.file.$error"
       :error-message="fileErrorMessage" last />
@@ -30,6 +30,8 @@ export default {
     natureOptions: { type: Array, default: () => [] },
     inModal: { type: Boolean, default: false },
     value: { type: Object, default: () => ({}) },
+    noDate: { type: Boolean, default: false },
+    noType: { type: Boolean, default: false },
   },
   data () {
     return {
