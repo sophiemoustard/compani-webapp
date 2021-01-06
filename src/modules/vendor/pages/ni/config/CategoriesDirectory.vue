@@ -2,7 +2,7 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Catégories" class="row q-mb-xl" />
     <q-card>
-      <ni-responsive-table :data="categories" :columns="columns" :pagination.sync="pagination">
+      <ni-responsive-table :data="categories" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
