@@ -26,6 +26,7 @@ const coachRoutes = [
   { name: 'ni planning customers', subscription: ERP },
   { name: 'account client' },
   { name: 'ni courses' },
+  { name: 'ni courses dashboard' },
   { name: 'ni courses info' },
   { name: 'ni courses learners' },
   { name: 'ni courses learners info' },

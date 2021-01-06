@@ -285,6 +285,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/courses/dashboard',
+        name: 'ni courses dashboard',
+        component: () => import('src/modules/client/pages/ni/courses/Dashboard'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
+      {
         path: 'ni/courses/learners',
         name: 'ni courses learners',
         component: () => import('src/modules/client/pages/ni/courses/LearnersDirectory'),
