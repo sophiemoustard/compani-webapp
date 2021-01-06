@@ -31,7 +31,7 @@ import Customers from '@api/Customers';
 import Events from '@api/Events';
 import EventHistories from '@api/EventHistories';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES } from '@data/constants';
+import { INTERVENTION, NEVER, PERSON, AUXILIARY, SECTOR, COACH_ROLES, DAILY } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
@@ -267,6 +267,7 @@ export default {
         subscription: '',
         internalHour: '',
         absence: '',
+        absenceNature: DAILY,
         address: { fullAddress: '' },
         attachment: {},
         auxiliary: person ? person._id : '',
@@ -275,6 +276,7 @@ export default {
           startDate: moment(selectedDay).hours(8).toISOString(),
           endDate: moment(selectedDay).hours(10).toISOString(),
         },
+        extension: '',
       };
       this.creationModal = true;
     },
