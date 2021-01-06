@@ -2,7 +2,7 @@
   <div>
     <div class="q-my-md">
       <p class="text-weight-bold">Émargements</p>
-      <ni-simple-table :data="attendanceSheets" :columns="columns">
+      <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -22,7 +22,7 @@
       </ni-simple-table>
       <div class="flex justify-end">
         <ni-button class="bg-primary" color="white" icon="add" label="Ajouter une feuille d'émargement"
-          @click="addAttendanceSheet()" />
+          @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
     <div v-if="followUp.subProgram">
@@ -44,18 +44,24 @@
         </q-card>
       </div>
     </div>
+
+    <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
+      @submit="addAttendanceSheet" :new-attendance-sheet.sync="newAttendanceSheet" :validations="$v.newAttendanceSheet"
+      :loading="modalLoading" :course="course" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import { requiredIf } from 'vuelidate/lib/validators';
 import moment from '@helpers/moment';
 import Courses from '@api/Courses';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import SurveyChart from '@components/courses/SurveyChart';
 import OpenQuestionChart from '@components/courses/OpenQuestionChart';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
 import QuestionAnswerChart from '@components/courses/QuestionAnswerChart';
+import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
@@ -68,6 +74,7 @@ export default {
     'question-answer-chart': QuestionAnswerChart,
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
+    'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
   },
   props: {
     profileId: { type: String, required: true },
@@ -76,11 +83,23 @@ export default {
     return {
       followUp: {},
       areCardsDisplayed: {},
-      attendanceSheetsLoading: false,
+      tableLoading: false,
+      modalLoading: false,
+      attendanceSheetAdditionModal: false,
       attendanceSheets: [],
+      newAttendanceSheet: { course: this.profileId, link: '', trainee: undefined, date: undefined },
       SURVEY,
       OPEN_QUESTION,
       QUESTION_ANSWER,
+    };
+  },
+  validations () {
+    return {
+      newAttendanceSheet: {
+        // link: { required },
+        trainee: { required: requiredIf(this.course.type !== INTRA) },
+        date: { required: requiredIf(this.course.type === INTRA) },
+      },
     };
   },
   async created () {
@@ -125,28 +144,33 @@ export default {
     },
     async refreshAttendanceSheets () {
       try {
-        this.attendanceSheetsLoading = true;
+        this.tableLoading = true;
         this.attendanceSheets = await AttendanceSheets.list({ course: this.profileId });
       } catch (e) {
         console.error(e);
         this.attendanceSheets = [];
         NotifyNegative('Erreur lors de la récupération des feuilles d\'émargement.');
       } finally {
-        this.attendanceSheetsLoading = false;
+        this.tableLoading = false;
       }
+    },
+    resetAttendanceSheetAdditionModal () {
+      this.$v.newAttendanceSheet.$reset();
+      this.newAttendanceSheet = { course: this.profileId, link: '', trainee: undefined, date: undefined };
     },
     showCards (activityId) {
       this.$set(this.areCardsDisplayed, activityId, !this.areCardsDisplayed[activityId]);
     },
     async addAttendanceSheet () {
       try {
-        await AttendanceSheets.create({
-          course: this.profileId,
-          link: 'https://www.google.com',
-          trainee: this.course.trainees[0]._id,
-          date: moment(),
-        });
+        this.newAttendanceSheet.link = 'https://www.google.cl';
+        this.$v.newAttendanceSheet.$touch();
+        if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.modalLoading = true;
 
+        await AttendanceSheets.create(this.newAttendanceSheet);
+
+        this.attendanceSheetAdditionModal = false;
         NotifyPositive('Feuille d\'émargement ajoutée.');
         await this.refreshAttendanceSheets();
       } catch (e) {
