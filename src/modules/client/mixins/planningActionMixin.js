@@ -163,6 +163,7 @@ export const planningActionMixin = {
           internalHour: '',
           absence: '',
           absenceNature: '',
+          extension: '',
           address: {},
           attachment: {},
           ...(type === ABSENCE && { absenceNature: DAILY }),

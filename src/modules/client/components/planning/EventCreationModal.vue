@@ -39,10 +39,10 @@
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
             @input="update($event, 'dates')" />
-          <q-checkbox v-model="isExtendedAbsence" label="Prolongation" dense />
-          <ni-select v-if="isExtendedAbsence" :value="formatAbsence(newEvent.extension)"
-            @input="update($event._id, 'extension')" in-modal caption="Absence" :options="extendedAbsenceOptions"
-            @focus="getAbsences" />
+          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="isExtendedAbsence" @input="getAbsences"
+            label="Prolongation" dense />
+          <ni-select v-if="isExtendedAbsence" :value="newEvent.extension" @input="update($event, 'extension')"
+            required-field in-modal caption="Absence" :options="extendedAbsenceOptions" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
             :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
             :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
@@ -94,6 +94,12 @@ import {
   UNJUSTIFIED,
   INTERVENTION,
   NEVER,
+  MATERNITY_LEAVE,
+  PATERNITY_LEAVE,
+  PARENTAL_LEAVE,
+  CESSATION_OF_WORK_RISK,
+  CESSATION_OF_WORK_CHILD,
+  ILLNESS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
@@ -150,6 +156,16 @@ export default {
       const hasContractOnEvent = this.hasContractOnEvent(aux, this.newEvent.dates.startDate);
 
       return { ...aux, hasContractOnEvent };
+    },
+    canExtendAbsence () {
+      return [
+        MATERNITY_LEAVE,
+        PATERNITY_LEAVE,
+        PARENTAL_LEAVE,
+        CESSATION_OF_WORK_RISK,
+        CESSATION_OF_WORK_CHILD,
+        ILLNESS,
+      ].includes(this.newEvent.absence);
     },
   },
   watch: {
@@ -219,29 +235,36 @@ export default {
       this.reset(true, event);
     },
     async updateAbsenceNature (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, absenceNature: event });
+      this.resetExtension();
+      await this.$emit('update:newEvent', { ...this.newEvent, absenceNature: event, extension: '' });
       this.resetAbsenceType();
     },
     async updateAbsence (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, absence: event });
+      this.resetExtension();
+      await this.$emit('update:newEvent', { ...this.newEvent, absence: event, extension: '' });
       this.setDateHours(this.newEvent, 'newEvent');
     },
     async updateCustomerAddress (event) {
       await this.$emit('update:newEvent', { ...this.newEvent, address: event });
       this.deleteClassFocus();
     },
-    async getAbsences () {
-      const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
-
-      this.extendedAbsenceOptions = auxiliaryEvents.filter(
-        e => e.absenceNature === this.newEvent.absenceNature && e.absence === this.newEvent.absence
-      ).map(a => ({
-        label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
-        _id: a._id,
-      }));
+    async resetExtension () {
+      this.isExtendedAbsence = false;
+      this.extendedAbsenceOptions = [];
     },
-    formatAbsence (abs) {
-      return abs ? this.extendedAbsenceOptions.find(a => a._id === abs).label : '';
+    async getAbsences () {
+      this.isExtendedAbsence = !this.isExtendedAbsence;
+
+      if (!this.extendedAbsenceOptions.length) {
+        const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
+
+        this.extendedAbsenceOptions = auxiliaryEvents.filter(e => e.absence === this.newEvent.absence)
+          .sort((a, b) => moment(a.startDate) - moment(b.startDate))
+          .map(a => ({
+            label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
+            value: a._id,
+          }));
+      }
     },
   },
 };
