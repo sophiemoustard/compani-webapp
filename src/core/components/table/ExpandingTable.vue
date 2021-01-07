@@ -1,6 +1,6 @@
 <template>
   <div class="relative-position table-spinner-container">
-    <q-table v-if="!loading" :data="data" :columns="columns" class="q-pa-md" :pagination="pagination">
+    <q-table v-if="!loading" :data="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props"> {{ col.label }} </q-th>
@@ -30,6 +30,7 @@ export default {
     columns: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
     pagination: { type: Object, default: () => ({}) },
+    rowKey: { type: String, default: '_id' },
   },
 };
 </script>
