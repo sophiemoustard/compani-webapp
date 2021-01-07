@@ -5,10 +5,10 @@
     </template>
     <ni-select v-if="course.type !== INTRA" :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
       :error="validations.trainee.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'trainee')" in-modal
-      :options="traineesOption" caption="Apprenant" required-field />
+      :options="traineeOptions" caption="Apprenant" required-field />
     <ni-select v-if="course.type == INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch"
       :error="validations.date.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'date')" in-modal
-      :options="dateOption" caption="Date" required-field />
+      :options="dateOptions" caption="Date" required-field />
     <ni-document-upload v-model="newAttendanceSheet.file" ref="documentUploadForm" @valid="formValid = $event" no-date
       no-type in-modal />
     <template slot="footer">
@@ -47,13 +47,13 @@ export default {
     'ni-document-upload': DocumentUpload,
   },
   computed: {
-    traineesOption () {
+    traineeOptions () {
       return this.course.trainees.map(trainee => ({
         label: formatIdentity(trainee.identity, 'FL'),
         value: trainee._id,
       }));
     },
-    dateOption () {
+    dateOptions () {
       return this.course.slots.map(date => ({
         label: moment(date.startDate).format('DD MMMM YYYY'),
         value: date.startDate,
