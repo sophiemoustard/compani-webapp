@@ -1,8 +1,8 @@
 <template>
   <div>
-    <p class="text-weight-bold q-mb-none">Participants</p>
+    <p class="text-weight-bold">Participants</p>
     <q-card>
-      <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination">
+      <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false">
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'progress'">
@@ -12,20 +12,20 @@
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
             <template v-else>
-              <div class="name" @click="goToLearnerProfile(props)">{{ col.value }}</div>
+              <div class="name" @click="goToLearnerProfile(props.row)">{{ col.value }}</div>
             </template>
           </q-td>
         </template>
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
             <div v-for="(step, stepIndex) in props.row.steps" :key="step._id" :props="props"
-              class="q-ma-sm step">
+              class="q-ma-sm expanding-table-expanded-row">
               <div>
                 <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
                 {{ stepIndex + 1 }} - {{ step.name }}
               </div>
-              <div class="progress-container">
-                <ni-progress class="sub-progress" :value="step.progress" />
+              <div class="expanding-table-progress-container">
+                <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
               </div>
             </div>
           </q-td>
@@ -118,13 +118,4 @@ export default {
   width: 100%
 .name
   width: fit-content;
-.step
-  display: flex
-  justify-content: space-between
-.sub-progress
-  min-width: 100px
-  width: 10%
-.progress-container
-  max-width: 230px
-  width: 25%
 </style>
