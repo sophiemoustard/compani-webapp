@@ -118,4 +118,6 @@ export default {
   width: 100%
 .name
   width: fit-content;
+  text-decoration: underline
+  color: $primary
 </style>
