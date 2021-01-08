@@ -1,0 +1,90 @@
+<template>
+  <q-page class="client-background" padding>
+    <ni-directory-header title="Formations eLearning" search-placeholder="Rechercher une formation"
+      @update-search="updateSearch" :search="searchStr" />
+    <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination" />
+  </q-page>
+</template>
+
+<script>
+import escapeRegExp from 'lodash/escapeRegExp';
+import Courses from '@api/Courses';
+import DirectoryHeader from '@components/DirectoryHeader';
+import TableList from '@components/table/TableList';
+import { NotifyNegative } from '@components/popup/notify';
+import { STRICTLY_E_LEARNING } from '@data/constants';
+import { removeDiacritics } from '@helpers/utils';
+import moment from '@helpers/moment';
+
+export default {
+  metaInfo: { title: 'Repertoire formation eLearning' },
+  name: 'ELearningCoursesDirectory',
+  components: {
+    'ni-directory-header': DirectoryHeader,
+    'ni-table-list': TableList,
+  },
+  data () {
+    return {
+      tableLoading: false,
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          field: 'name',
+          align: 'left',
+          sortable: true,
+          style: 'min-width: 200px; width: 70%',
+        },
+        {
+          name: 'createdAt',
+          label: 'Créée le...',
+          field: 'createdAt',
+          align: 'left',
+          sortable: true,
+          format: value => moment(value).format('DD/MM/YYYY'),
+          sort: (a, b) => new Date(b) - new Date(a),
+          style: 'min-width: 110px; width: 10%',
+        },
+      ],
+      courses: [],
+      pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
+      searchStr: '',
+    };
+  },
+  computed: {
+    filteredCourses () {
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.courses.filter(course => course.noDiacriticsName.match(new RegExp(formattedString, 'i')));
+    },
+  },
+  async created () {
+    await this.refreshCourse();
+  },
+  methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
+    async refreshCourse () {
+      try {
+        this.tableLoading = true;
+        const courseList = await Courses.list({ format: STRICTLY_E_LEARNING });
+
+        this.courses = courseList.map(c => ({
+          name: c.subProgram.program.name,
+          noDiacriticsName: removeDiacritics(c.subProgram.program.name),
+          createdAt: c.createdAt,
+          _id: c._id,
+        }));
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des formations.');
+      } finally {
+        this.tableLoading = false;
+      }
+    },
+    goToCourseProfile (row) {
+      this.$router.push({ name: 'ni management elearning courses info', params: { courseId: row._id } });
+    },
+  },
+};
+</script>

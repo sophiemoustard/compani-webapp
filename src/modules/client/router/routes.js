@@ -293,6 +293,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/courses/elearning-courses',
+        name: 'ni elearning courses',
+        component: () => import('src/modules/client/pages/ni/courses/ELearningCoursesDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
+      {
         path: 'ni/courses/learners',
         name: 'ni courses learners',
         component: () => import('src/modules/client/pages/ni/courses/LearnersDirectory'),
