@@ -3,7 +3,7 @@
     <div class="q-my-md">
       <p class="text-weight-bold">Émargements</p>
       <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading"
-        :visible-columns="visibleColumns">
+        :visible-columns="visibleColumns" :pagination.sync="pagination">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -107,6 +107,10 @@ export default {
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],
+      pagination: {
+        page: 1,
+        rowsPerPage: 15,
+      },
     };
   },
   validations () {
