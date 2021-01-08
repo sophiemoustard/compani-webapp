@@ -11,6 +11,9 @@
             <template v-else-if="col.name === 'expand'">
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
+            <template v-else-if="col.name === 'name'">
+              <div class="name" @click.stop="goToBlendedCourseProfile(props.row)">{{ col.value }}</div>
+            </template>
             <template v-else>{{ col.value }}</template>
           </q-td>
         </template>
@@ -51,7 +54,6 @@ export default {
   },
   data () {
     return {
-      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
       courses: [],
       loading: false,
       pagination: {
@@ -109,13 +111,19 @@ export default {
     }
   },
   methods: {
-    goToBlendedCourseProfileAdmin (row) {
-      if (!this.isVendorInterface) return;
+    goToBlendedCourseProfile (row) {
       this.$router.push({
         name: 'ni management blended courses info',
-        params: { courseId: row._id, defaultTab: 'admin' },
+        params: { courseId: row._id, defaultTab: 'traineeFollowUp' },
       });
     },
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.name
+  width: fit-content;
+  text-decoration: underline
+  color: $primary
+</style>
