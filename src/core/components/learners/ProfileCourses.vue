@@ -12,7 +12,9 @@
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
             <template v-else-if="col.name === 'name'">
-              <div class="name" @click.stop="goToBlendedCourseProfile(props.row)">{{ col.value }}</div>
+              <div @click.stop="goToCourseProfile(props)" :class="[{ 'name': canBeRedirected(props) }]">
+                {{ col.value }}
+              </div>
             </template>
             <template v-else>{{ col.value }}</template>
           </q-td>
@@ -54,6 +56,7 @@ export default {
   },
   data () {
     return {
+      isVendorInterface: /\/ad\//.test(this.$router.currentRoute.path),
       courses: [],
       loading: false,
       pagination: {
@@ -111,11 +114,33 @@ export default {
     }
   },
   methods: {
-    goToBlendedCourseProfile (row) {
+    goToCourseProfile (props) {
+      if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
+        props.expand = !props.expand;
+        return;
+      }
+
+      if (!this.isVendorInterface) {
+        return this.$router.push({
+          name: 'ni courses info',
+          params: { courseId: props.row._id },
+        });
+      }
+
+      if (props.row.subProgram.isStrictlyELearning) {
+        return this.$router.push({
+          name: 'ni management elearning courses info',
+          params: { courseId: props.row._id },
+        });
+      }
+
       this.$router.push({
         name: 'ni management blended courses info',
-        params: { courseId: row._id, defaultTab: 'traineeFollowUp' },
+        params: { courseId: props.row._id, defaultTab: 'traineeFollowUp' },
       });
+    },
+    canBeRedirected (props) {
+      return (this.isVendorInterface || (!this.isVendorInterface && !props.row.subProgram.isStrictlyELearning));
     },
   },
 };
