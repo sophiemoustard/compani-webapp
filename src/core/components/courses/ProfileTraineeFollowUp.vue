@@ -2,20 +2,19 @@
   <div>
     <div class="q-my-md">
       <p class="text-weight-bold">Émargements</p>
-      <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading">
+      <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading"
+        :visible-columns="visibleColumns">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions justify-end">
-                  <ni-button icon="download" color="primary" type="a" target="_self" :href="props.row.file.link" />
+                  <ni-button icon="download" color="primary" type="a" target="_blank" :href="props.row.file.link" />
                   <ni-button icon="delete" color="primary" disabled />
                 </div>
               </template>
-              <template v-else>
-                {{ col.value }}
-              </template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </q-tr>
         </template>
@@ -91,6 +90,23 @@ export default {
       SURVEY,
       OPEN_QUESTION,
       QUESTION_ANSWER,
+      columns: [
+        {
+          name: 'date',
+          label: 'Date',
+          align: 'left',
+          field: 'date',
+          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
+        },
+        {
+          name: 'trainee',
+          label: 'Nom de l\'apprenant',
+          align: 'left',
+          field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee)),
+          format: value => (value ? `${value.identity.firstname} ${value.identity.lastname}` : ''),
+        },
+        { name: 'actions', label: '', align: 'left', field: row => row },
+      ],
     };
   },
   validations () {
@@ -108,28 +124,8 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
-    columns () {
-      return this.course.type === INTRA
-        ? [
-          {
-            name: 'date',
-            label: 'Date',
-            align: 'left',
-            field: 'date',
-            format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-          },
-          { name: 'actions', label: '', align: 'left', field: row => row },
-        ]
-        : [
-          {
-            name: 'trainee',
-            label: 'Nom de l\'apprenant',
-            align: 'left',
-            field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee)),
-            format: value => (value ? `${value.identity.firstname} ${value.identity.lastname}` : ''),
-          },
-          { name: 'actions', label: '', align: 'left', field: row => row },
-        ];
+    visibleColumns () {
+      return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
     },
   },
   methods: {
@@ -166,7 +162,7 @@ export default {
       const form = new FormData();
       this.course.type === INTRA ? form.append('date', date) : form.append('trainee', trainee);
       form.append('course', course);
-      form.append('file', file.file);
+      form.append('file', file);
 
       return form;
     },

@@ -6,11 +6,12 @@
     <ni-select v-if="course.type !== INTRA" :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
       :error="validations.trainee.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'trainee')" in-modal
       :options="traineeOptions" caption="Apprenant" required-field />
-    <ni-select v-if="course.type == INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch"
+    <ni-select v-if="course.type === INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch"
       :error="validations.date.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'date')" in-modal
       :options="dateOptions" caption="Date" required-field />
-    <ni-document-upload v-model="newAttendanceSheet.file" ref="documentUploadForm" @valid="formValid = $event" no-date
-      no-type in-modal />
+    <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last
+      :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error"
+      :error-message="REQUIRED_LABEL" required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la feuille d'émargement" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
@@ -21,7 +22,7 @@
 <script>
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
-import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
+import Input from '@components/form/Input';
 import { REQUIRED_LABEL, INTRA } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -44,7 +45,7 @@ export default {
   components: {
     'ni-select': Select,
     'ni-modal': Modal,
-    'ni-document-upload': DocumentUpload,
+    'ni-input': Input,
   },
   computed: {
     traineeOptions () {
@@ -55,7 +56,7 @@ export default {
     },
     dateOptions () {
       return this.course.slots.map(date => ({
-        label: moment(date.startDate).format('DD MMMM YYYY'),
+        label: moment(date.startDate).format('DD/MM/YYYY'),
         value: date.startDate,
       }));
     },
