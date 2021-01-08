@@ -38,7 +38,7 @@
             :disable-end-date="isHourlyAbsence(newEvent)" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
-            @input="update($event, 'dates')" />
+            @input="updateDates($event)" />
           <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="isExtendedAbsence" @input="getAbsences"
             label="Prolongation" dense />
           <ni-select v-if="isExtendedAbsence" :value="newEvent.extension" @input="update($event, 'extension')"
@@ -248,6 +248,10 @@ export default {
       await this.$emit('update:newEvent', { ...this.newEvent, address: event });
       this.deleteClassFocus();
     },
+    async updateDates (event) {
+      await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
+      this.resetExtension();
+    },
     async resetExtension () {
       this.isExtendedAbsence = false;
       this.extendedAbsenceOptions = [];
@@ -258,7 +262,9 @@ export default {
       if (!this.extendedAbsenceOptions.length) {
         const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
 
-        this.extendedAbsenceOptions = auxiliaryEvents.filter(e => e.absence === this.newEvent.absence)
+        this.extendedAbsenceOptions = auxiliaryEvents
+          .filter(e => e.absence === this.newEvent.absence &&
+            moment(e.startDate).isBefore(this.newEvent.dates.startDate))
           .sort((a, b) => moment(a.startDate) - moment(b.startDate))
           .map(a => ({
             label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
