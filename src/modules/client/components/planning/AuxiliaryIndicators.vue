@@ -26,7 +26,7 @@
     </div>
     <div class="quality-indicators indicators">
       <div class="quality-indicators-item">
-        <span class="highlight">{{ customersDetails.customerCount }}</span> bénéficiaires accompagnés,
+        <span class="highlight">{{ customersDetails.customerCount || 0 }}</span> bénéficiaires accompagnés,
         <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }} en moyenne</span>
       </div>
       <div class="quality-indicators-item">

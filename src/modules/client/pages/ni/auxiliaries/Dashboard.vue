@@ -239,9 +239,10 @@ export default {
         for (const auxHoursDetails of hoursBalance) {
           for (const sector of auxHoursDetails.sectors) {
             if (!sectors.includes(sector)) continue;
-            const auxPaidInterventions = paidInterventions.find(hbd => hbd.auxiliaryId === auxHoursDetails._id);
+            const auxPaidInterventions = paidInterventions.find(pi => pi._id === auxHoursDetails.auxiliaryId);
+
             const auxiliaryStats = {
-              _id: auxPaidInterventions._id,
+              _id: auxHoursDetails.auxiliaryId,
               identity: auxHoursDetails.identity,
               picture: auxHoursDetails.picture,
               paidInterventions: omit(auxPaidInterventions, 'sectors'),
