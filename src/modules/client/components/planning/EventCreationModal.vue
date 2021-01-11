@@ -97,14 +97,15 @@ import {
   MATERNITY_LEAVE,
   PATERNITY_LEAVE,
   PARENTAL_LEAVE,
-  CESSATION_OF_WORK_RISK,
-  CESSATION_OF_WORK_CHILD,
+  WORK_ACCIDENT,
+  TRANSPORT_ACCIDENT,
   ILLNESS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import set from 'lodash/set';
 import Events from '@api/Events';
+import { NotifyWarning } from '@components/popup/notify';
 
 export default {
   name: 'EventCreationModal',
@@ -162,8 +163,8 @@ export default {
         MATERNITY_LEAVE,
         PATERNITY_LEAVE,
         PARENTAL_LEAVE,
-        CESSATION_OF_WORK_RISK,
-        CESSATION_OF_WORK_CHILD,
+        WORK_ACCIDENT,
+        TRANSPORT_ACCIDENT,
         ILLNESS,
       ].includes(this.newEvent.absence);
     },
@@ -197,6 +198,8 @@ export default {
       this.$emit('document-uploaded', value);
     },
     submit (value) {
+      if (this.isExtendedAbsence && !this.newEvent.extension) return NotifyWarning('Choisissez l\'absence à prolonger');
+
       this.$emit('submit', value);
     },
     resetAbsenceType () {
@@ -265,7 +268,7 @@ export default {
         this.extendedAbsenceOptions = auxiliaryEvents
           .filter(e => e.absence === this.newEvent.absence &&
             moment(e.startDate).isBefore(this.newEvent.dates.startDate))
-          .sort((a, b) => moment(a.startDate) - moment(b.startDate))
+          .sort((a, b) => moment(b.startDate) - moment(a.startDate))
           .map(a => ({
             label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
             value: a._id,
