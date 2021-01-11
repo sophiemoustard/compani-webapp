@@ -9,9 +9,8 @@
     <ni-select v-else :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch" :options="traineeOptions"
       :error="validations.trainee.$error" @input="update($event, 'trainee')" in-modal caption="Apprenant"
       required-field />
-    <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last
-      :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error"
-      :error-message="REQUIRED_LABEL" required-field />
+    <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
+      :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter la feuille d'émargement" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
@@ -54,7 +53,7 @@ export default {
       }));
     },
     dateOptions () {
-      const dateOptionsSet = new Set([...this.course.slots.map(date => moment(date.startDate).startOf('d').format())]);
+      const dateOptionsSet = new Set([...this.course.slots.map(date => moment(date.startDate).startOf('d').toDate())]);
       const dateOptions = [...dateOptionsSet];
       return dateOptions.map(date => ({ value: date, label: moment(date).format('DD/MM/YYYY') }));
     },
