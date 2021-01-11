@@ -1,27 +1,51 @@
 <template>
   <div>
-    <p class="text-weight-bold q-mb-none">Participants</p>
-    <ni-table-list :data="learners" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @go-to="goToLearnerProfile">
-      <template #body="{ col }">
-        <q-item v-if="col.name === 'progress'">
-          <ni-progress class="progress" :value="col.value" />
-        </q-item>
-      </template>
-    </ni-table-list>
+    <p class="text-weight-bold">Participants</p>
+    <q-card>
+      <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false">
+        <template #row="{ props }">
+          <q-td v-for="col in props.cols" :key="col.name" :props="props">
+            <template v-if="col.name === 'progress'">
+              <ni-progress class="progress" :value="col.value" />
+            </template>
+            <template v-else-if="col.name === 'expand'">
+              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+            </template>
+            <template v-else>
+              <div class="name" @click="goToLearnerProfile(props.row)">{{ col.value }}</div>
+            </template>
+          </q-td>
+        </template>
+        <template #expanding-row="{ props }">
+          <q-td colspan="100%">
+            <div v-for="(step, stepIndex) in props.row.steps" :key="step._id" :props="props"
+              class="q-ma-sm expanding-table-expanded-row">
+              <div>
+                <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
+                {{ stepIndex + 1 }} - {{ step.name }}
+              </div>
+              <div class="expanding-table-progress-container">
+                <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
+              </div>
+            </div>
+          </q-td>
+        </template>
+      </ni-expanding-table>
+    </q-card>
   </div>
 </template>
 
 <script>
 import Courses from '@api/Courses';
-import TableList from '@components/table/TableList';
+import ExpandingTable from '@components/table/ExpandingTable';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
+import { E_LEARNING } from '@data/constants.js';
 
 export default {
   name: 'ProfileFollowUp',
   components: {
-    'ni-table-list': TableList,
+    'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
   },
   props: {
@@ -39,18 +63,21 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'min-width: 200px; width: 80%',
+          style: 'width: 70%',
         },
         {
           name: 'progress',
           label: 'Progression',
           field: 'progress',
-          align: 'left',
+          align: 'center',
           sortable: true,
+          style: 'min-width: 150px; width: 20%',
         },
+        { name: 'expand', label: '', field: '' },
       ],
       learners: [],
-      pagination: { sortBy: 'identity', ascending: true, page: 1, rowsPerPage: 15 },
+      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
+      E_LEARNING,
     };
   },
   async created () {
@@ -64,6 +91,7 @@ export default {
         _id: trainee._id,
         identity: { ...trainee.identity, fullName: formattedName },
         progress: trainee.progress,
+        steps: trainee.steps,
       };
     },
     async getLearnersList () {
@@ -88,4 +116,8 @@ export default {
 <style lang="stylus" scoped>
 .progress
   width: 100%
+.name
+  width: fit-content;
+  text-decoration: underline
+  color: $primary
 </style>

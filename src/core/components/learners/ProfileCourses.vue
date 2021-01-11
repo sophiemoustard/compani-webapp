@@ -17,13 +17,13 @@
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
             <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-              class="q-ma-sm step">
+              class="q-ma-sm expanding-table-expanded-row">
               <div>
                 <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
                 {{ stepIndex + 1 }} - {{ step.name }}
               </div>
-              <div class="progress-container">
-                <ni-progress class="sub-progress" :value="step.progress" />
+              <div class="expanding-table-progress-container">
+                <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
               </div>
             </div>
           </q-td>
@@ -119,14 +119,3 @@ export default {
   },
 };
 </script>
-<style lang="stylus" scoped>
-.step
-  display: flex
-  justify-content: space-between
-.sub-progress
-  min-width: 100px
-  width: 10%
-.progress-container
-  max-width: 230px
-  width: 25%
-</style>
