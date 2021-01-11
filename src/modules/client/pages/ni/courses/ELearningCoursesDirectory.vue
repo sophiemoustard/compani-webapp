@@ -7,6 +7,7 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -52,6 +53,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({ company: 'main/getCompany' }),
     filteredCourses () {
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
       return this.courses.filter(course => course.noDiacriticsName.match(new RegExp(formattedString, 'i')));
@@ -67,7 +69,7 @@ export default {
     async refreshCourse () {
       try {
         this.tableLoading = true;
-        const courseList = await Courses.list({ format: STRICTLY_E_LEARNING });
+        const courseList = await Courses.list({ format: STRICTLY_E_LEARNING, company: this.company._id });
 
         this.courses = courseList.map(c => ({
           name: c.subProgram.program.name,
