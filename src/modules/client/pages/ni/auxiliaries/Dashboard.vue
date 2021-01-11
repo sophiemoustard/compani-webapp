@@ -93,7 +93,7 @@
         <q-slide-transition>
           <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
             class="auxiliary-cell-container row">
-            <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
+            <div v-for="auxiliary in auxiliariesStats[sector]" :key="`${sector}-${auxiliary._id}`"
               class="col-md-6 col-xs-12 auxiliary-cell q-mb-lg">
               <div class="row person-name q-mb-md">
                 <img :src="getAvatar(auxiliary.picture)" class="avatar">
@@ -236,16 +236,16 @@ export default {
           Pay.getHoursBalanceDetail({ sector: sectors, month: this.selectedMonth }),
         ]);
 
-        for (const auxiliaryPaidInterventions of paidInterventions) {
-          for (const sector of auxiliaryPaidInterventions.sectors) {
+        for (const auxHoursDetails of hoursBalance) {
+          for (const sector of auxHoursDetails.sectors) {
             if (!sectors.includes(sector)) continue;
-            const hoursDetails = hoursBalance.find(hbd => hbd.auxiliaryId === auxiliaryPaidInterventions._id);
+            const auxPaidInterventions = paidInterventions.find(hbd => hbd.auxiliaryId === auxHoursDetails._id);
             const auxiliaryStats = {
-              _id: auxiliaryPaidInterventions._id,
-              identity: hoursDetails.identity,
-              picture: hoursDetails.picture,
-              paidInterventions: omit(auxiliaryPaidInterventions, 'sectors'),
-              hoursBalanceDetail: omit(hoursDetails, ['sectors', 'auxiliary']),
+              _id: auxPaidInterventions._id,
+              identity: auxHoursDetails.identity,
+              picture: auxHoursDetails.picture,
+              paidInterventions: omit(auxPaidInterventions, 'sectors'),
+              hoursBalanceDetail: omit(auxHoursDetails, ['sectors', 'auxiliary']),
             };
             auxiliariesStats[sector].push(auxiliaryStats);
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
@@ -268,7 +268,7 @@ export default {
         : 0;
     },
     getCounterStatus (sector) {
-      if (!this.auxiliariesStats) return '';
+      if (!this.auxiliariesStats || !this.auxiliariesStats[sector]) return '';
       if (this.auxiliariesStats[sector].every(aux => aux.hoursBalanceDetail.hoursCounter > 0)) return 'bg-green-800';
       if (this.auxiliariesStats[sector].some(aux => aux.hoursBalanceDetail.hoursCounter < -35)) return 'bg-red-800';
       return 'bg-orange-500';
