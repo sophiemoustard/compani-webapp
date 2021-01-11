@@ -39,10 +39,11 @@
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
             @input="updateDates($event)" />
-          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="isExtendedAbsence" @input="getAbsences"
+          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="newEvent.isExtendedAbsence" @input="getAbsences"
             label="Prolongation" dense />
-          <ni-select v-if="isExtendedAbsence" :value="newEvent.extension" @input="update($event, 'extension')"
-            required-field in-modal caption="Absence" :options="extendedAbsenceOptions" />
+          <ni-select v-if="newEvent.isExtendedAbsence" :value="newEvent.extension" @input="update($event, 'extension')"
+            required-field in-modal caption="Absence" :options="extendedAbsenceOptions"
+            @blur="validations.extension.$touch" :error="validations.extension.$error" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(newEvent)" caption="Justificatif d'absence" path="attachment"
             :entity="newEvent" alt="justificatif absence" name="file" :url="docsUploadUrl" @uploaded="documentUploaded"
             :additional-value="additionalValue" required-field in-modal :disable="!selectedAuxiliary._id"
@@ -105,7 +106,6 @@ import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import set from 'lodash/set';
 import Events from '@api/Events';
-import { NotifyWarning } from '@components/popup/notify';
 
 export default {
   name: 'EventCreationModal',
@@ -125,7 +125,6 @@ export default {
   },
   data () {
     return {
-      isExtendedAbsence: false,
       extendedAbsenceOptions: [],
       selectedExtension: '',
     };
@@ -198,8 +197,6 @@ export default {
       this.$emit('document-uploaded', value);
     },
     submit (value) {
-      if (this.isExtendedAbsence && !this.newEvent.extension) return NotifyWarning('Choisissez l\'absence à prolonger');
-
       this.$emit('submit', value);
     },
     resetAbsenceType () {
@@ -238,13 +235,19 @@ export default {
       this.reset(true, event);
     },
     async updateAbsenceNature (event) {
-      this.resetExtension();
-      await this.$emit('update:newEvent', { ...this.newEvent, absenceNature: event, extension: '' });
+      this.extendedAbsenceOptions = [];
+      await this.$emit(
+        'update:newEvent',
+        { ...this.newEvent, absenceNature: event, extension: '', isExtendedAbsence: false }
+      );
       this.resetAbsenceType();
     },
     async updateAbsence (event) {
-      this.resetExtension();
-      await this.$emit('update:newEvent', { ...this.newEvent, absence: event, extension: '' });
+      this.extendedAbsenceOptions = [];
+      await this.$emit(
+        'update:newEvent',
+        { ...this.newEvent, absence: event, extension: '', isExtendedAbsence: false }
+      );
       this.setDateHours(this.newEvent, 'newEvent');
     },
     async updateCustomerAddress (event) {
@@ -255,20 +258,15 @@ export default {
       await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
       this.resetExtension();
     },
-    async resetExtension () {
-      this.isExtendedAbsence = false;
-      this.extendedAbsenceOptions = [];
-    },
     async getAbsences () {
-      this.isExtendedAbsence = !this.isExtendedAbsence;
-
+      await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });
       if (!this.extendedAbsenceOptions.length) {
         const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
 
         this.extendedAbsenceOptions = auxiliaryEvents
           .filter(e => e.absence === this.newEvent.absence &&
             moment(e.startDate).isBefore(this.newEvent.dates.startDate))
-          .sort((a, b) => moment(b.startDate) - moment(a.startDate))
+          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
           .map(a => ({
             label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
             value: a._id,

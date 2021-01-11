@@ -52,6 +52,10 @@ export const planningActionMixin = {
         internalHour: { required: requiredIf(item => item && item.type === INTERNAL_HOUR) },
         absence: { required: requiredIf(item => item && item.type === ABSENCE) },
         absenceNature: { required: requiredIf(item => item && item.type === ABSENCE) },
+        extension: {
+          required: requiredIf(() => this.newEvent && this.newEvent.type === ABSENCE &&
+            this.newEvent.isExtendedAbsence),
+        },
         address: {
           zipCode: { required: requiredIf(item => item && !!item.fullAddress) },
           street: { required: requiredIf(item => item && !!item.fullAddress) },
@@ -175,7 +179,7 @@ export const planningActionMixin = {
     },
     getPayload (event) {
       const payload = {
-        ...pickBy(omit(event, ['dates', '__v', 'company'])),
+        ...pickBy(omit(event, ['dates', '__v', 'company', 'isExtendedAbsence'])),
         ...pick(event, ['isCancelled']), // pickBy removes isCancelled: false
         startDate: event.dates.startDate,
         endDate: event.dates.endDate,
