@@ -434,7 +434,9 @@ export default {
 
 .gauge-wrapper
   display: flex
-  justify-content: space-between
+  justify-content: space-around
+  @media screen and (max-width: 767px)
+    justify-content: space-between
 
 .unassigned-hours
   font-style: italic

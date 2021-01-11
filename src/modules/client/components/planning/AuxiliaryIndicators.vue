@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="indicator row text-weight-bold">
-        <div class="col-4 indicator-title">Soldes d'heures du mois</div>
+        <div class="col-4 indicator-title">Soldes d'heures</div>
         <div class="col-2 indicator-hours">{{ hoursBalance | formatHours }}</div>
       </div>
     </div>
