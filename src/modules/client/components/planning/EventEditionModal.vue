@@ -42,6 +42,9 @@
           </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
+          <div v-if="!!editedEvent.extension">
+            {{ extensionInfo }}
+          </div>
           <ni-select in-modal caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
           <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
@@ -96,9 +99,10 @@
 
 <script>
 import { formatIdentity } from '@helpers/utils';
-import { INTERVENTION, ABSENCE, OTHER, NEVER } from '@data/constants';
+import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/constants';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import Button from '@components/Button';
+import moment from '@helpers/moment';
 
 export default {
   name: 'EventEditionModal',
@@ -141,6 +145,12 @@ export default {
     },
     isMiscRequired () {
       return (this.editedEvent.type === ABSENCE && this.editedEvent.absence === OTHER) || this.editedEvent.isCancelled;
+    },
+    extensionInfo () {
+      const nature = ABSENCE_TYPES.find(abs => abs.value === this.editedEvent.absence);
+      const startDate = moment(this.editedEvent.extension.startDate).format('DD/MM/YYYY');
+
+      return `Cette absence est une prolongation de ${nature.label.toLowerCase()} commencant le ${startDate}`;
     },
   },
   methods: {
