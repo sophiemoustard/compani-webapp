@@ -3,12 +3,12 @@
     <template slot="title">
       Ajouter une nouvelle <span class="text-weight-bold">feuille d'émargement</span>
     </template>
-    <ni-select v-if="course.type === INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch"
-      :error="validations.date.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'date')" in-modal
-      :options="dateOptions" caption="Date" required-field />
-    <ni-select v-else :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
-      :error="validations.trainee.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'trainee')" in-modal
-      :options="traineeOptions" caption="Apprenant" required-field />
+    <ni-select v-if="course.type === INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch" in-modal
+      :error="validations.date.$error" @input="update($event, 'date')" :options="dateOptions" caption="Date"
+      required-field />
+    <ni-select v-else :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch" :options="traineeOptions"
+      :error="validations.trainee.$error" @input="update($event, 'trainee')" in-modal caption="Apprenant"
+      required-field />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last
       :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error"
       :error-message="REQUIRED_LABEL" required-field />
@@ -23,7 +23,7 @@
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
-import { REQUIRED_LABEL, INTRA } from '@data/constants';
+import { INTRA } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 
@@ -43,7 +43,6 @@ export default {
   },
   data () {
     return {
-      REQUIRED_LABEL,
       INTRA,
     };
   },
