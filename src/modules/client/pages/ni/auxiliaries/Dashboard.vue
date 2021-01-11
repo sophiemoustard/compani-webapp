@@ -33,6 +33,12 @@
             </div>
             <div class="q-mb-lg">
               <div class="row auxiliary">
+                <div class="col-8 auxiliary-label">Compteur d'heures</div>
+                <div class="col-4 auxiliary-value">
+                  <div :class="['dot', stats[sector].hoursCounterStatus]" />
+                </div>
+              </div>
+              <div class="row auxiliary">
                 <div class="col-8 auxiliary-label">Heures facturées</div>
                 <div class="col-4 auxiliary-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
               </div>
@@ -218,7 +224,7 @@ export default {
         const sectors = [];
         const auxiliariesStats = {};
         for (const sector of sectorsIds) {
-          if (this.auxiliariesStats[sector] || !this.displayStats[sector].openedDetails) continue;
+          if (this.auxiliariesStats[sector]) continue;
           sectors.push(sector);
           this.$set(this.displayStats[sector], 'loadingDetails', true);
           auxiliariesStats[sector] = [];
@@ -261,6 +267,12 @@ export default {
         ? this.stats[sectorId].internalAndBilledHours.interventions
         : 0;
     },
+    getCounterStatus (sector) {
+      if (!this.auxiliariesStats) return '';
+      if (this.auxiliariesStats[sector].every(aux => aux.hoursBalanceDetail.hoursCounter > 0)) return 'bg-green-800';
+      if (this.auxiliariesStats[sector].some(aux => aux.hoursBalanceDetail.hoursCounter < -35)) return 'bg-red-800';
+      return 'bg-orange-500';
+    },
     getInternalHours (sectorId) {
       return this.stats[sectorId].internalAndBilledHours
         ? this.stats[sectorId].internalAndBilledHours.internalHours
@@ -293,7 +305,6 @@ export default {
         return;
       }
       this.$set(this.displayStats[sectorId], 'openedDetails', true);
-      await this.getAuxiliariesStats([sectorId]);
     },
     hoursRatio (sector) {
       return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;
@@ -316,6 +327,7 @@ export default {
         } else {
           this.unassignedHours = [];
         }
+        await this.getAuxiliariesStats(sectors);
 
         for (const sector of sectors) {
           this.stats = {
@@ -325,11 +337,11 @@ export default {
               customersAndDuration: customersAndDuration.find(cd => cd.sector === sector),
               hoursToWork: hoursToWork.find(hw => hw.sector === sector),
               paidTransportStats: paidTransportStats.find(pt => pt.sector === sector),
+              hoursCounterStatus: this.getCounterStatus(sector),
             },
           };
         }
 
-        await this.getAuxiliariesStats(sectors);
         this.setDisplayStats(sectors, { loading: false });
       } catch (e) {
         console.error(e);
@@ -374,7 +386,7 @@ export default {
   border-top: 1px solid $grey-300
   border-left: 1px solid $grey-300
   border-right: 1px solid $grey-300
-  &:nth-child(2)
+  &:nth-child(3)
     border-bottom: 1px solid $grey-300
   div
     padding: 5px
@@ -393,7 +405,11 @@ export default {
 
 .auxiliary-value
   justify-content: flex-end
+  align-items: center
   display: flex
+
+.dot
+  margin: 0px !important
 
 .sector-cell
   margin: 0 16px 16px
