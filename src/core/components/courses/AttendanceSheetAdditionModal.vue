@@ -3,12 +3,12 @@
     <template slot="title">
       Ajouter une nouvelle <span class="text-weight-bold">feuille d'émargement</span>
     </template>
-    <ni-select v-if="course.type !== INTRA" :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
-      :error="validations.trainee.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'trainee')" in-modal
-      :options="traineeOptions" caption="Apprenant" required-field />
     <ni-select v-if="course.type === INTRA" :value="newAttendanceSheet.date" @blur="validations.date.$touch"
       :error="validations.date.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'date')" in-modal
       :options="dateOptions" caption="Date" required-field />
+    <ni-select v-else :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch"
+      :error="validations.trainee.$error" :error-message="REQUIRED_LABEL" @input="update($event, 'trainee')" in-modal
+      :options="traineeOptions" caption="Apprenant" required-field />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last
       :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error"
       :error-message="REQUIRED_LABEL" required-field />
@@ -29,6 +29,11 @@ import moment from '@helpers/moment';
 
 export default {
   name: 'AttendanceSheetAdditionModal',
+  components: {
+    'ni-select': Select,
+    'ni-modal': Modal,
+    'ni-input': Input,
+  },
   props: {
     value: { type: Boolean, default: false },
     newAttendanceSheet: { type: Object, default: () => ({}) },
@@ -42,11 +47,6 @@ export default {
       INTRA,
     };
   },
-  components: {
-    'ni-select': Select,
-    'ni-modal': Modal,
-    'ni-input': Input,
-  },
   computed: {
     traineeOptions () {
       return this.course.trainees.map(trainee => ({
@@ -55,10 +55,9 @@ export default {
       }));
     },
     dateOptions () {
-      return this.course.slots.map(date => ({
-        label: moment(date.startDate).format('DD/MM/YYYY'),
-        value: date.startDate,
-      }));
+      const dateOptionsSet = new Set([...this.course.slots.map(date => moment(date.startDate).startOf('d').format())]);
+      const dateOptions = [...dateOptionsSet];
+      return dateOptions.map(date => ({ value: date, label: moment(date).format('DD/MM/YYYY') }));
     },
   },
   methods: {

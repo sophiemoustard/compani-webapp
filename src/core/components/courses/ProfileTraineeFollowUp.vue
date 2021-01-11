@@ -86,7 +86,7 @@ export default {
       modalLoading: false,
       attendanceSheetAdditionModal: false,
       attendanceSheets: [],
-      newAttendanceSheet: { course: this.profileId, file: null, trainee: undefined, date: undefined },
+      newAttendanceSheet: { course: this.profileId },
       SURVEY,
       OPEN_QUESTION,
       QUESTION_ANSWER,
@@ -156,7 +156,7 @@ export default {
     },
     resetAttendanceSheetAdditionModal () {
       this.$v.newAttendanceSheet.$reset();
-      this.newAttendanceSheet = { course: this.profileId, file: null, trainee: undefined, date: undefined };
+      this.newAttendanceSheet = { course: this.profileId };
     },
     showCards (activityId) {
       this.$set(this.areCardsDisplayed, activityId, !this.areCardsDisplayed[activityId]);
