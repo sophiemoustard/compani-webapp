@@ -19,6 +19,10 @@
         <div class="col-4 indicator-title">Soldes d'heures</div>
         <div class="col-2 indicator-hours">{{ hoursBalance | formatHours }}</div>
       </div>
+      <div class="indicator row text-weight-bold">
+        <div class="col-4 indicator-title">Compteur d'heures</div>
+        <div class="col-2 indicator-hours">{{ hoursDetails.hoursCounter | formatHours }}</div>
+      </div>
     </div>
     <div class="quality-indicators indicators">
       <div class="quality-indicators-item">
