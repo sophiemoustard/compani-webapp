@@ -322,7 +322,7 @@ export default {
         NotifyPositive('Email envoyé');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'envoi du mail.');
+        NotifyNegative('Erreur lors de l\'envoi de l\' email.');
       }
     },
   },
