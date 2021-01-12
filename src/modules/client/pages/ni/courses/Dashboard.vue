@@ -1,6 +1,6 @@
 <template>
   <q-page class="client-background q-pb-xl" padding>
-    <div class="title-padding">
+    <div class="q-mb-xl">
       <h4>La formation Compani dans ma structure</h4>
     </div>
     <q-card flat class="row q-pa-md">
@@ -19,7 +19,7 @@
         </div>
       </div>
     </q-card>
-  </q-page>
+</q-page>
 </template>
 
 <script>
