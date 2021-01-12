@@ -5,6 +5,7 @@ import moment from '@helpers/moment';
 export const eLearningCourseDirectoryMixin = {
   data () {
     return {
+      courses: [],
       tableLoading: false,
       columns: [
         {

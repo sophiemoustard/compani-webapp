@@ -24,11 +24,6 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
-  data () {
-    return {
-      courses: [],
-    };
-  },
   async created () {
     await this.refreshCourse();
   },
