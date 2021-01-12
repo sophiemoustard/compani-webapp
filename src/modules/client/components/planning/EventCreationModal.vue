@@ -126,7 +126,6 @@ export default {
   data () {
     return {
       extendedAbsenceOptions: [],
-      selectedExtension: '',
     };
   },
   computed: {
@@ -185,9 +184,11 @@ export default {
   },
   methods: {
     close () {
+      this.extendedAbsenceOptions = [];
       this.$emit('close');
     },
     reset (partialReset, type) {
+      this.extendedAbsenceOptions = [];
       this.$emit('reset', { partialReset, type });
     },
     deleteDocument (value) {
@@ -197,6 +198,7 @@ export default {
       this.$emit('document-uploaded', value);
     },
     submit (value) {
+      this.extendedAbsenceOptions = [];
       this.$emit('submit', value);
     },
     resetAbsenceType () {
@@ -227,6 +229,7 @@ export default {
       this.$emit('update:newEvent', set({ ...this.newEvent }, fields, event));
     },
     async updateCustomer (event) {
+      this.extendedAbsenceOptions = [];
       await this.$emit('update:newEvent', { ...this.newEvent, customer: event });
       this.setEventAddressAndSubscription();
     },
@@ -255,8 +258,8 @@ export default {
       this.deleteClassFocus();
     },
     async updateDates (event) {
+      this.extendedAbsenceOptions = [];
       await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
-      this.resetExtension();
     },
     async getAbsences () {
       await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });

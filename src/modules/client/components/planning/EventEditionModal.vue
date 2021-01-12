@@ -44,6 +44,9 @@
         <template v-if="editedEvent.type === ABSENCE">
           <div v-if="!!editedEvent.extension">
             {{ extensionInfo }}
+          <ni-select in-modal v-if="editedEvent.extension" :value="editedEvent.selectedExtendedAbsence"
+            required-field caption="Prolongation" :options="extendedAbsenceOptions" @input="updateExtension($event)"
+            @focus="getExtendedAbsenceOptions" />
           </div>
           <ni-select in-modal caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
@@ -103,6 +106,7 @@ import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/consta
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import Button from '@components/Button';
 import moment from '@helpers/moment';
+import Events from '@api/Events';
 
 export default {
   name: 'EventEditionModal',
@@ -119,6 +123,11 @@ export default {
   },
   components: {
     'ni-button': Button,
+  },
+  data () {
+    return {
+      extendedAbsenceOptions: [],
+    };
   },
   computed: {
     selectedCustomer () {
@@ -168,9 +177,11 @@ export default {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
     },
     close () {
+      this.extendedAbsenceOptions = [];
       this.$emit('close');
     },
     hide (partialReset, type) {
+      this.extendedAbsenceOptions = [];
       this.$emit('hide', { partialReset, type });
     },
     deleteDocument (value) {
@@ -180,6 +191,7 @@ export default {
       this.$emit('document-uploaded', value);
     },
     submit (value) {
+      this.extendedAbsenceOptions = [];
       this.$emit('submit', value);
     },
     deleteEventRepetition (value) {
@@ -193,6 +205,24 @@ export default {
       const addressIndex = addressList.findIndex(ev => this.editedEvent.address.fullAddress === ev.label);
       if (addressIndex === 0) this.editedEvent.address = addressList[1].value;
       else this.editedEvent.address = addressList[0].value;
+    },
+    async getExtendedAbsenceOptions () {
+      if (!this.extendedAbsenceOptions.length) {
+        const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
+
+        this.extendedAbsenceOptions = auxiliaryEvents
+          .filter(e => e.absence === this.editedEvent.absence &&
+            moment(e.startDate).isBefore(this.editedEvent.dates.startDate) &&
+            !moment(e.startDate).isSame(this.editedEvent.extension.startDate))
+          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+          .map(a => ({
+            label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
+            value: a._id,
+          }));
+      }
+    },
+    async updateExtension (event) {
+      await this.$emit('update:editedEvent', { ...this.editedEvent, selectedExtendedAbsence: event });
     },
   },
 };

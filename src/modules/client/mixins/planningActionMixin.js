@@ -395,6 +395,8 @@ export const planningActionMixin = {
       if (event.shouldUpdateRepetition) delete payload.misc;
       if (event.auxiliary) delete payload.sector;
       if (event.address && !event.address.fullAddress) payload.address = {};
+      if (event.selectedExtendedAbsence) payload.extension = event.selectedExtendedAbsence;
+      if (event.extension && !event.selectedExtendedAbsence) payload.extension = event.extension._id;
 
       return omit(payload, [
         'customer',
@@ -404,6 +406,7 @@ export const planningActionMixin = {
         'type',
         'displayedStartDate',
         'displayedEndDate',
+        'selectedExtendedAbsence',
       ]);
     },
     async updateEvent () {
@@ -432,6 +435,10 @@ export const planningActionMixin = {
           this.$v.editedEvent.$reset();
           return NotifyNegative('Impossible de créer l\'évènement :  '
             + 'il est en conflit avec les évènements de l\'auxiliaire.');
+        }
+        if (e.data.message === 'extension') {
+          return NotifyNegative('Impossible de créer l\'évènement :  '
+          + 'une extension d\'absence ne peut pas être du type sélectionné');
         }
         NotifyNegative('Erreur lors de la modification de l\'évènement.');
       } finally {
