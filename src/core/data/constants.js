@@ -434,3 +434,6 @@ export const ACCESS_OPTIONS = [
 
 // ORIGIN
 export const WEBAPP = 'webapp';
+
+// Email
+export const TRAINEE = 'trainee';
