@@ -121,17 +121,11 @@ export default {
       }
 
       if (!this.isVendorInterface) {
-        return this.$router.push({
-          name: 'ni courses info',
-          params: { courseId: props.row._id },
-        });
+        return this.$router.push({ name: 'ni courses info', params: { courseId: props.row._id } });
       }
 
       if (props.row.subProgram.isStrictlyELearning) {
-        return this.$router.push({
-          name: 'ni management elearning courses info',
-          params: { courseId: props.row._id },
-        });
+        return this.$router.push({ name: 'ni management elearning courses info', params: { courseId: props.row._id } });
       }
 
       this.$router.push({

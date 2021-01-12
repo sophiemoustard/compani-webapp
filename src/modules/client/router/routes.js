@@ -305,6 +305,15 @@ const routes = [
         path: 'ni/users/learners/:learnerId',
         name: 'ni courses learners info',
         component: () => import('src/modules/client/pages/ni/courses/LearnerProfile'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni courses info') to.params.defaultTab = 'courses';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
