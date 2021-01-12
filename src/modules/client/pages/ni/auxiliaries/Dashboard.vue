@@ -32,7 +32,7 @@
               </q-circular-progress>
             </div>
             <div class="q-mb-lg">
-              <div class="row auxiliary">
+              <div v-if="displayCounter(sector)" class="row auxiliary">
                 <div class="col-8 auxiliary-label">Compteur d'heures</div>
                 <div class="col-4 auxiliary-value">
                   <div :class="['dot', stats[sector].hoursCounterStatus]" />
@@ -268,6 +268,10 @@ export default {
         ? this.stats[sectorId].internalAndBilledHours.interventions
         : 0;
     },
+    displayCounter (sector) {
+      if (!this.auxiliariesStats || !this.auxiliariesStats[sector]) return false;
+      return this.auxiliariesStats[sector].every(stat => stat.hoursBalanceDetail.counterAndDiffRelevant);
+    },
     getCounterStatus (sector) {
       if (!this.auxiliariesStats || !this.auxiliariesStats[sector]) return '';
       if (this.auxiliariesStats[sector].every(aux => aux.hoursBalanceDetail.hoursCounter > 0)) return 'bg-green-800';
@@ -384,11 +388,11 @@ export default {
   font-style: italic
 
 .auxiliary
-  border-top: 1px solid $grey-300
   border-left: 1px solid $grey-300
   border-right: 1px solid $grey-300
-  &:nth-child(3)
-    border-bottom: 1px solid $grey-300
+  border-bottom: 1px solid $grey-300
+  &:nth-child(1)
+    border-top: 1px solid $grey-300
   div
     padding: 5px
   &-cell
