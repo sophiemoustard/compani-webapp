@@ -6,7 +6,7 @@
     <q-card flat class="row q-pa-md">
       <div class="col-4">
         <div class="text-weight-bold">Le e-learning dans ma structure</div>
-        <ni-date-range :value="dates" />
+        <ni-date-range v-model="dates" />
       </div>
       <div class="col-8 elearning">
         <div class="elearning-item">
@@ -47,6 +47,11 @@ export default {
   computed: {
     activeLearners () {
       return uniqBy(this.activityHistories, 'user').length;
+    },
+  },
+  watch: {
+    async dates () {
+      await this.getActivityHistories();
     },
   },
   async created () {
