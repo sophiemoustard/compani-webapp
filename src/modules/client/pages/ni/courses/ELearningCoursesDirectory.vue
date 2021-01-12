@@ -8,64 +8,34 @@
 
 <script>
 import { mapGetters } from 'vuex';
-import escapeRegExp from 'lodash/escapeRegExp';
 import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyNegative } from '@components/popup/notify';
 import { STRICTLY_E_LEARNING } from '@data/constants';
 import { removeDiacritics } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { eLearningCourseDirectoryMixin } from '@mixins/eLearningCourseDirectoryMixin';
 
 export default {
   metaInfo: { title: 'Repertoire formation eLearning' },
   name: 'ELearningCoursesDirectory',
+  mixins: [eLearningCourseDirectoryMixin],
   components: {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
   data () {
     return {
-      tableLoading: false,
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'name',
-          align: 'left',
-          sortable: true,
-          style: 'min-width: 200px; width: 70%',
-        },
-        {
-          name: 'createdAt',
-          label: 'Créée le...',
-          field: 'createdAt',
-          align: 'left',
-          sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => new Date(b) - new Date(a),
-          style: 'min-width: 110px; width: 10%',
-        },
-      ],
       courses: [],
-      pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
-      searchStr: '',
     };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
-    filteredCourses () {
-      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return this.courses.filter(course => course.noDiacriticsName.match(new RegExp(formattedString, 'i')));
-    },
   },
   async created () {
     await this.refreshCourse();
   },
   methods: {
-    updateSearch (value) {
-      this.searchStr = value;
-    },
     async refreshCourse () {
       try {
         this.tableLoading = true;
@@ -83,9 +53,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    goToCourseProfile (row) {
-      this.$router.push({ name: 'ni management elearning courses info', params: { courseId: row._id } });
     },
   },
 };
