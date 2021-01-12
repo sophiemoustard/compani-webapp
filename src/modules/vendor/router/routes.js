@@ -79,7 +79,8 @@ const routes = [
         props: true,
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni management blended courses info') to.params.defaultTab = 'courses';
+            if (from.name === 'ni management blended courses info' ||
+              from.name === 'ni management elearning courses info') to.params.defaultTab = 'courses';
 
             return next();
           } catch (e) {
