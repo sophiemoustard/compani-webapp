@@ -3,23 +3,23 @@
     <div class="q-mb-xl">
       <h4>La formation Compani dans ma structure</h4>
     </div>
-    <q-card flat class="row q-pa-md">
-      <div class="col-4">
-        <div class="text-weight-bold">Le e-learning dans ma structure</div>
-        <ni-date-range v-model="dates" />
+    <q-card flat class="q-pa-md elearning-container">
+      <div>
+        <div class="text-weight-bold q-mb-sm">Le e-learning dans ma structure</div>
+        <ni-date-range v-model="dates" class="dates" borders />
       </div>
-      <div class="col-8 elearning">
+      <div class="elearning">
         <div class="elearning-item">
           <div class="elearning-indicator text-weight-bold text-pink-500">{{ activeLearners }}</div>
-          <div>apprenants actifs</div>
+          <div class="text-center">apprenants actifs</div>
         </div>
         <div class="elearning-item">
           <div class="elearning-indicator text-weight-bold text-pink-500">{{ activityHistories.length }}</div>
-          <div>activités de eLearning réalisées</div>
+          <div class="text-center">activités de eLearning réalisées</div>
         </div>
       </div>
     </q-card>
-</q-page>
+  </q-page>
 </template>
 
 <script>
@@ -72,10 +72,17 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.elearning-container
+  display: flex
+  flex-direction: row
+  @media screen and (max-width: 767px)
+    flex-direction: column
+
 .elearning
   display: flex
   flex-direction: row
   justify-content: space-around
+  flex: 1
 
 .elearning-item
   display: flex
@@ -84,5 +91,4 @@ export default {
 
 .elearning-indicator
   font-size: 36px
-
 </style>

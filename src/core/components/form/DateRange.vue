@@ -5,7 +5,7 @@
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field dense borderless :error="error" :error-message="errorMessage">
-      <div class="date-container justify-center items-center row">
+      <div :class="['date-container', 'justify-center', 'items-center', 'row', borders && 'date-container-borders']">
         <ni-date-input data-cy="date-input" :value="value.startDate" @input="update($event, 'startDate')"
           class="date-item" @blur="blur" />
         <p class="delimiter">-</p>
@@ -39,6 +39,7 @@ export default {
     requiredField: { type: Boolean, default: false },
     error: { type: Boolean, default: false },
     errorMessage: { type: String, default: REQUIRED_LABEL },
+    borders: { type: Boolean, default: false },
   },
   methods: {
     update (value, key) {
@@ -52,9 +53,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+  .date-container-borders
+    border: solid 1px $grey-300
+    border-radius: 3px
+
   /deep/ .q-field__append
     .text-negative
       display: none
+
   /deep/ .q-field__bottom
     color: $secondary
     padding-top: 3px
@@ -66,6 +72,7 @@ export default {
     & .delimiter
       margin: 0
       color: black
+
   .date-item
     max-width: 150px
     /deep/ .q-field--with-bottom
