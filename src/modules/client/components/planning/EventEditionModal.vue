@@ -44,10 +44,10 @@
         </template>
         <template v-if="editedEvent.type === ABSENCE">
           <div v-if="!!editedEvent.extension">
-            {{ extensionInfo }}
-          <ni-select in-modal v-if="editedEvent.extension" :value="editedEvent.selectedExtendedAbsence"
-            caption="Prolongation" :options="extendedAbsenceOptions" @input="update($event, 'selectedExtendedAbsence')"
-            @focus="getExtendedAbsenceOptions" />
+            <div class="q-mb-md infos">{{ extensionInfo }}</div>
+            <ni-select in-modal v-if="editedEvent.extension" :value="editedEvent.selectedExtendedAbsence"
+              caption="Prolongation" :options="extendedAbsenceOptions" @focus="getExtendedAbsenceOptions"
+              @input="update($event, 'selectedExtendedAbsence')" />
           </div>
           <ni-select in-modal caption="Nature" :value="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
@@ -267,5 +267,9 @@ export default {
   .light-checkbox
     color: $grey-400
     font-size: 14px
+
+  .infos
+    font-style: italic;
+    color: $grey-400;
 
 </style>
