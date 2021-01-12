@@ -4,17 +4,17 @@
       <h4>La formation Compani dans ma structure</h4>
     </div>
     <q-card flat class="row q-pa-md">
-      <div class="col-6">
+      <div class="col-4">
         <div class="text-weight-bold">Le e-learning dans ma structure</div>
         <ni-date-range :value="dates" />
       </div>
-      <div class="col-6 elearning">
+      <div class="col-8 elearning">
         <div class="elearning-item">
-          <div class="elearning-indicator text-weight-bold text-pink-500">23</div>
+          <div class="elearning-indicator text-weight-bold text-pink-500">{{ activeLearners }}</div>
           <div>apprenants actifs</div>
         </div>
         <div class="elearning-item">
-          <div class="elearning-indicator text-weight-bold text-pink-500">214</div>
+          <div class="elearning-indicator text-weight-bold text-pink-500">{{ activityHistories.length }}</div>
           <div>activités de eLearning réalisées</div>
         </div>
       </div>
@@ -23,7 +23,10 @@
 </template>
 
 <script>
+import uniqBy from 'lodash/uniqBy';
+import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
+import { NotifyNegative } from '@components/popup/notify';
 import moment from '@helpers/moment';
 
 export default {
@@ -38,7 +41,27 @@ export default {
         startDate: moment().subtract(30, 'd').startOf('d').toISOString(),
         endDate: moment().toISOString(),
       },
+      activityHistories: [],
     };
+  },
+  computed: {
+    activeLearners () {
+      return uniqBy(this.activityHistories, 'user').length;
+    },
+  },
+  async created () {
+    await this.getActivityHistories();
+  },
+  methods: {
+    async getActivityHistories () {
+      try {
+        this.activityHistories = await ActivityHistories.list(this.dates);
+      } catch (e) {
+        this.activityHistories = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la recupération des données.');
+      }
+    },
   },
 };
 </script>
