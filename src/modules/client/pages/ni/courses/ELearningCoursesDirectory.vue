@@ -1,13 +1,14 @@
 <template>
-  <q-page class="vendor-background" padding>
+  <q-page class="client-background" padding>
     <ni-directory-header title="Formations eLearning" search-placeholder="Rechercher une formation"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @go-to="goToCourseProfile" />
+      disabled />
   </q-page>
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
@@ -24,6 +25,9 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
+  computed: {
+    ...mapGetters({ company: 'main/getCompany' }),
+  },
   async created () {
     await this.refreshCourse();
   },
@@ -31,7 +35,7 @@ export default {
     async refreshCourse () {
       try {
         this.tableLoading = true;
-        const courseList = await Courses.list({ format: STRICTLY_E_LEARNING });
+        const courseList = await Courses.list({ format: STRICTLY_E_LEARNING, company: this.company._id });
 
         this.courses = courseList.map(c => ({
           name: c.subProgram.program.name,
@@ -45,9 +49,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    goToCourseProfile (row) {
-      this.$router.push({ name: 'ni management elearning courses info', params: { courseId: row._id } });
     },
   },
 };
