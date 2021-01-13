@@ -241,11 +241,14 @@ export default {
       this.reset(true, event);
     },
     async updateAbsenceNature (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, absenceNature: event, extension: '' });
+      await this.$emit(
+        'update:newEvent',
+        { ...this.newEvent, absenceNature: event, extension: '', isExtendedAbsence: false }
+      );
       this.resetAbsenceType();
     },
     async updateAbsence (event) {
-      await this.$emit('update:newEvent', { ...this.newEvent, absence: event });
+      await this.$emit('update:newEvent', { ...this.newEvent, absence: event, isExtendedAbsence: false });
       this.setDateHours(this.newEvent, 'newEvent');
     },
     async updateCustomerAddress (event) {
@@ -256,8 +259,8 @@ export default {
       await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
     },
     async updateCheckBox (event) {
+      if (!this.newEvent.isExtendedAbsence) await this.getAbsences();
       await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });
-      this.getAbsences();
     },
     async getAbsences () {
       await this.$emit('update:newEvent', { ...this.newEvent, extension: '' });

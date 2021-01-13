@@ -395,7 +395,6 @@ export const planningActionMixin = {
       if (event.shouldUpdateRepetition) delete payload.misc;
       if (event.auxiliary) delete payload.sector;
       if (event.address && !event.address.fullAddress) payload.address = {};
-      if (event.extension) payload.extension = event.extension._id;
 
       return omit(payload, [
         'customer',
@@ -405,6 +404,7 @@ export const planningActionMixin = {
         'type',
         'displayedStartDate',
         'displayedEndDate',
+        'extension',
       ]);
     },
     async updateEvent () {
