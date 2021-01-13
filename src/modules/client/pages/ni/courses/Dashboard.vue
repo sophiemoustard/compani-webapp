@@ -26,7 +26,7 @@
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
 
 export default {
@@ -60,7 +60,10 @@ export default {
   methods: {
     async getActivityHistories () {
       try {
+        if (!this.dates.startDate || moment(this.dates.startDate).isAfter(this.dates.endDate)) return;
+
         this.activityHistories = await ActivityHistories.list(this.dates);
+        NotifyPositive('Données mises a jour.');
       } catch (e) {
         this.activityHistories = [];
         console.error(e);
