@@ -43,12 +43,7 @@
           </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
-          <div v-if="!!editedEvent.extension">
-            <div class="q-mb-md infos">{{ extensionInfo }}</div>
-            <ni-select in-modal v-if="editedEvent.extension" :value="editedEvent.selectedExtendedAbsence"
-              caption="Prolongation" :options="extendedAbsenceOptions" @focus="getExtendedAbsenceOptions"
-              @input="update($event, 'selectedExtendedAbsence')" />
-          </div>
+          <div v-if="!!editedEvent.extension"><div class="q-mb-md infos">{{ extensionInfos }}</div></div>
           <ni-select in-modal caption="Nature" :value="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
           <ni-select in-modal caption="Type d'absence" :value="editedEvent.absence" :options="absenceOptions"
@@ -108,7 +103,6 @@ import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/consta
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import Button from '@components/Button';
 import moment from '@helpers/moment';
-import Events from '@api/Events';
 import set from 'lodash/set';
 
 export default {
@@ -126,11 +120,6 @@ export default {
   },
   components: {
     'ni-button': Button,
-  },
-  data () {
-    return {
-      extendedAbsenceOptions: [],
-    };
   },
   computed: {
     selectedCustomer () {
@@ -158,7 +147,7 @@ export default {
     isMiscRequired () {
       return (this.editedEvent.type === ABSENCE && this.editedEvent.absence === OTHER) || this.editedEvent.isCancelled;
     },
-    extensionInfo () {
+    extensionInfos () {
       const nature = ABSENCE_TYPES.find(abs => abs.value === this.editedEvent.absence);
       const startDate = moment(this.editedEvent.extension.startDate).format('DD/MM/YYYY');
 
@@ -174,10 +163,7 @@ export default {
           isCancelled: !this.editedEvent.isCancelled,
         });
       } else {
-        this.$emit('update:edited-event', {
-          ...this.editedEvent,
-          isCancelled: !this.editedEvent.isCancelled,
-        });
+        this.$emit('update:edited-event', { ...this.editedEvent, isCancelled: !this.editedEvent.isCancelled });
         this.validations.misc.$touch();
         this.validations.cancel.$touch();
       }
@@ -195,11 +181,9 @@ export default {
     },
     close () {
       this.$emit('close');
-      this.extendedAbsenceOptions = [];
     },
     hide (partialReset, type) {
       this.$emit('hide', { partialReset, type });
-      this.extendedAbsenceOptions = [];
     },
     deleteDocument (value) {
       this.$emit('delete-document', value);
@@ -209,7 +193,6 @@ export default {
     },
     submit (value) {
       this.$emit('submit', value);
-      this.extendedAbsenceOptions = [];
     },
     deleteEventRepetition (value) {
       this.$emit('delete-event-repetition', value);
@@ -222,21 +205,6 @@ export default {
       const addressIndex = addressList.findIndex(ev => this.editedEvent.address.fullAddress === ev.label);
       if (addressIndex === 0) this.editedEvent.address = addressList[1].value;
       else this.editedEvent.address = addressList[0].value;
-    },
-    async getExtendedAbsenceOptions () {
-      if (!this.extendedAbsenceOptions.length) {
-        const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
-
-        this.extendedAbsenceOptions = auxiliaryEvents
-          .filter(e => e.absence === this.editedEvent.absence &&
-            moment(e.startDate).isBefore(this.editedEvent.dates.startDate) &&
-            !moment(e.startDate).isSame(this.editedEvent.extension.startDate))
-          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-          .map(a => ({
-            label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
-            value: a._id,
-          }));
-      }
     },
     async update (event, fields) {
       await this.$emit('update:edited-event', set({ ...this.editedEvent }, fields, event));

@@ -39,8 +39,8 @@
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
             @input="updateDates($event)" />
-          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="newEvent.isExtendedAbsence" @input="getAbsences"
-            label="Prolongation" dense />
+          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="newEvent.isExtendedAbsence"
+            @input="updateCheckBox" label="Prolongation" dense />
           <ni-select v-if="newEvent.isExtendedAbsence" :value="newEvent.extension" @input="update($event, 'extension')"
             required-field in-modal caption="Absence" :options="extendedAbsenceOptions"
             @blur="validations.extension.$touch" :error="validations.extension.$error" />
@@ -181,10 +181,15 @@ export default {
         });
       }
     },
+    'newEvent.absence': function () {
+      this.getAbsences();
+    },
+    'newEvent.dates.startDate': function () {
+      this.getAbsences();
+    },
   },
   methods: {
     close () {
-      this.extendedAbsenceOptions = [];
       this.$emit('close');
     },
     reset (partialReset, type) {
@@ -198,7 +203,6 @@ export default {
       this.$emit('document-uploaded', value);
     },
     submit (value) {
-      this.extendedAbsenceOptions = [];
       this.$emit('submit', value);
     },
     resetAbsenceType () {
@@ -229,7 +233,6 @@ export default {
       this.$emit('update:newEvent', set({ ...this.newEvent }, fields, event));
     },
     async updateCustomer (event) {
-      this.extendedAbsenceOptions = [];
       await this.$emit('update:newEvent', { ...this.newEvent, customer: event });
       this.setEventAddressAndSubscription();
     },
@@ -238,19 +241,11 @@ export default {
       this.reset(true, event);
     },
     async updateAbsenceNature (event) {
-      this.extendedAbsenceOptions = [];
-      await this.$emit(
-        'update:newEvent',
-        { ...this.newEvent, absenceNature: event, extension: '', isExtendedAbsence: false }
-      );
+      await this.$emit('update:newEvent', { ...this.newEvent, absenceNature: event, extension: '' });
       this.resetAbsenceType();
     },
     async updateAbsence (event) {
-      this.extendedAbsenceOptions = [];
-      await this.$emit(
-        'update:newEvent',
-        { ...this.newEvent, absence: event, extension: '', isExtendedAbsence: false }
-      );
+      await this.$emit('update:newEvent', { ...this.newEvent, absence: event });
       this.setDateHours(this.newEvent, 'newEvent');
     },
     async updateCustomerAddress (event) {
@@ -258,23 +253,24 @@ export default {
       this.deleteClassFocus();
     },
     async updateDates (event) {
-      this.extendedAbsenceOptions = [];
       await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
     },
-    async getAbsences () {
+    async updateCheckBox (event) {
       await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });
-      if (!this.extendedAbsenceOptions.length) {
-        const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
+      this.getAbsences();
+    },
+    async getAbsences () {
+      await this.$emit('update:newEvent', { ...this.newEvent, extension: '' });
+      const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
 
-        this.extendedAbsenceOptions = auxiliaryEvents
-          .filter(e => e.absence === this.newEvent.absence &&
+      this.extendedAbsenceOptions = auxiliaryEvents
+        .filter(e => e.absence === this.newEvent.absence &&
             moment(e.startDate).isBefore(this.newEvent.dates.startDate))
-          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-          .map(a => ({
-            label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
-            value: a._id,
-          }));
-      }
+        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+        .map(a => ({
+          label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
+          value: a._id,
+        }));
     },
   },
 };
