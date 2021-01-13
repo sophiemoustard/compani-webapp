@@ -241,14 +241,13 @@ export default {
             if (!sectors.includes(sector)) continue;
             const auxPaidInterventions = paidInterventions.find(pi => pi._id === auxHoursDetails.auxiliaryId);
 
-            const auxiliaryStats = {
+            auxiliariesStats[sector].push({
               _id: auxHoursDetails.auxiliaryId,
               identity: auxHoursDetails.identity,
               picture: auxHoursDetails.picture,
               paidInterventions: omit(auxPaidInterventions, 'sectors'),
               hoursBalanceDetail: omit(auxHoursDetails, ['sectors', 'auxiliary']),
-            };
-            auxiliariesStats[sector].push(auxiliaryStats);
+            });
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
           }
         }

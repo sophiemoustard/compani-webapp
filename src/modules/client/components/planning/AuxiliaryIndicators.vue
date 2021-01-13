@@ -55,7 +55,7 @@ export default {
       return (this.customersDetails.duration) / this.customersDetails.customerCount;
     },
     hoursToWork () {
-      return get(this.hoursDetails.diff, 'absencesHours') && this.hoursDetails.counterAndDiffRelevant
+      return get(this.hoursDetails, 'diff.absencesHours') && this.hoursDetails.counterAndDiffRelevant
         ? this.hoursDetails.hoursToWork - this.hoursDetails.diff.absencesHours
         : this.hoursDetails.hoursToWork;
     },
@@ -71,7 +71,7 @@ export default {
     workedHoursDetail () {
       let detail = '';
       if (this.hoursDetails.internalHours) detail += ` ${formatHours(this.hoursDetails.internalHours)} internes`;
-      if (get(this.hoursDetails.diff, 'workedHours') && this.hoursDetails.counterAndDiffRelevant) {
+      if (get(this.hoursDetails, 'diff.workedHours') && this.hoursDetails.counterAndDiffRelevant) {
         if (detail !== '') detail += ' et';
         detail += ` ${formatHours(this.hoursDetails.diff.workedHours)} de rattrapage`;
       }
