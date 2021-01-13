@@ -5,15 +5,15 @@
     </div>
     <q-card flat class="q-pa-md elearning-container">
       <div>
-        <div class="text-weight-bold q-mb-sm">Le e-learning dans ma structure</div>
+        <div class="text-weight-bold q-mb-sm">Le eLearning dans ma structure</div>
         <ni-date-range v-model="dates" class="dates" borders />
       </div>
       <div class="elearning">
-        <div class="elearning-item">
+        <div class="column items-center">
           <div class="elearning-indicator text-weight-bold text-pink-500">{{ activeLearners }}</div>
           <div class="text-center">apprenants actifs</div>
         </div>
-        <div class="elearning-item">
+        <div class="column items-center">
           <div class="elearning-indicator text-weight-bold text-pink-500">{{ activityHistories.length }}</div>
           <div class="text-center">activités de eLearning réalisées</div>
         </div>
@@ -86,11 +86,6 @@ export default {
   flex-direction: row
   justify-content: space-around
   flex: 1
-
-.elearning-item
-  display: flex
-  flex-direction: column
-  align-items: center
 
 .elearning-indicator
   font-size: 36px
