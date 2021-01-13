@@ -12,7 +12,7 @@
                 <div class="row no-wrap table-actions justify-end">
                   <ni-button icon="file_download" color="primary" type="a" target="_blank"
                     :href="props.row.file.link" />
-                  <ni-button icon="delete" color="primary" disabled />
+                  <ni-button icon="delete" color="primary" @click="validateAttendanceSheetDeletion(props.row)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -187,6 +187,29 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
       } finally {
         this.modalLoading = false;
+      }
+    },
+    validateAttendanceSheetDeletion (attendanceSheet) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette feuille d\'émargement ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteAttendanceSheet(attendanceSheet._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteAttendanceSheet (attendanceSheetId) {
+      try {
+        this.$q.loading.show();
+        await AttendanceSheets.delete(attendanceSheetId);
+
+        NotifyPositive('Feuille d\'émargement supprimée.');
+        await this.refreshAttendanceSheets();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppresion de la feuille d\'émargement.');
+      } finally {
+        this.$q.loading.hide();
       }
     },
   },
