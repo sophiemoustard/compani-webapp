@@ -14,7 +14,13 @@ export const eLearningCourseDirectoryMixin = {
           field: 'name',
           align: 'left',
           sortable: true,
-          style: 'min-width: 200px; width: 70%',
+        },
+        {
+          name: 'traineesCount',
+          label: 'Nombre d\'apprenants',
+          field: 'traineesCount',
+          align: 'center',
+          sortable: true,
         },
         {
           name: 'createdAt',
@@ -24,7 +30,6 @@ export const eLearningCourseDirectoryMixin = {
           sortable: true,
           format: value => moment(value).format('DD/MM/YYYY'),
           sort: (a, b) => new Date(b) - new Date(a),
-          style: 'min-width: 110px; width: 10%',
         },
       ],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
