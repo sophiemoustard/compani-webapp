@@ -32,6 +32,12 @@
               </q-circular-progress>
             </div>
             <div class="q-mb-lg">
+              <div v-if="displayCounter(sector)" class="row auxiliary">
+                <div class="col-8 auxiliary-label">Compteur d'heures</div>
+                <div class="col-4 auxiliary-value">
+                  <div :class="['dot', stats[sector].hoursCounterStatus]" />
+                </div>
+              </div>
               <div class="row auxiliary">
                 <div class="col-8 auxiliary-label">Heures facturées</div>
                 <div class="col-4 auxiliary-value">{{ formatHours(getBilledHours(sector), 0) }}</div>
@@ -87,7 +93,7 @@
         <q-slide-transition>
           <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
             class="auxiliary-cell-container row">
-            <div v-for="auxiliary in auxiliariesStats[sector]" :key="auxiliary._id"
+            <div v-for="auxiliary in auxiliariesStats[sector]" :key="`${sector}-${auxiliary._id}`"
               class="col-md-6 col-xs-12 auxiliary-cell q-mb-lg">
               <div class="row person-name q-mb-md">
                 <img :src="getAvatar(auxiliary.picture)" class="avatar">
@@ -218,7 +224,7 @@ export default {
         const sectors = [];
         const auxiliariesStats = {};
         for (const sector of sectorsIds) {
-          if (this.auxiliariesStats[sector] || !this.displayStats[sector].openedDetails) continue;
+          if (this.auxiliariesStats[sector]) continue;
           sectors.push(sector);
           this.$set(this.displayStats[sector], 'loadingDetails', true);
           auxiliariesStats[sector] = [];
@@ -230,18 +236,18 @@ export default {
           Pay.getHoursBalanceDetail({ sector: sectors, month: this.selectedMonth }),
         ]);
 
-        for (const auxiliaryPaidInterventions of paidInterventions) {
-          for (const sector of auxiliaryPaidInterventions.sectors) {
+        for (const auxHoursDetails of hoursBalance) {
+          for (const sector of auxHoursDetails.sectors) {
             if (!sectors.includes(sector)) continue;
-            const hoursDetails = hoursBalance.find(hbd => hbd.auxiliaryId === auxiliaryPaidInterventions._id);
-            const auxiliaryStats = {
-              _id: auxiliaryPaidInterventions._id,
-              identity: hoursDetails.identity,
-              picture: hoursDetails.picture,
-              paidInterventions: omit(auxiliaryPaidInterventions, 'sectors'),
-              hoursBalanceDetail: omit(hoursDetails, ['sectors', 'auxiliary']),
-            };
-            auxiliariesStats[sector].push(auxiliaryStats);
+            const auxPaidInterventions = paidInterventions.find(pi => pi._id === auxHoursDetails.auxiliaryId);
+
+            auxiliariesStats[sector].push({
+              _id: auxHoursDetails.auxiliaryId,
+              identity: auxHoursDetails.identity,
+              picture: auxHoursDetails.picture,
+              paidInterventions: omit(auxPaidInterventions, 'sectors'),
+              hoursBalanceDetail: omit(auxHoursDetails, ['sectors', 'auxiliary']),
+            });
             this.$set(this.auxiliariesStats, sector, auxiliariesStats[sector]);
           }
         }
@@ -260,6 +266,16 @@ export default {
       return this.stats[sectorId].internalAndBilledHours
         ? this.stats[sectorId].internalAndBilledHours.interventions
         : 0;
+    },
+    displayCounter (sector) {
+      if (!this.auxiliariesStats || !this.auxiliariesStats[sector]) return false;
+      return this.auxiliariesStats[sector].every(stat => stat.hoursBalanceDetail.counterAndDiffRelevant);
+    },
+    getCounterStatus (sector) {
+      if (!this.auxiliariesStats || !this.auxiliariesStats[sector]) return '';
+      if (this.auxiliariesStats[sector].every(aux => aux.hoursBalanceDetail.hoursCounter > 0)) return 'bg-green-800';
+      if (this.auxiliariesStats[sector].some(aux => aux.hoursBalanceDetail.hoursCounter < -35)) return 'bg-red-800';
+      return 'bg-orange-500';
     },
     getInternalHours (sectorId) {
       return this.stats[sectorId].internalAndBilledHours
@@ -293,7 +309,6 @@ export default {
         return;
       }
       this.$set(this.displayStats[sectorId], 'openedDetails', true);
-      await this.getAuxiliariesStats([sectorId]);
     },
     hoursRatio (sector) {
       return (this.getBilledHours(sector) / this.getHoursToWork(sector)) * 100 || 0;
@@ -316,6 +331,7 @@ export default {
         } else {
           this.unassignedHours = [];
         }
+        await this.getAuxiliariesStats(sectors);
 
         for (const sector of sectors) {
           this.stats = {
@@ -325,11 +341,11 @@ export default {
               customersAndDuration: customersAndDuration.find(cd => cd.sector === sector),
               hoursToWork: hoursToWork.find(hw => hw.sector === sector),
               paidTransportStats: paidTransportStats.find(pt => pt.sector === sector),
+              hoursCounterStatus: this.getCounterStatus(sector),
             },
           };
         }
 
-        await this.getAuxiliariesStats(sectors);
         this.setDisplayStats(sectors, { loading: false });
       } catch (e) {
         console.error(e);
@@ -371,11 +387,11 @@ export default {
   font-style: italic
 
 .auxiliary
-  border-top: 1px solid $grey-300
   border-left: 1px solid $grey-300
   border-right: 1px solid $grey-300
-  &:nth-child(2)
-    border-bottom: 1px solid $grey-300
+  border-bottom: 1px solid $grey-300
+  &:nth-child(1)
+    border-top: 1px solid $grey-300
   div
     padding: 5px
   &-cell
@@ -393,7 +409,11 @@ export default {
 
 .auxiliary-value
   justify-content: flex-end
+  align-items: center
   display: flex
+
+.dot
+  margin: 0px !important
 
 .sector-cell
   margin: 0 16px 16px
@@ -434,7 +454,9 @@ export default {
 
 .gauge-wrapper
   display: flex
-  justify-content: space-between
+  justify-content: space-around
+  @media screen and (max-width: 767px)
+    justify-content: space-between
 
 .unassigned-hours
   font-style: italic
