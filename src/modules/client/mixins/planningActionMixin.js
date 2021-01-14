@@ -404,6 +404,7 @@ export const planningActionMixin = {
         'type',
         'displayedStartDate',
         'displayedEndDate',
+        'extension',
       ]);
     },
     async updateEvent () {

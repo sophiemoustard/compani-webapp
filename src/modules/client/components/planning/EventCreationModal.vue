@@ -39,8 +39,8 @@
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(newEvent)"
             :disable-start-hour="!isIllnessOrWorkAccident(newEvent) && !isHourlyAbsence(newEvent)"
             @input="updateDates($event)" />
-          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="newEvent.isExtendedAbsence" @input="getAbsences"
-            label="Prolongation" dense />
+          <q-checkbox v-show="canExtendAbsence" class="q-mb-sm" :value="newEvent.isExtendedAbsence"
+            @input="updateCheckBox" label="Prolongation" dense />
           <ni-select v-if="newEvent.isExtendedAbsence" :value="newEvent.extension" @input="update($event, 'extension')"
             required-field in-modal caption="Absence" :options="extendedAbsenceOptions"
             @blur="validations.extension.$touch" :error="validations.extension.$error" />
@@ -126,7 +126,6 @@ export default {
   data () {
     return {
       extendedAbsenceOptions: [],
-      selectedExtension: '',
     };
   },
   computed: {
@@ -182,12 +181,19 @@ export default {
         });
       }
     },
+    'newEvent.absence': function () {
+      this.getAbsences();
+    },
+    'newEvent.dates.startDate': function () {
+      this.getAbsences();
+    },
   },
   methods: {
     close () {
       this.$emit('close');
     },
     reset (partialReset, type) {
+      this.extendedAbsenceOptions = [];
       this.$emit('reset', { partialReset, type });
     },
     deleteDocument (value) {
@@ -235,7 +241,6 @@ export default {
       this.reset(true, event);
     },
     async updateAbsenceNature (event) {
-      this.extendedAbsenceOptions = [];
       await this.$emit(
         'update:newEvent',
         { ...this.newEvent, absenceNature: event, extension: '', isExtendedAbsence: false }
@@ -243,11 +248,7 @@ export default {
       this.resetAbsenceType();
     },
     async updateAbsence (event) {
-      this.extendedAbsenceOptions = [];
-      await this.$emit(
-        'update:newEvent',
-        { ...this.newEvent, absence: event, extension: '', isExtendedAbsence: false }
-      );
+      await this.$emit('update:newEvent', { ...this.newEvent, absence: event, isExtendedAbsence: false });
       this.setDateHours(this.newEvent, 'newEvent');
     },
     async updateCustomerAddress (event) {
@@ -256,22 +257,23 @@ export default {
     },
     async updateDates (event) {
       await this.$emit('update:newEvent', { ...this.newEvent, dates: event });
-      this.resetExtension();
+    },
+    async updateCheckBox (event) {
+      if (!this.newEvent.isExtendedAbsence) await this.getAbsences();
+      await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });
     },
     async getAbsences () {
-      await this.$emit('update:newEvent', { ...this.newEvent, isExtendedAbsence: !this.newEvent.isExtendedAbsence });
-      if (!this.extendedAbsenceOptions.length) {
-        const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
+      await this.$emit('update:newEvent', { ...this.newEvent, extension: '' });
+      const auxiliaryEvents = await Events.list({ auxiliary: this.selectedAuxiliary._id, type: ABSENCE });
 
-        this.extendedAbsenceOptions = auxiliaryEvents
-          .filter(e => e.absence === this.newEvent.absence &&
+      this.extendedAbsenceOptions = auxiliaryEvents
+        .filter(e => e.absence === this.newEvent.absence &&
             moment(e.startDate).isBefore(this.newEvent.dates.startDate))
-          .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
-          .map(a => ({
-            label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
-            value: a._id,
-          }));
-      }
+        .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+        .map(a => ({
+          label: `${moment(a.startDate).format('DD/MM/YYYY')} - ${moment(a.endDate).format('DD/MM/YYYY')}`,
+          value: a._id,
+        }));
     },
   },
 };
