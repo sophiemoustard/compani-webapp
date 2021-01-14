@@ -125,9 +125,9 @@ export const menuItemsMixin = {
           label: 'Formations',
           children: [
             { name: 'ni courses dashboard', icon: 'assessment', label: 'Tableau de bord' },
-            { name: 'ni courses', icon: 'mdi-teach', label: 'Mes formations' },
-            { name: 'ni courses learners', icon: 'contacts', label: 'Apprenants' },
+            { name: 'ni courses', icon: 'mdi-teach', label: 'Formations mixtes' },
             { name: 'ni elearning courses', icon: 'stay_primary_portrait', label: 'Formations eLearning' },
+            { name: 'ni courses learners', icon: 'contacts', label: 'Apprenants' },
           ],
         }, {
           ref: 'billing',
