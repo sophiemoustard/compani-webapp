@@ -25,8 +25,9 @@
           @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <div v-if="followUp.subProgram">
-      <p class="text-weight-bold">Progression des participants</p>
+    <profile-follow-up :profile-id="profileId" class="q-my-md" />
+    <div v-if="followUp.subProgram" class="q-my-xl">
+      <p class="text-weight-bold">Réponse aux questionnaires</p>
       <div v-for="(step, stepIndex) of followUp.subProgram.steps" :key="stepIndex" class="q-mb-xl">
         <div class="q-mb-sm">{{ stepIndex + 1 }} - {{ step.name }}</div>
         <q-card v-for="(activity, activityIndex) of step.activities" :key="activityIndex" flat class="q-mb-sm">
@@ -65,6 +66,7 @@ import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdd
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
+import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
 
 export default {
   name: 'ProfileTraineeFollowUp',
@@ -75,6 +77,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
+    'profile-follow-up': ProfileFollowUp,
   },
   props: {
     profileId: { type: String, required: true },
