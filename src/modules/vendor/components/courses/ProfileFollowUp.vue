@@ -1,6 +1,6 @@
 <template>
   <div>
-    <p class="text-weight-bold">{{ title }}</p>
+    <p class="text-weight-bold">Progression des participants</p>
     <q-card>
       <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false">
         <template #row="{ props }">
@@ -50,7 +50,6 @@ export default {
   },
   props: {
     profileId: { type: String, required: true },
-    title: { type: String, default: 'Participants' },
   },
   data () {
     return {

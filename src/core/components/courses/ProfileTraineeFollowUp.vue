@@ -25,7 +25,7 @@
           @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <profile-follow-up :profile-id="profileId" title="Progression des Participants" class="q-my-md" />
+    <profile-follow-up :profile-id="profileId" class="q-my-md" />
     <div v-if="followUp.subProgram" class="q-my-xl">
       <p class="text-weight-bold">Réponse aux questionnaires</p>
       <div v-for="(step, stepIndex) of followUp.subProgram.steps" :key="stepIndex" class="q-mb-xl">
