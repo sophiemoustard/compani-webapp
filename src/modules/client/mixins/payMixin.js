@@ -151,6 +151,13 @@ export const payMixin = {
           format: value => formatHours(value),
         },
         {
+          name: 'absencesHours',
+          label: 'Heures d\'absences',
+          align: 'center',
+          field: 'absencesHours',
+          format: value => formatHours(value),
+        },
+        {
           name: 'mutual',
           label: 'Mutuelle',
           align: 'center',
@@ -161,6 +168,13 @@ export const payMixin = {
             if (a) return -1;
             return 1;
           },
+        },
+        {
+          name: 'paidTransportHours',
+          label: 'Heures de transport',
+          align: 'center',
+          field: 'paidTransportHours',
+          format: value => formatHours(value),
         },
         {
           name: 'transport',
