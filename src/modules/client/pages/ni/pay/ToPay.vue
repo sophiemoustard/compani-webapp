@@ -166,7 +166,7 @@ export default {
         { label: 'Compteur', value: 'hoursCounter', path: 'hoursCounter' },
         { label: 'Heures d\'absences', value: 'absencesHours', path: 'absencesHours' },
         { label: 'Mutuelle', value: 'mutual', path: 'mutual' },
-        { label: 'Heures de transport', value: 'paidTransportHours', path: 'paidTransportHours' },
+        { label: 'Temps de transport', value: 'paidTransportHours', path: 'paidTransportHours' },
         { label: 'Transport', value: 'transport', path: 'transport' },
         { label: 'Frais téléphoniques', value: 'phoneFees', path: 'phoneFees' },
       ],

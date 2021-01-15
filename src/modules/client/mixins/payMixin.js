@@ -171,7 +171,7 @@ export const payMixin = {
         },
         {
           name: 'paidTransportHours',
-          label: 'Heures de transport',
+          label: 'Temps de transport',
           align: 'center',
           field: 'paidTransportHours',
           format: value => formatHours(value),
@@ -283,7 +283,7 @@ export const payMixin = {
         'Heures comp à payer',
         'Heures d\'absence',
         'Mutuelle',
-        'Heures de transport',
+        'Temps de transport',
         'Transport',
         'Frais téléphoniques',
         'Prime',
