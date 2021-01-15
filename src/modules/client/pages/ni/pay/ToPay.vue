@@ -238,7 +238,7 @@ export default {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
       if (!draft) return false;
 
-      return Object.keys(draft[details]).length || Object.keys(draft.diff[details]).length;
+      return Object.keys(draft[details]).length || (draft.diff[details] && Object.keys(draft.diff[details]).length);
     },
     openSurchargeDetailModal (id, details) {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
