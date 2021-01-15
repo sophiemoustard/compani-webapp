@@ -61,8 +61,11 @@ export default {
     async getActivityHistories () {
       try {
         if (!this.dates.startDate || moment(this.dates.startDate).isAfter(this.dates.endDate)) return;
-
-        this.activityHistories = await ActivityHistories.list(this.dates);
+        const { endDate } = this.dates;
+        this.activityHistories = await ActivityHistories.list({
+          ...this.dates,
+          endDate: moment(endDate).endOf('d').toISOString(),
+        });
         NotifyPositive('Données mises a jour.');
       } catch (e) {
         this.activityHistories = [];
