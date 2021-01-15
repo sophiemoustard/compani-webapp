@@ -70,7 +70,7 @@ export const payMixin = {
           name: 'absencesHours',
           label: 'Heures d\'absences',
           align: 'center',
-          field: 'absencesHours',
+          field: row => row.absencesHours - (get(row, 'diff.absencesHours') || 0),
           format: value => formatHours(value),
         },
         {
@@ -119,7 +119,7 @@ export const payMixin = {
           name: 'paidTransportHours',
           label: 'Temps de transport',
           align: 'center',
-          field: 'paidTransportHours',
+          field: row => row.paidTransportHours - (get(row, 'diff.paidTransportHours') || 0),
           format: value => formatHours(value),
         },
         {
