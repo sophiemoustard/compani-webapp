@@ -42,6 +42,7 @@ export default {
           noDiacriticsName: removeDiacritics(c.subProgram.program.name),
           createdAt: c.createdAt,
           _id: c._id,
+          traineesCount: c.trainees.length || '0',
         }));
       } catch (e) {
         console.error(e);
