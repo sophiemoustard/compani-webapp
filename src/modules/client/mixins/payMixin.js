@@ -67,6 +67,13 @@ export const payMixin = {
           format: value => formatHours(value),
         },
         {
+          name: 'absencesHours',
+          label: 'Heures d\'absences',
+          align: 'center',
+          field: 'absencesHours',
+          format: value => formatHours(value),
+        },
+        {
           name: 'hoursToWork',
           label: 'Heures à travailler',
           align: 'center',
@@ -106,6 +113,13 @@ export const payMixin = {
           label: 'Dont non exo et majo',
           align: 'center',
           field: row => row.surchargedAndNotExempt + (get(row, 'diff.surchargedAndNotExempt') || 0),
+          format: value => formatHours(value),
+        },
+        {
+          name: 'paidTransportHours',
+          label: 'Temps de transport',
+          align: 'center',
+          field: 'paidTransportHours',
           format: value => formatHours(value),
         },
         {
@@ -151,13 +165,6 @@ export const payMixin = {
           format: value => formatHours(value),
         },
         {
-          name: 'absencesHours',
-          label: 'Heures d\'absences',
-          align: 'center',
-          field: 'absencesHours',
-          format: value => formatHours(value),
-        },
-        {
           name: 'mutual',
           label: 'Mutuelle',
           align: 'center',
@@ -168,13 +175,6 @@ export const payMixin = {
             if (a) return -1;
             return 1;
           },
-        },
-        {
-          name: 'paidTransportHours',
-          label: 'Temps de transport',
-          align: 'center',
-          field: 'paidTransportHours',
-          format: value => formatHours(value),
         },
         {
           name: 'transport',
@@ -268,6 +268,7 @@ export const payMixin = {
         'Début',
         'Fin',
         'Heures contrat',
+        'Heures d\'absence',
         'Heures à travailler',
         'Heures travaillées',
         'Dont exo non majo',
@@ -276,14 +277,13 @@ export const payMixin = {
         'Dont non exo et non majo ',
         'Dont non exo et majo',
         'Details non exo et majo',
+        'Temps de transport',
         'Solde heures',
         'Dont rattrapage',
         'Compteur',
         'Heures sup à payer',
         'Heures comp à payer',
-        'Heures d\'absence',
         'Mutuelle',
-        'Temps de transport',
         'Transport',
         'Frais téléphoniques',
         'Prime',
