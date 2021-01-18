@@ -247,7 +247,7 @@ export const payMixin = {
     },
     formatHoursWithDiff (pay, key) {
       let hours = pay[key];
-      if (pay.diff[key]) hours += pay.diff[key];
+      if (pay.diff && pay.diff[key]) hours += pay.diff[key];
 
       return this.formatNumberForCSV(hours);
     },
@@ -298,6 +298,7 @@ export const payMixin = {
           startDate ? moment(startDate).format('DD/MM/YYYY') : '',
           endDate ? moment(endDate).format('DD/MM/YYYY') : '',
           this.formatNumberForCSV(draftPay.contractHours),
+          this.formatHoursWithDiff(draftPay, 'absencesHours'),
           this.formatNumberForCSV(draftPay.hoursToWork - draftPay.diff.absencesHours),
           this.formatHoursWithDiff(draftPay, 'workedHours'),
           this.formatHoursWithDiff(draftPay, 'notSurchargedAndExempt'),
@@ -306,14 +307,13 @@ export const payMixin = {
           this.formatHoursWithDiff(draftPay, 'notSurchargedAndNotExempt'),
           this.formatHoursWithDiff(draftPay, 'surchargedAndNotExempt'),
           `"${this.formatSurchargeDetails(draftPay.surchargedAndNotExemptDetails)}"` || '',
+          this.formatHoursWithDiff(draftPay, 'paidTransportHours'),
           this.formatHoursWithDiff(draftPay, 'hoursBalance'),
           get(draftPay, 'diff.hoursBalance') ? this.formatNumberForCSV(draftPay.diff.hoursBalance) : '0,00',
           this.formatNumberForCSV(draftPay.hoursCounter),
           this.formatNumberForCSV(draftPay.overtimeHours),
           this.formatNumberForCSV(draftPay.additionalHours),
-          this.formatNumberForCSV(draftPay.absencesHours),
           draftPay.mutual ? 'Oui' : 'Non',
-          this.formatNumberForCSV(draftPay.paidTransportHours),
           this.formatNumberForCSV(draftPay.transport),
           this.formatNumberForCSV(draftPay.phoneFees),
           this.formatNumberForCSV(draftPay.bonus),
