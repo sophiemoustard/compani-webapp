@@ -132,12 +132,14 @@ export default {
         'startDate',
         'endDate',
         'contractHours',
+        'absencesHours',
         'hoursToWork',
         'workedHours',
         'notSurchargedAndExempt',
         'surchargedAndExempt',
         'notSurchargedAndNotExempt',
         'surchargedAndNotExempt',
+        'paidTransportHours',
         'diff',
         'hoursBalance',
         'previousMonthHoursCounter',
@@ -159,7 +161,9 @@ export default {
         { label: 'Équipe', value: 'sector', path: 'auxiliary.sector.name' },
         { label: 'Début', value: 'startDate', path: 'startDate' },
         { label: 'Heures contrat', value: 'contractHours', path: 'contractHours' },
+        { label: 'Heures d\'absences', value: 'absencesHours', path: 'absencesHours' },
         { label: 'Heures travaillées', value: 'workedHours', path: 'workedHours' },
+        { label: 'Temps de transport', value: 'paidTransportHours', path: 'paidTransportHours' },
         { label: 'Solde heures', value: 'hoursBalance', path: 'hoursBalance' },
         { label: 'Compteur', value: 'hoursCounter', path: 'hoursCounter' },
         { label: 'Mutuelle', value: 'mutual', path: 'mutual' },
@@ -238,7 +242,7 @@ export default {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
       if (!draft) return false;
 
-      return Object.keys(draft[details]).length || Object.keys(draft.diff[details]).length;
+      return Object.keys(draft[details]).length || (draft.diff[details] && Object.keys(draft.diff[details]).length);
     },
     openSurchargeDetailModal (id, details) {
       const draft = this.draftPay.find(dp => dp.auxiliary._id === id);

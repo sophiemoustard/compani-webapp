@@ -1,6 +1,6 @@
 <template>
   <div v-if="displayStaffingView" :id="event._id" :draggable="canDrag(event)" @dragstart="drag(event, $event)"
-    @click.stop="editEvent(event._id)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
+    @click.stop="click(event)" :class="['row', 'cursor-pointer', 'event', `event-${event.type}`, 'q-mt-sm']"
     :style="getEventStyleForStaffing(event)">
     <div class="event-container">
       <div class="event-title">

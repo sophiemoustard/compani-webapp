@@ -33,7 +33,7 @@ import DirectoryHeader from '@components/DirectoryHeader';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, TRAINEE } from '@data/constants';
 import {
   formatPhoneForPayload,
   removeDiacritics,
@@ -43,6 +43,7 @@ import {
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { learnerDirectoryMixin } from '@mixins/learnerDirectoryMixin';
+import Email from '@api/Email';
 
 export default {
   metaInfo: { title: 'Répertoire apprenants' },
@@ -164,6 +165,8 @@ export default {
         await Users.create(payload);
         NotifyPositive('Apprenant ajouté avec succès.');
 
+        await this.sendWelcome();
+
         this.learnerCreationModal = false;
         await this.getLearnerList();
       } catch (e) {
@@ -172,6 +175,15 @@ export default {
         NotifyNegative('Erreur lors de l\'ajout de l\' apprenant.');
       } finally {
         this.learnerCreationModalLoading = false;
+      }
+    },
+    async sendWelcome () {
+      try {
+        await Email.sendWelcome({ email: this.newLearner.local.email, type: TRAINEE });
+        NotifyPositive('Email envoyé');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'envoi du mail.');
       }
     },
   },

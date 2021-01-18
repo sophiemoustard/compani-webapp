@@ -11,19 +11,24 @@
             <template v-else-if="col.name === 'expand'">
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
+            <template v-else-if="col.name === 'name'">
+              <div @click.stop="goToCourseProfile(props)" :class="[{ 'name': canBeRedirected(props) }]">
+                {{ col.value }}
+              </div>
+            </template>
             <template v-else>{{ col.value }}</template>
           </q-td>
         </template>
         <template #expanding-row="{ props }">
           <q-td colspan="100%">
             <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-              class="q-ma-sm step">
+              class="q-ma-sm expanding-table-expanded-row">
               <div>
                 <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
                 {{ stepIndex + 1 }} - {{ step.name }}
               </div>
-              <div class="progress-container">
-                <ni-progress class="sub-progress" :value="step.progress" />
+              <div class="expanding-table-progress-container">
+                <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
               </div>
             </div>
           </q-td>
@@ -109,24 +114,35 @@ export default {
     }
   },
   methods: {
-    goToBlendedCourseProfileAdmin (row) {
-      if (!this.isVendorInterface) return;
+    goToCourseProfile (props) {
+      if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
+        props.expand = !props.expand;
+        return;
+      }
+
+      if (!this.isVendorInterface) {
+        return this.$router.push({ name: 'ni courses info', params: { courseId: props.row._id } });
+      }
+
+      if (props.row.subProgram.isStrictlyELearning) {
+        return this.$router.push({ name: 'ni management elearning courses info', params: { courseId: props.row._id } });
+      }
+
       this.$router.push({
         name: 'ni management blended courses info',
-        params: { courseId: row._id, defaultTab: 'admin' },
+        params: { courseId: props.row._id, defaultTab: 'traineeFollowUp' },
       });
+    },
+    canBeRedirected (props) {
+      return (this.isVendorInterface || (!this.isVendorInterface && !props.row.subProgram.isStrictlyELearning));
     },
   },
 };
 </script>
+
 <style lang="stylus" scoped>
-.step
-  display: flex
-  justify-content: space-between
-.sub-progress
-  min-width: 100px
-  width: 10%
-.progress-container
-  max-width: 230px
-  width: 25%
+.name
+  width: fit-content;
+  text-decoration: underline
+  color: $primary
 </style>

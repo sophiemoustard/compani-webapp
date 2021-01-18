@@ -2,83 +2,86 @@
   <q-dialog v-if="Object.keys(editedEvent).length !== 0" :value="editionModal" @hide="hide">
     <div class="modal-container-md">
       <div class="modal-padding">
-        <ni-planning-modal-header v-if="isCustomerPlanning" v-model="editedEvent.customer"
+        <ni-planning-modal-header v-if="isCustomerPlanning" :value="editedEvent.customer"
           :selected-person="selectedCustomer" @close="close" />
-        <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)" :options="[]"
-          v-model="editedEvent.auxiliary" :selected-person="selectedAuxiliary" @close="close" />
-        <ni-planning-modal-header v-else v-model="editedEvent.auxiliary" :options="auxiliariesOptions"
-          :selected-person="selectedAuxiliary" @close="close" />
+        <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)"
+          :value="editedEvent.auxiliary" :selected-person="selectedAuxiliary" @close="close" />
+        <ni-planning-modal-header v-else :value="editedEvent.auxiliary" @input="update($event, 'auxiliary')"
+          :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close" />
         <div class="modal-subtitle">
-          <q-btn-toggle no-wrap v-model="editedEvent.type" toggle-color="primary" rounded unelevated
+          <q-btn-toggle no-wrap :value="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
           <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
             color="grey" v-if="!isDisabled" data-cy="event-deletion-button" />
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
-          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
-            :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date />
+          <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
+            :disable="isDisabled" :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
+            @input="update($event, 'dates')" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
-          <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" v-model="editedEvent.auxiliary"
+          <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-            @blur="validations.auxiliary.$touch" />
-          <ni-select v-else in-modal caption="Bénéficiaire" v-model="editedEvent.customer" :options="customersOptions"
+            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
+          <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer" :options="customersOptions"
             :error="validations.customer.$error" required-field disable />
-          <ni-select in-modal caption="Service" :options="customerSubscriptionsOptions"
-            v-model="editedEvent.subscription" :error="validations.subscription.$error"
+          <ni-select in-modal :options="customerSubscriptionsOptions" @input="update($event, 'subscription')"
+            :value="editedEvent.subscription" :error="validations.subscription.$error" caption="Service"
             @blur="validations.subscription.$touch" required-field :disable="isDisabled" />
         </template>
         <template v-if="editedEvent.type === INTERNAL_HOUR">
-          <ni-select in-modal caption="Type d'heure interne" v-model="editedEvent.internalHour"
+          <ni-select in-modal caption="Type d'heure interne" :value="editedEvent.internalHour"
             :options="internalHourOptions" :error="validations.internalHour.$error"
-            @blur="validations.internalHour.$touch" />
-          <ni-search-address v-model="editedEvent.address" in-modal @blur="validations.address.$touch"
-            :error="validations.address.$error" :error-message="addressError" />
+            @blur="validations.internalHour.$touch" @input="update($event, 'internalHour')" />
+          <ni-search-address :value="editedEvent.address" in-modal @blur="validations.address.$touch"
+            :error="validations.address.$error" :error-message="addressError" @input="update($event, 'address')" />
         </template>
         <template v-if="isRepetition(editedEvent) && !isDisabled && !editedEvent.isCancelled">
           <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
+            <q-checkbox :value="editedEvent.shouldUpdateRepetition" label="Appliquer à la répétition"
               @input="toggleRepetition" dense />
           </div>
         </template>
         <template v-if="editedEvent.type === ABSENCE">
-          <ni-select in-modal caption="Nature" v-model="editedEvent.absenceNature" :options="absenceNatureOptions"
+          <div v-if="!!editedEvent.extension"><div class="q-mb-md infos">{{ extensionInfos }}</div></div>
+          <ni-select in-modal caption="Nature" :value="editedEvent.absenceNature" :options="absenceNatureOptions"
             :error="validations.absenceNature.$error" required-field disable />
-          <ni-select in-modal caption="Type d'absence" v-model="editedEvent.absence" :options="absenceOptions"
+          <ni-select in-modal caption="Type d'absence" :value="editedEvent.absence" :options="absenceOptions"
             :error="validations.absence.$error" required-field @blur="validations.absence.$touch"
-            :disable="isHourlyAbsence(editedEvent)" @input="setDateHours(editedEvent, 'editedEvent')" />
-          <ni-datetime-range caption="Dates et heures de l'évènement" v-model="editedEvent.dates" required-field
+            :disable="isHourlyAbsence(editedEvent)" @input="updateAbsence($event)" />
+          <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable-end-date="isHourlyAbsence(editedEvent)" :error="validations.dates.$error"
             @blur="validations.dates.$touch" :disable-end-hour="isDailyAbsence(editedEvent)"
-            :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" />
+            :disable-start-hour="!isIllnessOrWorkAccident(editedEvent)" @input="update($event, 'dates')" />
           <ni-file-uploader v-if="isIllnessOrWorkAccident(editedEvent)" caption="Justificatif d'absence" required-field
             path="attachment" :entity="editedEvent" alt="justificatif absence" name="file" :url="docsUploadUrl"
             @uploaded="documentUploaded" :additional-value="additionalValue" :disable="!selectedAuxiliary._id"
             :error="validations.attachment.$error" @delete="deleteDocument(editedEvent.attachment.driveId)" in-modal
             :extensions="extensions" drive-storage />
         </template>
-        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" v-model="editedEvent.misc" caption="Notes"
+        <ni-input in-modal v-if="!editedEvent.shouldUpdateRepetition" :value="editedEvent.misc" caption="Notes"
           :disable="isDisabled" @blur="validations.misc.$touch" :error="validations.misc.$error"
-          :required-field="isMiscRequired" />
+          :required-field="isMiscRequired" @input="update($event, 'misc')" />
         <template v-if="editedEvent.type === INTERVENTION && !editedEvent.shouldUpdateRepetition && !isDisabled">
           <div class="row q-mb-md light-checkbox">
-            <q-checkbox v-model="editedEvent.isCancelled" label="Annuler l'évènement" @input="toggleCancellationForm"
+            <q-checkbox :value="editedEvent.isCancelled" label="Annuler l'évènement"
+            @input="toggleCancellationForm($event)"
               dense />
           </div>
           <div class="row justify-between">
-            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.condition" required-field
+            <ni-select in-modal v-if="editedEvent.isCancelled" :value="editedEvent.cancel.condition" required-field
               caption="Conditions" :options="cancellationConditions" @blur="validations.cancel.condition.$touch"
-              :error="validations.cancel.condition.$error" />
-            <ni-select in-modal v-if="editedEvent.isCancelled" v-model="editedEvent.cancel.reason" caption="Motif"
+              :error="validations.cancel.condition.$error" @input="update($event, 'cancel.condition')" />
+            <ni-select in-modal v-if="editedEvent.isCancelled" :value="editedEvent.cancel.reason" caption="Motif"
               :options="cancellationReasons" required-field @blur="validations.cancel.reason.$touch"
-              :error="validations.cancel.reason.$error" />
+              :error="validations.cancel.reason.$error" @input="update($event, 'cancel.reason')" />
           </div>
         </template>
       </div>
       <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0"
         class="customer-info">
         <div class="row items-center no-wrap">
-          <q-select borderless dense v-model="editedEvent.address" @input="deleteClassFocus" emit-value behavior="menu"
+          <q-select borderless dense :value="editedEvent.address" @input="updateAddress" emit-value behavior="menu"
             :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
             :display-value="editedEvent.address.fullAddress" ref="addressSelect">
             <template #append v-if="customerAddressList(editedEvent).length > 1">
@@ -96,9 +99,11 @@
 
 <script>
 import { formatIdentity } from '@helpers/utils';
-import { INTERVENTION, ABSENCE, OTHER, NEVER } from '@data/constants';
+import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/constants';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import Button from '@components/Button';
+import moment from '@helpers/moment';
+import set from 'lodash/set';
 
 export default {
   name: 'EventEditionModal',
@@ -142,17 +147,34 @@ export default {
     isMiscRequired () {
       return (this.editedEvent.type === ABSENCE && this.editedEvent.absence === OTHER) || this.editedEvent.isCancelled;
     },
+    extensionInfos () {
+      const nature = ABSENCE_TYPES.find(abs => abs.value === this.editedEvent.absence);
+      const startDate = moment(this.editedEvent.extension.startDate).format('DD/MM/YYYY');
+
+      return `Cette absence est une prolongation de ${nature.label.toLowerCase()} commencant le ${startDate}`;
+    },
   },
   methods: {
     toggleCancellationForm (value) {
-      if (!value) this.$emit('update:edited-event', { ...this.editedEvent, cancel: {} });
-      else {
+      if (!value) {
+        this.$emit('update:edited-event', {
+          ...this.editedEvent,
+          cancel: {},
+          isCancelled: !this.editedEvent.isCancelled,
+        });
+      } else {
+        this.$emit('update:edited-event', { ...this.editedEvent, isCancelled: !this.editedEvent.isCancelled });
         this.validations.misc.$touch();
         this.validations.cancel.$touch();
       }
     },
     toggleRepetition () {
-      this.$emit('update:edited-event', { ...this.editedEvent, cancel: {}, isCancelled: false });
+      this.$emit('update:edited-event', {
+        ...this.editedEvent,
+        cancel: {},
+        isCancelled: false,
+        shouldUpdateRepetition: !this.editedEvent.shouldUpdateRepetition,
+      });
     },
     isRepetition (event) {
       return ABSENCE !== event.type && event.repetition && event.repetition.frequency !== NEVER;
@@ -184,6 +206,17 @@ export default {
       if (addressIndex === 0) this.editedEvent.address = addressList[1].value;
       else this.editedEvent.address = addressList[0].value;
     },
+    async update (event, fields) {
+      await this.$emit('update:edited-event', set({ ...this.editedEvent }, fields, event));
+    },
+    async updateAbsence (event) {
+      await this.$emit('update:edited-event', { ...this.editedEvent, absence: event });
+      await this.setDateHours(this.editedEvent, 'editedEvent');
+    },
+    async updateAddress (event) {
+      await this.$emit('update:edited-event', { ...this.editedEvent, address: event });
+      await this.deleteClassFocus();
+    },
   },
 };
 </script>
@@ -202,5 +235,9 @@ export default {
   .light-checkbox
     color: $grey-400
     font-size: 14px
+
+  .infos
+    font-style: italic;
+    color: $grey-400;
 
 </style>
