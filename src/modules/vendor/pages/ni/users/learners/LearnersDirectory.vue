@@ -17,7 +17,6 @@
 </template>
 
 <script>
-import Users from '@api/Users';
 import escapeRegExp from 'lodash/escapeRegExp';
 import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
@@ -37,7 +36,6 @@ export default {
   data () {
     return {
       loading: false,
-      learnerList: [],
       searchStr: '',
     };
   },
@@ -56,18 +54,6 @@ export default {
     },
     updateSearch (value) {
       this.searchStr = value;
-    },
-    async getLearnerList () {
-      try {
-        this.tableLoading = true;
-        const learners = await Users.learnerList();
-        this.learnerList = Object.freeze(learners.map(this.formatRow));
-      } catch (e) {
-        console.error(e);
-        this.learnerList = [];
-      } finally {
-        this.tableLoading = false;
-      }
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
