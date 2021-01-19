@@ -2,13 +2,13 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Catégories" class="row q-mb-xl" />
     <q-card>
-      <ni-responsive-table :data="categories" :columns="columns" :pagination.sync="pagination">
+      <ni-responsive-table :data="categories" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
         <template #body="{ props }">
           <q-tr :props="props">
             <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
               <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
+                <div class="row no-wrap table-actions justify-end">
                   <ni-button icon="edit" @click="openCategoryEditionModal(props.row)" />
                   <ni-button icon="delete" @click="validateCategoryDeletion(props.row)" />
                 </div>
@@ -68,7 +68,6 @@ export default {
           align: 'left',
           field: 'name',
           format: upperCaseFirstLetter,
-          style: 'width: 85%',
         },
         { name: 'actions', label: '', field: '_id' },
       ],

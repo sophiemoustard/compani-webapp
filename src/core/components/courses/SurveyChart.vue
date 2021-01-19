@@ -5,7 +5,7 @@
     <div class="chart">
       <div class="bar-container">
         <div v-for="(line, index) in lines" :key="index">
-          <div class="bar bg-peach-200">
+          <div class="bar bg-peach-100">
             <div class="bar-fill bg-peach-200" :style="`height: ${line.percentage * 100}%`" />
             <div class="q-mt-sm bar-label">{{ index + 1 }}</div>
           </div>

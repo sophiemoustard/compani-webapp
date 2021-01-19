@@ -79,7 +79,8 @@ const routes = [
         props: true,
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni management blended courses info') to.params.defaultTab = 'courses';
+            if (from.name === 'ni management blended courses info' ||
+              from.name === 'ni management elearning courses info') to.params.defaultTab = 'courses';
 
             return next();
           } catch (e) {
@@ -142,6 +143,15 @@ const routes = [
         path: 'ni/management/blended-courses/:courseId',
         name: 'ni management blended courses info',
         component: () => import('src/core/pages/courses/BlendedCourseProfile'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni users learners info') to.params.defaultTab = 'traineeFollowUp';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],

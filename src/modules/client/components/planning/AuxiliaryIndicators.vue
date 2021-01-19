@@ -16,13 +16,17 @@
         </div>
       </div>
       <div class="indicator row text-weight-bold">
-        <div class="col-4 indicator-title">Soldes d'heures du mois</div>
+        <div class="col-4 indicator-title">Soldes d'heures</div>
         <div class="col-2 indicator-hours">{{ hoursBalance | formatHours }}</div>
+      </div>
+      <div v-if="hoursDetails.counterAndDiffRelevant" class="indicator row text-weight-bold">
+        <div class="col-4 indicator-title">Compteur d'heures</div>
+        <div class="col-2 indicator-hours">{{ hoursDetails.hoursCounter | formatHours }}</div>
       </div>
     </div>
     <div class="quality-indicators indicators">
       <div class="quality-indicators-item">
-        <span class="highlight">{{ customersDetails.customerCount }}</span> bénéficiaires accompagnés,
+        <span class="highlight">{{ customersDetails.customerCount || 0 }}</span> bénéficiaires accompagnés,
         <span class="highlight">{{ `${Math.round(averageTimeByCustomer)}h` }} en moyenne</span>
       </div>
       <div class="quality-indicators-item">
@@ -33,6 +37,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import { formatHours } from '@helpers/utils';
 
 export default {
@@ -50,7 +55,7 @@ export default {
       return (this.customersDetails.duration) / this.customersDetails.customerCount;
     },
     hoursToWork () {
-      return this.hoursDetails.diff && this.hoursDetails.diff.absencesHours
+      return get(this.hoursDetails, 'diff.absencesHours') && this.hoursDetails.counterAndDiffRelevant
         ? this.hoursDetails.hoursToWork - this.hoursDetails.diff.absencesHours
         : this.hoursDetails.hoursToWork;
     },
@@ -66,7 +71,7 @@ export default {
     workedHoursDetail () {
       let detail = '';
       if (this.hoursDetails.internalHours) detail += ` ${formatHours(this.hoursDetails.internalHours)} internes`;
-      if (this.hoursDetails.diff && this.hoursDetails.diff.workedHours) {
+      if (get(this.hoursDetails, 'diff.workedHours') && this.hoursDetails.counterAndDiffRelevant) {
         if (detail !== '') detail += ' et';
         detail += ` ${formatHours(this.hoursDetails.diff.workedHours)} de rattrapage`;
       }
@@ -85,7 +90,7 @@ export default {
   },
   methods: {
     getHoursWithDiff (key) {
-      return this.hoursDetails.diff && this.hoursDetails.diff[key]
+      return this.hoursDetails.diff && this.hoursDetails.diff[key] && this.hoursDetails.counterAndDiffRelevant
         ? this.hoursDetails.diff[key] + this.hoursDetails[key]
         : this.hoursDetails[key];
     },

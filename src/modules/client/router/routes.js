@@ -278,7 +278,24 @@ const routes = [
         path: 'ni/courses',
         name: 'ni courses',
         component: () => import('src/modules/client/pages/ni/courses/BlendedCoursesDirectory'),
-        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
+      {
+        path: 'ni/courses/dashboard',
+        name: 'ni courses dashboard',
+        component: () => import('src/modules/client/pages/ni/courses/Dashboard'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
+      {
+        path: 'ni/courses/elearning-courses',
+        name: 'ni elearning courses',
+        component: () => import('src/modules/client/pages/ni/courses/ELearningCoursesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'courses',
@@ -288,7 +305,6 @@ const routes = [
         path: 'ni/courses/learners',
         name: 'ni courses learners',
         component: () => import('src/modules/client/pages/ni/courses/LearnersDirectory'),
-        props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'courses',
@@ -298,6 +314,15 @@ const routes = [
         path: 'ni/users/learners/:learnerId',
         name: 'ni courses learners info',
         component: () => import('src/modules/client/pages/ni/courses/LearnerProfile'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            if (from.name === 'ni courses info') to.params.defaultTab = 'courses';
+
+            return next();
+          } catch (e) {
+            console.error(e);
+          }
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
