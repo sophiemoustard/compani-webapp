@@ -273,8 +273,8 @@ export default {
     },
     getCounterStatus (sector) {
       if (!this.auxiliariesStats || !this.auxiliariesStats[sector]) return '';
-      if (this.auxiliariesStats[sector].every(aux => aux.hoursBalanceDetail.hoursCounter > 0)) return 'bg-green-800';
-      if (this.auxiliariesStats[sector].some(aux => aux.hoursBalanceDetail.hoursCounter < -35)) return 'bg-red-800';
+      if (this.auxiliariesStats[sector].every(aux => aux.hoursBalanceDetail.hoursCounter >= 0)) return 'bg-green-800';
+      if (this.auxiliariesStats[sector].some(aux => aux.hoursBalanceDetail.hoursCounter <= -35)) return 'bg-red-800';
       return 'bg-orange-500';
     },
     getInternalHours (sectorId) {
