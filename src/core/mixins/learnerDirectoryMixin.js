@@ -30,6 +30,13 @@ export const learnerDirectoryMixin = {
           align: 'center',
           sortable: true,
         },
+        {
+          name: 'activityHistoryCount',
+          label: 'Nombre d\'activités réalisées',
+          field: 'activityHistoryCount',
+          align: 'center',
+          sortable: true,
+        },
       ],
     };
   },
@@ -48,6 +55,7 @@ export const learnerDirectoryMixin = {
         company: user.company ? user.company.name : 'N/A',
         blendedCoursesCount: user.blendedCoursesCount,
         eLearningCoursesCount: user.eLearningCoursesCount,
+        activityHistoryCount: user.activityHistoryCount,
       };
     },
     async getLearnerList (companyId = null) {
