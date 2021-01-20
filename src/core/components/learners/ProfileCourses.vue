@@ -6,18 +6,16 @@
         <div class="col-sm-6 col-xs-12">
           <q-card flat class="q-pa-md right-stats">
             <div class="text-weight-bold q-mb-sm">Vue globale</div>
-            <div class="text-center">
-              <div>
+            <div class="row">
+              <div class="col-3 indicators-container stats-container">
                 <ni-e-learning-indicator :indicator="eLearningCoursesOnGoing.length" />
-                <span>{{ eLearningCoursesOnGoingText }}</span>
-              </div>
-              <div>
                 <ni-e-learning-indicator :indicator="eLearningCoursesCompleted.length" />
-                <span>{{ eLearningCoursesCompletedText }}</span>
-              </div>
-              <div>
                 <ni-e-learning-indicator :indicator="eLearningActivitiesCompleted.length" />
-                <span>{{ eLearningActivitesCompletedText }}</span>
+              </div>
+              <div class="col-9 stats-container">
+                <div>{{ eLearningCoursesOnGoingText }}</div>
+                <div>{{ eLearningCoursesCompletedText }}</div>
+                <div>{{ eLearningActivitesCompletedText }}</div>
               </div>
             </div>
           </q-card>
@@ -208,4 +206,16 @@ export default {
   @media (max-width: 599px)
     margin-right: 0px
     margin-bottom: 8px
+
+.indicators-container
+  text-align: end
+  padding-right: 16px
+  display: flex
+  flex-direction: column
+  justify-content: space-around
+
+.stats-container
+  display: flex
+  flex-direction: column
+  justify-content: space-around
 </style>
