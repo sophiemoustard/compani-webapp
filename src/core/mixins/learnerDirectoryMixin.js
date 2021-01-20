@@ -73,7 +73,7 @@ export const learnerDirectoryMixin = {
         blendedCoursesCount: user.blendedCoursesCount,
         eLearningCoursesCount: user.eLearningCoursesCount,
         activityHistoryCount: user.activityHistoryCount,
-        lastActivityHistory: this.formatLastActivityHistory(user.lastActivityHistory),
+        lastActivityHistory: this.formatLastActivityHistory(user.lastActivityHistory[0]),
       };
     },
     async getLearnerList (companyId = null) {
