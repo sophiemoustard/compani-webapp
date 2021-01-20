@@ -67,6 +67,7 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
+import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
 import { sortStrings, formatQuantity } from '@helpers/utils';
@@ -145,14 +146,14 @@ export default {
       return this.eLearningCoursesCompleted > 1 ? 'formations eLearning terminées' : 'formation eLearning terminée';
     },
     eLearningActivitiesCompleted () {
-      return this.eLearningCourses
+      return uniqBy(this.eLearningCourses
         .map(course => course.subProgram.steps
           .map(step => step.activities.map(act => act.activityHistories).flat())
           .flat())
-        .flat();
+        .flat(), '_id');
     },
     eLearningActivitesCompletedText () {
-      return this.eLearningCoursesCompleted > 1 ? 'activités eLearning réalisées' : 'activité eLearning réalisée';
+      return this.eLearningActivitiesCompleted > 1 ? 'activités eLearning réalisées' : 'activité eLearning réalisée';
     },
 
   },
