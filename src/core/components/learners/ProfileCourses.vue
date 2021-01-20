@@ -133,7 +133,7 @@ export default {
       return this.courses.filter(course => course.format === STRICTLY_E_LEARNING) || [];
     },
     eLearningCoursesOnGoing () {
-      return this.eLearningCourses.filter(course => course.progress === 1) || [];
+      return this.eLearningCourses.filter(course => course.progress < 1) || [];
     },
     eLearningCoursesOnGoingText () {
       const formation = this.eLearningCoursesOnGoing > 1 ? 'formations' : 'formation';
