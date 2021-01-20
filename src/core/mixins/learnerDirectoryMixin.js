@@ -1,6 +1,6 @@
 import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
 import Users from '@api/Users';
-import moment from '@helpers/moment';
+import { formatQuantity } from '../helpers/utils';
 
 export const learnerDirectoryMixin = {
   data () {
@@ -16,7 +16,7 @@ export const learnerDirectoryMixin = {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'width: 60%',
+          style: 'width: 50%',
         },
         {
           name: 'blendedCoursesCount',
@@ -24,7 +24,6 @@ export const learnerDirectoryMixin = {
           field: 'blendedCoursesCount',
           align: 'center',
           sortable: true,
-          style: 'width: 10%',
         },
         {
           name: 'eLearningCoursesCount',
@@ -32,7 +31,6 @@ export const learnerDirectoryMixin = {
           field: 'eLearningCoursesCount',
           align: 'center',
           sortable: true,
-          style: 'width: 10%',
         },
         {
           name: 'activityHistoryCount',
@@ -40,7 +38,6 @@ export const learnerDirectoryMixin = {
           field: 'activityHistoryCount',
           align: 'center',
           sortable: true,
-          style: 'width: 10%',
         },
         {
           name: 'lastActivityHistory',
@@ -48,18 +45,21 @@ export const learnerDirectoryMixin = {
           field: 'lastActivityHistory',
           align: 'center',
           sortable: true,
-          style: 'width: 10%',
         },
       ],
     };
   },
   methods: {
+    formatLastActivityHistory (lastActivityHistory) {
+      if (!lastActivityHistory) return '-';
+
+      const duration = Date.now() - new Date(lastActivityHistory.updatedAt);
+      const days = parseInt(Math.ceil(duration / 1000 / 60 / 60 / 24), 10);
+
+      return formatQuantity('jour', days);
+    },
     formatRow (user) {
       const formattedName = formatIdentity(user.identity, 'FL');
-
-      const formatedLastActivityHistory = user.lastActivityHistory
-        ? `${moment(moment().diff(moment(user.lastActivityHistory.updatedAt))).format('d')} jour(s)`
-        : 'jamais';
 
       return {
         learner: {
@@ -73,13 +73,13 @@ export const learnerDirectoryMixin = {
         blendedCoursesCount: user.blendedCoursesCount,
         eLearningCoursesCount: user.eLearningCoursesCount,
         activityHistoryCount: user.activityHistoryCount,
-        lastActivityHistory: formatedLastActivityHistory,
+        lastActivityHistory: this.formatLastActivityHistory(user.lastActivityHistory),
       };
     },
     async getLearnerList (companyId = null) {
       try {
         this.tableLoading = true;
-        const learners = await Users.learnerList(companyId ? { company: companyId } : null);
+        const learners = await Users.learnerList(companyId ? { company: companyId } : {});
         this.learnerList = Object.freeze(learners.map(this.formatRow));
       } catch (e) {
         console.error(e);
