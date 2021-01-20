@@ -1,45 +1,48 @@
 <template>
-  <div class="q-mb-xl">
-    <p class="text-weight-bold">Utilisation du eLearning</p>
-      <span>{{ eLearningCourses.length }}</span>
-      <span>{{ eLearningCoursesCompleted.length }}</span>
-      <span>{{ eLearningActivitiesCompleted.length }}</span>
-
-    <p class="text-weight-bold">Formations suivies</p>
-    <q-card>
-      <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
-        <template #row="{ props }">
-          <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <template v-if="col.name === 'progress'">
-              <ni-progress class="q-ml-lg" :value="col.value" />
-            </template>
-            <template v-else-if="col.name === 'expand'">
-              <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
-            </template>
-            <template v-else-if="col.name === 'name'">
-              <div @click.stop="goToCourseProfile(props)" :class="[{ 'name': canBeRedirected(props) }]">
-                {{ col.value }}
+  <div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Utilisation du eLearning</p>
+        <span>{{ eLearningCourses.length }}</span>
+        <span>{{ eLearningCoursesCompleted.length }}</span>
+        <span>{{ eLearningActivitiesCompleted.length }}</span>
+    </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Formations suivies</p>
+      <q-card>
+        <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'progress'">
+                <ni-progress class="q-ml-lg" :value="col.value" />
+              </template>
+              <template v-else-if="col.name === 'expand'">
+                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+              </template>
+              <template v-else-if="col.name === 'name'">
+                <div @click.stop="goToCourseProfile(props)" :class="[{ 'name': canBeRedirected(props) }]">
+                  {{ col.value }}
+                </div>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
+          </template>
+          <template #expanding-row="{ props }">
+            <q-td colspan="100%">
+              <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
+                class="q-ma-sm expanding-table-expanded-row">
+                <div>
+                  <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
+                  {{ stepIndex + 1 }} - {{ step.name }}
+                </div>
+                <div class="expanding-table-progress-container">
+                  <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
+                </div>
               </div>
-            </template>
-            <template v-else>{{ col.value }}</template>
-          </q-td>
-        </template>
-        <template #expanding-row="{ props }">
-          <q-td colspan="100%">
-            <div v-for="(step, stepIndex) in props.row.subProgram.steps" :key="step._id" :props="props"
-              class="q-ma-sm expanding-table-expanded-row">
-              <div>
-                <q-icon :name="step.type === E_LEARNING ? 'stay_current_portrait' : 'mdi-teach'" />
-                {{ stepIndex + 1 }} - {{ step.name }}
-              </div>
-              <div class="expanding-table-progress-container">
-                <ni-progress class="expanding-table-sub-progress" :value="step.progress" />
-              </div>
-            </div>
-          </q-td>
-        </template>
-      </ni-expanding-table>
-    </q-card>
+            </q-td>
+          </template>
+        </ni-expanding-table>
+      </q-card>
+    </div>
   </div>
 </template>
 
