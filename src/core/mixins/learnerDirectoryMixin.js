@@ -1,6 +1,7 @@
 import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
 import Users from '@api/Users';
 import { formatQuantity } from '../helpers/utils';
+import { dateDiff } from '../helpers/date';
 
 export const learnerDirectoryMixin = {
   data () {
@@ -53,8 +54,7 @@ export const learnerDirectoryMixin = {
     formatLastActivityHistory (lastActivityHistory) {
       if (!lastActivityHistory) return '-';
 
-      const duration = Date.now() - new Date(lastActivityHistory.updatedAt);
-      const days = parseInt(Math.ceil(duration / 1000 / 60 / 60 / 24), 10);
+      const days = dateDiff(Date.now(), lastActivityHistory.updatedAt);
 
       return formatQuantity('jour', days);
     },
