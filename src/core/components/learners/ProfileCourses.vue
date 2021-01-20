@@ -1,5 +1,10 @@
 <template>
   <div class="q-mb-xl">
+    <p class="text-weight-bold">Utilisation du eLearning</p>
+      <span>{{ eLearningCourses.length }}</span>
+      <span>{{ eLearningCoursesCompleted.length }}</span>
+      <span>{{ eLearningActivitiesCompleted.length }}</span>
+
     <p class="text-weight-bold">Formations suivies</p>
     <q-card>
       <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
@@ -42,7 +47,7 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
-import { BLENDED, E_LEARNING } from '@data/constants';
+import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative } from '@components/popup/notify';
@@ -100,6 +105,19 @@ export default {
   },
   computed: {
     ...mapState('userProfile', ['userProfile']),
+    eLearningCourses () {
+      return this.courses.filter(course => course.format === STRICTLY_E_LEARNING) || [];
+    },
+    eLearningCoursesCompleted () {
+      return this.eLearningCourses.filter(course => course.progress === 1) || [];
+    },
+    eLearningActivitiesCompleted () {
+      return this.eLearningCourses
+        .map(course => course.subProgram.steps
+          .map(step => step.activities.map(act => act.activityHistories).flat())
+          .flat())
+        .flat();
+    },
   },
   async created () {
     try {
