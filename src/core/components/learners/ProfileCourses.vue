@@ -2,9 +2,27 @@
   <div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Utilisation du eLearning</p>
-        <span>{{ eLearningCourses.length }}</span>
-        <span>{{ eLearningCoursesCompleted.length }}</span>
-        <span>{{ eLearningActivitiesCompleted.length }}</span>
+      <div class="row">
+        <div class="col-sm-6 col-xs-12">
+          <q-card flat class="q-pa-md right-stats">
+            <div class="text-weight-bold q-mb-sm">Vue globale</div>
+            <div class="text-center">
+              <div>
+                <ni-e-learning-indicator :indicator="eLearningCoursesOnGoing.length" />
+                <span>{{ eLearningCoursesOnGoingText }}</span>
+              </div>
+              <div>
+                <ni-e-learning-indicator :indicator="eLearningCoursesCompleted.length" />
+                <span>{{ eLearningCoursesCompletedText }}</span>
+              </div>
+              <div>
+                <ni-e-learning-indicator :indicator="eLearningActivitiesCompleted.length" />
+                <span>{{ eLearningActivitesCompletedText }}</span>
+              </div>
+            </div>
+          </q-card>
+        </div>
+      </div>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
@@ -51,16 +69,18 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
-import { sortStrings } from '@helpers/utils';
+import { sortStrings, formatQuantity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
+import ELearningIndicator from '@components/courses/ELearningIndicator';
 
 export default {
   name: 'ProfileCourses',
   components: {
     'ni-progress': Progress,
     'ni-expanding-table': ExpandingTable,
+    'ni-e-learning-indicator': ELearningIndicator,
   },
   data () {
     return {
@@ -111,8 +131,18 @@ export default {
     eLearningCourses () {
       return this.courses.filter(course => course.format === STRICTLY_E_LEARNING) || [];
     },
+    eLearningCoursesOnGoing () {
+      return this.eLearningCourses.filter(course => course.progress === 1) || [];
+    },
+    eLearningCoursesOnGoingText () {
+      const formation = this.eLearningCoursesOnGoing > 1 ? 'formations' : 'formation';
+      return `${formation} eLearning en cours`;
+    },
     eLearningCoursesCompleted () {
       return this.eLearningCourses.filter(course => course.progress === 1) || [];
+    },
+    eLearningCoursesCompletedText () {
+      return this.eLearningCoursesCompleted > 1 ? 'formations eLearning terminées' : 'formation eLearning terminée';
     },
     eLearningActivitiesCompleted () {
       return this.eLearningCourses
@@ -121,6 +151,10 @@ export default {
           .flat())
         .flat();
     },
+    eLearningActivitesCompletedText () {
+      return this.eLearningCoursesCompleted > 1 ? 'activités eLearning réalisées' : 'activité eLearning réalisée';
+    },
+
   },
   async created () {
     try {
@@ -135,6 +169,7 @@ export default {
     }
   },
   methods: {
+    formatQuantity,
     goToCourseProfile (props) {
       if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
         props.expand = !props.expand;
@@ -163,7 +198,13 @@ export default {
 
 <style lang="stylus" scoped>
 .name
-  width: fit-content;
+  width: fit-content
   text-decoration: underline
   color: $primary
+
+.right-stats
+  margin-right: 8px
+  @media (max-width: 599px)
+    margin-right: 0px
+    margin-bottom: 8px
 </style>
