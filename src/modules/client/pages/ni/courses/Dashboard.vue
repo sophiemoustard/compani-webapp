@@ -28,7 +28,7 @@
           <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
           <div class="text-grey-800">{{ course.name }}</div>
         </div>
-        {{ course.activeTrainees }}
+        {{ course.activeTraineesCount }}
       </div>
     </q-card>
   </q-page>
@@ -65,17 +65,15 @@ export default {
       return uniqBy(this.activityHistories, 'user').length;
     },
     courseList () {
-      const courses = Object.entries(groupBy(this.activityHistories.map(activityHistory => ({
+      const groupedByProgram = Object.values(groupBy(this.activityHistories.map(activityHistory => ({
         ...activityHistory,
-        name: get(activityHistory.activity.steps[0], 'subProgram.program.name', 'formation non trouvée'),
-        activeTrainees: activityHistory.activity.steps[0].subProgram.courses[0].trainees.length,
-      })), course => course.name));
+        program: get(activityHistory.activity.steps[0], 'subProgram.program', { _id: null }),
+      })), h => h.program._id));
 
-      return courses.map(course => ({
-        name: course[0],
-        activityHistories: course[1],
-        activeTrainees: course[1].map(a => a.activeTrainees).reduce((a, b) => a + b, 0),
-      })).sort((a, b) => b.activeTrainees - a.activeTrainees);
+      return groupedByProgram.map(group => ({
+        name: group[0].program.name,
+        activeTraineesCount: [...new Set(group.map(a => a.user))].length,
+      })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
     },
   },
   watch: {
