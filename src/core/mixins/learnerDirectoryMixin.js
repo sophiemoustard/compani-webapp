@@ -41,22 +41,22 @@ export const learnerDirectoryMixin = {
           sortable: true,
         },
         {
-          name: 'lastActivityHistory',
+          name: 'daysSinceLastActivityHistory',
           label: 'Dernière activité il y a...',
-          field: 'lastActivityHistory',
+          field: 'daysSinceLastActivityHistory',
           align: 'center',
           sortable: true,
+          format: value => (value !== null ? formatQuantity('jour', value) : '-'),
+          sort: (a, b) => b - a,
         },
       ],
     };
   },
   methods: {
-    formatLastActivityHistory (lastActivityHistory) {
-      if (!lastActivityHistory) return '-';
+    getDaysSinceLastActivityHistory (lastActivityHistory) {
+      if (!lastActivityHistory) return null;
 
-      const days = dateDiff(Date.now(), lastActivityHistory.updatedAt);
-
-      return formatQuantity('jour', days);
+      return dateDiff(Date.now(), lastActivityHistory.updatedAt);
     },
     formatRow (user) {
       const formattedName = formatIdentity(user.identity, 'FL');
@@ -73,7 +73,7 @@ export const learnerDirectoryMixin = {
         blendedCoursesCount: user.blendedCoursesCount,
         eLearningCoursesCount: user.eLearningCoursesCount,
         activityHistoryCount: user.activityHistoryCount,
-        lastActivityHistory: this.formatLastActivityHistory(user.lastActivityHistory[0]),
+        daysSinceLastActivityHistory: this.getDaysSinceLastActivityHistory(user.lastActivityHistory),
       };
     },
     async getLearnerList (companyId = null) {
