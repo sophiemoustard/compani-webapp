@@ -68,7 +68,7 @@ import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
-import { sortStrings, formatQuantity } from '@helpers/utils';
+import { sortStrings } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
@@ -134,14 +134,16 @@ export default {
       return this.eLearningCourses.filter(course => course.progress < 1) || [];
     },
     eLearningCoursesOnGoingText () {
-      const formation = this.eLearningCoursesOnGoing > 1 ? 'formations' : 'formation';
+      const formation = this.eLearningCoursesOnGoing.length > 1 ? 'formations' : 'formation';
       return `${formation} eLearning en cours`;
     },
     eLearningCoursesCompleted () {
       return this.eLearningCourses.filter(course => course.progress === 1) || [];
     },
     eLearningCoursesCompletedText () {
-      return this.eLearningCoursesCompleted > 1 ? 'formations eLearning terminées' : 'formation eLearning terminée';
+      return this.eLearningCoursesCompleted.length > 1
+        ? 'formations eLearning terminées'
+        : 'formation eLearning terminée';
     },
     eLearningActivitiesCompleted () {
       return uniqBy(this.eLearningCourses
@@ -151,7 +153,9 @@ export default {
         .flat(), '_id');
     },
     eLearningActivitesCompletedText () {
-      return this.eLearningActivitiesCompleted > 1 ? 'activités eLearning réalisées' : 'activité eLearning réalisée';
+      return this.eLearningActivitiesCompleted.length > 1
+        ? 'activités eLearning réalisées'
+        : 'activité eLearning réalisée';
     },
 
   },
@@ -168,7 +172,6 @@ export default {
     }
   },
   methods: {
-    formatQuantity,
     goToCourseProfile (props) {
       if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
         props.expand = !props.expand;
