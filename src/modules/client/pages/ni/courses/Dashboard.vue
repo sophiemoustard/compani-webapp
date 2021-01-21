@@ -35,7 +35,7 @@
 </template>
 
 <script>
-import get from 'lodash/get';
+import omit from 'lodash/omit';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
@@ -65,13 +65,14 @@ export default {
       return uniqBy(this.activityHistories, 'user').length;
     },
     courseList () {
-      const groupedByProgram = Object.values(groupBy(this.activityHistories.map(activityHistory => ({
-        ...activityHistory,
-        program: get(activityHistory.activity.steps[0], 'subProgram.program', { _id: null }),
-      })), h => h.program._id));
+      const groupedByCourses = Object.values(groupBy(this.activityHistories.map((aH) => {
+        const res = [];
+        for (const step of aH.activity.steps) res.push({ ...aH, activity: { ...omit(aH.activity, 'steps'), step } });
+        return res;
+      }).flat(), h => h.activity.step.subProgram.courses[0]._id));
 
-      return groupedByProgram.map(group => ({
-        name: group[0].program.name,
+      return groupedByCourses.map(group => ({
+        name: group[0].activity.step.subProgram.program.name,
         activeTraineesCount: [...new Set(group.map(a => a.user))].length,
       })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
     },
