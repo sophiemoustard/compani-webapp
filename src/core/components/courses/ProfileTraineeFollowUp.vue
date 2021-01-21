@@ -26,23 +26,17 @@
       </div>
     </div>
     <profile-follow-up :profile-id="profileId" class="q-my-md" />
-    <div v-if="followUp.subProgram" class="q-my-xl">
+    <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponse aux questionnaires</p>
-      <div v-for="(step, stepIndex) of followUp.subProgram.steps" :key="stepIndex" class="q-mb-xl">
-        <div class="q-mb-sm">{{ stepIndex + 1 }} - {{ step.name }}</div>
-        <q-card v-for="(activity, activityIndex) of step.activities" :key="activityIndex" flat class="q-mb-sm">
-          <q-card-section class="cursor-pointer" @click="showCards(activity._id)">
-            <div class="text-weight-bold">{{ activityIndex + 1 }} - {{ activity.name }}</div>
-          </q-card-section>
-          <div class="bg-peach-200 chart-container" v-if="areCardsDisplayed[activity._id]">
-            <template v-for="(card, cardIndex) of activity.followUp">
-              <survey-chart v-if="card.template === SURVEY" :key="cardIndex" class="chart" :card="card" />
-              <open-question-chart v-if="card.template === OPEN_QUESTION" :key="cardIndex" class="chart" :card="card" />
-              <question-answer-chart v-if="card.template === QUESTION_ANSWER" :key="cardIndex" class="chart"
-                :card="card" />
-            </template>
-          </div>
-        </q-card>
+      <div class="flex row">
+        <div v-for="activity in questionnaireActivities" :key="activity._id">
+          <q-card class="q-pa-sm q-pb-lg q-ma-sm">
+            <div class="text-grey-800">
+              Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
+            </div>
+            {{ upperCaseFirstLetter(activity.name) }}
+          </q-card>
+        </div>
       </div>
     </div>
 
@@ -56,24 +50,18 @@
 import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import moment from '@helpers/moment';
-import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import SurveyChart from '@components/courses/SurveyChart';
-import OpenQuestionChart from '@components/courses/OpenQuestionChart';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
-import QuestionAnswerChart from '@components/courses/QuestionAnswerChart';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
 import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import { upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
   name: 'ProfileTraineeFollowUp',
   components: {
-    'survey-chart': SurveyChart,
-    'open-question-chart': OpenQuestionChart,
-    'question-answer-chart': QuestionAnswerChart,
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
@@ -84,8 +72,6 @@ export default {
   },
   data () {
     return {
-      followUp: {},
-      areCardsDisplayed: {},
       tableLoading: false,
       modalLoading: false,
       attendanceSheetAdditionModal: false,
@@ -115,6 +101,7 @@ export default {
         page: 1,
         rowsPerPage: 15,
       },
+      upperCaseFirstLetter,
     };
   },
   validations () {
@@ -127,7 +114,6 @@ export default {
     };
   },
   async created () {
-    await this.refreshFollowUp();
     await this.refreshAttendanceSheets();
   },
   computed: {
@@ -135,17 +121,17 @@ export default {
     visibleColumns () {
       return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
     },
+    questionnaireActivities () {
+      return this.course.subProgram.steps.map((step, stepIndex) => {
+        const activities = [];
+        for (const activity of step.activities) {
+          if (activity.type === QUESTIONNAIRE) activities.push({ stepIndex, stepName: step.name, ...activity });
+        }
+        return activities;
+      }).flat();
+    },
   },
   methods: {
-    async refreshFollowUp () {
-      try {
-        this.followUp = await Courses.getFollowUp(this.profileId);
-      } catch (e) {
-        this.followUp = {};
-        NotifyNegative('Erreur lors de la récupération du suivi des stagiaires.');
-        console.error(e);
-      }
-    },
     async refreshAttendanceSheets () {
       try {
         this.tableLoading = true;
@@ -161,9 +147,6 @@ export default {
     resetAttendanceSheetAdditionModal () {
       this.$v.newAttendanceSheet.$reset();
       this.newAttendanceSheet = { course: this.profileId };
-    },
-    showCards (activityId) {
-      this.$set(this.areCardsDisplayed, activityId, !this.areCardsDisplayed[activityId]);
     },
     formatPayload () {
       const { course, file, trainee, date } = this.newAttendanceSheet;
@@ -218,12 +201,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-.chart-container
-  display: flex
-  flex-direction: column
-
-.chart
-  margin: 8px 8px 8px 48px
-</style>
