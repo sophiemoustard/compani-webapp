@@ -7,12 +7,12 @@
           <q-card flat class="q-pa-md right-stats">
             <div class="text-weight-bold q-mb-sm">Vue globale</div>
             <div class="row">
-              <div class="col-3 indicators-container stats-container">
+              <div class="col-3 text-right q-pr-md column justify-around">
                 <ni-e-learning-indicator :indicator="eLearningCoursesOnGoing.length" />
                 <ni-e-learning-indicator :indicator="eLearningCoursesCompleted.length" />
                 <ni-e-learning-indicator :indicator="eLearningActivitiesCompleted.length" />
               </div>
-              <div class="col-9 stats-container">
+              <div class="col-9 column justify-around">
                 <div>{{ eLearningCoursesOnGoingText }}</div>
                 <div>{{ eLearningCoursesCompletedText }}</div>
                 <div>{{ eLearningActivitesCompletedText }}</div>
@@ -209,16 +209,4 @@ export default {
   @media (max-width: 599px)
     margin-right: 0px
     margin-bottom: 8px
-
-.indicators-container
-  text-align: end
-  padding-right: 16px
-  display: flex
-  flex-direction: column
-  justify-content: space-around
-
-.stats-container
-  display: flex
-  flex-direction: column
-  justify-content: space-around
 </style>
