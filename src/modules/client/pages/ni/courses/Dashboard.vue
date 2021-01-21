@@ -19,10 +19,24 @@
         </div>
       </div>
     </q-card>
+    <q-card flat class="q-pa-md q-mt-md card">
+      <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
+      <div class="flex justify-end text-grey-800">Nombre d'apprenants</div>
+      <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
+        class="flex justify-between items-center">
+        <div class="flex items-center">
+          <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
+          <div class="text-grey-800">{{ course.name }}</div>
+        </div>
+        {{ course.activeTraineesCount }}
+      </div>
+    </q-card>
   </q-page>
 </template>
 
 <script>
+import omit from 'lodash/omit';
+import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
@@ -49,6 +63,18 @@ export default {
   computed: {
     activeLearners () {
       return uniqBy(this.activityHistories, 'user').length;
+    },
+    courseList () {
+      const groupedByCourses = Object.values(groupBy(this.activityHistories.map((aH) => {
+        const res = [];
+        for (const step of aH.activity.steps) res.push({ ...aH, activity: { ...omit(aH.activity, 'steps'), step } });
+        return res;
+      }).flat(), h => h.activity.step.subProgram.courses[0]._id));
+
+      return groupedByCourses.map(group => ({
+        name: group[0].activity.step.subProgram.program.name,
+        activeTraineesCount: [...new Set(group.map(a => a.user))].length,
+      })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
     },
   },
   watch: {
@@ -91,4 +117,10 @@ export default {
   flex-direction: row
   justify-content: space-around
   flex: 1
+
+.elearning-indicator
+  font-size: 36px
+
+.card
+  width: 50%
 </style>
