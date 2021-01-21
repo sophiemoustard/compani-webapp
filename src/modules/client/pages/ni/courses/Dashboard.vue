@@ -19,9 +19,17 @@
         </div>
       </div>
     </q-card>
-    <q-card flat class="q-pa-md q-mt-md">
+    <q-card flat class="q-pa-md q-mt-md card">
       <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
-      <ni-responsive-table :data="courseList" :columns="columns" />
+      <div class="flex justify-end text-grey-800">Nombre d'apprenants</div>
+      <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
+        class="flex justify-between items-center">
+        <div class="flex items-center">
+          <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
+          <div class="text-grey-800">{{ course.name }}</div>
+        </div>
+        {{ course.activeTrainees }}
+      </div>
     </q-card>
   </q-page>
 </template>
@@ -35,7 +43,6 @@ import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import ResponsiveTable from '@components/table/ResponsiveTable';
 
 export default {
   name: 'CourseDashboard',
@@ -43,7 +50,6 @@ export default {
   components: {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
-    'ni-responsive-table': ResponsiveTable,
   },
   data () {
     return {
@@ -52,7 +58,6 @@ export default {
         endDate: moment().toISOString(),
       },
       activityHistories: [],
-      columns: [{ name: 'nom', label: 'Nom', align: 'left', field: '0' }],
     };
   },
   computed: {
@@ -60,10 +65,17 @@ export default {
       return uniqBy(this.activityHistories, 'user').length;
     },
     courseList () {
-      return Object.entries(groupBy(this.activityHistories.map(activityHistory => ({
+      const courses = Object.entries(groupBy(this.activityHistories.map(activityHistory => ({
         ...activityHistory,
         name: get(activityHistory.activity.steps[0], 'subProgram.program.name', 'formation non trouvée'),
+        activeTrainees: activityHistory.activity.steps[0].subProgram.courses[0].trainees.length,
       })), course => course.name));
+
+      return courses.map(course => ({
+        name: course[0],
+        activityHistories: course[1],
+        activeTrainees: course[1].map(a => a.activeTrainees).reduce((a, b) => a + b, 0),
+      })).sort((a, b) => b.activeTrainees - a.activeTrainees);
     },
   },
   watch: {
@@ -106,4 +118,10 @@ export default {
   flex-direction: row
   justify-content: space-around
   flex: 1
+
+.elearning-indicator
+  font-size: 36px
+
+.card
+  width: 50%
 </style>
