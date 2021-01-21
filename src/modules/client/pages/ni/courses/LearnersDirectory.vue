@@ -57,7 +57,6 @@ export default {
   data () {
     return {
       loading: false,
-      learnerList: [],
       searchStr: '',
       learnerCreationModal: false,
       learnerCreationModalLoading: false,
@@ -73,7 +72,7 @@ export default {
     },
   },
   async created () {
-    await this.getLearnerList();
+    await this.getLearnerList(this.company._id);
   },
   validations () {
     return {
@@ -90,18 +89,6 @@ export default {
     },
     updateSearch (value) {
       this.searchStr = value;
-    },
-    async getLearnerList () {
-      try {
-        this.tableLoading = true;
-        const learners = await Users.learnerList({ company: this.company._id });
-        this.learnerList = Object.freeze(learners.map(this.formatRow));
-      } catch (e) {
-        console.error(e);
-        this.learnerList = [];
-      } finally {
-        this.tableLoading = false;
-      }
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
@@ -142,7 +129,7 @@ export default {
         NotifyPositive('Apprenant ajouté avec succès.');
 
         this.learnerCreationModal = false;
-        await this.getLearnerList();
+        await this.getLearnerList(this.company._id);
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
@@ -168,7 +155,7 @@ export default {
         await this.sendWelcome();
 
         this.learnerCreationModal = false;
-        await this.getLearnerList();
+        await this.getLearnerList(this.company._id);
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
