@@ -10,11 +10,11 @@
       </div>
       <div class="elearning">
         <div class="column items-center">
-          <div class="elearning-indicator text-weight-bold text-pink-500">{{ activeLearners }}</div>
+          <ni-e-learning-indicator :indicator="activeLearners" />
           <div class="text-center">apprenants actifs</div>
         </div>
         <div class="column items-center">
-          <div class="elearning-indicator text-weight-bold text-pink-500">{{ activityHistories.length }}</div>
+          <ni-e-learning-indicator :indicator="activityHistories.length" />
           <div class="text-center">activités de eLearning réalisées</div>
         </div>
       </div>
@@ -28,12 +28,14 @@ import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
+import ELearningIndicator from '@components/courses/ELearningIndicator';
 
 export default {
   name: 'CourseDashboard',
   metaInfo: { title: 'Tableau de bord des formations' },
   components: {
     'ni-date-range': DateRange,
+    'ni-e-learning-indicator': ELearningIndicator,
   },
   data () {
     return {
@@ -89,7 +91,4 @@ export default {
   flex-direction: row
   justify-content: space-around
   flex: 1
-
-.elearning-indicator
-  font-size: 36px
 </style>

@@ -30,7 +30,7 @@ export default {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
-    pagination: { type: Object, default: () => ({}) },
+    pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
     rowKey: { type: String, default: '_id' },
     hideBottom: { type: Boolean, default: true },
   },
