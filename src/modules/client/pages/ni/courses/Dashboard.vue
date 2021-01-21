@@ -19,16 +19,23 @@
         </div>
       </div>
     </q-card>
+    <q-card flat class="q-pa-md q-mt-md">
+      <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
+      <ni-responsive-table :data="courseList" :columns="columns" />
+    </q-card>
   </q-page>
 </template>
 
 <script>
+import get from 'lodash/get';
+import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 
 export default {
   name: 'CourseDashboard',
@@ -36,6 +43,7 @@ export default {
   components: {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
+    'ni-responsive-table': ResponsiveTable,
   },
   data () {
     return {
@@ -44,11 +52,18 @@ export default {
         endDate: moment().toISOString(),
       },
       activityHistories: [],
+      columns: [{ name: 'nom', label: 'Nom', align: 'left', field: '0' }],
     };
   },
   computed: {
     activeLearners () {
       return uniqBy(this.activityHistories, 'user').length;
+    },
+    courseList () {
+      return Object.entries(groupBy(this.activityHistories.map(activityHistory => ({
+        ...activityHistory,
+        name: get(activityHistory.activity.steps[0], 'subProgram.program.name', 'formation non trouvée'),
+      })), course => course.name));
     },
   },
   watch: {
