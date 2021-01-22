@@ -29,15 +29,17 @@
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="flex row">
-        <div v-for="activity in questionnaireActivities" :key="activity._id">
-          <q-card class="q-pa-sm q-ma-sm">
-            <div class="text-grey-800">
+        <div v-for="activity in questionnaireActivities" :key="activity._id" class="card">
+          <q-card class="q-ma-sm q-py-sm">
+            <div class="q-pl-sm text-grey-800 ellipsis-2-lines">
               Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
             </div>
-            {{ upperCaseFirstLetter(activity.name) }}
-            <q-separator class="q-mt-lg q-mb-sm" />
-            <div class="q-pa-xs text-center text-grey-800 bg-grey-100 answers">
-              {{ formatQuantity('réponse', activity.activityHistories.length) }}
+            <div class="q-pl-sm ellipsis-2-lines">
+              {{ upperCaseFirstLetter(activity.name) }}
+            </div>
+            <q-separator spaced />
+            <div class="q-ml-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
+              {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user._id)).size) }}
             </div>
           </q-card>
         </div>
@@ -127,13 +129,11 @@ export default {
       return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
     },
     questionnaireActivities () {
-      return this.course.subProgram.steps.map((step, stepIndex) => {
-        const activities = [];
-        for (const activity of step.activities) {
-          if (activity.type === QUESTIONNAIRE) activities.push({ stepIndex, stepName: step.name, ...activity });
-        }
-        return activities;
-      }).flat();
+      return this.course.subProgram.steps.map(
+        (step, stepIndex) => step.activities.filter(activity => activity.type === QUESTIONNAIRE).map(activity => ({
+          ...activity, stepIndex, stepName: step.name,
+        }))
+      ).flat();
     },
   },
   methods: {
@@ -209,5 +209,10 @@ export default {
 <style lang="stylus" scoped>
 .answers
   border-radius: 10px !important
-  width: 100px
+  width: 50%
+.card
+  width: 200px
+  heigth: 160px
+  @media screen and (max-width: 767px)
+    width: 100%
 </style>
