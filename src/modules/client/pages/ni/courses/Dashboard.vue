@@ -66,7 +66,7 @@ export default {
   },
   computed: {
     activeLearners () {
-      return uniqBy(this.activityHistories, 'user').length;
+      return uniqBy(this.activityHistories, 'user._id').length;
     },
     courseList () {
       const groupedByCourses = Object.values(groupBy(this.activityHistories.map((aH) => {
@@ -79,6 +79,14 @@ export default {
         name: group[0].activity.step.subProgram.program.name,
         activeTraineesCount: [...new Set(group.map(a => a.user))].length,
       })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
+    },
+    learnerList () {
+      const groupedByLearners = Object.values(groupBy(this.activityHistories, h => h.user._id));
+
+      return groupedByLearners.map(group => ({
+        ...group[0].user,
+        activityCount: group.length,
+      })).sort((a, b) => b.activityCount - a.activityCount);
     },
   },
   watch: {
