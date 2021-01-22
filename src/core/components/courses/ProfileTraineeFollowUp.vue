@@ -27,14 +27,18 @@
     </div>
     <profile-follow-up :profile-id="profileId" class="q-my-md" />
     <div v-if="questionnaireActivities.length" class="q-my-xl">
-      <p class="text-weight-bold">Réponse aux questionnaires</p>
+      <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="flex row">
         <div v-for="activity in questionnaireActivities" :key="activity._id">
-          <q-card class="q-pa-sm q-pb-lg q-ma-sm">
+          <q-card class="q-pa-sm q-ma-sm">
             <div class="text-grey-800">
               Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
             </div>
             {{ upperCaseFirstLetter(activity.name) }}
+            <q-separator class="q-mt-lg q-mb-sm" />
+            <div class="q-pa-xs text-center text-grey-800 bg-grey-100 answers">
+              {{ formatQuantity('réponse', activity.activityHistories.length) }}
+            </div>
           </q-card>
         </div>
       </div>
@@ -57,7 +61,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
 import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
-import { upperCaseFirstLetter } from '@helpers/utils';
+import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
 
 export default {
   name: 'ProfileTraineeFollowUp',
@@ -102,6 +106,7 @@ export default {
         rowsPerPage: 15,
       },
       upperCaseFirstLetter,
+      formatQuantity,
     };
   },
   validations () {
@@ -201,3 +206,8 @@ export default {
   },
 };
 </script>
+<style lang="stylus" scoped>
+.answers
+  border-radius: 10px !important
+  width: 100px
+</style>
