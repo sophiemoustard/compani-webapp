@@ -19,8 +19,25 @@
         </div>
       </div>
     </q-card>
-    <div class="row">
-      <q-card flat class="q-pa-md q-mt-md col-md-6 col-xs-12">
+    <div class="row justify-center">
+      <q-card flat class="q-pa-md q-ma-md col-xs-12">
+        <div class="text-weight-bold q-mb-sm">Apprenants les plus assidus</div>
+        <div class="row justify-end">
+          <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
+        </div>
+        <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
+          class="flex justify-between items-center row">
+          <div class="flex items-center col-8">
+            <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
+            <q-item-section avatar>
+              <img class="avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
+            </q-item-section>
+            <div class="text-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
+          </div>
+          <div class="col-4 text-center">{{ learner.activityCount }}</div>
+        </div>
+      </q-card>
+      <q-card flat class="q-pa-md q-mt-md col-xs-12">
         <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
         <div class="row justify-end">
           <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
@@ -47,6 +64,8 @@ import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
+import { formatIdentity } from '@helpers/utils';
+import { DEFAULT_AVATAR } from '@data/constants';
 
 export default {
   name: 'CourseDashboard',
@@ -62,6 +81,8 @@ export default {
         endDate: moment().toISOString(),
       },
       activityHistories: [],
+      formatIdentity,
+      DEFAULT_AVATAR,
     };
   },
   computed: {
