@@ -1,7 +1,5 @@
-import Courses from '@api/Courses';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
-import { NotifyNegative } from '@components/popup/notify';
 
 export const eLearningCourseProfileMixin = {
   data () {
@@ -43,21 +41,6 @@ export const eLearningCourseProfileMixin = {
         progress: trainee.progress,
         steps: trainee.steps,
       };
-    },
-    async getLearnersList () {
-      try {
-        this.tableLoading = true;
-        const course = await Courses.getFollowUp(this.profileId);
-
-        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
-        return course;
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des formations');
-        this.learners = [];
-      } finally {
-        this.tableLoading = false;
-      }
     },
   },
 };

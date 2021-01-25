@@ -36,8 +36,10 @@
 </template>
 
 <script>
+import Courses from '@api/Courses';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
+import { NotifyNegative } from '@components/popup/notify';
 import { eLearningCourseProfileMixin } from '@mixins/eLearningCourseProfileMixin';
 
 export default {
@@ -56,6 +58,20 @@ export default {
   methods: {
     goToLearnerProfile (row) {
       this.$router.push({ name: 'ni users learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
+    },
+    async getLearnersList () {
+      try {
+        this.tableLoading = true;
+        const course = await Courses.getFollowUp(this.profileId);
+
+        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des formations');
+        this.learners = [];
+      } finally {
+        this.tableLoading = false;
+      }
     },
   },
 };

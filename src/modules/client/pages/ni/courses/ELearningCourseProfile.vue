@@ -39,10 +39,13 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import get from 'lodash/get';
+import Courses from '@api/Courses';
 import ProfileHeader from '@components/ProfileHeader';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
+import { NotifyNegative } from '@components/popup/notify';
 import { eLearningCourseProfileMixin } from '@mixins/eLearningCourseProfileMixin';
 
 export default {
@@ -62,16 +65,31 @@ export default {
     };
   },
   computed: {
+    ...mapGetters({ company: 'main/getCompany' }),
     courseName () {
       return get(this.course, 'subProgram.program.name');
     },
   },
   async created () {
-    this.course = await this.getLearnersList();
+    await this.getLearnersList();
   },
   methods: {
     goToLearnerProfile (row) {
       this.$router.push({ name: 'ni courses learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
+    },
+    async getLearnersList () {
+      try {
+        this.tableLoading = true;
+        this.course = await Courses.getFollowUp(this.profileId, { company: this.company._id });
+
+        if (this.course) this.learners = Object.freeze(this.course.trainees.map(this.formatRow));
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des formations');
+        this.learners = [];
+      } finally {
+        this.tableLoading = false;
+      }
     },
   },
 };
