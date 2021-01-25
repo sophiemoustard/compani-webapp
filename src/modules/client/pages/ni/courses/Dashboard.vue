@@ -1,14 +1,12 @@
 <template>
-  <q-page class="client-background q-pb-xl" padding>
-    <div class="q-mb-xl">
+  <q-page class="client-background" padding>
+    <div class="flex no-wrap justify-between">
       <h4>La formation Compani dans ma structure</h4>
+      <ni-date-range v-model="dates" class="dates" borders />
     </div>
-    <q-card flat class="q-pa-md elearning-container">
-      <div>
-        <div class="text-weight-bold q-mb-sm">Le eLearning dans ma structure</div>
-        <ni-date-range v-model="dates" class="dates" borders />
-      </div>
-      <div class="elearning">
+    <q-card flat class="q-pa-md flex row">
+      <div class="text-weight-bold q-mb-sm col-md-4 col-xs-12">Le eLearning dans ma structure</div>
+      <div class="flex row justify-around col-md-8 col-xs-12">
         <div class="column items-center">
           <ni-e-learning-indicator :indicator="activeLearners" />
           <div class="text-center">apprenants actifs</div>
@@ -140,25 +138,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.elearning-container
-  display: flex
-  flex-direction: row
-  @media screen and (max-width: 767px)
-    flex-direction: column
-
-.elearning
-  display: flex
-  flex-direction: row
-  justify-content: space-around
-  flex: 1
 .left-card
   @media screen and (min-width: $breakpoint-md-min)
-    padding-right: 8px
-  @media screen and (max-width: $breakpoint-md-min)
-    padding-bottom: 8px
+    padding-right: 16px
+  @media screen and (max-width: $breakpoint-sm-max)
+    padding-bottom: 16px
 .rigth-card
   @media screen and (min-width: $breakpoint-md-min)
-    padding-left: 8px
-  @media screen and (max-width: $breakpoint-md-min)
-    padding-top: 8px
+    padding-left: 16px
+  @media screen and (max-width: $breakpoint-sm-max)
+    padding-top: 16px
 </style>
