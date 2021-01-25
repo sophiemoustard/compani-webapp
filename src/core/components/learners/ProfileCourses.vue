@@ -174,8 +174,7 @@ export default {
   methods: {
     goToCourseProfile (props) {
       if (!this.isVendorInterface && props.row.subProgram.isStrictlyELearning) {
-        props.expand = !props.expand;
-        return;
+        return this.$router.push({ name: 'ni elearning courses info', params: { courseId: props.row._id } });
       }
 
       if (!this.isVendorInterface) {

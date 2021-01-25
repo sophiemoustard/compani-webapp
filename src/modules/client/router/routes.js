@@ -302,6 +302,16 @@ const routes = [
         },
       },
       {
+        path: 'ni/courses/elearning-courses/:courseId',
+        name: 'ni elearning courses info',
+        component: () => import('src/modules/client/pages/ni/courses/ELearningCourseProfile'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'courses',
+        },
+      },
+      {
         path: 'ni/courses/learners',
         name: 'ni courses learners',
         component: () => import('src/modules/client/pages/ni/courses/LearnersDirectory'),
