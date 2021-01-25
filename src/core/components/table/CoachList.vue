@@ -32,7 +32,7 @@
       </q-card>
     </div>
 
-    <user-creation-modal v-model="userCreationModal" :new-user="newUser" :email-error="emailError($v.newUser)"
+    <user-creation-modal v-model="userCreationModal" :new-user.sync="newUser" :email-error="emailError($v.newUser)"
       :first-step="firstStep" :loading="loading" :phone-nbr-error="phoneNbrError($v.newUser)"
       :validations="$v.newUser" :role-options="roleOptions" @hide="resetUserCreationForm" @show="openUserCreationModal"
       @submit="createUser" @go-to-next-step="nextStep" />
