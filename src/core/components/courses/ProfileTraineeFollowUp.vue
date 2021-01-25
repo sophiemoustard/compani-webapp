@@ -29,8 +29,8 @@
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="flex row">
-        <div v-for="activity in questionnaireActivities" :key="activity._id" class="card-container">
-          <q-card class="q-ma-sm q-py-sm card">
+        <div v-for="activity in questionnaireActivities" :key="activity._id" class="q-ma-sm card-container">
+          <q-card class="q-py-sm fit">
             <div class="q-pl-sm text-grey-800 ellipsis-2-lines">
               Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
             </div>
@@ -208,10 +208,9 @@ export default {
 <style lang="stylus" scoped>
 .answers
   border-radius: 10px !important
-  width: 50%
-.card
-  height: 160px
+  width: 100px
 .card-container
+  height: 160px
   width: 200px
   @media screen and (max-width: 767px)
     width: 100%
