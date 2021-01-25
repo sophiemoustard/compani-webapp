@@ -40,16 +40,14 @@
 
 <script>
 import get from 'lodash/get';
-import Courses from '@api/Courses';
 import ProfileHeader from '@components/ProfileHeader';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
-import { E_LEARNING } from '@data/constants.js';
-import { NotifyNegative } from '@components/popup/notify';
-import { sortStrings, formatIdentity } from '@helpers/utils';
+import { eLearningCourseProfileMixin } from '@mixins/eLearningCourseProfileMixin';
 
 export default {
   name: 'ELearningCourseProfile',
+  mixins: [eLearningCourseProfileMixin],
   components: {
     'ni-profile-header': ProfileHeader,
     'ni-expanding-table': ExpandingTable,
@@ -61,31 +59,6 @@ export default {
   data () {
     return {
       course: [],
-      tableLoading: false,
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'identity',
-          format: value => (value ? value.fullName : ''),
-          align: 'left',
-          sortable: true,
-          sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'width: 70%',
-        },
-        {
-          name: 'progress',
-          label: 'Progression',
-          field: 'progress',
-          align: 'center',
-          sortable: true,
-          style: 'min-width: 150px; width: 20%',
-        },
-        { name: 'expand', label: '', field: '' },
-      ],
-      learners: [],
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
-      E_LEARNING,
     };
   },
   computed: {
@@ -94,44 +67,21 @@ export default {
     },
   },
   async created () {
-    await this.getLearnersList();
+    this.course = await this.getLearnersList();
   },
   methods: {
-    formatRow (trainee) {
-      const formattedName = formatIdentity(trainee.identity, 'FL');
-
-      return {
-        _id: trainee._id,
-        identity: { ...trainee.identity, fullName: formattedName },
-        progress: trainee.progress,
-        steps: trainee.steps,
-      };
-    },
-    async getLearnersList () {
-      try {
-        this.tableLoading = true;
-        this.course = await Courses.getFollowUp(this.profileId);
-
-        if (this.course) this.learners = Object.freeze(this.course.trainees.map(this.formatRow));
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des formations');
-        this.learners = [];
-      } finally {
-        this.tableLoading = false;
-      }
-    },
     goToLearnerProfile (row) {
       this.$router.push({ name: 'ni courses learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
     },
   },
 };
 </script>
+
 <style lang="stylus" scoped>
-.progress
-  width: 100%
-.name
-  width: fit-content;
-  text-decoration: underline
-  color: $primary
+  .progress
+    width: 100%
+  .name
+    width: fit-content;
+    text-decoration: underline
+    color: $primary
 </style>

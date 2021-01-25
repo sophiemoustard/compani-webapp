@@ -1,5 +1,5 @@
 <template>
-  <div>
+    <div>
     <p class="text-weight-bold">Progression des participants</p>
     <q-card>
       <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false">
@@ -36,15 +36,13 @@
 </template>
 
 <script>
-import Courses from '@api/Courses';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { sortStrings, formatIdentity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
-import { E_LEARNING } from '@data/constants.js';
-import { NotifyNegative } from '@components/popup/notify';
+import { eLearningCourseProfileMixin } from '@mixins/eLearningCourseProfileMixin';
 
 export default {
   name: 'ProfileFollowUp',
+  mixins: [eLearningCourseProfileMixin],
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
@@ -52,74 +50,22 @@ export default {
   props: {
     profileId: { type: String, required: true },
   },
-  data () {
-    return {
-      tableLoading: false,
-      columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'identity',
-          format: value => (value ? value.fullName : ''),
-          align: 'left',
-          sortable: true,
-          sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'width: 70%',
-        },
-        {
-          name: 'progress',
-          label: 'Progression',
-          field: 'progress',
-          align: 'center',
-          sortable: true,
-          style: 'min-width: 150px; width: 20%',
-        },
-        { name: 'expand', label: '', field: '' },
-      ],
-      learners: [],
-      pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
-      E_LEARNING,
-    };
-  },
   async created () {
     await this.getLearnersList();
   },
   methods: {
-    formatRow (trainee) {
-      const formattedName = formatIdentity(trainee.identity, 'FL');
-
-      return {
-        _id: trainee._id,
-        identity: { ...trainee.identity, fullName: formattedName },
-        progress: trainee.progress,
-        steps: trainee.steps,
-      };
-    },
-    async getLearnersList () {
-      try {
-        this.tableLoading = true;
-        const course = await Courses.getFollowUp(this.profileId);
-
-        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des formations');
-        this.learners = [];
-      } finally {
-        this.tableLoading = false;
-      }
-    },
     goToLearnerProfile (row) {
       this.$router.push({ name: 'ni users learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
     },
   },
 };
 </script>
+
 <style lang="stylus" scoped>
-.progress
-  width: 100%
-.name
-  width: fit-content;
-  text-decoration: underline
-  color: $primary
+  .progress
+    width: 100%
+  .name
+    width: fit-content;
+    text-decoration: underline
+    color: $primary
 </style>
