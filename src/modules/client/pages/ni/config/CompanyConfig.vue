@@ -85,7 +85,7 @@
     </div>
 
     <!-- Establishment creation modal -->
-    <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment="newEstablishment"
+    <establishment-creation-modal v-model="establishmentCreationModal" :new-establishment.sync="newEstablishment"
       :validations="$v.newEstablishment" @hide="resetEstablishmentCreationModal" @submit="createNewEstablishment"
       :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
 
@@ -289,6 +289,7 @@ export default {
 
         await Establishments.create(this.newEstablishment);
         NotifyPositive('Établissement créé.');
+        this.resetEstablishmentCreationModal();
         this.establishmentCreationModal = false;
         await this.getEstablishments();
       } catch (e) {
