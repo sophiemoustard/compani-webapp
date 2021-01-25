@@ -38,7 +38,7 @@
       @submit="createUser" @go-to-next-step="nextStep" />
 
     <user-edition-modal v-model="userEditionModal" :phone-nbr-error="phoneNbrError($v.newUser)" :loading="loading"
-      :validations="$v.selectedUser" :email-error="emailError($v.selectedUser)" :selected-user="selectedUser"
+      :validations="$v.selectedUser" :email-error="emailError($v.selectedUser)" :selected-user.sync="selectedUser"
       :role-options="roleOptions" @hide="resetUserEditionForm" @submit="updateUser" />
   </div>
 </template>
