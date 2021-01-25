@@ -19,18 +19,22 @@
         </div>
       </div>
     </q-card>
-    <q-card flat class="q-pa-md q-mt-md card">
-      <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
-      <div class="flex justify-end text-grey-800">Nombre d'apprenants</div>
-      <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
-        class="flex justify-between items-center">
-        <div class="flex items-center">
-          <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
-          <div class="text-grey-800">{{ course.name }}</div>
+    <div class="row">
+      <q-card flat class="q-pa-md q-mt-md col-md-6 col-xs-12">
+        <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
+        <div class="row justify-end">
+          <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
         </div>
-        {{ course.activeTraineesCount }}
-      </div>
-    </q-card>
+        <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
+          class="flex justify-between items-center row">
+          <div class="flex items-center col-8">
+            <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
+            <div class="text-grey-800">{{ course.name }}</div>
+          </div>
+          <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
+        </div>
+      </q-card>
+    </div>
   </q-page>
 </template>
 
@@ -120,7 +124,4 @@ export default {
 
 .elearning-indicator
   font-size: 36px
-
-.card
-  width: 50%
 </style>
