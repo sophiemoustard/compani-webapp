@@ -28,22 +28,19 @@
     <profile-follow-up :profile-id="profileId" class="q-my-md" />
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
-      <div class="flex row">
-        <div v-for="activity in questionnaireActivities" :key="activity._id"
-          class="col-md-3 col-sm-4 col-xs-12 q-pa-sm card">
-          <q-card class="fit">
-            <div class="q-pa-sm text-grey-800 ellipsis-2-lines">
+      <div class="questionnaire-container">
+        <q-card v-for="activity in questionnaireActivities" :key="activity._id" flat class="questionnaire">
+          <div class="q-pa-sm questionnaire-activity q-mb-md">
+            <div class="q-mb-sm text-grey-800 ellipsis-2-lines two-lines">
               Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
             </div>
-            <div class="q-pl-sm ellipsis-2-lines">{{ upperCaseFirstLetter(activity.name) }}</div>
-            <div class="absolute-bottom">
-              <q-separator />
-              <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
-                {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user._id)).size) }}
-              </div>
-            </div>
-          </q-card>
-        </div>
+            <div class="ellipsis-2-lines two-lines">{{ upperCaseFirstLetter(activity.name) }}</div>
+          </div>
+          <q-separator />
+          <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
+            {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user._id)).size) }}
+          </div>
+        </q-card>
       </div>
     </div>
 
@@ -210,6 +207,22 @@ export default {
 .answers
   border-radius: 10px !important
   width: 100px
-.card
-  height: 200px
+
+.questionnaire-container
+  display: grid
+  grid-auto-flow: row
+  grid-auto-rows: 1fr
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))
+  grid-gap: 16px
+
+.questionnaire
+  display: flex
+  flex-direction: column
+
+.questionnaire-activity
+  flex: 1
+
+.two-lines
+  height: 48px
+  overflow: hidden
 </style>
