@@ -156,9 +156,8 @@
 
     <!-- Third party payers edition modal -->
     <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" @submit="updateThirdPartyPayer"
-      :edited-third-party-payer="editedThirdPartyPayer"
-      :validations="$v.editedThirdPartyPayer" @hide="resetThirdPartyPayerEdition"
-      :loading="loading" :billing-mode-options="billingModeOptions" />
+      :edited-third-party-payer.sync="editedThirdPartyPayer" :validations="$v.editedThirdPartyPayer"
+      @hide="resetThirdPartyPayerEdition" :loading="loading" :billing-mode-options="billingModeOptions" />
   </q-page>
 </template>
 
