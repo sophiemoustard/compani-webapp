@@ -29,20 +29,18 @@
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="flex row">
-        <div v-for="activity in questionnaireActivities" :key="activity._id" class="q-ma-sm card-container">
-          <q-card class="q-py-sm fit">
-            <div class="q-pl-sm text-grey-800 ellipsis-2-lines">
-              Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
+        <q-card v-for="activity in questionnaireActivities" :key="activity._id" class="q-ma-sm card">
+          <div class="q-pl-sm q-pt-sm text-grey-800 ellipsis-2-lines">
+            Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
+          </div>
+          <div class="q-pl-sm ellipsis-2-lines">{{ upperCaseFirstLetter(activity.name) }}</div>
+          <div class="absolute-bottom q-mb-sm">
+            <q-separator spaced />
+            <div class="q-ml-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
+              {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user._id)).size) }}
             </div>
-            <div class="q-pl-sm ellipsis-2-lines">{{ upperCaseFirstLetter(activity.name) }}</div>
-            <div class="absolute-bottom q-mb-sm">
-              <q-separator spaced />
-              <div class="q-ml-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
-                {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user._id)).size) }}
-              </div>
-            </div>
-          </q-card>
-        </div>
+          </div>
+        </q-card>
       </div>
     </div>
 
@@ -209,7 +207,7 @@ export default {
 .answers
   border-radius: 10px !important
   width: 100px
-.card-container
+.card
   height: 160px
   width: 200px
   @media screen and (max-width: 767px)
