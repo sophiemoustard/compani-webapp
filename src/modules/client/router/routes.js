@@ -302,7 +302,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/courses/elearning-courses/:courseId',
+        path: 'ni/courses/elearning-courses/:profileId',
         name: 'ni elearning courses info',
         component: () => import('src/modules/client/pages/ni/courses/ELearningCourseProfile'),
         props: true,
@@ -327,6 +327,7 @@ const routes = [
         beforeEnter: async (to, from, next) => {
           try {
             if (from.name === 'ni courses info') to.params.defaultTab = 'courses';
+            if (from.name === 'ni elearning courses info') to.params.defaultTab = 'courses';
 
             return next();
           } catch (e) {

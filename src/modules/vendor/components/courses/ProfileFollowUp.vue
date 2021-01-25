@@ -12,7 +12,7 @@
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
             <template v-else>
-              <div class="name" @click="goToLearnerProfile(props.row)">{{ col.value }}</div>
+              <div class="name" @click.stop="goToLearnerProfile(props.row)">{{ col.value }}</div>
             </template>
           </q-td>
         </template>
@@ -41,6 +41,7 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
 import { E_LEARNING } from '@data/constants.js';
+import { NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'ProfileFollowUp',
@@ -102,6 +103,7 @@ export default {
         if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la récupération des formations');
         this.learners = [];
       } finally {
         this.tableLoading = false;
