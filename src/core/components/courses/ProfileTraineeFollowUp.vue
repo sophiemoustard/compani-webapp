@@ -26,21 +26,19 @@
       </div>
     </div>
     <profile-follow-up :profile-id="profileId" class="q-my-md" />
-    <div v-if="followUp.subProgram" class="q-my-xl">
-      <p class="text-weight-bold">Réponse aux questionnaires</p>
-      <div v-for="(step, stepIndex) of followUp.subProgram.steps" :key="stepIndex" class="q-mb-xl">
-        <div class="q-mb-sm">{{ stepIndex + 1 }} - {{ step.name }}</div>
-        <q-card v-for="(activity, activityIndex) of step.activities" :key="activityIndex" flat class="q-mb-sm">
-          <q-card-section class="cursor-pointer" @click="showCards(activity._id)">
-            <div class="text-weight-bold">{{ activityIndex + 1 }} - {{ activity.name }}</div>
-          </q-card-section>
-          <div class="bg-peach-200 chart-container" v-if="areCardsDisplayed[activity._id]">
-            <template v-for="(card, cardIndex) of activity.followUp">
-              <survey-chart v-if="card.template === SURVEY" :key="cardIndex" class="chart" :card="card" />
-              <open-question-chart v-if="card.template === OPEN_QUESTION" :key="cardIndex" class="chart" :card="card" />
-              <question-answer-chart v-if="card.template === QUESTION_ANSWER" :key="cardIndex" class="chart"
-                :card="card" />
-            </template>
+    <div v-if="questionnaireActivities.length" class="q-my-xl">
+      <p class="text-weight-bold">Réponses aux questionnaires</p>
+      <div class="questionnaire-container">
+        <q-card v-for="activity in questionnaireActivities" :key="activity._id" flat class="questionnaire">
+          <div class="q-pa-sm questionnaire-activity q-mb-md">
+            <div class="q-mb-sm text-grey-800 ellipsis-2-lines two-lines">
+              Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
+            </div>
+            <div class="ellipsis-2-lines two-lines">{{ upperCaseFirstLetter(activity.name) }}</div>
+          </div>
+          <q-separator />
+          <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
+            {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user._id)).size) }}
           </div>
         </q-card>
       </div>
@@ -56,24 +54,18 @@
 import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import moment from '@helpers/moment';
-import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import SurveyChart from '@components/courses/SurveyChart';
-import OpenQuestionChart from '@components/courses/OpenQuestionChart';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
-import QuestionAnswerChart from '@components/courses/QuestionAnswerChart';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
 import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
 
 export default {
   name: 'ProfileTraineeFollowUp',
   components: {
-    'survey-chart': SurveyChart,
-    'open-question-chart': OpenQuestionChart,
-    'question-answer-chart': QuestionAnswerChart,
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
@@ -84,8 +76,6 @@ export default {
   },
   data () {
     return {
-      followUp: {},
-      areCardsDisplayed: {},
       tableLoading: false,
       modalLoading: false,
       attendanceSheetAdditionModal: false,
@@ -115,6 +105,8 @@ export default {
         page: 1,
         rowsPerPage: 15,
       },
+      upperCaseFirstLetter,
+      formatQuantity,
     };
   },
   validations () {
@@ -127,7 +119,6 @@ export default {
     };
   },
   async created () {
-    await this.refreshFollowUp();
     await this.refreshAttendanceSheets();
   },
   computed: {
@@ -135,17 +126,14 @@ export default {
     visibleColumns () {
       return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
     },
+    questionnaireActivities () {
+      return this.course.subProgram.steps.map((step, stepIndex) => step.activities
+        .filter(activity => activity.type === QUESTIONNAIRE)
+        .map(activity => ({ ...activity, stepIndex, stepName: step.name })))
+        .flat();
+    },
   },
   methods: {
-    async refreshFollowUp () {
-      try {
-        this.followUp = await Courses.getFollowUp(this.profileId);
-      } catch (e) {
-        this.followUp = {};
-        NotifyNegative('Erreur lors de la récupération du suivi des stagiaires.');
-        console.error(e);
-      }
-    },
     async refreshAttendanceSheets () {
       try {
         this.tableLoading = true;
@@ -161,9 +149,6 @@ export default {
     resetAttendanceSheetAdditionModal () {
       this.$v.newAttendanceSheet.$reset();
       this.newAttendanceSheet = { course: this.profileId };
-    },
-    showCards (activityId) {
-      this.$set(this.areCardsDisplayed, activityId, !this.areCardsDisplayed[activityId]);
     },
     formatPayload () {
       const { course, file, trainee, date } = this.newAttendanceSheet;
@@ -218,12 +203,26 @@ export default {
   },
 };
 </script>
-
 <style lang="stylus" scoped>
-.chart-container
+.answers
+  border-radius: 10px !important
+  width: 100px
+
+.questionnaire-container
+  display: grid
+  grid-auto-flow: row
+  grid-auto-rows: 1fr
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))
+  grid-gap: 16px
+
+.questionnaire
   display: flex
   flex-direction: column
 
-.chart
-  margin: 8px 8px 8px 48px
+.questionnaire-activity
+  flex: 1
+
+.two-lines
+  height: 48px
+  overflow: hidden
 </style>
