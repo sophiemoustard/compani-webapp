@@ -5,23 +5,23 @@
     </template>
     <ni-input in-modal :disable="!firstStep" :value="newUser.local.email" caption="Email"
       :error="validations.local.email.$error" @blur="validations.local.email.$touch" required-field
-      :error-message="emailError" @input="updateLocal($event.trim(), 'email')" />
+      :error-message="emailError" @input="updateUser($event.trim(), 'local.email')" />
     <template v-if="!firstStep">
       <ni-select in-modal :value="newUser.identity.title" :options="civilityOptions" caption="Civilité"
         required-field :error="validations.identity.title.$error" @blur="validations.identity.title.$touch"
-        @input="updateIdentity($event, 'title')" />
+        @input="updateUser($event, 'identity.title')" />
       <ni-input in-modal :value="newUser.identity.lastname" :error="validations.identity.lastname.$error" caption="Nom"
         @blur="validations.identity.lastname.$touch" required-field
-        @input="updateIdentity($event.trim(), 'lastname')" />
+        @input="updateUser($event.trim(), 'identity.lastname')" />
       <ni-input in-modal :value="newUser.identity.firstname" :error="validations.identity.firstname.$error"
         caption="Prénom" @blur="validations.identity.firstname.$touch" required-field
-        @input="updateIdentity($event.trim(), 'firstname')" />
+        @input="updateUser($event.trim(), 'identity.firstname')" />
       <ni-input in-modal :value="newUser.contact.phone" :error="validations.contact.phone.$error" required-field
         caption="Numéro de téléphone" @blur="validations.contact.phone.$touch" :error-message="mobilePhoneError"
-        @input="updateContact($event, 'phone')" />
+        @input="updateUser($event, 'contact.phone')" />
       <ni-search-address :value="newUser.contact.address" color="white" inverted-light
         @blur="validations.contact.address.$touch" error-message="Adresse non valide"
-        :error="validations.contact.address.$error" in-modal @input="updateContact($event, 'address')" />
+        :error="validations.contact.address.$error" in-modal @input="updateUser($event, 'contact.address')" />
       <div class="row margin-input">
         <div class="col-12">
           <div class="row justify-between">
@@ -46,6 +46,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import SearchAddress from '@components/form/SearchAddress';
 import Select from '@components/form/Select';
@@ -104,17 +105,8 @@ export default {
     updateSendWelcome (event) {
       this.$emit('update:send-welcome-msg', event);
     },
-    updateUser (event, prop) {
-      this.$emit('update:newUser', { ...this.newUser, [prop]: event });
-    },
-    updateLocal (event, prop) {
-      this.$emit('update:newUser', { ...this.newUser, local: { ...this.newUser.local, [prop]: event } });
-    },
-    updateIdentity (event, prop) {
-      this.$emit('update:newUser', { ...this.newUser, identity: { ...this.newUser.identity, [prop]: event } });
-    },
-    updateContact (event, prop) {
-      this.$emit('update:newUser', { ...this.newUser, contact: { ...this.newUser.contact, [prop]: event } });
+    updateUser (event, fields) {
+      this.$emit('update:newUser', set({ ...this.newUser }, fields, event));
     },
   },
 };
