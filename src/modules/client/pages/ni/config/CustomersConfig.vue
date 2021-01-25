@@ -150,9 +150,9 @@
     </ni-modal>
 
     <!-- Third party payers creation modal -->
-    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal" :new-third-party-payer="newThirdPartyPayer"
+    <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal"
       :validations="$v.newThirdPartyPayer" @hide="resetThirdPartyPayerCreation" @submit="createNewThirdPartyPayer"
-      :loading="loading" :billing-mode-options="billingModeOptions" />
+      :loading="loading" :billing-mode-options="billingModeOptions" :new-third-party-payer.sync="newThirdPartyPayer" />
 
     <!-- Third party payers edition modal -->
     <third-party-payer-edition-modal v-model="thirdPartyPayerEditionModal" @submit="updateThirdPartyPayer"
