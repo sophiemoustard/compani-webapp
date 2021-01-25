@@ -19,38 +19,40 @@
         </div>
       </div>
     </q-card>
-    <div class="row justify-center">
-      <q-card flat class="q-pa-md q-ma-md col-xs-12">
-        <div class="text-weight-bold q-mb-sm">Apprenants les plus assidus</div>
-        <div class="row justify-end">
-          <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
-        </div>
-        <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
-          class="flex justify-between items-center row">
-          <div class="flex items-center col-8">
-            <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
-            <q-item-section avatar>
-              <img class="avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
-            </q-item-section>
-            <div class="text-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
+    <div class="row q-mt-md">
+      <div class="col-xs-12 col-md-6 left-card">
+        <q-card flat class="fit q-pa-md">
+          <div class="text-weight-bold q-mb-sm">Apprenants les plus assidus</div>
+          <div class="row justify-end">
+            <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
           </div>
-          <div class="col-4 text-center">{{ learner.activityCount }}</div>
-        </div>
-      </q-card>
-      <q-card flat class="q-pa-md q-mt-md col-xs-12">
-        <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
-        <div class="row justify-end">
-          <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
-        </div>
-        <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
-          class="flex justify-between items-center row">
-          <div class="flex items-center col-8">
-            <div class="elearning-indicator text-weight-bold text-pink-500 q-mx-md">{{ index + 1 }}</div>
-            <div class="text-grey-800">{{ course.name }}</div>
+          <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
+            class="flex justify-between items-center row">
+            <div class="flex no-wrap items-center col-8">
+              <ni-e-learning-indicator :indicator="index + 1" />
+              <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
+              <div class="text-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
+            </div>
+            <div class="col-4 text-center">{{ learner.activityCount }}</div>
           </div>
-          <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
-        </div>
-      </q-card>
+        </q-card>
+      </div>
+      <div class="col-xs-12 col-md-6 right-card">
+        <q-card flat class="fit q-pa-md">
+          <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
+          <div class="row justify-end">
+            <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
+          </div>
+          <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
+            class="flex justify-between items-center row">
+            <div class="flex no-wrap items-center col-8">
+              <ni-e-learning-indicator :indicator="index + 1" />
+              <div class="q-mx-md text-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
+            </div>
+            <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
+          </div>
+        </q-card>
+      </div>
     </div>
   </q-page>
 </template>
@@ -64,7 +66,7 @@ import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import { formatIdentity } from '@helpers/utils';
+import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
 import { DEFAULT_AVATAR } from '@data/constants';
 
 export default {
@@ -82,6 +84,7 @@ export default {
       },
       activityHistories: [],
       formatIdentity,
+      upperCaseFirstLetter,
       DEFAULT_AVATAR,
     };
   },
@@ -104,10 +107,8 @@ export default {
     learnerList () {
       const groupedByLearners = Object.values(groupBy(this.activityHistories, h => h.user._id));
 
-      return groupedByLearners.map(group => ({
-        ...group[0].user,
-        activityCount: group.length,
-      })).sort((a, b) => b.activityCount - a.activityCount);
+      return groupedByLearners.map(group => ({ ...group[0].user, activityCount: group.length }))
+        .sort((a, b) => b.activityCount - a.activityCount);
     },
   },
   watch: {
@@ -150,7 +151,14 @@ export default {
   flex-direction: row
   justify-content: space-around
   flex: 1
-
-.elearning-indicator
-  font-size: 36px
+.left-card
+  @media screen and (min-width: $breakpoint-md-min)
+    padding-right: 8px
+  @media screen and (max-width: $breakpoint-md-min)
+    padding-bottom: 8px
+.rigth-card
+  @media screen and (min-width: $breakpoint-md-min)
+    padding-left: 8px
+  @media screen and (max-width: $breakpoint-md-min)
+    padding-top: 8px
 </style>
