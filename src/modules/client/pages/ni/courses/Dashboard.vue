@@ -25,7 +25,7 @@
             <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
           </div>
           <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
-            class="flex justify-between items-center row">
+            class="flex justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
@@ -42,7 +42,7 @@
             <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
           </div>
           <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
-            class="flex justify-between items-center row">
+            class="flex justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <div class="q-mx-md text-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
