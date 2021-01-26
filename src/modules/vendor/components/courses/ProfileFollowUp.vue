@@ -67,7 +67,7 @@ export default {
         if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des formations');
+        NotifyNegative('Erreur lors de la récupération des apprenants');
         this.learners = [];
       } finally {
         this.tableLoading = false;
