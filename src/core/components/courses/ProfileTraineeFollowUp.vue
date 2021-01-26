@@ -29,7 +29,8 @@
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaire-container">
-        <q-card v-for="activity in questionnaireActivities" :key="activity._id" flat class="questionnaire">
+        <q-card v-for="activity in questionnaireActivities" :key="activity._id" flat
+          @click="goToQuestionnaireAnswers(activity._id)" class="questionnaire cursor-pointer">
           <div class="q-pa-sm questionnaire-activity q-mb-md">
             <div class="q-mb-sm text-grey-800 ellipsis-2-lines two-lines">
               Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
@@ -199,6 +200,11 @@ export default {
       } finally {
         this.$q.loading.hide();
       }
+    },
+    goToQuestionnaireAnswers (activityId) {
+      return this.$router.push(
+        { name: 'ni management questionnaire answers', params: { courseId: this.profileId, activityId } }
+      );
     },
   },
 };

@@ -230,6 +230,15 @@ const routes = [
         },
       },
       {
+        path: 'ni/management/:courseId/questionnaire/:activityId',
+        name: 'ni management questionnaire answers',
+        component: () => import('src/modules/vendor/pages/trainers/management/QuestionnaireAnswers'),
+        props: true,
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
+      },
+      {
         path: 'ni/config/categories',
         name: 'ni config categories',
         component: () => import('src/modules/vendor/pages/ni/config/CategoriesDirectory'),
