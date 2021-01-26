@@ -155,7 +155,7 @@
       :validations="$v.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
 
     <sector-creation-modal v-model="sectorCreationModal" :loading="loading" @hide="resetCreationSectorData"
-      :new-sector="newSector" @submit="createNewSector" :validations="$v.newSector" />
+      :new-sector.sync="newSector" @submit="createNewSector" :validations="$v.newSector" />
 
     <sector-edition-modal v-model="sectorEditionModal" :loading="loading" @hide="resetEditionSectorData"
       :edited-sector="editedSector" @submit="updateSector" :validations="$v.editedSector" />
