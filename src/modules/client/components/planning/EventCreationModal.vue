@@ -229,8 +229,8 @@ export default {
       if (addressIndex === 0) this.update(addressList[1].value, 'address');
       else this.update(addressList[0].value, 'address');
     },
-    update (event, fields) {
-      this.$emit('update:newEvent', set({ ...this.newEvent }, fields, event));
+    update (event, path) {
+      this.$emit('update:newEvent', set({ ...this.newEvent }, path, event));
     },
     async updateCustomer (event) {
       await this.$emit('update:newEvent', { ...this.newEvent, customer: event });
