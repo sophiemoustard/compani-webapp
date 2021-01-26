@@ -7,9 +7,15 @@ export default {
   namespaced: true,
   state: {
     course: null,
+    selectedTrainer: '',
+    selectedProgram: '',
+    selectedCompany: '',
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = !data ? data : ({ ...data }); },
+    SET_SELECTED_TRAINER: (state, data) => { state.selectedTrainer = data; },
+    SET_SELECTED_PROGRAM: (state, data) => { state.selectedProgram = data; },
+    SET_SELECTED_COMPANY: (state, data) => { state.selectedCompany = data; },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {
@@ -29,6 +35,14 @@ export default {
       }
     },
     resetCourse: ({ commit }) => { commit('SET_COURSE', null); },
+    setSelectedTrainer: ({ commit }, params) => { commit('SET_SELECTED_TRAINER', params.trainerId); },
+    setSelectedProgram: ({ commit }, params) => { commit('SET_SELECTED_PROGRAM', params.programId); },
+    setSelectedCompany: ({ commit }, params) => { commit('SET_SELECTED_COMPANY', params.companyId); },
+    resetFilters: ({ commit }) => {
+      commit('SET_SELECTED_TRAINER', '');
+      commit('SET_SELECTED_PROGRAM', '');
+      commit('SET_SELECTED_COMPANY', '');
+    },
   },
   getters: {},
 };

@@ -3,11 +3,11 @@
     <ni-title-header title="Formations" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :options="companyFilterOptions" v-model="selectedCompany" />
+        <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
-          v-model="selectedProgram" />
+          :value="selectedProgram" @input="updateSelectedProgram" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
         <span>Effacer les filtres</span>
@@ -56,6 +56,9 @@ export default {
         this.coursesWithGroupedSlot = [];
       }
     },
+  },
+  beforeDestroy () {
+    if (this.$router.currentRoute.name !== 'trainers courses info') this.$store.dispatch('course/resetFilters');
   },
 };
 </script>
