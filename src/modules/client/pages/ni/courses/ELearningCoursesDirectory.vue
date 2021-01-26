@@ -3,7 +3,7 @@
     <ni-directory-header title="Formations eLearning" search-placeholder="Rechercher une formation"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCourses" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      disabled />
+      @go-to="goToELearningCourseProfile" />
   </q-page>
 </template>
 
@@ -50,6 +50,12 @@ export default {
       } finally {
         this.tableLoading = false;
       }
+    },
+    goToELearningCourseProfile (row) {
+      return this.$router.push({
+        name: 'ni elearning courses info',
+        params: { profileId: row._id },
+      });
     },
   },
 };
