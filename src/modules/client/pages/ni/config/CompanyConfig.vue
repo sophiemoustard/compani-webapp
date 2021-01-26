@@ -90,7 +90,7 @@
       :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
 
     <!-- Establishment edition modal -->
-    <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment="editedEstablishment"
+    <establishment-edition-modal v-model="establishmentEditionModal" :edited-establishment.sync="editedEstablishment"
       :validations="$v.editedEstablishment" @hide="resetEstablishmentEditionModal" @submit="updateEstablishment"
       :loading="loading" :work-health-services="workHealthServices" :urssaf-codes="urssafCodes" />
   </q-page>
