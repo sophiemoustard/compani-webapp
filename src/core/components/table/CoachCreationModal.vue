@@ -3,18 +3,18 @@
     <template slot="title">
       Ajouter un <span class="text-weight-bold">utilisateur</span>
     </template>
-    <ni-input :disable="!firstStep" in-modal :value="newUser.local.email" :error="validations.local.email.$error"
+    <ni-input :disable="!firstStep" in-modal :value="newCoach.local.email" :error="validations.local.email.$error"
       caption="Email" @blur="validations.local.email.$touch" :error-message="emailError" required-field
       @input="update($event.trim(), 'local.email')" />
-    <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" :value="newUser.role"
+    <ni-select :disable="!firstStep" in-modal caption="Role" :options="roleOptions" :value="newCoach.role"
       :error="validations.role.$error" @blur="validations.role.$touch" required-field @input="update($event, 'role')"
       :last="firstStep" />
     <template v-if="!firstStep">
-      <ni-input :value="newUser.identity.firstname" caption="Prénom" @input="update($event, 'identity.firstname')"
+      <ni-input :value="newCoach.identity.firstname" caption="Prénom" @input="update($event, 'identity.firstname')"
         in-modal />
-      <ni-input in-modal :value="newUser.identity.lastname" :error="validations.identity.lastname.$error" required-field
-        caption="Nom" @blur="validations.identity.lastname.$touch" @input="update($event, 'identity.lastname')" />
-      <ni-input in-modal :value="newUser.contact.phone" :error="validations.contact.phone.$error" last
+      <ni-input in-modal :value="newCoach.identity.lastname" :error="validations.identity.lastname.$error" caption="Nom"
+        required-field @blur="validations.identity.lastname.$touch" @input="update($event, 'identity.lastname')" />
+      <ni-input in-modal :value="newCoach.contact.phone" :error="validations.contact.phone.$error" last
         caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
         @input="update($event.trim(), 'contact.phone')" />
     </template>
@@ -34,10 +34,10 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 
 export default {
-  name: 'UserCreationModal',
+  name: 'CoachCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    newUser: { type: Object, default: () => ({}) },
+    newCoach: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     roleOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
@@ -66,8 +66,8 @@ export default {
     goToNextStep () {
       this.$emit('go-to-next-step');
     },
-    update (event, fields) {
-      this.$emit('update:newUser', set({ ...this.newUser }, fields, event));
+    update (event, path) {
+      this.$emit('update:newCoach', set({ ...this.newCoach }, path, event));
     },
   },
 };

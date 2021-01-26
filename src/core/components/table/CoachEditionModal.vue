@@ -3,17 +3,17 @@
     <template slot="title">
       Éditer un <span class="text-weight-bold">utilisateur</span>
     </template>
-    <ni-input in-modal :value="selectedUser.local.email" :error="validations.local.email.$error" caption="Email"
+    <ni-input in-modal :value="selectedCoach.local.email" :error="validations.local.email.$error" caption="Email"
       @blur="validations.local.email.$touch" :error-message="emailError" @input="update($event, 'local.email')"
       required-field />
-    <ni-select caption="Role" :options="roleOptions" :value="selectedUser.role" @blur="validations.role.$touch"
+    <ni-select caption="Role" :options="roleOptions" :value="selectedCoach.role" @blur="validations.role.$touch"
       :error="validations.role.$error" required-field @input="update($event, 'role')" in-modal />
-    <ni-input in-modal :value="selectedUser.identity.firstname" @input="update($event, 'identity.firstname')"
+    <ni-input in-modal :value="selectedCoach.identity.firstname" @input="update($event, 'identity.firstname')"
       caption="Prénom" />
-    <ni-input :value="selectedUser.identity.lastname" :error="validations.identity.lastname.$error" caption="Nom"
+    <ni-input :value="selectedCoach.identity.lastname" :error="validations.identity.lastname.$error" caption="Nom"
       @blur="validations.identity.lastname.$touch" required-field @input="update($event, 'identity.lastname')"
       in-modal />
-    <ni-input in-modal :value="selectedUser.contact.phone" :error="validations.contact.phone.$error"
+    <ni-input in-modal :value="selectedCoach.contact.phone" :error="validations.contact.phone.$error"
       caption="Téléphone" @blur="validations.contact.phone.$touch" last @input="update($event.trim(), 'contact.phone')"
       :error-message="phoneNbrError" />
     <template slot="footer">
@@ -30,10 +30,10 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 
 export default {
-  name: 'UserEditionModal',
+  name: 'CoachEditionModal',
   props: {
     value: { type: Boolean, default: false },
-    selectedUser: { type: Object, default: () => ({}) },
+    selectedCoach: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     roleOptions: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
@@ -55,8 +55,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event, fields) {
-      this.$emit('update:selectedUser', set({ ...this.selectedUser }, fields, event));
+    update (event, path) {
+      this.$emit('update:selectedCoach', set({ ...this.selectedCoach }, path, event));
     },
   },
 };
