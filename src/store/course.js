@@ -8,10 +8,12 @@ export default {
   state: {
     course: null,
     selectedTrainer: '',
+    selectedProgram: '',
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = !data ? data : ({ ...data }); },
     SET_SELECTED_TRAINER: (state, data) => { state.selectedTrainer = data; },
+    SET_SELECTED_PROGRAM: (state, data) => { state.selectedProgram = data; },
   },
   actions: {
     fetchCourse: async ({ commit }, params) => {
@@ -32,7 +34,11 @@ export default {
     },
     resetCourse: ({ commit }) => { commit('SET_COURSE', null); },
     setSelectedTrainer: ({ commit }, params) => { commit('SET_SELECTED_TRAINER', params.trainerId); },
-    resetFilters: ({ commit }) => { commit('SET_SELECTED_TRAINER', ''); },
+    setSelectedProgram: ({ commit }, params) => { commit('SET_SELECTED_PROGRAM', params.programId); },
+    resetFilters: ({ commit }) => {
+      commit('SET_SELECTED_TRAINER', '');
+      commit('SET_SELECTED_PROGRAM', '');
+    },
   },
   getters: {},
 };

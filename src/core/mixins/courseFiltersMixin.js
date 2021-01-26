@@ -10,12 +10,11 @@ export const courseFiltersMixin = {
     return {
       programOptions: [],
       companyOptions: [],
-      selectedProgram: '',
       selectedCompany: '',
     };
   },
   computed: {
-    ...mapState('course', ['selectedTrainer']),
+    ...mapState('course', ['selectedTrainer', 'selectedProgram']),
     coursesFiltered () {
       let courses = this.coursesWithGroupedSlot;
       if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
@@ -69,10 +68,13 @@ export const courseFiltersMixin = {
     updateSelectedTrainer (trainerId) {
       this.$store.dispatch('course/setSelectedTrainer', { trainerId });
     },
+    updateSelectedProgram (programId) {
+      this.$store.dispatch('course/setSelectedProgram', { programId });
+    },
     resetFilters () {
       this.$store.dispatch('course/resetFilters');
+      this.$store.dispatch('course/resetFilters');
       this.selectedCompany = '';
-      this.selectedProgram = '';
     },
     filterCoursesByProgram (courses) {
       return courses.filter(course => course.subProgram.program._id === this.selectedProgram);
