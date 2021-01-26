@@ -7,7 +7,7 @@
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
-          v-model="selectedTrainer" />
+          :value="selectedTrainer" @input="updateSelectedTrainer" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-3">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"

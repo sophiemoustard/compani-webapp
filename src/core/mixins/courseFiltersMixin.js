@@ -1,3 +1,4 @@
+import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
@@ -10,11 +11,11 @@ export const courseFiltersMixin = {
       programOptions: [],
       companyOptions: [],
       selectedProgram: '',
-      selectedTrainer: '',
       selectedCompany: '',
     };
   },
   computed: {
+    ...mapState('course', ['selectedTrainer']),
     coursesFiltered () {
       let courses = this.coursesWithGroupedSlot;
       if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
@@ -65,6 +66,9 @@ export const courseFiltersMixin = {
     },
   },
   methods: {
+    updateSelectedTrainer (trainerId) {
+      this.$store.dispatch('course/setSelectedTrainer', { trainerId });
+    },
     resetFilters () {
       this.selectedTrainer = '';
       this.selectedCompany = '';
