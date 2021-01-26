@@ -29,8 +29,8 @@
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaire-container">
-        <q-card v-for="activity in questionnaireActivities" :key="activity._id" flat
-          @click="goToQuestionnaireAnswers(activity._id)" class="questionnaire cursor-pointer">
+        <q-card v-for="activity in questionnaireActivities" @click="goToQuestionnaireAnswers(activity)"
+         :key="activity._id" flat :class="`questionnaire ${answerCount(activity) ? 'cursor-pointer' : 'disabled'}`">
           <div class="q-pa-sm questionnaire-activity q-mb-md">
             <div class="q-mb-sm text-grey-800 ellipsis-2-lines two-lines">
               Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
@@ -39,7 +39,7 @@
           </div>
           <q-separator />
           <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
-            {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user._id)).size) }}
+            {{ formatQuantity('réponse', answerCount(activity)) }}
           </div>
         </q-card>
       </div>
@@ -135,6 +135,9 @@ export default {
     },
   },
   methods: {
+    answerCount (activity) {
+      return new Set(activity.activityHistories.map(aH => aH.user._id)).size;
+    },
     async refreshAttendanceSheets () {
       try {
         this.tableLoading = true;
@@ -201,10 +204,15 @@ export default {
         this.$q.loading.hide();
       }
     },
-    goToQuestionnaireAnswers (activityId) {
-      return this.$router.push(
-        { name: 'ni management questionnaire answers', params: { courseId: this.profileId, activityId } }
-      );
+    goToQuestionnaireAnswers (activity) {
+      if (this.answerCount(activity)) {
+        return this.$router.push(
+          {
+            name: 'ni management questionnaire answers',
+            params: { courseId: this.profileId, activityId: activity._id },
+          }
+        );
+      }
     },
   },
 };
