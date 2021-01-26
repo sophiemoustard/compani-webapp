@@ -140,5 +140,10 @@ export default {
       }
     },
   },
+  beforeDestroy () {
+    if (this.$router.currentRoute.name !== 'ni management blended courses info') {
+      this.$store.dispatch('course/resetFilters');
+    }
+  },
 };
 </script>

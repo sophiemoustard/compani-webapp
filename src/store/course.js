@@ -7,7 +7,7 @@ export default {
   namespaced: true,
   state: {
     course: null,
-    selectedTrainer: null,
+    selectedTrainer: '',
   },
   mutations: {
     SET_COURSE: (state, data) => { state.course = !data ? data : ({ ...data }); },
@@ -32,6 +32,7 @@ export default {
     },
     resetCourse: ({ commit }) => { commit('SET_COURSE', null); },
     setSelectedTrainer: ({ commit }, params) => { commit('SET_SELECTED_TRAINER', params.trainerId); },
+    resetFilters: ({ commit }) => { commit('SET_SELECTED_TRAINER', ''); },
   },
   getters: {},
 };

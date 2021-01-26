@@ -70,7 +70,7 @@ export const courseFiltersMixin = {
       this.$store.dispatch('course/setSelectedTrainer', { trainerId });
     },
     resetFilters () {
-      this.selectedTrainer = '';
+      this.$store.dispatch('course/resetFilters');
       this.selectedCompany = '';
       this.selectedProgram = '';
     },

@@ -59,5 +59,8 @@ export default {
       }
     },
   },
+  beforeDestroy () {
+    if (this.$router.currentRoute.name !== 'ni courses info') this.$store.dispatch('course/resetFilters');
+  },
 };
 </script>
