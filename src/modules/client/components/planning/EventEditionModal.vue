@@ -206,8 +206,8 @@ export default {
       if (addressIndex === 0) this.editedEvent.address = addressList[1].value;
       else this.editedEvent.address = addressList[0].value;
     },
-    async update (event, fields) {
-      await this.$emit('update:edited-event', set({ ...this.editedEvent }, fields, event));
+    async update (event, path) {
+      await this.$emit('update:edited-event', set({ ...this.editedEvent }, path, event));
     },
     async updateAbsence (event) {
       await this.$emit('update:edited-event', { ...this.editedEvent, absence: event });

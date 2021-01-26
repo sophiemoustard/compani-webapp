@@ -48,8 +48,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event, fields) {
-      this.$emit('update:editedTrainee', set({ ...this.editedTrainee }, fields, event));
+    update (event, path) {
+      this.$emit('update:editedTrainee', set({ ...this.editedTrainee }, path, event));
     },
   },
 };

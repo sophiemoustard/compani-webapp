@@ -3,33 +3,37 @@
     <template slot="title">
       Créer une nouvelle <span class="text-weight-bold">fiche auxiliaire</span>
     </template>
-    <ni-input in-modal :disable="!firstStep" v-model.trim="newUser.local.email" caption="Email"
+    <ni-input in-modal :disable="!firstStep" :value="newUser.local.email" caption="Email"
       :error="validations.local.email.$error" @blur="validations.local.email.$touch" required-field
-      :error-message="emailError" />
+      :error-message="emailError" @input="updateUser($event.trim(), 'local.email')" />
     <template v-if="!firstStep">
-      <ni-select in-modal v-model="newUser.identity.title" :options="civilityOptions" caption="Civilité"
-        required-field :error="validations.identity.title.$error" @blur="validations.identity.title.$touch" />
-      <ni-input in-modal v-model.trim="newUser.identity.lastname" :error="validations.identity.lastname.$error"
-        @blur="validations.identity.lastname.$touch" required-field caption="Nom" />
-      <ni-input in-modal v-model.trim="newUser.identity.firstname" :error="validations.identity.firstname.$error"
-        caption="Prénom" @blur="validations.identity.firstname.$touch" required-field />
-      <ni-input in-modal v-model="newUser.contact.phone" :error="validations.contact.phone.$error" required-field
-        caption="Numéro de téléphone" @blur="validations.contact.phone.$touch" :error-message="mobilePhoneError" />
-      <ni-search-address v-model="newUser.contact.address" color="white" inverted-light
+      <ni-select in-modal :value="newUser.identity.title" :options="civilityOptions" caption="Civilité"
+        required-field :error="validations.identity.title.$error" @blur="validations.identity.title.$touch"
+        @input="updateUser($event, 'identity.title')" />
+      <ni-input in-modal :value="newUser.identity.lastname" :error="validations.identity.lastname.$error" caption="Nom"
+        @blur="validations.identity.lastname.$touch" required-field
+        @input="updateUser($event.trim(), 'identity.lastname')" />
+      <ni-input in-modal :value="newUser.identity.firstname" :error="validations.identity.firstname.$error"
+        caption="Prénom" @blur="validations.identity.firstname.$touch" required-field
+        @input="updateUser($event.trim(), 'identity.firstname')" />
+      <ni-input in-modal :value="newUser.contact.phone" :error="validations.contact.phone.$error" required-field
+        caption="Numéro de téléphone" @blur="validations.contact.phone.$touch" :error-message="mobilePhoneError"
+        @input="updateUser($event, 'contact.phone')" />
+      <ni-search-address :value="newUser.contact.address" color="white" inverted-light
         @blur="validations.contact.address.$touch" error-message="Adresse non valide"
-        :error="validations.contact.address.$error" in-modal />
+        :error="validations.contact.address.$error" in-modal @input="updateUser($event, 'contact.address')" />
       <div class="row margin-input">
         <div class="col-12">
           <div class="row justify-between">
             <p class="input-caption required">Équipe</p>
             <q-icon v-if="validations.sector.$error" name="error_outline" color="secondary" />
           </div>
-          <ni-select-sector v-model="newUser.sector" @blur="validations.sector.$touch" in-modal
-            :company-id="companyId" :error="validations.sector.$error" :error-message="REQUIRED_LABEL" />
+          <ni-select-sector :value="newUser.sector" @blur="validations.sector.$touch" :error-message="REQUIRED_LABEL"
+            :company-id="companyId" :error="validations.sector.$error" in-modal @input="updateUser($event, 'sector')" />
         </div>
       </div>
       <div class="row margin-input last">
-        <q-checkbox :value="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense @input="update" />
+        <q-checkbox :value="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense @input="updateSendWelcome" />
       </div>
     </template>
     <template slot="footer">
@@ -42,6 +46,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import SearchAddress from '@components/form/SearchAddress';
 import Select from '@components/form/Select';
@@ -97,8 +102,11 @@ export default {
     goToNextStep () {
       this.$emit('go-to-next-step');
     },
-    update (event) {
+    updateSendWelcome (event) {
       this.$emit('update:send-welcome-msg', event);
+    },
+    updateUser (event, path) {
+      this.$emit('update:newUser', set({ ...this.newUser }, path, event));
     },
   },
 };
