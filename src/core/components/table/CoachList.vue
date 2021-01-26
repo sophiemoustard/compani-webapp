@@ -55,8 +55,8 @@ import Email from '@api/Email';
 import Users from '@api/Users';
 import Button from '@components/Button';
 import ResponsiveTable from '@components/table/ResponsiveTable';
-import coachCreationModal from '@components/table/coachCreationModal';
-import coachEditionModal from '@components/table/coachEditionModal';
+import CoachCreationModal from '@components/table/CoachCreationModal';
+import CoachEditionModal from '@components/table/CoachEditionModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { formatPhone, clear, removeEmptyProps, formatPhoneForPayload } from '@helpers/utils';
@@ -69,8 +69,8 @@ export default {
   components: {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
-    'coach-creation-modal': coachCreationModal,
-    'coach-edition-modal': coachEditionModal,
+    'coach-creation-modal': CoachCreationModal,
+    'coach-edition-modal': CoachEditionModal,
   },
   props: {
     company: { type: Object, default: () => ({}) },
