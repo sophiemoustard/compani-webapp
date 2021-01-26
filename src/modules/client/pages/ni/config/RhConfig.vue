@@ -158,7 +158,7 @@
       :new-sector.sync="newSector" @submit="createNewSector" :validations="$v.newSector" />
 
     <sector-edition-modal v-model="sectorEditionModal" :loading="loading" @hide="resetEditionSectorData"
-      :edited-sector="editedSector" @submit="updateSector" :validations="$v.editedSector" />
+      :edited-sector.sync="editedSector" @submit="updateSector" :validations="$v.editedSector" />
 </q-page>
 </template>
 
