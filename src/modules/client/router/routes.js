@@ -302,7 +302,7 @@ const routes = [
         },
       },
       {
-        path: 'ni/courses/elearning-courses/:profileId',
+        path: 'ni/courses/elearning-courses/:courseId',
         name: 'ni elearning courses info',
         component: () => import('src/modules/client/pages/ni/courses/ELearningCourseProfile'),
         props: true,

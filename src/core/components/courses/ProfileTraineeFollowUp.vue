@@ -60,8 +60,8 @@ import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdd
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
-import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
+import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 
 export default {
   name: 'ProfileTraineeFollowUp',

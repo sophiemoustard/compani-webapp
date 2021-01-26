@@ -10,7 +10,7 @@ import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
-import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
 import { NotifyNegative } from '@components/popup/notify';
 

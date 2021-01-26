@@ -52,10 +52,7 @@ export default {
       }
     },
     goToELearningCourseProfile (row) {
-      return this.$router.push({
-        name: 'ni elearning courses info',
-        params: { profileId: row._id },
-      });
+      return this.$router.push({ name: 'ni elearning courses info', params: { courseId: row._id } });
     },
   },
 };
