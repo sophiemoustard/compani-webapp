@@ -1,7 +1,7 @@
 <template>
     <q-page class="client-background" padding>
       <ni-profile-header :title="courseName" />
-      <ni-profile-follow-up :profile-id="courseId" />
+      <profile-follow-up :profile-id="courseId" />
     </q-page>
 </template>
 
@@ -16,7 +16,7 @@ export default {
   name: 'ELearningCourseProfile',
   components: {
     'ni-profile-header': ProfileHeader,
-    'ni-profile-follow-up': ProfileFollowUp,
+    'profile-follow-up': ProfileFollowUp,
   },
   props: {
     courseId: { type: String, required: true },
