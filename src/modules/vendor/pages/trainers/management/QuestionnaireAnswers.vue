@@ -29,6 +29,7 @@ import SurveyChart from '@components/courses/SurveyChart';
 import OpenQuestionChart from '@components/courses/OpenQuestionChart';
 import QuestionAnswerChart from '@components/courses/QuestionAnswerChart';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER } from '@data/constants';
+import { NotifyNegative } from '@components/popup/notify';
 
 export default {
   name: 'QuestionnaireAnswers',
@@ -44,7 +45,7 @@ export default {
   },
   data () {
     return {
-      activity: {},
+      activity: { steps: [{ subProgram: { program: {} } }] },
     };
   },
   async created () {
@@ -65,8 +66,10 @@ export default {
       try {
         this.activity = await Courses.getQuestionnaireAnswers(this.courseId, { activity: this.activityId });
       } catch (e) {
+        this.$router.go(-1);
+        NotifyNegative('Erreur lors de la récupération des réponses');
         console.error(e);
-        this.activity = {};
+        this.activity = { steps: [{ subProgram: { program: {} } }] };
       }
     },
   },
