@@ -30,7 +30,7 @@
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaire-container">
         <q-card v-for="activity in questionnaireActivities" @click="goToQuestionnaireAnswers(activity)"
-         :key="activity._id" flat :class="`questionnaire ${answerCount(activity) ? 'cursor-pointer' : 'disabled'}`">
+         :key="activity._id" flat class="cursor-pointer">
           <div class="q-pa-sm questionnaire-activity q-mb-md">
             <div class="q-mb-sm text-grey-800 ellipsis-2-lines two-lines">
               Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
@@ -39,7 +39,7 @@
           </div>
           <q-separator />
           <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
-            {{ formatQuantity('réponse', answerCount(activity)) }}
+            {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user)).size) }}
           </div>
         </q-card>
       </div>
@@ -135,9 +135,6 @@ export default {
     },
   },
   methods: {
-    answerCount (activity) {
-      return new Set(activity.activityHistories.map(aH => aH.user)).size;
-    },
     async refreshAttendanceSheets () {
       try {
         this.tableLoading = true;
@@ -205,14 +202,12 @@ export default {
       }
     },
     goToQuestionnaireAnswers (activity) {
-      if (this.answerCount(activity)) {
-        return this.$router.push(
-          {
-            name: 'ni management questionnaire answers',
-            params: { courseId: this.profileId, activityId: activity._id },
-          }
-        );
-      }
+      return this.$router.push(
+        {
+          name: 'ni management questionnaire answers',
+          params: { courseId: this.profileId, activityId: activity._id },
+        }
+      );
     },
   },
 };

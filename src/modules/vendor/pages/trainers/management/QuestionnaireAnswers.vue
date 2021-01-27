@@ -1,15 +1,15 @@
 <template>
   <q-page class="vendor-background" padding>
-    <profile-header :title="activity.name">
+    <profile-header :title="get(activity, 'name', 'Nom de l\'activité')">
       <template #body>
         <div class="row profile-info q-pl-lg">
           <q-item class="col-md-6 col-xs-12">
             <q-item-section side><q-icon size="xs" name="library_books" /></q-item-section>
-            <q-item-section>{{ activity.steps[0].name }}</q-item-section>
+            <q-item-section>{{ get(activity,'steps[0].name', 'Nom de l\'étape') }}</q-item-section>
           </q-item>
           <q-item class="col-md-6 col-xs-12">
             <q-item-section side><q-icon size="xs" name="book" /></q-item-section>
-            <q-item-section>{{ activity.steps[0].subProgram.program.name }}</q-item-section>
+            <q-item-section>{{ get(activity, 'steps[0].subProgram.program.name', 'Nom du programme') }}</q-item-section>
           </q-item>
         </div>
       </template>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import Courses from '@api/Courses';
 import ProfileHeader from '@components/ProfileHeader';
 import SurveyChart from '@components/courses/SurveyChart';
@@ -45,7 +46,8 @@ export default {
   },
   data () {
     return {
-      activity: { steps: [{ subProgram: { program: {} } }] },
+      activity: {},
+      get,
     };
   },
   async created () {
@@ -66,10 +68,9 @@ export default {
       try {
         this.activity = await Courses.getQuestionnaireAnswers(this.courseId, { activity: this.activityId });
       } catch (e) {
-        this.$router.go(-1);
         NotifyNegative('Erreur lors de la récupération des réponses');
         console.error(e);
-        this.activity = { steps: [{ subProgram: { program: {} } }] };
+        this.activity = {};
       }
     },
   },
