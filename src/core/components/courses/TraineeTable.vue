@@ -135,7 +135,7 @@ export default {
       traineeValidations: {
         identity: { lastname: { required: requiredIf(this.addNewTraineeIdentityStep) } },
         local: { email: { required, email } },
-        contact: { phone: { frPhoneNumber } },
+        contact: { phone: { required, frPhoneNumber } },
         company: { required: requiredIf(() => this.course.type === INTER_B2B) },
       },
       traineeEditionModal: false,

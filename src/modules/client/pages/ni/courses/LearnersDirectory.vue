@@ -79,7 +79,7 @@ export default {
       newLearner: {
         identity: { lastname: { required: requiredIf(this.identityStep) } },
         local: { email: { required, email } },
-        contact: { phone: { frPhoneNumber } },
+        contact: { phone: { required, frPhoneNumber } },
       },
     };
   },
