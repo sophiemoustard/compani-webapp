@@ -5,11 +5,11 @@
         <div class="row profile-info q-pl-lg">
           <q-item class="col-md-6 col-xs-12">
             <q-item-section side><q-icon size="xs" name="library_books" /></q-item-section>
-            <q-item-section>{{ get(activity,'steps[0].name', 'Nom de l\'étape') }}</q-item-section>
+            <q-item-section>{{ get(activity,'step.name', 'Nom de l\'étape') }}</q-item-section>
           </q-item>
           <q-item class="col-md-6 col-xs-12">
             <q-item-section side><q-icon size="xs" name="book" /></q-item-section>
-            <q-item-section>{{ get(activity, 'steps[0].subProgram.program.name', 'Nom du programme') }}</q-item-section>
+            <q-item-section>{{ get(activity, 'course.subProgram.program.name', 'Nom du programme') }}</q-item-section>
           </q-item>
         </div>
       </template>
