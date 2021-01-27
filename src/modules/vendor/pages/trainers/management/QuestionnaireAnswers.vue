@@ -16,7 +16,7 @@
     </profile-header>
     <div class="q-my-xl">
       <q-card v-for="(card, cardIndex) of activity.followUp" :key="cardIndex" flat class="q-mb-sm">
-        <component :is="switchChartComponent(card.template)" :card="card" />
+        <component :is="getChartComponent(card.template)" :card="card" />
       </q-card>
     </div>
   </q-page>
@@ -51,7 +51,7 @@ export default {
     await this.refreshAnswers();
   },
   methods: {
-    switchChartComponent (template) {
+    getChartComponent (template) {
       switch (template) {
         case SURVEY:
           return SurveyChart;
