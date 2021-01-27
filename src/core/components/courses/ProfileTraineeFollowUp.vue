@@ -136,7 +136,7 @@ export default {
   },
   methods: {
     answerCount (activity) {
-      return new Set(activity.activityHistories.map(aH => aH.user._id)).size;
+      return new Set(activity.activityHistories.map(aH => aH.user)).size;
     },
     async refreshAttendanceSheets () {
       try {
