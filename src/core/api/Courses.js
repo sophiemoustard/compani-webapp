@@ -16,8 +16,8 @@ export default {
     const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}`);
     return course.data.data.course;
   },
-  async getFollowUp (courseId) {
-    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}/follow-up`);
+  async getFollowUp (courseId, params = null) {
+    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}/follow-up`, { params });
     return course.data.data.followUp;
   },
   async update (courseId, payload) {

@@ -12,7 +12,7 @@
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
             <template v-else>
-              <div class="name" @click="goToLearnerProfile(props.row)">{{ col.value }}</div>
+              <div class="name" @click.stop="goToLearnerProfile(props.row)">{{ col.value }}</div>
             </template>
           </q-td>
         </template>
@@ -36,10 +36,12 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { sortStrings, formatIdentity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
+import { NotifyNegative } from '@components/popup/notify';
+import { sortStrings, formatIdentity } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
 
 export default {
@@ -52,7 +54,10 @@ export default {
     profileId: { type: String, required: true },
   },
   data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+
     return {
+      course: {},
       tableLoading: false,
       columns: [
         {
@@ -78,12 +83,20 @@ export default {
       learners: [],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       E_LEARNING,
+      isClientInterface,
     };
+  },
+  computed: {
+    ...mapGetters({ company: 'main/getCompany' }),
   },
   async created () {
     await this.getLearnersList();
   },
   methods: {
+    goToLearnerProfile (row) {
+      const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
+      this.$router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
+    },
     formatRow (trainee) {
       const formattedName = formatIdentity(trainee.identity, 'FL');
 
@@ -97,27 +110,29 @@ export default {
     async getLearnersList () {
       try {
         this.tableLoading = true;
-        const course = await Courses.getFollowUp(this.profileId);
+        const course = await Courses.getFollowUp(
+          this.profileId,
+          this.isClientInterface ? { company: this.company._id } : null
+        );
 
         if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
       } catch (e) {
         console.error(e);
+        NotifyNegative('Erreur lors de la récupération des apprenants');
         this.learners = [];
       } finally {
         this.tableLoading = false;
       }
     },
-    goToLearnerProfile (row) {
-      this.$router.push({ name: 'ni users learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
-    },
   },
 };
 </script>
+
 <style lang="stylus" scoped>
-.progress
-  width: 100%
-.name
-  width: fit-content;
-  text-decoration: underline
-  color: $primary
+  .progress
+    width: 100%
+  .name
+    width: fit-content;
+    text-decoration: underline
+    color: $primary
 </style>

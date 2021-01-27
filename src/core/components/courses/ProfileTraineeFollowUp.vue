@@ -54,13 +54,13 @@
 import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import moment from '@helpers/moment';
+import AttendanceSheets from '@api/AttendanceSheets';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
-import AttendanceSheets from '@api/AttendanceSheets';
 import Button from '@components/Button';
-import ProfileFollowUp from 'src/modules/vendor/components/courses/ProfileFollowUp';
+import ProfileFollowUp from '@components/courses/ProfileFollowUp';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
 
 export default {
