@@ -60,7 +60,7 @@ export default {
 <style lang="stylus" scoped>
   .referent-name
     font-style: italic;
-    @media (min-width: 1024px)
+    @media (min-width: $breakpoint-md-min)
       margin-top: 15px;
       font-size: 12px;
     @media (min-width: 421px) and (max-width: $breakpoint-sm-max)
@@ -74,7 +74,7 @@ export default {
     &-name
       font-weight: 600;
       font-size: 14px;
-      @media (min-width: 1024px)
+      @media (min-width: $breakpoint-md-min)
         margin-bottom: 15px;
       @media (min-width: 421px) and (max-width: $breakpoint-sm-max)
         margin-bottom: 15px;

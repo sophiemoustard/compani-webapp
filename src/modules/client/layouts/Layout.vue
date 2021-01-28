@@ -73,7 +73,7 @@ export default {
 <style lang="stylus" scoped>
   .q-page-sticky
     z-index: 10
-    @media (min-width: 1024px)
+    @media (min-width: $breakpoint-md-min)
       display: none;
 
   .chevron
