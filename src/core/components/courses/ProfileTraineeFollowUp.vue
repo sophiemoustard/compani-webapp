@@ -224,10 +224,6 @@ export default {
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))
   grid-gap: 16px
 
-.questionnaire
-  display: flex
-  flex-direction: column
-
 .questionnaire-activity
   flex: 1
 
