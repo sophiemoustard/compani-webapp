@@ -133,7 +133,7 @@ export default {
         company: '',
       },
       traineeValidations: {
-        identity: { lastname: { required: requiredIf(this.addNewTraineeIdentityStep) } },
+        identity: { lastname: { required } },
         local: { email: { required, email } },
         contact: { phone: { required, frPhoneNumber } },
         company: { required: requiredIf(() => this.course.type === INTER_B2B) },
@@ -241,9 +241,11 @@ export default {
       try {
         if (!this.firstStep) {
           this.$v.newTrainee.$touch();
-          const companyFieldError = this.addNewTraineeIdentityStep && this.$v.newTrainee.company.$error;
+          const companyOrLastnameFieldError = this.addNewTraineeIdentityStep &&
+            (this.$v.newTrainee.company.$error ||
+            this.$v.newTrainee.identity.lastname.$error);
           const newTraineeFormInvalid = !this.addNewTraineeIdentityStep && this.$v.newTrainee.$invalid;
-          if (companyFieldError || newTraineeFormInvalid) return NotifyWarning('Champ(s) invalide(s).');
+          if (companyOrLastnameFieldError || newTraineeFormInvalid) return NotifyWarning('Champ(s) invalide(s).');
         }
 
         this.traineeCreationModalLoading = true;
