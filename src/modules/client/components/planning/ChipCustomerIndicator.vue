@@ -63,7 +63,7 @@ export default {
     @media (min-width: 1024px)
       margin-top: 15px;
       font-size: 12px;
-    @media (min-width: 421px) and (max-width: 1023px)
+    @media (min-width: 421px) and (max-width: $breakpoint-sm-max)
       margin-top: 15px;
       font-size: 8px;
     @media (max-width: 420px)
@@ -76,7 +76,7 @@ export default {
       font-size: 14px;
       @media (min-width: 1024px)
         margin-bottom: 15px;
-      @media (min-width: 421px) and (max-width: 1023px)
+      @media (min-width: 421px) and (max-width: $breakpoint-sm-max)
         margin-bottom: 15px;
         font-size: 12px;
       @media (max-width: 420px)

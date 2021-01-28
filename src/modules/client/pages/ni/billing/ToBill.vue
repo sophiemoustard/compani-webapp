@@ -289,9 +289,9 @@ export default {
 
 <style lang="stylus" scoped>
 .selects
-  @media screen and (min-width: 768px) and (max-width: 1023px)
+  @media screen and (min-width: 768px) and (max-width: $breakpoint-sm-max)
     padding-left: 10px;
     padding-right: 10px;
-  @media screen and (max-width: 1023px)
+  @media screen and (max-width: $breakpoint-sm-max)
     margin: 0px !important;
 </style>

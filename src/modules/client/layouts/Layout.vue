@@ -86,7 +86,7 @@ export default {
       left: 235px
     &-right
       left: 15px
-    @media (max-width: 1023px)
+    @media (max-width: $breakpoint-sm-max)
       display: none
 
   .q-toolbar

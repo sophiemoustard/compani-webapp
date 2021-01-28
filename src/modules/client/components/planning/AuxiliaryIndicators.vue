@@ -125,7 +125,7 @@ export default {
   .indicators
     padding: 0 24px
     margin: 0 0 24px
-    @media screen and (max-width: 1023px)
+    @media screen and (max-width: $breakpoint-sm-max)
       padding: 0 12px
 
   .economic-indicators
