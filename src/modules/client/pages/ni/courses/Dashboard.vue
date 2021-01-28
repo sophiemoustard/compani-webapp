@@ -99,7 +99,7 @@ export default {
 
       return groupedByCourses.map(group => ({
         name: group[0].activity.step.subProgram.program.name,
-        activeTraineesCount: [...new Set(group.map(a => a.user._id))].length,
+        activeTraineesCount: new Set(group.map(a => a.user._id)).size,
       })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
     },
     learnerList () {
