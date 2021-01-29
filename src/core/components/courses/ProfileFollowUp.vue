@@ -1,5 +1,25 @@
 <template>
   <div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Rapport d'utilisation</p>
+      <div class="row">
+        <div class="col-sm-6 col-xs-12">
+          <q-card flat class="q-pa-md right-stats">
+            <div class="text-weight-bold q-mb-sm">Vue globale</div>
+            <div class="row">
+              <div class="col-3 text-right q-pr-md column justify-around">
+                <ni-e-learning-indicator :indicator="traineesOnGoing" />
+                <ni-e-learning-indicator :indicator="traineesFinnished" />
+              </div>
+              <div class="col-9 column justify-around">
+                <div>apprenant{{ traineesOnGoing - 1 ? 's' : '' }} en cours</div>
+                <div>apprenant{{ traineesFinnished - 1 ? 's' : '' }} ayant terminé</div>
+              </div>
+            </div>
+          </q-card>
+        </div>
+      </div>
+    </div>
     <p class="text-weight-bold">Progression des participants</p>
     <q-card>
       <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false">
@@ -43,12 +63,14 @@ import Progress from '@components/CourseProgress';
 import { NotifyNegative } from '@components/popup/notify';
 import { sortStrings, formatIdentity } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
+import ELearningIndicator from '@components/courses/ELearningIndicator';
 
 export default {
   name: 'ProfileFollowUp',
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
+    'ni-e-learning-indicator': ELearningIndicator,
   },
   props: {
     profileId: { type: String, required: true },
@@ -88,6 +110,12 @@ export default {
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
+    traineesOnGoing () {
+      return this.learners.filter(l => l.progress !== 1).length;
+    },
+    traineesFinnished () {
+      return this.learners.filter(l => l.progress === 1).length;
+    },
   },
   async created () {
     await this.getLearnersList();
