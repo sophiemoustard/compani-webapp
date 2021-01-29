@@ -14,7 +14,7 @@
           :error="validations.identity.lastname.$error" />
         <ni-input in-modal :value="newUser.contact.phone" @input="update($event.trim(), 'contact.phone')"
           caption="Téléphone" @blur="validations.contact.phone.$touch" :error="validations.contact.phone.$error"
-          :error-message="phoneNbrError(validations)" :last="!companyStep" />
+          :error-message="phoneNbrError(validations)" :last="!companyStep" required-field />
       </template>
         <ni-select v-if="!firstStep && companyStep" in-modal :options="companyOptions" :value="newUser.company"
           @input="update($event.trim(), 'company')" required-field caption="Structure"

@@ -32,7 +32,7 @@ import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
 import { DEFAULT_AVATAR, TRAINEE } from '@data/constants';
 import {
   formatPhoneForPayload,
@@ -77,9 +77,9 @@ export default {
   validations () {
     return {
       newLearner: {
-        identity: { lastname: { required: requiredIf(this.identityStep) } },
+        identity: { lastname: { required } },
         local: { email: { required, email } },
-        contact: { phone: { frPhoneNumber } },
+        contact: { phone: { required, frPhoneNumber } },
       },
     };
   },
