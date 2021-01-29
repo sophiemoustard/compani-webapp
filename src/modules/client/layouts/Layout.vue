@@ -73,7 +73,7 @@ export default {
 <style lang="stylus" scoped>
   .q-page-sticky
     z-index: 10
-    @media (min-width: $breakpoint-md-min)
+    @media screen and (min-width: $breakpoint-md-min)
       display: none;
 
   .chevron
@@ -86,7 +86,7 @@ export default {
       left: 235px
     &-right
       left: 15px
-    @media (max-width: $breakpoint-sm-max)
+    @media screen and (max-width: $breakpoint-sm-max)
       display: none
 
   .q-toolbar

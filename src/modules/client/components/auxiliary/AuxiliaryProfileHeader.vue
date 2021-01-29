@@ -208,6 +208,6 @@ export default {
 
   .custom-justify-end
     justify-content: flex-end
-    @media (max-width: 767px)
+    @media screen and (max-width: 767px)
       justify-content: center
 </style>

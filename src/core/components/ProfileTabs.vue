@@ -57,9 +57,9 @@ export default {
           padding-left: 0px
           justify-content: start
           margin-right: 24px
-          @media (max-width: 767px)
+          @media screen and (max-width: 767px)
             max-width: 66%
-          @media (min-width: 768px)
+          @media screen and (min-width: 768px)
             max-width: 33%
           & .q-tab__content
             & .q-tab__label

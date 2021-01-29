@@ -200,7 +200,7 @@ export default {
 
 .right-stats
   margin-right: 8px
-  @media (max-width: 599px)
+  @media screen and (max-width: 599px)
     margin-right: 0px
     margin-bottom: 8px
 </style>
