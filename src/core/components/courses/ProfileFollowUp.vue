@@ -3,17 +3,17 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Rapport d'utilisation</p>
       <div class="row">
-        <div class="col-sm-6 col-xs-12">
+        <div class="col-md-6 col-xs-12">
           <q-card flat class="q-pa-md right-stats">
             <div class="text-weight-bold q-mb-sm">Vue globale</div>
             <div class="row">
               <div class="col-3 text-right q-pr-md column justify-around">
-                <ni-e-learning-indicator :indicator="traineesOnGoing" />
-                <ni-e-learning-indicator :indicator="traineesFinnished" />
+                <ni-e-learning-indicator :indicator="traineesOnGoingCount" />
+                <ni-e-learning-indicator :indicator="traineesFinnishedCount" />
               </div>
               <div class="col-9 column justify-around">
-                <div>apprenant{{ traineesOnGoing - 1 ? 's' : '' }} en cours</div>
-                <div>apprenant{{ traineesFinnished - 1 ? 's' : '' }} ayant terminé</div>
+                <div>apprenant{{ traineesOnGoingCount - 1 ? 's' : '' }} en cours</div>
+                <div>apprenant{{ traineesFinnishedCount - 1 ? 's' : '' }} ayant terminé</div>
               </div>
             </div>
           </q-card>
@@ -110,10 +110,10 @@ export default {
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
-    traineesOnGoing () {
+    traineesOnGoingCount () {
       return this.learners.filter(l => l.progress !== 1).length;
     },
-    traineesFinnished () {
+    traineesFinnishedCount () {
       return this.learners.filter(l => l.progress === 1).length;
     },
   },
