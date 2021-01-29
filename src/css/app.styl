@@ -18,13 +18,13 @@ body
   font-family: 'Source Sans Pro', 'Roboto', 'Helvetica', 'Arial'
   font-size: 16px
 
-  @media (max-width: 767px)
+  @media screen and (max-width: 767px)
     font-size: 14px
 
 h1, h2, h3, h4, h5, h6
   margin-top: 0
 
-  @media (max-width: 767px)
+  @media screen and (max-width: 767px)
     margin-bottom: 20px !important
 
 div h4:only-child
@@ -58,15 +58,15 @@ div h4:only-child
   height: 100% !important
 
 .q-layout-padding
-  @media (min-width: 1024px)
+  @media screen and (min-width: $breakpoint-md-min)
     padding: 2rem 3rem 3rem
-  @media (max-width: 767px)
+  @media screen and (max-width: 767px)
     padding: 1.5rem .5rem
 
 .title-padding
-  @media (min-width: 1024px)
+  @media screen and (min-width: $breakpoint-md-min)
     padding: 2rem 2rem 1rem
-  @media (max-width: 1023px)
+  @media screen and (max-width: $breakpoint-sm-max)
     padding: 1rem
 
 // Used in q-dialog
@@ -87,6 +87,6 @@ div h4:only-child
   border-radius: 50%
   box-shadow: 0 1px 3px rgba(0,0,0,0.2), 0 1px 1px rgba(0,0,0,0.14), 0 2px 1px -1px rgba(0,0,0,0.12)
   vertical-align: middle
-  @media screen and (max-width: 1023px)
+  @media screen and (max-width: $breakpoint-sm-max)
     height: 30px
     width: 30px

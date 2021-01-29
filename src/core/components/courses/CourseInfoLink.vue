@@ -39,7 +39,7 @@ export default {
 
 <style lang="stylus" scoped>
 .course-link
-  @media screen and (min-width: 1024px)
+  @media screen and (min-width: $breakpoint-md-min)
     display: flex
     flex-direction: row
     align-items: center
