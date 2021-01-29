@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="q-mb-xl">
+    <div v-if="course.format === STRICTLY_E_LEARNING" class="q-mb-xl">
       <p class="text-weight-bold">Rapport d'utilisation</p>
       <div class="row">
         <div class="col-md-6 col-xs-12">
@@ -56,13 +56,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import Courses from '@api/Courses';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative } from '@components/popup/notify';
 import { sortStrings, formatIdentity } from '@helpers/utils';
-import { E_LEARNING } from '@data/constants.js';
+import { STRICTLY_E_LEARNING, E_LEARNING } from '@data/constants.js';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 
 export default {
@@ -79,7 +79,6 @@ export default {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
 
     return {
-      course: {},
       tableLoading: false,
       columns: [
         {
@@ -105,10 +104,12 @@ export default {
       learners: [],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       E_LEARNING,
+      STRICTLY_E_LEARNING,
       isClientInterface,
     };
   },
   computed: {
+    ...mapState('course', ['course']),
     ...mapGetters({ company: 'main/getCompany' }),
     traineesOnGoingCount () {
       return this.learners.filter(l => l.progress !== 1).length;
