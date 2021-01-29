@@ -9,11 +9,11 @@
             <div class="row">
               <div class="col-3 text-right q-pr-md column justify-around">
                 <ni-e-learning-indicator :indicator="traineesOnGoingCount" />
-                <ni-e-learning-indicator :indicator="traineesFinnishedCount" />
+                <ni-e-learning-indicator :indicator="traineesFinishedCount" />
               </div>
               <div class="col-9 column justify-around">
-                <div>apprenant{{ traineesOnGoingCount - 1 ? 's' : '' }} en cours</div>
-                <div>apprenant{{ traineesFinnishedCount - 1 ? 's' : '' }} ayant terminé</div>
+                <div>apprenant{{ traineesOnGoingCount > 1 ? 's' : '' }} en cours</div>
+                <div>apprenant{{ traineesFinishedCount > 1 ? 's' : '' }} ayant terminé</div>
               </div>
             </div>
           </q-card>
@@ -113,8 +113,8 @@ export default {
     traineesOnGoingCount () {
       return this.learners.filter(l => l.progress !== 1).length;
     },
-    traineesFinnishedCount () {
-      return this.learners.filter(l => l.progress === 1).length;
+    traineesFinishedCount () {
+      return this.learners.length - this.traineesOnGoingCount;
     },
   },
   async created () {
