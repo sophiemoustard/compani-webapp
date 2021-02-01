@@ -145,8 +145,9 @@ const routes = [
         component: () => import('src/core/pages/courses/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni users learners info') to.params.defaultTab = 'traineeFollowUp';
-
+            if (['ni users learners info', 'ni management questionnaire answers'].includes(from.name)) {
+              to.params.defaultTab = 'traineeFollowUp';
+            }
             return next();
           } catch (e) {
             console.error(e);
@@ -170,7 +171,7 @@ const routes = [
       {
         path: 'ni/management/elearning-courses/:courseId',
         name: 'ni management elearning courses info',
-        component: () => import('src/modules/vendor/pages/ni/management/ELearningCourseProfile.vue'),
+        component: () => import('src/modules/vendor/pages/ni/management/ELearningCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
             if (from.name === 'ni users learners info') to.params.defaultTab = 'followUp';
@@ -226,6 +227,16 @@ const routes = [
         name: 'account vendor',
         component: () => import('src/core/pages/AccountInfo'),
         meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+        },
+      },
+      {
+        path: 'ni/management/:courseId/questionnaire/:activityId',
+        name: 'ni management questionnaire answers',
+        component: () => import('src/modules/vendor/pages/trainers/management/QuestionnaireAnswers'),
+        props: true,
+        meta: {
+          parent: 'management',
           cookies: ['alenvi_token', 'refresh_token'],
         },
       },

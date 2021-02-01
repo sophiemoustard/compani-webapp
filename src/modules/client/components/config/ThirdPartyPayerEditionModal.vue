@@ -3,20 +3,21 @@
       <template slot="title">
         Editer le <span class="text-weight-bold">tiers payeur</span>
       </template>
-      <ni-input in-modal caption="Nom" v-model="editedThirdPartyPayer.name"
+      <ni-input in-modal caption="Nom" :value="editedThirdPartyPayer.name" @input="update($event, 'name')"
         :error="validations.name.$error" @blur="validations.name.$touch" required-field />
-      <ni-search-address v-model="editedThirdPartyPayer.address" error-message="Adresse invalide"
-        @blur="validations.address.$touch" :error="validations.address.$error" in-modal />
-      <ni-input in-modal caption="Email" v-model.trim="editedThirdPartyPayer.email" error-message="Email invalide"
-        :error="!validations.email.email" />
+      <ni-search-address in-modal :value="editedThirdPartyPayer.address" error-message="Adresse invalide"
+        @blur="validations.address.$touch" :error="validations.address.$error" @input="update($event, 'address')" />
+      <ni-input in-modal caption="Email" :value="editedThirdPartyPayer.email" error-message="Email invalide"
+        :error="!validations.email.email" @input="update($event.trim(), 'email')" />
       <ni-input in-modal caption="Prix unitaire TTC par défaut" suffix="€" type="number"
-        v-model="editedThirdPartyPayer.unitTTCRate" :error="validations.unitTTCRate.$error"
-        :error-message="nbrError('unitTTCRate', validations)" />
-      <ni-select in-modal v-model="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
+        :value="editedThirdPartyPayer.unitTTCRate" :error="validations.unitTTCRate.$error"
+        :error-message="nbrError('unitTTCRate', validations)" @input="update($event, 'unitTTCRate')" />
+      <ni-select in-modal :value="editedThirdPartyPayer.billingMode" :options="billingModeOptions"
         caption="Facturation" :filter="false" required-field :error="validations.billingMode.$error"
-        @blur="validations.billingMode.$touch" />
+        @blur="validations.billingMode.$touch" @input="update($event, 'billingMode')" />
       <div class="row q-mb-md light-checkbox">
-        <q-checkbox v-model="editedThirdPartyPayer.isApa" label="Financement APA" dense />
+        <q-checkbox :value="editedThirdPartyPayer.isApa" label="Financement APA" @input="update($event, 'isApa')"
+          dense />
       </div>
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer le tiers payeur" icon-right="check" color="primary"
@@ -57,6 +58,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:editedThirdPartyPayer', { ...this.editedThirdPartyPayer, [prop]: event });
     },
   },
 };

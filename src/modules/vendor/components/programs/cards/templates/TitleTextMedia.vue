@@ -44,7 +44,7 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-@media (max-width: 767px)
+@media screen and (max-width: 767px)
   .file-uploader
     width: fit-content
 </style>

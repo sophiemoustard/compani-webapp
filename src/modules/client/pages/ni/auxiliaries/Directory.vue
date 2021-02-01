@@ -24,9 +24,9 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="auxiliaryCreationModal = true" :disable="tableLoading" />
 
-    <auxiliary-creation-modal v-model="auxiliaryCreationModal" :new-user="newUser" :civility-options="civilityOptions"
+    <auxiliary-creation-modal v-model="auxiliaryCreationModal" :new-user.sync="newUser"
       :validations="$v.newUser" :company-id="company._id" :loading="loading" :email-error="emailError($v.newUser)"
-      :first-step="firstStep" :send-welcome-msg.sync="sendWelcomeMsg"
+      :first-step="firstStep" :send-welcome-msg.sync="sendWelcomeMsg" :civility-options="civilityOptions"
       @hide="resetForm" @submit="submit" @go-to-next-step="nextStep" />
   </q-page>
 </template>

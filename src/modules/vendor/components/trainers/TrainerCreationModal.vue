@@ -54,8 +54,8 @@ export default {
     goToNextStep () {
       this.$emit('go-to-next-step');
     },
-    update (event, fields) {
-      this.$emit('update:newTrainer', set({ ...this.newTrainer }, fields, event));
+    update (event, path) {
+      this.$emit('update:newTrainer', set({ ...this.newTrainer }, path, event));
     },
   },
 };

@@ -384,7 +384,7 @@ export default {
   &-subtitle
      font-style: italic
      font-size: 16px
-     @media (max-width: 767px)
+     @media screen and (max-width: 767px)
       font-size: 13px
 
 .to-plan-text

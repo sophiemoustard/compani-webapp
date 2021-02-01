@@ -31,6 +31,7 @@ const coachRoutes = [
   { name: 'ni courses learners' },
   { name: 'ni courses learners info' },
   { name: 'ni elearning courses' },
+  { name: 'ni elearning courses info' },
 ];
 const clientAdminRoutes = [
   ...coachRoutes,
@@ -92,6 +93,7 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni management elearning courses' },
   { name: 'ni management elearning courses info' },
   { name: 'account vendor' },
+  { name: 'ni management questionnaire answers' },
 ];
 const vendorAdminRoutes = [...trainingOrganisationManagerRoutes];
 const trainerRoutes = [

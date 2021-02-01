@@ -2,7 +2,8 @@
   <div>
     <p class="text-weight-bold">Progression des participants</p>
     <q-card>
-      <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false">
+      <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
+        :loading="loading">
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'progress'">
@@ -12,7 +13,7 @@
               <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
             </template>
             <template v-else>
-              <div class="name" @click="goToLearnerProfile(props.row)">{{ col.value }}</div>
+              <div class="name" @click.stop="goToLearnerProfile(props.row)">{{ col.value }}</div>
             </template>
           </q-td>
         </template>
@@ -36,24 +37,25 @@
 </template>
 
 <script>
-import Courses from '@api/Courses';
 import ExpandingTable from '@components/table/ExpandingTable';
-import { sortStrings, formatIdentity } from '@helpers/utils';
 import Progress from '@components/CourseProgress';
+import { sortStrings } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
 
 export default {
-  name: 'ProfileFollowUp',
+  name: 'TraineeFollowUpTable',
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
   },
   props: {
-    profileId: { type: String, required: true },
+    learners: { type: Array, default: () => [] },
+    loading: { type: Boolean, default: false },
   },
   data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+
     return {
-      tableLoading: false,
       columns: [
         {
           name: 'name',
@@ -75,49 +77,25 @@ export default {
         },
         { name: 'expand', label: '', field: '' },
       ],
-      learners: [],
       pagination: { sortBy: 'name', ascending: true, page: 1, rowsPerPage: 15 },
       E_LEARNING,
+      isClientInterface,
     };
   },
-  async created () {
-    await this.getLearnersList();
-  },
   methods: {
-    formatRow (trainee) {
-      const formattedName = formatIdentity(trainee.identity, 'FL');
-
-      return {
-        _id: trainee._id,
-        identity: { ...trainee.identity, fullName: formattedName },
-        progress: trainee.progress,
-        steps: trainee.steps,
-      };
-    },
-    async getLearnersList () {
-      try {
-        this.tableLoading = true;
-        const course = await Courses.getFollowUp(this.profileId);
-
-        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
-      } catch (e) {
-        console.error(e);
-        this.learners = [];
-      } finally {
-        this.tableLoading = false;
-      }
-    },
     goToLearnerProfile (row) {
-      this.$router.push({ name: 'ni users learners info', params: { learnerId: row._id, defaultTab: 'courses' } });
+      const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
+      this.$router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
     },
   },
 };
 </script>
+
 <style lang="stylus" scoped>
-.progress
-  width: 100%
-.name
-  width: fit-content;
-  text-decoration: underline
-  color: $primary
+  .progress
+    width: 100%
+  .name
+    width: fit-content;
+    text-decoration: underline
+    color: $primary
 </style>

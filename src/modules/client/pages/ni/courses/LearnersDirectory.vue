@@ -32,7 +32,7 @@ import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import LearnerCreationModal from '@components/courses/LearnerCreationModal';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { required, requiredIf, email } from 'vuelidate/lib/validators';
+import { required, email } from 'vuelidate/lib/validators';
 import { DEFAULT_AVATAR, TRAINEE } from '@data/constants';
 import {
   formatPhoneForPayload,
@@ -57,7 +57,6 @@ export default {
   data () {
     return {
       loading: false,
-      learnerList: [],
       searchStr: '',
       learnerCreationModal: false,
       learnerCreationModalLoading: false,
@@ -73,14 +72,14 @@ export default {
     },
   },
   async created () {
-    await this.getLearnerList();
+    await this.getLearnerList(this.company._id);
   },
   validations () {
     return {
       newLearner: {
-        identity: { lastname: { required: requiredIf(this.identityStep) } },
+        identity: { lastname: { required } },
         local: { email: { required, email } },
-        contact: { phone: { frPhoneNumber } },
+        contact: { phone: { required, frPhoneNumber } },
       },
     };
   },
@@ -90,18 +89,6 @@ export default {
     },
     updateSearch (value) {
       this.searchStr = value;
-    },
-    async getLearnerList () {
-      try {
-        this.tableLoading = true;
-        const learners = await Users.learnerList({ company: this.company._id });
-        this.learnerList = Object.freeze(learners.map(this.formatRow));
-      } catch (e) {
-        console.error(e);
-        this.learnerList = [];
-      } finally {
-        this.tableLoading = false;
-      }
     },
     getAvatar (link) {
       return link || DEFAULT_AVATAR;
@@ -142,7 +129,7 @@ export default {
         NotifyPositive('Apprenant ajouté avec succès.');
 
         this.learnerCreationModal = false;
-        await this.getLearnerList();
+        await this.getLearnerList(this.company._id);
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
@@ -168,7 +155,7 @@ export default {
         await this.sendWelcome();
 
         this.learnerCreationModal = false;
-        await this.getLearnerList();
+        await this.getLearnerList(this.company._id);
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
