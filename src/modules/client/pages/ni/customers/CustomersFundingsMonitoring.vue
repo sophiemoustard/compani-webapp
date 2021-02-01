@@ -2,6 +2,7 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide" padding>
       <template slot="content">
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div class="col-xs-12 col-sm-6 col-md-4">
             <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector"
@@ -30,6 +31,8 @@
 
 <script>
 import get from 'lodash/get';
+import moment from '@helpers/moment';
+import { downloadCsv } from '@helpers/file';
 import Stats from '@api/Stats';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SimpleTable from '@components/table/SimpleTable';
@@ -166,6 +169,37 @@ export default {
     },
     onInputSector () {
       if (this.selectedSector !== '') this.selectedThirdPartyPayer = '';
+    },
+    async exportToCSV () {
+      const csvData = [[
+        'Financeur',
+        'Bénéficiaire',
+        'Référent',
+        'Equipe',
+        'Taux participation du bénéficiaire',
+        'Prix unitaire',
+        'Nb d\'heures',
+        'Mois précédent',
+        'Mois en cours',
+        'Mois suivant',
+      ]];
+
+      for (const cusData of this.allCustomersFundingsMonitoring) {
+        csvData.push([
+          get(cusData, 'tpp.name') || '',
+          formatIdentity(cusData.customer, 'Lf'),
+          formatIdentity(cusData.referent, 'FL'),
+          get(cusData, 'sector.name'),
+          roundFrenchPercentage(cusData.customerParticipationRate),
+          formatPrice(cusData.unitTTCRate),
+          formatHours(cusData.careHours),
+          (cusData.prevMonthCareHours === -1 ? 'N/A' : formatHours(cusData.prevMonthCareHours, 1)),
+          formatHours(cusData.currentMonthCareHours, 1),
+          (cusData.nextMonthCareHours === -1 ? 'N/A' : formatHours(cusData.nextMonthCareHours, 1)),
+        ]);
+      }
+
+      return downloadCsv(csvData, `customers_fundings_${moment().format('MM_YYYY')}.csv`);
     },
   },
   async created () {
