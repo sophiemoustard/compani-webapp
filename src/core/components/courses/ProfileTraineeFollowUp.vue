@@ -25,7 +25,7 @@
           @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <profile-follow-up :profile-id="profileId" class="q-my-md" />
+    <trainee-follow-up-table :profile-id="profileId" class="q-my-md" />
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaire-container">
@@ -60,7 +60,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
 import Button from '@components/Button';
-import ProfileFollowUp from '@components/courses/ProfileFollowUp';
+import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
 
@@ -70,7 +70,7 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-button': Button,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
-    'profile-follow-up': ProfileFollowUp,
+    'trainee-follow-up-table': TraineeFollowUpTable,
   },
   props: {
     profileId: { type: String, required: true },
