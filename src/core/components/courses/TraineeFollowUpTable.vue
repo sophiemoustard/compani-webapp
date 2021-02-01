@@ -2,7 +2,8 @@
   <div>
     <p class="text-weight-bold">Progression des participants</p>
     <q-card>
-      <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false">
+      <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
+        :loading="loading">
         <template #row="{ props }">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
             <template v-if="col.name === 'progress'">
@@ -36,12 +37,9 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
-import Courses from '@api/Courses';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
-import { NotifyNegative } from '@components/popup/notify';
-import { sortStrings, formatIdentity } from '@helpers/utils';
+import { sortStrings } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
 
 export default {
@@ -51,14 +49,13 @@ export default {
     'ni-progress': Progress,
   },
   props: {
-    profileId: { type: String, required: true },
+    learners: { type: Array, default: () => [] },
+    loading: { type: Boolean, default: false },
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
 
     return {
-      learners: [],
-      tableLoading: false,
       columns: [
         {
           name: 'name',
@@ -85,44 +82,10 @@ export default {
       isClientInterface,
     };
   },
-  computed: {
-    ...mapGetters({ company: 'main/getCompany' }),
-  },
-  async created () {
-    await this.getLearnersList();
-  },
   methods: {
     goToLearnerProfile (row) {
       const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
       this.$router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
-    },
-    formatRow (trainee) {
-      const formattedName = formatIdentity(trainee.identity, 'FL');
-
-      return {
-        _id: trainee._id,
-        identity: { ...trainee.identity, fullName: formattedName },
-        progress: trainee.progress,
-        steps: trainee.steps,
-      };
-    },
-    async getLearnersList () {
-      try {
-        this.tableLoading = true;
-        const course = await Courses.getFollowUp(
-          this.profileId,
-          this.isClientInterface ? { company: this.company._id } : null
-        );
-
-        if (course) this.learners = Object.freeze(course.trainees.map(this.formatRow));
-        this.$emit('update:learners', this.learners);
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la récupération des apprenants');
-        this.learners = [];
-      } finally {
-        this.tableLoading = false;
-      }
     },
   },
 };

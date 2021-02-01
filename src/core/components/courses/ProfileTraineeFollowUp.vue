@@ -25,7 +25,7 @@
           @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <trainee-follow-up-table :profile-id="profileId" class="q-my-md" />
+    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" />
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaire-container">
@@ -63,9 +63,11 @@ import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
+import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
 export default {
   name: 'ProfileTraineeFollowUp',
+  mixins: [traineeFollowUpTableMixin],
   components: {
     'ni-simple-table': SimpleTable,
     'ni-button': Button,

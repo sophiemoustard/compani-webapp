@@ -18,27 +18,24 @@
         </q-card>
       </div>
     </div>
-    <trainee-follow-up-table :learners.sync="learners" :profile-id="profileId" class="q-mt-xl" />
+    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
   </div>
 </template>
 
 <script>
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
+import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
 export default {
   name: 'ProfileFollowUp',
+  mixins: [traineeFollowUpTableMixin],
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'trainee-follow-up-table': TraineeFollowUpTable,
   },
   props: {
     profileId: { type: String, required: true },
-  },
-  data () {
-    return {
-      learners: [],
-    };
   },
   computed: {
     traineesOnGoingCount () {
