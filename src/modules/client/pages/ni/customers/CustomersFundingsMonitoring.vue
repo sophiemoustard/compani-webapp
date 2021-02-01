@@ -1,8 +1,10 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide" padding>
-      <template slot="content">
+      <template slot="title">
         <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
+      </template>
+      <template slot="content">
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div class="col-xs-12 col-sm-6 col-md-4">
             <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector"
@@ -68,7 +70,7 @@ export default {
         {
           name: 'tpp',
           label: 'Financeur',
-          field: row => get(row, 'tpp.name', ''),
+          field: row => this.getTppName(row),
           format: value => truncate(value),
           align: 'left',
           classes: 'text-weight-bold',
@@ -77,7 +79,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           field: 'customer',
-          format: value => formatIdentity(value, 'Lf'),
+          format: value => this.formatCustomerName(value),
           align: 'left',
           classes: 'text-weight-bold',
           sort: (a, b) => b.lastname.localeCompare(a.lastname),
@@ -86,13 +88,13 @@ export default {
           name: 'referent',
           label: 'Référent',
           field: 'referent',
-          format: value => formatIdentity(value, 'FL'),
+          format: value => this.formatReferentName(value),
           align: 'left',
         },
         {
           name: 'sector',
           label: 'Equipe',
-          field: row => get(row, 'sector.name', ''),
+          field: row => this.getSectorName(row),
           align: 'left',
         },
         {
@@ -170,6 +172,18 @@ export default {
     onInputSector () {
       if (this.selectedSector !== '') this.selectedThirdPartyPayer = '';
     },
+    getTppName (cusData) {
+      return get(cusData, 'tpp.name') || '';
+    },
+    formatCustomerName (customer) {
+      return formatIdentity(customer, 'Lf');
+    },
+    formatReferentName (referent) {
+      return formatIdentity(referent, 'Lf');
+    },
+    getSectorName (cusData) {
+      return get(cusData, 'sector.name') || '';
+    },
     async exportToCSV () {
       const csvData = [[
         'Financeur',
@@ -186,16 +200,16 @@ export default {
 
       for (const cusData of this.allCustomersFundingsMonitoring) {
         csvData.push([
-          get(cusData, 'tpp.name') || '',
-          formatIdentity(cusData.customer, 'Lf'),
-          formatIdentity(cusData.referent, 'FL'),
-          get(cusData, 'sector.name'),
-          roundFrenchPercentage(cusData.customerParticipationRate),
-          formatPrice(cusData.unitTTCRate),
-          formatHours(cusData.careHours),
-          (cusData.prevMonthCareHours === -1 ? 'N/A' : formatHours(cusData.prevMonthCareHours, 1)),
-          formatHours(cusData.currentMonthCareHours, 1),
-          (cusData.nextMonthCareHours === -1 ? 'N/A' : formatHours(cusData.nextMonthCareHours, 1)),
+          this.getTppName(cusData),
+          this.formatCustomerName(cusData.customer),
+          this.formatReferentName(cusData.referent),
+          this.getSectorName(cusData),
+          cusData.customerParticipationRate,
+          cusData.unitTTCRate,
+          cusData.careHours,
+          cusData.prevMonthCareHours,
+          cusData.currentMonthCareHours,
+          cusData.nextMonthCareHours,
         ]);
       }
 
