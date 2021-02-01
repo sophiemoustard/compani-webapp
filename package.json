@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@casl/ability": "^5.2.2",
-    "@casl/vue": "^1.2.2",
+    "@casl/vue": "^2.0.2",
     "@quasar/extras": "^1.9.15",
     "axios": "^0.21.0",
     "connect-history-api-fallback": "^1.6.0",
