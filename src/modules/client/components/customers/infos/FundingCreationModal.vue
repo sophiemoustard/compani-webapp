@@ -3,36 +3,41 @@
       <template slot="title">
         Ajouter un <span class="text-weight-bold">financement</span>
       </template>
-      <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" v-model="newFunding.thirdPartyPayer"
-        :error="validations.thirdPartyPayer.$error" @blur="validations.thirdPartyPayer.$touch" required-field />
-      <ni-select in-modal v-model="newFunding.subscription" :options="fundingSubscriptionsOptions"
+      <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" :value="newFunding.thirdPartyPayer"
+        :error="validations.thirdPartyPayer.$error" @blur="validations.thirdPartyPayer.$touch" required-field
+        @input="update($event, 'thirdPartyPayer')" />
+      <ni-select in-modal :value="newFunding.subscription" :options="fundingSubscriptionsOptions"
         caption="Souscription" @blur="validations.subscription.$touch" :error="validations.subscription.$error"
-        required-field />
-      <ni-date-input v-model="newFunding.startDate" caption="Date de début de prise en charge" in-modal
-        @blur="validations.startDate.$touch" :error="validations.startDate.$error" required-field />
-      <ni-date-input v-model="newFunding.endDate" in-modal caption="Date de fin de prise en charge"
-        :min="minStartDate" />
-      <ni-input in-modal v-model="newFunding.folderNumber" caption="Numéro de dossier" />
-      <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" v-model="newFunding.frequency"
-        @blur="validations.frequency.$touch" :error="validations.frequency.$error" required-field />
-      <ni-select in-modal caption="Nature" :options="fundingNatureOptions" v-model="newFunding.nature"
+        required-field @input="update($event, 'subscription')" />
+      <ni-date-input :value="newFunding.startDate" caption="Date de début de prise en charge" in-modal
+        @blur="validations.startDate.$touch" :error="validations.startDate.$error" required-field
+        @input="update($event, 'startDate')" />
+      <ni-date-input :value="newFunding.endDate" in-modal caption="Date de fin de prise en charge"
+        :min="minStartDate" @input="update($event, 'endDate')" />
+      <ni-input in-modal :value="newFunding.folderNumber" caption="Numéro de dossier"
+        @input="update($event, 'folderNumber')" />
+      <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" :value="newFunding.frequency"
+        @blur="validations.frequency.$touch" :error="validations.frequency.$error" required-field
+        @input="update($event, 'frequency')" />
+      <ni-select in-modal caption="Nature" :options="fundingNatureOptions" :value="newFunding.nature"
         :error="validations.nature.$error" @blur="validations.nature.$touch" required-field
-        @input="resetFundingFrequency" />
-      <ni-input in-modal v-if="!isFixedFunding" v-model="newFunding.unitTTCRate" caption="Prix unitaire TTC"
+        @input="update($event, 'nature')" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.unitTTCRate" caption="Prix unitaire TTC"
         type="number" @blur="validations.unitTTCRate.$touch" :error="validations.unitTTCRate.$error"
-        required-field />
-      <ni-input in-modal v-if="isFixedFunding" v-model="newFunding.amountTTC" caption="Montant forfaitaire TTC"
-        type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field />
-      <ni-input in-modal v-if="!isFixedFunding" v-model="newFunding.careHours"
+        required-field @input="update($event, 'unitTTCRate')" />
+      <ni-input in-modal v-if="isFixedFunding" :value="newFunding.amountTTC" caption="Montant forfaitaire TTC"
+        type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field
+        @input="update($event, 'amountTTC')" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.careHours"
         caption="Nb. heures prises en charge" type="number" suffix="h" @blur="validations.careHours.$touch"
-        :error="validations.careHours.$error" required-field />
-      <ni-input in-modal v-if="!isFixedFunding" v-model="newFunding.customerParticipationRate"
-        caption="Taux de participation du bénéficiaire" type="number" suffix="%"
+        :error="validations.careHours.$error" required-field @input="update($event, 'careHours')" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.customerParticipationRate"
+        caption="Taux de participation du bénéficiaire" type="number" suffix="%" required-field
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
-        required-field />
-      <ni-option-group v-model="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
+        @input="update($event, 'customerParticipationRate')" />
+      <ni-option-group :value="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
-        required-field />
+        required-field @input="update($event, 'careDays')" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un financement" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -107,9 +112,6 @@ export default {
         this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
       }
     },
-    resetFundingFrequency () {
-      if (this.isFixedFunding && this.newFunding.frequency !== ONCE) this.newFunding.frequency = '';
-    },
     hide () {
       this.$emit('hide');
     },
@@ -118,6 +120,12 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      if (prop === 'nature' && this.isFixedFunding && this.newFunding.frequency !== ONCE) {
+        this.newFunding.frequency = '';
+      }
+      this.$emit('update:newFunding', { ...this.newFunding, [prop]: event });
     },
   },
 };

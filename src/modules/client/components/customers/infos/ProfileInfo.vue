@@ -267,7 +267,7 @@
 
     <!-- Funding creation modal -->
     <funding-creation-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :new-funding="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
+      :new-funding.sync="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
       :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
 
     <!-- Funding edition modal -->
