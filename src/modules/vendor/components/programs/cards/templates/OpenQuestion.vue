@@ -1,7 +1,11 @@
 <template>
-  <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
-    @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
-    type="textarea" :disable="disableEdition" />
+  <div>
+    <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
+      @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
+      type="textarea" :disable="disableEdition" />
+    <q-checkbox v-model="card.isMandatory" @input="updateCard('isMandatory')" label="Obligatoire"
+      class="q-mb-lg" dense />
+  </div>
 </template>
 
 <script>
