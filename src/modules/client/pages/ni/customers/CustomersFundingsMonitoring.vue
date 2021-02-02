@@ -1,6 +1,9 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide" padding>
+      <template slot="title">
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
+      </template>
       <template slot="content">
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div class="col-xs-12 col-sm-6 col-md-4">
@@ -30,6 +33,8 @@
 
 <script>
 import get from 'lodash/get';
+import moment from '@helpers/moment';
+import { downloadCsv } from '@helpers/file';
 import Stats from '@api/Stats';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import SimpleTable from '@components/table/SimpleTable';
@@ -37,7 +42,14 @@ import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import SelectSector from '@components/form/SelectSector';
 import { NotifyNegative } from '@components/popup/notify';
-import { formatIdentity, formatHours, formatPrice, roundFrenchPercentage, truncate } from '@helpers/utils';
+import {
+  formatIdentity,
+  formatHours,
+  formatPrice,
+  roundFrenchPercentage,
+  truncate,
+  formatNumberForCSV,
+} from '@helpers/utils';
 
 export default {
   name: 'CustomersFundingsMonitoring',
@@ -65,7 +77,7 @@ export default {
         {
           name: 'tpp',
           label: 'Financeur',
-          field: row => get(row, 'tpp.name', ''),
+          field: row => this.getTppName(row),
           format: value => truncate(value),
           align: 'left',
           classes: 'text-weight-bold',
@@ -74,7 +86,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           field: 'customer',
-          format: value => formatIdentity(value, 'Lf'),
+          format: value => this.formatCustomerName(value),
           align: 'left',
           classes: 'text-weight-bold',
           sort: (a, b) => b.lastname.localeCompare(a.lastname),
@@ -83,13 +95,13 @@ export default {
           name: 'referent',
           label: 'Référent',
           field: 'referent',
-          format: value => formatIdentity(value, 'FL'),
+          format: value => this.formatReferentName(value),
           align: 'left',
         },
         {
           name: 'sector',
           label: 'Equipe',
-          field: row => get(row, 'sector.name', ''),
+          field: row => this.getSectorName(row),
           align: 'left',
         },
         {
@@ -166,6 +178,49 @@ export default {
     },
     onInputSector () {
       if (this.selectedSector !== '') this.selectedThirdPartyPayer = '';
+    },
+    getTppName (cusData) {
+      return get(cusData, 'tpp.name') || '';
+    },
+    formatCustomerName (customer) {
+      return formatIdentity(customer, 'Lf');
+    },
+    formatReferentName (referent) {
+      return formatIdentity(referent, 'Lf');
+    },
+    getSectorName (cusData) {
+      return get(cusData, 'sector.name') || '';
+    },
+    async exportToCSV () {
+      const csvData = [[
+        'Financeur',
+        'Bénéficiaire',
+        'Référent',
+        'Equipe',
+        'Taux participation du bénéficiaire',
+        'Prix unitaire',
+        'Nb d\'heures',
+        'Mois précédent',
+        'Mois en cours',
+        'Mois suivant',
+      ]];
+
+      for (const cusData of this.allCustomersFundingsMonitoring) {
+        csvData.push([
+          this.getTppName(cusData),
+          this.formatCustomerName(cusData.customer),
+          this.formatReferentName(cusData.referent),
+          this.getSectorName(cusData),
+          formatNumberForCSV(cusData.customerParticipationRate),
+          formatNumberForCSV(cusData.unitTTCRate),
+          formatNumberForCSV(cusData.careHours),
+          formatNumberForCSV(cusData.prevMonthCareHours),
+          formatNumberForCSV(cusData.currentMonthCareHours),
+          formatNumberForCSV(cusData.nextMonthCareHours),
+        ]);
+      }
+
+      return downloadCsv(csvData, `customers_fundings_${moment().format('MM_YYYY')}.csv`);
     },
   },
   async created () {
