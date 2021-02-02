@@ -240,7 +240,7 @@
       :first-step="firstStep" />
 
     <!-- Edit helper modal -->
-    <helper-edition-modal :edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
+    <helper-edition-modal :edited-helper.sync="editedHelper" v-model="openEditedHelperModal" :loading="loading"
       :validations="$v.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
     <!-- Subscription creation modal -->

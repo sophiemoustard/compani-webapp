@@ -3,12 +3,15 @@
     <template slot="title">
       Éditer l'<span class="text-weight-bold">aidant</span>
     </template>
-    <ni-input in-modal v-model="editedHelper.local.email" caption="Email" disable />
-    <ni-input in-modal v-model="editedHelper.identity.lastname" :error="validations.identity.lastname.$error"
-      caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
-    <ni-input in-modal v-model="editedHelper.identity.firstname" caption="Prénom" />
-    <ni-input in-modal v-model="editedHelper.contact.phone" last :error="validations.contact.phone.$error"
-      caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError" />
+    <ni-input in-modal :value="editedHelper.local.email" caption="Email" disable />
+    <ni-input in-modal :value="editedHelper.identity.lastname" :error="validations.identity.lastname.$error"
+      caption="Nom" @blur="validations.identity.lastname.$touch" required-field
+      @input="update($event, 'identity.lastname')" />
+    <ni-input in-modal :value="editedHelper.identity.firstname" caption="Prénom"
+      @input="update($event, 'identity.firstname')" />
+    <ni-input in-modal :value="editedHelper.contact.phone" last :error="validations.contact.phone.$error"
+      caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
+      @input="update($event, 'contact.phone')" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer l'aidant" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -17,6 +20,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
@@ -51,6 +55,9 @@ export default {
     },
     input (event) {
       this.$emit('input', event);
+    },
+    update (event, path) {
+      this.$emit('update:editedHelper', set({ ...this.editedHelper }, path, event));
     },
   },
 };
