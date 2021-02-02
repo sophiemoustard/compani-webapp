@@ -3,28 +3,29 @@
       <template slot="title">
         Éditer le <span class="text-weight-bold">financement</span>
       </template>
-      <ni-date-input v-model="editedFunding.startDate" caption="Date de début de prise en charge"
+      <ni-date-input :value="editedFunding.startDate" caption="Date de début de prise en charge"
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="validations.startDate.$touch"
-        :error="validations.startDate.$error" required-field />
-      <ni-date-input v-model="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
-        :min="minEndDate" />
-      <ni-input in-modal v-model="editedFunding.folderNumber" caption="Numéro de dossier" />
-      <ni-input in-modal v-if="!isFixedFunding" v-model="editedFunding.unitTTCRate"
+        :error="validations.startDate.$error" required-field @input="update($event, 'startDate')" />
+      <ni-date-input :value="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
+        :min="minEndDate" @input="update($event, 'endDate')" />
+      <ni-input in-modal :value="editedFunding.folderNumber" caption="Numéro de dossier"
+        @input="update($event, 'folderNumber')" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.unitTTCRate"
         caption="Prix unitaire TTC" type="number" @blur="validations.unitTTCRate.$touch"
-        :error="validations.unitTTCRate.$error" required-field />
-      <ni-input in-modal v-if="isFixedFunding" v-model="editedFunding.amountTTC"
+        :error="validations.unitTTCRate.$error" required-field @input="update($event, 'unitTTCRate')" />
+      <ni-input in-modal v-if="isFixedFunding" :value="editedFunding.amountTTC"
         caption="Montant forfaitaire TTC" type="number" @blur="validations.amountTTC.$touch"
-        :error="validations.amountTTC.$error" required-field />
-      <ni-input in-modal v-if="!isFixedFunding" v-model="editedFunding.careHours"
+        :error="validations.amountTTC.$error" required-field @input="update($event, 'amountTTC')" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.careHours"
         caption="Nb. heures prises en charge" type="number" @blur="validations.careHours.$touch"
-        :error="validations.careHours.$error" required-field suffix="h" />
-      <ni-input in-modal v-if="!isFixedFunding" v-model="editedFunding.customerParticipationRate"
+        :error="validations.careHours.$error" required-field suffix="h" @input="update($event, 'careHours')" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.customerParticipationRate"
         caption="Taux de participation du bénéficiaire" type="number" suffix="%"
-        @blur="validations.customerParticipationRate.$touch"
+        @blur="validations.customerParticipationRate.$touch" @input="update($event, 'customerParticipationRate')"
         :error="validations.customerParticipationRate.$error" required-field />
-      <ni-option-group v-model="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
+      <ni-option-group :value="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
-        required-field />
+        required-field @input="update($event, 'careDays')" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer le financement" icon-right="check" color="primary"
           :loading="loading" @click="submit" />
@@ -55,10 +56,6 @@ export default {
     'ni-date-input': DateInput,
     'ni-option-group': OptionGroup,
   },
-  data () {
-    return {
-    };
-  },
   computed: {
     editedFundingMaxStartDate () {
       return this.editedFunding && this.editedFunding.endDate
@@ -81,6 +78,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:editedFunding', { ...this.editedFunding, [prop]: event });
     },
   },
 };

@@ -272,7 +272,7 @@
 
     <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
-      :edited-funding="editedFunding" @submit="editFunding" :days-options="daysOptions"
+      :edited-funding.sync="editedFunding" @submit="editFunding" :days-options="daysOptions"
       :validations="$v.editedFunding" />
 </div>
 </template>
