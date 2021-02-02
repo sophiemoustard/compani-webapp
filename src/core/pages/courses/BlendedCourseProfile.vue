@@ -137,6 +137,9 @@ export default {
   },
   beforeDestroy () {
     this.$store.dispatch('course/resetCourse');
+    if (!['ni courses', 'ni management blended courses', 'trainers courses'].includes(this.$router.currentRoute.name)) {
+      this.$store.dispatch('course/resetFilters');
+    }
   },
 
 };

@@ -1,3 +1,4 @@
+import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
@@ -9,12 +10,10 @@ export const courseFiltersMixin = {
     return {
       programOptions: [],
       companyOptions: [],
-      selectedProgram: '',
-      selectedTrainer: '',
-      selectedCompany: '',
     };
   },
   computed: {
+    ...mapState('course', ['selectedTrainer', 'selectedProgram', 'selectedCompany']),
     coursesFiltered () {
       let courses = this.coursesWithGroupedSlot;
       if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
@@ -65,10 +64,17 @@ export const courseFiltersMixin = {
     },
   },
   methods: {
+    updateSelectedTrainer (trainerId) {
+      this.$store.dispatch('course/setSelectedTrainer', { trainerId });
+    },
+    updateSelectedProgram (programId) {
+      this.$store.dispatch('course/setSelectedProgram', { programId });
+    },
+    updateSelectedCompany (companyId) {
+      this.$store.dispatch('course/setSelectedCompany', { companyId });
+    },
     resetFilters () {
-      this.selectedTrainer = '';
-      this.selectedCompany = '';
-      this.selectedProgram = '';
+      this.$store.dispatch('course/resetFilters');
     },
     filterCoursesByProgram (courses) {
       return courses.filter(course => course.subProgram.program._id === this.selectedProgram);

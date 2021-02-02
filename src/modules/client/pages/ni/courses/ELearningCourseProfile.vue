@@ -1,7 +1,7 @@
 <template>
-    <q-page class="vendor-background" padding>
+    <q-page class="client-background" padding>
       <ni-profile-header :title="courseName" />
-      <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
+      <profile-follow-up :profile-id="courseId" />
     </q-page>
 </template>
 
@@ -9,39 +9,23 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import ProfileHeader from '@components/ProfileHeader';
-import ProfileTabs from '@components/ProfileTabs';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
-import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
 import { NotifyNegative } from '@components/popup/notify';
 
 export default {
-  name: 'ELearningCoursesProfile',
+  name: 'ELearningCourseProfile',
   components: {
     'ni-profile-header': ProfileHeader,
-    'profile-tabs': ProfileTabs,
+    'profile-follow-up': ProfileFollowUp,
   },
   props: {
     courseId: { type: String, required: true },
-    defaultTab: { type: String, default: 'followUp' },
   },
   computed: {
     ...mapState('course', ['course']),
     courseName () {
       return get(this.course, 'subProgram.program.name');
     },
-  },
-  data () {
-    return {
-      tabsContent: [
-        {
-          label: 'Suivi',
-          name: 'followUp',
-          default: this.defaultTab === 'followUp',
-          component: ProfileFollowUp,
-        },
-        { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: ProfileAccess },
-      ],
-    };
   },
   async created () {
     await this.refreshCourse();

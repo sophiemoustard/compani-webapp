@@ -1,4 +1,4 @@
-import { Platform } from 'quasar';
+import { Platform, Screen } from 'quasar';
 import get from 'lodash/get';
 import users from '@api/Users';
 import { userModel } from '@data/user';
@@ -10,7 +10,7 @@ export default {
   state: {
     loggedUser: null,
     refreshState: true,
-    drawer: !!Platform.is.desktop,
+    drawer: !!Platform.is.desktop || Screen.width >= 1024,
   },
   mutations: {
     SET_REFRESH_STATE: (state, refresh) => { state.refreshState = refresh; },

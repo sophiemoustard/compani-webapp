@@ -156,7 +156,7 @@ h6
   display: grid
   grid-template-columns: repeat(auto-fill, 114px)
   justify-content: center
-  @media (max-width: 767px)
+  @media screen and (max-width: 767px)
     grid-template-columns: repeat(auto-fill, 79px)
 
 .card-button
@@ -166,7 +166,7 @@ h6
   font-size: 14px
   height: 120px
   width: 100px
-  @media (max-width: 767px)
+  @media screen and (max-width: 767px)
     width: 65px
     height: 90px
   display: flex
@@ -185,7 +185,7 @@ h6
       height: 35px
       margin: 5px 2px
       border-radius: 3px
-      @media (max-width: 767px)
+      @media screen and (max-width: 767px)
         width: 30%
         height: 30px
     .flashcard-right

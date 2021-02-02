@@ -3,25 +3,26 @@
       <template slot="title">
         Ajouter un <span class="text-weight-bold">établissement</span>
       </template>
-      <ni-input in-modal caption="Nom" v-model="newEstablishment.name" :error="validations.name.$error"
+      <ni-input in-modal caption="Nom" :value="newEstablishment.name" :error="validations.name.$error"
         :error-message="establishmentNameError(validations)" @blur="validations.name.$touch"
-        required-field />
-      <ni-input in-modal caption="SIRET" v-model="newEstablishment.siret" :error="validations.siret.$error"
+        required-field @input="update($event, 'name')" />
+      <ni-input in-modal caption="SIRET" :value="newEstablishment.siret" :error="validations.siret.$error"
         :error-message="establishmentSiretError(validations)" @blur="validations.siret.$touch"
-        required-field />
-      <ni-search-address in-modal v-model="newEstablishment.address" color="white"
+        required-field @input="update($event, 'siret')" />
+      <ni-search-address in-modal :value="newEstablishment.address" color="white"
         @blur="validations.address.$touch" :error-message="establishmentAddressError(validations)"
-        :error="validations.address.$error" required-field />
-      <ni-input in-modal caption="Téléphone" v-model="newEstablishment.phone" :error="validations.phone.$error"
+        :error="validations.address.$error" required-field @input="update($event, 'address')" />
+      <ni-input in-modal caption="Téléphone" :value="newEstablishment.phone" :error="validations.phone.$error"
         :error-message="establishmentPhoneError(validations)" @blur="validations.phone.$touch"
-        required-field />
-      <ni-select in-modal caption="Service de santé du travail" v-model="newEstablishment.workHealthService"
+        required-field @input="update($event, 'phone')" />
+      <ni-select in-modal caption="Service de santé du travail" :value="newEstablishment.workHealthService"
         :options="workHealthServices" :error="validations.workHealthService.$error"
         :error-message="establishmentWhsError(validations)" @blur="validations.workHealthService.$touch"
-        required-field />
-      <ni-select in-modal caption="Code URSSAF" v-model="newEstablishment.urssafCode" :options="urssafCodes"
+        required-field @input="update($event, 'workHealthService')" />
+      <ni-select in-modal caption="Code URSSAF" :value="newEstablishment.urssafCode" :options="urssafCodes"
         :error="validations.urssafCode.$error" @blur="validations.urssafCode.$touch"
-        :error-message="establishmentUrssafCodeError(validations)" required-field />
+        :error-message="establishmentUrssafCodeError(validations)" required-field
+        @input="update($event, 'urssafCode')" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Ajouter un établissement" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -62,6 +63,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newEstablishment', { ...this.newEstablishment, [prop]: event });
     },
   },
 };

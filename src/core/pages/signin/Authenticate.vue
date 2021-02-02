@@ -122,7 +122,7 @@ export default {
   .buttons
     display: flex
     justify-content: center
-    @media (max-width: 420px)
+    @media screen and (max-width: 420px)
       flex-direction: column-reverse
       .firstLoginBtn
         margin-top: 16px

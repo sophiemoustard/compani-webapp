@@ -1,39 +1,78 @@
 <template>
-  <q-page class="client-background q-pb-xl" padding>
-    <div class="q-mb-xl">
+  <q-page class="client-background" padding>
+    <div class="flex no-wrap justify-between">
       <h4>La formation Compani dans ma structure</h4>
+      <ni-date-range v-model="dates" class="dates" borders />
     </div>
-    <q-card flat class="q-pa-md elearning-container">
-      <div>
-        <div class="text-weight-bold q-mb-sm">Le eLearning dans ma structure</div>
-        <ni-date-range v-model="dates" class="dates" borders />
-      </div>
-      <div class="elearning">
+    <q-card flat class="q-pa-md flex row">
+      <div class="text-weight-bold q-mb-sm col-md-4 col-xs-12">Le eLearning dans ma structure</div>
+      <div class="flex row justify-around col-md-8 col-xs-12">
         <div class="column items-center">
-          <div class="elearning-indicator text-weight-bold text-pink-500">{{ activeLearners }}</div>
+          <ni-e-learning-indicator :indicator="activeLearners" />
           <div class="text-center">apprenants actifs</div>
         </div>
         <div class="column items-center">
-          <div class="elearning-indicator text-weight-bold text-pink-500">{{ activityHistories.length }}</div>
+          <ni-e-learning-indicator :indicator="activityHistories.length" />
           <div class="text-center">activités de eLearning réalisées</div>
         </div>
       </div>
     </q-card>
+    <div class="row q-mt-md">
+      <div class="col-xs-12 col-md-6 left-card">
+        <q-card flat class="fit q-pa-md">
+          <div class="text-weight-bold q-mb-sm">Apprenants les plus assidus</div>
+          <div class="row justify-end">
+            <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
+          </div>
+          <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
+            class="flex justify-between items-center row q-my-sm">
+            <div class="flex no-wrap items-center col-8">
+              <ni-e-learning-indicator :indicator="index + 1" />
+              <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
+              <div class="text-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
+            </div>
+            <div class="col-4 text-center">{{ learner.activityCount }}</div>
+          </div>
+        </q-card>
+      </div>
+      <div class="col-xs-12 col-md-6 right-card">
+        <q-card flat class="fit q-pa-md">
+          <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
+          <div class="row justify-end">
+            <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
+          </div>
+          <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
+            class="flex justify-between items-center row q-my-sm">
+            <div class="flex no-wrap items-center col-8">
+              <ni-e-learning-indicator :indicator="index + 1" />
+              <div class="q-mx-md text-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
+            </div>
+            <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
+          </div>
+        </q-card>
+      </div>
+    </div>
   </q-page>
 </template>
 
 <script>
+import omit from 'lodash/omit';
+import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import moment from '@helpers/moment';
+import ELearningIndicator from '@components/courses/ELearningIndicator';
+import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
+import { DEFAULT_AVATAR } from '@data/constants';
 
 export default {
   name: 'CourseDashboard',
   metaInfo: { title: 'Tableau de bord des formations' },
   components: {
     'ni-date-range': DateRange,
+    'ni-e-learning-indicator': ELearningIndicator,
   },
   data () {
     return {
@@ -42,11 +81,32 @@ export default {
         endDate: moment().toISOString(),
       },
       activityHistories: [],
+      formatIdentity,
+      upperCaseFirstLetter,
+      DEFAULT_AVATAR,
     };
   },
   computed: {
     activeLearners () {
-      return uniqBy(this.activityHistories, 'user').length;
+      return uniqBy(this.activityHistories, 'user._id').length;
+    },
+    courseList () {
+      const groupedByCourses = Object.values(groupBy(this.activityHistories.map((aH) => {
+        const res = [];
+        for (const step of aH.activity.steps) res.push({ ...aH, activity: { ...omit(aH.activity, 'steps'), step } });
+        return res;
+      }).flat(), h => h.activity.step.subProgram.courses[0]._id));
+
+      return groupedByCourses.map(group => ({
+        name: group[0].activity.step.subProgram.program.name,
+        activeTraineesCount: new Set(group.map(a => a.user._id)).size,
+      })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
+    },
+    learnerList () {
+      const groupedByLearners = Object.values(groupBy(this.activityHistories, h => h.user._id));
+
+      return groupedByLearners.map(group => ({ ...group[0].user, activityCount: group.length }))
+        .sort((a, b) => b.activityCount - a.activityCount);
     },
   },
   watch: {
@@ -78,18 +138,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.elearning-container
-  display: flex
-  flex-direction: row
-  @media screen and (max-width: 767px)
-    flex-direction: column
-
-.elearning
-  display: flex
-  flex-direction: row
-  justify-content: space-around
-  flex: 1
-
-.elearning-indicator
-  font-size: 36px
+.left-card
+  @media screen and (min-width: $breakpoint-md-min)
+    padding-right: 16px
+  @media screen and (max-width: $breakpoint-sm-max)
+    padding-bottom: 16px
+.rigth-card
+  @media screen and (min-width: $breakpoint-md-min)
+    padding-left: 16px
+  @media screen and (max-width: $breakpoint-sm-max)
+    padding-top: 16px
 </style>
