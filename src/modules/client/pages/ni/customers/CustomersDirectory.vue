@@ -20,7 +20,7 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
       @click="customerCreationModal = true" :disable="tableLoading" />
 
-    <customer-creation-modal v-model="customerCreationModal" :new-customer="newCustomer" :loading="loading"
+    <customer-creation-modal v-model="customerCreationModal" :new-customer.sync="newCustomer" :loading="loading"
       :validations="$v.newCustomer" :civility-options="civilityOptions" @hide="resetForm" @submit="createCustomer" />
   </q-page>
 </template>
