@@ -4,7 +4,7 @@
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       type="textarea" :disable="disableEdition" />
     <q-checkbox v-model="card.isMandatory" @input="updateCard('isMandatory')" label="Obligatoire"
-      class="q-mb-lg" dense />
+      class="q-mb-lg" dense :disable="disableEdition" />
   </div>
 </template>
 

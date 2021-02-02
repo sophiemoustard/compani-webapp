@@ -4,7 +4,7 @@
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" />
     <q-checkbox v-model="card.isMandatory" @input="updateCard('isMandatory')" label="Obligatoire"
-      class="q-mb-lg" dense />
+      class="q-mb-lg" dense :disable="disableEdition" />
     <div class="row gutter-profile">
       <ni-input class="col-md-6 col-xs-12" caption="Label gauche" v-model="card.label.left"
         @focus="saveTmp('label.left')" @blur="updateCardLabel('left')" :error="$v.card.label.left.$error"
