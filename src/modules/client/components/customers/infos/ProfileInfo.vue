@@ -236,7 +236,7 @@
 
     <!-- Add helper modal -->
     <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @next-step="nextStep"
-      :new-helper="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
+      :new-helper.sync="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
       :first-step="firstStep" />
 
     <!-- Edit helper modal -->

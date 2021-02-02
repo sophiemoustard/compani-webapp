@@ -3,15 +3,18 @@
     <template slot="title">
       Ajouter un <span class="text-weight-bold">aidant</span>
     </template>
-    <ni-input :disable="!firstStep" in-modal v-model.trim="newHelper.local.email" caption="Email" required-field
+    <ni-input :disable="!firstStep" in-modal :value="newHelper.local.email" caption="Email" required-field
       :error="validations.local.email.$error" @blur="validations.local.email.$touch" :error-message="emailError"
-      :last="firstStep" />
+      :last="firstStep" @input="update($event.trim(), 'local.email')" />
     <template v-if="!firstStep">
-      <ni-input in-modal v-model="newHelper.identity.firstname" caption="Prénom" />
-      <ni-input in-modal v-model="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
-        caption="Nom" @blur="validations.identity.lastname.$touch" required-field />
-      <ni-input in-modal v-model.trim="newHelper.contact.phone" last :error="validations.contact.phone.$error"
-        caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError" />
+      <ni-input in-modal :value="newHelper.identity.firstname" caption="Prénom"
+        @input="update($event, 'identity.firstname')" />
+      <ni-input in-modal :value="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
+        caption="Nom" @blur="validations.identity.lastname.$touch" required-field
+        @input="update($event, 'identity.lastname')" />
+      <ni-input in-modal :value="newHelper.contact.phone" last :error="validations.contact.phone.$error"
+        caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
+        @input="update($event.trim(), 'contact.phone')" />
     </template>
     <template slot="footer">
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary" @click="nextStep"
@@ -23,6 +26,7 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import get from 'lodash/get';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
@@ -70,6 +74,9 @@ export default {
     },
     nextStep () {
       this.$emit('next-step');
+    },
+    update (event, path) {
+      this.$emit('update:newHelper', set({ ...this.newHelper }, path, event));
     },
   },
 };
