@@ -42,7 +42,14 @@ import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import SelectSector from '@components/form/SelectSector';
 import { NotifyNegative } from '@components/popup/notify';
-import { formatIdentity, formatHours, formatPrice, roundFrenchPercentage, truncate } from '@helpers/utils';
+import {
+  formatIdentity,
+  formatHours,
+  formatPrice,
+  roundFrenchPercentage,
+  truncate,
+  formatNumberForCSV,
+} from '@helpers/utils';
 
 export default {
   name: 'CustomersFundingsMonitoring',
@@ -204,12 +211,12 @@ export default {
           this.formatCustomerName(cusData.customer),
           this.formatReferentName(cusData.referent),
           this.getSectorName(cusData),
-          cusData.customerParticipationRate,
-          cusData.unitTTCRate,
-          cusData.careHours,
-          cusData.prevMonthCareHours,
-          cusData.currentMonthCareHours,
-          cusData.nextMonthCareHours,
+          formatNumberForCSV(cusData.customerParticipationRate),
+          formatNumberForCSV(cusData.unitTTCRate),
+          formatNumberForCSV(cusData.careHours),
+          formatNumberForCSV(cusData.prevMonthCareHours),
+          formatNumberForCSV(cusData.currentMonthCareHours),
+          formatNumberForCSV(cusData.nextMonthCareHours),
         ]);
       }
 
