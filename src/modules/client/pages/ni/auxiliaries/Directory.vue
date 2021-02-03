@@ -254,18 +254,18 @@ export default {
           tag: HR_SMS,
           recipient: `+33${user.contact.phone.substring(1)}`,
           content: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
-          + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '
-          + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
-          + `/reset-password/${passwordToken.token} :-)\n`
-          + 'Par la suite pour te connecter suis ce lien: '
-          + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`,
+            + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce '
+            + `lien : ${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
+            + `/reset-password/${passwordToken.token} :-)\n`
+            + 'Par la suite pour te connecter suis ce lien: '
+            + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`,
         });
 
-        NotifyPositive('SMS bien envoyé');
+        NotifyPositive('SMS bien envoyé.');
       } catch (e) {
         console.error(e);
-        if (e.status === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
-        NotifyNegative('Erreur lors de l\'envoi de SMS');
+        if (e.status === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS.');
+        NotifyNegative('Erreur lors de l\'envoi de SMS.');
       }
     },
     fillNewUser (user) {
