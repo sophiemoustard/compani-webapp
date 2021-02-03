@@ -1,10 +1,11 @@
 <template>
   <q-card>
-    <q-table :data="course.trainees" :columns="columns" class="q-pa-md" hide-bottom :pagination="{ rowsPerPage: 0 }">
+    <q-table :data="course.trainees" :columns="columns" class="q-pa-md table" :pagination="{ rowsPerPage: 0 }"
+      separator="none" hide-bottom>
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="col.name !== 'trainees'">
+            <div v-if="col.name !== 'trainee'">
               <div class="text-primary date">{{ col.month }}</div>
               <div class="number">{{ col.day }}</div>
               <div class="text-weight-bold date">{{ col.weekDay }}</div>
@@ -23,7 +24,7 @@
       <template #body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="col.name === 'trainees'">
+            <div v-if="col.name === 'trainee'">
               <q-item>
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
@@ -58,10 +59,10 @@ export default {
   computed: {
     columns () {
       const columns = [{
-        name: 'trainees',
+        name: 'trainee',
         align: 'left',
         field: 'identity',
-        style: 'max-width: 200px',
+        style: 'width: 200px',
         classes: 'ellipsis',
       }];
       if (!this.course.slots) return columns;
@@ -90,4 +91,6 @@ export default {
   font-size: 24px
 .date
   font-size: 16px
+.table
+  display: table
 </style>
