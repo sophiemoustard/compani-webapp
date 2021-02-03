@@ -21,7 +21,7 @@
         @input="update($event, 'frequency')" />
       <ni-select in-modal caption="Nature" :options="fundingNatureOptions" :value="newFunding.nature"
         :error="validations.nature.$error" @blur="validations.nature.$touch" required-field
-        @input="update($event, 'nature')" />
+        @input="updateNature($event)" />
       <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.unitTTCRate" caption="Prix unitaire TTC"
         type="number" @blur="validations.unitTTCRate.$touch" :error="validations.unitTTCRate.$error"
         required-field @input="update($event, 'unitTTCRate')" />
@@ -126,6 +126,12 @@ export default {
         this.newFunding.frequency = '';
       }
       this.$emit('update:newFunding', { ...this.newFunding, [prop]: event });
+    },
+    async updateNature (event) {
+      if (this.isFixedFunding && this.newFunding.frequency !== ONCE) {
+        await this.$emit('update:newFunding', { ...this.newFunding, frequency: '' });
+      }
+      return this.update(event, 'nature');
     },
   },
 };

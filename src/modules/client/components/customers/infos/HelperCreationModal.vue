@@ -8,10 +8,10 @@
       :last="firstStep" @input="update($event.trim(), 'local.email')" />
     <template v-if="!firstStep">
       <ni-input in-modal :value="newHelper.identity.firstname" caption="Prénom"
-        @input="update($event, 'identity.firstname')" />
+        @input="update($event.trim(), 'identity.firstname')" />
       <ni-input in-modal :value="newHelper.identity.lastname" :error="validations.identity.lastname.$error"
         caption="Nom" @blur="validations.identity.lastname.$touch" required-field
-        @input="update($event, 'identity.lastname')" />
+        @input="update($event.trim(), 'identity.lastname')" />
       <ni-input in-modal :value="newHelper.contact.phone" last :error="validations.contact.phone.$error"
         caption="Téléphone" @blur="validations.contact.phone.$touch" :error-message="phoneNbrError"
         @input="update($event.trim(), 'contact.phone')" />
