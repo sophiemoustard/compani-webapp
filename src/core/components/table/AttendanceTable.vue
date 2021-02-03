@@ -1,10 +1,10 @@
 <template>
   <q-card>
-    <q-table :data="course.trainees" :columns="columns" class="q-pa-md" hide-bottom>
+    <q-table :data="course.trainees" :columns="columns" class="q-pa-md" hide-bottom :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="!['traineeName','traineePicture'].includes(col.name)">
+            <div v-if="col.name !== 'trainees'">
               <div class="text-primary date">{{ col.month }}</div>
               <div class="number">{{ col.day }}</div>
               <div class="text-weight-bold date">{{ col.weekDay }}</div>
@@ -14,7 +14,7 @@
               </div>
               <div class="text-grey-800">
                 <q-icon name="supervisor_account" />
-                {{ col.trainees }}
+                {{ col.traineesCount }}
               </div>
             </div>
           </q-th>
@@ -23,23 +23,24 @@
       <template #body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <img v-if="col.name === 'traineePicture'" class="q-mx-md avatar"
-              :src="col.value ? col.value.link : DEFAULT_AVATAR">
-            <div v-else-if="col.name === 'traineeName'">
-              {{ formatIdentity(col.value, 'FL') }}
+            <div v-if="col.name === 'trainees'">
+              <q-item>
+                <q-item-section avatar>
+                  <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
+                </q-item-section>
+                <q-item-section>{{ formatIdentity(col.value, 'FL') }}</q-item-section>
+              </q-item>
             </div>
             <q-checkbox v-else :value="false" dense size="sm" />
           </q-td>
         </q-tr>
       </template>
     </q-table>
-    <ni-button class="q-my-sm" icon="add" color="primary" label="Ajouter un participant" />
   </q-card>
 </template>
 
 <script>
 import moment from '@helpers/moment';
-import Button from '@components/Button';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR } from '@data/constants';
 
@@ -47,9 +48,6 @@ export default {
   name: 'ExpandingTable',
   props: {
     course: { type: Object, default: () => ({}) },
-  },
-  components: {
-    'ni-button': Button,
   },
   data () {
     return {
@@ -59,21 +57,30 @@ export default {
   },
   computed: {
     columns () {
-      const columns = this.course.slots.map(s => ({
-        name: s._id,
-        field: '_id',
-        align: 'center',
-        style: 'width: 80px',
-        month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
-        day: moment(s.startDate).day(),
-        weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
-        startHour: moment(s.startDate).format('LT'),
-        endHour: moment(s.endDate).format('LT'),
-        trainees: 0,
-      }));
-      columns.unshift({ name: 'traineeName', align: 'left', field: 'identity' });
-      columns.unshift({ name: 'traineePicture', align: 'left', field: 'picture', style: 'width: 20px' });
-      return columns;
+      const columns = [{
+        name: 'trainees',
+        align: 'left',
+        field: 'identity',
+        style: 'max-width: 200px',
+        classes: 'ellipsis',
+      }];
+      if (!this.course.slots) return columns;
+
+      return [
+        ...columns,
+        ...this.course.slots.map(s => ({
+          name: s._id,
+          field: '_id',
+          align: 'center',
+          style: 'width: 80px',
+          month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
+          day: moment(s.startDate).day(),
+          weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
+          startHour: moment(s.startDate).format('LT'),
+          endHour: moment(s.endDate).format('LT'),
+          traineesCount: 0,
+        })),
+      ];
     },
   },
 };
