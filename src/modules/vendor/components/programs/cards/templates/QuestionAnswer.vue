@@ -3,6 +3,8 @@
     <ni-input caption="Question" v-model="card.question" required-field @focus="saveTmp('question')"
       @blur="updateCard('question')" :error="$v.card.question.$error" :error-message="questionErrorMsg"
       :disable="disableEdition" class="q-mb-lg" />
+    <q-checkbox v-model="card.isMandatory" @input="updateCard('isMandatory')" label="Réponse obligatoire"
+      class="q-mb-lg" dense :disable="disableEdition" />
     <q-checkbox v-model="card.isQuestionAnswerMultipleChoiced" @input="updateCard('isQuestionAnswerMultipleChoiced')"
       dense :disable="disableEdition" label="Sélection multiple" class="q-mb-lg" />
     <div v-for="(answer, i) in card.qcAnswers" :key="i" class="answers">
