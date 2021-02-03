@@ -122,16 +122,13 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      if (prop === 'nature' && this.isFixedFunding && this.newFunding.frequency !== ONCE) {
-        this.newFunding.frequency = '';
-      }
       this.$emit('update:newFunding', { ...this.newFunding, [prop]: event });
     },
     async updateNature (event) {
       if (this.isFixedFunding && this.newFunding.frequency !== ONCE) {
         await this.$emit('update:newFunding', { ...this.newFunding, frequency: '' });
       }
-      return this.update(event, 'nature');
+      await this.update(event, 'nature');
     },
   },
 };
