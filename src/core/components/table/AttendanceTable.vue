@@ -1,5 +1,5 @@
 <template>
-  <q-card>
+  <q-card flat>
     <q-table :data="course.trainees" :columns="columns" class="q-pa-md table" :pagination="{ rowsPerPage: 0 }"
       separator="none" hide-bottom>
       <template #header="props">
