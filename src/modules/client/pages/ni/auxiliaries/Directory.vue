@@ -244,22 +244,29 @@ export default {
       return payload;
     },
     async sendSMS (user) {
-      if (!this.company.tradeName) {
-        return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
-      }
+      try {
+        if (!this.company.tradeName) {
+          return NotifyNegative('Veuillez renseigner votre nom commercial dans la page de configuration.');
+        }
 
-      const passwordToken = await Authentication.createPasswordToken(user._id, { email: user.local.email });
-      await Sms.send({
-        tag: HR_SMS,
-        recipient: `+33${user.contact.phone.substring(1)}`,
-        content: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
+        const passwordToken = await Authentication.createPasswordToken(user._id, { email: user.local.email });
+        await Sms.send({
+          tag: HR_SMS,
+          recipient: `+33${user.contact.phone.substring(1)}`,
+          content: `${this.company.name}. Bienvenue ! :)\nPour pouvoir `
           + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '
           + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
           + `/reset-password/${passwordToken.token} :-)\n`
           + 'Par la suite pour te connecter suis ce lien: '
           + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`,
-      });
-      NotifyPositive('SMS bien envoyé');
+        });
+
+        NotifyPositive('SMS bien envoyé');
+      } catch (e) {
+        console.error(e);
+        if (e.status === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
+        NotifyNegative('Erreur lors de l\'envoi de SMS');
+      }
     },
     fillNewUser (user) {
       const paths = [
@@ -323,7 +330,7 @@ export default {
 
         if (this.fetchedUser._id) {
           await Users.updateById(this.fetchedUser._id, payload);
-          editedUser = { contact: { phone: get(payload, 'contact.phone') || '' }, ...this.fetchedUser };
+          editedUser = { ...this.fetchedUser, contact: { phone: get(payload, 'contact.phone') || '' } };
         } else {
           editedUser = await Users.create(payload);
         }
@@ -332,19 +339,14 @@ export default {
         NotifyPositive('Fiche auxiliaire créée');
 
         this.auxiliaryCreationModal = false;
+
+        if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative('Email déjà existant.');
         NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
       } finally {
         this.loading = false;
-      }
-      try {
-        if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
-      } catch (e) {
-        console.error(e);
-        if (e.status === 400) return NotifyNegative('Le numéro entré ne recoit pas les SMS');
-        NotifyNegative('Erreur lors de l\'envoi de SMS');
       }
     },
     getAvatar (link) {
