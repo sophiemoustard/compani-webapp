@@ -1,7 +1,7 @@
 <template>
   <q-card flat>
     <q-table :data="course.trainees" :columns="columns" class="q-pa-md table" :pagination="{ rowsPerPage: 0 }"
-      separator="none" hide-bottom>
+      separator="none" hide-bottom :loading="loading">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -32,7 +32,8 @@
                 <q-item-section>{{ formatIdentity(col.value, 'FL') }}</q-item-section>
               </q-item>
             </div>
-            <q-checkbox v-else :value="false" dense size="sm" />
+            <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
+              @input="updateCheckbox(col.value, col.slot)" />
           </q-td>
         </q-tr>
       </template>
@@ -44,6 +45,8 @@
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR } from '@data/constants';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import Attendances from '@api/Attendances';
 
 export default {
   name: 'ExpandingTable',
@@ -54,7 +57,12 @@ export default {
     return {
       formatIdentity,
       DEFAULT_AVATAR,
+      attendances: [],
+      loading: false,
     };
+  },
+  async created () {
+    await this.refreshAttendances();
   },
   computed: {
     columns () {
@@ -83,6 +91,42 @@ export default {
           traineesCount: 0,
         })),
       ];
+    },
+  },
+  methods: {
+    checkboxValue (traineeId, slotId) {
+      if (this.attendances !== []) {
+        return !!this.attendances.filter(a => a.trainee === traineeId && a.courseSlot === slotId).length;
+      }
+    },
+    async refreshAttendances () {
+      try {
+        this.loading = true;
+        this.attendances = await Attendances.list({ courseSlots: this.course.slots.map(s => s._id) });
+
+        NotifyPositive('Liste mise à jour.');
+      } catch (e) {
+        console.error(e);
+        this.attendances = [];
+        NotifyNegative('Erreur lors de la mise à jour des l\'émargements.');
+      } finally {
+        this.loading = false;
+      }
+    },
+    async updateCheckbox (traineeId, slotId) {
+      if (!this.checkboxValue(traineeId, slotId)) {
+        try {
+          this.loading = true;
+          await Attendances.create({ trainee: traineeId, courseSlot: slotId });
+
+          await this.refreshAttendances();
+        } catch (e) {
+          console.error(e);
+          NotifyNegative('Erreur lors de la validation de l\'émargement.');
+        } finally {
+          this.loading = false;
+        }
+      }
     },
   },
 };
