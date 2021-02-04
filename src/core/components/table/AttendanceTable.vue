@@ -5,7 +5,7 @@
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="col.name !== 'trainee'">
+            <div v-if="/(slot)/.test(col.name)">
               <div class="text-primary date">{{ col.month }}</div>
               <div class="number">{{ col.day }}</div>
               <div class="text-weight-bold date">{{ col.weekDay }}</div>
@@ -70,7 +70,8 @@ export default {
       return [
         ...columns,
         ...this.course.slots.map(s => ({
-          name: s._id,
+          name: `slot-${s._id}`,
+          slot: s._id,
           field: '_id',
           align: 'center',
           style: 'width: 80px',
