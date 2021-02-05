@@ -49,7 +49,7 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import Attendances from '@api/Attendances';
 
 export default {
-  name: 'ExpandingTable',
+  name: 'AttendanceTable',
   props: {
     course: { type: Object, default: () => ({}) },
   },
@@ -100,17 +100,19 @@ export default {
       }
     },
     async refreshAttendances (courseSlots = this.course.slots.map(s => s._id)) {
-      try {
-        this.loading = true;
-        this.attendances = this.attendances.concat(await Attendances.list({ courseSlots }));
+      if (courseSlots.length) {
+        try {
+          this.loading = true;
+          this.attendances = this.attendances.concat(await Attendances.list({ courseSlots }));
 
-        NotifyPositive('Liste mise à jour.');
-      } catch (e) {
-        console.error(e);
-        this.attendances = [];
-        NotifyNegative('Erreur lors de la mise à jour des l\'émargements.');
-      } finally {
-        this.loading = false;
+          NotifyPositive('Liste mise à jour.');
+        } catch (e) {
+          console.error(e);
+          this.attendances = [];
+          NotifyNegative('Erreur lors de la mise à jour des émargements.');
+        } finally {
+          this.loading = false;
+        }
       }
     },
     async updateCheckbox (traineeId, slotId) {
