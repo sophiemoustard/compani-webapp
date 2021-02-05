@@ -99,10 +99,10 @@ export default {
         return !!this.attendances.filter(a => a.trainee === traineeId && a.courseSlot === slotId).length;
       }
     },
-    async refreshAttendances () {
+    async refreshAttendances (courseSlots = this.course.slots.map(s => s._id)) {
       try {
         this.loading = true;
-        this.attendances = await Attendances.list({ courseSlots: this.course.slots.map(s => s._id) });
+        this.attendances = this.attendances.concat(await Attendances.list({ courseSlots }));
 
         NotifyPositive('Liste mise à jour.');
       } catch (e) {
@@ -119,7 +119,7 @@ export default {
           this.loading = true;
           await Attendances.create({ trainee: traineeId, courseSlot: slotId });
 
-          await this.refreshAttendances();
+          await this.refreshAttendances([slotId]);
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la validation de l\'émargement.');
