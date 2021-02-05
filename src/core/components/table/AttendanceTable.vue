@@ -62,7 +62,7 @@ export default {
     };
   },
   async created () {
-    await this.refreshAttendances();
+    await this.refreshAttendances(this.course.slots.map(s => s._id));
   },
   computed: {
     columns () {
@@ -84,7 +84,7 @@ export default {
           align: 'center',
           style: 'width: 80px',
           month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
-          day: moment(s.startDate).day(),
+          day: moment(s.startDate).date(),
           weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
           startHour: moment(s.startDate).format('LT'),
           endHour: moment(s.endDate).format('LT'),
@@ -95,11 +95,11 @@ export default {
   },
   methods: {
     checkboxValue (traineeId, slotId) {
-      if (this.attendances !== []) {
-        return !!this.attendances.filter(a => a.trainee === traineeId && a.courseSlot === slotId).length;
+      if (this.attendances.length) {
+        return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
       }
     },
-    async refreshAttendances (courseSlots = this.course.slots.map(s => s._id)) {
+    async refreshAttendances (courseSlots) {
       if (courseSlots.length) {
         try {
           this.loading = true;
@@ -125,7 +125,6 @@ export default {
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la validation de l\'émargement.');
-        } finally {
           this.loading = false;
         }
       }
