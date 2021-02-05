@@ -103,8 +103,10 @@ export default {
       if (courseSlots.length) {
         try {
           this.loading = true;
-          this.attendances = this.attendances.concat(await Attendances.list({ courseSlots }));
+          const updatedCourseSlot = await Attendances.list({ courseSlots });
 
+          this.attendances = this.attendances.filter(a => a.courseSlot !== courseSlots[0]);
+          this.attendances = this.attendances.concat(updatedCourseSlot);
           NotifyPositive('Liste mise à jour.');
         } catch (e) {
           console.error(e);
