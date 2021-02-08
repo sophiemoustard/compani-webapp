@@ -3,7 +3,7 @@
     <p class="text-weight-bold">Rapport d'utilisation</p>
     <div class="row justify-between">
       <div class="col-md-5 col-xs-12">
-        <q-card flat class="q-pa-md right-stats">
+        <q-card flat class="q-pa-md right-stats global-view">
           <div class="text-weight-bold q-mb-sm">Vue globale</div>
           <div class="row">
             <div class="col-3 text-right q-pr-md column justify-around">
@@ -20,7 +20,7 @@
       <div class="col-md-6 col-xs-12">
         <q-card flat class="q-pa-md">
           <div class="text-weight-bold q-mb-md">Nombre d'apprenants dans le temps</div>
-          <line-chart :chart-data="chartData" :options="options" />
+          <line-chart :chart-data="chartData" :options="options" class="line-chart" />
         </q-card>
       </div>
     </div>
@@ -118,3 +118,11 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.global-view
+  height 100%;
+
+.line-chart
+  max-height 245px;
+</style>
