@@ -1,8 +1,8 @@
 <template>
   <div>
     <p class="text-weight-bold">Rapport d'utilisation</p>
-    <div class="row">
-      <div class="col-md-5 col-xs-12 q-mr-md">
+    <div class="row justify-between">
+      <div class="col-md-5 col-xs-12">
         <q-card flat class="q-pa-md right-stats">
           <div class="text-weight-bold q-mb-sm">Vue globale</div>
           <div class="row">
@@ -17,9 +17,9 @@
           </div>
         </q-card>
       </div>
-      <div class="col-md-5 col-xs-12">
+      <div class="col-md-6 col-xs-12">
         <q-card flat class="q-pa-md">
-          <div class="text-weight-bold q-mb-sm">Nombre d'apprenants dans le temps</div>
+          <div class="text-weight-bold q-mb-md">Nombre d'apprenants dans le temps</div>
           <line-chart :chart-data="chartData" :options="options" />
         </q-card>
       </div>
@@ -29,6 +29,8 @@
 </template>
 
 <script>
+import { colors } from 'quasar';
+import groupBy from 'lodash/groupBy';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import LineChart from '@components/LineChart';
@@ -44,30 +46,25 @@ export default {
   },
   props: {
     profileId: { type: String, required: true },
-    chartData: {
-      type: Object,
-      default: () => ({
-        labels: ['janv', 'fev'],
-        datasets: [{
-          label: 'test',
-          data: [40, 20],
-          borderColor: '#E2007A',
-          backgroundColor: 'transparent',
-        }],
-      }),
-    },
-    options: {
-      type: Object,
-      default: () => ({
+  },
+  data () {
+    return {
+      options: {
         responsive: true,
         maintainAspectRatio: false,
-      }),
-    },
+        scales: {
+          yAxes: [{
+            ticks: {
+              beginAtZero: true,
+            },
+          }],
+        },
+        legend: {
+          display: false,
+        },
+      },
+    };
   },
-  // data () {
-  //   const months = [];
-  //   return months;
-  // },
   computed: {
     traineesOnGoingCount () {
       return this.learners.filter(l => l.progress !== 1).length;
@@ -75,21 +72,49 @@ export default {
     traineesFinishedCount () {
       return this.learners.length - this.traineesOnGoingCount;
     },
-    // traineeCountByMonth () {
-    //   this.chartData.datasets.data = [40, 20];
-    //   return this.chartData;
-    // },
-    // getMonths () {
-    //   const monthNames = ['janv', 'fév', 'mars', 'avril', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov',
-    // 'déc'];
-    //   for (let i = 6; i > 0; i -= 1) {
-    //     const d = new Date(Date.now().getFullYear(), Date.now().getMonth() - i, 1);
-    //     const month = monthNames[d.getMonth()];
-    //     const year = d.getFullYear();
-    //     this.months.push(`${month} ${year}`);
-    //   }
-    //   return this.months;
-    // },
+    traineesCountByMonth () {
+      const limitDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
+      const currentMonthBegining = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const activityHistories = this.learners
+        .map(l => l.steps
+          .map(s => s.activities
+            .map(a => a.activityHistories
+              .filter(ah => new Date(ah.date) > limitDate && new Date(ah.date) < currentMonthBegining)
+              .map(ah => ({ user: ah.user, date: ah.date }))))).flat(3);
+
+      const traineesByMonth = Object.values(groupBy(
+        activityHistories,
+        ah => `${new Date(ah.date).getFullYear()}${new Date(ah.date).getMonth() < 10
+          ? `0${new Date(ah.date).getMonth()}`
+          : `${new Date(ah.date).getMonth()}`}`
+      ))
+        .map(group => Object.values(groupBy(group, g => g.user)).length);
+
+      while (traineesByMonth.length < 6) traineesByMonth.unshift(0);
+
+      return traineesByMonth;
+    },
+    chartData () {
+      return {
+        labels: this.months,
+        datasets: [{
+          data: this.traineesCountByMonth,
+          borderColor: colors.getBrand('primary'),
+          backgroundColor: 'transparent',
+        }],
+      };
+    },
+    months () {
+      const monthNames = ['janv', 'fév', 'mars', 'avril', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+      const res = [];
+      for (let i = 6; i > 0; i -= 1) {
+        const d = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
+        const month = monthNames[d.getMonth()];
+        const year = d.getFullYear();
+        res.push(`${month} ${year}`);
+      }
+      return res;
+    },
   },
 };
 </script>
