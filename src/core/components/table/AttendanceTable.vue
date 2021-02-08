@@ -1,7 +1,7 @@
 <template>
   <q-card flat>
     <q-table :data="course.trainees" :columns="columns" class="q-pa-md table" :pagination="{ rowsPerPage: 0 }"
-      separator="none" hide-bottom>
+      separator="none" hide-bottom :loading="loading">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -32,7 +32,8 @@
                 <q-item-section>{{ formatIdentity(col.value, 'FL') }}</q-item-section>
               </q-item>
             </div>
-            <q-checkbox v-else :value="false" dense size="sm" />
+            <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
+              @input="updateCheckbox(col.value, col.slot)" />
           </q-td>
         </q-tr>
       </template>
@@ -44,9 +45,11 @@
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR } from '@data/constants';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import Attendances from '@api/Attendances';
 
 export default {
-  name: 'ExpandingTable',
+  name: 'AttendanceTable',
   props: {
     course: { type: Object, default: () => ({}) },
   },
@@ -54,7 +57,12 @@ export default {
     return {
       formatIdentity,
       DEFAULT_AVATAR,
+      attendances: [],
+      loading: false,
     };
+  },
+  async created () {
+    await this.refreshAttendances(this.course.slots.map(s => s._id));
   },
   computed: {
     columns () {
@@ -76,13 +84,55 @@ export default {
           align: 'center',
           style: 'width: 80px',
           month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
-          day: moment(s.startDate).day(),
+          day: moment(s.startDate).date(),
           weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
           startHour: moment(s.startDate).format('LT'),
           endHour: moment(s.endDate).format('LT'),
           traineesCount: 0,
         })),
       ];
+    },
+  },
+  methods: {
+    checkboxValue (traineeId, slotId) {
+      if (this.attendances.length) {
+        return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
+      }
+      return false;
+    },
+    async refreshAttendances (courseSlots) {
+      if (courseSlots.length) {
+        try {
+          this.loading = true;
+          const updatedCourseSlot = await Attendances.list({ courseSlots });
+
+          this.attendances = [
+            ...this.attendances.filter(a => !courseSlots.some(cs => cs === a.courseSlot)),
+            ...updatedCourseSlot,
+          ];
+          NotifyPositive('Liste mise à jour.');
+        } catch (e) {
+          console.error(e);
+          this.attendances = [];
+          NotifyNegative('Erreur lors de la mise à jour des émargements.');
+        } finally {
+          this.loading = false;
+        }
+      }
+    },
+    async updateCheckbox (traineeId, slotId) {
+      if (!this.checkboxValue(traineeId, slotId)) {
+        try {
+          this.loading = true;
+          await Attendances.create({ trainee: traineeId, courseSlot: slotId });
+
+          await this.refreshAttendances([slotId]);
+        } catch (e) {
+          console.error(e);
+          NotifyNegative('Erreur lors de la validation de l\'émargement.');
+          this.loading = false;
+        }
+      }
     },
   },
 };
