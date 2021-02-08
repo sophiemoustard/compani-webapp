@@ -5,19 +5,19 @@
       <div class="col-md-5 col-xs-12">
         <q-card flat class="q-pa-md right-stats global-view">
           <div class="text-weight-bold q-mb-sm">Vue globale</div>
-          <div class="row">
-            <div class="col-3 text-right q-pr-md column justify-around">
-              <ni-e-learning-indicator :indicator="traineesOnGoingCount" />
-              <ni-e-learning-indicator :indicator="traineesFinishedCount" />
-            </div>
-            <div class="col-9 column justify-around">
+          <div>
+            <div class="row items-center">
+              <ni-e-learning-indicator :indicator="traineesOnGoingCount" class="q-pr-sm" />
               <div>apprenant{{ traineesOnGoingCount > 1 ? 's' : '' }} en cours</div>
+            </div>
+            <div class="row items-center">
+              <ni-e-learning-indicator :indicator="traineesFinishedCount" class="q-pr-sm" />
               <div>apprenant{{ traineesFinishedCount > 1 ? 's' : '' }} ayant terminé</div>
             </div>
           </div>
         </q-card>
       </div>
-      <div class="col-md-6 col-xs-12">
+      <div class="col-md-6 col-xs-12 line-chart-container">
         <q-card flat class="q-pa-md">
           <div class="text-weight-bold q-mb-md">Nombre d'apprenants dans le temps</div>
           <line-chart :chart-data="chartData" :options="options" class="line-chart" />
@@ -124,5 +124,9 @@ export default {
   height 100%;
 
 .line-chart
-  max-height 245px;
+  max-height 200px;
+
+.line-chart-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    margin-top: 16px;
 </style>
