@@ -5,9 +5,12 @@ import { formatIdentity } from '@helpers/utils';
 
 export const traineeFollowUpTableMixin = {
   data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+
     return {
       learners: [],
       loading: false,
+      isClientInterface,
     };
   },
   computed: {
