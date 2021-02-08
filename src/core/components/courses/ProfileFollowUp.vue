@@ -2,7 +2,7 @@
   <div>
     <p class="text-weight-bold">Rapport d'utilisation</p>
     <div class="row justify-between">
-      <div class="col-md-5 col-xs-12">
+      <div class="col-md-6 col-xs-12 global-view-container">
         <q-card flat class="q-pa-md right-stats global-view">
           <div class="text-weight-bold q-mb-sm">Vue globale</div>
           <div>
@@ -52,16 +52,8 @@ export default {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true,
-            },
-          }],
-        },
-        legend: {
-          display: false,
-        },
+        scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
+        legend: { display: false },
       },
     };
   },
@@ -105,7 +97,7 @@ export default {
       };
     },
     months () {
-      const monthNames = ['janv', 'fév', 'mars', 'avril', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+      const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
       const res = [];
       for (let i = 6; i > 0; i -= 1) {
         const d = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
@@ -120,13 +112,17 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.global-view-container
+  @media screen and (min-width: $breakpoint-sm-max)
+    padding-right: 16px;
+
 .global-view
   height 100%;
-
-.line-chart
-  max-height 200px;
 
 .line-chart-container
   @media screen and (max-width: $breakpoint-sm-max)
     margin-top: 16px;
+
+.line-chart
+  max-height 200px;
 </style>

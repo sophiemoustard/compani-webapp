@@ -7,10 +7,6 @@ export default {
   extends: Line,
   mixins: [reactiveProp],
   props: { chartData: { type: Object, default: () => ({}) }, options: { type: Object, default: () => ({}) } },
-  mounted () {
-    // this.chartData is created in the mixin.
-    // If you want to pass options please create a local options object
-    this.renderChart(this.chartData, this.options);
-  },
+  mounted () { this.renderChart(this.chartData, this.options); },
 };
 </script>
