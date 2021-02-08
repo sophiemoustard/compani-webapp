@@ -98,6 +98,7 @@ export default {
       if (this.attendances.length) {
         return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
       }
+      return false;
     },
     async refreshAttendances (courseSlots) {
       if (courseSlots.length) {
@@ -105,8 +106,10 @@ export default {
           this.loading = true;
           const updatedCourseSlot = await Attendances.list({ courseSlots });
 
-          this.attendances = this.attendances.filter(a => a.courseSlot !== courseSlots[0]);
-          this.attendances = this.attendances.concat(updatedCourseSlot);
+          this.attendances = [
+            ...this.attendances.filter(a => !courseSlots.some(cs => cs === a.courseSlot)),
+            ...updatedCourseSlot,
+          ];
           NotifyPositive('Liste mise à jour.');
         } catch (e) {
           console.error(e);
