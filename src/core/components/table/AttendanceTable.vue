@@ -121,7 +121,20 @@ export default {
       }
     },
     async updateCheckbox (traineeId, slotId) {
-      if (!this.checkboxValue(traineeId, slotId)) {
+      if (this.checkboxValue(traineeId, slotId)) {
+        try {
+          this.loading = true;
+          const attendance = this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
+          await Attendances.delete(attendance._id);
+
+          await this.refreshAttendances([slotId]);
+        } catch (e) {
+          console.error(e);
+          NotifyNegative('Erreur lors de la suppression de l\'émargement.');
+        } finally {
+          this.loading = false;
+        }
+      } else {
         try {
           this.loading = true;
           await Attendances.create({ trainee: traineeId, courseSlot: slotId });
@@ -130,6 +143,7 @@ export default {
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la validation de l\'émargement.');
+        } finally {
           this.loading = false;
         }
       }
