@@ -3,9 +3,9 @@
     <p class="text-weight-bold">Rapport d'utilisation</p>
     <div class="row justify-between">
       <div class="col-md-6 col-xs-12 global-view-container">
-        <q-card flat class="q-pa-md right-stats global-view row">
-          <div class="text-weight-bold q-mb-sm">Vue globale</div>
-          <div class="self-center q-my-lg">
+        <q-card flat class="q-pa-md right-stats global-view column">
+          <div class="text-weight-bold">Vue globale</div>
+          <div class="self-center justify-center column learners-data">
             <div class="row items-center">
               <ni-e-learning-indicator :indicator="traineesOnGoingCount" class="q-pr-sm" />
               <div>apprenant{{ traineesOnGoingCount > 1 ? 's' : '' }} en cours</div>
@@ -113,14 +113,16 @@ export default {
 
 <style lang="stylus" scoped>
 .global-view
-  height 100%;
+  height: 100%;
   &-container
     @media screen and (min-width: $breakpoint-sm-max)
       padding-right: 16px;
 
 .line-chart
-  max-height 200px;
+  max-height: 200px;
   &-container
     @media screen and (max-width: $breakpoint-sm-max)
       margin-top: 16px;
+.learners-data
+  flex: 1;
 </style>
