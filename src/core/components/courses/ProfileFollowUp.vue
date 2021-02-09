@@ -65,13 +65,13 @@ export default {
       return this.learners.length - this.traineesOnGoingCount;
     },
     traineesCountByMonth () {
-      const limitDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-      const currentMonthBegining = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
+      const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
       const activityHistories = this.learners
         .map(l => l.steps
           .map(s => s.activities
             .map(a => a.activityHistories
-              .filter(ah => new Date(ah.date) >= limitDate && new Date(ah.date) < currentMonthBegining)
+              .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
               .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
