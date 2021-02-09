@@ -123,6 +123,7 @@ export default {
   &-container
     @media screen and (max-width: $breakpoint-sm-max)
       margin-top: 16px;
+
 .learners-data
   flex: 1;
 </style>
