@@ -7,6 +7,8 @@ export default {
   extends: Line,
   mixins: [reactiveProp],
   props: { chartData: { type: Object, default: () => ({}) }, options: { type: Object, default: () => ({}) } },
-  mounted () { this.renderChart(this.chartData, this.options); },
+  mounted () {
+    this.renderChart(this.chartData, this.options);
+  },
 };
 </script>

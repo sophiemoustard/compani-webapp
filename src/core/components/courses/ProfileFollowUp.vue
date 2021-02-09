@@ -72,7 +72,8 @@ export default {
           .map(s => s.activities
             .map(a => a.activityHistories
               .filter(ah => new Date(ah.date) > limitDate && new Date(ah.date) < currentMonthBegining)
-              .map(ah => ({ user: ah.user, date: ah.date }))))).flat(3);
+              .map(ah => ({ user: ah.user, date: ah.date })))))
+        .flat(3);
 
       const traineesByMonth = Object.values(groupBy(
         activityHistories,
