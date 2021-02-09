@@ -131,6 +131,7 @@ export default {
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la suppression de l\'émargement.');
+        } finally {
           this.loading = false;
         }
       } else {
@@ -142,6 +143,7 @@ export default {
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la validation de l\'émargement.');
+        } finally {
           this.loading = false;
         }
       }
