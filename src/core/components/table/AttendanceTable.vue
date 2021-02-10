@@ -4,7 +4,7 @@
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
-          <q-th v-for="col in props.cols" :key="col.name" :props="props">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props" class="header">
             <div v-if="/(slot)/.test(col.name)">
               <div class="text-primary date">{{ col.month }}</div>
               <div class="number">{{ col.day }}</div>
@@ -76,7 +76,7 @@ export default {
         name: 'trainee',
         align: 'left',
         field: 'identity',
-        style: 'max-width: 200px',
+        style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
         classes: 'ellipsis',
       }];
       if (!this.course.slots) return columns;
@@ -88,7 +88,7 @@ export default {
           slot: s._id,
           field: '_id',
           align: 'center',
-          style: 'min-width: 80px',
+          style: 'width: 80px',
           month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
           day: moment(s.startDate).date(),
           weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
@@ -172,6 +172,8 @@ export default {
   font-size: 16px
 .no-data
   font-size: 12px
+.header
+  border-right: 1px solid $grey-200;
 .table
   thead tr:first-child th:first-child
     background-color: white
