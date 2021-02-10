@@ -1,6 +1,9 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Balances Clients" padding>
+        <template slot="title">
+         <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
+         </template>
       <template slot="content">
         <div class="col-xs-12 col-md-6 on-left">
           <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" separator />
@@ -57,6 +60,8 @@
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
+import moment from '@helpers/moment';
+import { downloadCsv } from '@helpers/file';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import SimpleTable from '@components/table/SimpleTable';
@@ -205,6 +210,31 @@ export default {
         cancel: 'Non',
       }).onOk(this.createPaymentList)
         .onCancel(() => NotifyPositive('Création des règlements annulée'));
+    },
+    async exportToCSV () {
+      const csvData = [[
+        'Client',
+        'Bénéficiaire',
+        'Taux de participation',
+        'Facturé TTC',
+        'Payé TTC',
+        'Solde',
+        'A prélever',
+      ]];
+
+      for (const clData of this.filteredBalances) {
+        csvData.push([
+          clData.thirdPartyPayer ? clData.thirdPartyPayer.name : formatIdentity(clData.customer.identity, 'Lf'),
+          formatIdentity(clData.customer.identity, 'Lf'),
+          clData.thirdPartyPayer ? '' : roundFrenchPercentage(clData.participationRate),
+          formatPrice(clData.billed),
+          formatPrice(clData.paid),
+          formatPrice(clData.balance),
+          formatPrice(clData.toPay),
+        ]);
+      }
+
+      return downloadCsv(csvData, `clients_balances_${moment().format('DD_MM_YYYY')}.csv`);
     },
   },
 };
