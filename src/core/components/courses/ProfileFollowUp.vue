@@ -111,8 +111,8 @@ export default {
           ? `${date.getFullYear()}0${date.getMonth()}`
           : `${date.getFullYear()}${date.getMonth()}`}`;
 
-        if (!activitiesByMonth[field]) monthlyTrainees.push = 0;
-        else monthlyTrainees.push(activitiesByMonth.map(group => Object.values(groupBy(group, g => g.user)).length));
+        if (!activitiesByMonth[field]) monthlyTrainees.push(0);
+        else monthlyTrainees.push(Object.values(groupBy(activitiesByMonth[field], group => group.user)).length);
       }
       this.traineesByMonth = monthlyTrainees;
     },
