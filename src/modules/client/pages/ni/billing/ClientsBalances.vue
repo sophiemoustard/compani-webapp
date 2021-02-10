@@ -1,9 +1,9 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Balances Clients" padding>
-        <template slot="title">
-         <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
-         </template>
+      <template slot="title">
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
+      </template>
       <template slot="content">
         <div class="col-xs-12 col-md-6 on-left">
           <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" separator />
@@ -60,8 +60,6 @@
 import orderBy from 'lodash/orderBy';
 import get from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
-import moment from '@helpers/moment';
-import { downloadCsv } from '@helpers/file';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import SimpleTable from '@components/table/SimpleTable';
@@ -69,7 +67,16 @@ import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPercentage } from '@helpers/utils';
+import {
+  formatPrice,
+  getLastVersion,
+  formatIdentity,
+  truncate,
+  roundFrenchPercentage,
+  formatNumberForCSV,
+} from '@helpers/utils';
+import moment from '@helpers/moment';
+import { downloadCsv } from '@helpers/file';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
 import { paymentMixin } from 'src/modules/client/mixins/paymentMixin';
 
@@ -227,10 +234,10 @@ export default {
           clData.thirdPartyPayer ? clData.thirdPartyPayer.name : formatIdentity(clData.customer.identity, 'Lf'),
           formatIdentity(clData.customer.identity, 'Lf'),
           clData.thirdPartyPayer ? '' : roundFrenchPercentage(clData.participationRate),
-          formatPrice(clData.billed),
-          formatPrice(clData.paid),
-          formatPrice(clData.balance),
-          formatPrice(clData.toPay),
+          formatNumberForCSV(clData.billed),
+          formatNumberForCSV(clData.paid),
+          formatNumberForCSV(clData.balance),
+          formatNumberForCSV(clData.toPay),
         ]);
       }
 
