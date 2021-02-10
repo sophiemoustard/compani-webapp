@@ -75,15 +75,24 @@ export default {
               .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
-      const traineesByMonth = Object.values(groupBy(
+      const activitiesByMonth = groupBy(
         activityHistories,
         ah => `${new Date(ah.date).getFullYear()}${new Date(ah.date).getMonth() < 10
           ? `0${new Date(ah.date).getMonth()}`
           : `${new Date(ah.date).getMonth()}`}`
-      ))
-        .map(group => Object.values(groupBy(group, g => g.user)).length);
+      );
 
-      while (traineesByMonth.length < 6) traineesByMonth.unshift(0);
+      for (let i = 6; i > 0; i -= 1) {
+        const date = new Date(new Date().getFullYear(), new Date().getMonth() - i);
+        const field = `${date.getMonth() < 10
+          ? `${date.getFullYear()}0${date.getMonth()}`
+          : `${date.getFullYear()}${date.getMonth()}`}`;
+
+        if (!activitiesByMonth[field]) activitiesByMonth[field] = [];
+      }
+
+      const traineesByMonth = Object.values(activitiesByMonth)
+        .map(group => Object.values(groupBy(group, g => g.user)).length);
 
       return traineesByMonth;
     },
