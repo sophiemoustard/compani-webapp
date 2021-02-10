@@ -24,7 +24,7 @@
       <template #body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="col.name === 'trainee'">
+            <div v-if="col.name === 'trainee'" :class="showBorders(col.value)">
               <q-item>
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
@@ -114,6 +114,11 @@ export default {
     traineesCount (slotId) {
       return this.attendances.filter(a => a.courseSlot === slotId).length;
     },
+    showBorders (value) {
+      if (value === this.course.trainees[0].identity) return 'first-cell';
+      if (value === this.course.trainees[this.course.trainees.length - 1].identity) return 'last-cell';
+      return '';
+    },
     async refreshAttendances (courseSlots) {
       if (courseSlots.length) {
         try {
@@ -173,7 +178,16 @@ export default {
 .no-data
   font-size: 12px
 .header
-  border-right: 1px solid $grey-200;
+  border-right: 1px solid $grey-200
+.first-cell
+  border-top: 1px solid $grey-200
+  margin-top: 16px
+  padding-top: 8px
+  margin-right: 16px
+.last-cell
+  border-bottom: 1px solid $grey-200
+  padding-bottom: 8px
+  margin-right: 16px
 .table
   thead tr:first-child th:first-child
     background-color: white
