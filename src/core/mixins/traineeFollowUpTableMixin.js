@@ -16,9 +16,6 @@ export const traineeFollowUpTableMixin = {
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
   },
-  async created () {
-    await this.getLearnersList();
-  },
   methods: {
     formatRow (trainee) {
       const formattedName = formatIdentity(trainee.identity, 'FL');
