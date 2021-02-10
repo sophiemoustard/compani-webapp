@@ -61,7 +61,7 @@ export default {
   },
   async created () {
     await this.getLearnersList();
-    this.traineesCountByMonth();
+    this.computeChartData();
   },
   computed: {
     traineesOnGoingCount () {
@@ -82,15 +82,14 @@ export default {
     },
   },
   methods: {
-    traineesCountByMonth () {
+    computeChartData () {
       const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
       const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-      const activityHistories = this.learners
-        .map(l => l.steps
-          .map(s => s.activities
-            .map(a => a.activityHistories
-              .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
-              .map(ah => ({ user: ah.user, date: ah.date })))))
+      const activityHistories = this.learners.map(l => l.steps
+        .map(s => s.activities
+          .map(a => a.activityHistories
+            .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
+            .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
       const activitiesByMonth = groupBy(
@@ -102,6 +101,7 @@ export default {
       );
 
       const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+      const monthlyTrainees = [];
       for (let i = 6; i > 0; i -= 1) {
         const date = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
         const month = monthNames[date.getMonth()];
@@ -111,11 +111,10 @@ export default {
           ? `${date.getFullYear()}0${date.getMonth()}`
           : `${date.getFullYear()}${date.getMonth()}`}`;
 
-        if (!activitiesByMonth[field]) activitiesByMonth[field] = [];
+        if (!activitiesByMonth[field]) monthlyTrainees.push = 0;
+        else monthlyTrainees.push(activitiesByMonth.map(group => Object.values(groupBy(group, g => g.user)).length));
       }
-
-      this.traineesByMonth = Object.values(activitiesByMonth)
-        .map(group => Object.values(groupBy(group, g => g.user)).length);
+      this.traineesByMonth = monthlyTrainees;
     },
   },
 };
