@@ -88,7 +88,7 @@ export default {
           slot: s._id,
           field: '_id',
           align: 'center',
-          style: 'width: 80px',
+          style: 'width: 80px; min-width: 80px',
           month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
           day: moment(s.startDate).date(),
           weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
