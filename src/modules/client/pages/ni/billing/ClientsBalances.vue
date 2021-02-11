@@ -2,7 +2,8 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Balances Clients" padding>
       <template slot="title">
-        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
+        :disable="!filteredBalances.length" />
       </template>
       <template slot="content">
         <div class="col-xs-12 col-md-6 on-left">
