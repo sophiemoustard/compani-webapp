@@ -4,7 +4,7 @@
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
-          <q-th v-for="col in props.cols" :key="col.name" :props="props" class="header">
+          <q-th v-for="col in props.cols" :key="col.name" :props="props">
             <div v-if="/(slot)/.test(col.name)">
               <div class="text-primary date">{{ col.month }}</div>
               <div class="number">{{ col.day }}</div>
@@ -24,7 +24,7 @@
       <template #body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="col.name === 'trainee'">
+            <div v-if="col.name === 'trainee'" class="rows">
               <q-item>
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
@@ -172,21 +172,27 @@ export default {
   font-size: 16px
 .no-data
   font-size: 12px
-.header
-  border-right: 1px solid $grey-200
+
 .table
   thead tr:first-child th:first-child
     background-color: white
 
   td:first-child
     background-color: white
-
+  th
+    border-right: 1px solid $grey-200
   tr:first-child
     td:first-child
+      .rows
         border-top: 1px solid $grey-200
+        padding-top: 8px
+        margin-right: 16px
   tr:last-child
     td:first-child
-      border-bottom: 1px solid $grey-200
+      .rows
+        border-bottom: 1px solid $grey-200
+        padding-bottom: 8px
+        margin-right: 16px
 
   th:first-child
   td:first-child
