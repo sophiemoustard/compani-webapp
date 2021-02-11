@@ -101,7 +101,7 @@ export default {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => (row.thirdPartyPayer ? row.thirdPartyPayer.name : formatIdentity(row.customer.identity, 'Lf')),
+          field: row => this.formatClient(row),
           format: val => truncate(val),
           classes: 'uppercase text-weight-bold',
         },
@@ -109,7 +109,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => formatIdentity(row.customer.identity, 'Lf'),
+          field: row => this.formatCustomer(row),
           format: val => truncate(val),
           classes: 'uppercase text-weight-bold',
         },
@@ -218,6 +218,12 @@ export default {
       }).onOk(this.createPaymentList)
         .onCancel(() => NotifyPositive('Création des règlements annulée'));
     },
+    formatClient (data) {
+      return data.thirdPartyPayer ? data.thirdPartyPayer.name : formatIdentity(data.customer.identity, 'Lf');
+    },
+    formatCustomer (data) {
+      return formatIdentity(data.customer.identity, 'Lf');
+    },
     async exportToCSV () {
       const csvData = [[
         'Client',
@@ -229,15 +235,15 @@ export default {
         'A prélever',
       ]];
 
-      for (const clData of this.filteredBalances) {
+      for (const clientData of this.filteredBalances) {
         csvData.push([
-          clData.thirdPartyPayer ? clData.thirdPartyPayer.name : formatIdentity(clData.customer.identity, 'Lf'),
-          formatIdentity(clData.customer.identity, 'Lf'),
-          clData.thirdPartyPayer ? '' : roundFrenchPercentage(clData.participationRate),
-          formatNumberForCSV(clData.billed),
-          formatNumberForCSV(clData.paid),
-          formatNumberForCSV(clData.balance),
-          formatNumberForCSV(clData.toPay),
+          this.formatClient(clientData),
+          this.formatCustomer(clientData),
+          clientData.thirdPartyPayer ? '' : formatNumberForCSV(clientData.participationRate),
+          formatNumberForCSV(clientData.billed),
+          formatNumberForCSV(clientData.paid),
+          formatNumberForCSV(clientData.balance),
+          formatNumberForCSV(clientData.toPay),
         ]);
       }
 
