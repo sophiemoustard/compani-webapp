@@ -125,6 +125,7 @@ export default {
     };
   },
   async created () {
+    await this.getLearnersList();
     await this.refreshAttendanceSheets();
   },
   computed: {

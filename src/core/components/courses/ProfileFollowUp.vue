@@ -55,7 +55,13 @@ export default {
         scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
         legend: { display: false },
       },
+      months: [],
+      traineesByMonth: [],
     };
+  },
+  async created () {
+    await this.getLearnersList();
+    this.computeChartData();
   },
   computed: {
     traineesOnGoingCount () {
@@ -64,49 +70,51 @@ export default {
     traineesFinishedCount () {
       return this.learners.length - this.traineesOnGoingCount;
     },
-    traineesCountByMonth () {
-      const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
-      const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-      const activityHistories = this.learners
-        .map(l => l.steps
-          .map(s => s.activities
-            .map(a => a.activityHistories
-              .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
-              .map(ah => ({ user: ah.user, date: ah.date })))))
-        .flat(3);
-
-      const traineesByMonth = Object.values(groupBy(
-        activityHistories,
-        ah => `${new Date(ah.date).getFullYear()}${new Date(ah.date).getMonth() < 10
-          ? `0${new Date(ah.date).getMonth()}`
-          : `${new Date(ah.date).getMonth()}`}`
-      ))
-        .map(group => Object.values(groupBy(group, g => g.user)).length);
-
-      while (traineesByMonth.length < 6) traineesByMonth.unshift(0);
-
-      return traineesByMonth;
-    },
     chartData () {
       return {
         labels: this.months,
         datasets: [{
-          data: this.traineesCountByMonth,
+          data: this.traineesByMonth,
           borderColor: colors.getBrand('primary'),
           backgroundColor: 'transparent',
         }],
       };
     },
-    months () {
+  },
+  methods: {
+    computeChartData () {
+      const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
+      const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+      const activityHistories = this.learners.map(l => l.steps
+        .map(s => s.activities
+          .map(a => a.activityHistories
+            .filter(ah => new Date(ah.date) >= chartStartDate && new Date(ah.date) < chartEndDate)
+            .map(ah => ({ user: ah.user, date: ah.date })))))
+        .flat(3);
+
+      const activitiesByMonth = groupBy(
+        activityHistories,
+        ah => `${new Date(ah.date).getFullYear()}${new Date(ah.date).getMonth() < 10
+          ? `0${new Date(ah.date).getMonth()}`
+          : `${new Date(ah.date).getMonth()}`
+        }`
+      );
+
       const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-      const res = [];
+      const monthlyTrainees = [];
       for (let i = 6; i > 0; i -= 1) {
-        const d = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
-        const month = monthNames[d.getMonth()];
-        const year = d.getFullYear();
-        res.push(`${month} ${year}`);
+        const date = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
+        const month = monthNames[date.getMonth()];
+        const year = date.getFullYear();
+        this.months.push(`${month} ${year}`);
+        const field = `${date.getMonth() < 10
+          ? `${date.getFullYear()}0${date.getMonth()}`
+          : `${date.getFullYear()}${date.getMonth()}`}`;
+
+        if (!activitiesByMonth[field]) monthlyTrainees.push(0);
+        else monthlyTrainees.push(Object.values(groupBy(activitiesByMonth[field], group => group.user)).length);
       }
-      return res;
+      this.traineesByMonth = monthlyTrainees;
     },
   },
 };
