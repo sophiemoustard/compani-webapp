@@ -1,8 +1,8 @@
 <template>
   <div class="row justify-between full-width text-grey-600">
     <div class="row items-center">
-      <q-btn-toggle class="on-left no-shadow" v-model="pagination.rowsPerPage" :options="rowsPerPageOptions"
-        toggle-text-color="primary" toggle-color="white" no-caps dense size="12px" />
+      <q-btn-toggle class="on-left no-shadow" :value="pagination.rowsPerPage" :options="rowsPerPageOptions" size="12px"
+        toggle-text-color="primary" toggle-color="white" no-caps dense @input="update($event, 'rowsPerPage')" />
       <div>Eléments par page</div>
     </div>
     <div class="row items-center">
@@ -52,6 +52,11 @@ export default {
       return rowsPerPage
         ? `${this.firstRowIndex + 1}-${Math.min(this.lastRowIndex, this.computedRowNumber)} de ${this.data.length}`
         : `1-${this.data.length} de ${this.data.length}`;
+    },
+  },
+  methods: {
+    update (event, prop) {
+      this.$emit('update:pagination', { ...this.pagination, [prop]: event });
     },
   },
 };
