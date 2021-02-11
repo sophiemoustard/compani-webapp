@@ -2,7 +2,8 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide" padding>
       <template slot="title">
-        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px" />
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
+          :disable="!allCustomersFundingsMonitoring.length" />
       </template>
       <template slot="content">
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
