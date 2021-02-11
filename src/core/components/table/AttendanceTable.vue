@@ -1,7 +1,7 @@
 <template>
   <q-card flat>
-    <q-table :data="course.trainees" :columns="columns" class="q-pa-md table" :pagination="{ rowsPerPage: 0 }"
-      separator="none" hide-bottom :loading="loading">
+    <q-table v-if="!noSlots" :data="course.trainees" :columns="columns" class="q-pa-md table"
+      separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props">
@@ -15,7 +15,7 @@
               </div>
               <div class="text-grey-800">
                 <q-icon name="supervisor_account" />
-                {{ col.traineesCount }}
+                {{ traineesCount(col.slot) }}
               </div>
             </div>
           </q-th>
@@ -24,7 +24,7 @@
       <template #body="props">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :props="props">
-            <div v-if="col.name === 'trainee'">
+            <div v-if="col.name === 'trainee'" class="rows">
               <q-item>
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
@@ -33,11 +33,17 @@
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
-              @input="updateCheckbox(col.value, col.slot)" />
+              @input="updateCheckbox(col.value, col.slot)" :disable="loading" />
           </q-td>
         </q-tr>
       </template>
+      <template #no-data>
+        <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
+      </template>
     </q-table>
+    <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
+      Aucun créneau n'a été ajouté à cette formation
+    </div>
   </q-card>
 </template>
 
@@ -70,7 +76,7 @@ export default {
         name: 'trainee',
         align: 'left',
         field: 'identity',
-        style: 'width: 200px',
+        style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
         classes: 'ellipsis',
       }];
       if (!this.course.slots) return columns;
@@ -82,15 +88,20 @@ export default {
           slot: s._id,
           field: '_id',
           align: 'center',
-          style: 'width: 80px',
+          style: 'width: 80px; min-width: 80px',
           month: upperCaseFirstLetter(moment(s.startDate).format('MMM')),
           day: moment(s.startDate).date(),
           weekDay: upperCaseFirstLetter(moment(s.startDate).format('ddd')),
           startHour: moment(s.startDate).format('LT'),
           endHour: moment(s.endDate).format('LT'),
-          traineesCount: 0,
         })),
       ];
+    },
+    noTrainees () {
+      return !this.course.trainees.length;
+    },
+    noSlots () {
+      return !this.course.slots.length;
     },
   },
   methods: {
@@ -99,6 +110,9 @@ export default {
         return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
       }
       return false;
+    },
+    traineesCount (slotId) {
+      return this.attendances.filter(a => a.courseSlot === slotId).length;
     },
     async refreshAttendances (courseSlots) {
       if (courseSlots.length) {
@@ -156,6 +170,33 @@ export default {
   font-size: 24px
 .date
   font-size: 16px
+.no-data
+  font-size: 12px
+
 .table
-  display: table
+  thead tr:first-child th:first-child
+    background-color: white
+
+  td:first-child
+    background-color: white
+  th
+    border-right: 1px solid $grey-200
+  tr:first-child
+    td:first-child
+      .rows
+        border-top: 1px solid $grey-200
+        padding-top: 8px
+        margin-right: 16px
+  tr:last-child
+    td:first-child
+      .rows
+        border-bottom: 1px solid $grey-200
+        padding-bottom: 8px
+        margin-right: 16px
+
+  th:first-child
+  td:first-child
+    position: sticky
+    left: 0
+    z-index: 1
 </style>
