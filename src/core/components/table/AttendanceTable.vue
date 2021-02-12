@@ -76,7 +76,7 @@ export default {
         name: 'trainee',
         align: 'left',
         field: 'identity',
-        style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
+        style: `white-space: nowrap; ${!this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px'}`,
         classes: 'ellipsis',
       }];
       if (!this.course.slots) return columns;
