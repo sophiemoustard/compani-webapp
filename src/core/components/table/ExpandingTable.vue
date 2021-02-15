@@ -1,5 +1,5 @@
 <template>
-  <div class="relative-position table-spinner-container">
+  <q-card class="relative-position table-spinner-container" flat>
     <q-table v-if="!loading" :data="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
       :hide-bottom="hideBottom">
       <template #header="props">
@@ -20,7 +20,7 @@
     <q-inner-loading :showing="loading">
       <q-spinner-facebook size="30px" color="primary" />
     </q-inner-loading>
-  </div>
+  </q-card>
 </template>
 
 <script>

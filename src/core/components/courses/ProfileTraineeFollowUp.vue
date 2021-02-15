@@ -2,6 +2,7 @@
   <div>
     <div class="q-my-md">
       <p class="text-weight-bold">Émargements</p>
+      <attendance-table :course="course" />
       <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading"
         :visible-columns="visibleColumns" :pagination.sync="pagination">
         <template #body="{ props }">
@@ -59,6 +60,7 @@ import AttendanceSheets from '@api/AttendanceSheets';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
+import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
@@ -73,6 +75,7 @@ export default {
     'ni-button': Button,
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
     'trainee-follow-up-table': TraineeFollowUpTable,
+    'attendance-table': AttendanceTable,
   },
   props: {
     profileId: { type: String, required: true },
@@ -122,6 +125,7 @@ export default {
     };
   },
   async created () {
+    await this.getLearnersList();
     await this.refreshAttendanceSheets();
   },
   computed: {

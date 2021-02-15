@@ -3,6 +3,8 @@
     <ni-input class="q-mb-lg" caption="Texte" v-model="card.gappedText" required-field
       @blur="updateCard('gappedText')" :error="$v.card.gappedText.$error" type="textarea" @focus="saveTmp('gappedText')"
       :error-message="gappedTextTagCodeErrorMsg" :disable="disableEdition" />
+    <q-checkbox v-model="card.canSwitchAnswers" @input="updateCard('canSwitchAnswers')"
+      label="Réponses interchangeables" class="q-mb-lg" dense :disable="disableEdition" />
     <div class="row gutter-profile-x">
       <div v-for="(answer, i) in card.falsyGapAnswers" :key="i" class="col-md-6 col-xs-12 answers">
         <ni-input class="input" v-model="card.falsyGapAnswers[i].text" :disable="disableEdition"

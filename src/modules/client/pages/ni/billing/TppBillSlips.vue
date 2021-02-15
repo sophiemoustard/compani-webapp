@@ -1,7 +1,8 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Bordereaux tiers payeurs" padding />
-    <ni-simple-table :data="billSlipList" :columns="columns" row-key="name" :pagination="pagination" :loading="loading">
+    <ni-simple-table :data="billSlipList" :columns="columns" row-key="name" :pagination.sync="pagination"
+      :loading="loading">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"

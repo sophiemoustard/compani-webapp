@@ -121,7 +121,7 @@ export default {
       const programsReusingActivity = [...new Set(
         this.activity.steps
           .filter(s => s._id !== this.stepId)
-          .map(s => s.subProgram.program.name)
+          .map(s => get(s, 'subProgram.program.name'))
       )];
 
       const usedInOtherStepMessage = this.isActivityUsedInOtherStep

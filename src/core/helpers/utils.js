@@ -133,3 +133,5 @@ export const sortStrings = (a, b) => a.toLowerCase().localeCompare(b.toLowerCase
 export const formatAndSortOptions = (array, field) => array
   .map(element => ({ label: get(element, field), value: element._id }))
   .sort((a, b) => a.label.localeCompare(b.label));
+
+export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');

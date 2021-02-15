@@ -3,7 +3,7 @@ import omit from 'lodash/omit';
 import Pay from '@api/Pay';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { END_CONTRACT_REASONS, SURCHARGES } from '@data/constants';
-import { formatPrice, formatIdentity, formatHours } from '@helpers/utils';
+import { formatPrice, formatIdentity, formatHours, formatNumberForCSV } from '@helpers/utils';
 import { downloadCsv, downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 
@@ -249,16 +249,13 @@ export const payMixin = {
       let hours = pay[key];
       if (pay.diff && pay.diff[key]) hours += pay.diff[key];
 
-      return this.formatNumberForCSV(hours);
+      return formatNumberForCSV(hours);
     },
     setSelectedPeriod (offset) {
       this.dates = {
         startDate: moment().subtract(offset, 'M').startOf('M').toISOString(),
         endDate: moment().subtract(offset, 'M').endOf('M').toISOString(),
       };
-    },
-    formatNumberForCSV (number) {
-      return parseFloat(number).toFixed(2).replace('.', ',');
     },
     async exportToCSV () {
       const csvData = [[
@@ -297,9 +294,9 @@ export const payMixin = {
           get(auxiliary, 'sector.name') || '',
           startDate ? moment(startDate).format('DD/MM/YYYY') : '',
           endDate ? moment(endDate).format('DD/MM/YYYY') : '',
-          this.formatNumberForCSV(draftPay.contractHours),
+          formatNumberForCSV(draftPay.contractHours),
           this.formatHoursWithDiff(draftPay, 'absencesHours'),
-          this.formatNumberForCSV(draftPay.hoursToWork - draftPay.diff.absencesHours),
+          formatNumberForCSV(draftPay.hoursToWork - draftPay.diff.absencesHours),
           this.formatHoursWithDiff(draftPay, 'workedHours'),
           this.formatHoursWithDiff(draftPay, 'notSurchargedAndExempt'),
           this.formatHoursWithDiff(draftPay, 'surchargedAndExempt'),
@@ -309,14 +306,14 @@ export const payMixin = {
           `"${this.formatSurchargeDetails(draftPay.surchargedAndNotExemptDetails)}"` || '',
           this.formatHoursWithDiff(draftPay, 'paidTransportHours'),
           this.formatHoursWithDiff(draftPay, 'hoursBalance'),
-          get(draftPay, 'diff.hoursBalance') ? this.formatNumberForCSV(draftPay.diff.hoursBalance) : '0,00',
-          this.formatNumberForCSV(draftPay.hoursCounter),
-          this.formatNumberForCSV(draftPay.overtimeHours),
-          this.formatNumberForCSV(draftPay.additionalHours),
+          get(draftPay, 'diff.hoursBalance') ? formatNumberForCSV(draftPay.diff.hoursBalance) : '0,00',
+          formatNumberForCSV(draftPay.hoursCounter),
+          formatNumberForCSV(draftPay.overtimeHours),
+          formatNumberForCSV(draftPay.additionalHours),
           draftPay.mutual ? 'Oui' : 'Non',
-          this.formatNumberForCSV(draftPay.transport),
-          this.formatNumberForCSV(draftPay.phoneFees),
-          this.formatNumberForCSV(draftPay.bonus),
+          formatNumberForCSV(draftPay.transport),
+          formatNumberForCSV(draftPay.phoneFees),
+          formatNumberForCSV(draftPay.bonus),
         ]);
       }
 

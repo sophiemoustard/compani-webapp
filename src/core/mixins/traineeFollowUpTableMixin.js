@@ -5,16 +5,16 @@ import { formatIdentity } from '@helpers/utils';
 
 export const traineeFollowUpTableMixin = {
   data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+
     return {
       learners: [],
       loading: false,
+      isClientInterface,
     };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
-  },
-  async created () {
-    await this.getLearnersList();
   },
   methods: {
     formatRow (trainee) {

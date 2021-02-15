@@ -1,6 +1,10 @@
 <template>
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Balances Clients" padding>
+      <template slot="title">
+        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
+          :disable="!filteredBalances.length" />
+      </template>
       <template slot="content">
         <div class="col-xs-12 col-md-6 on-left">
           <ni-select :options="balancesOptions" v-model="balancesOption" @input="resetSelected" separator />
@@ -64,7 +68,16 @@ import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import { formatPrice, getLastVersion, formatIdentity, truncate, roundFrenchPercentage } from '@helpers/utils';
+import {
+  formatPrice,
+  getLastVersion,
+  formatIdentity,
+  truncate,
+  roundFrenchPercentage,
+  formatNumberForCSV,
+} from '@helpers/utils';
+import moment from '@helpers/moment';
+import { downloadCsv } from '@helpers/file';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
 import { paymentMixin } from 'src/modules/client/mixins/paymentMixin';
 
@@ -89,7 +102,7 @@ export default {
           name: 'client',
           label: 'Client',
           align: 'left',
-          field: row => (row.thirdPartyPayer ? row.thirdPartyPayer.name : formatIdentity(row.customer.identity, 'Lf')),
+          field: row => this.formatClient(row),
           format: val => truncate(val),
           classes: 'uppercase text-weight-bold',
         },
@@ -97,7 +110,7 @@ export default {
           name: 'customer',
           label: 'Bénéficiaire',
           align: 'left',
-          field: row => formatIdentity(row.customer.identity, 'Lf'),
+          field: row => this.formatCustomer(row),
           format: val => truncate(val),
           classes: 'uppercase text-weight-bold',
         },
@@ -205,6 +218,37 @@ export default {
         cancel: 'Non',
       }).onOk(this.createPaymentList)
         .onCancel(() => NotifyPositive('Création des règlements annulée'));
+    },
+    formatClient (data) {
+      return data.thirdPartyPayer ? data.thirdPartyPayer.name : formatIdentity(data.customer.identity, 'Lf');
+    },
+    formatCustomer (data) {
+      return formatIdentity(data.customer.identity, 'Lf');
+    },
+    async exportToCSV () {
+      const csvData = [[
+        'Client',
+        'Bénéficiaire',
+        'Taux de participation',
+        'Facturé TTC',
+        'Payé TTC',
+        'Solde',
+        'A prélever',
+      ]];
+
+      for (const clientData of this.filteredBalances) {
+        csvData.push([
+          this.formatClient(clientData),
+          this.formatCustomer(clientData),
+          clientData.thirdPartyPayer ? '' : formatNumberForCSV(clientData.participationRate),
+          formatNumberForCSV(clientData.billed),
+          formatNumberForCSV(clientData.paid),
+          formatNumberForCSV(clientData.balance),
+          formatNumberForCSV(clientData.toPay),
+        ]);
+      }
+
+      return downloadCsv(csvData, `clients_balances_${moment().format('DD_MM_YYYY')}.csv`);
     },
   },
 };
