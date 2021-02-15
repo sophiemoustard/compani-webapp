@@ -29,7 +29,7 @@
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
-                <q-item-section>{{ formatIdentity(col.value, 'FL') }}</q-item-section>
+                <q-item-section class="ellipsis">{{ formatIdentity(col.value, 'FL') }}</q-item-section>
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
@@ -77,7 +77,6 @@ export default {
         align: 'left',
         field: 'identity',
         style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
-        classes: 'ellipsis',
       }];
       if (!this.course.slots) return columns;
 
@@ -172,6 +171,12 @@ export default {
   font-size: 16px
 .no-data
   font-size: 12px
+
+.ellipsis
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  display: block
 
 .table
   thead tr:first-child th:first-child
