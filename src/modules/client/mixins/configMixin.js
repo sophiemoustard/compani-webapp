@@ -41,12 +41,10 @@ export const configMixin = {
       }
     },
     nbrError (path, validations = this.$v) {
-      if (get(validations, path).required === false) return REQUIRED_LABEL;
-      if (get(validations, path).positiveNumber === false ||
-        get(validations, path).numeric === false ||
-        get(validations, path).maxValue === false) {
-        return 'Nombre non valide';
-      }
+      const val = get(validations, path);
+      if (val.required === false) return REQUIRED_LABEL;
+      if (val.positiveNumber === false || val.numeric === false || val.maxValue === false) return 'Nombre non valide';
+
       return '';
     },
     // Documents
