@@ -43,7 +43,6 @@ export const companyMixin = {
           street: { required },
           city: { required },
           fullAddress: { required, frAddress },
-          location: { required },
         },
       },
     };

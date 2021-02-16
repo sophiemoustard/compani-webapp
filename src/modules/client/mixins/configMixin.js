@@ -24,15 +24,15 @@ export const configMixin = {
       try {
         if (this.tmpInput === get(this.company, path)) return;
         if (get(this.$v.company, path)) {
-          get(this.$v.company, path).$touch();
           const isValid = await this.waitForValidation(this.$v.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
         }
 
-        const value = get(this.company, path);
-        const payload = set({}, path, value);
+        const payload = set({}, path, get(this.company, path));
         await Companies.updateById(this.company._id, payload);
         NotifyPositive('Modification enregistrée.');
+
+        await this.refreshCompany();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la modification.');
@@ -43,8 +43,8 @@ export const configMixin = {
     nbrError (path, validations = this.$v) {
       if (get(validations, path).required === false) return REQUIRED_LABEL;
       if (get(validations, path).positiveNumber === false ||
-      get(validations, path).numeric === false ||
-      get(validations, path).maxValue === false) {
+        get(validations, path).numeric === false ||
+        get(validations, path).maxValue === false) {
         return 'Nombre non valide';
       }
       return '';
@@ -56,7 +56,8 @@ export const configMixin = {
 
         const payload = { [key]: { templates: { [type]: { driveId: null, link: null } } } };
         await Companies.updateById(this.company._id, payload);
-        this.refreshCompany();
+
+        await this.refreshCompany();
         NotifyPositive('Document supprimé');
       } catch (e) {
         console.error(e);
@@ -72,9 +73,9 @@ export const configMixin = {
       }).onOk(() => this.deleteDocument(driveId, type, key))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
-    documentUploaded () {
+    async documentUploaded () {
       NotifyPositive('Document envoyé');
-      this.refreshCompany();
+      await this.refreshCompany();
     },
   },
 };
