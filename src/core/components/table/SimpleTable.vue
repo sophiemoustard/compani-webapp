@@ -24,7 +24,8 @@
         </slot>
       </template>
       <template #bottom="props">
-        <ni-pagination :props="props" :pagination.sync="pagination" :data="data" :options="paginationOptions" />
+        <ni-pagination :props="props" :pagination="pagination" :data="data" :options="paginationOptions"
+          @update:pagination="update($event)" />
       </template>
       <template #bottom-row="props">
         <slot name="bottom-row" :props="props" />
@@ -72,6 +73,11 @@ export default {
     },
     formattedVisibleColumns () {
       return this.visibleColumns.length ? this.visibleColumns : this.columns.map(col => col.name);
+    },
+  },
+  methods: {
+    update (event) {
+      this.$emit('update:pagination', event);
     },
   },
 };

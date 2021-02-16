@@ -2,19 +2,21 @@
   <div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Utilisation du eLearning</p>
-      <div class="row">
-        <div class="col-sm-6 col-xs-12">
-          <q-card flat class="q-pa-md right-stats">
-            <div class="text-weight-bold q-mb-sm">Vue globale</div>
-            <div class="row">
-              <div class="col-3 text-right q-pr-md column justify-around">
-                <ni-e-learning-indicator :indicator="eLearningCoursesOnGoing.length" />
-                <ni-e-learning-indicator :indicator="eLearningCoursesCompleted.length" />
-                <ni-e-learning-indicator :indicator="eLearningActivitiesCompleted.length" />
-              </div>
-              <div class="col-9 column justify-around">
+      <div class="row justify-between">
+        <div class="col-md-6 col-xs-12 global-view-container">
+          <q-card flat class="q-pa-md right-stats global-view column">
+            <div class="text-weight-bold">Vue globale</div>
+            <div class="self-center justify-center column learners-data">
+              <div class="row items-center">
+                <ni-e-learning-indicator :indicator="eLearningCoursesOnGoing.length" class="q-pr-sm" />
                 <div>{{ eLearningCoursesOnGoingText }}</div>
+              </div>
+              <div class="row items-center">
+                <ni-e-learning-indicator :indicator="eLearningCoursesCompleted.length" class="q-pr-sm" />
                 <div>{{ eLearningCoursesCompletedText }}</div>
+              </div>
+              <div class="row items-center">
+                <ni-e-learning-indicator :indicator="eLearningActivitiesCompleted.length" class="q-pr-sm" />
                 <div>{{ eLearningActivitesCompletedText }}</div>
               </div>
             </div>
@@ -203,4 +205,13 @@ export default {
   @media screen and (max-width: 599px)
     margin-right: 0px
     margin-bottom: 8px
+
+.global-view
+  height: 100%;
+  &-container
+    @media screen and (min-width: $breakpoint-sm-max)
+      padding-right: 16px;
+
+.learners-data
+  flex: 1;
 </style>

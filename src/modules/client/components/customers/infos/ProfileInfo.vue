@@ -236,11 +236,11 @@
 
     <!-- Add helper modal -->
     <helper-creation-modal v-model="openNewHelperModal" :company="company" :loading="loading" @next-step="nextStep"
-      :new-helper="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
+      :new-helper.sync="newHelper" @submit="createHelper" @hide="resetAddHelperForm" :validations="$v.newHelper"
       :first-step="firstStep" />
 
     <!-- Edit helper modal -->
-    <helper-edition-modal :edited-helper="editedHelper" v-model="openEditedHelperModal" :loading="loading"
+    <helper-edition-modal :edited-helper.sync="editedHelper" v-model="openEditedHelperModal" :loading="loading"
       :validations="$v.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
     <!-- Subscription creation modal -->
@@ -267,12 +267,12 @@
 
     <!-- Funding creation modal -->
     <funding-creation-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :new-funding="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
+      :new-funding.sync="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
       :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
 
     <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
-      :edited-funding="editedFunding" @submit="editFunding" :days-options="daysOptions"
+      :edited-funding.sync="editedFunding" @submit="editFunding" :days-options="daysOptions"
       :validations="$v.editedFunding" />
 </div>
 </template>

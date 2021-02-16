@@ -5,7 +5,7 @@
       <template #body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar"></q-item-section>
-          <q-item-section class="auxilary-column">
+          <q-item-section>
             {{ col.value.name }}
             <div class="sector-label">{{ col.value.sector }}</div>
           </q-item-section>

@@ -57,6 +57,7 @@
 
 <script>
 import omit from 'lodash/omit';
+import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
@@ -95,10 +96,10 @@ export default {
         const res = [];
         for (const step of aH.activity.steps) res.push({ ...aH, activity: { ...omit(aH.activity, 'steps'), step } });
         return res;
-      }).flat(), h => h.activity.step.subProgram.courses[0]._id));
+      }).flat(), h => get(h, 'activity.step.subProgram.courses[0]._id')));
 
       return groupedByCourses.map(group => ({
-        name: group[0].activity.step.subProgram.program.name,
+        name: get(group[0], 'activity.step.subProgram.program.name'),
         activeTraineesCount: new Set(group.map(a => a.user._id)).size,
       })).sort((a, b) => b.activeTraineesCount - a.activeTraineesCount);
     },
