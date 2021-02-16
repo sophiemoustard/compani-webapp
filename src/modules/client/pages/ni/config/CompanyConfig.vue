@@ -224,6 +224,7 @@ export default {
       this.company.address = this.company.address || { fullAddress: '' };
       this.company.legalRepresentative = this.company.legalRepresentative ||
         { lastname: '', firstname: '', position: '' };
+      this.$v.company.$touch();
     },
     // Establishment
     async getEstablishments () {
