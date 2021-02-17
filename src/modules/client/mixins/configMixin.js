@@ -22,7 +22,9 @@ export const configMixin = {
     },
     async updateCompany (path) {
       try {
+        if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
         if (this.tmpInput === get(this.company, path)) return;
+
         if (get(this.$v.company, path)) {
           const isValid = await this.waitForValidation(this.$v.company, path);
           if (!isValid) return NotifyWarning('Champ(s) invalide(s)');

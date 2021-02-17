@@ -10,9 +10,8 @@
           <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
             @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
             :error-message="tradeNameError($v.company)" />
-          <ni-search-address v-model="company.address" color="white" inverted-light :error-message="addressError"
-            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
-            :error="$v.company.address.$error" />
+          <ni-search-address v-model="company.address" :error-message="addressError" @blur="updateCompany('address')"
+            @focus="saveTmp('address.fullAddress')" :error="$v.company.address.$error" />
           <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
             @blur="updateCompany('rcs')" :error="$v.company.rcs.$error" :error-message="rcsError" />
           <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
