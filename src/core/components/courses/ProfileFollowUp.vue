@@ -33,7 +33,7 @@ import { colors } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
-import LineChart from '@components/LineChart';
+import LineChart from '@components/lineChart/VueChartLineChart';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
 export default {
