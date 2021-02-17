@@ -17,12 +17,8 @@
           </div>
         </q-card>
       </div>
-      <div class="col-md-6 col-xs-12 line-chart-container">
-        <q-card flat class="q-pa-md">
-          <div class="text-weight-bold q-mb-md">Nombre d'apprenants dans le temps</div>
-          <line-chart :chart-data="chartData" :options="options" class="line-chart" />
-        </q-card>
-      </div>
+      <ni-line-chart title="Nombre d'apprenants dans le temps" :chart-data="chartData" :options="options"
+        class="col-md-6 col-xs-12 line-chart-container" />
     </div>
     <trainee-follow-up-table :learners="learners" :loading="loading" class="q-mt-xl" />
   </div>
@@ -33,7 +29,7 @@ import { colors } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
-import LineChart from '@components/lineChart/VueChartLineChart';
+import LineChart from '@components/lineChart/LineChart';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
 export default {
@@ -42,7 +38,7 @@ export default {
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'trainee-follow-up-table': TraineeFollowUpTable,
-    'line-chart': LineChart,
+    'ni-line-chart': LineChart,
   },
   props: {
     profileId: { type: String, required: true },
@@ -127,11 +123,9 @@ export default {
     @media screen and (min-width: $breakpoint-sm-max)
       padding-right: 16px;
 
-.line-chart
-  max-height: 200px;
-  &-container
-    @media screen and (max-width: $breakpoint-sm-max)
-      margin-top: 16px;
+.line-chart-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    margin-top: 16px;
 
 .learners-data
   flex: 1;
