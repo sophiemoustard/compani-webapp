@@ -106,9 +106,10 @@ import Establishments from '@api/Establishments';
 import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
-import EstablishmentCreationModal from 'src/modules/client/components/config/EstablishmentCreationModal';
-import EstablishmentEditionModal from 'src/modules/client/components/config/EstablishmentEditionModal';
-
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { COMPANY } from '@data/constants';
+import { urssafCodes } from '@data/urssafCodes';
+import { workHealthServices } from '@data/workHealthServices';
 import {
   frAddress,
   validWorkHealthService,
@@ -117,15 +118,13 @@ import {
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
 import { formatPhoneForPayload } from '@helpers/utils';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANY } from '@data/constants';
-import { urssafCodes } from '@data/urssafCodes';
-import { workHealthServices } from '@data/workHealthServices';
-import { companyMixin } from '@mixins/companyMixin';
 import { defineAbilitiesFor } from '@helpers/ability';
+import { companyMixin } from '@mixins/companyMixin';
+import { validationMixin } from '@mixins/validationMixin';
+import EstablishmentCreationModal from 'src/modules/client/components/config/EstablishmentCreationModal';
+import EstablishmentEditionModal from 'src/modules/client/components/config/EstablishmentEditionModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
-import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'CompanyConfig',
@@ -148,30 +147,10 @@ export default {
       // Establishment
       establishments: [],
       establishmentsColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
-        {
-          name: 'siret',
-          label: 'SIRET',
-          align: 'left',
-          field: 'siret',
-        },
-        {
-          name: 'address',
-          label: 'Adresse',
-          align: 'left',
-          field: row => get(row, 'address.fullAddress') || '',
-        },
-        {
-          name: 'phone',
-          label: 'Téléphone',
-          align: 'left',
-          field: 'phone',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
+        { name: 'siret', label: 'SIRET', align: 'left', field: 'siret' },
+        { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
+        { name: 'phone', label: 'Téléphone', align: 'left', field: 'phone' },
         {
           name: 'workHealthService',
           label: 'Service de santé du travail',
@@ -186,12 +165,7 @@ export default {
           field: 'urssafCode',
           format: value => (value ? get(urssafCodes.find(code => code.value === value), 'label', '') : ''),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       establishmentsPagination: { rowsPerPage: 0, sortBy: 'name' },
       establishmentCreationModal: false,
@@ -250,6 +224,7 @@ export default {
       this.company.address = this.company.address || { fullAddress: '' };
       this.company.legalRepresentative = this.company.legalRepresentative ||
         { lastname: '', firstname: '', position: '' };
+      this.$v.company.$touch();
     },
     // Establishment
     async getEstablishments () {
@@ -319,9 +294,7 @@ export default {
     async updateEstablishment () {
       try {
         const formIsValid = await this.waitForFormValidation(this.$v.editedEstablishment);
-        if (!formIsValid) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];

@@ -67,7 +67,7 @@ export const companyMixin = {
     rcsError () {
       if (!this.$v.company.rcs.required) return REQUIRED_LABEL;
       if (!this.$v.company.rcs.maxLength || !this.$v.company.rcs.minLength) {
-        return 'Doit contenir 9 caractères (espaces inclus).';
+        return 'Doit contenir 9 caractères.';
       }
 
       return '';
