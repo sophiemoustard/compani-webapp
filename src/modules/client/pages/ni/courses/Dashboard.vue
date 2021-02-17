@@ -4,9 +4,9 @@
       <h4>La formation Compani dans ma structure</h4>
       <ni-date-range v-model="dates" class="dates" borders />
     </div>
-    <q-card flat class="q-pa-md flex row">
+    <q-card flat class="q-pa-md row">
       <div class="text-weight-bold q-mb-sm col-md-4 col-xs-12">Le eLearning dans ma structure</div>
-      <div class="flex row justify-around col-md-8 col-xs-12">
+      <div class="row justify-around col-md-8 col-xs-12">
         <div class="column items-center">
           <ni-e-learning-indicator :indicator="activeLearners" />
           <div class="text-center">apprenants actifs</div>
@@ -25,7 +25,7 @@
             <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
           </div>
           <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
-            class="flex justify-between items-center row q-my-sm">
+            class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
@@ -42,7 +42,7 @@
             <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
           </div>
           <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
-            class="flex justify-between items-center row q-my-sm">
+            class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <div class="q-mx-md text-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
