@@ -55,10 +55,14 @@
         </q-card>
       </div>
     </div>
+    <p class="text-weight-bold q-mt-xl">Evolution dans le temps</p>
+    <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData" :options="options"
+      class="q-mt-md line-chart-container" />
   </q-page>
 </template>
 
 <script>
+import { colors } from 'quasar';
 import omit from 'lodash/omit';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
@@ -66,10 +70,11 @@ import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import moment from '@helpers/moment';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
+import LineChart from '@components/lineChart/LineChart';
 import { DEFAULT_AVATAR } from '@data/constants';
+import moment from '@helpers/moment';
+import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
 
 export default {
   name: 'CourseDashboard',
@@ -77,6 +82,7 @@ export default {
   components: {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
+    'ni-line-chart': LineChart,
   },
   data () {
     return {
@@ -88,6 +94,14 @@ export default {
       formatIdentity,
       upperCaseFirstLetter,
       DEFAULT_AVATAR,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
+        legend: { display: false },
+      },
+      months: [],
+      traineesByMonth: [],
     };
   },
   computed: {
@@ -112,6 +126,16 @@ export default {
       return groupedByLearners.map(group => ({ ...group[0].user, activityCount: group.length }))
         .sort((a, b) => b.activityCount - a.activityCount);
     },
+    chartData () {
+      return {
+        labels: this.months,
+        datasets: [{
+          data: this.traineesByMonth,
+          borderColor: colors.getBrand('primary'),
+          backgroundColor: 'transparent',
+        }],
+      };
+    },
   },
   watch: {
     async dates () {
@@ -120,6 +144,7 @@ export default {
   },
   async created () {
     await this.getActivityHistories();
+    await this.computeChartData();
   },
   methods: {
     async getActivityHistories () {
@@ -133,6 +158,52 @@ export default {
         NotifyPositive('Données mises a jour.');
       } catch (e) {
         this.activityHistories = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la recupération des données.');
+      }
+    },
+    formatMonthAndYear (date) {
+      return `${new Date(date).getFullYear()}${new Date(date).getMonth() < 10
+        ? `0${new Date(date).getMonth()}`
+        : `${new Date(date).getMonth()}`
+      }`;
+    },
+    async computeChartData () {
+      try {
+        const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
+        const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
+        const lastSixMonthsActivityHistories = await ActivityHistories.list({
+          startDate: chartStartDate,
+          endDate: chartEndDate,
+        });
+
+        const activityHistoriesByMonth = groupBy(
+          lastSixMonthsActivityHistories,
+          ah => this.formatMonthAndYear(ah.date)
+        );
+
+        const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
+        const monthlyTrainees = [];
+        for (let i = 6; i > 0; i -= 1) {
+          const date = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
+          const month = monthNames[date.getMonth()];
+          const year = date.getFullYear();
+          this.months.push(`${month} ${year}`);
+
+          const field = this.formatMonthAndYear(date);
+
+          if (!activityHistoriesByMonth[field]) monthlyTrainees.push(0);
+          else {
+            monthlyTrainees.push(
+              Object.values(groupBy(activityHistoriesByMonth[field], group => group.user._id)).length
+            );
+          }
+          this.traineesByMonth = monthlyTrainees;
+        }
+
+        NotifyPositive('Données mises a jour.');
+      } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la recupération des données.');
       }
@@ -153,4 +224,8 @@ export default {
     padding-left: 16px
   @media screen and (max-width: $breakpoint-sm-max)
     padding-top: 16px
+
+.line-chart-container
+  width: 50%;
+  padding-right: 16px;
 </style>
