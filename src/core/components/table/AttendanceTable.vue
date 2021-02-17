@@ -177,6 +177,7 @@ export default {
   overflow: hidden
   text-overflow: ellipsis
   display: block
+  align-self: center
 
 .table
   thead tr:first-child th:first-child
