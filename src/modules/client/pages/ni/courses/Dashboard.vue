@@ -2,6 +2,9 @@
   <q-page class="client-background" padding>
     <div class="flex no-wrap justify-between">
       <h4>La formation Compani dans ma structure</h4>
+    </div>
+    <div class="flex justify-between q-mt-xl">
+      <p class="text-weight-bold">Chiffre généraux</p>
       <ni-date-range v-model="dates" class="dates" borders />
     </div>
     <q-card flat class="q-pa-md row">
@@ -144,6 +147,7 @@ export default {
     padding-right: 16px
   @media screen and (max-width: $breakpoint-sm-max)
     padding-bottom: 16px
+
 .rigth-card
   @media screen and (min-width: $breakpoint-md-min)
     padding-left: 16px
