@@ -33,4 +33,7 @@ export const userModel = {
     },
   },
   establishment: null,
+  company: {
+    address: { fullAddress: '' },
+  },
 };
