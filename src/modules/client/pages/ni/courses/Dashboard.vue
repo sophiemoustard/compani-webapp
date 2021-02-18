@@ -62,7 +62,6 @@
 </template>
 
 <script>
-import { colors } from 'quasar';
 import omit from 'lodash/omit';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
@@ -75,10 +74,12 @@ import LineChart from '@components/lineChart/LineChart';
 import { DEFAULT_AVATAR } from '@data/constants';
 import moment from '@helpers/moment';
 import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
+import { lineChartMixin } from '@mixins/lineChartMixin';
 
 export default {
   name: 'CourseDashboard',
   metaInfo: { title: 'Tableau de bord des formations' },
+  mixins: [lineChartMixin],
   components: {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
@@ -94,14 +95,6 @@ export default {
       formatIdentity,
       upperCaseFirstLetter,
       DEFAULT_AVATAR,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
-        legend: { display: false },
-      },
-      months: [],
-      traineesByMonth: [],
     };
   },
   computed: {
@@ -125,16 +118,6 @@ export default {
 
       return groupedByLearners.map(group => ({ ...group[0].user, activityCount: group.length }))
         .sort((a, b) => b.activityCount - a.activityCount);
-    },
-    chartData () {
-      return {
-        labels: this.months,
-        datasets: [{
-          data: this.traineesByMonth,
-          borderColor: colors.getBrand('primary'),
-          backgroundColor: 'transparent',
-        }],
-      };
     },
   },
   watch: {
@@ -162,12 +145,6 @@ export default {
         NotifyNegative('Erreur lors de la recupération des données.');
       }
     },
-    formatMonthAndYear (date) {
-      return `${new Date(date).getFullYear()}${new Date(date).getMonth() < 10
-        ? `0${new Date(date).getMonth()}`
-        : `${new Date(date).getMonth()}`
-      }`;
-    },
     async computeChartData () {
       try {
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
@@ -183,24 +160,7 @@ export default {
           ah => this.formatMonthAndYear(ah.date)
         );
 
-        const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-        const monthlyTrainees = [];
-        for (let i = 6; i > 0; i -= 1) {
-          const date = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
-          const month = monthNames[date.getMonth()];
-          const year = date.getFullYear();
-          this.months.push(`${month} ${year}`);
-
-          const field = this.formatMonthAndYear(date);
-
-          if (!activityHistoriesByMonth[field]) monthlyTrainees.push(0);
-          else {
-            monthlyTrainees.push(
-              Object.values(groupBy(activityHistoriesByMonth[field], group => group.user._id)).length
-            );
-          }
-          this.traineesByMonth = monthlyTrainees;
-        }
+        this.traineesByMonth = this.getTraineeByMonth(activityHistoriesByMonth);
 
         NotifyPositive('Données mises a jour.');
       } catch (e) {

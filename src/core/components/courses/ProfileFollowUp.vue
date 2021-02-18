@@ -25,16 +25,16 @@
 </template>
 
 <script>
-import { colors } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import LineChart from '@components/lineChart/LineChart';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
+import { lineChartMixin } from '@mixins/lineChartMixin';
 
 export default {
   name: 'ProfileFollowUp',
-  mixins: [traineeFollowUpTableMixin],
+  mixins: [traineeFollowUpTableMixin, lineChartMixin],
   components: {
     'ni-e-learning-indicator': ELearningIndicator,
     'trainee-follow-up-table': TraineeFollowUpTable,
@@ -42,18 +42,6 @@ export default {
   },
   props: {
     profileId: { type: String, required: true },
-  },
-  data () {
-    return {
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
-        legend: { display: false },
-      },
-      months: [],
-      traineesByMonth: [],
-    };
   },
   async created () {
     await this.getLearnersList();
@@ -66,21 +54,12 @@ export default {
     traineesFinishedCount () {
       return this.learners.length - this.traineesOnGoingCount;
     },
-    chartData () {
-      return {
-        labels: this.months,
-        datasets: [{
-          data: this.traineesByMonth,
-          borderColor: colors.getBrand('primary'),
-          backgroundColor: 'transparent',
-        }],
-      };
-    },
   },
   methods: {
     computeChartData () {
       const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
       const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+
       const activityHistories = this.learners.map(l => l.steps
         .map(s => s.activities
           .map(a => a.activityHistories
@@ -88,29 +67,9 @@ export default {
             .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
-      const activitiesByMonth = groupBy(
-        activityHistories,
-        ah => `${new Date(ah.date).getFullYear()}${new Date(ah.date).getMonth() < 10
-          ? `0${new Date(ah.date).getMonth()}`
-          : `${new Date(ah.date).getMonth()}`
-        }`
-      );
+      const activityHistoriesByMonth = groupBy(activityHistories, ah => this.formatMonthAndYear(ah.date));
 
-      const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-      const monthlyTrainees = [];
-      for (let i = 6; i > 0; i -= 1) {
-        const date = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
-        const month = monthNames[date.getMonth()];
-        const year = date.getFullYear();
-        this.months.push(`${month} ${year}`);
-        const field = `${date.getMonth() < 10
-          ? `${date.getFullYear()}0${date.getMonth()}`
-          : `${date.getFullYear()}${date.getMonth()}`}`;
-
-        if (!activitiesByMonth[field]) monthlyTrainees.push(0);
-        else monthlyTrainees.push(Object.values(groupBy(activitiesByMonth[field], group => group.user)).length);
-      }
-      this.traineesByMonth = monthlyTrainees;
+      this.traineesByMonth = this.getTraineeByMonth(activityHistoriesByMonth);
     },
   },
 };
