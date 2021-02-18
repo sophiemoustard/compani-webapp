@@ -186,6 +186,7 @@ export default {
     padding-top: 16px
 
 .line-chart-container
-  width: 50%;
-  padding-right: 16px;
+  @media screen and (min-width: $breakpoint-sm-max)
+    width: 50%;
+    padding-right: 16px;
 </style>
