@@ -18,12 +18,12 @@
     <div class="planning-container full-width">
       <table :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
-          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': persons.length > 0 }">
+          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': uniqPersons.length > 0 }">
             <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
               @click="staffingView = !staffingView" />
           </th>
-          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': persons.length > 0 }" :key="index"
-            v-for="(day, index) in daysHeader" class="capitalize">
+          <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': uniqPersons.length > 0 }"
+            :key="index" v-for="(day, index) in daysHeader" class="capitalize">
             <div class="row justify-center items-baseline days-header">
               <div class="days-name q-mr-md">{{ day.name }}</div>
               <div :class="['days-number', { 'current-day': isCurrentDay(day.moment) }]">{{ day.number }}</div>
@@ -99,6 +99,7 @@
 import { mapGetters, mapState } from 'vuex';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
+import uniqBy from 'lodash/uniqBy';
 import Customers from '@api/Customers';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
@@ -189,7 +190,10 @@ export default {
       return this.clientRole === PLANNING_REFERENT;
     },
     personsGroupedBySector () {
-      return this.isCustomerPlanning ? { allSectors: this.persons } : groupBy(this.persons, 'sector._id');
+      return this.isCustomerPlanning ? { allSectors: this.uniqPersons } : groupBy(this.uniqPersons, 'sector._id');
+    },
+    uniqPersons () {
+      return uniqBy(this.persons, '_id');
     },
   },
   methods: {
@@ -268,7 +272,7 @@ export default {
     },
     // History
     toggleHistory () {
-      if (this.persons.length === 0) return;
+      if (this.uniqPersons.length === 0) return;
       this.$emit('toggle-history', !this.displayHistory);
     },
     // Drag & drop
