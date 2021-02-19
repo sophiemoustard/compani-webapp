@@ -50,7 +50,7 @@ export const attendanceTableMixin = {
           const companyTrainees = await Users.learnerList({ company: this.selectedCompany });
           this.trainees = companyTrainees;
         } else {
-          const trainees = await Users.learnerList();
+          const trainees = await Users.learnerList({ hasCompany: true });
           this.trainees = trainees;
         }
       } catch (error) {
