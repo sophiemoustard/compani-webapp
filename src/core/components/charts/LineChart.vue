@@ -1,8 +1,10 @@
 <template>
+  <div>
     <q-card flat class="q-pa-md">
       <div class="text-weight-bold q-mb-md">{{ title }}</div>
       <line-chart :chart-data="chartData" :options="options" class="line-chart" />
     </q-card>
+  </div>
 </template>
 
 <script>
