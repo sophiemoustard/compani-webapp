@@ -56,8 +56,7 @@
       </div>
     </div>
     <p class="text-weight-bold q-mt-xl">Evolution dans le temps</p>
-    <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData" :options="options"
-      class="q-mt-md line-chart-container" />
+    <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData" class="q-mt-md line-chart-container" />
   </q-page>
 </template>
 
@@ -70,16 +69,16 @@ import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import LineChart from '@components/lineChart/LineChart';
+import LineChart from '@components/charts/LineChart';
 import { DEFAULT_AVATAR } from '@data/constants';
 import moment from '@helpers/moment';
 import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
-import { lineChartMixin } from '@mixins/lineChartMixin';
+import { traineeChartMixin } from '@mixins/traineeChartMixin';
 
 export default {
   name: 'CourseDashboard',
   metaInfo: { title: 'Tableau de bord des formations' },
-  mixins: [lineChartMixin],
+  mixins: [traineeChartMixin],
   components: {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,

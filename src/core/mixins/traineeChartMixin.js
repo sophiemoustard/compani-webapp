@@ -2,15 +2,9 @@ import { colors } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 
-export const lineChartMixin = {
+export const traineeChartMixin = {
   data () {
     return {
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { yAxes: [{ ticks: { beginAtZero: true } }] },
-        legend: { display: false },
-      },
       months: [],
       traineesByMonth: [],
     };
@@ -52,10 +46,7 @@ export const lineChartMixin = {
             Object.values(
               groupBy(
                 activityHistoriesByMonth[field],
-                (group) => {
-                  const userId = get(group, 'user._id', null) || group.user;
-                  return userId;
-                }
+                group => get(group, 'user._id', null) || group.user
               )
             ).length
           );
