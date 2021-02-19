@@ -23,7 +23,6 @@ export const attendanceTableMixin = {
           .sort((a, b) => a.label.localeCompare(b.label));
 
         return [
-          { label: 'Tous les apprenants', value: '' },
           ...uniqBy(selectedCompanyTrainees, 'value'),
         ].filter(learner => !this.learners.map(l => l._id).includes(learner.value._id));
       }
@@ -35,7 +34,6 @@ export const attendanceTableMixin = {
         .sort((a, b) => a.label.localeCompare(b.label));
 
       return [
-        { label: 'Tous les apprenants', value: '' },
         ...uniqBy(allTrainees, 'value'),
       ].filter(learner => !this.learners.map(l => l._id).includes(learner.value._id));
     },

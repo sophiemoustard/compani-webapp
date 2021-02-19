@@ -4,7 +4,7 @@
       Ajouter un nouveau <span class="text-weight-bold">participant</span>
     </template>
     <ni-select :options="traineeFilterOptions" :value="selectedTrainee" @input="updateSelectedTrainee"
-      caption="Participant" in-modal />
+      caption="Participant" in-modal :label="'Tous les apprenants'" />
       <div class="row q-pb-md">
         Selectionner les créneaux auxquelles a été présent ce participant *
     <div v-for="slot in slots" :key="slot.value" class="col-md-6">

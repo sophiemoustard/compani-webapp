@@ -8,7 +8,7 @@
       :disable="disable" @focus="onFocus" @blur="onBlur" @input="onInput" behavior="menu" @filter="onFilter"
       :class="{ 'borders': inModal, 'no-bottom': noError }" :error="error" :error-message="errorMessage" use-input
       :display-value="displayedValue" hide-selected fill-input :input-debounce="0" emit-value ref="selectInput"
-      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
+      :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon" :label="label">
       <template #append>
         <ni-button v-if="value && !disable" icon="close" @click.stop="resetValue" size="sm" />
         <ni-button v-if="icon" :icon="icon" class="select-icon pink-icon" @click="$refs['selectInput'].showPopup()" />
@@ -39,6 +39,7 @@ export default {
     bgColor: { type: String, default: 'white' },
     optionDisable: { type: String, default: 'disable' },
     dataCy: { type: String, default: '' },
+    label: { type: String, default: '' },
   },
   components: {
     'ni-button': Button,
