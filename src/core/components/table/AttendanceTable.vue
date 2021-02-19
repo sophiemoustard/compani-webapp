@@ -1,6 +1,7 @@
 <template>
+<div>
   <q-card flat>
-    <q-table v-if="!noSlots" :data="course.trainees" :columns="columns" class="q-pa-md table"
+    <q-table v-if="!noSlots" :data="learners" :columns="columns" class="q-pa-md table"
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
@@ -29,7 +30,10 @@
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
-                <q-item-section class="ellipsis">{{ formatIdentity(col.value, 'FL') }}</q-item-section>
+                <q-item-section class="ellipsis">
+                  {{ formatIdentity(col.value.identity, 'FL') }}
+                  <q-item-section v-if="col.value.external" class="unsubscribed">Pas inscrit</q-item-section>
+                </q-item-section>
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
@@ -41,23 +45,35 @@
         <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
       </template>
     </q-table>
+    <ni-button color="primary" icon="add" label="Ajouter un participant" :disable="loading"
+      @click="traineeAdditionModal = true" />
     <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
   </q-card>
+    <learner-addition-modal v-model="traineeAdditionModal" :course="course" @hide="resetSelectedTrainee"
+      @submit="addLearner" :loading="modalLoading" :learners="learners" :selected-trainee.sync="selectedTrainee" />
+</div>
 </template>
 
 <script>
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR } from '@data/constants';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import Button from '@components/Button';
 import Attendances from '@api/Attendances';
+import Users from '@api/Users';
+import LearnerAdditionModal from './LearnerAdditionModal';
 
 export default {
   name: 'AttendanceTable',
   props: {
     course: { type: Object, default: () => ({}) },
+  },
+  components: {
+    'ni-button': Button,
+    'learner-addition-modal': LearnerAdditionModal,
   },
   data () {
     return {
@@ -65,17 +81,31 @@ export default {
       DEFAULT_AVATAR,
       attendances: [],
       loading: false,
+      modalLoading: false,
+      traineeAdditionModal: false,
+      unsubscribedLearners: [],
+      selectedTrainee: {},
     };
   },
   async created () {
     await this.refreshAttendances(this.course.slots.map(s => s._id));
+    const learnersId = this.learners.map(learner => learner._id);
+    const unsubscribedLearnersId = [...new Set(this.attendances
+      .filter(a => (!learnersId.includes(a.trainee)))
+      .map(u => u.trainee))];
+
+    this.unsubscribedLearners = await Promise.all(unsubscribedLearnersId
+      .map(unsubscribedLearnerId => Users.getById(unsubscribedLearnerId)));
+
+    this.unsubscribedLearners = this.unsubscribedLearners
+      .map(unsubscribedLearner => ({ ...unsubscribedLearner, external: true }));
   },
   computed: {
     columns () {
       const columns = [{
         name: 'trainee',
         align: 'left',
-        field: 'identity',
+        field: row => ({ identity: row.identity, external: !!row.external }),
         style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
       }];
       if (!this.course.slots) return columns;
@@ -101,6 +131,9 @@ export default {
     },
     noSlots () {
       return !this.course.slots.length;
+    },
+    learners () {
+      return this.course.trainees.concat(this.unsubscribedLearners);
     },
   },
   methods: {
@@ -161,6 +194,24 @@ export default {
         }
       }
     },
+    async addLearner (event) {
+      try {
+        if (!event.trainee) return NotifyWarning('Veuillez sélectionner un participant');
+        this.modalLoading = true;
+        event.slots.map(s => this.updateCheckbox(event.trainee._id, s));
+        this.unsubscribedLearners.push(event.trainee);
+        this.traineeAdditionModal = false;
+        NotifyPositive('Participant ajouté.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout du participant.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetSelectedTrainee () {
+      this.selectedTrainee = {};
+    },
   },
 };
 </script>
@@ -205,4 +256,13 @@ export default {
     position: sticky
     left: 0
     z-index: 1
+.add-learner
+  padding-left: 16px
+  padding-bottom: 16px
+  border-color: 'transparent'
+.unsubscribed
+    color: $secondary
+    line-height: 1
+    font-size: 11px
+    padding-top: 3px
 </style>
