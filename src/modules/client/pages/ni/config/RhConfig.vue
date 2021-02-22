@@ -164,7 +164,6 @@
 
 <script>
 import get from 'lodash/get';
-import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import { required, maxValue } from 'vuelidate/lib/validators';
 import Companies from '@api/Companies';
@@ -201,7 +200,6 @@ export default {
   data () {
     return {
       MAX_INTERNAL_HOURS_NUMBER: 9,
-      company: null,
       internalHours: [],
       internalHoursColumns: [
         { name: 'name', label: 'Nom', align: 'left', field: 'name' },
@@ -256,14 +254,7 @@ export default {
     };
   },
   async mounted () {
-    this.company = cloneDeep(this.loggedCompany);
-    if (!this.company.rhConfig.templates) this.company.rhConfig.templates = {};
-
-    await Promise.all([
-      this.refreshInternalHours(),
-      this.getSectors(),
-      this.getAdministrativeDocuments(),
-    ]);
+    await Promise.all([this.refreshInternalHours(), this.getSectors(), this.getAdministrativeDocuments()]);
   },
   methods: {
     async updateCompanyTransportSubs (index) {
@@ -285,10 +276,6 @@ export default {
       } finally {
         this.tmpInput = '';
       }
-    },
-    async refreshCompany () {
-      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
-      this.company = this.loggedCompany;
     },
     // Internal hours
     resetInternalHourCreationModal () {

@@ -36,5 +36,7 @@ export const userModel = {
   company: {
     address: { fullAddress: '' },
     legalRepresentative: { firstname: '', lastname: '', position: '' },
+    customersConfig: { templates: {} },
+    rhConfig: { templates: {} },
   },
 };

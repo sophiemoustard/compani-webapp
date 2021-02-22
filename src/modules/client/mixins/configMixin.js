@@ -14,14 +14,19 @@ export const configMixin = {
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({ loggedCompany: 'main/getCompany' }),
+    ...mapGetters({ company: 'main/getCompany' }),
   },
   methods: {
     saveTmp (path) {
       this.tmpInput = get(this.company, path);
     },
+    async refreshCompany () {
+      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
+      this.$v.company.$touch();
+    },
     async updateCompany (path) {
       try {
+        this.$v.company.$touch();
         if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
         if (this.tmpInput === get(this.company, path)) return;
 

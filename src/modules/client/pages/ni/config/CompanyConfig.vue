@@ -138,7 +138,6 @@ export default {
   mixins: [configMixin, validationMixin, tableMixin, companyMixin],
   data () {
     return {
-      company: null,
       documents: null,
       COMPANY,
       loading: false,
@@ -217,11 +216,6 @@ export default {
     else await this.refreshCompany();
   },
   methods: {
-    async refreshCompany () {
-      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
-      this.company = this.loggedCompany;
-      this.$v.company.$touch();
-    },
     // Establishment
     async getEstablishments () {
       try {
