@@ -4,14 +4,12 @@
       Ajouter un nouveau <span class="text-weight-bold">participant</span>
     </template>
     <ni-select :options="traineeFilterOptions" :value="selectedTrainee" @input="updateSelectedTrainee"
-      caption="Participant" in-modal :label="'Tous les apprenants'" />
-      <div class="row q-pb-md">
-        Selectionner les créneaux auxquelles a été présent ce participant *
-    <div v-for="slot in slots" :key="slot.value" class="col-md-6">
-      <q-checkbox :value="checkboxValue(slot.value)" dense size="sm" :disable="loading" :label="slot.label"
-        @input="upadteCheckBox(slot.value)" />
+      caption="Participant" in-modal />
+    <div class="row q-pb-md">
+      Selectionner les créneaux auxquelles a été présent ce participant *
+      <ni-option-group :value="this.attendances" @input="updateCheckbox" :options="slots" type="checkbox"
+      :inline="true" />
     </div>
-      </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le participant" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
@@ -23,19 +21,21 @@
 import moment from '@helpers/moment';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
-import { attendanceTableMixin } from '@mixins/attendanceTableMixin';
+import OptionGroup from '@components/form/OptionGroup';
 
 export default {
-  name: 'LearnerAdditionModal',
+  name: 'LearnerAttendanceCreationModal',
   props: {
     value: { type: Boolean, default: false },
     course: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     learners: { type: Array, default: () => [] },
+    traineeFilterOptions: { type: Array, default: () => [] },
     selectedTrainee: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-select': Select,
+    'ni-option-group': OptionGroup,
     'ni-modal': Modal,
   },
   data () {
@@ -43,7 +43,6 @@ export default {
       attendances: [],
     };
   },
-  mixins: [attendanceTableMixin],
   computed: {
     slots () {
       return this.course.slots.map(s => ({
@@ -67,17 +66,8 @@ export default {
     submit () {
       this.$emit('submit', { trainee: this.selectedTrainee, slots: this.attendances });
     },
-    checkboxValue (slotId) {
-      if (this.attendances.length) {
-        return !!this.attendances.find(a => a === slotId);
-      }
-      return false;
-    },
-    upadteCheckBox (slotId) {
-      if (this.checkboxValue(slotId)) {
-        const slotIndex = this.attendances.indexOf(slotId);
-        this.attendances.splice(slotIndex, 1);
-      } else this.attendances.push(slotId);
+    updateCheckbox (event) {
+      this.attendances = event;
     },
   },
 };

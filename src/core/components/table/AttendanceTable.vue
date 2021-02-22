@@ -46,25 +46,28 @@
       </template>
     </q-table>
     <ni-button color="primary" icon="add" label="Ajouter un participant" :disable="loading"
-      @click="traineeAdditionModal = true" />
+      @click="traineeAdditionModal = true" class="q-mb-sm" />
     <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
   </q-card>
-    <learner-addition-modal v-model="traineeAdditionModal" :course="course" @hide="resetSelectedTrainee"
-      @submit="addLearner" :loading="modalLoading" :learners="learners" :selected-trainee.sync="selectedTrainee" />
+
+  <learner-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetSelectedTrainee"
+    @submit="addLearner" :loading="modalLoading" :learners="learners" :selected-trainee.sync="selectedTrainee"
+    :trainee-filter-options="traineeFilterOptions" />
 </div>
 </template>
 
 <script>
+import uniqBy from 'lodash/uniqBy';
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR } from '@data/constants';
+import { DEFAULT_AVATAR, INTRA } from '@data/constants';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import Button from '@components/Button';
 import Attendances from '@api/Attendances';
 import Users from '@api/Users';
-import LearnerAdditionModal from './LearnerAdditionModal';
+import LearnerAttendanceCreationModal from './LearnerAttendanceCreationModal';
 
 export default {
   name: 'AttendanceTable',
@@ -73,7 +76,7 @@ export default {
   },
   components: {
     'ni-button': Button,
-    'learner-addition-modal': LearnerAdditionModal,
+    'learner-attendance-creation-modal': LearnerAttendanceCreationModal,
   },
   data () {
     return {
@@ -83,22 +86,13 @@ export default {
       loading: false,
       modalLoading: false,
       traineeAdditionModal: false,
-      unsubscribedLearners: [],
       selectedTrainee: {},
+      potentialsTrainees: [],
     };
   },
   async created () {
     await this.refreshAttendances(this.course.slots.map(s => s._id));
-    const learnersId = this.learners.map(learner => learner._id);
-    const unsubscribedLearnersId = [...new Set(this.attendances
-      .filter(a => (!learnersId.includes(a.trainee)))
-      .map(u => u.trainee))];
-
-    this.unsubscribedLearners = await Promise.all(unsubscribedLearnersId
-      .map(unsubscribedLearnerId => Users.getById(unsubscribedLearnerId)));
-
-    this.unsubscribedLearners = this.unsubscribedLearners
-      .map(unsubscribedLearner => ({ ...unsubscribedLearner, external: true }));
+    if (!this.potentialsTrainees.length) await this.getTrainees();
   },
   computed: {
     columns () {
@@ -133,7 +127,31 @@ export default {
       return !this.course.slots.length;
     },
     learners () {
-      return this.course.trainees.concat(this.unsubscribedLearners);
+      return [...this.course.trainees, ...this.unsubscribedLearners];
+    },
+    unsubscribedLearners () {
+      const learnersId = this.course.trainees.map(learner => learner._id);
+      const unsubscribedLearnersId = [...new Set(this.attendances
+        .filter(a => (!learnersId.includes(a.trainee)))
+        .map(u => u.trainee))];
+
+      return unsubscribedLearnersId
+        .map(unsubscribedLearnerId => this.potentialsTrainees.find(trainee => trainee._id === unsubscribedLearnerId))
+        .map(unsubscribedLearner => ({ ...unsubscribedLearner, external: true }));
+    },
+    traineeFilterOptions () {
+      const formattedTrainees = this.potentialsTrainees
+        .map(trainee => ({
+          label: formatIdentity(trainee.identity, 'FL'),
+          value: { identity: trainee.identity, _id: trainee._id, external: true },
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      return uniqBy(formattedTrainees, 'value')
+        .filter(learner => !this.learners.map(l => l._id).includes(learner.value._id));
+    },
+    selectedCompany () {
+      return this.course.company ? this.course.company._id : '';
     },
   },
   methods: {
@@ -194,9 +212,18 @@ export default {
         }
       }
     },
+    async getTrainees () {
+      try {
+        this.potentialsTrainees = await Users.learnerList(this.course.type === INTRA
+          ? { company: this.selectedCompany }
+          : { hasCompany: true });
+      } catch (error) {
+        console.error(error);
+      }
+    },
     async addLearner (event) {
       try {
-        if (!event.trainee) return NotifyWarning('Veuillez sélectionner un participant');
+        if (!event.trainee._id) return NotifyWarning('Veuillez sélectionner un participant');
         this.modalLoading = true;
         event.slots.map(s => this.updateCheckbox(event.trainee._id, s));
         this.unsubscribedLearners.push(event.trainee);
@@ -264,5 +291,6 @@ export default {
     color: $secondary
     line-height: 1
     font-size: 11px
+    font-style: italic
     padding-top: 3px
 </style>
