@@ -25,7 +25,6 @@
 </template>
 
 <script>
-import groupBy from 'lodash/groupBy';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import LineChart from '@components/charts/LineChart';
@@ -59,7 +58,6 @@ export default {
     computeChartData () {
       const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
       const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
-
       const activityHistories = this.learners.map(l => l.steps
         .map(s => s.activities
           .map(a => a.activityHistories
@@ -67,9 +65,7 @@ export default {
             .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
-      const activityHistoriesByMonth = groupBy(activityHistories, ah => this.formatMonthAndYear(ah.date));
-
-      this.traineesByMonth = this.getTraineeByMonth(activityHistoriesByMonth);
+      this.traineesByMonth = this.getTraineeByMonth(activityHistories);
     },
   },
 };

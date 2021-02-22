@@ -4,7 +4,7 @@
       <h4>La formation Compani dans ma structure</h4>
     </div>
     <div class="flex justify-between q-mt-xl">
-      <p class="text-weight-bold">Chiffre généraux</p>
+      <p class="text-weight-bold section-title">Chiffres généraux</p>
       <ni-date-range v-model="dates" class="dates" borders />
     </div>
     <q-card flat class="q-pa-md row">
@@ -55,8 +55,13 @@
         </q-card>
       </div>
     </div>
-    <p class="text-weight-bold q-mt-xl">Evolution dans le temps</p>
-    <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData" class="q-mt-md line-chart-container" />
+    <div class="q-mt-xl">
+      <p class="text-weight-bold section-title">Evolution dans le temps</p>
+      <div class="row">
+        <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData"
+        class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
+      </div>
+    </div>
   </q-page>
 </template>
 
@@ -137,34 +142,24 @@ export default {
           ...this.dates,
           endDate: moment(endDate).endOf('d').toISOString(),
         });
-        NotifyPositive('Données mises a jour.');
+        NotifyPositive('Données mises à jour.');
       } catch (e) {
         this.activityHistories = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la recupération des données.');
+        NotifyNegative('Erreur lors de la récupération des données.');
       }
     },
     async computeChartData () {
       try {
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const sixMonthsHistories = await ActivityHistories.list({ startDate: chartStartDate, endDate: chartEndDate });
 
-        const lastSixMonthsActivityHistories = await ActivityHistories.list({
-          startDate: chartStartDate,
-          endDate: chartEndDate,
-        });
-
-        const activityHistoriesByMonth = groupBy(
-          lastSixMonthsActivityHistories,
-          ah => this.formatMonthAndYear(ah.date)
-        );
-
-        this.traineesByMonth = this.getTraineeByMonth(activityHistoriesByMonth);
-
-        NotifyPositive('Données mises a jour.');
+        this.traineesByMonth = this.getTraineeByMonth(sixMonthsHistories);
+        NotifyPositive('Données mises à jour.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la recupération des données.');
+        NotifyNegative('Erreur lors de la récupération des données.');
       }
     },
   },
@@ -186,6 +181,8 @@ export default {
 
 .line-chart-container
   @media screen and (min-width: $breakpoint-sm-max)
-    width: 50%;
     padding-right: 16px;
+
+.section-title
+  font-size: 24px;
 </style>
