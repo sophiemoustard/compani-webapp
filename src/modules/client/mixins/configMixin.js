@@ -26,7 +26,6 @@ export const configMixin = {
     },
     async updateCompany (path) {
       try {
-        this.$v.company.$touch();
         if (path === 'address' && this.tmpInput === get(this.company, 'address.fullAddress')) return;
         if (this.tmpInput === get(this.company, path)) return;
 
