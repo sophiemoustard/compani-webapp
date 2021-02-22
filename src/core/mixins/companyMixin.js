@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import { required, requiredIf, maxLength, minLength, email } from 'vuelidate/lib/validators';
 import {
   frAddress,
@@ -19,13 +20,13 @@ export const companyMixin = {
         tradeName: { validTradeName },
         type: { required },
         rcs: {
-          required: requiredIf(item => item.type === COMPANY),
+          required: requiredIf(item => get(item, 'type') === COMPANY),
           rcs,
           maxLength: maxLength(9),
           minLength: minLength(9),
         },
         rna: {
-          required: requiredIf(item => item.type === ASSOCIATION),
+          required: requiredIf(item => get(item, 'type') === ASSOCIATION),
           rcs,
           maxLength: maxLength(9),
           minLength: minLength(9),
