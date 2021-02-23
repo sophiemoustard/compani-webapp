@@ -600,6 +600,7 @@ export default {
       this.refreshServices(),
       this.refreshThirdPartyPayers(),
     ]);
+    this.documents = this.company.customersConfig.templates || {};
   },
   methods: {
     getServiceLastVersion (service) {
