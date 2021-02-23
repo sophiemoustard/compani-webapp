@@ -87,17 +87,15 @@ export default {
       loading: false,
       modalLoading: false,
       traineeAdditionModal: false,
-      newTraineeAttendance: { trainee: {}, attendance: [] },
+      newTraineeAttendance: { trainee: {}, attendances: [] },
       potentialTrainees: [],
     };
   },
   validations () {
     return {
       newTraineeAttendance: {
-        trainee: {
-          _id: { required },
-        },
-        attendance: { minArrayLength: minArrayLength(1) },
+        trainee: { _id: { required } },
+        attendances: { minArrayLength: minArrayLength(1) },
       },
     };
   },
@@ -238,8 +236,7 @@ export default {
         this.$v.newTraineeAttendance.$touch();
         if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
-        this.newTraineeAttendance.attendance.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee._id, s));
-        this.unsubscribedTrainees.push(this.newTraineeAttendance.trainee);
+        this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee._id, s));
         this.traineeAdditionModal = false;
         NotifyPositive('Participant ajouté.');
       } catch (e) {
@@ -251,7 +248,7 @@ export default {
     },
     resetSelectedTrainee () {
       this.$v.newTraineeAttendance.$reset();
-      this.newTraineeAttendance = { trainee: {}, attendance: [] };
+      this.newTraineeAttendance = { trainee: {}, attendances: [] };
     },
   },
 };
@@ -297,10 +294,6 @@ export default {
     position: sticky
     left: 0
     z-index: 1
-// .add-trainee
-//   padding-left: 16px
-//   padding-bottom: 16px
-//   border-color: 'transparent'
 .unsubscribed
     color: $secondary
     line-height: 1
