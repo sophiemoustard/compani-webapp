@@ -114,7 +114,8 @@
         <div class="row gutter-profile">
           <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod" in-form
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
-            :options="billingPeriodOptions" />
+            :options="billingPeriodOptions" :error="$v.company.customersConfig.billingPeriod.$error"
+            :error-message="REQUIRED_LABEL" />
         </div>
       </div>
     </div>
@@ -186,6 +187,7 @@ import {
   NATURE_OPTIONS,
   FIXED,
   COMPANY,
+  REQUIRED_LABEL,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -245,10 +247,10 @@ export default {
   data () {
     return {
       loading: false,
-      company: null,
       documents: null,
       FIXED,
       COMPANY,
+      REQUIRED_LABEL,
       billingPeriodOptions: [
         { value: TWO_WEEKS, label: 'Quinzaine' },
         { value: MONTH, label: 'Mois' },
@@ -552,7 +554,7 @@ export default {
     },
     company: {
       customersConfig: {
-        bllingPeriod: { required },
+        billingPeriod: { required },
       },
     },
     newThirdPartyPayer: {
@@ -653,12 +655,6 @@ export default {
       } finally {
         this.servicesLoading = false;
       }
-    },
-    async refreshCompany () {
-      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
-      this.company = this.loggedCompany;
-      this.documents = this.company.customersConfig.templates || {};
-      this.company.address = this.company.address || { fullAddress: '' };
     },
     async refreshThirdPartyPayers () {
       try {
