@@ -3,12 +3,13 @@
     <template slot="title">
       Ajouter un nouveau <span class="text-weight-bold">participant</span>
     </template>
-    <ni-select :options="traineeFilterOptions" :value="selectedTrainee" @input="updateSelectedTrainee"
-      caption="Participant" in-modal />
+    <ni-select :options="traineeFilterOptions" :value="newTraineeAttendance.trainee"
+      @input="update($event, 'trainee')" caption="Participant" in-modal
+      :error="validation.trainee.$error" :error-message="REQUIRED_LABEL" required-field />
     <div class="row q-pb-md">
-      Selectionner les créneaux auxquelles a été présent ce participant *
-      <ni-option-group :value="this.attendances" @input="updateCheckbox" :options="slots" type="checkbox"
-        :inline="true" />
+      <ni-option-group :value="newTraineeAttendance.attendance" @input="update($event, 'attendance')"
+      :options="slotsOptions" :error="validation.attendance.$error" :error-message="REQUIRED_LABEL" required-field
+        type="checkbox" :inline="true" caption="Selectionner les créneaux auxquelles a été présent ce participant" />
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le participant" color="primary"
@@ -18,20 +19,23 @@
 </template>
 
 <script>
+import set from 'lodash/set';
 import moment from '@helpers/moment';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
-  name: 'LearnerAttendanceCreationModal',
+  name: 'TraineeAttendanceCreationModal',
   props: {
     value: { type: Boolean, default: false },
     course: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    learners: { type: Array, default: () => [] },
+    trainees: { type: Array, default: () => [] },
     traineeFilterOptions: { type: Array, default: () => [] },
-    selectedTrainee: { type: Object, default: () => ({}) },
+    newTraineeAttendance: { type: Object, default: () => ({}) },
+    validation: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-select': Select,
@@ -40,11 +44,11 @@ export default {
   },
   data () {
     return {
-      attendances: [],
+      REQUIRED_LABEL,
     };
   },
   computed: {
-    slots () {
+    slotsOptions () {
       return this.course.slots.map(s => ({
         label: `${moment(s.startDate).format('DD/MM/YYYY')}
         ${moment(s.startDate).format('LT')} - ${moment(s.endDate).format('LT')}`,
@@ -54,20 +58,16 @@ export default {
   },
   methods: {
     hide () {
-      this.attendances = [];
       this.$emit('hide');
     },
     input (event) {
       this.$emit('input', event);
     },
-    updateSelectedTrainee (event) {
-      this.$emit('update:selectedTrainee', event);
+    update (event, path) {
+      this.$emit('update:newTraineeAttendance', set({ ...this.newTraineeAttendance }, path, event));
     },
     submit () {
-      this.$emit('submit', { trainee: this.selectedTrainee, slots: this.attendances });
-    },
-    updateCheckbox (event) {
-      this.attendances = event;
+      this.$emit('submit');
     },
   },
 };

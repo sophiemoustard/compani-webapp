@@ -1,7 +1,7 @@
 <template>
 <div>
   <q-card flat>
-    <q-table v-if="!noSlots" :data="learners" :columns="columns" class="q-pa-md table"
+    <q-table v-if="!noSlots" :data="trainees" :columns="columns" class="q-pa-md table"
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
@@ -52,13 +52,15 @@
     </div>
   </q-card>
 
-  <learner-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetSelectedTrainee"
-    @submit="addLearner" :loading="modalLoading" :learners="learners" :selected-trainee.sync="selectedTrainee"
-    :trainee-filter-options="traineeFilterOptions" />
+  <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetSelectedTrainee"
+    @submit="addTrainee" :loading="modalLoading" :trainees="trainees" :validation="$v.newTraineeAttendance"
+    :new-trainee-attendance.sync="newTraineeAttendance" :trainee-filter-options="traineeFilterOptions" />
 </div>
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
+import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, INTRA } from '@data/constants';
@@ -66,7 +68,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import Button from '@components/Button';
 import Attendances from '@api/Attendances';
 import Users from '@api/Users';
-import LearnerAttendanceCreationModal from './LearnerAttendanceCreationModal';
+import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
   name: 'AttendanceTable',
@@ -75,7 +77,7 @@ export default {
   },
   components: {
     'ni-button': Button,
-    'learner-attendance-creation-modal': LearnerAttendanceCreationModal,
+    'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
   },
   data () {
     return {
@@ -85,8 +87,18 @@ export default {
       loading: false,
       modalLoading: false,
       traineeAdditionModal: false,
-      selectedTrainee: {},
+      newTraineeAttendance: { trainee: {}, attendance: [] },
       potentialTrainees: [],
+    };
+  },
+  validations () {
+    return {
+      newTraineeAttendance: {
+        trainee: {
+          _id: { required },
+        },
+        attendance: { minArrayLength: minArrayLength(1) },
+      },
     };
   },
   async created () {
@@ -125,18 +137,18 @@ export default {
     noSlots () {
       return !this.course.slots.length;
     },
-    learners () {
-      return [...this.course.trainees, ...this.unsubscribedLearners];
+    trainees () {
+      return [...this.course.trainees, ...this.unsubscribedTrainees];
     },
-    unsubscribedLearners () {
-      const learnersId = this.course.trainees.map(learner => learner._id);
-      const unsubscribedLearnersId = [...new Set(this.attendances
-        .filter(a => (!learnersId.includes(a.trainee)))
+    unsubscribedTrainees () {
+      const traineesId = this.course.trainees.map(trainee => trainee._id);
+      const unsubscribedTraineesId = [...new Set(this.attendances
+        .filter(a => (!traineesId.includes(a.trainee)))
         .map(a => a.trainee))];
 
-      return unsubscribedLearnersId
-        .map((unsubscribedLearnerId) => {
-          const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedLearnerId));
+      return unsubscribedTraineesId
+        .map((unsubscribedTraineeId) => {
+          const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedTraineeId));
           return { ...trainee, external: true };
         });
     },
@@ -148,7 +160,7 @@ export default {
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
 
-      return formattedTrainees.filter(learner => !this.learners.map(l => l._id).includes(learner.value._id));
+      return formattedTrainees.filter(trainee => !this.trainees.map(l => l._id).includes(trainee.value._id));
     },
     selectedCompany () {
       return this.course.company ? this.course.company._id : '';
@@ -221,12 +233,13 @@ export default {
         console.error(error);
       }
     },
-    async addLearner (event) {
+    async addTrainee () {
       try {
-        if (!event.trainee._id) return NotifyWarning('Veuillez sélectionner un participant');
+        this.$v.newTraineeAttendance.$touch();
+        if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
-        event.slots.map(s => this.updateCheckbox(event.trainee._id, s));
-        this.unsubscribedLearners.push(event.trainee);
+        this.newTraineeAttendance.attendance.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee._id, s));
+        this.unsubscribedTrainees.push(this.newTraineeAttendance.trainee);
         this.traineeAdditionModal = false;
         NotifyPositive('Participant ajouté.');
       } catch (e) {
@@ -237,7 +250,8 @@ export default {
       }
     },
     resetSelectedTrainee () {
-      this.selectedTrainee = {};
+      this.$v.newTraineeAttendance.$reset();
+      this.newTraineeAttendance = { trainee: {}, attendance: [] };
     },
   },
 };
@@ -283,10 +297,10 @@ export default {
     position: sticky
     left: 0
     z-index: 1
-.add-learner
-  padding-left: 16px
-  padding-bottom: 16px
-  border-color: 'transparent'
+// .add-trainee
+//   padding-left: 16px
+//   padding-bottom: 16px
+//   border-color: 'transparent'
 .unsubscribed
     color: $secondary
     line-height: 1
