@@ -2,11 +2,14 @@
   <q-page class="client-background" padding>
     <div class="flex no-wrap justify-between">
       <h4>La formation Compani dans ma structure</h4>
+    </div>
+    <div class="flex justify-between q-mt-xl">
+      <p class="text-weight-bold section-title">Chiffres généraux</p>
       <ni-date-range v-model="dates" class="dates" borders />
     </div>
-    <q-card flat class="q-pa-md flex row">
+    <q-card flat class="q-pa-md row">
       <div class="text-weight-bold q-mb-sm col-md-4 col-xs-12">Le eLearning dans ma structure</div>
-      <div class="flex row justify-around col-md-8 col-xs-12">
+      <div class="row justify-around col-md-8 col-xs-12">
         <div class="column items-center">
           <ni-e-learning-indicator :indicator="activeLearners" />
           <div class="text-center">apprenants actifs</div>
@@ -25,7 +28,7 @@
             <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
           </div>
           <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
-            class="flex justify-between items-center row q-my-sm">
+            class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
@@ -42,7 +45,7 @@
             <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
           </div>
           <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
-            class="flex justify-between items-center row q-my-sm">
+            class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <div class="q-mx-md text-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
@@ -50,6 +53,13 @@
             <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
           </div>
         </q-card>
+      </div>
+    </div>
+    <div class="q-mt-xl">
+      <p class="text-weight-bold section-title">Evolution dans le temps</p>
+      <div class="row">
+        <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData"
+        class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
       </div>
     </div>
   </q-page>
@@ -63,17 +73,21 @@ import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
-import moment from '@helpers/moment';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
-import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
+import LineChart from '@components/charts/LineChart';
 import { DEFAULT_AVATAR } from '@data/constants';
+import moment from '@helpers/moment';
+import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
+import { traineeChartMixin } from '@mixins/traineeChartMixin';
 
 export default {
   name: 'CourseDashboard',
   metaInfo: { title: 'Tableau de bord des formations' },
+  mixins: [traineeChartMixin],
   components: {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
+    'ni-line-chart': LineChart,
   },
   data () {
     return {
@@ -117,6 +131,7 @@ export default {
   },
   async created () {
     await this.getActivityHistories();
+    await this.computeChartData();
   },
   methods: {
     async getActivityHistories () {
@@ -127,11 +142,24 @@ export default {
           ...this.dates,
           endDate: moment(endDate).endOf('d').toISOString(),
         });
-        NotifyPositive('Données mises a jour.');
+        NotifyPositive('Données mises à jour.');
       } catch (e) {
         this.activityHistories = [];
         console.error(e);
-        NotifyNegative('Erreur lors de la recupération des données.');
+        NotifyNegative('Erreur lors de la récupération des données.');
+      }
+    },
+    async computeChartData () {
+      try {
+        const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
+        const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const sixMonthsHistories = await ActivityHistories.list({ startDate: chartStartDate, endDate: chartEndDate });
+
+        this.traineesByMonth = this.getTraineeByMonth(sixMonthsHistories);
+        NotifyPositive('Données mises à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des données.');
       }
     },
   },
@@ -144,9 +172,17 @@ export default {
     padding-right: 16px
   @media screen and (max-width: $breakpoint-sm-max)
     padding-bottom: 16px
+
 .rigth-card
   @media screen and (min-width: $breakpoint-md-min)
     padding-left: 16px
   @media screen and (max-width: $breakpoint-sm-max)
     padding-top: 16px
+
+.line-chart-container
+  @media screen and (min-width: $breakpoint-sm-max)
+    padding-right: 16px;
+
+.section-title
+  font-size: 24px;
 </style>
