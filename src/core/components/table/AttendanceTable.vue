@@ -59,7 +59,6 @@
 </template>
 
 <script>
-import uniqBy from 'lodash/uniqBy';
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
 import { DEFAULT_AVATAR, INTRA } from '@data/constants';
@@ -87,12 +86,12 @@ export default {
       modalLoading: false,
       traineeAdditionModal: false,
       selectedTrainee: {},
-      potentialsTrainees: [],
+      potentialTrainees: [],
     };
   },
   async created () {
     await this.refreshAttendances(this.course.slots.map(s => s._id));
-    if (!this.potentialsTrainees.length) await this.getTrainees();
+    await this.getTrainees();
   },
   computed: {
     columns () {
@@ -133,22 +132,23 @@ export default {
       const learnersId = this.course.trainees.map(learner => learner._id);
       const unsubscribedLearnersId = [...new Set(this.attendances
         .filter(a => (!learnersId.includes(a.trainee)))
-        .map(u => u.trainee))];
+        .map(a => a.trainee))];
 
       return unsubscribedLearnersId
-        .map(unsubscribedLearnerId => this.potentialsTrainees.find(trainee => trainee._id === unsubscribedLearnerId))
-        .map(unsubscribedLearner => ({ ...unsubscribedLearner, external: true }));
+        .map((unsubscribedLearnerId) => {
+          const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedLearnerId));
+          return { ...trainee, external: true };
+        });
     },
     traineeFilterOptions () {
-      const formattedTrainees = this.potentialsTrainees
+      const formattedTrainees = this.potentialTrainees
         .map(trainee => ({
           label: formatIdentity(trainee.identity, 'FL'),
-          value: { identity: trainee.identity, _id: trainee._id, external: true },
+          value: { identity: trainee.identity, _id: trainee._id },
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
 
-      return uniqBy(formattedTrainees, 'value')
-        .filter(learner => !this.learners.map(l => l._id).includes(learner.value._id));
+      return formattedTrainees.filter(learner => !this.learners.map(l => l._id).includes(learner.value._id));
     },
     selectedCompany () {
       return this.course.company ? this.course.company._id : '';
@@ -214,7 +214,7 @@ export default {
     },
     async getTrainees () {
       try {
-        this.potentialsTrainees = await Users.learnerList(this.course.type === INTRA
+        this.potentialTrainees = await Users.learnerList(this.course.type === INTRA
           ? { company: this.selectedCompany }
           : { hasCompany: true });
       } catch (error) {

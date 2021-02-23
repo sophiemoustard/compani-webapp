@@ -8,7 +8,7 @@
     <div class="row q-pb-md">
       Selectionner les créneaux auxquelles a été présent ce participant *
       <ni-option-group :value="this.attendances" @input="updateCheckbox" :options="slots" type="checkbox"
-      :inline="true" />
+        :inline="true" />
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter le participant" color="primary"
