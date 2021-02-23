@@ -39,7 +39,6 @@ export default {
     bgColor: { type: String, default: 'white' },
     optionDisable: { type: String, default: 'disable' },
     dataCy: { type: String, default: '' },
-    label: { type: String, default: '' },
   },
   components: {
     'ni-button': Button,
