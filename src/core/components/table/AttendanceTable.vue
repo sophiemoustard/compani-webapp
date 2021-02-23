@@ -52,7 +52,7 @@
     </div>
   </q-card>
 
-  <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetSelectedTrainee"
+  <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
     @submit="addTrainee" :loading="modalLoading" :trainees="trainees" :validation="$v.newTraineeAttendance"
     :new-trainee-attendance.sync="newTraineeAttendance" :trainee-filter-options="traineeFilterOptions" />
 </div>
@@ -154,11 +154,11 @@ export default {
       const formattedTrainees = this.potentialTrainees
         .map(trainee => ({
           label: formatIdentity(trainee.identity, 'FL'),
-          value: { identity: trainee.identity, _id: trainee._id },
+          value: trainee._id,
         }))
         .sort((a, b) => a.label.localeCompare(b.label));
 
-      return formattedTrainees.filter(trainee => !this.trainees.map(l => l._id).includes(trainee.value._id));
+      return formattedTrainees.filter(trainee => !this.trainees.map(t => t._id).includes(trainee.value));
     },
     selectedCompany () {
       return this.course.company ? this.course.company._id : '';
@@ -236,7 +236,7 @@ export default {
         this.$v.newTraineeAttendance.$touch();
         if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
-        this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee._id, s));
+        this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee, s));
         this.traineeAdditionModal = false;
         NotifyPositive('Participant ajouté.');
       } catch (e) {
@@ -246,7 +246,7 @@ export default {
         this.modalLoading = false;
       }
     },
-    resetSelectedTrainee () {
+    resetNewTraineeAttendance () {
       this.$v.newTraineeAttendance.$reset();
       this.newTraineeAttendance = { trainee: '', attendances: [] };
     },
