@@ -87,14 +87,14 @@ export default {
       loading: false,
       modalLoading: false,
       traineeAdditionModal: false,
-      newTraineeAttendance: { trainee: {}, attendances: [] },
+      newTraineeAttendance: { trainee: '', attendances: [] },
       potentialTrainees: [],
     };
   },
   validations () {
     return {
       newTraineeAttendance: {
-        trainee: { _id: { required } },
+        trainee: { required },
         attendances: { minArrayLength: minArrayLength(1) },
       },
     };
@@ -248,7 +248,7 @@ export default {
     },
     resetSelectedTrainee () {
       this.$v.newTraineeAttendance.$reset();
-      this.newTraineeAttendance = { trainee: {}, attendances: [] };
+      this.newTraineeAttendance = { trainee: '', attendances: [] };
     },
   },
 };
