@@ -67,14 +67,21 @@
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate"
               :entity="company" alt="template mandat prelevement" name="debitMandate" :url="docsUploadUrl" drive-storage
-              @delete="validateDocumentDeletion(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`" />
+              @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`"
+              @delete="validateDocumentDeletion(
+                company.customersConfig.templates.debitMandate.driveId,
+                'debitMandate',
+                'customersConfig'
+              )" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" alt="template devis" name="quote"
-              @delete="validateDocumentDeletion(documents.quote.driveId, 'quote', 'customersConfig')" :entity="company"
               @uploaded="documentUploaded" :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl"
-              drive-storage />
+              drive-storage :entity="company" @delete="validateDocumentDeletion(
+                company.customersConfig.templates.quote.driveId,
+                'quote',
+                'customersConfig'
+              )" />
           </div>
         </div>
       </div>
@@ -247,7 +254,6 @@ export default {
   data () {
     return {
       loading: false,
-      documents: null,
       FIXED,
       COMPANY,
       REQUIRED_LABEL,
@@ -600,7 +606,6 @@ export default {
       this.refreshServices(),
       this.refreshThirdPartyPayers(),
     ]);
-    this.documents = this.company.customersConfig.templates || {};
   },
   methods: {
     getServiceLastVersion (service) {
