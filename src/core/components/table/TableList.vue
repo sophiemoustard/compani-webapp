@@ -2,7 +2,7 @@
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" flat :row-key="rowKey" binary-state-sort
       :pagination="pagination" class="table-list"
-      :rows-per-page-options="[]" @update:pagination="$emit('update:pagination', $event)"
+      :rows-per-page-options="[]" @update:pagination="update($event)"
       :visible-columns="formattedVisibleColumns">
       <template #body="props">
         <q-tr :no-hover="disabled" :props="props" @click="click(props.row)">
@@ -21,7 +21,7 @@
       </template>
       <template #bottom="props">
         <ni-pagination :props="props" :pagination="pagination" :data="data" :options="paginationOptions"
-          @update:pagination="$emit('update:pagination', $event)" />
+         @update:pagination="update($event)" />
       </template>
     </q-table>
     <div v-else class="loading-container" />
@@ -61,6 +61,9 @@ export default {
     click (row) {
       if (this.disabled) return;
       this.$emit('go-to', row);
+    },
+    update (event) {
+      this.$emit('update:pagination', event);
     },
   },
 };
