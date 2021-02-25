@@ -2,7 +2,7 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
-      <template #body="{ col }">
+      <template #body="{ col }" :rows-per-page="[15, 50]">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar"></q-item-section>
           <q-item-section>

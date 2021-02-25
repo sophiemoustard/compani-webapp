@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire formateurs" search-placeholder="Rechercher un formateur"
       @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredTrainers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @go-to="goToTrainerProfile" />
+      @go-to="goToTrainerProfile" :rows-per-page="[5, 10, 15]" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un formateur"
       @click="trainerCreationModal = true" :disable="tableLoading" />
 

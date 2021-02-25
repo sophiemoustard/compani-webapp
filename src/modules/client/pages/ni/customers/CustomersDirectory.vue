@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
       display-toggle @update-search="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
-      @go-to="goToCustomerProfile" :loading="tableLoading">
+      @go-to="goToCustomerProfile" :loading="tableLoading" :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>
