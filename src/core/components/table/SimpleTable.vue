@@ -1,7 +1,8 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
-      class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners"
+      class="q-pa-sm large-table sticky-header-table" flat :separator="separator" :selection="selection"
+      :row-key="rowKey" v-on="$listeners"
       :selected="selected" :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom">
       <template #header="props">
         <slot name="header" :props="props">
@@ -82,3 +83,20 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.sticky-header-table
+  @media screen and (min-width: 768px)
+    height: 85vh
+  @media screen and (min-width : 320px) and (max-width : 480px)
+    height: 55vh
+  @media screen and (min-width : 481px) and (max-width : 767px)
+    height: 75vh
+
+  thead tr th
+    position: sticky
+    z-index: 1
+    background-color: $grey-100
+  thead tr:first-child th
+    top: 0
+</style>
