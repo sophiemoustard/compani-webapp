@@ -1,8 +1,7 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" flat :row-key="rowKey" binary-state-sort
-      :pagination="pagination" class="table-list"
-      :rows-per-page-options="[]" @update:pagination="update($event)"
+      :pagination="pagination" class="table-list" :rows-per-page-options="[]" @update:pagination="update($event)"
       :visible-columns="formattedVisibleColumns">
       <template #body="props">
         <q-tr :no-hover="disabled" :props="props" @click="click(props.row)">
@@ -19,9 +18,9 @@
           <span>Pas de données disponibles</span>
         </div>
       </template>
-      <template #bottom="props">
+      <template #bottom="props" v-if="rowsPerPage.length">
         <ni-pagination :props="props" :pagination="pagination" :data="data" :options="paginationOptions"
-         @update:pagination="update($event)" />
+          @update:pagination="update($event)" />
       </template>
     </q-table>
     <div v-else class="loading-container" />
@@ -44,7 +43,7 @@ export default {
     loading: { type: Boolean, default: false },
     rowKey: { type: String, default: 'name' },
     disabled: { type: Boolean, default: false },
-    rowsPerPage: { type: Array, default: () => [15, 50] },
+    rowsPerPage: { type: Array, default: () => [] },
   },
   components: {
     'ni-pagination': Pagination,
