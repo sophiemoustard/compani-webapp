@@ -138,7 +138,7 @@
       :loading="loading" />
 
     <!-- Service creation modal -->
-    <service-creation-modal v-model="serviceCreationModal" :new-service="newService" :validations="$v.newService"
+    <service-creation-modal v-model="serviceCreationModal" :new-service.sync="newService" :validations="$v.newService"
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
       :loading="loading" />
