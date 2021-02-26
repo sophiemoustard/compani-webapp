@@ -91,12 +91,7 @@ export default {
       userList: [],
       searchStr: '',
       activeUsers: true,
-      pagination: {
-        sortBy: 'startDate',
-        descending: true,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'startDate', descending: true, page: 1, rowsPerPage: 15 },
       columns: [
         {
           name: 'name',

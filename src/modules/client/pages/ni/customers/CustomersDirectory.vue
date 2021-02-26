@@ -74,12 +74,7 @@ export default {
       customers: [],
       searchStr: '',
       onlyClients: false,
-      pagination: {
-        sortBy: 'createdAt',
-        descending: true,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
       columns: [
         {
           name: 'fullName',

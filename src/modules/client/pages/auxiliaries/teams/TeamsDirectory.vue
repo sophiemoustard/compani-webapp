@@ -42,12 +42,7 @@ export default {
       userList: [],
       searchStr: '',
       activeUsers: true,
-      pagination: {
-        page: 1,
-        rowsPerPage: 15,
-        sortBy: 'name',
-        descending: false,
-      },
+      pagination: { page: 1, rowsPerPage: 15, sortBy: 'name', descending: false },
       columns: [
         {
           name: 'name',
