@@ -246,22 +246,20 @@
     max-width: 230px
     width: 25%
 
-.client-sticky-header
-  max-height: 85vh
-
+.client-background-header
   thead tr th
-    position: sticky
-    z-index: 1
     background-color: $grey-100
-  thead tr:first-child th
-    top: 0
 
-.vendor-sticky-header
+.vendor-background-header
+  thead tr th
+    background-color: $peach-100
+
+
+.sticky-header
   max-height: 85vh
 
   thead tr th
     position: sticky
     z-index: 1
-    background-color: $peach-100
   thead tr:first-child th
     top: 0
