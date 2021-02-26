@@ -62,6 +62,12 @@ export default {
       learnerCreationModalLoading: false,
       identityStep: false,
       newLearner: { identity: { firstname: '', lastname: '' }, contact: { phone: '' }, local: { email: '' } },
+      pagination: {
+        sortBy: 'name',
+        descending: false,
+        page: 1,
+        rowsPerPage: 15,
+      },
     };
   },
   computed: {

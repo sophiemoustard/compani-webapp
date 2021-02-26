@@ -37,6 +37,12 @@ export default {
     return {
       loading: false,
       searchStr: '',
+      pagination: {
+        sortBy: 'name',
+        descending: false,
+        page: 1,
+        rowsPerPage: 15,
+      },
     };
   },
   computed: {
