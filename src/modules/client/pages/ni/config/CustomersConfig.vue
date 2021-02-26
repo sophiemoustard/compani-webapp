@@ -128,7 +128,7 @@
     </div>
 
     <!-- Surcharge creation modal -->
-    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge="newSurcharge"
+    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge.sync="newSurcharge"
       :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
       :loading="loading" />
 
