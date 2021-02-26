@@ -43,7 +43,7 @@ export default {
     loading: { type: Boolean, default: false },
     rowKey: { type: String, default: 'name' },
     disabled: { type: Boolean, default: false },
-    rowsPerPage: { type: Array, default: () => [] },
+    rowsPerPage: { type: Array, default: () => [15, 50, 100] },
   },
   components: {
     'ni-pagination': Pagination,
