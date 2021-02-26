@@ -3,7 +3,7 @@
     <ni-directory-header title="Répertoire auxiliaires" toggle-label="Actifs" :toggle-value="activeUsers" display-toggle
       @update-search="updateSearch" @toggle="activeUsers = !activeUsers" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
-      @go-to="goToUserProfile">
+      @go-to="goToUserProfile" :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar>
@@ -91,12 +91,7 @@ export default {
       userList: [],
       searchStr: '',
       activeUsers: true,
-      pagination: {
-        sortBy: 'startDate',
-        descending: true,
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { sortBy: 'startDate', descending: true, page: 1, rowsPerPage: 15 },
       columns: [
         {
           name: 'name',
