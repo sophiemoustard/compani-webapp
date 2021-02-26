@@ -3,19 +3,23 @@
     <template slot="title">
       Éditer le <span class="text-weight-bold">service</span>
     </template>
-    <ni-input in-modal caption="Nom" v-model="editedService.name" :error="validations.name.$error"
-      @blur="validations.name.$touch" required-field />
-    <ni-date-input caption="Date d'effet" v-model="editedService.startDate" :error="validations.startDate.$error"
-      @blur="validations.startDate.$touch" :min="minStartDate" in-modal required-field />
+    <ni-input in-modal caption="Nom" :value="editedService.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field @input="update($event, 'name')" />
+    <ni-date-input caption="Date d'effet" :value="editedService.startDate" :error="validations.startDate.$error"
+      @blur="validations.startDate.$touch" :min="minStartDate" in-modal required-field
+      @input="update($event, 'startDate')" />
     <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
-      v-model="editedService.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
-      @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError" />
-    <ni-input in-modal caption="TVA" suffix="%" v-model="editedService.vat" :error="validations.vat.$error"
-      type="number" @blur="validations.vat.$touch" error-message="La TVA doit être positive ou nulle" />
+      :value="editedService.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
+      @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError"
+      @input="update($event, 'defaultUnitAmount')" />
+    <ni-input in-modal caption="TVA" suffix="%" :value="editedService.vat" :error="validations.vat.$error"
+      type="number" @blur="validations.vat.$touch" error-message="La TVA doit être positive ou nulle"
+      @input="update($event, 'vat')" />
     <ni-select in-modal v-if="editedService.nature !== FIXED" caption="Plan de majoration"
-      v-model="editedService.surcharge" :options="surchargesOptions" clearable />
+      :value="editedService.surcharge" :options="surchargesOptions" clearable @input="update($event, 'surcharge')" />
     <div class="row q-mb-md">
-      <q-checkbox label="Exonération de charges" v-model="editedService.exemptFromCharges" dense />
+      <q-checkbox label="Exonération de charges" :value="editedService.exemptFromCharges" dense
+        @input="update($event, 'exemptFromCharges')" />
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer le service" icon-right="check" color="primary"
@@ -62,6 +66,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:editedService', { ...this.editedService, [prop]: event });
     },
   },
 };
