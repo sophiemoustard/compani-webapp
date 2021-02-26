@@ -244,12 +244,12 @@
       :validations="$v.editedHelper" @hide="resetEditedHelperForm" @submit="editHelper" />
 
     <!-- Subscription creation modal -->
-    <subscription-creation-modal v-model="openNewSubscriptionModal" :new-subscription="newSubscription"
+    <subscription-creation-modal v-model="openNewSubscriptionModal" :new-subscription.sync="newSubscription"
       :service-options="serviceOptions" :validations="$v.newSubscription" @hide="resetCreationSubscriptionData"
       :loading="loading" @submit="createSubscription" />
 
     <!-- Subscription edition modal -->
-    <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription="editedSubscription"
+    <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription.sync="editedSubscription"
       :validations="$v.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
       @submit="updateSubscription" />
 

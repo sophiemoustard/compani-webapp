@@ -128,25 +128,26 @@
     </div>
 
     <!-- Surcharge creation modal -->
-    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge="newSurcharge"
+    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge.sync="newSurcharge"
       :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
       :loading="loading" />
 
     <!-- Surcharge edition modal -->
-    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge="editedSurcharge"
+    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge.sync="editedSurcharge"
       :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
       :loading="loading" />
 
     <!-- Service creation modal -->
-    <service-creation-modal v-model="serviceCreationModal" :new-service="newService" :validations="$v.newService"
+    <service-creation-modal v-model="serviceCreationModal" :new-service.sync="newService" :validations="$v.newService"
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
       :loading="loading" />
 
     <!-- Service edition modal -->
-    <service-edition-modal v-model="serviceEditionModal" :edited-service="editedService" :validations="$v.editedService"
+    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService"
       :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
-      :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate" />
+      :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
+      :validations="$v.editedService" />
 
     <!-- Service history modal -->
     <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData" container-class="modal-container-md">
