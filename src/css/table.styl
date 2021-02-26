@@ -245,3 +245,23 @@
   &-progress-container
     max-width: 230px
     width: 25%
+
+.client-sticky-header
+  max-height: 85vh
+
+  thead tr th
+    position: sticky
+    z-index: 1
+    background-color: $grey-100
+  thead tr:first-child th
+    top: 0
+
+.vendor-sticky-header
+  max-height: 85vh
+
+  thead tr th
+    position: sticky
+    z-index: 1
+    background-color: $peach-100
+  thead tr:first-child th
+    top: 0
