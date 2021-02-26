@@ -4,8 +4,8 @@
       flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners" :selected="selected"
       :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom"
       :class="['q-pa-sm large-table sticky-header', isClientInterface ?
-        'client-background-header'
-        : 'vendor-background-header']">
+        'client-header'
+        : 'vendor-header']">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
