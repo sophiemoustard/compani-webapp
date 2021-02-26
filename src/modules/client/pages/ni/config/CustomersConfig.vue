@@ -133,7 +133,7 @@
       :loading="loading" />
 
     <!-- Surcharge edition modal -->
-    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge="editedSurcharge"
+    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge.sync="editedSurcharge"
       :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
       :loading="loading" />
 
