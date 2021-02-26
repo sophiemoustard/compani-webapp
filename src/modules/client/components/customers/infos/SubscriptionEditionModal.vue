@@ -3,15 +3,17 @@
     <template slot="title">
       Editer la <span class="text-weight-bold">souscription</span>
     </template>
-    <ni-input in-modal v-model="editedSubscription.unitTTCRate" :error="validations.unitTTCRate.$error"
-      caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number" required-field />
-    <ni-input in-modal v-model="editedSubscription.estimatedWeeklyVolume"
+    <ni-input in-modal :value="editedSubscription.unitTTCRate" :error="validations.unitTTCRate.$error"
+      caption="Prix unitaire TTC" @blur="validations.unitTTCRate.$touch" type="number" required-field
+      @input="update($event, 'unitTTCRate')" />
+    <ni-input in-modal :value="editedSubscription.estimatedWeeklyVolume"
       :error="validations.estimatedWeeklyVolume.$error" caption="Volume hebdomadaire estimatif"
-      @blur="validations.estimatedWeeklyVolume.$touch" type="number" required-field />
-    <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.sundays"
-      caption="Dont dimanche (h)" type="number" />
-    <ni-input in-modal v-if="editedSubscription.nature !== FIXED" v-model="editedSubscription.evenings"
-      caption="Dont soirée (h)" last type="number" />
+      @blur="validations.estimatedWeeklyVolume.$touch" type="number" required-field
+      @input="update($event, 'estimatedWeeklyVolume')" />
+    <ni-input in-modal v-if="editedSubscription.nature !== FIXED" :value="editedSubscription.sundays"
+      caption="Dont dimanche (h)" type="number" @input="update($event, 'sundays')" />
+    <ni-input in-modal v-if="editedSubscription.nature !== FIXED" :value="editedSubscription.evenings"
+      caption="Dont soirée (h)" last type="number" @input="update($event, 'evenings')" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer la souscription" icon-right="check" color="primary"
         :loading="loading" @click="submit" />
@@ -51,6 +53,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:editedSubscription', { ...this.editedSubscription, [prop]: event });
     },
   },
 };

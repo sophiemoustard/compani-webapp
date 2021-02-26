@@ -249,7 +249,7 @@
       :loading="loading" @submit="createSubscription" />
 
     <!-- Subscription edition modal -->
-    <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription="editedSubscription"
+    <subscription-edition-modal v-model="openEditedSubscriptionModal" :edited-subscription.sync="editedSubscription"
       :validations="$v.editedSubscription" @hide="resetEditionSubscriptionData" :loading="loading"
       @submit="updateSubscription" />
 
