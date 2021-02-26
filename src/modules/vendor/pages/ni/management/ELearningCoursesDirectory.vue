@@ -24,9 +24,6 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
-  data () {
-    return { pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 } };
-  },
   async created () {
     await this.refreshCourse();
   },

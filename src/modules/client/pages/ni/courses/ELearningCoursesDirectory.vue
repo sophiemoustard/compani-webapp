@@ -25,9 +25,6 @@ export default {
     'ni-directory-header': DirectoryHeader,
     'ni-table-list': TableList,
   },
-  data () {
-    return { pagination: { sortBy: 'name', descending: false, page: 1, rowsPerPage: 15 } };
-  },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
   },
