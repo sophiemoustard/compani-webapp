@@ -64,7 +64,7 @@ export default {
       this.refreshRowsPerPage();
     },
   },
-  async created () {
+  created () {
     this.refreshRowsPerPage();
   },
   methods: {
