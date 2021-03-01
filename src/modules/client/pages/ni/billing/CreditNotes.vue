@@ -27,7 +27,7 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
-      :new-credit-note="newCreditNote" :validations="$v.newCreditNote" :customers-options="customersOptions"
+      :new-credit-note.sync="newCreditNote" :validations="$v.newCreditNote" :customers-options="customersOptions"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" :loading="loading"
       :third-party-payer-options="thirdPartyPayerOptions" @hide="resetCreationCreditNoteData" @get-events="getEvents"
@@ -35,7 +35,7 @@
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
-      v-model="creditNoteEditionModal" :edited-credit-note="editedCreditNote" :validations="$v.editedCreditNote"
+      v-model="creditNoteEditionModal" :edited-credit-note.sync="editedCreditNote" :validations="$v.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" :loading="loading"
       @hide="resetEditionCreditNoteData" @get-events="getEvents" />
