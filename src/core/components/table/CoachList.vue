@@ -165,7 +165,8 @@ export default {
         const { user } = userInfo;
 
         const sameOrNoCompany = !user.company || user.company === this.company._id;
-        if (userInfo.exists && !sameOrNoCompany) {
+        const noDataOnUser = !Object.keys(user).length;
+        if (userInfo.exists && (!sameOrNoCompany || noDataOnUser)) {
           return NotifyNegative('Cet utilisateur n\'est pas relié à cette structure');
         }
         if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');

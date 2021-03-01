@@ -1,7 +1,8 @@
 <template>
   <q-page class="client-background" padding>
     <ni-directory-header title="Répertoire" @update-search="updateSearch" :search="searchStr" />
-    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
+    <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
+      :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ col }">
         <q-item v-if="col.name === 'name'">
           <q-item-section avatar><img :src="getAvatar(col.value.picture)" class="avatar"></q-item-section>
@@ -42,12 +43,7 @@ export default {
       userList: [],
       searchStr: '',
       activeUsers: true,
-      pagination: {
-        page: 1,
-        rowsPerPage: 15,
-        sortBy: 'name',
-        descending: false,
-      },
+      pagination: { page: 1, rowsPerPage: 15, sortBy: 'name', descending: false },
       columns: [
         {
           name: 'name',

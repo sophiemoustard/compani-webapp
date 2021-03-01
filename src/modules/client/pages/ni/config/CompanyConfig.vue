@@ -10,9 +10,8 @@
           <ni-input caption="Nom commercial" v-model.trim="company.tradeName" @focus="saveTmp('tradeName')"
             @blur="updateCompany('tradeName')" :error="$v.company.tradeName.$error"
             :error-message="tradeNameError($v.company)" />
-          <ni-search-address v-model="company.address" color="white" inverted-light :error-message="addressError"
-            @focus="saveTmp('address.fullAddress')" @blur="updateCompany('address')"
-            :error="$v.company.address.$error" />
+          <ni-search-address v-model="company.address" :error-message="addressError" @blur="updateCompany('address')"
+            @focus="saveTmp('address.fullAddress')" :error="$v.company.address.$error" />
           <ni-input v-if="company.type === COMPANY" caption="Numéro RCS" v-model="company.rcs" @focus="saveTmp('rcs')"
             @blur="updateCompany('rcs')" :error="$v.company.rcs.$error" :error-message="rcsError" />
           <ni-input v-else caption="Numéro RNA" v-model="company.rna" @focus="saveTmp('rna')"
@@ -106,9 +105,10 @@ import Establishments from '@api/Establishments';
 import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
-import EstablishmentCreationModal from 'src/modules/client/components/config/EstablishmentCreationModal';
-import EstablishmentEditionModal from 'src/modules/client/components/config/EstablishmentEditionModal';
-
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import { COMPANY } from '@data/constants';
+import { urssafCodes } from '@data/urssafCodes';
+import { workHealthServices } from '@data/workHealthServices';
 import {
   frAddress,
   validWorkHealthService,
@@ -117,15 +117,13 @@ import {
   frPhoneNumber,
 } from '@helpers/vuelidateCustomVal';
 import { formatPhoneForPayload } from '@helpers/utils';
-import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { COMPANY } from '@data/constants';
-import { urssafCodes } from '@data/urssafCodes';
-import { workHealthServices } from '@data/workHealthServices';
-import { companyMixin } from '@mixins/companyMixin';
 import { defineAbilitiesFor } from '@helpers/ability';
+import { companyMixin } from '@mixins/companyMixin';
+import { validationMixin } from '@mixins/validationMixin';
+import EstablishmentCreationModal from 'src/modules/client/components/config/EstablishmentCreationModal';
+import EstablishmentEditionModal from 'src/modules/client/components/config/EstablishmentEditionModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
-import { validationMixin } from '@mixins/validationMixin';
 
 export default {
   name: 'CompanyConfig',
@@ -140,7 +138,6 @@ export default {
   mixins: [configMixin, validationMixin, tableMixin, companyMixin],
   data () {
     return {
-      company: null,
       documents: null,
       COMPANY,
       loading: false,
@@ -148,30 +145,10 @@ export default {
       // Establishment
       establishments: [],
       establishmentsColumns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-        },
-        {
-          name: 'siret',
-          label: 'SIRET',
-          align: 'left',
-          field: 'siret',
-        },
-        {
-          name: 'address',
-          label: 'Adresse',
-          align: 'left',
-          field: row => get(row, 'address.fullAddress') || '',
-        },
-        {
-          name: 'phone',
-          label: 'Téléphone',
-          align: 'left',
-          field: 'phone',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name' },
+        { name: 'siret', label: 'SIRET', align: 'left', field: 'siret' },
+        { name: 'address', label: 'Adresse', align: 'left', field: row => get(row, 'address.fullAddress') || '' },
+        { name: 'phone', label: 'Téléphone', align: 'left', field: 'phone' },
         {
           name: 'workHealthService',
           label: 'Service de santé du travail',
@@ -186,12 +163,7 @@ export default {
           field: 'urssafCode',
           format: value => (value ? get(urssafCodes.find(code => code.value === value), 'label', '') : ''),
         },
-        {
-          name: 'actions',
-          label: '',
-          align: 'center',
-          field: '_id',
-        },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       establishmentsPagination: { rowsPerPage: 0, sortBy: 'name' },
       establishmentCreationModal: false,
@@ -244,13 +216,6 @@ export default {
     else await this.refreshCompany();
   },
   methods: {
-    async refreshCompany () {
-      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
-      this.company = this.loggedCompany;
-      this.company.address = this.company.address || { fullAddress: '' };
-      this.company.legalRepresentative = this.company.legalRepresentative ||
-        { lastname: '', firstname: '', position: '' };
-    },
     // Establishment
     async getEstablishments () {
       try {
@@ -319,9 +284,7 @@ export default {
     async updateEstablishment () {
       try {
         const formIsValid = await this.waitForFormValidation(this.$v.editedEstablishment);
-        if (!formIsValid) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         const fields = ['name', 'siret', 'address', 'phone', 'workHealthServices', 'urssafCodes'];

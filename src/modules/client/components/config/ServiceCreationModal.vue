@@ -3,20 +3,21 @@
     <template slot="title">
       Créer un <span class="text-weight-bold">service</span>
     </template>
-    <ni-input in-modal caption="Nom" v-model="newService.name" :error="validations.name.$error"
-      @blur="validations.name.$touch" required-field />
-    <ni-select in-modal caption="Nature" v-model="newService.nature" :error="validations.nature.$error"
-      @blur="validations.nature.$touch" :options="natureOptions" required-field />
-    <ni-input in-modal caption="Prix unitaire par défaut TTC" suffix="€" type="number"
-      v-model="newService.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
-      @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError" />
-    <ni-input in-modal caption="TVA" suffix="%" v-model="newService.vat" type="number"
+    <ni-input in-modal caption="Nom" :value="newService.name" :error="validations.name.$error"
+      @blur="validations.name.$touch" required-field @input="update($event, 'name')" />
+    <ni-select in-modal caption="Nature" :value="newService.nature" :error="validations.nature.$error"
+      @blur="validations.nature.$touch" :options="natureOptions" required-field @input="update($event, 'nature')" />
+    <ni-input in-modal caption="Prix unitaire par défaut TTC" @input="update($event, 'defaultUnitAmount')"
+      :value="newService.defaultUnitAmount" :error="validations.defaultUnitAmount.$error" required-field
+      @blur="validations.defaultUnitAmount.$touch" :error-message="defaultUnitAmountError" suffix="€" type="number" />
+    <ni-input in-modal caption="TVA" suffix="%" :value="newService.vat" type="number" @input="update($event, 'vat')"
       :error="validations.vat.$error" @blur="validations.vat.$touch"
       error-message="La TVA doit être positive ou nulle" />
-    <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" v-model="newService.surcharge"
-      :options="surchargesOptions" clearable />
+    <ni-select in-modal v-if="newService.nature !== FIXED" caption="Plan de majoration" :value="newService.surcharge"
+      :options="surchargesOptions" clearable @input="update($event, 'surcharge')" />
     <div class="row q-mb-md">
-      <q-checkbox label="Exonération de charges" v-model="newService.exemptFromCharges" dense />
+      <q-checkbox label="Exonération de charges" :value="newService.exemptFromCharges" dense
+        @input="update($event, 'exemptFromCharges')" />
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer le service" icon-right="add" color="primary"
@@ -61,6 +62,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newService', { ...this.newService, [prop]: event });
     },
   },
 };
