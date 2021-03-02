@@ -2,7 +2,7 @@
   <q-page class="client-background" padding>
     <ni-directory-header title="Bénéficiaires" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredUsers" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
-      @go-to="goToCustomerProfile" />
+      @go-to="goToCustomerProfile" :rows-per-page="[15, 50, 100, 200]" />
   </q-page>
 </template>
 

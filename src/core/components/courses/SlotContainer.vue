@@ -321,6 +321,7 @@ export default {
         this.editionModal = false;
       } catch (e) {
         console.error(e);
+        if (e.data.statusCode === 409) return NotifyWarning('Créneau émargé : impossible de le supprimer');
         NotifyNegative('Erreur lors de la suppression du créneau.');
       } finally {
         this.modalLoading = false;

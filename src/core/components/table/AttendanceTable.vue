@@ -1,6 +1,7 @@
 <template>
+<div>
   <q-card flat>
-    <q-table v-if="!noSlots" :data="course.trainees" :columns="columns" class="q-pa-md table"
+    <q-table v-if="!noSlots" :data="trainees" :columns="columns" class="q-pa-md table"
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
@@ -29,7 +30,10 @@
                 <q-item-section avatar>
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
-                <q-item-section>{{ formatIdentity(col.value, 'FL') }}</q-item-section>
+                <q-item-section class="ellipsis">
+                  {{ formatIdentity(col.value.identity, 'FL') }}
+                  <q-item-section v-if="col.value.external" class="unsubscribed">Pas inscrit</q-item-section>
+                </q-item-section>
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
@@ -41,23 +45,39 @@
         <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
       </template>
     </q-table>
+    <ni-button color="primary" icon="add" label="Ajouter un participant" :disable="loading"
+      @click="traineeAdditionModal = true" class="q-mb-sm" />
     <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
   </q-card>
+
+  <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
+    @submit="addTrainee" :loading="modalLoading" :trainees="trainees" :validation="$v.newTraineeAttendance"
+    :new-trainee-attendance.sync="newTraineeAttendance" :trainee-filter-options="traineeFilterOptions" />
+</div>
 </template>
 
 <script>
+import { required } from 'vuelidate/lib/validators';
+import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR } from '@data/constants';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { DEFAULT_AVATAR, INTRA } from '@data/constants';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import Button from '@components/Button';
 import Attendances from '@api/Attendances';
+import Users from '@api/Users';
+import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
   name: 'AttendanceTable',
   props: {
     course: { type: Object, default: () => ({}) },
+  },
+  components: {
+    'ni-button': Button,
+    'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
   },
   data () {
     return {
@@ -65,19 +85,31 @@ export default {
       DEFAULT_AVATAR,
       attendances: [],
       loading: false,
+      modalLoading: false,
+      traineeAdditionModal: false,
+      newTraineeAttendance: { trainee: '', attendances: [] },
+      potentialTrainees: [],
+    };
+  },
+  validations () {
+    return {
+      newTraineeAttendance: {
+        trainee: { required },
+        attendances: { minArrayLength: minArrayLength(1) },
+      },
     };
   },
   async created () {
     await this.refreshAttendances(this.course.slots.map(s => s._id));
+    await this.getTrainees();
   },
   computed: {
     columns () {
       const columns = [{
         name: 'trainee',
         align: 'left',
-        field: 'identity',
+        field: row => ({ identity: row.identity, external: !!row.external }),
         style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
-        classes: 'ellipsis',
       }];
       if (!this.course.slots) return columns;
 
@@ -102,6 +134,34 @@ export default {
     },
     noSlots () {
       return !this.course.slots.length;
+    },
+    trainees () {
+      return [...this.course.trainees, ...this.unsubscribedTrainees];
+    },
+    unsubscribedTrainees () {
+      const traineesId = this.course.trainees.map(trainee => trainee._id);
+      const unsubscribedTraineesId = [...new Set(this.attendances
+        .filter(a => (!traineesId.includes(a.trainee)))
+        .map(a => a.trainee))];
+
+      return unsubscribedTraineesId
+        .map((unsubscribedTraineeId) => {
+          const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedTraineeId));
+          return { ...trainee, external: true };
+        });
+    },
+    traineeFilterOptions () {
+      const formattedTrainees = this.potentialTrainees
+        .map(trainee => ({
+          label: formatIdentity(trainee.identity, 'FL'),
+          value: trainee._id,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      return formattedTrainees.filter(trainee => !this.trainees.map(t => t._id).includes(trainee.value));
+    },
+    selectedCompany () {
+      return this.course.company ? this.course.company._id : '';
     },
   },
   methods: {
@@ -162,6 +222,34 @@ export default {
         }
       }
     },
+    async getTrainees () {
+      try {
+        this.potentialTrainees = await Users.learnerList(this.course.type === INTRA
+          ? { company: this.selectedCompany }
+          : { hasCompany: true });
+      } catch (error) {
+        console.error(error);
+      }
+    },
+    async addTrainee () {
+      try {
+        this.$v.newTraineeAttendance.$touch();
+        if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
+        this.modalLoading = true;
+        this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee, s));
+        this.traineeAdditionModal = false;
+        NotifyPositive('Participant ajouté.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout du participant.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetNewTraineeAttendance () {
+      this.$v.newTraineeAttendance.$reset();
+      this.newTraineeAttendance = { trainee: '', attendances: [] };
+    },
   },
 };
 </script>
@@ -172,6 +260,13 @@ export default {
   font-size: 16px
 .no-data
   font-size: 12px
+
+.ellipsis
+  white-space: nowrap
+  overflow: hidden
+  text-overflow: ellipsis
+  display: block
+  align-self: center
 
 .table
   thead tr:first-child th:first-child
@@ -199,4 +294,10 @@ export default {
     position: sticky
     left: 0
     z-index: 1
+.unsubscribed
+    color: $secondary
+    line-height: 1
+    font-size: 11px
+    font-style: italic
+    padding-top: 3px
 </style>

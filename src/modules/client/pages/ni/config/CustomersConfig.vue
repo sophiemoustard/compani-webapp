@@ -67,14 +67,21 @@
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Mandat de prélèvement" path="customersConfig.templates.debitMandate"
               :entity="company" alt="template mandat prelevement" name="debitMandate" :url="docsUploadUrl" drive-storage
-              @delete="validateDocumentDeletion(documents.debitMandate.driveId, 'debitMandate', 'customersConfig')"
-              @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`" />
+              @uploaded="documentUploaded" :additional-value="`modele_mandat_prelevement_${company.name}`"
+              @delete="validateDocumentDeletion(
+                company.customersConfig.templates.debitMandate.driveId,
+                'debitMandate',
+                'customersConfig'
+              )" />
           </div>
           <div class="col-xs-12 col-md-6">
             <ni-file-uploader caption="Devis" path="customersConfig.templates.quote" alt="template devis" name="quote"
-              @delete="validateDocumentDeletion(documents.quote.driveId, 'quote', 'customersConfig')" :entity="company"
               @uploaded="documentUploaded" :additional-value="`modele_devis_${company.name}`" :url="docsUploadUrl"
-              drive-storage />
+              drive-storage :entity="company" @delete="validateDocumentDeletion(
+                company.customersConfig.templates.quote.driveId,
+                'quote',
+                'customersConfig'
+              )" />
           </div>
         </div>
       </div>
@@ -114,31 +121,33 @@
         <div class="row gutter-profile">
           <ni-select caption="Période de facturation par défaut" v-model="company.customersConfig.billingPeriod" in-form
             @focus="saveTmp('customersConfig.billingPeriod')" @blur="updateCompany('customersConfig.billingPeriod')"
-            :options="billingPeriodOptions" />
+            :options="billingPeriodOptions" :error="$v.company.customersConfig.billingPeriod.$error"
+            :error-message="REQUIRED_LABEL" />
         </div>
       </div>
     </div>
 
     <!-- Surcharge creation modal -->
-    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge="newSurcharge"
+    <surcharge-creation-modal v-model="surchargeCreationModal" :new-surcharge.sync="newSurcharge"
       :validations="$v.newSurcharge" @hide="resetCreationSurchargeData" @submit="createNewSurcharge"
       :loading="loading" />
 
     <!-- Surcharge edition modal -->
-    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge="editedSurcharge"
+    <surcharge-edition-modal v-model="surchargeEditionModal" :edited-surcharge.sync="editedSurcharge"
       :validations="$v.editedSurcharge" @hide="resetEditionSurchargeData" @submit="updateSurcharge"
       :loading="loading" />
 
     <!-- Service creation modal -->
-    <service-creation-modal v-model="serviceCreationModal" :new-service="newService" :validations="$v.newService"
+    <service-creation-modal v-model="serviceCreationModal" :new-service.sync="newService" :validations="$v.newService"
       :nature-options="natureOptions" :default-unit-amount-error="nbrError('newService.defaultUnitAmount')"
       :surcharges-options="surchargesOptions" @hide="resetCreationServiceData" @submit="createNewService"
       :loading="loading" />
 
     <!-- Service edition modal -->
-    <service-edition-modal v-model="serviceEditionModal" :edited-service="editedService" :validations="$v.editedService"
+    <service-edition-modal v-model="serviceEditionModal" :edited-service.sync="editedService"
       :default-unit-amount-error="nbrError('newService.defaultUnitAmount')" :surcharges-options="surchargesOptions"
-      :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate" />
+      :loading="loading" @hide="resetEditionServiceData" @submit="updateService" :min-start-date="minStartDate"
+      :validations="$v.editedService" />
 
     <!-- Service history modal -->
     <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData" container-class="modal-container-md">
@@ -186,6 +195,7 @@ import {
   NATURE_OPTIONS,
   FIXED,
   COMPANY,
+  REQUIRED_LABEL,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
@@ -245,10 +255,9 @@ export default {
   data () {
     return {
       loading: false,
-      company: null,
-      documents: null,
       FIXED,
       COMPANY,
+      REQUIRED_LABEL,
       billingPeriodOptions: [
         { value: TWO_WEEKS, label: 'Quinzaine' },
         { value: MONTH, label: 'Mois' },
@@ -552,7 +561,7 @@ export default {
     },
     company: {
       customersConfig: {
-        bllingPeriod: { required },
+        billingPeriod: { required },
       },
     },
     newThirdPartyPayer: {
@@ -653,12 +662,6 @@ export default {
       } finally {
         this.servicesLoading = false;
       }
-    },
-    async refreshCompany () {
-      await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
-      this.company = this.loggedCompany;
-      this.documents = this.company.customersConfig.templates || {};
-      this.company.address = this.company.address || { fullAddress: '' };
     },
     async refreshThirdPartyPayers () {
       try {

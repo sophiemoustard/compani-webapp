@@ -1,8 +1,9 @@
 <template>
   <div class="relative-position table-spinner-container">
     <q-table v-if="!loading" :data="data" :columns="columns" :pagination="pagination" binary-state-sort
-      class="q-pa-sm large-table" flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners"
-      :selected="selected" :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom">
+      flat :separator="separator" :selection="selection" :row-key="rowKey" v-on="$listeners" :selected="selected"
+      :visible-columns="formattedVisibleColumns" :hide-bottom="shouldHideBottom"
+      :class="['q-pa-sm large-table sticky-header', isClientInterface ? 'client-header' : 'vendor-header']">
       <template #header="props">
         <slot name="header" :props="props">
           <q-tr :props="props">
@@ -63,6 +64,12 @@ export default {
   },
   components: {
     'ni-pagination': Pagination,
+  },
+  data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+    return {
+      isClientInterface,
+    };
   },
   computed: {
     shouldHideBottom () {

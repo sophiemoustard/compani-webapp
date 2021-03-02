@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <h4>Coachs</h4>
-    <ni-coach-list :company="loggedCompany" />
+    <ni-coach-list :company="company" />
   </q-page>
 </template>
 
@@ -15,7 +15,7 @@ export default {
     'ni-coach-list': CoachList,
   },
   computed: {
-    ...mapGetters({ loggedCompany: 'main/getCompany' }),
+    ...mapGetters({ company: 'main/getCompany' }),
   },
 };
 </script>
