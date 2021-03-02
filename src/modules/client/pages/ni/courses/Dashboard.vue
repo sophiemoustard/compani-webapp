@@ -133,7 +133,7 @@ export default {
   },
   async created () {
     await this.getActivityHistories();
-    await this.computeChartData();
+    await this.computeChartsData();
   },
   methods: {
     async getActivityHistories () {
@@ -151,14 +151,14 @@ export default {
         NotifyNegative('Erreur lors de la récupération des données.');
       }
     },
-    async computeChartData () {
+    async computeChartsData () {
       try {
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const sixMonthsHistories = await ActivityHistories.list({ startDate: chartStartDate, endDate: chartEndDate });
 
-        this.traineesByMonth = this.getTraineeByMonth(sixMonthsHistories);
-        this.activitiesByMonth = this.getActivityHistoriesByMonth(sixMonthsHistories);
+        this.traineesByMonth = this.getDataByMonth(sixMonthsHistories, 'trainee');
+        this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories, 'activity');
         NotifyPositive('Données mises à jour.');
       } catch (e) {
         console.error(e);
