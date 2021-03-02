@@ -135,6 +135,7 @@ export default {
   },
   methods: {
     async getActivityHistories () {
+      console.log('skusku');
       try {
         if (!this.dates.startDate || moment(this.dates.startDate).isAfter(this.dates.endDate)) return;
         const { endDate } = this.dates;
