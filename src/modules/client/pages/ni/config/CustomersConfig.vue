@@ -331,6 +331,12 @@ export default {
           field: row => row.firstOfMay && `${row.firstOfMay}%`,
         },
         {
+          name: 'firstOfJanuary',
+          label: '1er janvier',
+          align: 'center',
+          field: row => row.firstOfJanuary && `${row.firstOfJanuary}%`,
+        },
+        {
           name: 'evening',
           label: 'Soirée',
           align: 'center',
