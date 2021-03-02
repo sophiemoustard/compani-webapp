@@ -21,6 +21,10 @@
       <ni-input in-modal caption="Majoration 1er mai" suffix="%" type="number" :value="editedSurcharge.firstOfMay"
         :error="validations.firstOfMay.$error" @blur="validations.firstOfMay.$touch"
         :error-message="nbrError('firstOfMay', validations)" @input="update($event, 'firstOfMay')" />
+      <ni-input in-modal caption="Majoration 1er janvier" suffix="%" type="number"
+        :value="editedSurcharge.firstOfJanuary" @input="update($event, 'firstOfJanuary')"
+        :error="validations.firstOfJanuary.$error" @blur="validations.firstOfJanuary.$touch"
+        :error-message="nbrError('firstOfJanuary', validations)" />
       <ni-input in-modal caption="Majoration soirée" suffix="%" type="number" :value="editedSurcharge.evening"
         :error="validations.evening.$error" @blur="validations.evening.$touch" @input="update($event, 'evening')"
         :error-message="nbrError('evening', validations)" first-of-may />
