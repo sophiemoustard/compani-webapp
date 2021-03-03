@@ -65,7 +65,7 @@ export default {
             .map(ah => ({ user: ah.user, date: ah.date })))))
         .flat(3);
 
-      this.traineesByMonth = this.getDataByMonth(activityHistories, 'trainee');
+      this.traineesByMonth = this.getDataByMonth(activityHistories, 'user');
     },
   },
 };
