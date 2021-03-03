@@ -198,6 +198,7 @@ import {
   REQUIRED_LABEL,
 } from '@data/constants';
 import moment from '@helpers/moment';
+import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
@@ -304,73 +305,73 @@ export default {
           name: 'saturday',
           label: 'Samedi',
           align: 'center',
-          field: row => this.formatPercentageField(row.saturday),
+          field: row => roundFrenchPercentage(row.saturday, 0),
         },
         {
           name: 'sunday',
           label: 'Dimanche',
           align: 'center',
-          field: row => this.formatPercentageField(row.sunday),
+          field: row => roundFrenchPercentage(row.sunday, 0),
         },
         {
           name: 'publicHoliday',
           label: 'Jour férié',
           align: 'center',
-          field: row => this.formatPercentageField(row.publicHoliday),
+          field: row => roundFrenchPercentage(row.publicHoliday, 0),
         },
         {
           name: 'twentyFifthOfDecember',
           label: '25 décembre',
           align: 'center',
-          field: row => this.formatPercentageField(row.twentyFifthOfDecember),
+          field: row => roundFrenchPercentage(row.twentyFifthOfDecember, 0),
         },
         {
           name: 'firstOfMay',
           label: '1er mai',
           align: 'center',
-          field: row => this.formatPercentageField(row.firstOfMay),
+          field: row => roundFrenchPercentage(row.firstOfMay, 0),
         },
         {
           name: 'firstOfJanuary',
           label: '1er janvier',
           align: 'center',
-          field: row => this.formatPercentageField(row.firstOfJanuary),
+          field: row => roundFrenchPercentage(row.firstOfJanuary, 0),
         },
         {
           name: 'evening',
           label: 'Soirée',
           align: 'center',
-          field: row => this.formatPercentageField(row.evening),
+          field: row => roundFrenchPercentage(row.evening, 0),
         },
         {
           name: 'eveningStartTime',
           label: 'Début soirée',
           align: 'center',
-          field: row => this.formatTimeField(row.eveningStartTime),
+          field: row => (row.eveningStartTime ? formatHoursWithMinutes(row.eveningStartTime) : ''),
         },
         {
           name: 'eveningEndTime',
           label: 'Fin soirée',
           align: 'center',
-          field: row => this.formatTimeField(row.eveningEndTime),
+          field: row => (row.eveningEndTime ? formatHoursWithMinutes(row.eveningEndTime) : ''),
         },
         {
           name: 'custom',
           label: 'Perso',
           align: 'center',
-          field: row => this.formatPercentageField(row.custom),
+          field: row => roundFrenchPercentage(row.custom, 0),
         },
         {
           name: 'customStartTime',
           label: 'Début perso',
           align: 'center',
-          field: row => this.formatTimeField(row.customStartTime),
+          field: row => (row.customStartTime ? formatHoursWithMinutes(row.customStartTime) : ''),
         },
         {
           name: 'customEndTime',
           label: 'Fin perso',
           align: 'center',
-          field: row => this.formatTimeField(row.customEndTime),
+          field: row => (row.customEndTime ? formatHoursWithMinutes(row.customEndTime) : ''),
         },
         { name: 'actions', label: '', align: 'center', field: '_id', style: 'padding-left: 0px' },
       ],
@@ -680,12 +681,6 @@ export default {
       }
     },
     // Surcharges
-    formatPercentageField (field) {
-      return field && `${field}%`;
-    },
-    formatTimeField (field) {
-      return (field ? moment(field).format('HH:mm') : '');
-    },
     resetCreationSurchargeData () {
       this.newSurcharge = {
         name: '',
