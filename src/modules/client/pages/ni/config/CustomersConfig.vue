@@ -304,75 +304,75 @@ export default {
           name: 'saturday',
           label: 'Samedi',
           align: 'center',
-          field: row => row.saturday && `${row.saturday}%`,
+          field: row => this.formatPercentageField(row.saturday),
         },
         {
           name: 'sunday',
           label: 'Dimanche',
           align: 'center',
-          field: row => row.sunday && `${row.sunday}%`,
+          field: row => this.formatPercentageField(row.sunday),
         },
         {
           name: 'publicHoliday',
           label: 'Jour férié',
           align: 'center',
-          field: row => row.publicHoliday && `${row.publicHoliday}%`,
+          field: row => this.formatPercentageField(row.publicHoliday),
         },
         {
           name: 'twentyFifthOfDecember',
           label: '25 décembre',
           align: 'center',
-          field: row => row.twentyFifthOfDecember && `${row.twentyFifthOfDecember}%`,
+          field: row => this.formatPercentageField(row.twentyFifthOfDecember),
         },
         {
           name: 'firstOfMay',
           label: '1er mai',
           align: 'center',
-          field: row => row.firstOfMay && `${row.firstOfMay}%`,
+          field: row => this.formatPercentageField(row.firstOfMay),
         },
         {
           name: 'firstOfJanuary',
           label: '1er janvier',
           align: 'center',
-          field: row => row.firstOfJanuary && `${row.firstOfJanuary}%`,
+          field: row => this.formatPercentageField(row.firstOfJanuary),
         },
         {
           name: 'evening',
           label: 'Soirée',
           align: 'center',
-          field: row => row.evening && `${row.evening}%`,
+          field: row => this.formatPercentageField(row.evening),
         },
         {
           name: 'eveningStartTime',
           label: 'Début soirée',
           align: 'center',
-          field: row => (row.eveningStartTime ? moment(row.eveningStartTime).format('HH:mm') : ''),
+          field: row => this.formatTimeField(row.eveningStartTime),
         },
         {
           name: 'eveningEndTime',
           label: 'Fin soirée',
           align: 'center',
-          field: row => (row.eveningEndTime ? moment(row.eveningEndTime).format('HH:mm') : ''),
+          field: row => this.formatTimeField(row.eveningEndTime),
         },
         {
           name: 'custom',
           label: 'Perso',
           align: 'center',
-          field: row => row.custom && `${row.custom}%`,
+          field: row => this.formatPercentageField(row.custom),
         },
         {
           name: 'customStartTime',
           label: 'Début perso',
           align: 'center',
-          field: row => (row.customStartTime ? moment(row.customStartTime).format('HH:mm') : ''),
+          field: row => this.formatTimeField(row.customStartTime),
         },
         {
           name: 'customEndTime',
           label: 'Fin perso',
           align: 'center',
-          field: row => (row.customEndTime ? moment(row.customEndTime).format('HH:mm') : ''),
+          field: row => this.formatTimeField(row.customEndTime),
         },
-        { name: 'actions', label: '', align: 'center', field: '_id' },
+        { name: 'actions', label: '', align: 'center', field: '_id', style: 'padding-left: 0px' },
       ],
       surchargesLoading: false,
       // Services
@@ -619,11 +619,6 @@ export default {
     ]);
   },
   methods: {
-    getServiceLastVersion (service) {
-      if (!service.versions || service.versions.length === 0) return {};
-
-      return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
-    },
     // Refresh data
     async refreshSurcharges () {
       try {
@@ -685,6 +680,12 @@ export default {
       }
     },
     // Surcharges
+    formatPercentageField (field) {
+      return field && `${field}%`;
+    },
+    formatTimeField (field) {
+      return (field ? moment(field).format('HH:mm') : '');
+    },
     resetCreationSurchargeData () {
       this.newSurcharge = {
         name: '',
@@ -820,6 +821,11 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Services
+    getServiceLastVersion (service) {
+      if (!service.versions || service.versions.length === 0) return {};
+
+      return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
+    },
     formatCreatedService () {
       const { nature, name, defaultUnitAmount, exemptFromCharges } = this.newService;
       const formattedService = {
