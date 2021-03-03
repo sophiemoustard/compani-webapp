@@ -150,13 +150,8 @@
       :validations="$v.editedService" />
 
     <!-- Service history modal -->
-    <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData" container-class="modal-container-md">
-      <template slot="title">
-        Historique du service <span class="text-weight-bold">{{ selectedService.name }}</span>
-      </template>
-      <ni-responsive-table class="q-mb-sm" :data="selectedService.versions" :columns="serviceColumns"
-        :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns" />
-    </ni-modal>
+    <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
+      :selected-service="selectedService" :service-columns="serviceColumns" />
 
     <!-- Third party payers creation modal -->
     <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal"
@@ -185,7 +180,6 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import FileUploader from '@components/form/FileUploader';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
-import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
 import {
   BILLING_DIRECT,
@@ -207,6 +201,7 @@ import SurchargeCreationModal from 'src/modules/client/components/config/Surchar
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
 import ThirdPartyPayerEditionModal from 'src/modules/client/components/config/ThirdPartyPayerEditionModal';
+import ServiceHistoryModal from 'src/modules/client/components/config/ServiceHistoryModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -216,7 +211,6 @@ export default {
   components: {
     'ni-file-uploader': FileUploader,
     'ni-select': Select,
-    'ni-modal': Modal,
     'ni-btn': Button,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
@@ -225,6 +219,7 @@ export default {
     'surcharge-edition-modal': SurchargeEditionModal,
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
     'third-party-payer-edition-modal': ThirdPartyPayerEditionModal,
+    'service-history-modal': ServiceHistoryModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
