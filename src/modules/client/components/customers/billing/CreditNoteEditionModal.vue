@@ -18,7 +18,7 @@
           @input="updateAndGetEvents($event, 'startDate')" required-field :error="validations.startDate.$error" />
         <ni-date-input caption="Fin période concernée" :value="editedCreditNote.endDate" in-modal
           :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @blur="validations.endDate.$touch"
-          @input="updateAndGetEvents($event, endDate)" required-field :error="validations.endDate.$error" />
+          @input="updateAndGetEvents($event, 'endDate')" required-field :error="validations.endDate.$error" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group :value="editedCreditNote.events" @input="update($event, 'events')"
             :options="creditNoteEventsOptions" caption="Évènements"
@@ -126,7 +126,7 @@ export default {
     },
     async updateAndGetEvents (event, prop) {
       await this.update(event, prop);
-      this.getEvents();
+      await this.getEvents();
     },
   },
 };

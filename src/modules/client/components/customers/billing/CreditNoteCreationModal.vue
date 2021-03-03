@@ -5,7 +5,7 @@
     </template>
     <ni-select in-modal caption="Bénéficiaire" :value="newCreditNote.customer" :options="customersOptions"
       required-field @input="updateAndGetEvents($event, 'customer')" @blur="validations.customer.$touch"
-      :error="validations.customer .$error" use-input clearable />
+      :error="validations.customer.$error" use-input clearable />
     <ni-select in-modal caption="Tiers payeur" :value="newCreditNote.thirdPartyPayer"
       :options="thirdPartyPayerOptions" @input="updateAndGetEvents($event, 'thirdPartyPayer')"
       :disable="thirdPartyPayerOptions.length === 0" clearable />

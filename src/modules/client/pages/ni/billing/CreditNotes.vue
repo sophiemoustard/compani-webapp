@@ -165,15 +165,23 @@ export default {
     'newCreditNote.customer': function (value) {
       this.newCreditNote.thirdPartyPayer = null;
     },
-    'newCreditNote.events': function (value) {
-      const prices = this.computePrices(this.newCreditNote.events);
-      this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
-      this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
-      this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
-      this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
+    'newCreditNote.events': function (newValue, oldValue) {
+      // eslint-disable-next-line no-console
+      // console.log(newValue, oldValue);
+      if (this.hasLinkedEvents &&
+        (!newValue.every((value, i) => value === oldValue[i]) ||
+        newValue.length !== oldValue.length)) {
+        const prices = this.computePrices(this.newCreditNote.events);
+        this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
+        this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
+        this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
+        this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
+      }
     },
-    'editedCreditNote.events': function (value) {
-      if (this.hasLinkedEvents) {
+    'editedCreditNote.events': function (newValue, oldValue) {
+      // eslint-disable-next-line no-console
+      console.log(newValue, oldValue, this.creditNoteEvents);
+      if (this.hasLinkedEvents && this.fieldHasBeenUpdated(newValue, oldValue)) {
         const prices = this.computePrices(this.editedCreditNote.events);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
@@ -185,10 +193,49 @@ export default {
       if (value === null) {
         this.creditNoteEvents = [];
       }
+      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
+        if (event.endDate > value) return true;
+        this.newCreditNote.events = this.newCreditNote.events.filter(e => e !== event.eventId);
+        return false;
+      });
     },
     'newCreditNote.endDate': function (value) {
+      // eslint-disable-next-line no-console
+      // console.log(value, this.creditNoteEvents);
       if (value === null) {
         this.creditNoteEvents = [];
+      }
+      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
+        if (event.startDate < value) return true;
+        this.newCreditNote.events = this.newCreditNote.events.filter(e => e !== event.eventId);
+        return false;
+      });
+    },
+    'editedCreditNote.startDate': function (value) {
+      if (value === null) {
+        this.creditNoteEvents = [];
+      }
+      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
+        if (event.endDate > value) return true;
+        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e !== event.eventId);
+        return false;
+      });
+    },
+    'editedCreditNote.endDate': function (value) {
+      if (value === null) {
+        this.creditNoteEvents = [];
+      }
+      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
+        if (event.startDate < value) return true;
+        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e !== event.eventId);
+        return false;
+      });
+    },
+    'newCreditNote.thirdPartyPayer': function (newValue, oldValue) {
+      if (newValue !== oldValue) {
+        // eslint-disable-next-line no-console
+        // console.log(newValue, oldValue, 'tiers-payeur');
+        this.newCreditNote.events = [];
       }
     },
   },
@@ -544,6 +591,11 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteCreditNote(id))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    fieldHasBeenUpdated (newValue, oldValue) {
+      if (!newValue || !oldValue || newValue.every((value, i) => value === oldValue[i]) ||
+        newValue.length !== oldValue.length) return false;
+      return true;
     },
   },
 };
