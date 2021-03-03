@@ -81,7 +81,10 @@ export default {
       const aDate = new Date(a.substring(3), a.substring(0, 2));
       const bDate = new Date(b.substring(3), b.substring(0, 2));
 
-      return aDate > bDate;
+      if (aDate > bDate) return 1;
+      if (aDate < bDate) return -1;
+
+      return 0;
     },
     async refreshBillSlips () {
       try {
