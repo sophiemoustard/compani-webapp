@@ -49,6 +49,7 @@ export default {
           align: 'left',
           field: 'month',
           format: value => moment(value, 'MM-YYYY').format('MMMM YYYY'),
+          sort: (a, b) => this.sortMonths(a, b),
         },
         {
           name: 'thirdPartyPayer',
@@ -76,6 +77,15 @@ export default {
     await this.refreshBillSlips();
   },
   methods: {
+    sortMonths (a, b) {
+      const aDate = new Date(a.substring(3), a.substring(0, 2));
+      const bDate = new Date(b.substring(3), b.substring(0, 2));
+
+      if (aDate > bDate) return 1;
+      if (aDate < bDate) return -1;
+
+      return 0;
+    },
     async refreshBillSlips () {
       try {
         this.loading = true;
