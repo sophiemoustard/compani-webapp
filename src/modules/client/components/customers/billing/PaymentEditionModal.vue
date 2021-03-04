@@ -5,16 +5,14 @@
     </template>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
-    <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
-      :value="editedPayment.netInclTaxes" @input="update($event, 'netInclTaxes')" required-field
-      :error="validations.netInclTaxes.$error" @blur="validations.netInclTaxes.$touch"
-      :error-message="netInclTaxesError" />
+    <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" @blur="validations.netInclTaxes.$touch"
+      :value="editedPayment.netInclTaxes" @input="update($event, 'netInclTaxes')" type="number" required-field
+      :error="validations.netInclTaxes.$error" :error-message="netInclTaxesError" />
     <ni-select in-modal :caption="`Type du ${editionModalNature}`" :value="editedPayment.type"
       @input="update($event, 'type')" :options="paymentOptions" required-field
       @blur="validations.type.$touch" :error="validations.type.$error" />
-    <ni-date-input :caption="`Date du ${editionModalNature}`" :value="editedPayment.date"
-      @input="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch"
-      in-modal required-field />
+    <ni-date-input :caption="`Date du ${editionModalNature}`" :value="editedPayment.date" in-modal required-field
+      @input="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
         :loading="loading" @click="submit" />

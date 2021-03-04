@@ -9,10 +9,9 @@
     </div>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
-    <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number"
-      :value="newPayment.netInclTaxes" @input="update($event, 'netInclTaxes')" required-field
-      :error="validations.netInclTaxes.$error" @blur="validations.netInclTaxes.$touch"
-      :error-message="netInclTaxesError" />
+    <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number" required-field
+      :value="newPayment.netInclTaxes" @input="update($event, 'netInclTaxes')" :error-message="netInclTaxesError"
+      :error="validations.netInclTaxes.$error" @blur="validations.netInclTaxes.$touch" />
     <ni-select in-modal :caption="`Type du ${creationModalNature}`" :value="newPayment.type"
       @input="update($event, 'type')" :options="paymentOptions" required-field @blur="validations.type.$touch"
       :error="validations.type.$error" />
