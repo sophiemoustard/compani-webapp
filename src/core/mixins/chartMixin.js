@@ -27,7 +27,7 @@ export const chartMixin = {
         : `${new Date(date).getMonth()}`
       }`;
     },
-    getDataByMonth (activityHistories, groupByParam) {
+    getDataByMonth (activityHistories, groupByPath) {
       const historiesByMonth = groupBy(activityHistories, ah => this.formatMonthAndYear(ah.date));
       const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
       const monthlyData = [];
@@ -40,9 +40,9 @@ export const chartMixin = {
 
         const field = this.formatMonthAndYear(date);
         if (!historiesByMonth[field]) monthlyData.push(0);
-        else if (groupByParam) {
+        else if (groupByPath) {
           monthlyData.push(
-            Object.values(groupBy(historiesByMonth[field], group => get(group, groupByParam, null))).length
+            Object.values(groupBy(historiesByMonth[field], group => get(group, groupByPath, null))).length
           );
         } else monthlyData.push(historiesByMonth[field].length);
       }
