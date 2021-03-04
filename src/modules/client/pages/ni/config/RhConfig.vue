@@ -254,7 +254,12 @@ export default {
     };
   },
   async mounted () {
-    await Promise.all([this.refreshInternalHours(), this.getSectors(), this.getAdministrativeDocuments()]);
+    await Promise.all([
+      this.refreshInternalHours(),
+      this.getSectors(),
+      this.getAdministrativeDocuments(),
+      this.refreshCompany(),
+    ]);
   },
   methods: {
     async updateCompanyTransportSubs (index) {
