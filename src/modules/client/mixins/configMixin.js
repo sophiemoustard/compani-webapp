@@ -1,6 +1,7 @@
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import { extend } from '@helpers/utils';
 import Companies from '@api/Companies';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -8,13 +9,22 @@ import { REQUIRED_LABEL } from '@data/constants';
 
 export const configMixin = {
   data () {
+    const companyModel = {
+      address: { fullAddress: '' },
+      legalRepresentative: { firstname: '', lastname: '', position: '' },
+      customersConfig: { templates: {} },
+      rhConfig: { templates: {} },
+    };
+
     return {
       tmpInput: '',
+      resetCompany: companyModel,
+      company: companyModel,
     };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    ...mapGetters({ company: 'main/getCompany' }),
+    ...mapGetters({ loggedCompany: 'main/getCompany' }),
   },
   methods: {
     saveTmp (path) {
@@ -22,6 +32,7 @@ export const configMixin = {
     },
     async refreshCompany () {
       await this.$store.dispatch('main/fetchLoggedUser', this.loggedUser._id);
+      this.company = { ...extend(this.resetCompany, this.loggedCompany) };
       this.$v.company.$touch();
     },
     async updateCompany (path) {
