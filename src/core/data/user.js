@@ -33,10 +33,4 @@ export const userModel = {
     },
   },
   establishment: null,
-  company: {
-    address: { fullAddress: '' },
-    legalRepresentative: { firstname: '', lastname: '', position: '' },
-    customersConfig: { templates: {} },
-    rhConfig: { templates: {} },
-  },
 };
