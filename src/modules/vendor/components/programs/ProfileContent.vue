@@ -507,7 +507,8 @@ export default {
         NotifyPositive('Étape retirée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du retrait de l\'étape.');
+        if (e.status === 409) return NotifyWarning('Impossible de retirer l\'étape tant qu\'elle lié à un créneau');
+        return NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
     },
     validateActivityDeletion (stepId, activityId) {
