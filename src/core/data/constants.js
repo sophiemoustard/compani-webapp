@@ -38,6 +38,7 @@ export const SURCHARGES = {
   publicHoliday: 'Jours fériés',
   twentyFifthOfDecember: '25 décembre',
   firstOfMay: '1er mai',
+  firstOfJanuary: '1er janvier',
   evening: 'Soirée',
   custom: 'Personnalisée',
 };
