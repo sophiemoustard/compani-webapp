@@ -239,6 +239,9 @@ export default {
   &-container
     @media screen and (min-width: $breakpoint-sm-max)
       padding-right: 16px;
+.line-chart-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    margin-top: 16px;
 
 .learners-data
   flex: 1;
