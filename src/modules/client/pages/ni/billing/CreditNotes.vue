@@ -481,7 +481,7 @@ export default {
 
       this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
       if (this.hasLinkedEvents) {
-        await this.getEvents(creditNote);
+        await this.getEvents();
         for (let i = 0, l = creditNote.events.length; i < l; i++) {
           if (!this.creditNoteEvents.some(event => creditNote.events[i].eventId === event.eventId)) {
             this.creditNoteEvents.push(creditNote.events[i]);

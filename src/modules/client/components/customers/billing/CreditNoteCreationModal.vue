@@ -4,11 +4,11 @@
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
     <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
-      required-field @input="getEvents" @blur="validations.customer.$touch" :error="validations.customer.$error"
-      use-input clearable />
+      required-field @input="getEvents" @blur="validations.customer.$touch"
+      :error="validations.customer.$error" use-input clearable />
     <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer"
       :options="thirdPartyPayerOptions" @input="getEvents" :disable="thirdPartyPayerOptions.length === 0" clearable />
-    <ni-date-input caption="Date de l'avoir" :v-model="newCreditNote.date" :error="validations.date.$error"
+    <ni-date-input caption="Date de l'avoir" v-model="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field />
     <div class="row q-mb-md light">
       <q-toggle :value="hasLinkedEvents" @input="updateHasLinkedEvents" label="Lié à des interventions ?" />
@@ -17,8 +17,8 @@
     <template v-if="hasLinkedEvents">
       <ni-date-input caption="Début période concernée" v-model="newCreditNote.startDate"
         :error="validations.startDate.$error" @blur="validations.startDate.$touch" in-modal
-        :disable="!hasLinkedEvents" required-field @input="getEvents" />
-      <ni-date-input caption="Fin période concernée" :v-model="newCreditNote.endDate"
+        :disable="!hasLinkedEvents" @input="getEvents" required-field />
+      <ni-date-input caption="Fin période concernée" v-model="newCreditNote.endDate"
         :error="validations.endDate.$error" @blur="validations.endDate.$touch" in-modal
         :disable="!hasLinkedEvents" @input="getEvents" required-field />
       <template v-if="creditNoteEvents.length > 0">

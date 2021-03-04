@@ -12,11 +12,12 @@
       <!-- Has linked events -->
       <template v-if="hasLinkedEvents">
         <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @blur="validations.startDate.$touch"
-          @input="getEvents" required-field :error="validations.startDate.$error" />
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
+          :error="validations.startDate.$error"
+          @blur="validations.startDate.$touch" />
         <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @blur="validations.endDate.$touch"
-          @input="getEvents" required-field :error="validations.endDate.$error" />
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
+          :error="validations.endDate.$error" @blur="validations.endDate.$touch" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
