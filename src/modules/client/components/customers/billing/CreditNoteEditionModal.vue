@@ -21,9 +21,8 @@
           @input="updateAndGetEvents($event, 'endDate')" required-field :error="validations.endDate.$error" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group :value="editedCreditNote.events" @input="update($event, 'events')"
-            :options="creditNoteEventsOptions" caption="Évènements"
-            type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
-            :error="validations.events.$error" />
+            :options="creditNoteEventsOptions" caption="Évènements" type="checkbox" required-field inline
+            :disable="!editedCreditNote.isEditable" :error="validations.events.$error" />
         </template>
         <div v-if="editedCreditNoteHasNoEvents" class="light warning">
           <p>Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données</p>

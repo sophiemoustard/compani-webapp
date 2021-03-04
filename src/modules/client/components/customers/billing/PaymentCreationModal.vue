@@ -17,7 +17,7 @@
       @input="update($event, 'type')" :options="paymentOptions" required-field @blur="validations.type.$touch"
       :error="validations.type.$error" />
     <ni-date-input :value="newPayment.date" @input="update($event, 'date')" :caption="`Date du ${creationModalNature}`"
-      :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
+      :error="validations.date.$error" @blur="validations.date.$touch" in-modal required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary" :loading="loading"
         @click="submit" />

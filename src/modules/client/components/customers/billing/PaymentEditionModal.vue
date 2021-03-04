@@ -14,7 +14,7 @@
       @blur="validations.type.$touch" :error="validations.type.$error" />
     <ni-date-input :caption="`Date du ${editionModalNature}`" :value="editedPayment.date"
       @input="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch"
-      in-modal type="date" required-field />
+      in-modal required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
