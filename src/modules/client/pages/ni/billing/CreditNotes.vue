@@ -38,7 +38,7 @@
       v-model="creditNoteEditionModal" :edited-credit-note.sync="editedCreditNote" :validations="$v.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" :loading="loading"
-      @hide="resetEditionCreditNoteData" @get-events="getEvents" />
+      @hide="resetEditionCreditNoteData" @get-events="getEvents(editedCreditNote)" />
   </q-page>
 </template>
 
@@ -166,8 +166,6 @@ export default {
       this.newCreditNote.thirdPartyPayer = null;
     },
     'newCreditNote.events': function (newValue, oldValue) {
-      // eslint-disable-next-line no-console
-      // console.log(newValue, oldValue);
       if (this.hasLinkedEvents &&
         (!newValue.every((value, i) => value === oldValue[i]) ||
         newValue.length !== oldValue.length)) {
@@ -179,8 +177,6 @@ export default {
       }
     },
     'editedCreditNote.events': function (newValue, oldValue) {
-      // eslint-disable-next-line no-console
-      console.log(newValue, oldValue, this.creditNoteEvents);
       if (this.hasLinkedEvents && this.fieldHasBeenUpdated(newValue, oldValue)) {
         const prices = this.computePrices(this.editedCreditNote.events);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
@@ -200,8 +196,6 @@ export default {
       });
     },
     'newCreditNote.endDate': function (value) {
-      // eslint-disable-next-line no-console
-      // console.log(value, this.creditNoteEvents);
       if (value === null) {
         this.creditNoteEvents = [];
       }
@@ -217,7 +211,7 @@ export default {
       }
       this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
         if (event.endDate > value) return true;
-        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e !== event.eventId);
+        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e.eventId !== event.eventId);
         return false;
       });
     },
@@ -227,14 +221,12 @@ export default {
       }
       this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
         if (event.startDate < value) return true;
-        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e !== event.eventId);
+        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e.eventId !== event.eventId);
         return false;
       });
     },
     'newCreditNote.thirdPartyPayer': function (newValue, oldValue) {
       if (newValue !== oldValue) {
-        // eslint-disable-next-line no-console
-        // console.log(newValue, oldValue, 'tiers-payeur');
         this.newCreditNote.events = [];
       }
     },
@@ -292,7 +284,7 @@ export default {
       return creditNoteEvents.map(cnEvent => ({
         label: `${moment(cnEvent.startDate).format('DD/MM/YYYY HH:mm')} - `
           + `${moment(cnEvent.endDate).format('HH:mm')}`,
-        value: cnEvent.eventId,
+        value: cnEvent,
       }));
     },
     thirdPartyPayerOptions () {
@@ -353,7 +345,7 @@ export default {
         return cnEvent;
       });
     },
-    async getEvents () {
+    async getEvents (truc) {
       try {
         if (this.hasLinkedEvents && this.newCreditNote.customer && this.newCreditNote.startDate &&
           this.newCreditNote.endDate) {
@@ -379,6 +371,13 @@ export default {
             query.thirdPartyPayer = creditNote.thirdPartyPayer._id;
           }
           this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
+          if (truc) {
+            for (let i = 0, l = truc.events.length; i < l; i++) {
+              if (!this.creditNoteEvents.some(event => truc.events[i] === event.eventId)) {
+                this.creditNoteEvents.push(truc.events[i]);
+              }
+            }
+          }
         }
       } catch (e) {
         this.creditNoteEvents = [];
@@ -387,11 +386,10 @@ export default {
       }
     },
     // Compute
-    computePrices (eventIds) {
+    computePrices (selectedEvents) {
       let exclTaxesCustomer = 0; let inclTaxesCustomer = 0;
       let exclTaxesTpp = 0; let inclTaxesTpp = 0;
       if (this.creditNoteEvents) {
-        const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
         for (let i = 0, l = selectedEvents.length; i < l; i++) {
           if (selectedEvents[i].bills.exclTaxesCustomer) {
             exclTaxesCustomer += selectedEvents[i].bills.exclTaxesCustomer;
@@ -528,13 +526,7 @@ export default {
 
       this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
       if (this.hasLinkedEvents) {
-        await this.getEvents();
-        for (let i = 0, l = creditNote.events.length; i < l; i++) {
-          if (!this.creditNoteEvents.some(event => creditNote.events[i].eventId === event.eventId)) {
-            this.creditNoteEvents.push(creditNote.events[i]);
-          }
-        }
-        this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
+        await this.getEvents(creditNote);
       } else {
         this.editedCreditNote.subscription = creditNote.subscription._id;
       }
@@ -593,8 +585,9 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
     fieldHasBeenUpdated (newValue, oldValue) {
-      if (!newValue || !oldValue || newValue.every((value, i) => value === oldValue[i]) ||
-        newValue.length !== oldValue.length) return false;
+      if ((!newValue && !oldValue) ||
+        ((oldValue && newValue) && newValue.length === oldValue.length &&
+        newValue.every((value, i) => value === oldValue[i]))) return false;
       return true;
     },
   },
