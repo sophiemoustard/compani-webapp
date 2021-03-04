@@ -3,28 +3,27 @@
     <template slot="title">
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
-    <ni-select in-modal caption="Bénéficiaire" :value="newCreditNote.customer" :options="customersOptions"
-      required-field @input="updateAndGetEvents($event, 'customer')" @blur="validations.customer.$touch"
-      :error="validations.customer.$error" use-input clearable />
-    <ni-select in-modal caption="Tiers payeur" :value="newCreditNote.thirdPartyPayer"
-      :options="thirdPartyPayerOptions" @input="updateAndGetEvents($event, 'thirdPartyPayer')"
-      :disable="thirdPartyPayerOptions.length === 0" clearable />
-    <ni-date-input caption="Date de l'avoir" :value="newCreditNote.date" :error="validations.date.$error"
-      @blur="validations.date.$touch" in-modal required-field @input="update($event, 'date')" />
+    <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
+      required-field @input="getEvents" @blur="validations.customer.$touch" :error="validations.customer.$error"
+      use-input clearable />
+    <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer"
+      :options="thirdPartyPayerOptions" @input="getEvents" :disable="thirdPartyPayerOptions.length === 0" clearable />
+    <ni-date-input caption="Date de l'avoir" :v-model="newCreditNote.date" :error="validations.date.$error"
+      @blur="validations.date.$touch" in-modal required-field />
     <div class="row q-mb-md light">
       <q-toggle :value="hasLinkedEvents" @input="updateHasLinkedEvents" label="Lié à des interventions ?" />
     </div>
     <!-- Has linked events -->
     <template v-if="hasLinkedEvents">
-      <ni-date-input caption="Début période concernée" :value="newCreditNote.startDate"
+      <ni-date-input caption="Début période concernée" v-model="newCreditNote.startDate"
         :error="validations.startDate.$error" @blur="validations.startDate.$touch" in-modal
-        :disable="!hasLinkedEvents" required-field @input="updateAndGetEvents($event, 'startDate')" />
-      <ni-date-input caption="Fin période concernée" :value="newCreditNote.endDate"
+        :disable="!hasLinkedEvents" required-field @input="getEvents" />
+      <ni-date-input caption="Fin période concernée" :v-model="newCreditNote.endDate"
         :error="validations.endDate.$error" @blur="validations.endDate.$touch" in-modal
-        :disable="!hasLinkedEvents" @input="updateAndGetEvents($event, 'endDate')" required-field />
+        :disable="!hasLinkedEvents" @input="getEvents" required-field />
       <template v-if="creditNoteEvents.length > 0">
-        <ni-option-group :value="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
-          type="checkbox" required-field inline :error="validations.events.$error" @input="update($event, 'events')" />
+        <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
+          type="checkbox" required-field inline :error="validations.events.$error" />
       </template>
       <div v-if="newCreditNoteHasNoEvents" class="light warning">
         <p>Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données</p>
@@ -51,17 +50,14 @@
     <!-- Hasn't linked event -->
     <template v-else>
       <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions"
-        :value="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field
-        :error="validations.subscription.$error" @blur="validations.subscription.$touch"
-        @input="update($event, 'subscription')" />
+        v-model="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field
+        :error="validations.subscription.$error" @blur="validations.subscription.$touch" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
-        :value="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
-        @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError"
-        @input="update($event, 'inclTaxesCustomer')" />
+        v-model="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
+        @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError" />
       <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
-        :value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
-        @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError"
-        @input="update($event, 'inclTaxesTpp')" />
+        v-model="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
+        @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" />
     </template>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"
@@ -125,13 +121,6 @@ export default {
     },
     updateHasLinkedEvents (value) {
       this.$emit('update-has-linked-events', value);
-    },
-    update (event, prop) {
-      this.$emit('update:newCreditNote', { ...this.newCreditNote, [prop]: event });
-    },
-    async updateAndGetEvents (event, prop) {
-      await this.update(event, prop);
-      await this.getEvents();
     },
   },
 };

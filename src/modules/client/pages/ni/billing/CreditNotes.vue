@@ -27,7 +27,7 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
-      :new-credit-note.sync="newCreditNote" :validations="$v.newCreditNote" :customers-options="customersOptions"
+      :new-credit-note="newCreditNote" :validations="$v.newCreditNote" :customers-options="customersOptions"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" :loading="loading"
       :third-party-payer-options="thirdPartyPayerOptions" @hide="resetCreationCreditNoteData" @get-events="getEvents"
@@ -35,10 +35,10 @@
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
-      v-model="creditNoteEditionModal" :edited-credit-note.sync="editedCreditNote" :validations="$v.editedCreditNote"
+      v-model="creditNoteEditionModal" :edited-credit-note="editedCreditNote" :validations="$v.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" :loading="loading"
-      @hide="resetEditionCreditNoteData" @get-events="getEvents(editedCreditNote)" />
+      @hide="resetEditionCreditNoteData" @get-events="getEvents" />
   </q-page>
 </template>
 
@@ -165,19 +165,15 @@ export default {
     'newCreditNote.customer': function (value) {
       this.newCreditNote.thirdPartyPayer = null;
     },
-    'newCreditNote.events': function (newValue, oldValue) {
-      if (this.hasLinkedEvents &&
-        (!newValue.every((value, i) => value === oldValue[i]) ||
-        newValue.length !== oldValue.length)) {
-        const prices = this.computePrices(this.newCreditNote.events);
-        this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
-        this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
-        this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
-        this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
-      }
+    'newCreditNote.events': function (value) {
+      const prices = this.computePrices(this.newCreditNote.events);
+      this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
+      this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
+      this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
+      this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
     },
-    'editedCreditNote.events': function (newValue, oldValue) {
-      if (this.hasLinkedEvents && this.fieldHasBeenUpdated(newValue, oldValue)) {
+    'editedCreditNote.events': function (value) {
+      if (this.hasLinkedEvents) {
         const prices = this.computePrices(this.editedCreditNote.events);
         this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
         this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
@@ -189,45 +185,10 @@ export default {
       if (value === null) {
         this.creditNoteEvents = [];
       }
-      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
-        if (event.endDate > value) return true;
-        this.newCreditNote.events = this.newCreditNote.events.filter(e => e !== event.eventId);
-        return false;
-      });
     },
     'newCreditNote.endDate': function (value) {
       if (value === null) {
         this.creditNoteEvents = [];
-      }
-      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
-        if (event.startDate < value) return true;
-        this.newCreditNote.events = this.newCreditNote.events.filter(e => e !== event.eventId);
-        return false;
-      });
-    },
-    'editedCreditNote.startDate': function (value) {
-      if (value === null) {
-        this.creditNoteEvents = [];
-      }
-      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
-        if (event.endDate > value) return true;
-        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e.eventId !== event.eventId);
-        return false;
-      });
-    },
-    'editedCreditNote.endDate': function (value) {
-      if (value === null) {
-        this.creditNoteEvents = [];
-      }
-      this.creditNoteEvents = this.creditNoteEvents.filter((event) => {
-        if (event.startDate < value) return true;
-        this.editedCreditNote.events = this.editedCreditNote.events.filter(e => e.eventId !== event.eventId);
-        return false;
-      });
-    },
-    'newCreditNote.thirdPartyPayer': function (newValue, oldValue) {
-      if (newValue !== oldValue) {
-        this.newCreditNote.events = [];
       }
     },
   },
@@ -284,7 +245,7 @@ export default {
       return creditNoteEvents.map(cnEvent => ({
         label: `${moment(cnEvent.startDate).format('DD/MM/YYYY HH:mm')} - `
           + `${moment(cnEvent.endDate).format('HH:mm')}`,
-        value: cnEvent,
+        value: cnEvent.eventId,
       }));
     },
     thirdPartyPayerOptions () {
@@ -345,7 +306,7 @@ export default {
         return cnEvent;
       });
     },
-    async getEvents (truc) {
+    async getEvents () {
       try {
         if (this.hasLinkedEvents && this.newCreditNote.customer && this.newCreditNote.startDate &&
           this.newCreditNote.endDate) {
@@ -371,13 +332,6 @@ export default {
             query.thirdPartyPayer = creditNote.thirdPartyPayer._id;
           }
           this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
-          if (truc) {
-            for (let i = 0, l = truc.events.length; i < l; i++) {
-              if (!this.creditNoteEvents.some(event => truc.events[i] === event.eventId)) {
-                this.creditNoteEvents.push(truc.events[i]);
-              }
-            }
-          }
         }
       } catch (e) {
         this.creditNoteEvents = [];
@@ -386,10 +340,11 @@ export default {
       }
     },
     // Compute
-    computePrices (selectedEvents) {
+    computePrices (eventIds) {
       let exclTaxesCustomer = 0; let inclTaxesCustomer = 0;
       let exclTaxesTpp = 0; let inclTaxesTpp = 0;
       if (this.creditNoteEvents) {
+        const selectedEvents = this.creditNoteEvents.filter(ev => eventIds.includes(ev.eventId));
         for (let i = 0, l = selectedEvents.length; i < l; i++) {
           if (selectedEvents[i].bills.exclTaxesCustomer) {
             exclTaxesCustomer += selectedEvents[i].bills.exclTaxesCustomer;
@@ -527,6 +482,12 @@ export default {
       this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
       if (this.hasLinkedEvents) {
         await this.getEvents(creditNote);
+        for (let i = 0, l = creditNote.events.length; i < l; i++) {
+          if (!this.creditNoteEvents.some(event => creditNote.events[i].eventId === event.eventId)) {
+            this.creditNoteEvents.push(creditNote.events[i]);
+          }
+        }
+        this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
       } else {
         this.editedCreditNote.subscription = creditNote.subscription._id;
       }
@@ -583,12 +544,6 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteCreditNote(id))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    fieldHasBeenUpdated (newValue, oldValue) {
-      if ((!newValue && !oldValue) ||
-        ((oldValue && newValue) && newValue.length === oldValue.length &&
-        newValue.every((value, i) => value === oldValue[i]))) return false;
-      return true;
     },
   },
 };
