@@ -68,7 +68,6 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import uniqBy from 'lodash/uniqBy';
-import moment from '@helpers/moment';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
@@ -130,10 +129,6 @@ export default {
         { name: 'expand', label: '', field: '_id' },
       ],
       E_LEARNING,
-      dates: {
-        startDate: moment().subtract(30, 'd').startOf('d').toISOString(),
-        endDate: moment().toISOString(),
-      },
     };
   },
   computed: {
