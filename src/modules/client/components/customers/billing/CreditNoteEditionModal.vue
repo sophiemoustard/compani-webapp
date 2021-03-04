@@ -13,8 +13,7 @@
       <template v-if="hasLinkedEvents">
         <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal
           :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
-          :error="validations.startDate.$error"
-          @blur="validations.startDate.$touch" />
+          :error="validations.startDate.$error" @blur="validations.startDate.$touch" />
         <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal
           :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
           :error="validations.endDate.$error" @blur="validations.endDate.$touch" />
