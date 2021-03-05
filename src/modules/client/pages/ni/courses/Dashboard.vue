@@ -60,7 +60,7 @@
       <div class="row">
         <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData(this.traineesByMonth)"
           class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
-        <ni-line-chart title="Nombre total d’activités réalisées par mois"
+        <ni-line-chart title="Nombre total d'activités réalisées par mois"
           :chart-data="chartData(this.activitiesByMonth)" class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
       </div>
     </div>
