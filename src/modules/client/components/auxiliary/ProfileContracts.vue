@@ -23,7 +23,7 @@
       :weekly-hours-error="weeklyHoursError($v.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
       :loading="loading" />
 
-    <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
+    <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
       @hide="resetVersionEditionModal" @submit="editVersion"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />

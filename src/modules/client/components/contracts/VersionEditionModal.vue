@@ -4,12 +4,15 @@
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
     <ni-input in-modal caption="Taux horaire" type="number" suffix="€" required-field
-      v-model="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
-      @blur="validations.grossHourlyRate.$touch" :error-message="grossHourlyRateError" />
-    <ni-date-input caption="Date d'effet" v-model="editedVersion.startDate" :min="minStartDate"
-      in-modal required-field @blur="validations.startDate.$touch" :error="validations.startDate.$error" />
+      :value="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
+      @input="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch"
+      :error-message="grossHourlyRateError" />
+    <ni-date-input caption="Date d'effet" :value="editedVersion.startDate" :min="minStartDate"
+      @input="update($event, 'startDate')" in-modal required-field @blur="validations.startDate.$touch"
+      :error="validations.startDate.$error" />
     <div class="margin-input last">
-      <q-checkbox dense v-model="editedVersion.shouldBeSigned" label="Signature en ligne" />
+      <q-checkbox dense :value="editedVersion.shouldBeSigned" label="Signature en ligne"
+        @input="update($event, 'shouldBeSigned')" />
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
@@ -48,6 +51,9 @@ export default {
     },
     hide () {
       this.$emit('hide');
+    },
+    update (event, prop) {
+      this.$emit('update:editedVersion', { ...this.editedVersion, [prop]: event });
     },
   },
 };
