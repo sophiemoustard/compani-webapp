@@ -109,6 +109,7 @@ import {
   BANK_TRANSFER,
   CHECK,
   CESU,
+  CASH,
   REFUND,
   COACH_ROLES,
   CLIENT_ADMIN,
@@ -282,6 +283,7 @@ export default {
         case BANK_TRANSFER:
         case DIRECT_DEBIT:
         case CHECK:
+        case CASH:
         case CESU:
           if (doc.nature === REFUND) return -doc.netInclTaxes;
           return doc.netInclTaxes;
