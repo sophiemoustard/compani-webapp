@@ -3,14 +3,18 @@
     <template slot="title">
       Terminer un <span class="text-weight-bold">contrat</span>
     </template>
-    <ni-date-input caption="Date de notification" v-model="contractToEnd.endNotificationDate" in-modal
-      required-field @blur="validations.endNotificationDate.$touch" :error="validations.endNotificationDate.$error" />
-    <ni-date-input caption="Date de fin de contrat" v-model="contractToEnd.endDate" :min="contractMinEndDate"
-      in-modal required-field @blur="validations.endDate.$touch" :error="validations.endDate.$error" />
-    <ni-select in-modal caption="Motif" :options="endContractReasons" v-model="contractToEnd.endReason" required-field
-      @blur="validations.endReason.$touch" :error="validations.endReason.$error" @input="resetOtherMisc" />
-    <ni-input in-modal caption="Autres" v-if="contractToEnd.endReason === OTHER" v-model="contractToEnd.otherMisc"
-      required-field @blur="validations.otherMisc.$touch" :error="validations.otherMisc.$error" />
+    <ni-date-input caption="Date de notification" :value="contractToEnd.endNotificationDate" in-modal
+      @input="update($event, 'endNotificationDate')" required-field @blur="validations.endNotificationDate.$touch"
+      :error="validations.endNotificationDate.$error" />
+    <ni-date-input caption="Date de fin de contrat" :value="contractToEnd.endDate" :min="contractMinEndDate"
+      in-modal required-field @blur="validations.endDate.$touch" :error="validations.endDate.$error"
+      @input="update($event, 'endDate')" />
+    <ni-select in-modal caption="Motif" :options="endContractReasons" :value="contractToEnd.endReason" required-field
+      @blur="validations.endReason.$touch" :error="validations.endReason.$error"
+      @input="updateAndResetOtherMisc($event, 'endReason')" />
+    <ni-input in-modal caption="Autres" v-if="contractToEnd.endReason === OTHER" :value="contractToEnd.otherMisc"
+      required-field @blur="validations.otherMisc.$touch" :error="validations.otherMisc.$error"
+      @input="update($event, 'otherMisc')" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Mettre fin au contrat" icon-right="clear" color="primary"
         :loading="loading" @click="submit" />
@@ -61,6 +65,13 @@ export default {
         delete this.contractToEnd.otherMisc;
         this.validations.otherMisc.$reset();
       }
+    },
+    async updateAndResetOtherMisc (event, prop) {
+      await this.update(event, prop);
+      await this.resetOtherMisc();
+    },
+    update (event, prop) {
+      this.$emit('update:contractToEnd', { ...this.contractToEnd, [prop]: event });
     },
   },
 };

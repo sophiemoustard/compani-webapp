@@ -28,9 +28,9 @@
       @hide="resetVersionEditionModal" @submit="editVersion"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
-    <contract-ending-modal v-model="endContractModal" :contract-to-end="contractToEnd" :validations="$v.contractToEnd"
-      @hide="resetEndContractModal" @submit="endExistingContract" :contract-min-end-date="contractMinEndDate"
-      :end-contract-reasons="endContractReasons" :loading="loading" />
+    <contract-ending-modal v-model="endContractModal" :contract-to-end.sync="contractToEnd"
+      :validations="$v.contractToEnd" @hide="resetEndContractModal" @submit="endExistingContract"
+      :contract-min-end-date="contractMinEndDate" :end-contract-reasons="endContractReasons" :loading="loading" />
   </div>
 </template>
 
