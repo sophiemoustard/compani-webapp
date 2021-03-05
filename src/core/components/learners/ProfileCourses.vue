@@ -203,9 +203,8 @@ export default {
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const sixMonthsHistories = this.eLearningActivitiesCompleted
           .filter(activityHistory => new Date(activityHistory.createdAt) > chartStartDate &&
-          new Date(activityHistory.createdAt > chartEndDate));
+          new Date(activityHistory.createdAt) < chartEndDate);
 
-        this.traineesByMonth = this.getDataByMonth(sixMonthsHistories, 'user._id');
         this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
       } catch (e) {
