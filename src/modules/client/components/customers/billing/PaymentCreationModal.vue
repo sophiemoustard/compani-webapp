@@ -4,17 +4,19 @@
       Ajouter un <span class="text-weight-bold">{{ creationModalNature }}</span>
     </template>
     <div class="modal-subtitle">
-      <q-btn-toggle no-wrap v-model="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary" />
+      <q-btn-toggle no-wrap :value="newPayment.nature" :options="paymentNatureOptions" toggle-color="primary"
+        @input="update($event, 'nature')" />
     </div>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
-    <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number"
-      v-model="newPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
-      @blur="validations.netInclTaxes.$touch" :error-message="netInclTaxesError" />
-    <ni-select in-modal :caption="`Type du ${creationModalNature}`" v-model="newPayment.type" :options="paymentOptions"
-      required-field @blur="validations.type.$touch" :error="validations.type.$error" />
-    <ni-date-input v-model="newPayment.date" :caption="`Date du ${creationModalNature}`"
-      :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
+    <ni-input in-modal :caption="`Montant du ${creationModalNature}`" suffix="€" type="number" required-field
+      :value="newPayment.netInclTaxes" @input="update($event, 'netInclTaxes')" :error-message="netInclTaxesError"
+      :error="validations.netInclTaxes.$error" @blur="validations.netInclTaxes.$touch" />
+    <ni-select in-modal :caption="`Type du ${creationModalNature}`" :value="newPayment.type"
+      @input="update($event, 'type')" :options="paymentOptions" required-field @blur="validations.type.$touch"
+      :error="validations.type.$error" />
+    <ni-date-input :value="newPayment.date" @input="update($event, 'date')" :caption="`Date du ${creationModalNature}`"
+      :error="validations.date.$error" @blur="validations.date.$touch" in-modal required-field />
     <template slot="footer">
       <q-btn no-caps class="full-width" :label="creationButtonLabel" icon-right="add" color="primary" :loading="loading"
         @click="submit" />
@@ -80,6 +82,9 @@ export default {
     },
     submit (value) {
       this.$emit('submit', value);
+    },
+    update (event, prop) {
+      this.$emit('update:newPayment', { ...this.newPayment, [prop]: event });
     },
   },
 };
