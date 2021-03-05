@@ -3,17 +3,18 @@
     <template slot="title">
       Créer une <span class="text-weight-bold">version</span>
     </template>
-    <ni-input in-modal caption="Volume horaire hebdomadaire" v-model="newVersion.weeklyHours" type="number"
-      :error="validations.weeklyHours.$error" :error-messsage="weeklyHoursError"
+    <ni-input in-modal caption="Volume horaire hebdomadaire" :value="newVersion.weeklyHours" type="number"
+      :error="validations.weeklyHours.$error" :error-messsage="weeklyHoursError" @input="update($event, 'weeklyHours')"
       @blur="validations.weeklyHours.$touch" suffix="h" required-field />
-    <ni-input in-modal caption="Taux horaire" :error="validations.grossHourlyRate.$error"
-      v-model="newVersion.grossHourlyRate" type="number" suffix="€" required-field
+    <ni-input in-modal caption="Taux horaire" :error="validations.grossHourlyRate.$error" type="number" suffix="€"
+      :value="newVersion.grossHourlyRate" required-field @input="update($event, 'grossHourlyRate')"
       @blur="validations.grossHourlyRate.$touch" :error-messsage="grossHourlyRateError" />
-    <ni-date-input caption="Date d'effet" :error="validations.startDate.$error" v-model="newVersion.startDate"
-      :min="newVersionMinStartDate" in-modal required-field />
+    <ni-date-input caption="Date d'effet" :error="validations.startDate.$error" :value="newVersion.startDate"
+      :min="newVersionMinStartDate" in-modal required-field @input="update($event, 'startDate')" />
     <div class="row margin-input last">
       <div class="col-12">
-        <q-checkbox dense v-model="newVersion.shouldBeSigned" label="Signature en ligne" />
+        <q-checkbox dense :value="newVersion.shouldBeSigned" label="Signature en ligne"
+          @input="update($event, 'shouldBeSigned')" />
       </div>
     </div>
     <template slot="footer">
@@ -53,6 +54,9 @@ export default {
     },
     hide () {
       this.$emit('hide');
+    },
+    update (event, prop) {
+      this.$emit('update:newVersion', { ...this.newVersion, [prop]: event });
     },
   },
 };

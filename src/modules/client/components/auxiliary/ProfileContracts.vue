@@ -19,7 +19,7 @@
       :contract-min-start-date="contractMinStartDate" />
 
     <version-creation-modal v-model="newVersionModal" :gross-hourly-rate-error="grossHourlyRateError($v.newVersion)"
-      :new-version-min-start-date="newVersionMinStartDate" :new-version="newVersion" :validations="$v.newVersion"
+      :new-version-min-start-date="newVersionMinStartDate" :new-version.sync="newVersion" :validations="$v.newVersion"
       :weekly-hours-error="weeklyHoursError($v.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
       :loading="loading" />
 
