@@ -14,7 +14,7 @@
     </div>
 
     <contract-creation-modal v-model="newContractModal" @hide="resetContractCreationModal" @submit="createContract"
-      :new-contract="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
+      :new-contract.sync="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
       :gross-hourly-rate-error="grossHourlyRateError($v.newContract)" :validations="$v.newContract"
       :contract-min-start-date="contractMinStartDate" />
 
