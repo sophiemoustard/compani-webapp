@@ -507,7 +507,9 @@ export default {
         NotifyPositive('Étape retirée.');
       } catch (e) {
         console.error(e);
-        if (e.status === 409) return NotifyWarning('Impossible de retirer l\'étape tant qu\'elle lié à un créneau');
+        if (e.status === 409) {
+          return NotifyWarning('Certains créneaux de formation sont encore rattachés à cette étape.');
+        }
         return NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
     },
