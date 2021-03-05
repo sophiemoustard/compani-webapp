@@ -71,6 +71,7 @@ import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
+import { isBetween } from '@helpers/date';
 import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
@@ -202,8 +203,7 @@ export default {
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const sixMonthsHistories = this.eLearningActivitiesCompleted
-          .filter(activityHistory => new Date(activityHistory.createdAt) > chartStartDate &&
-          new Date(activityHistory.createdAt) < chartEndDate);
+          .filter(ah => isBetween(ah.createdAt, chartStartDate, chartEndDate));
 
         this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
