@@ -3,13 +3,11 @@
     <template slot="title">
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
-    <ni-input in-modal caption="Taux horaire" type="number" suffix="€" required-field
-      :value="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
-      @input="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch"
-      :error-message="grossHourlyRateError" />
-    <ni-date-input caption="Date d'effet" :value="editedVersion.startDate" :min="minStartDate"
-      @input="update($event, 'startDate')" in-modal required-field @blur="validations.startDate.$touch"
-      :error="validations.startDate.$error" />
+    <ni-input in-modal caption="Taux horaire" type="number" :error-message="grossHourlyRateError"
+      :value="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error" suffix="€" required-field
+      @input="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch" />
+    <ni-date-input :value="editedVersion.startDate" :min="minStartDate" :error="validations.startDate.$error" in-modal
+      @input="update($event, 'startDate')" required-field @blur="validations.startDate.$touch" caption="Date d'effet" />
     <div class="margin-input last">
       <q-checkbox dense :value="editedVersion.shouldBeSigned" label="Signature en ligne"
         @input="update($event, 'shouldBeSigned')" />

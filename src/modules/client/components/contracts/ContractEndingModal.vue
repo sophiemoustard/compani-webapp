@@ -66,9 +66,9 @@ export default {
         this.validations.otherMisc.$reset();
       }
     },
-    async updateAndResetOtherMisc (event, prop) {
-      await this.update(event, prop);
-      await this.resetOtherMisc();
+    updateAndResetOtherMisc (event, prop) {
+      this.update(event, prop);
+      this.resetOtherMisc();
     },
     update (event, prop) {
       this.$emit('update:contractToEnd', { ...this.contractToEnd, [prop]: event });
