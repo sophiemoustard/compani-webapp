@@ -11,6 +11,9 @@
           <template v-else-if="col.name === 'expand'">
             <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
           </template>
+          <template v-else-if="col.name === 'isConnected'">
+            <connected-dot v-if="col.value" />
+          </template>
           <template v-else>
             <div class="name" @click.stop="goToLearnerProfile(props.row)">{{ col.value }}</div>
           </template>
@@ -39,12 +42,14 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 import { sortStrings } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
+import ConnectedDot from './ConnectedDot';
 
 export default {
   name: 'TraineeFollowUpTable',
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
+    'connected-dot': ConnectedDot,
   },
   props: {
     learners: { type: Array, default: () => [] },
@@ -63,7 +68,14 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'width: 70%',
+          style: 'width: 40%',
+        },
+        {
+          name: 'isConnected',
+          label: 'Connexion à l\'app ?',
+          field: 'firstMobileConnection',
+          format: value => !!value,
+          align: 'center',
         },
         {
           name: 'progress',
