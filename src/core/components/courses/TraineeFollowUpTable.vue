@@ -75,7 +75,7 @@ export default {
           label: 'Connexion à l\'app ?',
           field: 'firstMobileConnection',
           format: value => !!value,
-          align: 'left',
+          align: 'center',
         },
         {
           name: 'progress',

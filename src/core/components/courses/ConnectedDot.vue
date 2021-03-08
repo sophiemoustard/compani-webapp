@@ -17,9 +17,9 @@ export default {
   display: flex
   flex-direction row
   align-items: center
+  justify-content: center
 
 .connected-text
   font-size: 12px
   color: $green-800
-  margin-left: 8px
 </style>
