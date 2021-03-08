@@ -62,7 +62,7 @@ export default {
     },
     resetOtherMisc () {
       if (this.contractToEnd.endReason !== OTHER && this.contractToEnd.otherMisc) {
-        delete this.contractToEnd.otherMisc;
+        this.update('', 'otherMisc');
         this.validations.otherMisc.$reset();
       }
     },
