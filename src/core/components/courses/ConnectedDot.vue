@@ -1,0 +1,29 @@
+<template>
+  <div v-if="connected" class="dot-container">
+    <q-icon size="12px" name="check_circle" color="green-800" />
+    <span :class="'connected-text'">Connecté</span>
+  </div>
+</template>
+
+<script>
+
+export default {
+  name: 'PublishedDot',
+  props: {
+    connected: { type: Boolean, required: true },
+  },
+};
+</script>
+
+<style lang="stylus" scoped>
+.dot-container
+  display: flex
+  flex-direction row
+  align-items: center
+  margin-left: 8px
+
+.connected-text
+  font-size: 12px
+  color: $green-800
+  margin-left: 8px
+</style>
