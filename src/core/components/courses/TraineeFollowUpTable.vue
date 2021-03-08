@@ -12,7 +12,7 @@
             <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
           </template>
           <template v-else-if="col.name === 'isConnected'">
-            <connected-dot :connected="col.value" />
+            <connected-dot v-if="col.value" />
           </template>
           <template v-else>
             <div class="name" @click.stop="goToLearnerProfile(props.row)">{{ col.value }}</div>
@@ -72,9 +72,9 @@ export default {
         },
         {
           name: 'isConnected',
-          label: 'Connexion à l\'app',
+          label: 'Connexion à l\'app ?',
           field: 'firstMobileConnection',
-          format: value => (!!value),
+          format: value => !!value,
           align: 'left',
         },
         {

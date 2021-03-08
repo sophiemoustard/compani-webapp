@@ -1,5 +1,5 @@
 <template>
-  <div v-if="connected" class="dot-container">
+  <div class="dot-container">
     <q-icon size="12px" name="check_circle" color="green-800" />
     <span :class="'connected-text'">Connecté</span>
   </div>
@@ -9,9 +9,6 @@
 
 export default {
   name: 'PublishedDot',
-  props: {
-    connected: { type: Boolean, required: true },
-  },
 };
 </script>
 
@@ -20,7 +17,6 @@ export default {
   display: flex
   flex-direction row
   align-items: center
-  margin-left: 8px
 
 .connected-text
   font-size: 12px
