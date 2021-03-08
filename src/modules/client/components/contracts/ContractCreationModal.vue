@@ -3,17 +3,18 @@
     <template slot="title">
       Créer un <span class="text-weight-bold">nouveau contrat</span>
     </template>
-    <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" v-model="newContract.weeklyHours"
-      :error="validations.weeklyHours.$error" :error-messsage="weeklyHoursError"
+    <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" :value="newContract.weeklyHours"
+      :error="validations.weeklyHours.$error" :error-messsage="weeklyHoursError" @input="update($event, 'weeklyHours')"
       @blur="validations.weeklyHours.$touch" suffix="h" required-field />
     <ni-input in-modal caption="Taux horaire" :error="validations.grossHourlyRate.$error" type="number"
-      v-model="newContract.grossHourlyRate" @blur="validations.grossHourlyRate.$touch" suffix="€" required-field
-      :error-messsage="grossHourlyRateError" />
+      :value="newContract.grossHourlyRate" @blur="validations.grossHourlyRate.$touch" suffix="€" required-field
+      :error-messsage="grossHourlyRateError" @input="update($event, 'grossHourlyRate')" />
     <ni-date-input caption="Date d'effet" :error="validations.startDate.$error" :min="contractMinStartDate"
-      v-model="newContract.startDate" in-modal required-field />
+      :value="newContract.startDate" in-modal required-field @input="update($event, 'startDate')" />
     <div class="row margin-input last">
       <div class="col-12">
-        <q-checkbox dense v-model="newContract.shouldBeSigned" label="Signature en ligne" />
+        <q-checkbox dense :value="newContract.shouldBeSigned" label="Signature en ligne"
+          @input="update($event, 'shouldBeSigned')" />
       </div>
     </div>
     <template slot="footer">
@@ -53,6 +54,9 @@ export default {
     },
     hide () {
       this.$emit('hide');
+    },
+    update (event, prop) {
+      this.$emit('update:newContract', { ...this.newContract, [prop]: event });
     },
   },
 };

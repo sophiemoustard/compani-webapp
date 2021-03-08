@@ -14,23 +14,23 @@
     </div>
 
     <contract-creation-modal v-model="newContractModal" @hide="resetContractCreationModal" @submit="createContract"
-      :new-contract="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
+      :new-contract.sync="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
       :gross-hourly-rate-error="grossHourlyRateError($v.newContract)" :validations="$v.newContract"
       :contract-min-start-date="contractMinStartDate" />
 
     <version-creation-modal v-model="newVersionModal" :gross-hourly-rate-error="grossHourlyRateError($v.newVersion)"
-      :new-version-min-start-date="newVersionMinStartDate" :new-version="newVersion" :validations="$v.newVersion"
+      :new-version-min-start-date="newVersionMinStartDate" :new-version.sync="newVersion" :validations="$v.newVersion"
       :weekly-hours-error="weeklyHoursError($v.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
       :loading="loading" />
 
-    <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
+    <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
       @hide="resetVersionEditionModal" @submit="editVersion"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
-    <contract-ending-modal v-model="endContractModal" :contract-to-end="contractToEnd" :validations="$v.contractToEnd"
-      @hide="resetEndContractModal" @submit="endExistingContract" :contract-min-end-date="contractMinEndDate"
-      :end-contract-reasons="endContractReasons" :loading="loading" />
+    <contract-ending-modal v-model="endContractModal" :contract-to-end.sync="contractToEnd"
+      :validations="$v.contractToEnd" @hide="resetEndContractModal" @submit="endExistingContract"
+      :contract-min-end-date="contractMinEndDate" :end-contract-reasons="endContractReasons" :loading="loading" />
   </div>
 </template>
 
