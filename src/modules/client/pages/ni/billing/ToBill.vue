@@ -24,8 +24,8 @@
       <template #body="{ props }">
         <ni-to-bill-row v-for="(bill, index) in props.row.customerBills.bills" :key="bill._id" :props="props"
           @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
-          @discount-input="computeTotalAmount(props.row.customerBills)" :index="index" :bill.sync="bills[index]"
-          display-checkbox data-cy="bill-row" />
+          @discount-input="computeTotalAmount(props.row.customerBills)" :index="index"
+          :bill.sync="props.row.customerBills.bills[index]" display-checkbox data-cy="bill-row" />
         <q-tr v-if="props.row.customerBills.bills.length > 1" :props="props">
           <q-td colspan="10">
             <div class="text-right">Total :</div>
@@ -35,9 +35,9 @@
         </q-tr>
         <template v-if="props.row.thirdPartyPayerBills">
           <template v-for="tpp in props.row.thirdPartyPayerBills">
-            <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" :bill.sync="bills[index]"
+            <ni-to-bill-row v-for="(bill, index) in tpp.bills" :key="bill._id" :props="props" data-cy="bill-row"
               @discount-click="discountEdit($event, bill)" @datetime-input="refreshBill(props.row, bill)"
-              @discount-input="computeTotalAmount(tpp)" display-checkbox :index="index" data-cy="bill-row" />
+              @discount-input="computeTotalAmount(tpp)" display-checkbox :index="index" :bill.sync="tpp.bills[index]" />
           </template>
         </template>
       </template>
