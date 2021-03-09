@@ -3,8 +3,8 @@
       <template slot="title">
         Créer une <span class="text-weight-bold">heure interne</span>
       </template>
-      <ni-input in-modal caption="Nom" v-model="newInternalHour.name" :error="validations.name.$error"
-        @blur="validations.name.$touch" required-field />
+      <ni-input in-modal caption="Nom" :value="newInternalHour.name" :error="validations.name.$error"
+        @blur="validations.name.$touch" required-field @input="update($event, 'name')" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Créer l'heure interne" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
@@ -37,6 +37,9 @@ export default {
     },
     submit () {
       this.$emit('submit');
+    },
+    update (event, prop) {
+      this.$emit('update:newInternalHour', { ...this.newInternalHour, [prop]: event });
     },
   },
 };

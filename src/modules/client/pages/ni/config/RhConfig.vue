@@ -147,7 +147,7 @@
     </div>
 
     <internal-hour-creation-modal v-model="internalHourCreationModal" :validations="$v.newInternalHour"
-      :new-internal-hour="newInternalHour" @hide="resetInternalHourCreationModal" @submit="createInternalHour"
+      :new-internal-hour.sync="newInternalHour" @hide="resetInternalHourCreationModal" @submit="createInternalHour"
       :loading="loading" />
 
     <administrative-document-creation-modal v-model="administrativeDocumentCreationModal" :loading="loading"
