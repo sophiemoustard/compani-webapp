@@ -3,7 +3,7 @@
     <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-cy="`col-${col.name}`"
       :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
       <template v-if="index === 0 && col.name === 'externalBilling' && bill.thirdPartyPayer">
-        <q-checkbox v-model="bill.externalBilling" color="grey" dense />
+        <q-checkbox :value="bill.externalBilling" color="grey" dense @input="update($event, 'externalBilling')" />
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">
@@ -19,8 +19,8 @@
         <div class="cursor-pointer text-primary">
           {{ formatDate(bill.startDate) }}
           <q-menu>
-            <q-date v-model="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal
-              @input="$emit('datetime-input')" />
+            <q-date :value="bill.startDate" :max="bill.endDate" mask="YYYY-MM-DD" minimal
+              @input="updateDate($event, 'startDate')" />
           </q-menu>
         </div>
       </template>
@@ -97,6 +97,13 @@ export default {
     },
     disableDiscountEditing (bill) {
       bill.discountEdition = false;
+    },
+    update (event, prop) {
+      this.$emit('update:bill', { ...this.bill, [prop]: event });
+    },
+    updateDate (event, prop) {
+      this.update(event, prop);
+      this.$emit('datetime-input');
     },
   },
 };
