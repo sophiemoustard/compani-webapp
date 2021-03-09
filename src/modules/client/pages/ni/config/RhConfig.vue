@@ -151,7 +151,7 @@
       :loading="loading" />
 
     <administrative-document-creation-modal v-model="administrativeDocumentCreationModal" :loading="loading"
-      :new-administrative-document="newAdministrativeDocument" @submit="createNewAdministrativeDocument"
+      :new-administrative-document.sync="newAdministrativeDocument" @submit="createNewAdministrativeDocument"
       :validations="$v.newAdministrativeDocument" @hide="resetAdministrativeDocumentModal" />
 
     <sector-creation-modal v-model="sectorCreationModal" :loading="loading" @hide="resetCreationSectorData"
