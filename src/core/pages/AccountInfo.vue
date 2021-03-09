@@ -47,10 +47,9 @@
       </div>
     </div>
 
-    <new-password-modal :validations="$v" v-model="newPasswordModal" :user-profile="userProfile"
-      @submit="submitPasswordChange" @hide="resetForm" :loading="loading" :new-password.sync="newPassword"
-      :password-error="passwordError($v.newPassword.password)"
-      :password-confirm-error="passwordConfirmError($v.newPassword.passwordConfirm)" />
+    <new-password-modal :password-confirm-error="passwordConfirmError($v.newPassword.confirm)" :validations="$v"
+      v-model="newPasswordModal" :user-profile="userProfile" @hide="resetForm" :new-password.sync="newPassword"
+      :password-error="passwordError($v.newPassword.password)" @submit="submitPasswordChange" :loading="loading" />
 
     <!-- RGPD modal -->
     <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
@@ -97,7 +96,7 @@ export default {
       tmpInput: '',
       emailLock: true,
       newPasswordModal: false,
-      newPassword: { password: '', passwordConfirm: '' },
+      newPassword: { password: '', confirm: '' },
       loading: false,
       rgpd,
       rgpdModal: false,
@@ -123,7 +122,7 @@ export default {
       },
       newPassword: {
         password: { required, ...this.passwordValidation },
-        passwordConfirm: {
+        confirm: {
           required: requiredIf(() => this.newPassword.password),
           sameAsPassword: sameAs(() => this.newPassword.password),
         },
@@ -159,14 +158,10 @@ export default {
       try {
         this.loading = true;
 
-        this.$v.newPassword.password.$touch();
-        this.$v.newPassword.passwordConfirm.$touch();
-        if (this.$v.newPassword.password.$error || this.$v.newPassword.passwordConfirm.$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        this.$v.newPassword.$touch();
+        if (this.$v.newPassword.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const value = get(this.newPassword, 'password');
-        const payload = set({}, 'local.password', value);
+        const payload = set({}, 'local.password', get(this.newPassword, 'password'));
         await Authentication.updatePassword(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée.');
@@ -179,7 +174,7 @@ export default {
       }
     },
     resetForm () {
-      this.newPassword = { password: '', passwordConfirm: '' };
+      this.newPassword = { password: '', confirm: '' };
       this.$v.newPassword.$reset();
     },
     logout () {

@@ -6,9 +6,9 @@
       <ni-input in-modal :value="newPassword.password" type="password" caption="Nouveau mot de passe"
         :error-message="passwordError" required-field @blur="validations.newPassword.password.$touch"
         :error="validations.newPassword.password.$error" @input="update($event, 'password')" />
-      <ni-input in-modal :value="newPassword.passwordConfirm" :error="validations.newPassword.passwordConfirm.$error"
+      <ni-input in-modal :value="newPassword.confirm" :error="validations.newPassword.confirm.$error"
         type="password" caption="Confirmation mot de passe" :error-message="passwordConfirmError" required-field
-        @blur="validations.newPassword.passwordConfirm.$touch" @input="update($event, 'passwordConfirm')" />
+        @blur="validations.newPassword.confirm.$touch" @input="update($event, 'confirm')" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
           icon-right="done" @click="submit" />
