@@ -40,6 +40,9 @@ export const defineAbilitiesFor = (user) => {
       can('edit', 'Events', { auxiliaryId: { $eq: _id } });
       can('edit', 'Events', { sectorId: { $eq: sector } });
     }
+
+    if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole) ||
+      [CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('read', 'learner_info');
   }
   return new Ability(rules);
 };
