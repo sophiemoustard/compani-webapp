@@ -47,9 +47,10 @@
       </div>
     </div>
 
-    <new-password-modal :validations="$v" v-model="newPasswordModal" :user-profile="userProfile"
-      @submit="submitPasswordChange" @hide="resetForm" :loading="loading" :password-confirm.sync="passwordConfirm"
-      :password-error="passwordError($v.userProfile.local.password)" :password-confirm-error="passwordConfirmError" />
+    <new-password-modal :confirm-error-message="passwordConfirmError($v.newPassword.confirm)" :validations="$v"
+      v-model="newPasswordModal" :user-profile="userProfile" @hide="resetForm" :new-password.sync="newPassword"
+      :password-error-message="passwordError($v.newPassword.password)" @submit="submitPasswordChange"
+      :loading="loading" />
 
     <!-- RGPD modal -->
     <ni-html-modal title="Politique RGPD" v-model="rgpdModal" :html="rgpd" />
@@ -96,7 +97,7 @@ export default {
       tmpInput: '',
       emailLock: true,
       newPasswordModal: false,
-      passwordConfirm: '',
+      newPassword: { password: '', confirm: '' },
       loading: false,
       rgpd,
       rgpdModal: false,
@@ -115,15 +116,17 @@ export default {
         },
         local: {
           email: { required, email },
-          password: { required, ...this.passwordValidation },
         },
         contact: {
           phone: { frPhoneNumber },
         },
       },
-      passwordConfirm: {
-        required: requiredIf(item => !!item.userProfile.local.password),
-        sameAsPassword: sameAs(item => item.userProfile.local.password),
+      newPassword: {
+        password: { required, ...this.passwordValidation },
+        confirm: {
+          required: requiredIf(() => this.newPassword.password),
+          sameAsPassword: sameAs(() => this.newPassword.password),
+        },
       },
     };
   },
@@ -156,14 +159,10 @@ export default {
       try {
         this.loading = true;
 
-        this.$v.userProfile.local.password.$touch();
-        this.$v.passwordConfirm.$touch();
-        if (this.$v.userProfile.local.password.$error || this.$v.passwordConfirm.$error) {
-          return NotifyWarning('Champ(s) invalide(s)');
-        }
+        this.$v.newPassword.$touch();
+        if (this.$v.newPassword.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const value = get(this.userProfile, 'local.password');
-        const payload = set({}, 'local.password', value);
+        const payload = set({}, 'local.password', get(this.newPassword, 'password'));
         await Authentication.updatePassword(this.userProfile._id, payload);
 
         NotifyPositive('Modification enregistrée.');
@@ -176,10 +175,8 @@ export default {
       }
     },
     resetForm () {
-      this.userProfile.local.password = '';
-      this.passwordConfirm = '';
-      this.$v.userProfile.local.password.$reset();
-      this.$v.passwordConfirm.$reset();
+      this.newPassword = { password: '', confirm: '' };
+      this.$v.newPassword.$reset();
     },
     logout () {
       this.isLoggingOut = true;

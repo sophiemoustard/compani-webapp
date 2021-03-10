@@ -3,12 +3,12 @@
     <template slot="title">
         Modifier mon <span class="text-weight-bold">mot de passe</span>
       </template>
-      <ni-input in-modal v-model.trim="userProfile.local.password" type="password" caption="Nouveau mot de passe"
-        :error-message="passwordError" required-field @blur="validations.userProfile.local.password.$touch"
-        :error="validations.userProfile.local.password.$error" />
-      <ni-input in-modal :value="passwordConfirm" :error="validations.passwordConfirm.$error"
-        type="password" caption="Confirmation mot de passe" :error-message="passwordConfirmError"
-        @blur="validations.passwordConfirm.$touch" required-field @input="update" />
+      <ni-input in-modal :value="newPassword.password" type="password" caption="Nouveau mot de passe"
+        :error-message="passwordErrorMessage" required-field @blur="validations.newPassword.password.$touch"
+        :error="validations.newPassword.password.$error" @input="update($event, 'password')" />
+      <ni-input in-modal :value="newPassword.confirm" :error="validations.newPassword.confirm.$error"
+        type="password" caption="Confirmation mot de passe" :error-message="confirmErrorMessage" required-field
+        @blur="validations.newPassword.confirm.$touch" @input="update($event, 'confirm')" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Modifier" color="primary" :loading="loading"
           icon-right="done" @click="submit" />
@@ -25,9 +25,9 @@ export default {
   props: {
     validations: { type: Object, default: () => ({}) },
     userProfile: { type: Object, default: () => ({}) },
-    passwordError: { type: String, default: '' },
-    passwordConfirm: { type: String, default: '' },
-    passwordConfirmError: { type: String, default: '' },
+    passwordErrorMessage: { type: String, default: '' },
+    newPassword: { type: Object, default: () => ({}) },
+    confirmErrorMessage: { type: String, default: '' },
     value: { type: Boolean, default: false },
     loading: { type: Boolean, default: false },
   },
@@ -45,8 +45,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    update (event) {
-      this.$emit('update:password-confirm', event.trim());
+    update (event, prop) {
+      this.$emit('update:newPassword', { ...this.newPassword, [prop]: event.trim() });
     },
   },
 };
