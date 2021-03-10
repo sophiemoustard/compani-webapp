@@ -54,7 +54,7 @@ export default {
     columns: { type: Array, default: () => [] },
     pagination: { type: Object, default: () => ({ page: 1, rowsPerPage: 15 }) },
     loading: { type: Boolean, default: false },
-    rowKey: { type: String, default: 'name' },
+    rowKey: { type: [String, Function], default: 'name' },
     visibleColumns: { type: Array, default: () => [] },
     selection: { type: String, default: 'none' },
     selected: { type: Array, default: () => [] },
