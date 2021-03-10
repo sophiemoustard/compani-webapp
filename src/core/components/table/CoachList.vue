@@ -146,7 +146,7 @@ export default {
     canSetUserCompany () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company']));
 
-      return ability.can('set', 'user_company');
+      return ability.can('update', 'user_company');
     },
   },
   methods: {
