@@ -135,7 +135,8 @@ export const contractMixin = {
         console.error(e);
         if (e.status === 422) {
           this.$v.editedVersion.$reset();
-          return NotifyNegative('La date de début du contrat doit etre antérieure aux évènements de l\'auxiliaire.');
+          return NotifyNegative('Impossible de modifier ce contrat : il est en conflit avec les évènements ou '
+            + 'autres contrats de l\'auxiliaire');
         }
         NotifyNegative('Erreur lors de la modification du contrat.');
       } finally {
