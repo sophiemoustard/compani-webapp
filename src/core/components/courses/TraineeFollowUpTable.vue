@@ -15,7 +15,10 @@
             <connected-dot v-if="col.value" />
           </template>
           <template v-else>
-            <div class="name" @click.stop="goToLearnerProfile(props.row)">{{ col.value }}</div>
+            <div :class="['name', canReadLearnerInfo && 'cliquable-name']"
+              @click="goToLearnerProfile(props.row, $event)">
+              {{ col.value }}
+            </div>
           </template>
         </q-td>
       </template>
@@ -38,10 +41,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import pick from 'lodash/pick';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 import { sortStrings } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
+import { defineAbilitiesFor } from '@helpers/ability';
 import ConnectedDot from './ConnectedDot';
 
 export default {
@@ -92,8 +98,19 @@ export default {
       isClientInterface,
     };
   },
+  computed: {
+    ...mapState('main', ['loggedUser']),
+    canReadLearnerInfo () {
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+
+      return ability.can('read', 'learner_info');
+    },
+  },
   methods: {
-    goToLearnerProfile (row) {
+    goToLearnerProfile (row, $event) {
+      if (!this.canReadLearnerInfo) return;
+
+      $event.stopPropagation();
       const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
       this.$router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
     },
@@ -106,6 +123,7 @@ export default {
     width: 100%
   .name
     width: fit-content;
+  .cliquable-name
     text-decoration: underline
     color: $primary
 </style>

@@ -55,7 +55,6 @@
 <script>
 import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import moment from '@helpers/moment';
 import AttendanceSheets from '@api/AttendanceSheets';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
@@ -64,6 +63,7 @@ import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
+import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 

@@ -32,13 +32,16 @@ export const defineAbilitiesFor = (user) => {
   if (!clientRole && !vendorRole) can('read', 'account client');
   if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
 
+  if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole) ||
+      [CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('read', 'learner_info');
+
   if (companySubscriptions.includes(ERP)) {
     if (clientRole === CLIENT_ADMIN) can('update', 'erp_config');
 
-    if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('edit', 'Events');
+    if ([CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('update', 'Events');
     if (clientRole === AUXILIARY) {
-      can('edit', 'Events', { auxiliaryId: { $eq: _id } });
-      can('edit', 'Events', { sectorId: { $eq: sector } });
+      can('update', 'Events', { auxiliaryId: { $eq: _id } });
+      can('update', 'Events', { sectorId: { $eq: sector } });
     }
   }
   return new Ability(rules);
