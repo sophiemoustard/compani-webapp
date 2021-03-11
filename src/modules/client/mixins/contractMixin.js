@@ -135,8 +135,8 @@ export const contractMixin = {
         console.error(e);
         if (e.status === 422) {
           this.$v.editedVersion.$reset();
-          return NotifyNegative('Impossible de modifier ce contrat : il est en conflit avec les évènements ou '
-            + 'autres contrats de l\'auxiliaire');
+          return NotifyNegative(`Impossible de modifier ce contrat : il est en conflit avec les évènements ou autres
+            contrats de l'auxiliaire`);
         }
         NotifyNegative('Erreur lors de la modification du contrat.');
       } finally {
@@ -153,8 +153,8 @@ export const contractMixin = {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant '
-          + 'prenant effet ce mois-ci. <br /><br />Confirmez-vous ce changement ?',
+        message: `Ce changement impacte une paie déjà effectuée. Vérifiez que vous ne pouvez pas créer un avenant
+          prenant effet ce mois-ci. <br /><br />Confirmez-vous ce changement ?`,
         html: true,
         ok: true,
         cancel: 'Annuler',
