@@ -8,7 +8,7 @@
       @input="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch" />
     <ni-date-input :value="editedVersion.startDate" :min="minStartDate" :error="validations.startDate.$error" in-modal
       @input="update($event, 'startDate')" required-field @blur="validations.startDate.$touch" caption="Date d'effet"
-      :error-message="startDateError" />
+      :error-message="startDateError" :class="[!validations.startDate.minDate && $q.platform.is.mobile && 'q-mb-sm']" />
     <div class="margin-input last">
       <q-checkbox dense :value="editedVersion.shouldBeSigned" label="Signature en ligne"
         @input="update($event, 'shouldBeSigned')" />

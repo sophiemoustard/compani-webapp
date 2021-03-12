@@ -79,13 +79,13 @@ export const contractMixin = {
     grossHourlyRateError (validationObj) {
       if (get(validationObj, 'grossHourlyRate.required', null) === false) return REQUIRED_LABEL;
       if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
+
       return '';
     },
     weeklyHoursError (validationObj) {
       if (get(validationObj, 'weeklyHours.required', null) === false) return REQUIRED_LABEL;
-      if (get(validationObj, 'weeklyHours.minValue', null) === false) {
-        return 'Volume horaire hebdomadaire non valide';
-      }
+      if (get(validationObj, 'weeklyHours.minValue', null) === false) return 'Volume horaire hebdomadaire non valide';
+
       return '';
     },
     resetVersionEditionModal () {
