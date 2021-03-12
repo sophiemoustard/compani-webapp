@@ -2,7 +2,7 @@
   <div>
     <p class="text-weight-bold">Progression des participants</p>
     <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
-      :loading="loading">
+      :loading="loading" :visible-columns="visibleColumns">
       <template #row="{ props }">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template v-if="col.name === 'progress'">
@@ -83,7 +83,6 @@ export default {
           field: 'firstMobileConnection',
           format: value => !!value,
           align: 'center',
-          style: this.isConnectedColumnVisible ? '' : 'display: none',
         },
         {
           name: 'progress',
@@ -106,6 +105,11 @@ export default {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
       return ability.can('read', 'learner_info');
+    },
+    visibleColumns () {
+      return this.isConnectedColumnVisible
+        ? ['name', 'isConnected', 'progress', 'expand']
+        : ['name', 'progress', 'expand'];
     },
   },
   methods: {
