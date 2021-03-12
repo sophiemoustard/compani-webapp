@@ -60,7 +60,7 @@ export default {
   props: {
     learners: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
-    isConnectedColumnVisible: { type: Boolean, default: false },
+    isBlended: { type: Boolean, default: false },
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
@@ -75,7 +75,7 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: this.isConnectedColumnVisible ? 'width: 40%' : 'width: 70%',
+          style: this.isBlended ? 'width: 40%' : 'width: 70%',
         },
         {
           name: 'isConnected',
@@ -107,7 +107,7 @@ export default {
       return ability.can('read', 'learner_info');
     },
     visibleColumns () {
-      return this.isConnectedColumnVisible
+      return this.isBlended
         ? ['name', 'isConnected', 'progress', 'expand']
         : ['name', 'progress', 'expand'];
     },

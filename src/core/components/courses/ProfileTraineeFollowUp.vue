@@ -27,7 +27,7 @@
       </div>
     </div>
     <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md"
-      :is-connected-column-visible="true" />
+      :is-blended="true" />
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaire-container">
