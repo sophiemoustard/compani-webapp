@@ -29,7 +29,8 @@
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
+        <ni-expanding-table :data="courses" :columns="columns" :loading="loading"
+          :visible-columns="columns.map(c => c.name)">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'progress'">

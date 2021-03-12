@@ -2,7 +2,7 @@
   <div>
     <p class="text-weight-bold">Progression des participants</p>
     <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
-      :loading="loading">
+      :loading="loading" :visible-columns="visibleColumns">
       <template #row="{ props }">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template v-if="col.name === 'progress'">
@@ -60,6 +60,7 @@ export default {
   props: {
     learners: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
+    isBlended: { type: Boolean, default: false },
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
@@ -74,7 +75,7 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'width: 40%',
+          style: this.isBlended ? 'width: 40%' : 'width: 70%',
         },
         {
           name: 'isConnected',
@@ -104,6 +105,11 @@ export default {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
       return ability.can('read', 'learner_info');
+    },
+    visibleColumns () {
+      return this.isBlended
+        ? ['name', 'isConnected', 'progress', 'expand']
+        : ['name', 'progress', 'expand'];
     },
   },
   methods: {

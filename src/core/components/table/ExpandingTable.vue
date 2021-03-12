@@ -1,7 +1,7 @@
 <template>
   <q-card class="relative-position table-spinner-container" flat>
     <q-table v-if="!loading" :data="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
-      :hide-bottom="hideBottom">
+      :hide-bottom="hideBottom" :visible-columns="visibleColumns">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props"> {{ col.label }} </q-th>
@@ -33,6 +33,7 @@ export default {
     pagination: { type: Object, default: () => ({ rowsPerPage: 0 }) },
     rowKey: { type: String, default: '_id' },
     hideBottom: { type: Boolean, default: true },
+    visibleColumns: { type: Array, default: () => [] },
   },
 };
 </script>
