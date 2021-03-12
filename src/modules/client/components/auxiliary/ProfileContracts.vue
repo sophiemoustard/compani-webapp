@@ -25,7 +25,7 @@
 
     <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @submit="editVersion"
+      @hide="resetVersionEditionModal" @submit="editVersion" :start-date-error="startDateError"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
     <contract-ending-modal v-model="endContractModal" :contract-to-end.sync="contractToEnd"

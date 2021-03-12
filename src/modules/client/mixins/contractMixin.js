@@ -67,6 +67,13 @@ export const contractMixin = {
 
       return !!get(this.selectedVersion, 'signature.eversignId') !== this.editedVersion.shouldBeSigned;
     },
+    startDateError () {
+      if (get(this.$v.editedVersion, 'startDate.required', null) === false) return REQUIRED_LABEL;
+      if (get(this.$v.editedVersion, 'startDate.minDate', null) === false) {
+        return 'La date d\'effet doit être postérieure à la date de début de la version précédente.';
+      }
+      return '';
+    },
   },
   methods: {
     grossHourlyRateError (validationObj) {

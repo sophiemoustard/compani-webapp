@@ -7,7 +7,8 @@
       :value="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error" suffix="€" required-field
       @input="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch" />
     <ni-date-input :value="editedVersion.startDate" :min="minStartDate" :error="validations.startDate.$error" in-modal
-      @input="update($event, 'startDate')" required-field @blur="validations.startDate.$touch" caption="Date d'effet" />
+      @input="update($event, 'startDate')" required-field @blur="validations.startDate.$touch" caption="Date d'effet"
+      :error-message="startDateError" />
     <div class="margin-input last">
       <q-checkbox dense :value="editedVersion.shouldBeSigned" label="Signature en ligne"
         @input="update($event, 'shouldBeSigned')" />
@@ -34,6 +35,7 @@ export default {
     versionTemplate: { type: String, default: '' },
     loading: { type: Boolean, default: false },
     grossHourlyRateError: { type: String, default: '' },
+    startDateError: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
