@@ -21,11 +21,11 @@
     <version-creation-modal v-model="newVersionModal" :gross-hourly-rate-error="grossHourlyRateError($v.newVersion)"
       :new-version-min-start-date="newVersionMinStartDate" :new-version.sync="newVersion" :validations="$v.newVersion"
       :weekly-hours-error="weeklyHoursError($v.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
-      :loading="loading" />
+      :loading="loading" :start-date-error="startDateError($v.newVersion)" />
 
     <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @submit="editVersion" :start-date-error="startDateError"
+      @hide="resetVersionEditionModal" @submit="editVersion" :start-date-error="startDateError($v.editedVersion)"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
     <contract-ending-modal v-model="endContractModal" :contract-to-end.sync="contractToEnd"
@@ -130,7 +130,7 @@ export default {
       },
       newVersion: {
         weeklyHours: { required, minValue: minValue(0) },
-        startDate: { required },
+        startDate: { required, minDate: this.newVersionMinStartDate ? minDate(this.newVersionMinStartDate) : '' },
         grossHourlyRate: { required, minValue: minValue(0) },
       },
       editedVersion: {
@@ -183,10 +183,6 @@ export default {
         return moment(lastVersion.startDate).add(1, 'day').toISOString();
       }
       return '';
-    },
-    newVersionMinStartDate () {
-      const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
-      return lastVersion ? moment(lastVersion.startDate).toISOString() : '';
     },
   },
   async mounted () {

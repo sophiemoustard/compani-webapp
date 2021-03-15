@@ -37,12 +37,14 @@
 
 <script>
 import get from 'lodash/get';
+import { required, minValue } from 'vuelidate/lib/validators';
 import Contracts from '@api/Contracts';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
+import { minDate } from '@helpers/vuelidateCustomVal';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
 
@@ -108,6 +110,14 @@ export default {
         },
         { name: 'actions', align: 'center', field: 'user' },
       ],
+    };
+  },
+  validations () {
+    return {
+      editedVersion: {
+        grossHourlyRate: { required, minValue: minValue(0) },
+        startDate: { required, minDate: this.editedVersionMinStartDate ? minDate(this.editedVersionMinStartDate) : '' },
+      },
     };
   },
   async mounted () {

@@ -4,11 +4,11 @@
       Créer un <span class="text-weight-bold">nouveau contrat</span>
     </template>
     <ni-input in-modal caption="Volume horaire hebdomadaire" type="number" :value="newContract.weeklyHours"
-      :error="validations.weeklyHours.$error" :error-messsage="weeklyHoursError" @input="update($event, 'weeklyHours')"
+      :error="validations.weeklyHours.$error" :error-message="weeklyHoursError" @input="update($event, 'weeklyHours')"
       @blur="validations.weeklyHours.$touch" suffix="h" required-field />
     <ni-input in-modal caption="Taux horaire" :error="validations.grossHourlyRate.$error" type="number"
       :value="newContract.grossHourlyRate" @blur="validations.grossHourlyRate.$touch" suffix="€" required-field
-      :error-messsage="grossHourlyRateError" @input="update($event, 'grossHourlyRate')" />
+      :error-message="grossHourlyRateError" @input="update($event, 'grossHourlyRate')" />
     <ni-date-input caption="Date d'effet" :error="validations.startDate.$error" :min="contractMinStartDate"
       :value="newContract.startDate" in-modal required-field @input="update($event, 'startDate')" />
     <div class="row margin-input last">
