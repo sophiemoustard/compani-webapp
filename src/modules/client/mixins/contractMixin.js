@@ -2,13 +2,11 @@ import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
-import { required, minValue } from 'vuelidate/lib/validators';
 import Contracts from '@api/Contracts';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import nationalities from '@data/nationalities';
 import { REQUIRED_LABEL } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
-import { minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 
@@ -23,25 +21,18 @@ export const contractMixin = {
       selectedVersion: {},
     };
   },
-  validations () {
-    return {
-      newVersion: {
-        weeklyHours: { required },
-        startDate: { required },
-        grossHourlyRate: { required },
-      },
-      editedVersion: {
-        grossHourlyRate: { required, minValue: minValue(0) },
-        startDate: { required, minDate: this.editedVersionMinStartDate ? minDate(this.editedVersionMinStartDate) : '' },
-      },
-    };
-  },
   computed: {
     ...mapState('main', ['loggedUser']),
     ...mapGetters({ company: 'main/getCompany' }),
     isPreviousPayImpacted () {
       const startOfMonth = moment().startOf('M');
+
       return startOfMonth.isAfter(this.selectedVersion.startDate) || startOfMonth.isAfter(this.editedVersion.startDate);
+    },
+    newVersionMinStartDate () {
+      const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
+
+      return lastVersion ? moment(lastVersion.startDate).add(1, 'd').toISOString() : '';
     },
     editedVersionMinStartDate () {
       if (!this.editedVersion.versionId) return '';
@@ -50,6 +41,7 @@ export const contractMixin = {
       if (!index) return '';
 
       const previousVersion = this.selectedContract.versions[index - 1];
+
       return moment(previousVersion.startDate).add(1, 'd').toISOString();
     },
     userFullName () {
@@ -69,16 +61,23 @@ export const contractMixin = {
     },
   },
   methods: {
+    startDateError (validationObj) {
+      if (get(validationObj, 'startDate.required', null) === false) return REQUIRED_LABEL;
+      if (get(validationObj, 'startDate.minDate', null) === false) {
+        return 'La date d\'effet doit être postérieure à la date de début de la version précédente.';
+      }
+      return '';
+    },
     grossHourlyRateError (validationObj) {
       if (get(validationObj, 'grossHourlyRate.required', null) === false) return REQUIRED_LABEL;
       if (get(validationObj, 'grossHourlyRate.minValue', null) === false) return 'Taux horaire non valide';
+
       return '';
     },
     weeklyHoursError (validationObj) {
       if (get(validationObj, 'weeklyHours.required', null) === false) return REQUIRED_LABEL;
-      if (get(validationObj, 'weeklyHours.minValue', null) === false) {
-        return 'Volume horaire hebdomadaire non valide';
-      }
+      if (get(validationObj, 'weeklyHours.minValue', null) === false) return 'Volume horaire hebdomadaire non valide';
+
       return '';
     },
     resetVersionEditionModal () {
