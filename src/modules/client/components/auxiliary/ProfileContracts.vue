@@ -218,7 +218,9 @@ export default {
         const events = await Promise.all(promises);
         for (let i = 0, l = events.length; i < l; i++) {
           this.contracts[i].versions = this.contracts[i].versions.map((version, index) => {
-            if (index !== this.contracts[i].versions.length - 1) return { ...version, canBeDeleted: false };
+            const isLastVersion = index === this.contracts[i].versions.length - 1;
+            if (!isLastVersion) return { ...version, canBeDeleted: false };
+
             return { ...version, canBeDeleted: index !== 0 || events[i].length === 0 };
           });
         }
