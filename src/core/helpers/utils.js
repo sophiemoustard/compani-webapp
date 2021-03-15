@@ -69,9 +69,9 @@ export const roundFrenchPrice = number => number.toLocaleString(
   { minimumFractionDigits: 2, style: 'currency', currency: 'EUR', currencyDisplay: 'symbol' }
 );
 
-export const roundFrenchPercentage = (number, digits = 2) => (number / 100).toLocaleString(
-  'fr-FR',
-  { minimumFractionDigits: digits, style: 'percent' }
+export const roundFrenchPercentage = (number, digits = 2) => (number
+  ? (number / 100).toLocaleString('fr-FR', { minimumFractionDigits: digits, style: 'percent' })
+  : '0%'
 );
 
 export const formatPrice = (val) => {

@@ -59,13 +59,13 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :new-payment="newPayment" v-model="paymentCreationModal" :validations="$v.newPayment"
+    <ni-payment-creation-modal :new-payment.sync="newPayment" v-model="paymentCreationModal"
       :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
-      @submit="createPayment" @hide="resetPaymentCreationModal" />
+      @submit="createPayment" @hide="resetPaymentCreationModal" :validations="$v.newPayment" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
-      :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment="editedPayment"
+      :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment.sync="editedPayment"
       @submit="updatePayment" @hide="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
@@ -109,6 +109,7 @@ import {
   BANK_TRANSFER,
   CHECK,
   CESU,
+  CASH,
   REFUND,
   COACH_ROLES,
   CLIENT_ADMIN,
@@ -282,6 +283,7 @@ export default {
         case BANK_TRANSFER:
         case DIRECT_DEBIT:
         case CHECK:
+        case CASH:
         case CESU:
           if (doc.nature === REFUND) return -doc.netInclTaxes;
           return doc.netInclTaxes;

@@ -48,9 +48,9 @@
     </ni-simple-table>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal v-model="paymentCreationModal" :new-payment="newPayment" :validations="$v.newPayment"
+    <ni-payment-creation-modal v-model="paymentCreationModal" :new-payment.sync="newPayment"
       :selected-tpp="selectedTpp" :loading="paymentCreationLoading" @hide="resetPaymentCreationModal"
-      @submit="createPayment" :selected-customer="selectedCustomer" />
+      @submit="createPayment" :selected-customer="selectedCustomer" :validations="$v.newPayment" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
       :disable="selected.length === 0" @click="validatePaymentListCreation" />

@@ -7,18 +7,16 @@ export const passwordMixin = {
       passwordValidation: { minLength: minLength(6) },
     };
   },
-  computed: {
-    passwordConfirmError () {
-      if (!this.$v.passwordConfirm.required) return REQUIRED_LABEL;
-      if (!this.$v.passwordConfirm.sameAs) return 'Le mot de passe doit être identique.';
-      return 'Mot de passe invalide.';
-    },
-  },
   methods: {
     passwordError (validationObj) {
       if (validationObj.required === false) return REQUIRED_LABEL;
       if (!validationObj.minLength) return 'Le mot de passe doit contenir au minimum 6 caractères.';
       return '';
+    },
+    passwordConfirmError (validationObj) {
+      if (!validationObj.required) return REQUIRED_LABEL;
+      if (!validationObj.sameAs) return 'Le mot de passe doit être identique.';
+      return 'Mot de passe invalide.';
     },
   },
 };

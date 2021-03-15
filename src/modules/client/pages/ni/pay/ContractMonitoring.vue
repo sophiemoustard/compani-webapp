@@ -28,20 +28,23 @@
     </ni-simple-table>
 
     <!-- Edition modal -->
-    <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
+    <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" @hide="resetVersionEditionModal"
-      @submit="editVersion" :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
+      @submit="editVersion" :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"
+      :start-date-error="startDateError" />
   </q-page>
 </template>
 
 <script>
 import get from 'lodash/get';
+import { required, minValue } from 'vuelidate/lib/validators';
 import Contracts from '@api/Contracts';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
+import { minDate } from '@helpers/vuelidateCustomVal';
 import { contractMixin } from 'src/modules/client/mixins/contractMixin';
 import VersionEditionModal from 'src/modules/client/components/contracts/VersionEditionModal';
 
@@ -107,6 +110,14 @@ export default {
         },
         { name: 'actions', align: 'center', field: 'user' },
       ],
+    };
+  },
+  validations () {
+    return {
+      editedVersion: {
+        grossHourlyRate: { required, minValue: minValue(0) },
+        startDate: { required, minDate: this.editedVersionMinStartDate ? minDate(this.editedVersionMinStartDate) : '' },
+      },
     };
   },
   async mounted () {

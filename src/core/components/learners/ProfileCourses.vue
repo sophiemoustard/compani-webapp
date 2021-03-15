@@ -22,12 +22,15 @@
             </div>
           </q-card>
         </div>
+        <ni-line-chart title="Nombre total d'activités réalisées par mois"
+          :chart-data="chartData(this.activitiesByMonth)" class="col-md-6 col-xs-12 line-chart-container" />
       </div>
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Formations suivies</p>
       <q-card>
-        <ni-expanding-table :data="courses" :columns="columns" :loading="loading">
+        <ni-expanding-table :data="courses" :columns="columns" :loading="loading"
+          :visible-columns="columns.map(c => c.name)">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'progress'">
@@ -69,17 +72,22 @@ import uniqBy from 'lodash/uniqBy';
 import Courses from '@api/Courses';
 import { BLENDED, E_LEARNING, STRICTLY_E_LEARNING } from '@data/constants';
 import { sortStrings } from '@helpers/utils';
+import { isBetween } from '@helpers/date';
+import LineChart from '@components/charts/LineChart';
 import Progress from '@components/CourseProgress';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ExpandingTable from '@components/table/ExpandingTable';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
+import { chartMixin } from '@mixins/chartMixin';
 
 export default {
   name: 'ProfileCourses',
+  mixins: [chartMixin],
   components: {
     'ni-progress': Progress,
     'ni-expanding-table': ExpandingTable,
     'ni-e-learning-indicator': ELearningIndicator,
+    'ni-line-chart': LineChart,
   },
   data () {
     return {
@@ -163,6 +171,7 @@ export default {
     try {
       this.loading = true;
       this.courses = await Courses.listUserCourse({ traineeId: this.userProfile._id });
+      await this.computeChartsData();
     } catch (e) {
       NotifyNegative('Erreur lors de la récupération des formations');
       console.error(e);
@@ -190,6 +199,20 @@ export default {
         params: { courseId: props.row._id, defaultTab: 'traineeFollowUp' },
       });
     },
+    async computeChartsData () {
+      try {
+        const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
+        const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+        const sixMonthsHistories = this.eLearningActivitiesCompleted
+          .filter(ah => isBetween(ah.createdAt, chartStartDate, chartEndDate));
+
+        this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories);
+        NotifyPositive('Données mises à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des données.');
+      }
+    },
   },
 };
 </script>
@@ -211,6 +234,9 @@ export default {
   &-container
     @media screen and (min-width: $breakpoint-sm-max)
       padding-right: 16px;
+.line-chart-container
+  @media screen and (max-width: $breakpoint-sm-max)
+    margin-top: 16px;
 
 .learners-data
   flex: 1;

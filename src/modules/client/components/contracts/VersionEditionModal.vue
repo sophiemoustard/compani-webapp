@@ -3,13 +3,15 @@
     <template slot="title">
       Éditer le <span class="text-weight-bold">contrat</span>
     </template>
-    <ni-input in-modal caption="Taux horaire" type="number" suffix="€" required-field
-      v-model="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error"
-      @blur="validations.grossHourlyRate.$touch" :error-message="grossHourlyRateError" />
-    <ni-date-input caption="Date d'effet" v-model="editedVersion.startDate" :min="minStartDate"
-      in-modal required-field @blur="validations.startDate.$touch" :error="validations.startDate.$error" />
+    <ni-input in-modal caption="Taux horaire" type="number" :error-message="grossHourlyRateError"
+      :value="editedVersion.grossHourlyRate" :error="validations.grossHourlyRate.$error" suffix="€" required-field
+      @input="update($event, 'grossHourlyRate')" @blur="validations.grossHourlyRate.$touch" />
+    <ni-date-input :value="editedVersion.startDate" :min="minStartDate" :error="validations.startDate.$error" in-modal
+      @input="update($event, 'startDate')" required-field @blur="validations.startDate.$touch" caption="Date d'effet"
+      :error-message="startDateError" :class="[!validations.startDate.minDate && $q.platform.is.mobile && 'q-mb-sm']" />
     <div class="margin-input last">
-      <q-checkbox dense v-model="editedVersion.shouldBeSigned" label="Signature en ligne" />
+      <q-checkbox dense :value="editedVersion.shouldBeSigned" label="Signature en ligne"
+        @input="update($event, 'shouldBeSigned')" />
     </div>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Éditer le contrat" icon-right="add" color="primary"
@@ -33,6 +35,7 @@ export default {
     versionTemplate: { type: String, default: '' },
     loading: { type: Boolean, default: false },
     grossHourlyRateError: { type: String, default: '' },
+    startDateError: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
@@ -48,6 +51,9 @@ export default {
     },
     hide () {
       this.$emit('hide');
+    },
+    update (event, prop) {
+      this.$emit('update:editedVersion', { ...this.editedVersion, [prop]: event });
     },
   },
 };

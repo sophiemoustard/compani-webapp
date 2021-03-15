@@ -14,23 +14,23 @@
     </div>
 
     <contract-creation-modal v-model="newContractModal" @hide="resetContractCreationModal" @submit="createContract"
-      :new-contract="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
+      :new-contract.sync="newContract" :weekly-hours-error="weeklyHoursError($v.newContract)" :loading="loading"
       :gross-hourly-rate-error="grossHourlyRateError($v.newContract)" :validations="$v.newContract"
       :contract-min-start-date="contractMinStartDate" />
 
     <version-creation-modal v-model="newVersionModal" :gross-hourly-rate-error="grossHourlyRateError($v.newVersion)"
-      :new-version-min-start-date="newVersionMinStartDate" :new-version="newVersion" :validations="$v.newVersion"
+      :new-version-min-start-date="newVersionMinStartDate" :new-version.sync="newVersion" :validations="$v.newVersion"
       :weekly-hours-error="weeklyHoursError($v.newVersion)" @hide="resetVersionCreationModal" @submit="createVersion"
-      :loading="loading" />
+      :loading="loading" :start-date-error="startDateError($v.newVersion)" />
 
-    <version-edition-modal v-model="versionEditionModal" :edited-version="editedVersion" :loading="loading"
+    <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" :is-version-updated="isVersionUpdated"
-      @hide="resetVersionEditionModal" @submit="editVersion"
+      @hide="resetVersionEditionModal" @submit="editVersion" :start-date-error="startDateError($v.editedVersion)"
       :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)" />
 
-    <contract-ending-modal v-model="endContractModal" :contract-to-end="contractToEnd" :validations="$v.contractToEnd"
-      @hide="resetEndContractModal" @submit="endExistingContract" :contract-min-end-date="contractMinEndDate"
-      :end-contract-reasons="endContractReasons" :loading="loading" />
+    <contract-ending-modal v-model="endContractModal" :contract-to-end.sync="contractToEnd"
+      :validations="$v.contractToEnd" @hide="resetEndContractModal" @submit="endExistingContract"
+      :contract-min-end-date="contractMinEndDate" :end-contract-reasons="endContractReasons" :loading="loading" />
   </div>
 </template>
 
@@ -130,7 +130,7 @@ export default {
       },
       newVersion: {
         weeklyHours: { required, minValue: minValue(0) },
-        startDate: { required },
+        startDate: { required, minDate: this.newVersionMinStartDate ? minDate(this.newVersionMinStartDate) : '' },
         grossHourlyRate: { required, minValue: minValue(0) },
       },
       editedVersion: {
@@ -184,10 +184,6 @@ export default {
       }
       return '';
     },
-    newVersionMinStartDate () {
-      const lastVersion = this.selectedContract.versions[this.selectedContract.versions.length - 1];
-      return lastVersion ? moment(lastVersion.startDate).toISOString() : '';
-    },
   },
   async mounted () {
     try {
@@ -222,7 +218,9 @@ export default {
         const events = await Promise.all(promises);
         for (let i = 0, l = events.length; i < l; i++) {
           this.contracts[i].versions = this.contracts[i].versions.map((version, index) => {
-            if (index !== this.contracts[i].versions.length - 1) return { ...version, canBeDeleted: false };
+            const isLastVersion = index === this.contracts[i].versions.length - 1;
+            if (!isLastVersion) return { ...version, canBeDeleted: false };
+
             return { ...version, canBeDeleted: index !== 0 || events[i].length === 0 };
           });
         }

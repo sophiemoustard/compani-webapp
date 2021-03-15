@@ -378,7 +378,7 @@ export const planningActionMixin = {
     canEditEvent (event) {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
-      return ability.can('edit', subject('Events', event));
+      return ability.can('update', subject('Events', event));
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();

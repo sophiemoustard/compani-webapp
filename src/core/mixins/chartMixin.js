@@ -2,36 +2,35 @@ import { colors } from 'quasar';
 import groupBy from 'lodash/groupBy';
 import get from 'lodash/get';
 
-export const traineeChartMixin = {
+export const chartMixin = {
   data () {
     return {
       months: [],
       traineesByMonth: [],
+      activitiesByMonth: [],
     };
   },
-  computed: {
-    chartData () {
+  methods: {
+    chartData (data) {
       return {
         labels: this.months,
         datasets: [{
-          data: this.traineesByMonth,
+          data,
           borderColor: colors.getBrand('primary'),
           backgroundColor: 'transparent',
         }],
       };
     },
-  },
-  methods: {
     formatMonthAndYear (date) {
       return `${new Date(date).getFullYear()}${new Date(date).getMonth() < 10
         ? `0${new Date(date).getMonth()}`
         : `${new Date(date).getMonth()}`
       }`;
     },
-    getTraineeByMonth (activityHistories) {
+    getDataByMonth (activityHistories, groupByPath) {
       const historiesByMonth = groupBy(activityHistories, ah => this.formatMonthAndYear(ah.date));
       const monthNames = ['janv', 'fév', 'mars', 'avr', 'mai', 'juin', 'juil', 'août', 'sept', 'oct', 'nov', 'déc'];
-      const monthlyTrainees = [];
+      const monthlyData = [];
       this.months = [];
       for (let i = 6; i > 0; i -= 1) {
         const date = new Date(new Date().getFullYear(), new Date().getMonth() - i, 1);
@@ -40,15 +39,15 @@ export const traineeChartMixin = {
         this.months.push(`${month} ${year}`);
 
         const field = this.formatMonthAndYear(date);
-        if (!historiesByMonth[field]) monthlyTrainees.push(0);
-        else {
-          monthlyTrainees.push(
-            Object.values(groupBy(historiesByMonth[field], group => get(group, 'user._id', null) || group.user)).length
+        if (!historiesByMonth[field]) monthlyData.push(0);
+        else if (groupByPath) {
+          monthlyData.push(
+            Object.values(groupBy(historiesByMonth[field], group => get(group, groupByPath, null))).length
           );
-        }
+        } else monthlyData.push(historiesByMonth[field].length);
       }
 
-      return monthlyTrainees;
+      return monthlyData;
     },
   },
 };

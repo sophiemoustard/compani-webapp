@@ -502,12 +502,21 @@ export default {
     },
     async detachStep (subProgramId, stepId) {
       try {
+        const subProgram = this.program.subPrograms.find(sp => sp._id === subProgramId);
+        const step = subProgram.steps.find(s => s._id === stepId);
+        if (step.courseSlotsCount) {
+          return NotifyWarning('Certains créneaux de formation sont encore rattachés à cette étape.');
+        }
+
         await SubPrograms.detachStep(subProgramId, stepId);
         await this.refreshProgram();
         NotifyPositive('Étape retirée.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du retrait de l\'étape.');
+        if (e.status === 409) {
+          return NotifyWarning('Certains créneaux de formation sont encore rattachés à cette étape.');
+        }
+        return NotifyNegative('Erreur lors du retrait de l\'étape.');
       }
     },
     validateActivityDeletion (stepId, activityId) {
