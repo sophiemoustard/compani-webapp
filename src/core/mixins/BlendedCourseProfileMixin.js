@@ -3,11 +3,8 @@ import { INTER_B2B } from '@data/constants';
 
 export const blendedCourseProfileMixin = {
   data () {
-    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
-
     return {
       courseName: '',
-      isClientInterface,
     };
   },
   computed: {
@@ -21,15 +18,6 @@ export const blendedCourseProfileMixin = {
         { icon: 'emoji_people', label: this.trainerName },
       ];
     },
-  },
-  watch: {
-    course () {
-      this.courseName = this.composeCourseName(this.course, !this.isClientInterface);
-    },
-  },
-  async created () {
-    if (!this.course) await this.refreshCourse();
-    this.courseName = this.composeCourseName(this.course, !this.isClientInterface);
   },
   methods: {
     async refreshCourse () {

@@ -77,6 +77,15 @@ export default {
       ];
     },
   },
+  watch: {
+    course () {
+      this.courseName = this.composeCourseName(this.course, true);
+    },
+  },
+  async created () {
+    if (!this.course) await this.refreshCourse();
+    this.courseName = this.composeCourseName(this.course, true);
+  },
   methods: {
     async deleteCourse () {
       try {

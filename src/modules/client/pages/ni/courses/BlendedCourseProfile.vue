@@ -60,6 +60,15 @@ export default {
       ];
     },
   },
+  watch: {
+    course () {
+      this.courseName = this.composeCourseName(this.course);
+    },
+  },
+  async created () {
+    if (!this.course) await this.refreshCourse();
+    this.courseName = this.composeCourseName(this.course);
+  },
 };
 </script>
 
