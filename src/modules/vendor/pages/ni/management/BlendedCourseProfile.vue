@@ -46,6 +46,11 @@ export default {
     'ni-profile-organization': ProfileOrganization,
     'ni-button': Button,
   },
+  data () {
+    return {
+      backgroundClass: 'vendor-background',
+    };
+  },
 };
 </script>
 

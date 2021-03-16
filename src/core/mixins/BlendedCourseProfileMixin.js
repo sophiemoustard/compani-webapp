@@ -13,7 +13,6 @@ export const blendedCourseProfileMixin = {
     return {
       courseName: '',
       isClientInterface,
-      backgroundClass: isClientInterface ? 'client-background' : 'vendor-background',
     };
   },
   computed: {
