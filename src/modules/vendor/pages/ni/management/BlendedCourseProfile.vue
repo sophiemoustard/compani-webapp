@@ -25,7 +25,9 @@
 </template>
 
 <script>
+import Courses from '@api/Courses';
 import Button from '@components/Button';
+import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileHeader from '@components/ProfileHeader';
@@ -50,6 +52,29 @@ export default {
     return {
       backgroundClass: 'vendor-background',
     };
+  },
+  methods: {
+    async deleteCourse () {
+      try {
+        await Courses.delete(this.course._id);
+        NotifyPositive('Formation supprimée.');
+        this.$router.push({ name: 'ni management blended courses' });
+      } catch (e) {
+        console.error(e);
+        if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer cette formation.');
+        if (e.msg) NotifyNegative('Erreur lors de la suppression de la formation.');
+      }
+    },
+    validateCourseDeletion () {
+      if (this.disableCourseDeletion) return;
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Confirmez-vous la suppression ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(this.deleteCourse)
+        .onCancel(() => NotifyPositive('Suppression annulée'));
+    },
   },
 };
 </script>

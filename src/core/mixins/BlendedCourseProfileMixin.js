@@ -1,6 +1,4 @@
 import { mapState } from 'vuex';
-import Courses from '@api/Courses';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
@@ -67,27 +65,6 @@ export const blendedCourseProfileMixin = {
       } catch (e) {
         console.error(e);
       }
-    },
-    async deleteCourse () {
-      try {
-        await Courses.delete(this.course._id);
-        NotifyPositive('Formation supprimée.');
-        this.$router.push({ name: 'ni management blended courses' });
-      } catch (e) {
-        console.error(e);
-        if (e.status === 403) NotifyNegative('Vous ne pouvez pas supprimer cette formation.');
-        if (e.msg) NotifyNegative('Erreur lors de la suppression de la formation.');
-      }
-    },
-    validateCourseDeletion () {
-      if (this.disableCourseDeletion) return;
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Confirmez-vous la suppression ?',
-        ok: 'OK',
-        cancel: 'Annuler',
-      }).onOk(this.deleteCourse)
-        .onCancel(() => NotifyPositive('Suppression annulée'));
     },
   },
   beforeDestroy () {
