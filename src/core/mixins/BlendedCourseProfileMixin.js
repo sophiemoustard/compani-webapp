@@ -1,5 +1,4 @@
 import { mapState } from 'vuex';
-import { INTER_B2B } from '@data/constants';
 
 export const blendedCourseProfileMixin = {
   data () {
@@ -9,9 +8,6 @@ export const blendedCourseProfileMixin = {
   },
   computed: {
     ...mapState('course', ['course']),
-    isCourseInter () {
-      return this.course.type === INTER_B2B;
-    },
     headerInfo () {
       return [
         { icon: 'bookmark_border', label: this.courseType },

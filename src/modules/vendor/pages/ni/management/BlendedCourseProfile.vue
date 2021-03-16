@@ -14,10 +14,7 @@
           </div>
         </template>
       </ni-profile-header>
-      <div v-if="isClientInterface && isCourseInter">
-        <ni-profile-organization :profile-id="courseId" />
-      </div>
-      <div v-else>
+      <div>
         <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
       </div>
     </template>
@@ -47,7 +44,6 @@ export default {
   components: {
     'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
-    'ni-profile-organization': ProfileOrganization,
     'ni-button': Button,
   },
   data () {

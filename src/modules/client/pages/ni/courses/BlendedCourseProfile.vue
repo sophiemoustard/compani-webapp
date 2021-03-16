@@ -11,7 +11,7 @@
           </div>
         </template>
       </ni-profile-header>
-      <div v-if="isClientInterface && isCourseInter">
+      <div v-if="isCourseInter">
         <ni-profile-organization :profile-id="courseId" />
       </div>
       <div v-else>
@@ -26,6 +26,7 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
+import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
@@ -48,6 +49,9 @@ export default {
     };
   },
   computed: {
+    isCourseInter () {
+      return this.course.type === INTER_B2B;
+    },
     tabsContent () {
       return [
         {
