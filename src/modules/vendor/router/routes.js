@@ -93,17 +93,17 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/programs',
-        name: 'ni config programs',
+        path: 'ni/pedagogy/programs',
+        name: 'ni pedagogy programs',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
       {
-        path: 'ni/config/programs/:programId',
-        name: 'ni config programs info',
+        path: 'ni/pedagogy/programs/:programId',
+        name: 'ni pedagogy programs info',
         component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
         beforeEnter: async (to, from, next) => {
           try {
@@ -117,17 +117,17 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
       {
-        path: 'ni/config/programs/:programId/subprogram/:subProgramId/step/:stepId/activity/:activityId',
-        name: 'ni config activity info',
+        path: 'ni/pedagogy/programs/:programId/subprogram/:subProgramId/step/:stepId/activity/:activityId',
+        name: 'ni pedagogy activity info',
         component: () => import('src/modules/vendor/pages/ni/config/ActivityProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
       {
@@ -241,12 +241,12 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/categories',
-        name: 'ni config categories',
+        path: 'ni/pedagogy/categories',
+        name: 'ni pedagogy categories',
         component: () => import('src/modules/vendor/pages/ni/config/CategoriesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
     ],

@@ -75,7 +75,7 @@ export default {
       this.searchStr = value;
     },
     goToProgramProfile (row) {
-      this.$router.push({ name: 'ni config programs info', params: { programId: row._id } });
+      this.$router.push({ name: 'ni pedagogy programs info', params: { programId: row._id } });
     },
     async refreshProgram () {
       try {
