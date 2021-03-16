@@ -1,7 +1,7 @@
 <template>
   <q-page padding :class="backgroundClass">
     <template v-if="course">
-      <ni-profile-header :title="courseName" class="delete-container">
+      <ni-profile-header :title="courseName">
         <template #body>
           <div class="row profile-info q-pl-lg">
             <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
@@ -25,6 +25,7 @@
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileHeader from '@components/ProfileHeader';
+import ProfileAdmin from '@components/courses/ProfileAdmin';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
@@ -46,6 +47,19 @@ export default {
       backgroundClass: 'client-background',
     };
   },
+  computed: {
+    tabsContent () {
+      return [
+        {
+          label: 'Organisation',
+          name: 'organization',
+          default: this.defaultTab === 'organization',
+          component: ProfileOrganization,
+        },
+        { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
+      ];
+    },
+  },
 };
 </script>
 
@@ -56,12 +70,4 @@ export default {
 
 /deep/ h4
   margin-right: 32px !important
-
-.delete-container
-  position: relative
-
-.delete
-  position: absolute
-  top: 0
-  right: 0
 </style>

@@ -31,6 +31,8 @@ import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileHeader from '@components/ProfileHeader';
+import ProfileAdmin from '@components/courses/ProfileAdmin';
+import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
@@ -52,6 +54,28 @@ export default {
     return {
       backgroundClass: 'vendor-background',
     };
+  },
+  computed: {
+    disableCourseDeletion () {
+      return !!this.course.slots.length || !!this.course.trainees.length || !!this.course.slotsToPlan.length;
+    },
+    tabsContent () {
+      return [
+        {
+          label: 'Organisation',
+          name: 'organization',
+          default: this.defaultTab === 'organization',
+          component: ProfileOrganization,
+        },
+        { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
+        {
+          label: 'Suivi des stagiaires',
+          name: 'traineeFollowUp',
+          default: this.defaultTab === 'traineeFollowUp',
+          component: ProfileTraineeFollowUp,
+        },
+      ];
+    },
   },
   methods: {
     async deleteCourse () {
