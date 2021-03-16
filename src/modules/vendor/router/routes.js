@@ -142,7 +142,7 @@ const routes = [
       {
         path: 'ni/management/blended-courses/:courseId',
         name: 'ni management blended courses info',
-        component: () => import('src/core/pages/courses/BlendedCourseProfile'),
+        component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
             if (['ni users learners info', 'ni management questionnaire answers'].includes(from.name)) {
@@ -200,7 +200,7 @@ const routes = [
       {
         path: 'trainers/management/courses/:courseId',
         name: 'trainers courses info',
-        component: () => import('src/core/pages/courses/BlendedCourseProfile'),
+        component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         async beforeEnter (to, from, next) {
           await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
           const { course } = store.state.course;
