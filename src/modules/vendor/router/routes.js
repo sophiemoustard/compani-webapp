@@ -95,7 +95,7 @@ const routes = [
       {
         path: 'ni/pedagogy/programs',
         name: 'ni pedagogy programs',
-        component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'pedagogy',
@@ -104,10 +104,10 @@ const routes = [
       {
         path: 'ni/pedagogy/programs/:programId',
         name: 'ni pedagogy programs info',
-        component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/ProgramProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni config activity info') to.params.defaultTab = 'content';
+            if (from.name === 'ni pedagogy activity info') to.params.defaultTab = 'content';
 
             return next();
           } catch (e) {
@@ -123,7 +123,7 @@ const routes = [
       {
         path: 'ni/pedagogy/programs/:programId/subprogram/:subProgramId/step/:stepId/activity/:activityId',
         name: 'ni pedagogy activity info',
-        component: () => import('src/modules/vendor/pages/ni/config/ActivityProfile'),
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/ActivityProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
@@ -243,7 +243,7 @@ const routes = [
       {
         path: 'ni/pedagogy/categories',
         name: 'ni pedagogy categories',
-        component: () => import('src/modules/vendor/pages/ni/config/CategoriesDirectory'),
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/CategoriesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'pedagogy',
