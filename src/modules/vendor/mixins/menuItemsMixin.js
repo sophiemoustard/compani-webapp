@@ -3,7 +3,7 @@ export const menuItemsMixin = {
     return {
       adminActiveRoutes: {
         users: { open: false },
-        configuration: { open: false },
+        pedagogy: { open: false },
         management: { open: false },
       },
       trainerActiveRoutes: {
@@ -29,11 +29,11 @@ export const menuItemsMixin = {
           ],
         },
         {
-          ref: 'configuration',
-          label: 'Configuration',
+          ref: 'pedagogy',
+          label: 'Pédagogie',
           children: [
-            { name: 'ni config programs', icon: 'view_headline', label: 'Catalogue' },
-            { name: 'ni config categories', icon: 'category', label: 'Catégories' },
+            { name: 'ni pedagogy programs', icon: 'view_headline', label: 'Catalogue' },
+            { name: 'ni pedagogy categories', icon: 'category', label: 'Catégories' },
           ],
         },
       ],
