@@ -41,17 +41,17 @@
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
               :style="col.style">
             <template v-if="col.name === 'surchargedAndExempt'">
-              <div v-if="shouldDisplayDetails(props.row.auxiliary._id, 'surchargedAndExemptDetails')"
+              <div v-if="shouldDisplayDetails(props.row.auxiliary._id, 'surchargedAndExemptDetails', draftPay)"
                 class="cursor-pointer text-primary"
-                @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails')">
+                @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndExemptDetails', draftPay)">
                 {{ col.value }}
               </div>
               <div v-else>{{ col.value }}</div>
             </template>
             <template v-else-if="col.name === 'surchargedAndNotExempt'">
-              <div v-if="shouldDisplayDetails(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')"
+              <div v-if="shouldDisplayDetails(props.row.auxiliary._id, 'surchargedAndNotExemptDetails', draftPay)"
                 class="cursor-pointer text-primary"
-                @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails')">
+                @click="openSurchargeDetailModal(props.row.auxiliary._id, 'surchargedAndNotExemptDetails', draftPay)">
                 {{ col.value }}
               </div>
               <div v-else>{{ col.value }}</div>
@@ -152,8 +152,6 @@ export default {
         'bonus',
       ],
       surchargeDetailModal: false,
-      pay: {},
-      surchargeDetailKey: '',
       selectedSector: '',
       tableLoading: false,
       sortOptions: [
@@ -237,24 +235,6 @@ export default {
       } finally {
         this.tableLoading = false;
       }
-    },
-    shouldDisplayDetails (id, details) {
-      const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
-      if (!draft) return false;
-
-      return Object.keys(draft[details]).length || (draft.diff[details] && Object.keys(draft.diff[details]).length);
-    },
-    openSurchargeDetailModal (id, details) {
-      const draft = this.draftPay.find(dp => dp.auxiliary._id === id);
-      if (!draft) return;
-
-      this.pay = draft;
-      this.surchargeDetailKey = details;
-      this.surchargeDetailModal = true;
-    },
-    resetSurchargeDetail () {
-      this.pay = {};
-      this.surchargeDetailKey = '';
     },
     validateCreation () {
       this.$q.dialog({

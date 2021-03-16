@@ -150,13 +150,8 @@
       :validations="$v.editedService" />
 
     <!-- Service history modal -->
-    <ni-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData" container-class="modal-container-md">
-      <template slot="title">
-        Historique du service <span class="text-weight-bold">{{ selectedService.name }}</span>
-      </template>
-      <ni-responsive-table class="q-mb-sm" :data="selectedService.versions" :columns="serviceColumns"
-        :pagination.sync="paginationHistory" :visible-columns="visibleHistoryColumns" />
-    </ni-modal>
+    <service-history-modal v-model="serviceHistoryModal" @hide="resetServiceHistoryData"
+      :selected-service="selectedService" :service-columns="serviceColumns" />
 
     <!-- Third party payers creation modal -->
     <third-party-payer-creation-modal v-model="thirdPartyPayerCreationModal"
@@ -185,7 +180,6 @@ import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup
 import FileUploader from '@components/form/FileUploader';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
-import Modal from '@components/modal/Modal';
 import ReponsiveTable from '@components/table/ResponsiveTable';
 import {
   BILLING_DIRECT,
@@ -198,6 +192,7 @@ import {
   REQUIRED_LABEL,
 } from '@data/constants';
 import moment from '@helpers/moment';
+import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
 import { frAddress, positiveNumber } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import ServiceCreationModal from 'src/modules/client/components/config/ServiceCreationModal';
@@ -206,6 +201,7 @@ import SurchargeCreationModal from 'src/modules/client/components/config/Surchar
 import SurchargeEditionModal from 'src/modules/client/components/config/SurchargeEditionModal';
 import ThirdPartyPayerCreationModal from 'src/modules/client/components/config/ThirdPartyPayerCreationModal';
 import ThirdPartyPayerEditionModal from 'src/modules/client/components/config/ThirdPartyPayerEditionModal';
+import ServiceHistoryModal from 'src/modules/client/components/config/ServiceHistoryModal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -215,7 +211,6 @@ export default {
   components: {
     'ni-file-uploader': FileUploader,
     'ni-select': Select,
-    'ni-modal': Modal,
     'ni-btn': Button,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
@@ -224,6 +219,7 @@ export default {
     'surcharge-edition-modal': SurchargeEditionModal,
     'third-party-payer-creation-modal': ThirdPartyPayerCreationModal,
     'third-party-payer-edition-modal': ThirdPartyPayerEditionModal,
+    'service-history-modal': ServiceHistoryModal,
   },
   mixins: [configMixin, validationMixin, tableMixin],
   watch: {
@@ -275,6 +271,7 @@ export default {
         publicHoliday: '',
         twentyFifthOfDecember: '',
         firstOfMay: '',
+        firstOfJanuary: '',
         evening: '',
         eveningStartTime: null,
         eveningEndTime: null,
@@ -289,6 +286,7 @@ export default {
         publicHoliday: '',
         twentyFifthOfDecember: '',
         firstOfMay: '',
+        firstOfJanuary: '',
         evening: '',
         eveningStartTime: null,
         eveningEndTime: null,
@@ -302,69 +300,75 @@ export default {
           name: 'saturday',
           label: 'Samedi',
           align: 'center',
-          field: row => row.saturday && `${row.saturday}%`,
+          field: row => roundFrenchPercentage(row.saturday, 0),
         },
         {
           name: 'sunday',
           label: 'Dimanche',
           align: 'center',
-          field: row => row.sunday && `${row.sunday}%`,
+          field: row => roundFrenchPercentage(row.sunday, 0),
         },
         {
           name: 'publicHoliday',
           label: 'Jour férié',
           align: 'center',
-          field: row => row.publicHoliday && `${row.publicHoliday}%`,
+          field: row => roundFrenchPercentage(row.publicHoliday, 0),
         },
         {
           name: 'twentyFifthOfDecember',
           label: '25 décembre',
           align: 'center',
-          field: row => row.twentyFifthOfDecember && `${row.twentyFifthOfDecember}%`,
+          field: row => roundFrenchPercentage(row.twentyFifthOfDecember, 0),
         },
         {
           name: 'firstOfMay',
           label: '1er mai',
           align: 'center',
-          field: row => row.firstOfMay && `${row.firstOfMay}%`,
+          field: row => roundFrenchPercentage(row.firstOfMay, 0),
+        },
+        {
+          name: 'firstOfJanuary',
+          label: '1er janvier',
+          align: 'center',
+          field: row => roundFrenchPercentage(row.firstOfJanuary, 0),
         },
         {
           name: 'evening',
           label: 'Soirée',
           align: 'center',
-          field: row => row.evening && `${row.evening}%`,
+          field: row => roundFrenchPercentage(row.evening, 0),
         },
         {
           name: 'eveningStartTime',
           label: 'Début soirée',
           align: 'center',
-          field: row => (row.eveningStartTime ? moment(row.eveningStartTime).format('HH:mm') : ''),
+          field: row => (row.eveningStartTime ? formatHoursWithMinutes(row.eveningStartTime) : ''),
         },
         {
           name: 'eveningEndTime',
           label: 'Fin soirée',
           align: 'center',
-          field: row => (row.eveningEndTime ? moment(row.eveningEndTime).format('HH:mm') : ''),
+          field: row => (row.eveningEndTime ? formatHoursWithMinutes(row.eveningEndTime) : ''),
         },
         {
           name: 'custom',
           label: 'Perso',
           align: 'center',
-          field: row => row.custom && `${row.custom}%`,
+          field: row => roundFrenchPercentage(row.custom, 0),
         },
         {
           name: 'customStartTime',
           label: 'Début perso',
           align: 'center',
-          field: row => (row.customStartTime ? moment(row.customStartTime).format('HH:mm') : ''),
+          field: row => (row.customStartTime ? formatHoursWithMinutes(row.customStartTime) : ''),
         },
         {
           name: 'customEndTime',
           label: 'Fin perso',
           align: 'center',
-          field: row => (row.customEndTime ? moment(row.customEndTime).format('HH:mm') : ''),
+          field: row => (row.customEndTime ? formatHoursWithMinutes(row.customEndTime) : ''),
         },
-        { name: 'actions', label: '', align: 'center', field: '_id' },
+        { name: 'actions', label: '', align: 'center', field: '_id', style: 'padding-left: 0px' },
       ],
       surchargesLoading: false,
       // Services
@@ -526,6 +530,7 @@ export default {
       publicHoliday: { positiveNumber },
       twentyFifthOfDecember: { positiveNumber },
       firstOfMay: { positiveNumber },
+      firstOfJanuary: { positiveNumber },
       evening: { positiveNumber },
       eveningStartTime: { required: requiredIf(item => item.evening) },
       eveningEndTime: { required: requiredIf(item => item.evening) },
@@ -540,6 +545,7 @@ export default {
       publicHoliday: { positiveNumber },
       twentyFifthOfDecember: { positiveNumber },
       firstOfMay: { positiveNumber },
+      firstOfJanuary: { positiveNumber },
       evening: { positiveNumber },
       eveningStartTime: { required: requiredIf(item => item.evening) },
       eveningEndTime: { required: requiredIf(item => item.evening) },
@@ -609,11 +615,6 @@ export default {
     ]);
   },
   methods: {
-    getServiceLastVersion (service) {
-      if (!service.versions || service.versions.length === 0) return {};
-
-      return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
-    },
     // Refresh data
     async refreshSurcharges () {
       try {
@@ -683,6 +684,7 @@ export default {
         publicHoliday: '',
         twentyFifthOfDecember: '',
         firstOfMay: '',
+        firstOfJanuary: '',
         evening: '',
         eveningStartTime: null,
         eveningEndTime: null,
@@ -738,6 +740,7 @@ export default {
         'publicHoliday',
         'twentyFifthOfDecember',
         'firstOfMay',
+        'firstOfJanuary',
         'evening',
         'custom',
       ];
@@ -758,6 +761,7 @@ export default {
         publicHoliday: '',
         twentyFifthOfDecember: '',
         firstOfMay: '',
+        firstOfJanuary: '',
         evening: '',
         eveningStartTime: null,
         eveningEndTime: null,
@@ -807,6 +811,11 @@ export default {
         .onCancel(() => NotifyPositive('Suppression annulée'));
     },
     // Services
+    getServiceLastVersion (service) {
+      if (!service.versions || service.versions.length === 0) return {};
+
+      return service.versions.sort((a, b) => new Date(b.startDate) - new Date(a.startDate))[0];
+    },
     formatCreatedService () {
       const { nature, name, defaultUnitAmount, exemptFromCharges } = this.newService;
       const formattedService = {

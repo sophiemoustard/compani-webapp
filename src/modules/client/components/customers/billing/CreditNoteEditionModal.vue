@@ -8,8 +8,7 @@
       <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
         v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
       <ni-date-input caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal required-field
-        :error="validations.date.$error" @blur="validations.date.$touch"
-        :disable="!editedCreditNote.isEditable" />
+        :error="validations.date.$error" @blur="validations.date.$touch" :disable="!editedCreditNote.isEditable" />
       <!-- Has linked events -->
       <template v-if="hasLinkedEvents">
         <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal

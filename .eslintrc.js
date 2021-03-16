@@ -24,7 +24,9 @@ module.exports = {
     'linebreak-style': ['error', 'unix'],
     'react/display-name': 'off',
     'max-len': ['error', { code: 120, tabWidth: 2 }],
-    'no-console': ['error', { allow: ['error'] }],
+    'no-console': process.env.NODE_ENV === 'development'
+      ? ['warn', { allow: ['error'] }]
+      : ['error', { allow: ['error'] }],
     'no-trailing-spaces': 'error',
     'vue/max-attributes-per-line': 0,
     'vue/singleline-html-element-content-newline': 0,

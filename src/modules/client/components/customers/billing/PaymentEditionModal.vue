@@ -5,13 +5,14 @@
     </template>
     <ni-input in-modal caption="Bénéficiaire" :value="customerFullname" required-field read-only />
     <ni-input in-modal caption="Client" v-model="selectedClientName" required-field read-only />
-    <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" type="number"
-      v-model="editedPayment.netInclTaxes" required-field :error="validations.netInclTaxes.$error"
-      @blur="validations.netInclTaxes.$touch" :error-message="netInclTaxesError" />
-    <ni-select in-modal :caption="`Type du ${editionModalNature}`" v-model="editedPayment.type"
-      :options="paymentOptions" required-field @blur="validations.type.$touch" :error="validations.type.$error" />
-    <ni-date-input :caption="`Date du ${editionModalNature}`" v-model="editedPayment.date"
-      :error="validations.date.$error" @blur="validations.date.$touch" in-modal type="date" required-field />
+    <ni-input in-modal :caption="`Montant du ${editionModalNature}`" suffix="€" @blur="validations.netInclTaxes.$touch"
+      :value="editedPayment.netInclTaxes" @input="update($event, 'netInclTaxes')" type="number" required-field
+      :error="validations.netInclTaxes.$error" :error-message="netInclTaxesError" />
+    <ni-select in-modal :caption="`Type du ${editionModalNature}`" :value="editedPayment.type"
+      @input="update($event, 'type')" :options="paymentOptions" required-field
+      @blur="validations.type.$touch" :error="validations.type.$error" />
+    <ni-date-input :caption="`Date du ${editionModalNature}`" :value="editedPayment.date" in-modal required-field
+      @input="update($event, 'date')" :error="validations.date.$error" @blur="validations.date.$touch" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" :label="editionButtonLabel" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
@@ -77,6 +78,9 @@ export default {
     },
     submit (value) {
       this.$emit('submit', value);
+    },
+    update (event, prop) {
+      this.$emit('update:editedPayment', { ...this.editedPayment, [prop]: event });
     },
   },
 };

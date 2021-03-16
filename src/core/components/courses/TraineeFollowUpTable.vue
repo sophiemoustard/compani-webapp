@@ -2,7 +2,7 @@
   <div>
     <p class="text-weight-bold">Progression des participants</p>
     <ni-expanding-table :data="learners" :columns="columns" :pagination="pagination" :hide-bottom="false"
-      :loading="loading">
+      :loading="loading" :visible-columns="visibleColumns">
       <template #row="{ props }">
         <q-td v-for="col in props.cols" :key="col.name" :props="props">
           <template v-if="col.name === 'progress'">
@@ -11,8 +11,14 @@
           <template v-else-if="col.name === 'expand'">
             <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
           </template>
+          <template v-else-if="col.name === 'isConnected'">
+            <connected-dot v-if="col.value" />
+          </template>
           <template v-else>
-            <div class="name" @click.stop="goToLearnerProfile(props.row)">{{ col.value }}</div>
+            <div :class="['name', canReadLearnerInfo && 'cliquable-name']"
+              @click="goToLearnerProfile(props.row, $event)">
+              {{ col.value }}
+            </div>
           </template>
         </q-td>
       </template>
@@ -35,20 +41,26 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import pick from 'lodash/pick';
 import ExpandingTable from '@components/table/ExpandingTable';
 import Progress from '@components/CourseProgress';
 import { sortStrings } from '@helpers/utils';
 import { E_LEARNING } from '@data/constants.js';
+import { defineAbilitiesFor } from '@helpers/ability';
+import ConnectedDot from './ConnectedDot';
 
 export default {
   name: 'TraineeFollowUpTable',
   components: {
     'ni-expanding-table': ExpandingTable,
     'ni-progress': Progress,
+    'connected-dot': ConnectedDot,
   },
   props: {
     learners: { type: Array, default: () => [] },
     loading: { type: Boolean, default: false },
+    isBlended: { type: Boolean, default: false },
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
@@ -63,7 +75,14 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => sortStrings(a.lastname, b.lastname),
-          style: 'width: 70%',
+          style: this.isBlended ? 'width: 40%' : 'width: 70%',
+        },
+        {
+          name: 'isConnected',
+          label: 'Connexion à l\'app ?',
+          field: 'firstMobileConnection',
+          format: value => !!value,
+          align: 'center',
         },
         {
           name: 'progress',
@@ -80,8 +99,24 @@ export default {
       isClientInterface,
     };
   },
+  computed: {
+    ...mapState('main', ['loggedUser']),
+    canReadLearnerInfo () {
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+
+      return ability.can('read', 'learner_info');
+    },
+    visibleColumns () {
+      return this.isBlended
+        ? ['name', 'isConnected', 'progress', 'expand']
+        : ['name', 'progress', 'expand'];
+    },
+  },
   methods: {
-    goToLearnerProfile (row) {
+    goToLearnerProfile (row, $event) {
+      if (!this.canReadLearnerInfo) return;
+
+      $event.stopPropagation();
       const name = this.isClientInterface ? 'ni courses learners info' : 'ni users learners info';
       this.$router.push({ name, params: { learnerId: row._id, defaultTab: 'courses' } });
     },
@@ -94,6 +129,7 @@ export default {
     width: 100%
   .name
     width: fit-content;
+  .cliquable-name
     text-decoration: underline
     color: $primary
 </style>

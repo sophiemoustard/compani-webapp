@@ -38,6 +38,7 @@ export const SURCHARGES = {
   publicHoliday: 'Jours fériés',
   twentyFifthOfDecember: '25 décembre',
   firstOfMay: '1er mai',
+  firstOfJanuary: '1er janvier',
   evening: 'Soirée',
   custom: 'Personnalisée',
 };
@@ -244,11 +245,13 @@ export const DIRECT_DEBIT = 'direct_debit';
 export const BANK_TRANSFER = 'bank_transfer';
 export const CHECK = 'check';
 export const CESU = 'cesu';
+export const CASH = 'cash';
 export const PAYMENT_OPTIONS = [
   { label: 'Prélèvement', value: DIRECT_DEBIT },
   { label: 'Virement', value: BANK_TRANSFER },
   { label: 'Chèque', value: CHECK },
   { label: 'CESU', value: CESU },
+  { label: 'Espèces', value: CASH },
 ];
 export const REFUND = 'refund';
 export const PAYMENT = 'payment';

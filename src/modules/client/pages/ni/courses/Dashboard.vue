@@ -58,8 +58,10 @@
     <div class="q-mt-xl">
       <p class="text-weight-bold section-title">Evolution dans le temps</p>
       <div class="row">
-        <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData"
-        class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
+        <ni-line-chart title="Apprenants actifs mensuels" :chart-data="chartData(this.traineesByMonth)"
+          class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
+        <ni-line-chart title="Nombre total d'activités réalisées par mois"
+          :chart-data="chartData(this.activitiesByMonth)" class="col-xs-12 col-md-6 q-mt-sm line-chart-container" />
       </div>
     </div>
   </q-page>
@@ -78,12 +80,12 @@ import LineChart from '@components/charts/LineChart';
 import { DEFAULT_AVATAR } from '@data/constants';
 import moment from '@helpers/moment';
 import { formatIdentity, upperCaseFirstLetter } from '@helpers/utils';
-import { traineeChartMixin } from '@mixins/traineeChartMixin';
+import { chartMixin } from '@mixins/chartMixin';
 
 export default {
   name: 'CourseDashboard',
   metaInfo: { title: 'Tableau de bord des formations' },
-  mixins: [traineeChartMixin],
+  mixins: [chartMixin],
   components: {
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
@@ -131,7 +133,7 @@ export default {
   },
   async created () {
     await this.getActivityHistories();
-    await this.computeChartData();
+    await this.computeChartsData();
   },
   methods: {
     async getActivityHistories () {
@@ -149,13 +151,14 @@ export default {
         NotifyNegative('Erreur lors de la récupération des données.');
       }
     },
-    async computeChartData () {
+    async computeChartsData () {
       try {
         const chartStartDate = new Date(new Date().getFullYear(), new Date().getMonth() - 6, 1);
         const chartEndDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
         const sixMonthsHistories = await ActivityHistories.list({ startDate: chartStartDate, endDate: chartEndDate });
 
-        this.traineesByMonth = this.getTraineeByMonth(sixMonthsHistories);
+        this.traineesByMonth = this.getDataByMonth(sixMonthsHistories, 'user._id');
+        this.activitiesByMonth = this.getDataByMonth(sixMonthsHistories);
         NotifyPositive('Données mises à jour.');
       } catch (e) {
         console.error(e);

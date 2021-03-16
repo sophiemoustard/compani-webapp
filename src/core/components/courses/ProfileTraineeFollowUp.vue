@@ -26,7 +26,7 @@
           @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" />
+    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" is-blended />
     <div v-if="questionnaireActivities.length" class="q-my-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaire-container">
@@ -55,7 +55,6 @@
 <script>
 import { mapState } from 'vuex';
 import { required, requiredIf } from 'vuelidate/lib/validators';
-import moment from '@helpers/moment';
 import AttendanceSheets from '@api/AttendanceSheets';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
@@ -64,6 +63,7 @@ import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
+import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 

@@ -25,6 +25,7 @@ export const traineeFollowUpTableMixin = {
         identity: { ...trainee.identity, fullName: formattedName },
         progress: trainee.progress,
         steps: trainee.steps,
+        firstMobileConnection: trainee.firstMobileConnection,
       };
     },
     async getLearnersList () {

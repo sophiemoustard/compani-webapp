@@ -214,6 +214,8 @@ export const payMixin = {
         startDate: moment().startOf('M').toISOString(),
         endDate: moment().endOf('M').toISOString(),
       },
+      pay: {},
+      surchargeDetailKey: '',
     };
   },
   methods: {
@@ -329,6 +331,24 @@ export const payMixin = {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement du document.');
       }
+    },
+    shouldDisplayDetails (id, details, draftPays) {
+      const draft = draftPays.find(dp => dp.auxiliary._id === id);
+      if (!draft) return false;
+
+      return Object.keys(draft[details]).length || (draft.diff[details] && Object.keys(draft.diff[details]).length);
+    },
+    openSurchargeDetailModal (id, details, draftPays) {
+      const draft = draftPays.find(ds => ds.auxiliary._id === id);
+      if (!draft) return;
+
+      this.pay = draft;
+      this.surchargeDetailKey = details;
+      this.surchargeDetailModal = true;
+    },
+    resetSurchargeDetail () {
+      this.pay = {};
+      this.surchargeDetailKey = '';
     },
   },
 };

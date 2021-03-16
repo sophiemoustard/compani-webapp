@@ -9,7 +9,7 @@
           :error-message="passwordError($v.password)" required-field />
         <ni-input caption="Confirmation nouveau mot de passe" :error="$v.passwordConfirm.$error"
           v-model.trim="passwordConfirm" @blur="$v.passwordConfirm.$touch" type="password" required-field
-          :error-message="passwordConfirmError" />
+          :error-message="passwordConfirmError($v.passwordConfirm)" />
         <div class="row justify-center">
           <q-btn @click="submit" color="primary" :disable="$v.$invalid">Envoyer</q-btn>
         </div>
