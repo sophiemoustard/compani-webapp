@@ -1,16 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <template v-if="course">
-      <ni-profile-header :title="courseName">
-        <template #body>
-          <div class="row profile-info q-pl-lg">
-            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
-              <q-item-section>{{ info.label }}</q-item-section>
-            </q-item>
-          </div>
-        </template>
-      </ni-profile-header>
+      <ni-blended-course-profile-header :title="courseName" />
       <div v-if="isCourseInter">
         <ni-profile-organization :profile-id="courseId" />
       </div>
@@ -25,10 +16,10 @@
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
-import ProfileHeader from '@components/ProfileHeader';
 import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
+import BlendedCourseProfileHeader from '../../../../../core/components/BlendedCourseProfileHeader';
 
 export default {
   name: 'BlendedCourseProfile',
@@ -41,7 +32,7 @@ export default {
   components: {
     'profile-tabs': ProfileTabs,
     'ni-profile-organization': ProfileOrganization,
-    'ni-profile-header': ProfileHeader,
+    'ni-blended-course-profile-header': BlendedCourseProfileHeader,
   },
   computed: {
     isCourseInter () {
