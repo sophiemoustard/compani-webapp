@@ -234,6 +234,7 @@ export default {
           ? { company: this.selectedCompany }
           : { hasCompany: true });
       } catch (error) {
+        this.potentialTrainees = [];
         console.error(error);
       }
     },
@@ -244,7 +245,6 @@ export default {
         this.modalLoading = true;
         this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee, s));
         this.traineeAdditionModal = false;
-        NotifyPositive('Participant ajouté.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'ajout du participant.');
