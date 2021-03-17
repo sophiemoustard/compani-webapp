@@ -38,43 +38,29 @@
         </q-card-actions>
       </q-card>
     </div>
-    <div class="q-mb-xl">
-      <p class="text-weight-bold">Testeurs</p>
-      <q-card>
-        <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter un testeur" @click="testerCreationModal = true" />
-        </q-card-actions>
-      </q-card>
-    </div>
+    <tester-table :program-id="profileId" />
 
     <category-addition-modal v-model="categoryAdditionModal" :new-category.sync="newCategory" :loading="loading"
       @hide="resetModal" @submit="addCategory" :category-options="categoryOptions" :validations="$v.newCategory" />
-
-    <tester-creation-modal v-model="testerCreationModal" :new-tester.sync="newTester" :validations="$v.newTester"
-      :first-step="firstStep" :loading="testerCreationModalLoading" @next-step="nextStepTesterCreationModal"
-      :identity-step="addnewTesterIdentityStep" @hide="resetTesterCreationModal" @submit="addTester" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required, email } from 'vuelidate/lib/validators';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
-import Users from '@api/Users';
 import Programs from '@api/Programs';
 import Categories from '@api/Categories';
-import Email from '@api/Email';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import CategoryAdditionModal from 'src/modules/vendor/components/programs/CategoryAdditionModal';
-import TesterCreationModal from 'src/modules/vendor/components/programs/TesterCreationModal';
+import TesterTable from 'src/modules/vendor/components/programs/TesterTable';
 import Button from '@components/Button';
-import { IMAGE_EXTENSIONS, TRAINEE } from '@data/constants';
+import { IMAGE_EXTENSIONS } from '@data/constants';
 import { upperCaseFirstLetter, formatAndSortOptions } from '@helpers/utils';
-import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 
 export default {
   name: 'ProfileInfo',
@@ -87,7 +73,7 @@ export default {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
     'category-addition-modal': CategoryAdditionModal,
-    'tester-creation-modal': TesterCreationModal,
+    'tester-table': TesterTable,
   },
   data () {
     return {
@@ -128,11 +114,6 @@ export default {
         learningGoals: { required },
       },
       newCategory: { required },
-      newTester: {
-        local: { email: { required, email } },
-        identity: { lastname: { required } },
-        contact: { phone: { required, frPhoneNumber } },
-      },
     };
   },
   computed: {
@@ -263,67 +244,6 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.removeCategory(category._id))
         .onCancel(() => NotifyPositive('Retrait annulé.'));
-    },
-    async nextStepTesterCreationModal () {
-      try {
-        this.$v.newTester.$touch();
-        if (this.$v.newTester.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
-
-        this.testerCreationModalLoading = true;
-        const userInfo = await Users.exists({ email: this.newTester.local.email });
-
-        if (userInfo.exists) {
-          await Programs.addTester(this.profileId, { local: { email: this.newTester.local.email } });
-          NotifyPositive('Testeur ajouté avec succès');
-          this.resetTesterCreationModal();
-        } else {
-          this.firstStep = false;
-          this.addnewTesterIdentityStep = true;
-        }
-      } catch (e) {
-        NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
-      } finally {
-        this.testerCreationModalLoading = false;
-      }
-    },
-    async addTester () {
-      try {
-        this.$v.newTester.$touch();
-        if (this.$v.newTester.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.testerCreationModalLoading = true;
-        await Programs.addTester(this.profileId, this.newTester);
-        NotifyPositive('Testeur ajouté avec succès');
-
-        await this.sendWelcome();
-        this.resetTesterCreationModal();
-      } catch (e) {
-        console.error(e);
-        if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du testeur.');
-      } finally {
-        this.testerCreationModalLoading = false;
-      }
-    },
-    async sendWelcome () {
-      try {
-        await Email.sendWelcome({ email: this.newTester.local.email, type: TRAINEE });
-        NotifyPositive('Email envoyé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'envoi de l\' email.');
-      }
-    },
-    resetTesterCreationModal () {
-      this.testerCreationModal = false;
-      this.firstStep = true;
-      this.addnewTesterIdentityStep = false;
-      this.newTester = {
-        local: { email: '' },
-        identity: { firstname: '', lastname: '' },
-        contact: { phone: '' },
-      };
-      this.$v.newTester.$reset();
     },
   },
 };
