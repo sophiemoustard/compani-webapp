@@ -31,6 +31,7 @@ export const defineAbilitiesFor = (user) => {
   if (vendorRole) can('read', getVendorAbilities(vendorRole));
   if (!clientRole && !vendorRole) can('read', 'account client');
   if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('set', 'user_company');
+  if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole)) can('update', 'course_trainee_follow_up');
 
   if ([VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(vendorRole) ||
       [CLIENT_ADMIN, COACH, PLANNING_REFERENT].includes(clientRole)) can('read', 'learner_info');

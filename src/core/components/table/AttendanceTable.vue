@@ -59,15 +59,16 @@
 </template>
 
 <script>
+import pick from 'lodash/pick';
 import { required } from 'vuelidate/lib/validators';
-import { minArrayLength } from '@helpers/vuelidateCustomVal';
-import moment from '@helpers/moment';
-import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR, INTRA } from '@data/constants';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import Button from '@components/Button';
 import Attendances from '@api/Attendances';
 import Users from '@api/Users';
+import Button from '@components/Button';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import { DEFAULT_AVATAR, INTRA } from '@data/constants';
+import { minArrayLength } from '@helpers/vuelidateCustomVal';
+import moment from '@helpers/moment';
+import { upperCaseFirstLetter, formatIdentity, defineAbilitiesFor } from '@helpers/utils';
 import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
@@ -162,6 +163,11 @@ export default {
     },
     selectedCompany () {
       return this.course.company ? this.course.company._id : '';
+    },
+    canUpdateAttendance () {
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+
+      return ability.can('update', 'course_trainee_follow_up');
     },
   },
   methods: {
