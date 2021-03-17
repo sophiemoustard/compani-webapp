@@ -9,9 +9,6 @@ export const blendedCourseProfileMixin = {
   computed: {
     ...mapState('course', ['course']),
   },
-  async created () {
-    if (!this.course) await this.refreshCourse();
-  },
   methods: {
     async refreshCourse () {
       try {

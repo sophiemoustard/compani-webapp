@@ -57,6 +57,10 @@ export default {
       ];
     },
   },
+  async created () {
+    if (!this.course) await this.refreshCourse();
+    this.courseName = this.composeCourseName(this.course, true);
+  },
   watch: {
     course () {
       this.courseName = this.composeCourseName(this.course, true);
