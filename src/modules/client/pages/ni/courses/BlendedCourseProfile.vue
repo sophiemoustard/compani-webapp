@@ -3,10 +3,10 @@
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" :header-info="headerInfo" />
       <div v-if="isIntraCourse">
-        <ni-profile-organization :profile-id="courseId" />
+        <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
       </div>
       <div v-else>
-        <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
+        <ni-profile-organization :profile-id="courseId" />
       </div>
     </template>
   </q-page>
