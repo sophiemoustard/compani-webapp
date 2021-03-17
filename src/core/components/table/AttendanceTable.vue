@@ -37,7 +37,7 @@
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
-              @input="updateCheckbox(col.value, col.slot)" :disable="loading" />
+              @input="updateCheckbox(col.value, col.slot)" :disable="loading || !canUpdateAttendance" />
           </q-td>
         </q-tr>
       </template>
@@ -45,7 +45,7 @@
         <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
       </template>
     </q-table>
-    <ni-button color="primary" icon="add" label="Ajouter un participant" :disable="loading"
+    <ni-button v-if="canUpdateAttendance" color="primary" icon="add" label="Ajouter un participant" :disable="loading"
       @click="traineeAdditionModal = true" class="q-mb-sm" />
     <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
