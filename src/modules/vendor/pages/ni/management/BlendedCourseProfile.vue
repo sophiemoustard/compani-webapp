@@ -3,9 +3,7 @@
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" @validate-course-deletion="validateCourseDeletion"
         :disable-course-deletion="disableCourseDeletion" :header-info="headerInfo" />
-      <div>
-        <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
-      </div>
+      <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>
 </template>
