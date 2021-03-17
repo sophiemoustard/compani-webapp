@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <template v-if="course">
-      <ni-blended-course-profile-header :title="courseName" />
+      <ni-blended-course-profile-header :title="courseName" :header-info="headerInfo" />
       <div v-if="isCourseInter">
         <ni-profile-organization :profile-id="courseId" />
       </div>

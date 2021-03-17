@@ -17,14 +17,13 @@
 <script>
 import ProfileHeader from '@components/ProfileHeader';
 import Button from '@components/Button';
-import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
 export default {
   name: 'BlendedCourseProfileHeader',
-  mixins: [blendedCourseProfileMixin],
   props: {
     title: { type: String, required: true },
     disableCourseDeletion: { type: Boolean, default: true },
+    headerInfo: { type: Array, required: true },
   },
   components: {
     'ni-profile-header': ProfileHeader,
