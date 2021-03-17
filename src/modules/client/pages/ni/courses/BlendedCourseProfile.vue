@@ -1,5 +1,5 @@
 <template>
-  <q-page padding :class="backgroundClass">
+  <q-page padding class="client-background">
     <template v-if="course">
       <ni-profile-header :title="courseName">
         <template #body>
@@ -24,8 +24,8 @@
 <script>
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
-import ProfileHeader from '@components/ProfileHeader';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
+import ProfileHeader from '@components/ProfileHeader';
 import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
@@ -39,14 +39,9 @@ export default {
     defaultTab: { type: String, default: 'organization' },
   },
   components: {
-    'ni-profile-header': ProfileHeader,
     'profile-tabs': ProfileTabs,
     'ni-profile-organization': ProfileOrganization,
-  },
-  data () {
-    return {
-      backgroundClass: 'client-background',
-    };
+    'ni-profile-header': ProfileHeader,
   },
   computed: {
     isCourseInter () {
@@ -71,7 +66,6 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    this.courseName = this.composeCourseName(this.course);
   },
 };
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <q-page padding :class="backgroundClass">
+  <q-page padding class="vendor-background">
     <template v-if="course">
       <ni-profile-header :title="courseName" class="delete-container">
         <template #title>
@@ -46,11 +46,6 @@ export default {
     'profile-tabs': ProfileTabs,
     'ni-button': Button,
   },
-  data () {
-    return {
-      backgroundClass: 'vendor-background',
-    };
-  },
   computed: {
     disableCourseDeletion () {
       return !!this.course.slots.length || !!this.course.trainees.length || !!this.course.slotsToPlan.length;
@@ -80,7 +75,6 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    this.courseName = this.composeCourseName(this.course, true);
   },
   methods: {
     async deleteCourse () {
