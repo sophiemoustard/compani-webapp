@@ -14,6 +14,7 @@ import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
 import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
+import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 
@@ -41,6 +42,12 @@ export default {
           component: ProfileOrganization,
         },
         { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
+        {
+          label: 'Suivi des stagiaires',
+          name: 'traineeFollowUp',
+          default: this.defaultTab === 'traineeFollowUp',
+          component: ProfileTraineeFollowUp,
+        },
       ];
     },
   },
