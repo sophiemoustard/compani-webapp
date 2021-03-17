@@ -126,6 +126,15 @@ export default {
         { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
         { name: 'balance', label: 'Solde', align: 'center', field: row => row.balance, sortable: true },
         {
+          name: 'lastCesuPaymentDate',
+          label: 'Date du dernier prelevement CESU',
+          field: 'lastCesuPaymentDate',
+          align: 'center',
+          sortable: true,
+          format: value => this.formatDate(value),
+          style: 'max-width: 60px; text-align: left',
+        },
+        {
           name: 'toPay',
           label: 'A Prélever',
           align: 'center',
@@ -224,6 +233,9 @@ export default {
     },
     formatCustomer (data) {
       return formatIdentity(data.customer.identity, 'Lf');
+    },
+    formatDate (value) {
+      return value ? `${moment(value).format('DD/MM/YY')}` : '';
     },
     async exportToCSV () {
       const csvData = [[
