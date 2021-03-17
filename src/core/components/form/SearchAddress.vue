@@ -81,10 +81,8 @@ export default {
 <style lang="stylus" scoped>
   /deep/ .q-select
     width: 100%
-
-  .q-select__dropdown-icon
-    display: none
-
-  .q-spinner
-    display: none
+    .q-select__dropdown-icon
+      display: none
+    .q-spinner
+      display: none
 </style>
