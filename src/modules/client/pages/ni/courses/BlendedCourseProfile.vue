@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" :header-info="headerInfo" />
-      <div v-if="isCourseInter">
+      <div v-if="isIntraCourse">
         <ni-profile-organization :profile-id="courseId" />
       </div>
       <div v-else>
@@ -13,10 +13,10 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
-import { INTER_B2B } from '@data/constants';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
 import BlendedCourseProfileHeader from '../../../../../core/components/BlendedCourseProfileHeader';
@@ -35,9 +35,7 @@ export default {
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
   },
   computed: {
-    isCourseInter () {
-      return this.course.type === INTER_B2B;
-    },
+    ...mapState('course', ['course']),
     tabsContent () {
       return [
         {

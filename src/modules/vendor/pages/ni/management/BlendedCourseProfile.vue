@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
@@ -34,6 +35,7 @@ export default {
     'profile-tabs': ProfileTabs,
   },
   computed: {
+    ...mapState('course', ['course']),
     disableCourseDeletion () {
       return !!this.course.slots.length || !!this.course.trainees.length || !!this.course.slotsToPlan.length;
     },

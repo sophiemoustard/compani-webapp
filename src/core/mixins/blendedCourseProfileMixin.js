@@ -8,12 +8,6 @@ export const blendedCourseProfileMixin = {
   },
   computed: {
     ...mapState('course', ['course']),
-    headerInfo () {
-      return [
-        { icon: 'bookmark_border', label: this.courseType },
-        { icon: 'emoji_people', label: this.trainerName },
-      ];
-    },
   },
   async created () {
     if (!this.course) await this.refreshCourse();
