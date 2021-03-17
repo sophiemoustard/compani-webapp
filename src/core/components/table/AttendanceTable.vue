@@ -59,6 +59,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import pick from 'lodash/pick';
 import { required } from 'vuelidate/lib/validators';
 import Attendances from '@api/Attendances';
@@ -106,6 +107,7 @@ export default {
     await this.getTrainees();
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
     columns () {
       const columns = [{
         name: 'trainee',
@@ -202,6 +204,8 @@ export default {
       }
     },
     async updateCheckbox (traineeId, slotId) {
+      if (!this.canUpdateAttendance) return NotifyNegative('Erreur lors de la suppression de l\'émargement.');
+
       if (this.checkboxValue(traineeId, slotId)) {
         try {
           this.loading = true;
@@ -241,6 +245,8 @@ export default {
     },
     async addTrainee () {
       try {
+        if (!this.canUpdateAttendance) return NotifyNegative('Erreur lors de l\'ajout du participant.');
+
         this.$v.newTraineeAttendance.$touch();
         if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
