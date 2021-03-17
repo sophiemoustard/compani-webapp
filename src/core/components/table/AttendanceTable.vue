@@ -68,7 +68,8 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { DEFAULT_AVATAR, INTRA } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { upperCaseFirstLetter, formatIdentity, defineAbilitiesFor } from '@helpers/utils';
+import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
+import { defineAbilitiesFor } from '@helpers/ability';
 import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
