@@ -1,19 +1,8 @@
 <template>
   <q-page padding class="vendor-background">
     <template v-if="course">
-      <ni-profile-header :title="courseName" class="delete-container">
-        <template #title>
-          <ni-button class="delete" icon="delete" @click="validateCourseDeletion" :disabled="disableCourseDeletion" />
-        </template>
-        <template #body>
-          <div class="row profile-info q-pl-lg">
-            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
-              <q-item-section>{{ info.label }}</q-item-section>
-            </q-item>
-          </div>
-        </template>
-      </ni-profile-header>
+      <ni-blended-course-profile-header :title="courseName" @validate-course-deletion="validateCourseDeletion"
+        :disable-course-deletion="disableCourseDeletion" />
       <div>
         <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
       </div>
@@ -23,11 +12,10 @@
 
 <script>
 import Courses from '@api/Courses';
-import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
-import ProfileHeader from '@components/ProfileHeader';
+import BlendedCourseProfileHeader from '@components/BlendedCourseProfileHeader';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
@@ -42,9 +30,8 @@ export default {
     defaultTab: { type: String, default: 'organization' },
   },
   components: {
-    'ni-profile-header': ProfileHeader,
+    'ni-blended-course-profile-header': BlendedCourseProfileHeader,
     'profile-tabs': ProfileTabs,
-    'ni-button': Button,
   },
   computed: {
     disableCourseDeletion () {
@@ -72,9 +59,6 @@ export default {
     course () {
       this.courseName = this.composeCourseName(this.course, true);
     },
-  },
-  async created () {
-    if (!this.course) await this.refreshCourse();
   },
   methods: {
     async deleteCourse () {
@@ -109,12 +93,4 @@ export default {
 
 /deep/ h4
   margin-right: 32px !important
-
-.delete-container
-  position: relative
-
-.delete
-  position: absolute
-  top: 0
-  right: 0
 </style>

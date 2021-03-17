@@ -55,9 +55,6 @@ export default {
       this.courseName = this.composeCourseName(this.course);
     },
   },
-  async created () {
-    if (!this.course) await this.refreshCourse();
-  },
 };
 </script>
 

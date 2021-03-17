@@ -15,6 +15,9 @@ export const blendedCourseProfileMixin = {
       ];
     },
   },
+  async created () {
+    if (!this.course) await this.refreshCourse();
+  },
   methods: {
     async refreshCourse () {
       try {
