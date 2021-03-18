@@ -39,7 +39,6 @@ export default {
     firstStep: { type: Boolean, default: true },
     identityStep: { type: Boolean, default: false },
     newTester: { type: Object, default: () => ({}) },
-    companyOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },

@@ -94,15 +94,6 @@ export default {
         { name: 'actions', label: '', field: '_id' },
       ],
       categoryAdditionModal: false,
-      testerCreationModal: false,
-      newTester: {
-        local: { email: '' },
-        identity: { firstname: '', lastname: '' },
-        contact: { phone: '' },
-      },
-      firstStep: true,
-      testerCreationModalLoading: false,
-      addnewTesterIdentityStep: false,
       loading: false,
     };
   },
