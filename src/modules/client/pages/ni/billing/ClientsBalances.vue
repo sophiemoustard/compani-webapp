@@ -75,6 +75,7 @@ import {
   truncate,
   roundFrenchPercentage,
   formatNumberForCSV,
+  formatDate,
 } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
@@ -125,14 +126,8 @@ export default {
         { name: 'billed', label: 'Facturé TTC', align: 'center', field: 'billed', format: val => formatPrice(val) },
         { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
         { name: 'balance', label: 'Solde', align: 'center', field: row => row.balance, sortable: true },
-        {
-          name: 'toPay',
-          label: 'A Prélever',
-          align: 'center',
-          field: 'toPay',
-          format: value => formatPrice(value),
-          sortable: true,
-        },
+        { name: 'lastCesuDate', label: 'Dernier CESU', field: 'lastCesuDate', align: 'center', format: formatDate },
+        { name: 'toPay', label: 'A Prélever', align: 'center', field: 'toPay', format: formatPrice, sortable: true },
         { name: 'actions', label: '', align: 'left', field: row => row.customer._id },
       ],
       pagination: { rowsPerPage: 0 },
