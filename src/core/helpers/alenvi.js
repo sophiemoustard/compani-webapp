@@ -3,11 +3,7 @@ import store from 'src/store/index';
 
 export const canNavigate = async () => {
   const { loggedUser } = store.state.main;
-  if (!loggedUser) {
-    const auth = await refreshAlenviCookies();
-    if (auth) await store.dispatch('main/fetchLoggedUser', auth.user._id);
-    else return false;
-  }
+  if (!loggedUser) return refreshState();
 
   return true;
 };
@@ -32,10 +28,9 @@ export const refreshState = async () => {
 };
 
 export const isUserLogged = async () => {
-  const refresh = await refreshAlenviCookies();
+  const refresh = await refreshState();
   if (!refresh) return false;
 
-  await store.dispatch('main/fetchLoggedUser', refresh.user._id);
   const loggedUser = store.getters['main/getLoggedUser'];
   if (loggedUser) return true;
 
