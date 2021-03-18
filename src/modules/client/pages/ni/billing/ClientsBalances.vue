@@ -126,22 +126,14 @@ export default {
         { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
         { name: 'balance', label: 'Solde', align: 'center', field: row => row.balance, sortable: true },
         {
-          name: 'lastCesuPaymentDate',
-          label: 'Date du dernier prelevement CESU',
-          field: 'lastCesuPaymentDate',
+          name: 'lastCesuDate',
+          label: 'Dernier CESU',
+          field: 'lastCesuDate',
           align: 'center',
-          sortable: true,
-          format: value => this.formatDate(value),
-          style: 'max-width: 60px; text-align: left',
+          format: this.formatDate,
+          style: 'max-width: 60px',
         },
-        {
-          name: 'toPay',
-          label: 'A Prélever',
-          align: 'center',
-          field: 'toPay',
-          format: value => formatPrice(value),
-          sortable: true,
-        },
+        { name: 'toPay', label: 'A Prélever', align: 'center', field: 'toPay', format: formatPrice, sortable: true },
         { name: 'actions', label: '', align: 'left', field: row => row.customer._id },
       ],
       pagination: { rowsPerPage: 0 },
@@ -235,7 +227,7 @@ export default {
       return formatIdentity(data.customer.identity, 'Lf');
     },
     formatDate (value) {
-      return value ? `${moment(value).format('DD/MM/YY')}` : '';
+      return value ? moment(value).format('DD/MM/YY') : '';
     },
     async exportToCSV () {
       const csvData = [[
