@@ -99,7 +99,7 @@ export default {
   methods: {
     async nextStepTesterCreationModal () {
       try {
-        this.$v.newTester.$touch();
+        this.$v.newTester.local.email.$touch();
         if (this.$v.newTester.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         this.testerCreationModalLoading = true;
