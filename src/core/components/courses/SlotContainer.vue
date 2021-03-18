@@ -97,7 +97,7 @@ export default {
           endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
-        step: null,
+        step: '',
       },
       editedCourseSlot: {},
       editionModal: false,
@@ -176,7 +176,7 @@ export default {
     stepOptions () {
       if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
       return [
-        { label: 'Pas d\'étape spécifiée', value: null },
+        { label: 'Pas d\'étape spécifiée', value: '' },
         ...this.course.subProgram.steps.map((step, index) => ({
           label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
           value: step._id,
@@ -222,7 +222,7 @@ export default {
           endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
-        step: null,
+        step: '',
       };
       this.$v.newCourseSlot.$reset();
     },
@@ -243,7 +243,7 @@ export default {
         _id: slot._id,
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
-        step: get(slot, 'step._id') || null,
+        step: get(slot, 'step._id') || '',
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;
