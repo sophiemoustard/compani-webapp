@@ -28,6 +28,6 @@ export default {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/programs/${programId}/categories/${categoryId}`);
   },
   async addTester (programId, payload) {
-    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/tester`, payload);
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/testers`, payload);
   },
 };

@@ -32,7 +32,7 @@ import { userMixin } from '@mixins/userMixin';
 import set from 'lodash/set';
 
 export default {
-  name: 'LearnerCreationModal',
+  name: 'TesterCreationModal',
   mixins: [userMixin],
   props: {
     value: { type: Boolean, default: false },

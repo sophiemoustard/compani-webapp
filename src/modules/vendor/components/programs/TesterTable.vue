@@ -5,7 +5,7 @@
         <p class="text-weight-bold table-title">Testeurs</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="testers" :columns="testersColumns" :pagination.sync="testersPagination" />
+        <ni-responsive-table :data="testers" :columns="columns" :pagination.sync="pagination" />
         <q-card-actions align="right">
           <ni-button color="primary" icon="add" label="Ajouter un testeur" :disable="loading"
             @click="testerCreationModal = true" />
@@ -14,7 +14,7 @@
     </div>
 
     <tester-creation-modal v-model="testerCreationModal" :new-tester.sync="newTester" :validations="$v.newTester"
-      :first-step="firstStep" :loading="testerCreationModalLoading" @next-step="nextStepTesterCreationModal"
+      :first-step="firstStep" :loading="modalLoading" @next-step="nextStepTesterCreationModal"
       @hide="resetTesterCreationModal" @submit="addTester" />
   </div>
 </template>
@@ -36,7 +36,7 @@ import Programs from '@api/Programs';
 import Users from '@api/Users';
 
 export default {
-  name: 'TraineeTable',
+  name: 'TesterTable',
   mixins: [userMixin, courseMixin],
   props: {
     programId: { type: String, required: true },
@@ -49,7 +49,7 @@ export default {
   },
   data () {
     return {
-      testersColumns: [
+      columns: [
         {
           name: 'firstname',
           label: 'Prénom',
@@ -70,11 +70,11 @@ export default {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: value => formatPhone(value),
+          format: formatPhone,
         },
       ],
       loading: false,
-      testersPagination: { rowsPerPage: 0, sortBy: 'lastname' },
+      pagination: { rowsPerPage: 0, sortBy: 'lastname' },
       testerCreationModal: false,
       newTester: {
         local: { email: '' },
@@ -82,7 +82,7 @@ export default {
         contact: { phone: '' },
       },
       firstStep: true,
-      testerCreationModalLoading: false,
+      modalLoading: false,
     };
   },
   validations () {
@@ -100,13 +100,13 @@ export default {
         this.$v.newTester.local.email.$touch();
         if (this.$v.newTester.local.email.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        this.testerCreationModalLoading = true;
+        this.modalLoading = true;
         const userInfo = await Users.exists({ email: this.newTester.local.email });
 
         if (userInfo.exists) {
           await Programs.addTester(this.programId, { local: { email: this.newTester.local.email } });
 
-          NotifyPositive('Testeur ajouté avec succès');
+          NotifyPositive('Testeur ajouté avec succès.');
           this.resetTesterCreationModal();
           this.$emit('refresh');
         } else {
@@ -116,7 +116,7 @@ export default {
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
-        this.testerCreationModalLoading = false;
+        this.modalLoading = false;
       }
     },
     async addTester () {
@@ -124,9 +124,9 @@ export default {
         this.$v.newTester.$touch();
         if (this.$v.newTester.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        this.testerCreationModalLoading = true;
+        this.modalLoading = true;
         await Programs.addTester(this.programId, this.newTester);
-        NotifyPositive('Testeur ajouté avec succès');
+        NotifyPositive('Testeur ajouté avec succès.');
 
         await this.sendWelcome();
         this.resetTesterCreationModal();
@@ -136,7 +136,7 @@ export default {
         if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du testeur.');
       } finally {
-        this.testerCreationModalLoading = false;
+        this.modalLoading = false;
       }
     },
     async sendWelcome () {
