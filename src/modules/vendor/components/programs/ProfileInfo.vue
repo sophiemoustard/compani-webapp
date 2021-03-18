@@ -38,7 +38,7 @@
         </q-card-actions>
       </q-card>
     </div>
-    <tester-table :program-id="profileId" />
+    <tester-table :program-id="profileId" :testers="program.testers" @refresh="refreshProgram" />
 
     <category-addition-modal v-model="categoryAdditionModal" :new-category.sync="newCategory" :loading="loading"
       @hide="resetModal" @submit="addCategory" :category-options="categoryOptions" :validations="$v.newCategory" />

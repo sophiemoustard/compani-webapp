@@ -5,12 +5,14 @@
         <p class="text-weight-bold table-title">Testeurs</p>
       </div>
       <q-card>
+        <ni-responsive-table :data="testers" :columns="testersColumns" :pagination.sync="testersPagination" />
         <q-card-actions align="right">
           <ni-button color="primary" icon="add" label="Ajouter un testeur" :disable="loading"
             @click="testerCreationModal = true" />
         </q-card-actions>
       </q-card>
     </div>
+
     <tester-creation-modal v-model="testerCreationModal" :new-tester.sync="newTester" :validations="$v.newTester"
       :first-step="firstStep" :loading="testerCreationModalLoading" @next-step="nextStepTesterCreationModal"
       :identity-step="addnewTesterIdentityStep" @hide="resetTesterCreationModal" @submit="addTester" />
@@ -25,7 +27,7 @@ import { formatPhone } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
 import TesterCreationModal from 'src/modules/vendor/components/programs/TesterCreationModal';
-// import ResponsiveTable from '@components/table/ResponsiveTable';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -38,22 +40,16 @@ export default {
   mixins: [userMixin, courseMixin],
   props: {
     programId: { type: String, required: true },
+    testers: { type: Array, default: () => [] },
   },
   components: {
     'ni-button': Button,
     'tester-creation-modal': TesterCreationModal,
-    // 'ni-responsive-table': ResponsiveTable,
+    'ni-responsive-table': ResponsiveTable,
   },
   data () {
     return {
-      traineesColumns: [
-        {
-          name: 'company',
-          label: 'Structure',
-          align: 'left',
-          field: row => get(row, 'company.name') || '',
-          classes: 'text-capitalize',
-        },
+      testersColumns: [
         {
           name: 'firstname',
           label: 'Prénom',
@@ -76,14 +72,9 @@ export default {
           field: row => get(row, 'contact.phone') || '',
           format: value => formatPhone(value),
         },
-        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       loading: false,
-      traineesPagination: {
-        rowsPerPage: 0,
-        sortBy: 'lastname',
-      },
-      companyOptions: [],
+      testersPagination: { rowsPerPage: 0, sortBy: 'lastname' },
       testerCreationModal: false,
       newTester: {
         local: { email: '' },
@@ -116,8 +107,10 @@ export default {
 
         if (userInfo.exists) {
           await Programs.addTester(this.programId, { local: { email: this.newTester.local.email } });
+
           NotifyPositive('Testeur ajouté avec succès');
           this.resetTesterCreationModal();
+          this.$emit('refresh');
         } else {
           this.firstStep = false;
           this.addnewTesterIdentityStep = true;
@@ -139,6 +132,7 @@ export default {
 
         await this.sendWelcome();
         this.resetTesterCreationModal();
+        this.$emit('refresh');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
