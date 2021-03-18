@@ -15,7 +15,7 @@
 
     <tester-creation-modal v-model="testerCreationModal" :new-tester.sync="newTester" :validations="$v.newTester"
       :first-step="firstStep" :loading="testerCreationModalLoading" @next-step="nextStepTesterCreationModal"
-      :identity-step="addnewTesterIdentityStep" @hide="resetTesterCreationModal" @submit="addTester" />
+      @hide="resetTesterCreationModal" @submit="addTester" />
   </div>
 </template>
 
@@ -83,8 +83,6 @@ export default {
       },
       firstStep: true,
       testerCreationModalLoading: false,
-      addnewTesterIdentityStep: false,
-
     };
   },
   validations () {
@@ -113,7 +111,6 @@ export default {
           this.$emit('refresh');
         } else {
           this.firstStep = false;
-          this.addnewTesterIdentityStep = true;
         }
       } catch (e) {
         if (e.status === 409) return NotifyNegative(e.data.message);
@@ -154,7 +151,6 @@ export default {
     resetTesterCreationModal () {
       this.testerCreationModal = false;
       this.firstStep = true;
-      this.addnewTesterIdentityStep = false;
       this.newTester = {
         local: { email: '' },
         identity: { firstname: '', lastname: '' },

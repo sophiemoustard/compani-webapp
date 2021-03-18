@@ -6,7 +6,7 @@
       <ni-input in-modal :value="newTester.local.email" @input="update($event.trim(), 'local.email')" caption="Email"
         @blur="validations.local.email.$touch" :error-message="emailError(validations)"
         :error="validations.local.email.$error" required-field :last="firstStep" :disable="!firstStep" />
-      <template v-if="!firstStep && identityStep">
+      <template v-if="!firstStep">
         <ni-input in-modal :value="newTester.identity.firstname" @input="update($event, 'identity.firstname')"
           caption="Prénom" />
         <ni-input in-modal :value="newTester.identity.lastname" @input="update($event, 'identity.lastname')"
@@ -37,7 +37,6 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     firstStep: { type: Boolean, default: true },
-    identityStep: { type: Boolean, default: false },
     newTester: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
