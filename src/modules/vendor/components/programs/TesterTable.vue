@@ -116,6 +116,7 @@ export default {
           this.addnewTesterIdentityStep = true;
         }
       } catch (e) {
+        if (e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
         this.testerCreationModalLoading = false;
