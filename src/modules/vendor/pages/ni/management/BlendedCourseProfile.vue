@@ -1,8 +1,8 @@
 <template>
   <q-page padding class="vendor-background">
     <template v-if="course">
-      <ni-blended-course-profile-header :title="courseName" @validate-course-deletion="validateCourseDeletion"
-        :disable-course-deletion="disableCourseDeletion" :header-info="headerInfo" />
+      <ni-blended-course-profile-header :title="courseName" @delete="validateCourseDeletion" :header-info="headerInfo"
+        :disable-course-deletion="disableCourseDeletion" />
       <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>
@@ -14,7 +14,7 @@ import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
-import BlendedCourseProfileHeader from '@components/BlendedCourseProfileHeader';
+import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
 import ProfileTraineeFollowUp from '@components/courses/ProfileTraineeFollowUp';
 import { courseMixin } from '@mixins/courseMixin';
@@ -89,12 +89,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-.q-item
-  padding: 0
-  min-height: 0
-
-/deep/ h4
-  margin-right: 32px !important
-</style>

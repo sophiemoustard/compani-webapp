@@ -2,12 +2,8 @@
   <q-page padding class="client-background">
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" :header-info="headerInfo" />
-      <div v-if="isIntraCourse">
-        <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
-      </div>
-      <div v-else>
-        <ni-profile-organization :profile-id="courseId" />
-      </div>
+      <profile-tabs v-if="isIntraCourse" :profile-id="courseId" :tabs-content="tabsContent" />
+      <ni-profile-organization v-else :profile-id="courseId" />
     </template>
   </q-page>
 </template>
@@ -17,9 +13,9 @@ import { mapState } from 'vuex';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileOrganization from '@components/courses/ProfileOrganization';
 import ProfileAdmin from '@components/courses/ProfileAdmin';
+import BlendedCourseProfileHeader from '@components/courses/BlendedCourseProfileHeader';
 import { courseMixin } from '@mixins/courseMixin';
 import { blendedCourseProfileMixin } from '@mixins/blendedCourseProfileMixin';
-import BlendedCourseProfileHeader from '../../../../../core/components/BlendedCourseProfileHeader';
 
 export default {
   name: 'BlendedCourseProfile',
@@ -59,12 +55,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-.q-item
-  padding: 0
-  min-height: 0
-
-/deep/ h4
-  margin-right: 32px !important
-</style>

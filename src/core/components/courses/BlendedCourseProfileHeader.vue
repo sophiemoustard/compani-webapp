@@ -1,7 +1,7 @@
 <template>
   <ni-profile-header :title="title" class="delete-container">
     <template #title v-if="!isClientInterface">
-      <ni-button class="delete" icon="delete" @click="validateCourseDeletion" :disabled="disableCourseDeletion" />
+      <ni-button class="delete" icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
     </template>
     <template #body>
       <div class="row profile-info q-pl-lg">
@@ -37,8 +37,8 @@ export default {
     };
   },
   methods: {
-    validateCourseDeletion () {
-      this.$emit('validate-course-deletion');
+    deleteCourse () {
+      this.$emit('delete');
     },
   },
 };
