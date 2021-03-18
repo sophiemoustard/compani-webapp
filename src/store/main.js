@@ -9,16 +9,13 @@ export default {
   namespaced: true,
   state: {
     loggedUser: null,
-    refreshState: true,
     drawer: !!Platform.is.desktop || Screen.width >= 1024,
   },
   mutations: {
-    SET_REFRESH_STATE: (state, refresh) => { state.refreshState = refresh; },
     SET_DRAWER: (state, toggle) => { state.drawer = toggle; },
     SET_LOGGED_USER: (state, user) => { state.loggedUser = user; },
   },
   actions: {
-    setRefreshState: ({ commit }, refresh) => { commit('SET_REFRESH_STATE', refresh); },
     setDrawer: ({ commit }, toggle) => { commit('SET_DRAWER', toggle); },
     fetchLoggedUser: async ({ commit }, userId) => {
       try {
@@ -34,7 +31,6 @@ export default {
     },
     resetMain: ({ commit }) => {
       commit('SET_LOGGED_USER', null);
-      commit('SET_REFRESH_STATE', true);
       commit('SET_DRAWER', !!Platform.is.desktop);
     },
   },
