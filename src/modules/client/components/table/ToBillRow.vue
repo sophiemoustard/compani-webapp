@@ -47,9 +47,8 @@
 
 <script>
 import EditableTd from '@components/table/EditableTd';
-import { formatPrice, getLastVersion, formatIdentity, truncate } from '@helpers/utils';
+import { formatPrice, getLastVersion, formatIdentity, truncate, formatDate } from '@helpers/utils';
 import { FIXED } from '@data/constants';
-import moment from '@helpers/moment';
 
 export default {
   name: 'ToBillRow',
@@ -76,7 +75,7 @@ export default {
       return bill.hours ? `${parseFloat(bill.hours).toFixed(2)}h` : '';
     },
     formatDate (value) {
-      return value ? `${moment(value).format('DD/MM/YY')}` : '';
+      return formatDate(value);
     },
     getClientName (customer, bill) {
       if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');

@@ -75,6 +75,7 @@ import {
   truncate,
   roundFrenchPercentage,
   formatNumberForCSV,
+  formatDate,
 } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
@@ -130,7 +131,7 @@ export default {
           label: 'Dernier CESU',
           field: 'lastCesuDate',
           align: 'center',
-          format: this.formatDate,
+          format: formatDate,
           style: 'max-width: 60px',
         },
         { name: 'toPay', label: 'A Prélever', align: 'center', field: 'toPay', format: formatPrice, sortable: true },
@@ -225,9 +226,6 @@ export default {
     },
     formatCustomer (data) {
       return formatIdentity(data.customer.identity, 'Lf');
-    },
-    formatDate (value) {
-      return value ? moment(value).format('DD/MM/YY') : '';
     },
     async exportToCSV () {
       const csvData = [[

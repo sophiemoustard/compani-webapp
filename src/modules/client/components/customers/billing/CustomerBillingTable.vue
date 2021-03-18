@@ -89,7 +89,7 @@ import {
   COMPANI,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { formatPrice } from '@helpers/utils';
+import { formatPrice, formatDate } from '@helpers/utils';
 import { openPdf } from '@helpers/file';
 
 export default {
@@ -161,7 +161,7 @@ export default {
       return `${titlePrefix}${typeLabel}`;
     },
     formatDate (value) {
-      return value ? `${moment(value).format('DD/MM/YY')}` : '';
+      return formatDate(value);
     },
     formatPrice (value) {
       return formatPrice(value);
