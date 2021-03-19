@@ -77,8 +77,8 @@ export default {
       customersOptions: [],
       creditNoteEvents: [],
       newCreditNote: {
-        customer: null,
-        thirdPartyPayer: null,
+        customer: '',
+        thirdPartyPayer: '',
         date: '',
         events: [],
         startDate: '',
@@ -87,7 +87,7 @@ export default {
         inclTaxesCustomer: 0,
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
-        subscription: null,
+        subscription: '',
       },
       editedCreditNote: {},
       creditNotes: [],
@@ -362,7 +362,7 @@ export default {
     // Creation
     resetCreationCreditNoteData () {
       this.newCreditNote = {
-        customer: null,
+        customer: '',
         date: '',
         events: [],
         startDate: '',
@@ -371,8 +371,8 @@ export default {
         inclTaxesCustomer: 0,
         exclTaxesTpp: 0,
         inclTaxesTpp: 0,
-        subscription: null,
-        thirdPartyPayer: null,
+        subscription: '',
+        thirdPartyPayer: '',
       };
       this.creditNoteEvents = [];
       this.hasLinkedEvents = false;

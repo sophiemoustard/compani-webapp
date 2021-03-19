@@ -42,13 +42,13 @@ export default {
       access: FREE_ACCESS,
       RESTRICTED_ACCESS,
       ACCESS_OPTIONS,
-      accessCompany: null,
+      accessCompany: '',
     };
   },
   methods: {
     hide () {
       this.access = FREE_ACCESS;
-      this.accessCompany = null;
+      this.accessCompany = '';
       this.$emit('hide');
     },
     input (event) {
@@ -58,7 +58,7 @@ export default {
       this.$emit('submit', this.accessCompany);
     },
     resetAccess () {
-      this.accessCompany = null;
+      this.accessCompany = '';
     },
   },
 };

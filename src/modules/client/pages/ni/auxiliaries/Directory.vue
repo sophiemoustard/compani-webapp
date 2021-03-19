@@ -82,7 +82,7 @@ export default {
           phone: '',
         },
         local: { email: '' },
-        sector: null,
+        sector: '',
         administrative: {
           transportInvoice: { transportType: 'public' },
         },
