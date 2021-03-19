@@ -169,7 +169,7 @@ export default {
     },
     async addAttendanceSheet () {
       try {
-        if (!this.canUpdateAttendance) return NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
+        if (!this.canUpdateAttendance) return NotifyNegative('Impossible d\'ajouter une feuille d\'emargement.');
 
         this.$v.newAttendanceSheet.$touch();
         if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -189,7 +189,7 @@ export default {
     },
     validateAttendanceSheetDeletion (attendanceSheet) {
       if (!this.canUpdateAttendance) {
-        return NotifyNegative('Erreur lors de la suppression de la feuille d\'émargement.');
+        return NotifyNegative('Impossible de supprimer la feuille d\'emargement.');
       }
 
       this.$q.dialog({
