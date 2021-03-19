@@ -4,10 +4,11 @@
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
     <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
-      required-field @input="getEvents" @blur="validations.customer.$touch"
-      :error="validations.customer.$error" use-input clearable />
-    <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer"
-      :options="thirdPartyPayerOptions" @input="getEvents" :disable="thirdPartyPayerOptions.length === 0" clearable />
+      required-field @input="getEvents('customer')" @blur="validations.customer.$touch" use-input clearable
+      :error="validations.customer.$error" />
+    <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer" clearable
+      :options="thirdPartyPayerOptions" @input="getEvents('thirdPartyPayer')"
+      :disable="thirdPartyPayerOptions.length === 0" />
     <ni-date-input caption="Date de l'avoir" v-model="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field />
     <div class="row q-mb-md light">
@@ -15,12 +16,12 @@
     </div>
     <!-- Has linked events -->
     <template v-if="hasLinkedEvents">
-      <ni-date-input caption="Début période concernée" v-model="newCreditNote.startDate"
-        :error="validations.startDate.$error" @blur="validations.startDate.$touch" in-modal
-        :disable="!hasLinkedEvents" @input="getEvents" required-field />
-      <ni-date-input caption="Fin période concernée" v-model="newCreditNote.endDate"
-        :error="validations.endDate.$error" @blur="validations.endDate.$touch" in-modal
-        :disable="!hasLinkedEvents" @input="getEvents" required-field />
+      <ni-date-input caption="Début période concernée" v-model="newCreditNote.startDate" required-field in-modal
+        :error="validations.startDate.$error" @blur="validations.startDate.$touch" @input="getEvents('startDate')"
+        :disable="!hasLinkedEvents" :error-message="startDateInputErrorMessage" :max="limitDate.startDate" />
+      <ni-date-input caption="Fin période concernée" v-model="newCreditNote.endDate" required-field in-modal
+        :error="validations.endDate.$error" @blur="validations.endDate.$touch" @input="getEvents('endDate')"
+        :disable="!hasLinkedEvents" :error-message="endDateInputErrorMessage" :min="limitDate.endDate" />
       <template v-if="creditNoteEvents.length > 0">
         <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error" />
@@ -49,8 +50,8 @@
     </template>
     <!-- Hasn't linked event -->
     <template v-else>
-      <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions"
-        v-model="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer" required-field
+      <ni-select in-modal caption="Souscription concernée" :options="subscriptionsOptions" required-field
+        v-model="newCreditNote.subscription" :disable="!hasLinkedEvents && !newCreditNote.customer"
         :error="validations.subscription.$error" @blur="validations.subscription.$touch" />
       <ni-input in-modal v-if="!newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
         v-model="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
@@ -73,6 +74,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import { formatPrice, formatIdentity } from '@helpers/utils';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'CreditNoteCreationModal',
@@ -87,6 +89,9 @@ export default {
     creditNoteEventsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    startDateInputErrorMessage: { type: String, default: REQUIRED_LABEL },
+    endDateInputErrorMessage: { type: String, default: REQUIRED_LABEL },
+    limitDate: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-option-group': OptionGroup,
@@ -116,8 +121,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    getEvents () {
-      this.$emit('get-events');
+    getEvents (value) {
+      this.$emit('get-events', value);
     },
     updateHasLinkedEvents (value) {
       this.$emit('update-has-linked-events', value);
