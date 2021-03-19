@@ -18,10 +18,10 @@
     <template v-if="hasLinkedEvents">
       <ni-date-input caption="Début période concernée" v-model="newCreditNote.startDate" required-field in-modal
         :error="validations.startDate.$error" @blur="validations.startDate.$touch" @input="getEvents('startDate')"
-        :disable="!hasLinkedEvents" :error-message="startDateInputErrorMessage" :max="limitDate.startDate" />
+        :disable="!hasLinkedEvents" :error-message="startDateErrorMessage" :max="minAndMaxDates.startDate" />
       <ni-date-input caption="Fin période concernée" v-model="newCreditNote.endDate" required-field in-modal
         :error="validations.endDate.$error" @blur="validations.endDate.$touch" @input="getEvents('endDate')"
-        :disable="!hasLinkedEvents" :error-message="endDateInputErrorMessage" :min="limitDate.endDate" />
+        :disable="!hasLinkedEvents" :error-message="endDateErrorMessage" :min="minAndMaxDates.endDate" />
       <template v-if="creditNoteEvents.length > 0">
         <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error" />
@@ -89,9 +89,9 @@ export default {
     creditNoteEventsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    startDateInputErrorMessage: { type: String, default: REQUIRED_LABEL },
-    endDateInputErrorMessage: { type: String, default: REQUIRED_LABEL },
-    limitDate: { type: Object, default: () => ({}) },
+    startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    minAndMaxDates: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-option-group': OptionGroup,

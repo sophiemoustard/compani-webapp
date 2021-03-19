@@ -27,11 +27,11 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote" :loading="loading"
-      :new-credit-note="newCreditNote" :validations="$v.newCreditNote" :customers-options="customersOptions"
+      :new-credit-note="newCreditNote" @get-events="getCreationEvents" :customers-options="customersOptions"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
-      :has-linked-events="hasLinkedEvents" :limit-date="creationLimitDate" @hide="resetCreationCreditNoteData"
-      :start-date-input-error-message="creationStartDateErrorMessage" :credit-note-events="creditNoteEvents"
-      @get-events="creationUpdateEvents" :end-date-input-error-message="creationEndDateErrorMessage"
+      :has-linked-events="hasLinkedEvents" :min-and-max-dates="creationMinAndMaxDates" :validations="$v.newCreditNote"
+      :start-date-error-message="creationStartDateErrorMessage" :credit-note-events="creditNoteEvents"
+      @hide="resetCreationCreditNoteData" :end-date-error-message="creationEndDateErrorMessage"
       :third-party-payer-options="thirdPartyPayerOptions" @update-has-linked-events="updateHasLinkedEvents" />
 
     <!-- Credit note edition modal -->
@@ -39,8 +39,8 @@
       v-model="creditNoteEditionModal" :edited-credit-note="editedCreditNote" :validations="$v.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
-      @get-events="editionUpdateEvents" :end-date-input-error-message="editionEndDateErrorMessage" :loading="loading"
-      :start-date-input-error-message="editionStartDateErrorMessage" :limit-date="editionLimitDate" />
+      @get-events="getEditionEvents" :end-date-error-message="editionEndDateErrorMessage" :loading="loading"
+      :start-date-error-message="editionStartDateErrorMessage" :min-and-max-dates="editionMinAndMaxDates" />
   </q-page>
 </template>
 
@@ -50,6 +50,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
+import get from 'lodash/get';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
@@ -211,34 +212,38 @@ export default {
     const newCreditNoteDateValidation = {
       startDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        maxDate: this.creationLimitDate.startDate ? maxDate(this.creationLimitDate.startDate) : '',
+        maxDate: this.creationMinAndMaxDates.startDate ? maxDate(this.creationMinAndMaxDates.startDate) : '',
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.creationLimitDate.endDate || this.newCreditNote.startDate),
+        minDate: minDate(this.creationMinAndMaxDates.endDate || this.newCreditNote.startDate),
       },
     };
     const editedCreditNoteDateValidation = {
       startDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        maxDate: this.editionLimitDate.startDate ? maxDate(this.editionLimitDate.startDate) : '',
+        maxDate: this.editionMinAndMaxDates.startDate ? maxDate(this.editionMinAndMaxDates.startDate) : '',
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.editionLimitDate.endDate || this.editedCreditNote.startDate),
+        minDate: minDate(this.editionMinAndMaxDates.endDate || this.editedCreditNote.startDate),
       },
     };
     const inclTaxesValidation = { required, strictPositiveNumber };
-    const newCreditNoteValidation = this.newCreditNote.thirdPartyPayer
+    const newCreditNoteInclTaxesValidation = this.newCreditNote.thirdPartyPayer
       ? { inclTaxesTpp: inclTaxesValidation }
       : { inclTaxesCustomer: inclTaxesValidation };
-    const editedCreditNoteValidation = this.editedCreditNote.thirdPartyPayer
+    const editedCreditNoteInclTaxesValidation = this.editedCreditNote.thirdPartyPayer
       ? { inclTaxesTpp: inclTaxesValidation }
       : { inclTaxesCustomer: inclTaxesValidation };
 
     return {
-      newCreditNote: { ...creditNoteValidation, ...newCreditNoteDateValidation, ...newCreditNoteValidation },
-      editedCreditNote: { ...creditNoteValidation, ...editedCreditNoteDateValidation, ...editedCreditNoteValidation },
+      newCreditNote: { ...creditNoteValidation, ...newCreditNoteDateValidation, ...newCreditNoteInclTaxesValidation },
+      editedCreditNote: {
+        ...creditNoteValidation,
+        ...editedCreditNoteDateValidation,
+        ...editedCreditNoteInclTaxesValidation,
+      },
     };
   },
   computed: {
@@ -281,39 +286,41 @@ export default {
     },
     creationStartDateErrorMessage () {
       if (!this.$v.newCreditNote.startDate.required) return REQUIRED_LABEL;
-      if (!this.$v.newCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle';
+
+      if (!this.$v.newCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle.';
 
       return REQUIRED_LABEL;
     },
     creationEndDateErrorMessage () {
       if (!this.$v.newCreditNote.endDate.required) return REQUIRED_LABEL;
+
       if (!this.$v.newCreditNote.endDate.minDate) {
         return this.newCreditNote.events.length
-          ? 'Il y a des créneaux dans cet intervalle'
-          : 'La date de fin ne peut être antérieure à la date de début';
+          ? 'Il y a des créneaux dans cet intervalle.'
+          : 'La date de fin ne peut être antérieure à la date de début.';
       }
 
       return REQUIRED_LABEL;
     },
     editionStartDateErrorMessage () {
-      if (!this.$v.editedCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle';
+      if (!this.$v.editedCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle.';
 
       return REQUIRED_LABEL;
     },
     editionEndDateErrorMessage () {
       if (!this.$v.editedCreditNote.endDate.minDate) {
         return this.editedCreditNote.events.length
-          ? 'Il y a des créneaux dans cet intervalle'
-          : 'La date de fin ne peut être antérieure à la date de début';
+          ? 'Il y a des créneaux dans cet intervalle.'
+          : 'La date de fin ne peut être antérieure à la date de début.';
       }
 
       return REQUIRED_LABEL;
     },
-    creationLimitDate () {
-      return this.setLimitDate(this.newCreditNote.events);
+    creationMinAndMaxDates () {
+      return this.setMinAndMaxDates(this.newCreditNote.events);
     },
-    editionLimitDate () {
-      return this.setLimitDate(this.editedCreditNote.events);
+    editionMinAndMaxDates () {
+      return this.setMinAndMaxDates(this.editedCreditNote.events);
     },
   },
   methods: {
@@ -361,23 +368,25 @@ export default {
         return cnEvent;
       });
     },
-    async getEvents (customCreditNote, name) {
+    async getEvents (creditNote, creditNoteVariableName) {
       try {
-        if (this.hasLinkedEvents && customCreditNote.customer && customCreditNote.startDate &&
-          customCreditNote.endDate) {
+        if (this.hasLinkedEvents && creditNote.customer && creditNote.startDate && creditNote.endDate) {
           let query = {
-            startDate: customCreditNote.startDate,
-            endDate: customCreditNote.endDate,
-            customer: customCreditNote.customer?._id || customCreditNote.customer,
+            startDate: creditNote.startDate,
+            endDate: creditNote.endDate,
+            customer: get(creditNote.customer, '_id') || creditNote.customer,
           };
-          if (name === 'editedCreditNote') query = { ...query, creditNoteId: customCreditNote._id };
-          if (customCreditNote.thirdPartyPayer) {
-            query.thirdPartyPayer = customCreditNote.thirdPartyPayer?._id || customCreditNote.thirdPartyPayer;
-          } else if (customCreditNote.linkedCreditNote) {
-            const creditNote = this.creditNotes.find(cd => cd._id === customCreditNote.linkedCreditNote);
-            query.thirdPartyPayer = creditNote.thirdPartyPayer._id;
+
+          if (creditNoteVariableName === 'editedCreditNote') query = { ...query, creditNoteId: creditNote._id };
+
+          if (creditNote.thirdPartyPayer) {
+            query.thirdPartyPayer = get(creditNote.thirdPartyPayer, '_id') || creditNote.thirdPartyPayer;
+          } else if (creditNote.linkedCreditNote) {
+            const creditNoteWithThirdPartyPayer = this.creditNotes.find(cd => cd._id === creditNote.linkedCreditNote);
+            query.thirdPartyPayer = creditNoteWithThirdPartyPayer.thirdPartyPayer._id;
           }
-          if (!this.$v[name].startDate.$error && !this.$v[name].endDate.$error) {
+
+          if (!this.$v[creditNoteVariableName].startDate.$error && !this.$v[creditNoteVariableName].endDate.$error) {
             this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
           }
         }
@@ -387,29 +396,24 @@ export default {
         NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire.');
       }
     },
-    editionUpdateEvents () {
+    getEditionEvents () {
       this.$v.editedCreditNote.$touch();
       this.getEvents(this.editedCreditNote, 'editedCreditNote');
     },
-    creationUpdateEvents (field) {
+    getCreationEvents (field) {
       if (this.$v.newCreditNote[field]) this.$v.newCreditNote[field].$touch();
       this.getEvents(this.newCreditNote, 'newCreditNote');
     },
-    setLimitDate (events) {
-      if (events?.length) {
-        const dates = this.creditNoteEvents
-          .filter(e => events.includes(e._id));
-        const endDate = new Date(dates[dates.length - 1]?.endDate);
+    setMinAndMaxDates (events) {
+      if (events && events.length) {
+        const dates = this.creditNoteEvents.filter(e => events.includes(e._id));
+        const endDate = new Date(get(dates[dates.length - 1], 'endDate'));
         const startOfEndDate = (new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())).toString();
-        return {
-          startDate: dates[0]?.startDate,
-          endDate: startOfEndDate,
-        };
+
+        return { startDate: get(dates[0], 'startDate'), endDate: startOfEndDate };
       }
-      return {
-        startDate: '',
-        endDate: '',
-      };
+
+      return { startDate: '', endDate: '' };
     },
     // Compute
     computePrices (eventIds) {

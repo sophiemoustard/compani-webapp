@@ -13,12 +13,12 @@
       <template v-if="hasLinkedEvents">
         <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal required-field
           :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents"
-          :error="validations.startDate.$error" @blur="validations.$touch" :max="limitDate.startDate"
-          :error-message="startDateInputErrorMessage" />
+          :error="validations.startDate.$error" @blur="validations.$touch" :max="minAndMaxDates.startDate"
+          :error-message="startDateErrorMessage" />
         <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal
           :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
-          :error="validations.endDate.$error" @blur="validations.$touch" :error-message="endDateInputErrorMessage"
-          :min="limitDate.endDate" />
+          :error="validations.endDate.$error" @blur="validations.$touch" :error-message="endDateErrorMessage"
+          :min="minAndMaxDates.endDate" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
@@ -85,9 +85,9 @@ export default {
     creditNoteEventsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
-    startDateInputErrorMessage: { type: String, default: REQUIRED_LABEL },
-    endDateInputErrorMessage: { type: String, default: REQUIRED_LABEL },
-    limitDate: { type: Object, default: () => ({}) },
+    startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    minAndMaxDates: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-option-group': OptionGroup,
