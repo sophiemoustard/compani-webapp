@@ -136,4 +136,10 @@ export const formatAndSortOptions = (array, field) => array
 
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
 
-export const formatDate = value => (value ? moment(value).format('DD/MM/YYYY') : '');
+export const formatDate = (date) => {
+  if (!date) return '';
+
+  const month = new Date(date).getMonth() < 10 ? `0${new Date(date).getMonth()}` : new Date(date).getMonth();
+
+  return `${new Date(date).getDate()}/${month}/${new Date(date).getFullYear()}`;
+};
