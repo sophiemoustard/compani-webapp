@@ -1,6 +1,5 @@
 import escapeRegExp from 'lodash/escapeRegExp';
-import { removeDiacritics } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { removeDiacritics, formatDate } from '@helpers/utils';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
@@ -28,7 +27,7 @@ export const eLearningCourseDirectoryMixin = {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
+          format: formatDate,
           sort: (a, b) => new Date(b) - new Date(a),
         },
       ],
