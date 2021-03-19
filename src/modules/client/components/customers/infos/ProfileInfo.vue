@@ -66,9 +66,7 @@
           <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" dense />
           <span style="vertical-align: middle">
             Validation en ligne des souscriptions
-            <span class="text-weight-thin text-italic">
-              {{ acceptedByHelper }}
-            </span>
+            <span class="text-weight-thin text-italic">{{ acceptedByHelper }}</span>
           </span>
         </div>
       </template>
@@ -119,7 +117,7 @@
       </div>
       <q-card>
         <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
-          :visible-columns="mandatesVisibleColumns" class="mandate-table" :loading="mandatesLoading">
+          class="mandate-table" :loading="mandatesLoading">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -202,7 +200,7 @@
       </div>
       <q-card>
         <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" :pagination.sync="pagination"
-          :visible-columns="quotesVisibleColumns" :loading="quotesLoading">
+          :loading="quotesLoading">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -306,6 +304,7 @@ import {
   DOC_EXTENSIONS,
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
+import { formatDate } from '@helpers/utils';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { userMixin } from '@mixins/userMixin';
@@ -369,21 +368,11 @@ export default {
       tmpInput: '',
       subscriptions: [],
       services: [],
-      quotesVisibleColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       quotesColumns: [
         { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
         { name: 'emptyQuote', label: 'Devis', align: 'center', field: 'emptyQuote' },
         { name: 'signedQuote', label: 'Devis signé', align: 'center', field: 'signedQuote' },
         { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
-        {
-          name: 'createdAt',
-          label: '',
-          field: 'createdAt',
-          align: 'left',
-          sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
-        },
       ],
       quotesLoading: false,
       newSubscription: {
@@ -392,22 +381,12 @@ export default {
         estimatedWeeklyVolume: '',
       },
       editedSubscription: {},
-      mandatesVisibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
         { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },
         { name: 'signedMandate', label: 'Mandat signé', align: 'center', field: 'signedMandate' },
         { name: 'signed', label: 'Signé', align: 'center', field: 'signedAt' },
         { name: 'signedAt', label: 'Date de signature', align: 'left', field: 'signedAt' },
-        {
-          name: 'createdAt',
-          label: '',
-          field: 'createdAt',
-          align: 'left',
-          sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
-        },
       ],
       mandatesLoading: false,
       fundingsVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
@@ -488,11 +467,9 @@ export default {
       return '';
     },
     acceptedByHelper () {
-      if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `le ${moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
-          + `par ${this.acceptedBy}`;
-      }
-      return '';
+      return this.lastSubscriptionHistory && this.customer.subscriptionsAccepted
+        ? `le ${formatDate(this.lastSubscriptionHistory.approvalDate)} par ${this.acceptedBy}`
+        : '';
     },
     fundingSubscriptionsOptions () {
       return this.subscriptions
@@ -772,7 +749,7 @@ export default {
         const data = {
           bankAccountOwner: this.customer.payment.bankAccountOwner || '',
           customerAddress: this.customer.contact.primaryAddress.fullAddress,
-          downloadDate: moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: formatDate(Date.now()),
           ics: this.company.ics,
           rum: doc.rum,
           bic: this.customer.payment.bic || '',
@@ -827,7 +804,7 @@ export default {
           companyAddress: this.company.address.fullAddress,
           rcs: this.company.rcs,
           subscriptions,
-          downloadDate: moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: formatDate(Date.now()),
         };
         const params = { driveId: quoteDriveId };
         await downloadDriveDocx(params, data, 'devis.docx');

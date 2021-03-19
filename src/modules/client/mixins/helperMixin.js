@@ -59,12 +59,6 @@ export const helperMixin = {
       return [...this.helpers]
         .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
     },
-    acceptedByHelper () {
-      if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        const approvalDate = moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY');
-        return `le ${approvalDate} par ${this.acceptedBy}`;
-      }
-    },
   },
   methods: {
     // Refresh
