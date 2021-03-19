@@ -63,8 +63,7 @@ import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
-import moment from '@helpers/moment';
-import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
+import { upperCaseFirstLetter, formatQuantity, formatDate } from '@helpers/utils';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
 export default {
@@ -91,13 +90,7 @@ export default {
       OPEN_QUESTION,
       QUESTION_ANSWER,
       columns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         {
           name: 'trainee',
           label: 'Nom de l\'apprenant',

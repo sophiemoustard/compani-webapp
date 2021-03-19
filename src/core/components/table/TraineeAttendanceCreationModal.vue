@@ -25,6 +25,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { REQUIRED_LABEL } from '@data/constants';
+import { formatDate } from '@helpers/utils';
 
 export default {
   name: 'TraineeAttendanceCreationModal',
@@ -50,8 +51,7 @@ export default {
   computed: {
     slotsOptions () {
       return this.course.slots.map(s => ({
-        label: `${moment(s.startDate).format('DD/MM/YYYY')}
-        ${moment(s.startDate).format('LT')} - ${moment(s.endDate).format('LT')}`,
+        label: `${formatDate(s.startDate)} ${moment(s.startDate).format('LT')} - ${moment(s.endDate).format('LT')}`,
         value: s._id,
       }));
     },

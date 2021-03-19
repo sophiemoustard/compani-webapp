@@ -136,4 +136,4 @@ export const formatAndSortOptions = (array, field) => array
 
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
 
-export const formatDate = value => (value ? moment(value).format('DD/MM/YY') : '');
+export const formatDate = value => (value ? moment(value).format('DD/MM/YYYY') : '');
