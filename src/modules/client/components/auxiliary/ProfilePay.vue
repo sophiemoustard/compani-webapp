@@ -58,7 +58,7 @@ import Modal from '@components/modal/Modal';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
-import moment from '@helpers/moment';
+import { formatDate } from '@helpers/utils';
 import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
@@ -87,13 +87,7 @@ export default {
           field: 'nature',
           format: value => this.documentNatureLabels[value],
         },
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],
       pagination: {
