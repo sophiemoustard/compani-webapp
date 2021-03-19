@@ -64,7 +64,7 @@ import SlotEditionModal from '@components/courses/SlotEditionModal';
 import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING } from '@data/constants';
-import { formatQuantity } from '@helpers/utils';
+import { formatQuantity, formatDate } from '@helpers/utils';
 import { frAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
@@ -196,10 +196,7 @@ export default {
   },
   methods: {
     groupByCourses () {
-      this.courseSlots = groupBy(
-        this.course.slots.filter(slot => !!slot.startDate),
-        s => moment(s.startDate).format('DD/MM/YYYY')
-      );
+      this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
     },
     getSlotDuration (slot) {

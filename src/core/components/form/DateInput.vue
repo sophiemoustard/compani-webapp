@@ -20,6 +20,7 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
+import { formatDate } from '@helpers/utils';
 import moment from '@helpers/moment';
 
 export default {
@@ -43,7 +44,7 @@ export default {
     },
     inputDate () {
       if (!this.value) return '';
-      return moment(this.value).format('DD/MM/YYYY');
+      return formatDate(this.value);
     },
   },
   methods: {
