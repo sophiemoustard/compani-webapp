@@ -215,9 +215,7 @@ export default {
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: this.creationLimitDate.endDate
-          ? minDate(this.creationLimitDate.endDate)
-          : minDate(this.newCreditNote.startDate),
+        minDate: minDate(this.creationLimitDate.endDate || this.newCreditNote.startDate),
       },
     };
     const editedCreditNoteDateValidation = {
@@ -227,9 +225,7 @@ export default {
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: this.editionLimitDate.endDate
-          ? minDate(this.editionLimitDate.endDate)
-          : minDate(this.editedCreditNote.startDate),
+        minDate: minDate(this.editionLimitDate.endDate || this.editedCreditNote.startDate),
       },
     };
     const inclTaxesValidation = { required, strictPositiveNumber };
@@ -285,7 +281,7 @@ export default {
     },
     creationStartDateErrorMessage () {
       if (!this.$v.newCreditNote.startDate.required) return REQUIRED_LABEL;
-      if (!this.$v.newCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervale';
+      if (!this.$v.newCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle';
 
       return REQUIRED_LABEL;
     },
@@ -293,21 +289,21 @@ export default {
       if (!this.$v.newCreditNote.endDate.required) return REQUIRED_LABEL;
       if (!this.$v.newCreditNote.endDate.minDate) {
         return this.newCreditNote.events.length
-          ? 'Il y a des créneaux dans cet intervale'
+          ? 'Il y a des créneaux dans cet intervalle'
           : 'La date de fin ne peut être antérieure à la date de début';
       }
 
       return REQUIRED_LABEL;
     },
     editionStartDateErrorMessage () {
-      if (!this.$v.editedCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervale';
+      if (!this.$v.editedCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle';
 
       return REQUIRED_LABEL;
     },
     editionEndDateErrorMessage () {
       if (!this.$v.editedCreditNote.endDate.minDate) {
         return this.editedCreditNote.events.length
-          ? 'Il y a des créneaux dans cet intervale'
+          ? 'Il y a des créneaux dans cet intervalle'
           : 'La date de fin ne peut être antérieure à la date de début';
       }
 
