@@ -78,8 +78,9 @@ export default {
         }
       });
     },
-    resetValue () {
-      this.onInput(null);
+    resetValue ($event) {
+      this.onInput('');
+      $event.preventDefault();
     },
   },
 };
