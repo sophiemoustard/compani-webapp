@@ -114,7 +114,7 @@ export default {
         }
       } catch (e) {
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
+        NotifyNegative('Erreur lors de l\'ajout du testeur.');
       } finally {
         this.modalLoading = false;
       }
@@ -142,7 +142,7 @@ export default {
     async sendWelcome () {
       try {
         await Email.sendWelcome({ email: this.newTester.local.email, type: TRAINEE });
-        NotifyPositive('Email envoyé');
+        NotifyPositive('Email envoyé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de l\'envoi de l\' email.');
