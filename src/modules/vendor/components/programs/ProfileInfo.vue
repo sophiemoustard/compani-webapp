@@ -25,7 +25,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <ni-button class="row no-wrap table-actions" icon="close" :disable="program.categories.length <= 1"
+                  <ni-button class="table-actions" icon="close" :disable="program.categories.length <= 1"
                     @click="validateCategoryRemoval(props.row)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -83,15 +83,8 @@ export default {
       newCategory: '',
       categories: [],
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-          format: upperCaseFirstLetter,
-          style: 'width: 92%',
-        },
-        { name: 'actions', label: '', field: '_id' },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name', format: upperCaseFirstLetter, style: 'width: 90%' },
+        { name: 'actions', label: '', field: '_id', align: 'right' },
       ],
       categoryAdditionModal: false,
       loading: false,

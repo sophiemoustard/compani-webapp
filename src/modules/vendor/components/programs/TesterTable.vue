@@ -5,7 +5,19 @@
         <p class="text-weight-bold table-title">Testeurs</p>
       </div>
       <q-card>
-        <ni-responsive-table :data="testers" :columns="columns" :pagination.sync="pagination" />
+        <ni-responsive-table :data="testers" :columns="columns" :pagination.sync="pagination">
+          <template #body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'actions'">
+                  <ni-button class="table-actions" icon="close" @click.native="validateTesterDeletion(col.value)" />
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
         <q-card-actions align="right">
           <ni-button color="primary" icon="add" label="Ajouter un testeur" :disable="loading"
             @click="testerCreationModal = true" />
@@ -72,6 +84,7 @@ export default {
           field: row => get(row, 'contact.phone') || '',
           format: formatPhone,
         },
+        { name: 'actions', label: '', field: '_id', align: 'right' },
       ],
       loading: false,
       pagination: { rowsPerPage: 0, sortBy: 'lastname' },
@@ -158,6 +171,25 @@ export default {
       };
       this.$v.newTester.$reset();
     },
+    validateTesterDeletion (testerId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir retirer ce testeur du programme ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteTester(testerId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteTester (testerId) {
+      try {
+        await Programs.removeTester(this.programId, testerId);
+        this.$emit('refresh');
+        NotifyPositive('Testeur supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du testeur.');
+      }
+    },
   },
 };
 </script>
@@ -165,5 +197,4 @@ export default {
 <style lang="stylus" scoped>
   .table-title
     flex: 1
-
 </style>
