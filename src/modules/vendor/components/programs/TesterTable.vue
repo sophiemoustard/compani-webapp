@@ -11,9 +11,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <ni-button icon="close" @click.native="validateTesterDeletion(col.value)" />
-                  </div>
+                  <ni-button class="table-actions" icon="close" @click.native="validateTesterDeletion(col.value)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -86,7 +84,7 @@ export default {
           field: row => get(row, 'contact.phone') || '',
           format: formatPhone,
         },
-        { name: 'actions', label: '', align: 'left', field: '_id' },
+        { name: 'actions', label: '', field: '_id' },
       ],
       loading: false,
       pagination: { rowsPerPage: 0, sortBy: 'lastname' },
@@ -199,5 +197,8 @@ export default {
 <style lang="stylus" scoped>
   .table-title
     flex: 1
+  .actions
+    display: flex
+    justify-content: flex-end
 
 </style>
