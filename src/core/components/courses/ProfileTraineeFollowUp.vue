@@ -188,9 +188,7 @@ export default {
       }
     },
     validateAttendanceSheetDeletion (attendanceSheet) {
-      if (!this.canUpdateAttendance) {
-        return NotifyNegative('Impossible de supprimer la feuille d\'emargement.');
-      }
+      if (!this.canUpdateAttendance) return NotifyNegative('Impossible de supprimer la feuille d\'emargement.');
 
       this.$q.dialog({
         title: 'Confirmation',

@@ -188,12 +188,9 @@ export default {
         this.loading = true;
         const updatedCourseSlot = await Attendances.list(query);
 
-        this.attendances = query.course
-          ? [...updatedCourseSlot]
-          : [
-            ...this.attendances.filter(a => a.courseSlot !== query.courseSlot),
-            ...updatedCourseSlot,
-          ];
+        this.attendances = query.courseSlot
+          ? [...this.attendances.filter(a => a.courseSlot !== query.courseSlot), ...updatedCourseSlot]
+          : updatedCourseSlot;
         NotifyPositive('Liste mise à jour.');
       } catch (e) {
         console.error(e);
