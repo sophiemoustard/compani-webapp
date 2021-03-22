@@ -140,7 +140,8 @@ export const formatDate = (value) => {
   if (!value) return '';
 
   const date = new Date(value).getDate() < 10 ? `0${new Date(value).getDate()}` : new Date(value).getDate();
-  const month = new Date(value).getMonth() < 10 ? `0${new Date(value).getMonth() + 1}` : new Date(value).getMonth();
+  const month = new Date(value).getMonth() + 1;
+  const formattedMonth = month < 10 ? `0${month}` : month;
 
-  return `${date}/${month}/${new Date(value).getFullYear()}`;
+  return `${date}/${formattedMonth}/${new Date(value).getFullYear()}`;
 };
