@@ -103,7 +103,7 @@ export default {
     };
   },
   async created () {
-    await this.refreshAttendances(this.course.slots.map(s => s._id));
+    await this.refreshAttendances({ course: this.course._id });
     await this.getTrainees();
   },
   computed: {
@@ -183,24 +183,24 @@ export default {
     traineesCount (slotId) {
       return this.attendances.filter(a => a.courseSlot === slotId).length;
     },
-    async refreshAttendances (courseSlots) {
-      if (courseSlots.length) {
-        try {
-          this.loading = true;
-          const updatedCourseSlot = await Attendances.list({ courseSlots });
+    async refreshAttendances (query) {
+      try {
+        this.loading = true;
+        const updatedCourseSlot = await Attendances.list(query);
 
-          this.attendances = [
-            ...this.attendances.filter(a => !courseSlots.some(cs => cs === a.courseSlot)),
+        this.attendances = query.course
+          ? [...updatedCourseSlot]
+          : [
+            ...this.attendances.filter(a => a.courseSlot !== query.courseSlot),
             ...updatedCourseSlot,
           ];
-          NotifyPositive('Liste mise à jour.');
-        } catch (e) {
-          console.error(e);
-          this.attendances = [];
-          NotifyNegative('Erreur lors de la mise à jour des émargements.');
-        } finally {
-          this.loading = false;
-        }
+        NotifyPositive('Liste mise à jour.');
+      } catch (e) {
+        console.error(e);
+        this.attendances = [];
+        NotifyNegative('Erreur lors de la mise à jour des émargements.');
+      } finally {
+        this.loading = false;
       }
     },
     async updateCheckbox (traineeId, slotId) {
@@ -212,7 +212,7 @@ export default {
           const attendance = this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
           await Attendances.delete(attendance._id);
 
-          await this.refreshAttendances([slotId]);
+          await this.refreshAttendances({ courseSlot: slotId });
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la suppression de l\'émargement.');
@@ -224,7 +224,7 @@ export default {
           this.loading = true;
           await Attendances.create({ trainee: traineeId, courseSlot: slotId });
 
-          await this.refreshAttendances([slotId]);
+          await this.refreshAttendances({ courseSlot: slotId });
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la validation de l\'émargement.');
