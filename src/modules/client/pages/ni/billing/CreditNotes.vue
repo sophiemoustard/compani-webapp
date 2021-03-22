@@ -29,7 +29,7 @@
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote" :loading="loading"
       :customers-options="customersOptions" :third-party-payer-options="thirdPartyPayerOptions"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
-      :validations="$v.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" :@get-events="getCreationEvents"
+      :validations="$v.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" @get-events="getCreationEvents"
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.$v.newCreditNote)"
       :has-linked-events.sync="hasLinkedEvents" @hide="resetCreationCreditNoteData" :new-credit-note="newCreditNote"
       :end-date-error-message="setEndDateErrorMessage(this.$v.newCreditNote, this.newCreditNote.events)" />
@@ -218,7 +218,7 @@ export default {
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.creationMinAndMaxDates.minEndDate || this.newCreditNote.maxStartDate),
+        minDate: minDate(this.creationMinAndMaxDates.minEndDate || this.newCreditNote.startDate),
       },
     };
     const editedCreditNoteDateValidation = {
@@ -228,7 +228,7 @@ export default {
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.editionMinAndMaxDates.minEndDate || this.editedCreditNote.maxStartDate),
+        minDate: minDate(this.editionMinAndMaxDates.minEndDate || this.editedCreditNote.startDate),
       },
     };
     const inclTaxesValidation = { required, strictPositiveNumber };
