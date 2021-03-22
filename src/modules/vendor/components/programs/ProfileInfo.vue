@@ -83,14 +83,7 @@ export default {
       newCategory: '',
       categories: [],
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-          format: upperCaseFirstLetter,
-          style: 'width: 90%',
-        },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name', format: upperCaseFirstLetter, style: 'width: 90%' },
         { name: 'actions', label: '', field: '_id', align: 'right' },
       ],
       categoryAdditionModal: false,
@@ -239,10 +232,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  .actions
-    display: flex
-    justify-content: flex-end
-
-</style>

@@ -84,7 +84,7 @@ export default {
           field: row => get(row, 'contact.phone') || '',
           format: formatPhone,
         },
-        { name: 'actions', label: '', field: '_id' },
+        { name: 'actions', label: '', field: '_id', align: 'right' },
       ],
       loading: false,
       pagination: { rowsPerPage: 0, sortBy: 'lastname' },
@@ -197,8 +197,4 @@ export default {
 <style lang="stylus" scoped>
   .table-title
     flex: 1
-  .actions
-    display: flex
-    justify-content: flex-end
-
 </style>
