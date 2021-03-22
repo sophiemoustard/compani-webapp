@@ -1,7 +1,7 @@
 <template>
 <div>
   <q-card flat>
-    <q-table v-if="!noSlots" :data="trainees" :columns="columns" class="q-pa-md table"
+    <q-table v-if="!noSlot" :data="trainees" :columns="columns" class="q-pa-md table"
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
@@ -45,7 +45,7 @@
         <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
       </template>
     </q-table>
-    <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
+    <div v-if="noSlot" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
     <ni-button v-if="course.slots.length && canUpdateAttendance" color="primary" icon="add" class="q-mb-sm"
@@ -136,7 +136,7 @@ export default {
     noTrainees () {
       return !this.course.trainees.length;
     },
-    noSlots () {
+    noSlot () {
       return !this.course.slots.length;
     },
     trainees () {
