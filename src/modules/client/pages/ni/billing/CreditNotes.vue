@@ -27,20 +27,21 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote" :loading="loading"
-      :new-credit-note="newCreditNote" @get-events="getCreationEvents" :customers-options="customersOptions"
+      :customers-options="customersOptions" :third-party-payer-options="thirdPartyPayerOptions"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
-      :has-linked-events="hasLinkedEvents" :min-and-max-dates="creationMinAndMaxDates" :validations="$v.newCreditNote"
-      :start-date-error-message="creationStartDateErrorMessage" :credit-note-events="creditNoteEvents"
-      @hide="resetCreationCreditNoteData" :end-date-error-message="creationEndDateErrorMessage"
-      :third-party-payer-options="thirdPartyPayerOptions" @update-has-linked-events="updateHasLinkedEvents" />
+      :validations="$v.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" :@get-events="getCreationEvents"
+      :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.$v.newCreditNote)"
+      :has-linked-events.sync="hasLinkedEvents" @hide="resetCreationCreditNoteData" new-credit-note="newCreditNote"
+      :end-date-error-message="setEndDateErrorMessage(this.$v.newCreditNote, this.newCreditNote.events)" />
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
       v-model="creditNoteEditionModal" :edited-credit-note="editedCreditNote" :validations="$v.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
-      @get-events="getEditionEvents" :end-date-error-message="editionEndDateErrorMessage" :loading="loading"
-      :start-date-error-message="editionStartDateErrorMessage" :min-and-max-dates="editionMinAndMaxDates" />
+      @get-events="getEditionEvents" :min-and-max-dates="editionMinAndMaxDates" :loading="loading"
+      :end-date-error-message="setEndDateErrorMessage(this.$v.editedCreditNote, this.editedCreditNote.events)"
+      :start-date-error-message="setStartDateErrorMessage(this.$v.editedCreditNote)" />
   </q-page>
 </template>
 
@@ -60,6 +61,7 @@ import { COMPANI, REQUIRED_LABEL } from '@data/constants';
 import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
 import { strictPositiveNumber, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
+import { getStartOfDay } from '@helpers/date';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
 
@@ -284,38 +286,6 @@ export default {
         value: tpp._id,
       }));
     },
-    creationStartDateErrorMessage () {
-      if (!this.$v.newCreditNote.startDate.required) return REQUIRED_LABEL;
-
-      if (!this.$v.newCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle.';
-
-      return REQUIRED_LABEL;
-    },
-    creationEndDateErrorMessage () {
-      if (!this.$v.newCreditNote.endDate.required) return REQUIRED_LABEL;
-
-      if (!this.$v.newCreditNote.endDate.minDate) {
-        return this.newCreditNote.events.length
-          ? 'Il y a des créneaux dans cet intervalle.'
-          : 'La date de fin ne peut être antérieure à la date de début.';
-      }
-
-      return REQUIRED_LABEL;
-    },
-    editionStartDateErrorMessage () {
-      if (!this.$v.editedCreditNote.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle.';
-
-      return REQUIRED_LABEL;
-    },
-    editionEndDateErrorMessage () {
-      if (!this.$v.editedCreditNote.endDate.minDate) {
-        return this.editedCreditNote.events.length
-          ? 'Il y a des créneaux dans cet intervalle.'
-          : 'La date de fin ne peut être antérieure à la date de début.';
-      }
-
-      return REQUIRED_LABEL;
-    },
     creationMinAndMaxDates () {
       return this.setMinAndMaxDates(this.newCreditNote.events);
     },
@@ -368,52 +338,67 @@ export default {
         return cnEvent;
       });
     },
-    async getEvents (creditNote, creditNoteVariableName) {
+    async getEvents (creditNote, validations) {
       try {
-        if (this.hasLinkedEvents && creditNote.customer && creditNote.startDate && creditNote.endDate) {
-          let query = {
-            startDate: creditNote.startDate,
-            endDate: creditNote.endDate,
-            customer: get(creditNote.customer, '_id') || creditNote.customer,
-          };
+        if (!this.hasLinkedEvents || !creditNote.customer || !creditNote.startDate || !creditNote.endDate ||
+        validations.startDate.$error || validations.endDate.$error) return;
+        let query = {
+          startDate: creditNote.startDate,
+          endDate: creditNote.endDate,
+          customer: get(creditNote.customer, '_id') || creditNote.customer,
+        };
 
-          if (creditNoteVariableName === 'editedCreditNote') query = { ...query, creditNoteId: creditNote._id };
+        if (creditNote._id) query = { ...query, creditNoteId: creditNote._id };
 
-          if (creditNote.thirdPartyPayer) {
-            query.thirdPartyPayer = get(creditNote.thirdPartyPayer, '_id') || creditNote.thirdPartyPayer;
-          } else if (creditNote.linkedCreditNote) {
-            const creditNoteWithThirdPartyPayer = this.creditNotes.find(cd => cd._id === creditNote.linkedCreditNote);
-            query.thirdPartyPayer = creditNoteWithThirdPartyPayer.thirdPartyPayer._id;
-          }
-
-          if (!this.$v[creditNoteVariableName].startDate.$error && !this.$v[creditNoteVariableName].endDate.$error) {
-            this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
-          }
+        if (creditNote.thirdPartyPayer) {
+          query.thirdPartyPayer = get(creditNote.thirdPartyPayer, '_id') || creditNote.thirdPartyPayer;
+        } else if (creditNote.linkedCreditNote) {
+          const linkedCreditNote = this.creditNotes.find(cd => cd._id === creditNote.linkedCreditNote);
+          query.thirdPartyPayer = linkedCreditNote.thirdPartyPayer._id;
         }
+
+        this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
       } catch (e) {
         this.creditNoteEvents = [];
         console.error(e);
         NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire.');
       }
     },
-    getEditionEvents () {
-      this.$v.editedCreditNote.$touch();
-      this.getEvents(this.editedCreditNote, 'editedCreditNote');
+    getEditionEvents (field) {
+      if (this.$v.editedCreditNote[field]) this.$v.editedCreditNote[field].$touch();
+      this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
     },
     getCreationEvents (field) {
       if (this.$v.newCreditNote[field]) this.$v.newCreditNote[field].$touch();
-      this.getEvents(this.newCreditNote, 'newCreditNote');
+      this.getEvents(this.newCreditNote, this.$v.newCreditNote);
     },
     setMinAndMaxDates (events) {
       if (events && events.length) {
-        const dates = this.creditNoteEvents.filter(e => events.includes(e._id));
-        const endDate = new Date(get(dates[dates.length - 1], 'endDate'));
-        const startOfEndDate = (new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())).toString();
+        const eventsWithCreditNote = this.creditNoteEvents.filter(e => events.includes(e._id));
+        const endDate = new Date(get(eventsWithCreditNote[eventsWithCreditNote.length - 1], 'endDate'));
 
-        return { startDate: get(dates[0], 'startDate'), endDate: startOfEndDate };
+        return { startDate: get(eventsWithCreditNote[0], 'startDate'), endDate: getStartOfDay(endDate).toString() };
       }
 
       return { startDate: '', endDate: '' };
+    },
+    setStartDateErrorMessage (validations) {
+      if (!validations.startDate.required) return REQUIRED_LABEL;
+
+      if (!validations.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle.';
+
+      return REQUIRED_LABEL;
+    },
+    setEndDateErrorMessage (validations, events) {
+      if (!validations.endDate.required) return REQUIRED_LABEL;
+
+      if (!validations.endDate.minDate) {
+        return events.length
+          ? 'Il y a des créneaux dans cet intervalle.'
+          : 'La date de fin ne peut être antérieure à la date de début.';
+      }
+
+      return REQUIRED_LABEL;
     },
     // Compute
     computePrices (eventIds) {
@@ -557,7 +542,7 @@ export default {
 
       this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
       if (this.hasLinkedEvents) {
-        await this.getEvents(this.editedCreditNote, 'editedCreditNote');
+        await this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
         this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
       } else {
         this.editedCreditNote.subscription = creditNote.subscription._id;

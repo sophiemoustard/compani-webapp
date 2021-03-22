@@ -12,13 +12,13 @@
       <!-- Has linked events -->
       <template v-if="hasLinkedEvents">
         <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal required-field
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents"
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents('startDate')"
           :error="validations.startDate.$error" @blur="validations.$touch" :max="minAndMaxDates.startDate"
           :error-message="startDateErrorMessage" />
         <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
-          :error="validations.endDate.$error" @blur="validations.$touch" :error-message="endDateErrorMessage"
-          :min="minAndMaxDates.endDate" />
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents('endDate')"
+          required-field :error="validations.endDate.$error" @blur="validations.$touch" :min="minAndMaxDates.endDate"
+          :error-message="endDateErrorMessage" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
@@ -117,8 +117,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    getEvents () {
-      this.$emit('get-events');
+    getEvents (value) {
+      this.$emit('get-events', value);
     },
   },
 };

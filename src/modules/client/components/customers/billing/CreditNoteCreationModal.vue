@@ -4,11 +4,10 @@
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
     <ni-select in-modal caption="Bénéficiaire" v-model="newCreditNote.customer" :options="customersOptions"
-      required-field @input="getEvents('customer')" @blur="validations.customer.$touch" use-input clearable
+      required-field @input="getEvents('customer')" @blur="validations.customer.$touch" clearable
       :error="validations.customer.$error" />
-    <ni-select in-modal caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer" clearable
-      :options="thirdPartyPayerOptions" @input="getEvents('thirdPartyPayer')"
-      :disable="thirdPartyPayerOptions.length === 0" />
+    <ni-select caption="Tiers payeur" v-model="newCreditNote.thirdPartyPayer" @input="getEvents('thirdPartyPayer')"
+      :options="thirdPartyPayerOptions" :disable="thirdPartyPayerOptions.length === 0" clearable in-modal />
     <ni-date-input caption="Date de l'avoir" v-model="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field />
     <div class="row q-mb-md light">
@@ -125,7 +124,7 @@ export default {
       this.$emit('get-events', value);
     },
     updateHasLinkedEvents (value) {
-      this.$emit('update-has-linked-events', value);
+      this.$emit('update:hasLinkedEvents', value);
     },
   },
 };
