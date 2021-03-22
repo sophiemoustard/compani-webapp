@@ -214,21 +214,29 @@ export default {
     const newCreditNoteDateValidation = {
       startDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        maxDate: this.creationMinAndMaxDates.maxStartDate ? maxDate(this.creationMinAndMaxDates.maxStartDate) : '',
+        maxDate: this.isValidDate(this.creationMinAndMaxDates.maxStartDate)
+          ? maxDate(this.creationMinAndMaxDates.maxStartDate)
+          : '',
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.creationMinAndMaxDates.minEndDate || this.newCreditNote.startDate),
+        minDate: minDate(this.isValidDate(this.creationMinAndMaxDates.minEndDate)
+          ? this.creationMinAndMaxDates.minEndDate
+          : this.newCreditNote.startDate),
       },
     };
     const editedCreditNoteDateValidation = {
       startDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        maxDate: this.editionMinAndMaxDates.maxStartDate ? maxDate(this.editionMinAndMaxDates.maxStartDate) : '',
+        maxDate: this.isValidDate(this.editionMinAndMaxDates.maxStartDate)
+          ? maxDate(this.editionMinAndMaxDates.maxStartDate)
+          : '',
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.editionMinAndMaxDates.minEndDate || this.editedCreditNote.startDate),
+        minDate: minDate(this.isValidDate(this.editionMinAndMaxDates.minEndDate)
+          ? this.editionMinAndMaxDates.minEndDate
+          : this.editedCreditNote.startDate),
       },
     };
     const inclTaxesValidation = { required, strictPositiveNumber };
@@ -265,8 +273,7 @@ export default {
       }));
     },
     creditNoteEventsOptions () {
-      const creditNoteEvents = [...this.creditNoteEvents]
-        .sort((e1, e2) => (new Date(e1.startDate)) - (new Date(e2.startDate)));
+      const creditNoteEvents = [...this.creditNoteEvents];
 
       return creditNoteEvents.map(cnEvent => ({
         label: `${moment(cnEvent.startDate).format('DD/MM/YYYY HH:mm')} - `
@@ -366,7 +373,8 @@ export default {
       }
     },
     getEditionEvents (field) {
-      if (this.$v.editedCreditNote[field]) this.$v.editedCreditNote[field].$touch();
+      if (field && this.$v.editedCreditNote[field]) this.$v.editedCreditNote[field].$touch();
+      else this.$v.editedCreditNote.$touch();
       this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
     },
     getCreationEvents (field) {
@@ -385,7 +393,10 @@ export default {
         };
       }
 
-      return { startDate: '', endDate: '' };
+      return { maxStartDate: '', minEndDate: '' };
+    },
+    isValidDate (date) {
+      return date && date !== 'Invalid Date';
     },
     setStartDateErrorMessage (validations) {
       if (!validations.startDate.required) return REQUIRED_LABEL;
@@ -547,7 +558,7 @@ export default {
 
       this.hasLinkedEvents = creditNote.events && creditNote.events.length > 0;
       if (this.hasLinkedEvents) {
-        await this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
+        await this.getEditionEvents();
         this.editedCreditNote.events = creditNote.events.map(ev => ev.eventId);
       } else {
         this.editedCreditNote.subscription = creditNote.subscription._id;
