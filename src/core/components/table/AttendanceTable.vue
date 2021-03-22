@@ -45,11 +45,11 @@
         <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
       </template>
     </q-table>
-    <ni-button v-if="canUpdateAttendance" color="primary" icon="add" label="Ajouter un participant" :disable="loading"
-      @click="traineeAdditionModal = true" class="q-mb-sm" />
     <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
+    <ni-button v-if="course.slots.length && canUpdateAttendance" color="primary" icon="add" class="q-mb-sm"
+      label="Ajouter un participant" :disable="loading" @click="traineeAdditionModal = true" />
   </q-card>
 
   <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
