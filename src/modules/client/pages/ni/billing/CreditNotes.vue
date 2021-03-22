@@ -31,7 +31,7 @@
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :validations="$v.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" :@get-events="getCreationEvents"
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.$v.newCreditNote)"
-      :has-linked-events.sync="hasLinkedEvents" @hide="resetCreationCreditNoteData" new-credit-note="newCreditNote"
+      :has-linked-events.sync="hasLinkedEvents" @hide="resetCreationCreditNoteData" :new-credit-note="newCreditNote"
       :end-date-error-message="setEndDateErrorMessage(this.$v.newCreditNote, this.newCreditNote.events)" />
 
     <!-- Credit note edition modal -->
@@ -61,7 +61,7 @@ import { COMPANI, REQUIRED_LABEL } from '@data/constants';
 import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
 import { strictPositiveNumber, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { getStartOfDay } from '@helpers/date';
+import { getStartOfDay, getEndOfDay } from '@helpers/date';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
 
@@ -214,21 +214,21 @@ export default {
     const newCreditNoteDateValidation = {
       startDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        maxDate: this.creationMinAndMaxDates.startDate ? maxDate(this.creationMinAndMaxDates.startDate) : '',
+        maxDate: this.creationMinAndMaxDates.maxStartDate ? maxDate(this.creationMinAndMaxDates.maxStartDate) : '',
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.creationMinAndMaxDates.endDate || this.newCreditNote.startDate),
+        minDate: minDate(this.creationMinAndMaxDates.minEndDate || this.newCreditNote.maxStartDate),
       },
     };
     const editedCreditNoteDateValidation = {
       startDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        maxDate: this.editionMinAndMaxDates.startDate ? maxDate(this.editionMinAndMaxDates.startDate) : '',
+        maxDate: this.editionMinAndMaxDates.maxStartDate ? maxDate(this.editionMinAndMaxDates.maxStartDate) : '',
       },
       endDate: {
         required: requiredIf(() => this.hasLinkedEvents),
-        minDate: minDate(this.editionMinAndMaxDates.endDate || this.editedCreditNote.startDate),
+        minDate: minDate(this.editionMinAndMaxDates.minEndDate || this.editedCreditNote.maxStartDate),
       },
     };
     const inclTaxesValidation = { required, strictPositiveNumber };
@@ -342,6 +342,7 @@ export default {
       try {
         if (!this.hasLinkedEvents || !creditNote.customer || !creditNote.startDate || !creditNote.endDate ||
         validations.startDate.$error || validations.endDate.$error) return;
+
         let query = {
           startDate: creditNote.startDate,
           endDate: creditNote.endDate,
@@ -376,8 +377,12 @@ export default {
       if (events && events.length) {
         const eventsWithCreditNote = this.creditNoteEvents.filter(e => events.includes(e._id));
         const endDate = new Date(get(eventsWithCreditNote[eventsWithCreditNote.length - 1], 'endDate'));
+        const startDate = new Date(get(eventsWithCreditNote[0], 'startDate'));
 
-        return { startDate: get(eventsWithCreditNote[0], 'startDate'), endDate: getStartOfDay(endDate).toString() };
+        return {
+          maxStartDate: getEndOfDay(startDate).toString(),
+          minEndDate: getStartOfDay(endDate).toString(),
+        };
       }
 
       return { startDate: '', endDate: '' };

@@ -17,10 +17,10 @@
     <template v-if="hasLinkedEvents">
       <ni-date-input caption="Début période concernée" v-model="newCreditNote.startDate" required-field in-modal
         :error="validations.startDate.$error" @blur="validations.startDate.$touch" @input="getEvents('startDate')"
-        :disable="!hasLinkedEvents" :error-message="startDateErrorMessage" :max="minAndMaxDates.startDate" />
+        :disable="!hasLinkedEvents" :error-message="startDateErrorMessage" :max="minAndMaxDates.maxStartDate" />
       <ni-date-input caption="Fin période concernée" v-model="newCreditNote.endDate" required-field in-modal
         :error="validations.endDate.$error" @blur="validations.endDate.$touch" @input="getEvents('endDate')"
-        :disable="!hasLinkedEvents" :error-message="endDateErrorMessage" :min="minAndMaxDates.endDate" />
+        :disable="!hasLinkedEvents" :error-message="endDateErrorMessage" :min="minAndMaxDates.minEndDate" />
       <template v-if="creditNoteEvents.length > 0">
         <ni-option-group v-model="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error" />
