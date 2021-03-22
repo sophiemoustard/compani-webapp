@@ -21,7 +21,7 @@
         @input="update($event, 'frequency')" />
       <ni-select in-modal caption="Nature" :options="fundingNatureOptions" :value="newFunding.nature"
         :error="validations.nature.$error" @blur="validations.nature.$touch" required-field
-        @input="updateNature($event)" />
+        @input="update($event, 'nature')" />
       <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.unitTTCRate" caption="Prix unitaire TTC"
         type="number" @blur="validations.unitTTCRate.$touch" :error="validations.unitTTCRate.$error"
         required-field @input="update($event, 'unitTTCRate')" />
@@ -95,23 +95,7 @@ export default {
       return moment(this.newFunding.startDate).add(1, 'day').toISOString();
     },
   },
-  watch: {
-    'newFunding.thirdPartyPayer': function () {
-      this.setUnitUTTRate();
-    },
-    'newFunding.nature': function () {
-      this.setUnitUTTRate();
-    },
-  },
   methods: {
-    setUnitUTTRate () {
-      if (this.isFixedFunding) {
-        this.newFunding.unitTTCRate = 0;
-      } else {
-        const ttp = this.thirdPartyPayers.find(p => p._id === this.newFunding.thirdPartyPayer);
-        this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
-      }
-    },
     hide () {
       this.$emit('hide');
     },
@@ -123,12 +107,6 @@ export default {
     },
     update (event, prop) {
       this.$emit('update:newFunding', { ...this.newFunding, [prop]: event });
-    },
-    async updateNature (event) {
-      if (this.isFixedFunding && this.newFunding.frequency !== ONCE) {
-        await this.$emit('update:newFunding', { ...this.newFunding, frequency: '' });
-      }
-      await this.update(event, 'nature');
     },
   },
 };

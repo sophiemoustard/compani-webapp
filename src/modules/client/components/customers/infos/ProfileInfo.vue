@@ -302,6 +302,7 @@ import {
   REQUIRED_LABEL,
   CIVILITY_OPTIONS,
   DOC_EXTENSIONS,
+  ONCE,
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate } from '@helpers/date';
@@ -546,6 +547,15 @@ export default {
         customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
       },
     };
+  },
+  watch: {
+    'newFunding.thirdPartyPayer': function () {
+      this.setUnitUTTRate();
+    },
+    'newFunding.nature': function (newNature) {
+      if (newNature === FIXED) this.newFunding.frequency = ONCE;
+      this.setUnitUTTRate();
+    },
   },
   async mounted () {
     await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices()]);
@@ -839,6 +849,13 @@ export default {
       }
     },
     // Fundings
+    setUnitUTTRate () {
+      if (this.newFunding.nature === FIXED) this.newFunding.unitTTCRate = 0;
+      else {
+        const ttp = this.ttpList.find(p => p._id === this.newFunding.thirdPartyPayer);
+        this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
+      }
+    },
     async getThirdPartyPayers () {
       try {
         this.ttpList = await ThirdPartyPayers.list();
