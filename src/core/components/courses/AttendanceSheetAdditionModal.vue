@@ -54,9 +54,8 @@ export default {
     },
     dateOptions () {
       const dateOptionsSet = new Set([...this.course.slots.map(date => moment(date.startDate).startOf('d').toDate())]);
-      const dateOptions = [...dateOptionsSet];
 
-      return dateOptions.map(date => ({ value: new Date(date), label: formatDate(date) }));
+      return [...dateOptionsSet].map(date => ({ value: new Date(date), label: formatDate(date) }));
     },
   },
   methods: {
