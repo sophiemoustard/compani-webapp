@@ -38,6 +38,7 @@
         </q-card-actions>
       </q-card>
     </div>
+    <tester-table :program-id="profileId" :testers="program.testers" @refresh="refreshProgram" />
 
     <category-addition-modal v-model="categoryAdditionModal" :new-category.sync="newCategory" :loading="loading"
       @hide="resetModal" @submit="addCategory" :category-options="categoryOptions" :validations="$v.newCategory" />
@@ -56,6 +57,7 @@ import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import CategoryAdditionModal from 'src/modules/vendor/components/programs/CategoryAdditionModal';
+import TesterTable from 'src/modules/vendor/components/programs/TesterTable';
 import Button from '@components/Button';
 import { IMAGE_EXTENSIONS } from '@data/constants';
 import { upperCaseFirstLetter, formatAndSortOptions } from '@helpers/utils';
@@ -71,6 +73,7 @@ export default {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
     'category-addition-modal': CategoryAdditionModal,
+    'tester-table': TesterTable,
   },
   data () {
     return {
