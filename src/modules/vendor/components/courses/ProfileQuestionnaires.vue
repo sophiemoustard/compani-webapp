@@ -1,6 +1,6 @@
 <template>
   <div>
-    <q-card v-for="(card, cardIndex) of followUp" :key="cardIndex" flat class="q-mb-sm">
+    <q-card v-for="(card, cardIndex) of questionnaireAnswers" :key="cardIndex" flat class="q-mb-sm">
       <component :is="getChartComponent(card.template)" :card="card" />
     </q-card>
   </div>
@@ -26,11 +26,11 @@ export default {
     ...mapState('course', ['course']),
   },
   data () {
-    return { followUp: [] };
+    return { questionnaireAnswers: [] };
   },
   async created () {
     try {
-      this.followUp = await Courses.getQuestionnaireAnswers(this.course._id);
+      this.questionnaireAnswers = await Courses.getQuestionnaireAnswers(this.course._id);
     } catch (e) {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des questionnaires');
