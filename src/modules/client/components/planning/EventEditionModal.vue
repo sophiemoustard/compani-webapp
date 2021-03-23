@@ -207,14 +207,14 @@ export default {
       else this.update(addressList[0].value, 'address');
     },
     update (event, path) {
-      this.$emit('update:edited-event', set({ ...this.editedEvent }, path, event));
+      this.$emit('update:editedEvent', set({ ...this.editedEvent }, path, event));
     },
     updateAbsence (event) {
-      this.$emit('update:edited-event', { ...this.editedEvent, absence: event });
+      this.$emit('update:editedEvent', { ...this.editedEvent, absence: event });
       this.setDateHours(this.editedEvent, 'editedEvent');
     },
     updateAddress (event) {
-      this.$emit('update:edited-event', { ...this.editedEvent, address: event });
+      this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
       this.deleteClassFocus();
     },
   },
