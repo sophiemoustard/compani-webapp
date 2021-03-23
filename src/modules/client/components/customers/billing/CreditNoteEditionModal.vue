@@ -5,18 +5,20 @@
       </template>
       <ni-input in-modal caption="Bénéficiaire" :value="formatIdentity(editedCreditNote.customer.identity, 'FL')"
         required-field disable />
-      <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
-        v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
+      <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur" required-field disable
+        v-model="editedCreditNote.thirdPartyPayer.name" />
       <ni-date-input caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal required-field
         :error="validations.date.$error" @blur="validations.date.$touch" :disable="!editedCreditNote.isEditable" />
       <!-- Has linked events -->
       <template v-if="hasLinkedEvents">
-        <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
-          :error="validations.startDate.$error" @blur="validations.startDate.$touch" />
+        <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal required-field
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents('startDate')"
+          :error="validations.startDate.$error" @blur="validations.$touch" :max="minAndMaxDates.maxStartDate"
+          :error-message="startDateErrorMessage" />
         <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
-          :error="validations.endDate.$error" @blur="validations.endDate.$touch" />
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents('endDate')"
+          required-field :error="validations.endDate.$error" @blur="validations.$touch" :min="minAndMaxDates.minEndDate"
+          :error-message="endDateErrorMessage" />
         <template v-if="creditNoteEvents.length > 0">
           <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
@@ -70,6 +72,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import { formatPrice, formatIdentity } from '@helpers/utils';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'CreditNoteEditionModal',
@@ -82,6 +85,9 @@ export default {
     creditNoteEventsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    minAndMaxDates: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-option-group': OptionGroup,
@@ -111,8 +117,8 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    getEvents () {
-      this.$emit('get-events');
+    getEvents (value) {
+      this.$emit('get-events', value);
     },
   },
 };
