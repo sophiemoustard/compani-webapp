@@ -32,8 +32,9 @@ export default {
     try {
       this.questionnaireAnswers = await Courses.getQuestionnaireAnswers(this.course._id);
     } catch (e) {
+      this.questionnaireAnswers = [];
       console.error(e);
-      NotifyNegative('Erreur lors de la récupération des questionnaires');
+      NotifyNegative('Erreur lors de la récupération des questionnaires.');
     }
   },
   methods: {

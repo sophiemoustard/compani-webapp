@@ -34,12 +34,7 @@ export default {
   data () {
     return {
       tabsContent: [
-        {
-          label: 'Suivi',
-          name: 'followUp',
-          default: this.defaultTab === 'followUp',
-          component: ProfileFollowUp,
-        },
+        { label: 'Suivi', name: 'followUp', default: this.defaultTab === 'followUp', component: ProfileFollowUp },
         {
           label: 'Questionnaires',
           name: 'questionnaires',
