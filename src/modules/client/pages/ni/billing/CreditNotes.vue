@@ -36,7 +36,7 @@
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
-      v-model="creditNoteEditionModal" :edited-credit-note="editedCreditNote" :validations="$v.editedCreditNote"
+      v-model="creditNoteEditionModal" :edited-credit-note.sync="editedCreditNote" :validations="$v.editedCreditNote"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :has-linked-events="hasLinkedEvents" :credit-note-events="creditNoteEvents" @hide="resetEditionCreditNoteData"
       @get-events="getEditionEvents" :min-and-max-dates="editionMinAndMaxDates" :loading="loading"
@@ -52,6 +52,7 @@ import pickBy from 'lodash/pickBy';
 import omit from 'lodash/omit';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
+import isEqual from 'lodash/isEqual';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
@@ -177,15 +178,6 @@ export default {
       this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
       this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
     },
-    'editedCreditNote.events': function (value) {
-      if (this.hasLinkedEvents) {
-        const prices = this.computePrices(this.editedCreditNote.events);
-        this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
-        this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
-        this.editedCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
-        this.editedCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
-      }
-    },
     'newCreditNote.startDate': function (value) {
       if (value === null) {
         this.creditNoteEvents = [];
@@ -194,6 +186,15 @@ export default {
     'newCreditNote.endDate': function (value) {
       if (value === null) {
         this.creditNoteEvents = [];
+      }
+    },
+    'editedCreditNote.events': function (previousValue, currentValue) {
+      if (!isEqual(previousValue, currentValue) && this.hasLinkedEvents) {
+        const prices = this.computePrices(this.editedCreditNote.events);
+        this.editedCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
+        this.editedCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
+        this.editedCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
+        this.editedCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
       }
     },
   },
@@ -337,8 +338,7 @@ export default {
           query.thirdPartyPayer = linkedCreditNote.thirdPartyPayer._id;
         }
 
-        const eventsTest = await Events.listForCreditNotes(query);
-        this.creditNoteEvents = await this.formatEventsAsCreditNoteEvents(eventsTest);
+        this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
       } catch (e) {
         this.creditNoteEvents = [];
         console.error(e);
