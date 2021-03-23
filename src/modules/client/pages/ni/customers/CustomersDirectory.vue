@@ -37,7 +37,7 @@ import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { CIVILITY_OPTIONS } from '@data/constants';
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
@@ -92,8 +92,8 @@ export default {
           field: 'createdAt',
           align: 'left',
           sortable: true,
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : 'N/A'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
+          format: value => formatDate(value) || 'N/A',
+          sort: ascendingSort,
           style: 'width: 85px',
         },
         {
@@ -102,7 +102,7 @@ export default {
           field: 'firstIntervention',
           align: 'left',
           sortable: false,
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
+          format: formatDate,
           style: 'width: 85px',
         },
         {
