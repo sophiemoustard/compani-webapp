@@ -337,21 +337,22 @@ export default {
           query.thirdPartyPayer = linkedCreditNote.thirdPartyPayer._id;
         }
 
-        this.creditNoteEvents = this.formatEventsAsCreditNoteEvents(await Events.listForCreditNotes(query));
+        const eventsTest = await Events.listForCreditNotes(query);
+        this.creditNoteEvents = await this.formatEventsAsCreditNoteEvents(eventsTest);
       } catch (e) {
         this.creditNoteEvents = [];
         console.error(e);
         NotifyNegative('Impossible de récupérer les évènements facturés de ce bénéficiaire.');
       }
     },
-    getEditionEvents (field) {
+    async getEditionEvents (field) {
       if (field && this.$v.editedCreditNote[field]) this.$v.editedCreditNote[field].$touch();
       else this.$v.editedCreditNote.$touch();
-      this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
+      await this.getEvents(this.editedCreditNote, this.$v.editedCreditNote);
     },
-    getCreationEvents (field) {
+    async getCreationEvents (field) {
       if (this.$v.newCreditNote[field]) this.$v.newCreditNote[field].$touch();
-      this.getEvents(this.newCreditNote, this.$v.newCreditNote);
+      await this.getEvents(this.newCreditNote, this.$v.newCreditNote);
     },
     setMinAndMaxDates (events) {
       if (!events || !events.length) return { maxStartDate: '', minEndDate: '' };
