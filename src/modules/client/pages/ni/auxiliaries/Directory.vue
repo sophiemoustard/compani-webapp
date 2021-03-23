@@ -46,8 +46,8 @@ import TableList from '@components/table/TableList';
 import DirectoryHeader from '@components/DirectoryHeader';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, AUXILIARY, AUXILIARY_ROLES, REQUIRED_LABEL, CIVILITY_OPTIONS, HR_SMS } from '@data/constants';
-import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { formatIdentity, formatPhoneForPayload, removeDiacritics, sortStrings, formatDate } from '@helpers/utils';
+import { ascendingSort } from '@helpers/date';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import AuxiliaryCreationModal from 'src/modules/client/components/auxiliary/AuxiliaryCreationModal';
@@ -115,8 +115,8 @@ export default {
           field: 'startDate',
           align: 'left',
           sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
+          format: formatDate,
+          sort: ascendingSort,
           style: 'min-width: 110px; width: 15%',
         },
         {
@@ -125,8 +125,8 @@ export default {
           field: 'hiringDate',
           align: 'left',
           sortable: true,
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : null),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
+          format: formatDate,
+          sort: ascendingSort,
           style: 'min-width: 110px; width: 15%',
         },
         {

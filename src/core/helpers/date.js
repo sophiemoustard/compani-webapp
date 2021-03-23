@@ -9,3 +9,7 @@ export const isBetween = (date, min, max) => new Date(date) < new Date(max) && n
 export const getStartOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
 export const getEndOfDay = date => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59);
+
+export const ascendingSort = (a, b) => new Date(a) - new Date(b);
+
+export const descendingSort = (a, b) => new Date(b) - new Date(a);
