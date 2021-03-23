@@ -10,7 +10,7 @@ import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { formatDate } from '../../../core/helpers/utils';
 
 export const helperMixin = {
   data () {
@@ -37,15 +37,15 @@ export const helperMixin = {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: value => formatPhone(value),
+          format: formatPhone,
         },
         {
           name: 'startDate',
           label: 'Depuis le...',
           field: 'createdAt',
           align: 'left',
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
+          format: formatDate,
+          sort: (a, b) => new Date(a) - new Date(b),
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
