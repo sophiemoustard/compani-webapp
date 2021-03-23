@@ -29,7 +29,7 @@ import Contracts from '@api/Contracts';
 import SimpleTable from '@components/table/SimpleTable';
 import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
-import moment from '@helpers/moment';
+import { formatDate } from '@helpers/utils';
 
 export default {
   name: 'StaffRegister',
@@ -54,12 +54,7 @@ export default {
           field: row => get(row, 'user.identity.lastname', '').toUpperCase(),
           align: 'left',
         },
-        {
-          name: 'firstname',
-          label: 'Prénom',
-          field: row => get(row, 'user.identity.firstname') || '',
-          align: 'left',
-        },
+        { name: 'firstname', label: 'Prénom', field: row => get(row, 'user.identity.firstname') || '', align: 'left' },
         {
           name: 'gender',
           label: 'Civilité',
@@ -74,7 +69,7 @@ export default {
           label: 'Date de naissance',
           field: row => get(row, 'user.identity.birthDate') || '',
           align: 'left',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
+          format: formatDate,
         },
         {
           name: 'nationality',
@@ -82,32 +77,10 @@ export default {
           field: row => nationalities[get(row, 'user.identity.nationality')] || '',
           align: 'left',
         },
-        {
-          name: 'job',
-          label: 'Emploi',
-          field: row => 'Auxiliaire de vie',
-          align: 'left',
-        },
-        {
-          name: 'contract',
-          label: 'Type de contrat',
-          field: row => 'CDI',
-          align: 'center',
-        },
-        {
-          name: 'startDate',
-          label: 'Date de début',
-          field: 'startDate',
-          align: 'left',
-          format: value => moment(value).format('DD/MM/YYYY'),
-        },
-        {
-          name: 'endDate',
-          label: 'Date de fin',
-          field: 'endDate',
-          align: 'left',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'job', label: 'Emploi', field: () => 'Auxiliaire de vie', align: 'left' },
+        { name: 'contract', label: 'Type de contrat', field: () => 'CDI', align: 'center' },
+        { name: 'startDate', label: 'Date de début', field: 'startDate', align: 'left', format: formatDate },
+        { name: 'endDate', label: 'Date de fin', field: 'endDate', align: 'left', format: formatDate },
         {
           name: 'idCardOrResidencePermitRecto',
           label: 'Titre de séjour/Identité (R)',
