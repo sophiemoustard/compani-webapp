@@ -2,7 +2,8 @@ import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
-import { formatIdentity, formatDate } from '@helpers/utils';
+import { formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 
 export const courseFiltersMixin = {
   data () {

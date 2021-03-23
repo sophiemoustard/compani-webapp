@@ -122,7 +122,8 @@ import {
   SITUATION_OPTIONS,
 } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { formatIdentity, formatHours, formatDate } from '@helpers/utils';
+import { formatIdentity, formatHours } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';

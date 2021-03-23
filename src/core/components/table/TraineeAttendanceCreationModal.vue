@@ -25,7 +25,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatDate } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 
 export default {
   name: 'TraineeAttendanceCreationModal',

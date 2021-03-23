@@ -13,3 +13,13 @@ export const getEndOfDay = date => new Date(date.getFullYear(), date.getMonth(),
 export const ascendingSort = (a, b) => new Date(a) - new Date(b);
 
 export const descendingSort = (a, b) => new Date(b) - new Date(a);
+
+export const formatDate = (value) => {
+  if (!value) return '';
+
+  const date = new Date(value).getDate() < 10 ? `0${new Date(value).getDate()}` : new Date(value).getDate();
+  const month = new Date(value).getMonth() + 1;
+  const formattedMonth = month < 10 ? `0${month}` : month;
+
+  return `${date}/${formattedMonth}/${new Date(value).getFullYear()}`;
+};

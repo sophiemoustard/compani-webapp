@@ -88,7 +88,8 @@ import {
   PAYMENT,
   COMPANI,
 } from '@data/constants';
-import { formatPrice, formatDate } from '@helpers/utils';
+import { formatPrice } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { openPdf } from '@helpers/file';
 
 export default {

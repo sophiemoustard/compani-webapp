@@ -10,7 +10,7 @@ import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
-import { formatDate } from '../../../core/helpers/utils';
+import { formatDate } from '@helpers/date';
 
 export const helperMixin = {
   data () {

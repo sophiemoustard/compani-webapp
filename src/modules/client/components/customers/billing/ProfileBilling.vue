@@ -119,7 +119,8 @@ import {
   REQUIRED_LABEL,
 } from '@data/constants';
 import moment from '@helpers/moment';
-import { formatIdentity, formatDate } from '@helpers/utils';
+import { formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { openPdf } from '@helpers/file';
 import CustomerBillingTable from 'src/modules/client/components/customers/billing/CustomerBillingTable';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';

@@ -47,7 +47,8 @@
 
 <script>
 import EditableTd from '@components/table/EditableTd';
-import { formatPrice, getLastVersion, formatIdentity, truncate, formatDate } from '@helpers/utils';
+import { formatPrice, getLastVersion, formatIdentity, truncate } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { FIXED } from '@data/constants';
 
 export default {

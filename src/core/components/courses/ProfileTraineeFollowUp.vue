@@ -65,7 +65,8 @@ import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
-import { upperCaseFirstLetter, formatQuantity, formatDate } from '@helpers/utils';
+import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 

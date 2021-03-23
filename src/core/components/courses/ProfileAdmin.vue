@@ -97,7 +97,8 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import CourseInfoLink from '@components/courses/CourseInfoLink';
 import BiColorButton from '@components/BiColorButton';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
-import { formatQuantity, formatIdentity, formatDate } from '@helpers/utils';
+import { formatQuantity, formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { openPdf, downloadZip } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';

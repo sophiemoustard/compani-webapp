@@ -75,8 +75,8 @@ import {
   truncate,
   roundFrenchPercentage,
   formatNumberForCSV,
-  formatDate,
 } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';

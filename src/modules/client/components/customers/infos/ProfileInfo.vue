@@ -304,7 +304,7 @@ import {
   DOC_EXTENSIONS,
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
-import { formatDate } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { userMixin } from '@mixins/userMixin';

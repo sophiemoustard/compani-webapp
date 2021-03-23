@@ -58,7 +58,7 @@ import Modal from '@components/modal/Modal';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
-import { formatDate } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 

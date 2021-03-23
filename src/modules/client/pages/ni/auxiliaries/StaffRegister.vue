@@ -29,7 +29,7 @@ import Contracts from '@api/Contracts';
 import SimpleTable from '@components/table/SimpleTable';
 import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
-import { formatDate } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 
 export default {
   name: 'StaffRegister',

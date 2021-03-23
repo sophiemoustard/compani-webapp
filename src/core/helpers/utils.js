@@ -135,13 +135,3 @@ export const formatAndSortOptions = (array, field) => array
   .sort((a, b) => a.label.localeCompare(b.label));
 
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
-
-export const formatDate = (value) => {
-  if (!value) return '';
-
-  const date = new Date(value).getDate() < 10 ? `0${new Date(value).getDate()}` : new Date(value).getDate();
-  const month = new Date(value).getMonth() + 1;
-  const formattedMonth = month < 10 ? `0${month}` : month;
-
-  return `${date}/${formattedMonth}/${new Date(value).getFullYear()}`;
-};

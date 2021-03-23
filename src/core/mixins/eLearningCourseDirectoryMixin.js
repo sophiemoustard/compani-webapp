@@ -1,5 +1,6 @@
 import escapeRegExp from 'lodash/escapeRegExp';
-import { removeDiacritics, formatDate } from '@helpers/utils';
+import { removeDiacritics } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
