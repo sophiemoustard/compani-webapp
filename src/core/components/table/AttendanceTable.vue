@@ -1,7 +1,7 @@
 <template>
 <div>
   <q-card flat>
-    <q-table v-if="!noSlots" :data="trainees" :columns="columns" class="q-pa-md table"
+    <q-table v-if="courseHasSlot" :data="trainees" :columns="columns" class="q-pa-md table"
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
@@ -37,7 +37,7 @@
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
-              @input="updateCheckbox(col.value, col.slot)" :disable="loading" />
+              @input="updateCheckbox(col.value, col.slot)" :disable="loading || !canUpdateAttendance" />
           </q-td>
         </q-tr>
       </template>
@@ -45,11 +45,11 @@
         <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
       </template>
     </q-table>
-    <ni-button color="primary" icon="add" label="Ajouter un participant" :disable="loading"
-      @click="traineeAdditionModal = true" class="q-mb-sm" />
-    <div v-if="noSlots" class="text-center text-italic q-pa-lg no-data">
+    <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
+    <ni-button v-if="courseHasSlot && canUpdateAttendance" color="primary" icon="add" class="q-mb-sm"
+      label="Ajouter un participant" :disable="loading" @click="traineeAdditionModal = true" />
   </q-card>
 
   <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
@@ -59,15 +59,18 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+import pick from 'lodash/pick';
 import { required } from 'vuelidate/lib/validators';
+import Attendances from '@api/Attendances';
+import Users from '@api/Users';
+import Button from '@components/Button';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
+import { DEFAULT_AVATAR, INTRA } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
-import { DEFAULT_AVATAR, INTRA } from '@data/constants';
-import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import Button from '@components/Button';
-import Attendances from '@api/Attendances';
-import Users from '@api/Users';
+import { defineAbilitiesFor } from '@helpers/ability';
 import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
@@ -100,10 +103,11 @@ export default {
     };
   },
   async created () {
-    await this.refreshAttendances(this.course.slots.map(s => s._id));
+    await this.refreshAttendances({ course: this.course._id });
     await this.getTrainees();
   },
   computed: {
+    ...mapState('main', ['loggedUser']),
     columns () {
       const columns = [{
         name: 'trainee',
@@ -132,8 +136,8 @@ export default {
     noTrainees () {
       return !this.course.trainees.length;
     },
-    noSlots () {
-      return !this.course.slots.length;
+    courseHasSlot () {
+      return this.course.slots.length;
     },
     trainees () {
       return [...this.course.trainees, ...this.unsubscribedTrainees];
@@ -163,6 +167,11 @@ export default {
     selectedCompany () {
       return this.course.company ? this.course.company._id : '';
     },
+    canUpdateAttendance () {
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+
+      return ability.can('update', 'course_trainee_follow_up');
+    },
   },
   methods: {
     checkboxValue (traineeId, slotId) {
@@ -174,34 +183,33 @@ export default {
     traineesCount (slotId) {
       return this.attendances.filter(a => a.courseSlot === slotId).length;
     },
-    async refreshAttendances (courseSlots) {
-      if (courseSlots.length) {
-        try {
-          this.loading = true;
-          const updatedCourseSlot = await Attendances.list({ courseSlots });
+    async refreshAttendances (query) {
+      try {
+        this.loading = true;
+        const updatedCourseSlot = await Attendances.list(query);
 
-          this.attendances = [
-            ...this.attendances.filter(a => !courseSlots.some(cs => cs === a.courseSlot)),
-            ...updatedCourseSlot,
-          ];
-          NotifyPositive('Liste mise à jour.');
-        } catch (e) {
-          console.error(e);
-          this.attendances = [];
-          NotifyNegative('Erreur lors de la mise à jour des émargements.');
-        } finally {
-          this.loading = false;
-        }
+        this.attendances = query.courseSlot
+          ? [...this.attendances.filter(a => a.courseSlot !== query.courseSlot), ...updatedCourseSlot]
+          : updatedCourseSlot;
+        NotifyPositive('Liste mise à jour.');
+      } catch (e) {
+        console.error(e);
+        this.attendances = [];
+        NotifyNegative('Erreur lors de la mise à jour des émargements.');
+      } finally {
+        this.loading = false;
       }
     },
     async updateCheckbox (traineeId, slotId) {
+      if (!this.canUpdateAttendance) return NotifyNegative('Impossible de modifier l\'emargement.');
+
       if (this.checkboxValue(traineeId, slotId)) {
         try {
           this.loading = true;
           const attendance = this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
           await Attendances.delete(attendance._id);
 
-          await this.refreshAttendances([slotId]);
+          await this.refreshAttendances({ courseSlot: slotId });
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la suppression de l\'émargement.');
@@ -213,7 +221,7 @@ export default {
           this.loading = true;
           await Attendances.create({ trainee: traineeId, courseSlot: slotId });
 
-          await this.refreshAttendances([slotId]);
+          await this.refreshAttendances({ courseSlot: slotId });
         } catch (e) {
           console.error(e);
           NotifyNegative('Erreur lors de la validation de l\'émargement.');
@@ -228,11 +236,14 @@ export default {
           ? { company: this.selectedCompany }
           : { hasCompany: true });
       } catch (error) {
+        this.potentialTrainees = [];
         console.error(error);
       }
     },
     async addTrainee () {
       try {
+        if (!this.canUpdateAttendance) return NotifyNegative('Impossible d\'ajouter un participant');
+
         this.$v.newTraineeAttendance.$touch();
         if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;

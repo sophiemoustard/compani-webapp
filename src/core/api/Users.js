@@ -27,12 +27,8 @@ export default {
     }
   },
   async learnerList (params = null) {
-    try {
-      const learners = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/learners`, { params });
-      return learners.data.data.users;
-    } catch (e) {
-      console.error(e.response);
-    }
+    const learners = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/learners`, { params });
+    return learners.data.data.users;
   },
   async getById (id) {
     const userRaw = await alenviAxios.get(`${process.env.API_HOSTNAME}/users/${id}`);
