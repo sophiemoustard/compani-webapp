@@ -1,6 +1,6 @@
 import escapeRegExp from 'lodash/escapeRegExp';
 import { removeDiacritics } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, descendingSort } from '@helpers/date';
 
 export const eLearningCourseDirectoryMixin = {
   data () {
@@ -8,13 +8,7 @@ export const eLearningCourseDirectoryMixin = {
       courses: [],
       tableLoading: false,
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'name',
-          align: 'left',
-          sortable: true,
-        },
+        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true },
         {
           name: 'traineesCount',
           label: 'Nombre d\'apprenants',
@@ -29,7 +23,7 @@ export const eLearningCourseDirectoryMixin = {
           align: 'left',
           sortable: true,
           format: formatDate,
-          sort: (a, b) => new Date(b) - new Date(a),
+          sort: descendingSort,
         },
       ],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },

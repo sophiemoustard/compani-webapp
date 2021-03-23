@@ -10,7 +10,7 @@ import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
-import { formatDate } from '@helpers/date';
+import { formatDate, ascendingSort } from '@helpers/date';
 
 export const helperMixin = {
   data () {
@@ -45,7 +45,7 @@ export const helperMixin = {
           field: 'createdAt',
           align: 'left',
           format: formatDate,
-          sort: (a, b) => new Date(a) - new Date(b),
+          sort: ascendingSort,
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
