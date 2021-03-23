@@ -389,7 +389,7 @@ export default {
     setStartDateErrorMessage (validations) {
       if (!validations.startDate.required) return REQUIRED_LABEL;
 
-      if (!validations.startDate.maxDate) return 'Il y a des créneaux dans cet intervalle.';
+      if (!validations.startDate.maxDate) return 'Il y a des évènements dans cet intervalle.';
 
       return REQUIRED_LABEL;
     },
@@ -398,7 +398,7 @@ export default {
 
       if (!validations.endDate.minDate) {
         return events.length
-          ? 'Il y a des créneaux dans cet intervalle.'
+          ? 'Il y a des évènements dans cet intervalle.'
           : 'La date de fin ne peut être antérieure à la date de début.';
       }
 
