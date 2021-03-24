@@ -203,19 +203,19 @@ export default {
     toggleAddressSelect () {
       const addressList = this.customerAddressList(this.editedEvent);
       const addressIndex = addressList.findIndex(ev => this.editedEvent.address.fullAddress === ev.label);
-      if (addressIndex === 0) this.editedEvent.address = addressList[1].value;
-      else this.editedEvent.address = addressList[0].value;
+      if (addressIndex === 0) this.update(addressList[1].value, 'address');
+      else this.update(addressList[0].value, 'address');
     },
-    async update (event, path) {
-      await this.$emit('update:edited-event', set({ ...this.editedEvent }, path, event));
+    update (event, path) {
+      this.$emit('update:editedEvent', set({ ...this.editedEvent }, path, event));
     },
-    async updateAbsence (event) {
-      await this.$emit('update:edited-event', { ...this.editedEvent, absence: event });
-      await this.setDateHours(this.editedEvent, 'editedEvent');
+    updateAbsence (event) {
+      this.$emit('update:editedEvent', { ...this.editedEvent, absence: event });
+      this.setDateHours(this.editedEvent, 'editedEvent');
     },
-    async updateAddress (event) {
-      await this.$emit('update:edited-event', { ...this.editedEvent, address: event });
-      await this.deleteClassFocus();
+    updateAddress (event) {
+      this.$emit('update:editedEvent', { ...this.editedEvent, address: event });
+      this.deleteClassFocus();
     },
   },
 };

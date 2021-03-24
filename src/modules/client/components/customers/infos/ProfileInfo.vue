@@ -264,20 +264,26 @@
       :selected="selectedFunding" @hide="resetFundingHistoryData" />
 
     <!-- Funding creation modal -->
-    <funding-creation-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :new-funding.sync="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
-      :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
+    <funding-creation-modal v-model="fundingCreationModal" :new-funding.sync="newFunding" :third-party-payers="ttpList"
+      :care-hours-error-message="careHoursErrorMessage($v.newFunding)" @submit="createFunding" :loading="loading"
+      :amount-ttc-error-message="amountTTCErrorMessage($v.newFunding)" :validations="$v.newFunding"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.newFunding)" :days-options="daysOptions"
+      :funding-subscriptions-options="fundingSubscriptionsOptions" @hide="resetCreationFundingData"
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.newFunding)" />
 
     <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
       :edited-funding.sync="editedFunding" @submit="editFunding" :days-options="daysOptions"
-      :validations="$v.editedFunding" />
+      :validations="$v.editedFunding" :care-hours-error-message="careHoursErrorMessage($v.editedFunding)"
+      :amount-ttc-error-message="amountTTCErrorMessage($v.editedFunding)"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.editedFunding)"
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)" />
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf, minValue, maxValue } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -302,10 +308,11 @@ import {
   REQUIRED_LABEL,
   CIVILITY_OPTIONS,
   DOC_EXTENSIONS,
+  ONCE,
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate } from '@helpers/date';
-import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -530,22 +537,19 @@ export default {
         subscription: { required },
         nature: { required },
         frequency: { required },
-        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
-        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
-        careHours: { required: requiredIf(item => item.nature === HOURLY) },
-        careDays: { required },
-        startDate: { required },
-        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
+        ...this.getFundingValidation(this.newFunding),
       },
-      editedFunding: {
-        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
-        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
-        careHours: { required: requiredIf(item => item.nature === HOURLY) },
-        careDays: { required },
-        startDate: { required },
-        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
-      },
+      editedFunding: { ...this.getFundingValidation(this.editedFunding) },
     };
+  },
+  watch: {
+    'newFunding.thirdPartyPayer': function () {
+      this.setUnitUTTRate();
+    },
+    'newFunding.nature': function (newNature) {
+      if (newNature === FIXED) this.newFunding.frequency = ONCE;
+      this.setUnitUTTRate();
+    },
   },
   async mounted () {
     await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices()]);
@@ -553,6 +557,43 @@ export default {
   },
   methods: {
     get,
+    getFundingValidation (funding) {
+      return {
+        amountTTC: { required: requiredIf(item => item.nature === FIXED), minValue: minValue(0) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
+        careDays: { required },
+        startDate: { required },
+        endDate: { minDate: minDate(funding.startDate) },
+        customerParticipationRate: {
+          required: requiredIf(item => item.nature === HOURLY),
+          minValue: minValue(0),
+          maxValue: maxValue(100),
+        },
+      };
+    },
+    careHoursErrorMessage (validations) {
+      if (!validations.careHours.required) return REQUIRED_LABEL;
+      if (!validations.careHours.minValue) return 'Nombre d\'heures invalide';
+      return '';
+    },
+    amountTTCErrorMessage (validations) {
+      if (!validations.amountTTC.required) return REQUIRED_LABEL;
+      if (!validations.amountTTC.minValue) return 'Montant forfaitaire TTC invalide';
+      return '';
+    },
+    unitTTCRateErrorMessage (validations) {
+      if (!validations.unitTTCRate.required) return REQUIRED_LABEL;
+      if (!validations.unitTTCRate.minValue) return 'Prix unitaire TTC invalide';
+      return '';
+    },
+    customerParticipationRateErrorMessage (validations) {
+      if (!validations.customerParticipationRate.required) return REQUIRED_LABEL;
+      if (!validations.customerParticipationRate.minValue || !validations.customerParticipationRate.maxValue) {
+        return 'Taux de participation du bénéficiaire invalide';
+      }
+      return '';
+    },
     mandateFormFields (row) {
       return [
         { name: 'mandateId', value: row._id },
@@ -839,6 +880,13 @@ export default {
       }
     },
     // Fundings
+    setUnitUTTRate () {
+      if (this.newFunding.nature === FIXED) this.newFunding.unitTTCRate = 0;
+      else {
+        const ttp = this.ttpList.find(p => p._id === this.newFunding.thirdPartyPayer);
+        this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
+      }
+    },
     async getThirdPartyPayers () {
       try {
         this.ttpList = await ThirdPartyPayers.list();

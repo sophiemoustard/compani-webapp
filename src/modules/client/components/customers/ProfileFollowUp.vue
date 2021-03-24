@@ -188,12 +188,14 @@ export default {
       situationOptions: SITUATION_OPTIONS,
     };
   },
-  validations: {
-    customer: {
-      contact: {
-        phone: { frPhoneNumber },
+  validations () {
+    return {
+      customer: {
+        contact: {
+          phone: { frPhoneNumber },
+        },
       },
-    },
+    };
   },
   computed: {
     ...mapState('customer', ['customer']),
