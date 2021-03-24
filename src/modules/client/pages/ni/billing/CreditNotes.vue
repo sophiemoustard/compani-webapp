@@ -27,11 +27,11 @@
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote" :loading="loading"
-      :customers-options="customersOptions" :third-party-payer-options="thirdPartyPayerOptions"
+      :has-linked-events.sync="hasLinkedEvents" :third-party-payer-options="thirdPartyPayerOptions"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :validations="$v.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" @get-events="getCreationEvents"
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.$v.newCreditNote)"
-      :has-linked-events.sync="hasLinkedEvents" @hide="resetCreationCreditNoteData" :new-credit-note="newCreditNote"
+      :customers-options="customersOptions" @hide="resetCreationCreditNoteData" :new-credit-note.sync="newCreditNote"
       :end-date-error-message="setEndDateErrorMessage(this.$v.newCreditNote, this.newCreditNote.events)" />
 
     <!-- Credit note edition modal -->
@@ -158,25 +158,18 @@ export default {
       this.$v.newCreditNote.startDate.$reset();
       this.$v.newCreditNote.endDate.$reset();
     },
-    'newCreditNote.customer': function (value) {
+    'newCreditNote.customer': function (previousValue, currentValue) {
+      if (isEqual(previousValue, currentValue)) return;
       this.newCreditNote.thirdPartyPayer = null;
     },
-    'newCreditNote.events': function (value) {
+    'newCreditNote.events': function (previousValue, currentValue) {
+      if (isEqual(previousValue, currentValue)) return;
+
       const prices = this.computePrices(this.newCreditNote.events);
       this.newCreditNote.exclTaxesCustomer = prices.exclTaxesCustomer;
       this.newCreditNote.inclTaxesCustomer = prices.inclTaxesCustomer;
       this.newCreditNote.exclTaxesTpp = prices.exclTaxesTpp;
       this.newCreditNote.inclTaxesTpp = prices.inclTaxesTpp;
-    },
-    'newCreditNote.startDate': function (value) {
-      if (value === null) {
-        this.creditNoteEvents = [];
-      }
-    },
-    'newCreditNote.endDate': function (value) {
-      if (value === null) {
-        this.creditNoteEvents = [];
-      }
     },
     'editedCreditNote.events': function (previousValue, currentValue) {
       if (!isEqual(previousValue, currentValue) && this.hasLinkedEvents) {
@@ -458,7 +451,7 @@ export default {
 
       return payload;
     },
-    formatCreditNoteEvents (creditNoteEvents, customer) {
+    formatCreditNoteEvents (creditNoteEvents) {
       return creditNoteEvents.map((eventId) => {
         const cnEvent = this.creditNoteEvents.find(ev => ev.eventId === eventId);
 
