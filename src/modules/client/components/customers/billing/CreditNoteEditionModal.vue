@@ -70,7 +70,6 @@
 </template>
 
 <script>
-import set from 'lodash/set';
 import DateInput from '@components/form/DateInput';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -126,8 +125,8 @@ export default {
       this.update(event, value);
       this.$emit('get-events', value);
     },
-    update (event, path) {
-      this.$emit('update:editedCreditNote', set({ ...this.editedCreditNote }, path, event));
+    update (event, prop) {
+      this.$emit('update:editedCreditNote', { ...this.editedCreditNote, [prop]: event });
     },
   },
 };
