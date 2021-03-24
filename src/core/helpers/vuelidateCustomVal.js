@@ -57,9 +57,9 @@ export const strictPositiveNumber = (value) => {
 
 export const validHour = value => !value || !!value.match(/^[0-1][0-9]:[0-5][0-9]$|^2[0-3]:[0-5][0-9]$/);
 
-export const minDate = min => value => new Date(min) <= new Date(value);
+export const minDate = min => value => !value || new Date(min) <= new Date(value);
 
-export const maxDate = max => value => new Date(max) >= new Date(value);
+export const maxDate = max => value => !value || new Date(max) >= new Date(value);
 
 export const apeCode = value => !value || /^\d{3,4}[A-Z]$/.test(value);
 
