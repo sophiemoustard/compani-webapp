@@ -20,7 +20,7 @@
 
 <script>
 import { REQUIRED_LABEL } from '@data/constants';
-import { formatDate } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 
 export default {

@@ -46,6 +46,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import { NotifyWarning } from '@components/popup/notify';
 import { formatIdentity, formatHours } from '@helpers/utils';
 import moment from '@helpers/moment';
+import { formatDate } from '@helpers/date';
 import { ABSENCE, ABSENCE_NATURES, ABSENCE_TYPES, DAILY, AUXILIARY } from '@data/constants';
 import EventEditionModal from 'src/modules/client/components/planning/EventEditionModal';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
@@ -97,7 +98,7 @@ export default {
           name: 'startDate',
           label: 'Date de début',
           field: 'startDate',
-          format: value => moment(value).format('DD/MM/YYYY'),
+          format: formatDate,
           align: 'center',
           sortable: true,
         },
@@ -112,7 +113,7 @@ export default {
           name: 'endDate',
           label: 'Date de fin',
           field: 'endDate',
-          format: value => moment(value).format('DD/MM/YYYY'),
+          format: formatDate,
           align: 'center',
           sortable: true,
         },

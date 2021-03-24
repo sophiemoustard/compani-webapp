@@ -20,7 +20,8 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Banner from '@components/Banner';
-import { formatQuantity, formatDate } from '@helpers/utils';
+import { formatQuantity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 
 export default {
   name: 'SmsDetailsModal',

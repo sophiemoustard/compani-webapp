@@ -23,7 +23,8 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import { INTRA } from '@data/constants';
-import { formatIdentity, formatDate } from '@helpers/utils';
+import { formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 
 export default {

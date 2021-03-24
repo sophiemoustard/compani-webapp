@@ -88,8 +88,8 @@ import {
   PAYMENT,
   COMPANI,
 } from '@data/constants';
-import moment from '@helpers/moment';
-import { formatPrice, formatDate } from '@helpers/utils';
+import { formatPrice } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { openPdf } from '@helpers/file';
 
 export default {
@@ -112,20 +112,14 @@ export default {
       BILL,
       COMPANI,
       columns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         { name: 'document', label: '', align: 'left' },
         {
           name: 'inclTaxes',
           label: 'Montant TTC',
           align: 'center',
           field: row => this.getInclTaxes(row),
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         {
           name: 'balance',
@@ -133,7 +127,7 @@ export default {
           align: 'center',
           field: 'balance',
           style: 'width: 100px',
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         { name: 'actions', label: '', align: 'center' },
       ],

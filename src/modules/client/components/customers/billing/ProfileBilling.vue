@@ -120,6 +120,7 @@ import {
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { openPdf } from '@helpers/file';
 import CustomerBillingTable from 'src/modules/client/components/customers/billing/CustomerBillingTable';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
@@ -155,24 +156,9 @@ export default {
       editedPayment: {},
       taxCertificates: [],
       taxCertificatesColumns: [
-        {
-          name: 'year',
-          field: 'year',
-          align: 'left',
-          label: 'Attestation',
-        },
-        {
-          name: 'date',
-          field: 'date',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-          align: 'left',
-          label: 'Date',
-        },
-        {
-          name: 'actions',
-          field: '_id',
-          align: 'center',
-        },
+        { name: 'year', field: 'year', align: 'left', label: 'Attestation' },
+        { name: 'date', field: 'date', format: formatDate, align: 'left', label: 'Date' },
+        { name: 'actions', field: '_id', align: 'center' },
       ],
       taxCertificatesPagination: {
         sortBy: 'year',

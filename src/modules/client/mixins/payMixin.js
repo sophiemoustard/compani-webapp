@@ -4,6 +4,7 @@ import Pay from '@api/Pay';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { END_CONTRACT_REASONS, SURCHARGES } from '@data/constants';
 import { formatPrice, formatIdentity, formatHours, formatNumberForCSV } from '@helpers/utils';
+import { ascendingSort } from '@helpers/date';
 import { downloadCsv, downloadFile } from '@helpers/file';
 import moment from '@helpers/moment';
 
@@ -33,7 +34,7 @@ export const payMixin = {
           align: 'left',
           field: 'startDate',
           format: value => (value ? moment(value).format('DD/MM') : ''),
-          sort: (a, b) => new Date(a) - new Date(b),
+          sort: ascendingSort,
         },
         {
           name: 'endNotificationDate',

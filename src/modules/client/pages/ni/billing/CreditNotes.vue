@@ -61,7 +61,7 @@ import { COMPANI, REQUIRED_LABEL } from '@data/constants';
 import { formatPrice, getLastVersion, formatIdentity } from '@helpers/utils';
 import { strictPositiveNumber, minDate, maxDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { getStartOfDay, getEndOfDay } from '@helpers/date';
+import { getStartOfDay, getEndOfDay, formatDate } from '@helpers/date';
 import CreditNoteEditionModal from 'src/modules/client/components/customers/billing/CreditNoteEditionModal';
 import CreditNoteCreationModal from 'src/modules/client/components/customers/billing/CreditNoteCreationModal';
 
@@ -103,20 +103,10 @@ export default {
           label: 'Date de l\'avoir',
           align: 'left',
           field: row => (row.date ? row.date : null),
-          format: val => (val ? moment(val).format('DD/MM/YYYY') : ''),
+          format: formatDate,
         },
-        {
-          name: 'startDate',
-          label: 'Début',
-          align: 'left',
-          field: row => (row.startDate ? moment(row.startDate).format('DD/MM/YYYY') : ''),
-        },
-        {
-          name: 'endDate',
-          label: 'Fin',
-          align: 'left',
-          field: row => (row.endDate ? moment(row.endDate).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'startDate', label: 'Début', align: 'left', field: 'startDate', format: formatDate },
+        { name: 'endDate', label: 'Fin', align: 'left', field: 'endDate', format: formatDate },
         {
           name: 'customer',
           label: 'Bénéficiaire',
@@ -127,7 +117,7 @@ export default {
           name: 'thirdPartyPayer',
           label: 'Tiers payeur',
           align: 'left',
-          field: row => (row.thirdPartyPayer ? `${row.thirdPartyPayer.name}` : ''),
+          field: row => get(row, 'thirdPartyPayer.name') || '',
           style: 'max-width: 250px',
         },
         {
@@ -135,14 +125,14 @@ export default {
           label: 'HT',
           align: 'left',
           field: row => (row.thirdPartyPayer ? row.exclTaxesTpp : row.exclTaxesCustomer),
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         {
           name: 'inclTaxes',
           label: 'TTC',
           align: 'left',
           field: row => (row.thirdPartyPayer ? row.inclTaxesTpp : row.inclTaxesCustomer),
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
@@ -236,9 +226,7 @@ export default {
       if (this.newCreditNote.customer) {
         selectedCustomer = this.customersOptions.find(cus => cus.value === this.newCreditNote.customer);
       }
-      if (this.editedCreditNote.customer) {
-        selectedCustomer = this.editedCreditNote.customer;
-      }
+      if (this.editedCreditNote.customer) selectedCustomer = this.editedCreditNote.customer;
 
       if (!selectedCustomer) return [];
       return selectedCustomer.subscriptions.map(sub => ({
@@ -260,10 +248,7 @@ export default {
       const selectedCustomer = this.customersOptions.find(cus => cus.value === customer);
       if (!selectedCustomer) return [];
 
-      return selectedCustomer.thirdPartyPayers.map(tpp => ({
-        label: tpp.name,
-        value: tpp._id,
-      }));
+      return selectedCustomer.thirdPartyPayers.map(tpp => ({ label: tpp.name, value: tpp._id }));
     },
     creationMinAndMaxDates () {
       return this.setMinAndMaxDates(this.newCreditNote.events);
@@ -494,9 +479,7 @@ export default {
         thirdPartyPayer: creditNote.thirdPartyPayer,
       };
 
-      if (creditNote.events.length > 0) {
-        payload.events = this.formatCreditNoteEvents(creditNote.events, customer);
-      }
+      if (creditNote.events.length > 0) payload.events = this.formatCreditNoteEvents(creditNote.events, customer);
 
       return payload;
     },
