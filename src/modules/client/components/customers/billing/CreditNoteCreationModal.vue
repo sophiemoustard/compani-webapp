@@ -127,7 +127,6 @@ export default {
       this.$emit('get-events', prop);
     },
     updateHasLinkedEvents (event) {
-      this.update(event, 'hasLinkedEvents');
       this.$emit('update:hasLinkedEvents', event);
     },
     update (event, prop) {
