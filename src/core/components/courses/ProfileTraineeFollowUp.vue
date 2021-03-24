@@ -13,7 +13,7 @@
                 <div class="row no-wrap table-actions justify-end">
                   <ni-button icon="file_download" color="primary" type="a" target="_blank"
                     :href="props.row.file.link" />
-                  <ni-button v-if="canUpdateAttendance" icon="delete" color="primary"
+                  <ni-button v-if="canUpdate" icon="delete" color="primary"
                     @click="validateAttendanceSheetDeletion(props.row)" />
                 </div>
               </template>
@@ -23,7 +23,7 @@
         </template>
       </ni-simple-table>
       <div class="flex justify-end">
-        <ni-button v-if="canUpdateAttendance" class="bg-primary" color="white" icon="add"
+        <ni-button v-if="canUpdate" class="bg-primary" color="white" icon="add"
           label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
@@ -112,7 +112,7 @@ export default {
     visibleColumns () {
       return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
     },
-    canUpdateAttendance () {
+    canUpdate () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
       return ability.can('update', 'course_trainee_follow_up');
@@ -146,7 +146,7 @@ export default {
     },
     async addAttendanceSheet () {
       try {
-        if (!this.canUpdateAttendance) return NotifyNegative('Impossible d\'ajouter une feuille d\'emargement.');
+        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter une feuille d\'emargement.');
 
         this.$v.newAttendanceSheet.$touch();
         if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -165,7 +165,7 @@ export default {
       }
     },
     validateAttendanceSheetDeletion (attendanceSheet) {
-      if (!this.canUpdateAttendance) return NotifyNegative('Impossible de supprimer la feuille d\'emargement.');
+      if (!this.canUpdate) return NotifyNegative('Impossible de supprimer la feuille d\'emargement.');
 
       this.$q.dialog({
         title: 'Confirmation',
