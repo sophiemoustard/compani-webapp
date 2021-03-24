@@ -6,20 +6,18 @@
     <ni-select in-modal caption="Bénéficiaire" :value="newCreditNote.customer" :options="customersOptions"
       required-field @input="getEvents($event, 'customer')" @blur="validations.customer.$touch" clearable
       :error="validations.customer.$error" />
-    <ni-select caption="Tiers payeur" :value="newCreditNote.thirdPartyPayer" clearable in-modal
-      @input="getEvents($event, 'thirdPartyPayer')" :options="thirdPartyPayerOptions"
-      :disable="thirdPartyPayerOptions.length === 0" />
+    <ni-select caption="Tiers payeur" @input="getEvents($event, 'thirdPartyPayer')" :options="thirdPartyPayerOptions"
+      clearable in-modal :disable="thirdPartyPayerOptions.length === 0" :value="newCreditNote.thirdPartyPayer" />
     <ni-date-input caption="Date de l'avoir" :value="newCreditNote.date" :error="validations.date.$error"
       @blur="validations.date.$touch" in-modal required-field @input="update($event, 'date')" />
     <div class="row q-mb-md light">
-      <q-toggle :value="hasLinkedEvents" @input="updateHasLinkedEvents($event)" label="Lié à des interventions ?" />
+      <q-toggle :value="hasLinkedEvents" @input="updateHasLinkedEvents" label="Lié à des interventions ?" />
     </div>
     <!-- Has linked events -->
     <template v-if="hasLinkedEvents">
-      <ni-date-input caption="Début période concernée" :value="newCreditNote.startDate" required-field in-modal
-        :error="validations.startDate.$error" @blur="validations.startDate.$touch" :disable="!hasLinkedEvents"
-        @input="getEvents($event, 'startDate')" :error-message="startDateErrorMessage"
-        :max="minAndMaxDates.maxStartDate" />
+      <ni-date-input @blur="validations.startDate.$touch" :max="minAndMaxDates.maxStartDate" :disable="!hasLinkedEvents"
+        :error="validations.startDate.$error" caption="Début période concernée" :value="newCreditNote.startDate"
+        @input="getEvents($event, 'startDate')" :error-message="startDateErrorMessage" required-field in-modal />
       <ni-date-input caption="Fin période concernée" :value="newCreditNote.endDate" required-field in-modal
         :error="validations.endDate.$error" @blur="validations.endDate.$touch" @input="getEvents($event, 'endDate')"
         :disable="!hasLinkedEvents" :error-message="endDateErrorMessage" :min="minAndMaxDates.minEndDate" />
@@ -59,10 +57,9 @@
         :value="newCreditNote.inclTaxesCustomer" required-field :error="validations.inclTaxesCustomer.$error"
         @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError"
         @input="update($event, 'inclTaxesCustomer')" />
-      <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
-        :value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
-        @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError"
-        @input="update($event, 'inclTaxesTpp')" />
+      <ni-input in-modal v-if="newCreditNote.thirdPartyPayer" @input="update($event, 'inclTaxesTpp')"
+        :value="newCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error" type="number"
+        @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" caption="Montant TTC" suffix="€" />
     </template>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer l'avoir" icon-right="add" color="primary"

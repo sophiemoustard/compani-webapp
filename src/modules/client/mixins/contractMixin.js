@@ -135,7 +135,7 @@ export const contractMixin = {
         if (e.status === 422) {
           this.$v.editedVersion.$reset();
           return NotifyNegative(`Impossible de modifier ce contrat : il est en conflit avec les évènements ou autres
-            contrats de l'auxiliaire`);
+            contrats de l'auxiliaire.`);
         }
         NotifyNegative('Erreur lors de la modification du contrat.');
       } finally {

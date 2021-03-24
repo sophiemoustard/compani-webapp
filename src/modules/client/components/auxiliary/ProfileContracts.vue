@@ -286,7 +286,7 @@ export default {
         if (e.status === 422) {
           this.$v.newContract.$reset();
           return NotifyNegative(`Impossible de créer ce contrat : il est en conflit avec les évènements ou autres
-            contrats de l'auxiliaire`);
+            contrats de l'auxiliaire.`);
         }
         NotifyNegative('Erreur lors de la création du contrat.');
       } finally {
