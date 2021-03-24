@@ -17,7 +17,7 @@ module.exports = {
     'cypress/globals': true,
   },
   rules: {
-    'vue/no-mutating-props': 0,
+    'vue/no-mutating-props': 1,
     quotes: ['error', 'single'],
     semi: ['error', 'always'],
     indent: ['error', 2, { SwitchCase: 1 }],
