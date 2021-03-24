@@ -25,17 +25,17 @@
         @input="update($event, 'nature')" />
       <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.unitTTCRate" caption="Prix unitaire TTC"
         type="number" @blur="validations.unitTTCRate.$touch" :error="validations.unitTTCRate.$error"
-        required-field @input="update($event, 'unitTTCRate')" />
+        required-field @input="update($event, 'unitTTCRate')" :error-message="unitTtcRateErrorMessage" />
       <ni-input in-modal v-if="isFixedFunding" :value="newFunding.amountTTC" caption="Montant forfaitaire TTC"
         type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field
-        @input="update($event, 'amountTTC')" />
-      <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.careHours"
+        @input="update($event, 'amountTTC')" :error-message="amountTtcErrorMessage" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.careHours" :error-message="careHoursErrorMessage"
         caption="Nb. heures prises en charge" type="number" suffix="h" @blur="validations.careHours.$touch"
         :error="validations.careHours.$error" required-field @input="update($event, 'careHours')" />
       <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.customerParticipationRate"
         caption="Taux de participation du bénéficiaire" type="number" suffix="%" required-field
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
-        @input="update($event, 'customerParticipationRate')" />
+        @input="update($event, 'customerParticipationRate')" :error-message="customerParticipationRateErrorMessage" />
       <ni-option-group :value="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
         required-field @input="update($event, 'careDays')" />
@@ -65,6 +65,10 @@ export default {
     fundingSubscriptionsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    careHoursErrorMessage: { type: String, default: '' },
+    amountTtcErrorMessage: { type: String, default: '' },
+    unitTtcRateErrorMessage: { type: String, default: '' },
+    customerParticipationRateErrorMessage: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
