@@ -13,7 +13,8 @@
         @blur="validations.startDate.$touch" :error="validations.startDate.$error" required-field
         @input="update($event, 'startDate')" />
       <ni-date-input :value="newFunding.endDate" in-modal caption="Date de fin de prise en charge"
-        :min="minStartDate" @input="update($event, 'endDate')" />
+        :min="minStartDate" @input="update($event, 'endDate')" @blur="validations.endDate.$touch"
+        :error="validations.endDate.$error" error-message="La date de fin doit etre postérieure à la date de début" />
       <ni-input in-modal :value="newFunding.folderNumber" caption="Numéro de dossier"
         @input="update($event, 'folderNumber')" />
       <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" :value="newFunding.frequency"

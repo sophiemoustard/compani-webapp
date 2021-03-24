@@ -7,7 +7,8 @@
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="validations.startDate.$touch"
         :error="validations.startDate.$error" required-field @input="update($event, 'startDate')" />
       <ni-date-input :value="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
-        :min="minEndDate" @input="update($event, 'endDate')" />
+        :min="minEndDate" @input="update($event, 'endDate')" @blur="validations.endDate.$touch"
+        :error="validations.endDate.$error" error-message="La date de fin doit etre postérieure à la date de début" />
       <ni-input in-modal :value="editedFunding.folderNumber" caption="Numéro de dossier"
         @input="update($event, 'folderNumber')" />
       <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.unitTTCRate"

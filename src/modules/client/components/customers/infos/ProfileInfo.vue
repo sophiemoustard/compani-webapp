@@ -277,7 +277,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf, minValue, maxValue } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -306,7 +306,7 @@ import {
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
 import { formatDate } from '@helpers/date';
-import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
+import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -531,20 +531,30 @@ export default {
         subscription: { required },
         nature: { required },
         frequency: { required },
-        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
-        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
-        careHours: { required: requiredIf(item => item.nature === HOURLY) },
+        amountTTC: { required: requiredIf(item => item.nature === FIXED), minValue: minValue(0) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
+        endDate: { minDate: minDate(this.newFunding.startDate) },
+        customerParticipationRate: {
+          required: requiredIf(item => item.nature === HOURLY),
+          minValue: minValue(0),
+          maxValue: maxValue(100),
+        },
       },
       editedFunding: {
-        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
-        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
-        careHours: { required: requiredIf(item => item.nature === HOURLY) },
+        amountTTC: { required: requiredIf(item => item.nature === FIXED), minValue: minValue(0) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
         careDays: { required },
         startDate: { required },
-        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
+        endDate: { minDate: minDate(this.editedFunding.startDate) },
+        customerParticipationRate: {
+          required: requiredIf(item => item.nature === HOURLY),
+          minValue: minValue(0),
+          maxValue: maxValue(100),
+        },
       },
     };
   },
