@@ -2,8 +2,7 @@
   <q-page padding class="client-background">
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" :header-info="headerInfo" />
-      <profile-tabs v-if="isIntraCourse" :profile-id="courseId" :tabs-content="tabsContent" />
-      <ni-profile-organization v-else :profile-id="courseId" />
+      <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>
 </template>
@@ -28,27 +27,29 @@ export default {
   },
   components: {
     'profile-tabs': ProfileTabs,
-    'ni-profile-organization': ProfileOrganization,
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
   },
   computed: {
     ...mapState('course', ['course']),
     tabsContent () {
-      return [
+      const tabs = [
         {
           label: 'Organisation',
           name: 'organization',
           default: this.defaultTab === 'organization',
           component: ProfileOrganization,
         },
-        { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
-        {
-          label: 'Suivi des stagiaires',
-          name: 'traineeFollowUp',
-          default: this.defaultTab === 'traineeFollowUp',
-          component: ProfileTraineeFollowUp,
-        },
       ];
+      if (this.isIntraCourse) {
+        tabs.push({ label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin });
+      }
+      tabs.push({
+        label: 'Suivi des stagiaires',
+        name: 'traineeFollowUp',
+        default: this.defaultTab === 'traineeFollowUp',
+        component: ProfileTraineeFollowUp,
+      });
+      return tabs;
     },
   },
   async created () {
