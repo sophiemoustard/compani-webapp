@@ -12,6 +12,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import ProfileFollowUp from '@components/courses/ProfileFollowUp';
 import ProfileAccess from 'src/modules/vendor/components/courses/ProfileAccess';
+import ProfileQuestionnaires from 'src/modules/vendor/components/courses/ProfileQuestionnaires';
 import { NotifyNegative } from '@components/popup/notify';
 
 export default {
@@ -33,11 +34,12 @@ export default {
   data () {
     return {
       tabsContent: [
+        { label: 'Suivi', name: 'followUp', default: this.defaultTab === 'followUp', component: ProfileFollowUp },
         {
-          label: 'Suivi',
-          name: 'followUp',
-          default: this.defaultTab === 'followUp',
-          component: ProfileFollowUp,
+          label: 'Questionnaires',
+          name: 'questionnaires',
+          default: this.defaultTab === 'questionnaires',
+          component: ProfileQuestionnaires,
         },
         { label: 'Accès', name: 'access', default: this.defaultTab === 'access', component: ProfileAccess },
       ],
