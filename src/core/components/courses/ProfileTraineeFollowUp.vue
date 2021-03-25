@@ -38,6 +38,7 @@
 <script>
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
+import get from 'lodash/get';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -47,7 +48,7 @@ import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
-import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
+import { upperCaseFirstLetter, formatQuantity, formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
@@ -82,7 +83,7 @@ export default {
           label: 'Nom de l\'apprenant',
           align: 'left',
           field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee)),
-          format: value => (value ? `${value.identity.firstname} ${value.identity.lastname}` : ''),
+          format: value => formatIdentity(get(value, 'identity'), 'FL'),
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],
