@@ -123,7 +123,13 @@ export default {
     async refreshAttendanceSheets () {
       try {
         this.tableLoading = true;
-        this.attendanceSheets = await AttendanceSheets.list({ course: this.profileId });
+        const attendanceSheets = await AttendanceSheets.list({ course: this.profileId });
+
+        if (this.course.type === INTRA || !this.isClientInterface) this.attendanceSheets = attendanceSheets;
+        else {
+          const courseTraineesIdList = this.course.trainees.map(t => t._id);
+          this.attendanceSheets = attendanceSheets.filter(a => courseTraineesIdList.includes(a.trainee));
+        }
       } catch (e) {
         console.error(e);
         this.attendanceSheets = [];
