@@ -154,7 +154,7 @@ export default {
 
       if (!unsubscribedTraineesId.length) return [];
 
-      return unsubscribedTraineesId
+      return unsubscribedTraineesId // faire un reduce
         .filter((unsubscribedTraineeId) => {
           const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedTraineeId));
 
@@ -197,6 +197,8 @@ export default {
     async refreshAttendances (query) {
       try {
         this.loading = true;
+        if (!this.courseHasSlot) return;
+
         const updatedCourseSlot = await Attendances.list(query);
 
         this.attendances = query.courseSlot
