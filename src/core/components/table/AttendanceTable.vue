@@ -145,8 +145,10 @@ export default {
     unsubscribedTrainees () {
       const traineesId = this.course.trainees.map(trainee => trainee._id);
       const unsubscribedTraineesId = [...new Set(this.attendances
-        .filter(a => (!traineesId.includes(a.trainee)))
-        .map(a => a.trainee))];
+        .filter(a => (!traineesId.includes(get(a, 'trainee._id'))))
+        .map(a => get(a, 'trainee._id')))];
+
+      if (!unsubscribedTraineesId.length) return [];
 
       return unsubscribedTraineesId
         .map((unsubscribedTraineeId) => {
@@ -176,7 +178,7 @@ export default {
   methods: {
     checkboxValue (traineeId, slotId) {
       if (this.attendances.length) {
-        return !!this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
+        return !!this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
       }
       return false;
     },
@@ -206,7 +208,7 @@ export default {
       if (this.checkboxValue(traineeId, slotId)) {
         try {
           this.loading = true;
-          const attendance = this.attendances.find(a => a.trainee === traineeId && a.courseSlot === slotId);
+          const attendance = this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
           await Attendances.delete(attendance._id);
 
           await this.refreshAttendances({ courseSlot: slotId });
