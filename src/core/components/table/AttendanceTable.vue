@@ -61,12 +61,13 @@
 <script>
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
+import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
 import Attendances from '@api/Attendances';
 import Users from '@api/Users';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { DEFAULT_AVATAR, INTRA } from '@data/constants';
+import { DEFAULT_AVATAR, INTRA, INTER_B2B } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
@@ -83,6 +84,8 @@ export default {
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
   },
   data () {
+    const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
+
     return {
       formatIdentity,
       DEFAULT_AVATAR,
@@ -92,6 +95,7 @@ export default {
       traineeAdditionModal: false,
       newTraineeAttendance: { trainee: '', attendances: [] },
       potentialTrainees: [],
+      isClientInterface,
     };
   },
   validations () {
@@ -234,9 +238,14 @@ export default {
     },
     async getTrainees () {
       try {
-        this.potentialTrainees = await Users.learnerList(this.course.type === INTRA
-          ? { company: this.selectedCompany }
-          : { hasCompany: true });
+        let query;
+
+        if (this.course.type === INTRA) query = { company: this.selectedCompany };
+        if (this.course.type === INTER_B2B) {
+          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
+        }
+
+        this.potentialTrainees = await Users.learnerList(query);
       } catch (error) {
         this.potentialTrainees = [];
         console.error(error);
