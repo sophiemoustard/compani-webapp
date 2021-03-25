@@ -134,7 +134,7 @@ export default {
     },
     updateCustomer (event) {
       this.update(event, 'customer');
-      this.$emit('reset-data');
+      this.$emit('reset-customer-data');
       this.$emit('get-events', 'customer');
     },
   },

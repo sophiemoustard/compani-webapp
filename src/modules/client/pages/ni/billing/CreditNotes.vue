@@ -26,13 +26,14 @@
       @click="creditNoteCreationModal = true" :disable="tableLoading" />
 
     <!-- Credit note creation modal -->
-    <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote" @reset-data="resetData"
+    <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
       :has-linked-events.sync="hasLinkedEvents" :third-party-payer-options="thirdPartyPayerOptions" :loading="loading"
       :subscriptions-options="subscriptionsOptions" :credit-note-events-options="creditNoteEventsOptions"
       :validations="$v.newCreditNote" :min-and-max-dates="creationMinAndMaxDates" @get-events="getCreationEvents"
       :credit-note-events="creditNoteEvents" :start-date-error-message="setStartDateErrorMessage(this.$v.newCreditNote)"
       :customers-options="customersOptions" @hide="resetCreationCreditNoteData" :new-credit-note.sync="newCreditNote"
-      :end-date-error-message="setEndDateErrorMessage(this.$v.newCreditNote, this.newCreditNote.events)" />
+      :end-date-error-message="setEndDateErrorMessage(this.$v.newCreditNote, this.newCreditNote.events)"
+      @reset-customer-data="resetCustomerData" />
 
     <!-- Credit note edition modal -->
     <credit-note-edition-modal v-if="Object.keys(editedCreditNote).length > 0" @submit="updateCreditNote"
@@ -144,7 +145,7 @@ export default {
   },
   watch: {
     hasLinkedEvents () {
-      this.resetData();
+      this.resetCustomerData();
     },
     'newCreditNote.customer': function (previousValue, currentValue) {
       if (isEqual(previousValue, currentValue)) return;
@@ -240,16 +241,20 @@ export default {
     },
   },
   methods: {
-    resetData () {
+    resetCustomerData () {
       this.creditNoteEvents = [];
-      this.newCreditNote.events = [];
-      this.newCreditNote.subscription = null;
-      this.newCreditNote.startDate = '';
-      this.newCreditNote.endDate = '';
-      this.newCreditNote.exclTaxesCustomer = 0;
-      this.newCreditNote.inclTaxesCustomer = 0;
-      this.newCreditNote.exclTaxesTpp = 0;
-      this.newCreditNote.inclTaxesTpp = 0;
+      this.newCreditNote = {
+        ...this.newCreditNote,
+        events: [],
+        subscription: null,
+        startDate: '',
+        endDate: '',
+        exclTaxesCustomer: 0,
+        inclTaxesCustomer: 0,
+        exclTaxesTpp: 0,
+        inclTaxesTpp: 0,
+      };
+
       this.$v.newCreditNote.startDate.$reset();
       this.$v.newCreditNote.endDate.$reset();
       this.$v.newCreditNote.subscription.$reset();
