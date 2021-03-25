@@ -4,7 +4,7 @@
       Créer un <span class="text-weight-bold">avoir</span>
     </template>
     <ni-select in-modal caption="Bénéficiaire" :value="newCreditNote.customer" :options="customersOptions"
-      required-field @input="getEvents($event, 'customer')" @blur="validations.customer.$touch" clearable
+      required-field @input="updateCustomer" @blur="validations.customer.$touch" clearable
       :error="validations.customer.$error" />
     <ni-select caption="Tiers payeur" @input="getEvents($event, 'thirdPartyPayer')" :options="thirdPartyPayerOptions"
       clearable in-modal :disable="thirdPartyPayerOptions.length === 0" :value="newCreditNote.thirdPartyPayer" />
@@ -131,6 +131,11 @@ export default {
     },
     update (event, prop) {
       this.$emit('update:newCreditNote', { ...this.newCreditNote, [prop]: event });
+    },
+    updateCustomer (event) {
+      this.update(event, 'customer');
+      this.$emit('reset-data');
+      this.$emit('get-events', 'customer');
     },
   },
 };
