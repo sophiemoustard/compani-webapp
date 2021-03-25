@@ -107,11 +107,7 @@ export default {
     };
   },
   async created () {
-    await this.refreshAttendances(
-      this.isClientInterface
-        ? { course: this.course._id, company: this.loggedUser.company._id }
-        : { course: this.course._id }
-    );
+    await this.refreshAttendances({ course: this.course._id });
     await this.getTrainees();
   },
   computed: {
@@ -159,6 +155,11 @@ export default {
       if (!unsubscribedTraineesId.length) return [];
 
       return unsubscribedTraineesId
+        .filter((unsubscribedTraineeId) => {
+          const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedTraineeId));
+
+          return !!trainee;
+        })
         .map((unsubscribedTraineeId) => {
           const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedTraineeId));
           return { ...trainee, external: true };
@@ -246,14 +247,10 @@ export default {
 
         if (this.course.type === INTRA) query = { company: this.selectedCompany };
         if (this.course.type === INTER_B2B) {
-          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
+          query = !this.isClientInterface ? { hasCompany: true } : { company: get(this.loggedUser, 'company._id') };
         }
 
-        console.log('query', query);
-
         this.potentialTrainees = await Users.learnerList(query);
-
-        console.log('potentialTrainees', this.potentialTrainees);
       } catch (error) {
         this.potentialTrainees = [];
         console.error(error);
