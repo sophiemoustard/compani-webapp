@@ -137,11 +137,7 @@ export default {
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
-      pagination: {
-        rowsPerPage: 0,
-        sortBy: 'date',
-        descending: true,
-      },
+      pagination: { rowsPerPage: 0, sortBy: 'date', descending: true },
       tableLoading: false,
       COMPANI,
     };
