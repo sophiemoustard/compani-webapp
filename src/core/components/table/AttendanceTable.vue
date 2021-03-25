@@ -107,7 +107,11 @@ export default {
     };
   },
   async created () {
-    await this.refreshAttendances({ course: this.course._id });
+    await this.refreshAttendances(
+      this.isClientInterface
+        ? { course: this.course._id, company: this.loggedUser.company._id }
+        : { course: this.course._id }
+    );
     await this.getTrainees();
   },
   computed: {
@@ -245,7 +249,11 @@ export default {
           query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
         }
 
+        console.log('query', query);
+
         this.potentialTrainees = await Users.learnerList(query);
+
+        console.log('potentialTrainees', this.potentialTrainees);
       } catch (error) {
         this.potentialTrainees = [];
         console.error(error);
