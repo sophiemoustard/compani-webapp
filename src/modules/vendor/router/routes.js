@@ -1,3 +1,4 @@
+import get from 'lodash/get';
 import { TRAINER } from '@data/constants';
 import { canNavigate } from '@helpers/alenvi';
 import store from 'src/store/index';
@@ -199,6 +200,17 @@ const routes = [
         path: 'trainers/management/courses/:courseId',
         name: 'trainers courses info',
         component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
+            const { course } = store.state.course;
+            const { loggedUser } = store.state.main;
+
+            return loggedUser._id === get(course, 'trainer._id') ? next() : next('/404');
+          } catch (e) {
+            console.error(e);
+          }
+        },
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
