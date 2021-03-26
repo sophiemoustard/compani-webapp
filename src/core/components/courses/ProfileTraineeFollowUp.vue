@@ -28,24 +28,6 @@
       </div>
     </div>
     <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" is-blended />
-    <div v-if="questionnaireActivities.length" class="q-my-xl">
-      <p class="text-weight-bold">Réponses aux questionnaires</p>
-      <div class="questionnaire-container">
-        <q-card v-for="activity in questionnaireActivities" @click="goToQuestionnaireAnswers(activity)"
-         :key="activity._id" flat class="cursor-pointer">
-          <div class="q-pa-sm questionnaire-activity q-mb-md">
-            <div class="q-mb-sm text-grey-800 ellipsis-2-lines two-lines">
-              Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
-            </div>
-            <div class="ellipsis-2-lines two-lines">{{ upperCaseFirstLetter(activity.name) }}</div>
-          </div>
-          <q-separator />
-          <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
-            {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user)).size) }}
-          </div>
-        </q-card>
-      </div>
-    </div>
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
       @submit="addAttendanceSheet" :new-attendance-sheet.sync="newAttendanceSheet" :validations="$v.newAttendanceSheet"
@@ -64,7 +46,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { defineAbilitiesFor } from '@helpers/ability';
@@ -129,12 +111,6 @@ export default {
     ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),
     visibleColumns () {
       return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
-    },
-    questionnaireActivities () {
-      return this.course.subProgram.steps.map((step, stepIndex) => step.activities
-        .filter(activity => activity.type === QUESTIONNAIRE)
-        .map(activity => ({ ...activity, stepIndex, stepName: step.name })))
-        .flat();
     },
     canUpdateAttendance () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
@@ -213,14 +189,6 @@ export default {
         this.$q.loading.hide();
       }
     },
-    goToQuestionnaireAnswers (activity) {
-      return this.$router.push(
-        {
-          name: 'ni management questionnaire answers',
-          params: { courseId: this.profileId, activityId: activity._id },
-        }
-      );
-    },
   },
 };
 </script>
@@ -228,16 +196,6 @@ export default {
 .answers
   border-radius: 10px !important
   width: 100px
-
-.questionnaire-container
-  display: grid
-  grid-auto-flow: row
-  grid-auto-rows: 1fr
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))
-  grid-gap: 16px
-
-.questionnaire-activity
-  flex: 1
 
 .two-lines
   height: 48px
