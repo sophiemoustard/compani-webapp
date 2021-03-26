@@ -69,6 +69,10 @@ export const paymentMixin = {
       };
       this.$v.newPayment.$reset();
     },
+    hasTaxCertificateOnSameYear (payment, taxCertificates) {
+      const paymentDate = (new Date(payment.date)).getFullYear().toString();
+      return taxCertificates.some(tax => tax.year === paymentDate);
+    },
     validatePaymentCreation (taxCertificates) {
       this.paymentCreationLoading = true;
       this.$v.newPayment.$touch();
@@ -77,12 +81,11 @@ export const paymentMixin = {
         return NotifyWarning('Champ(s) invalide(s)');
       }
 
-      const newPaymentDate = (new Date(this.newPayment.date)).getFullYear().toString();
-      if (!taxCertificates.some(tax => tax.year === newPaymentDate)) return this.createPayment();
+      if (!this.hasTaxCertificateOnSameYear(this.newPayment, taxCertificates)) return this.createPayment();
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le créer',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le créer ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.createPayment())

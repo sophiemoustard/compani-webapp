@@ -374,8 +374,7 @@ export default {
         return NotifyWarning('Champ(s) invalide(s)');
       }
 
-      const editedPaymentDate = (new Date(this.editedPayment.date)).getFullYear().toString();
-      if (!this.taxCertificates.some(tax => tax.year === editedPaymentDate)) return this.updatePayment();
+      if (!this.hasTaxCertificateOnSameYear(this.editedPayment, this.taxCertificates)) return this.updatePayment();
 
       this.$q.dialog({
         title: 'Confirmation',
@@ -480,8 +479,7 @@ export default {
       }
     },
     validateRefundDeletion (refund) {
-      const refundDate = (new Date(refund.date)).getFullYear().toString();
-      const message = this.taxCertificates.some(tax => tax.year === refundDate)
+      const message = this.hasTaxCertificateOnSameYear(refund, this.taxCertificates)
         ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer ?'
         : 'Etes-vous sûr de vouloir supprimer ce remboursement ?';
 
