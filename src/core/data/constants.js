@@ -355,6 +355,9 @@ export const ACTIVITY_TYPES = [
   { label: 'Vidéo', value: VIDEO },
 ];
 
+// CARD CATEGORIES
+export const QUESTIONNAIRE = 'questionnaire';
+
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
 export const TITLE_TEXT_MEDIA = 'title_text_media';
@@ -383,8 +386,6 @@ export const CARD_TEMPLATES = [
   { label: 'Question\t&\tRéponse', value: QUESTION_ANSWER, type: QUESTIONNAIRE },
 ];
 
-// CARD CATEGORIES
-export const QUESTIONNAIRE = 'questionnaire';
 export const TEMPLATE_TYPES = {
   [LESSON]: 'Cours',
   [QUIZ]: 'Quiz',
