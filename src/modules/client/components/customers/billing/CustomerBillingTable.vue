@@ -229,9 +229,6 @@ export default {
   .q-table tbody tr:hover
     background: none;
 
-  .q-btn
-    height: 100%;
-
   .download
     cursor: pointer;
     color: $primary;
