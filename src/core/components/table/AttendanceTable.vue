@@ -154,16 +154,14 @@ export default {
 
       if (!unsubscribedTraineesId.length) return [];
 
-      return unsubscribedTraineesId // faire un reduce
-        .filter((unsubscribedTraineeId) => {
-          const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedTraineeId));
+      return unsubscribedTraineesId.reduce((filtered, traineeId) => {
+        const trainee = this.potentialTrainees.find(t => (t._id === traineeId));
+        if (trainee) {
+          filtered.push({ ...trainee, external: true });
+        }
 
-          return !!trainee;
-        })
-        .map((unsubscribedTraineeId) => {
-          const trainee = this.potentialTrainees.find(t => (t._id === unsubscribedTraineeId));
-          return { ...trainee, external: true };
-        });
+        return filtered;
+      }, []);
     },
     traineeFilterOptions () {
       const formattedTrainees = this.potentialTrainees
