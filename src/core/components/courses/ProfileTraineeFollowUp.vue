@@ -47,7 +47,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, INTER_B2B } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity, formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { defineAbilitiesFor } from '@helpers/ability';
@@ -82,7 +82,7 @@ export default {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
           align: 'left',
-          field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee)),
+          field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee._id)),
           format: value => formatIdentity(get(value, 'identity'), 'FL'),
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
@@ -125,11 +125,10 @@ export default {
         this.tableLoading = true;
         const attendanceSheets = await AttendanceSheets.list({ course: this.profileId });
 
-        if (this.course.type === INTRA || !this.isClientInterface) this.attendanceSheets = attendanceSheets;
-        else {
-          const courseTraineesIdList = this.course.trainees.map(t => t._id);
-          this.attendanceSheets = attendanceSheets.filter(a => courseTraineesIdList.includes(a.trainee));
-        }
+        if (this.course.type === INTER_B2B && this.isClientInterface) {
+          this.attendanceSheets = attendanceSheets
+            .filter(a => get(a, 'trainee.company') === this.loggedUser.company._id);
+        } else this.attendanceSheets = attendanceSheets;
       } catch (e) {
         console.error(e);
         this.attendanceSheets = [];
