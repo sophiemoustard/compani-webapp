@@ -66,7 +66,7 @@
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
       :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment.sync="editedPayment"
-      @submit="updatePayment" @hide="resetPaymentEditionModal" />
+      @submit="validatePaymentUpdate" @hide="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
     <ni-modal v-model="taxCertificateModal" @hide="resetTaxCertificateModal">
@@ -366,12 +366,27 @@ export default {
       this.selectedTpp = {};
       this.editedPayment = {};
     },
+    async validatePaymentUpdate () {
+      this.paymentEditionLoading = true;
+      this.$v.editedPayment.$touch();
+      if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+      const editedPaymentDate = (new Date(this.editedPayment.date)).getFullYear().toString();
+      if (!this.taxCertificates.some(tax => tax.year === editedPaymentDate)) return this.updatePayment();
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le modifier',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.updatePayment())
+        .onCancel(() => {
+          NotifyPositive('Modification annulée.');
+          this.paymentEditionLoading = false;
+        });
+    },
     async updatePayment () {
       try {
-        this.paymentEditionLoading = true;
-        this.$v.editedPayment.$touch();
-        if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-
         const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer']);
         await Payments.update(this.editedPayment._id, payload);
         this.paymentEditionModal = false;
@@ -463,7 +478,7 @@ export default {
     },
     validateRefundDeletion (refund) {
       const refundDate = (new Date(refund.date)).getFullYear().toString();
-      const message = this.taxCertificates.find(tax => tax.year === refundDate)
+      const message = this.taxCertificates.some(tax => tax.year === refundDate)
         ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer'
         : 'Etes-vous sûr de vouloir supprimer ce remboursement ?';
 
