@@ -48,10 +48,10 @@
               </q-item-section>
             </q-item>
           </template>
-          <template v-else-if="col.name === 'actions'">
-            <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
+          <template v-else-if="col.name === 'actions' && displayActions">
+            <q-btn v-if="paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
               @click="openEditionModal(props.row)" />
-            <q-btn v-if="displayActions && REFUND === props.row.nature" flat dense color="grey" icon="close"
+            <q-btn v-if="REFUND === props.row.nature" flat dense color="grey" icon="close"
               @click="removeRefund(props.row)" />
           </template>
           <template v-else>{{ col.value }}</template>

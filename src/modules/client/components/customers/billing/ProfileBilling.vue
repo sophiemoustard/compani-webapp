@@ -379,7 +379,7 @@ export default {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le modifier',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le modifier ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.updatePayment())
@@ -482,7 +482,7 @@ export default {
     validateRefundDeletion (refund) {
       const refundDate = (new Date(refund.date)).getFullYear().toString();
       const message = this.taxCertificates.some(tax => tax.year === refundDate)
-        ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer'
+        ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer ?'
         : 'Etes-vous sûr de vouloir supprimer ce remboursement ?';
 
       this.$q.dialog({
