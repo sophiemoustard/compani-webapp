@@ -1,4 +1,3 @@
-import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import { TRAINER } from '@data/constants';
 import { canNavigate } from '@helpers/alenvi';
@@ -201,11 +200,16 @@ const routes = [
         path: 'trainers/management/courses/:courseId',
         name: 'trainers courses info',
         component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
-        async beforeEnter (to, from, next) {
-          await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
-          const { course } = store.state.course;
+        beforeEnter: async (to, from, next) => {
+          try {
+            await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
+            const { course } = store.state.course;
+            const { loggedUser } = store.state.main;
 
-          return Cookies.get('user_id') === get(course, 'trainer._id') ? next() : next('/404');
+            return loggedUser._id === get(course, 'trainer._id') ? next() : next('/404');
+          } catch (e) {
+            console.error(e);
+          }
         },
         props: true,
         meta: {
