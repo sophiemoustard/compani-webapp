@@ -51,6 +51,8 @@
           <template v-else-if="col.name === 'actions'">
             <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
               @click="openEditionModal(props.row)" />
+            <q-btn v-if="displayActions && REFUND === props.row.nature" flat dense color="grey" icon="close"
+              @click="removeRefund(props.row)" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -111,6 +113,7 @@ export default {
       CREDIT_NOTE,
       BILL,
       COMPANI,
+      REFUND,
       columns: [
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         { name: 'document', label: '', align: 'left' },
@@ -129,7 +132,7 @@ export default {
           style: 'width: 100px',
           format: formatPrice,
         },
-        { name: 'actions', label: '', align: 'center' },
+        { name: 'actions', label: '', align: 'left', style: 'width: 100px' },
       ],
       pagination: { rowsPerPage: 0 },
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
@@ -211,6 +214,9 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');
       }
+    },
+    removeRefund (refund) {
+      this.$emit('remove-refund', refund);
     },
   },
 };

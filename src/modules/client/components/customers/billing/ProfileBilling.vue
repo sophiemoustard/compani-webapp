@@ -12,8 +12,8 @@
         <a :href="'mailto:' + company.billingAssistance"> {{ company.billingAssistance }}</a>.
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :display-actions="isAdmin"
-        @open-edition-modal="openEditionModal" :type="CUSTOMER" :start-balance="getStartBalance()"
-        :end-balance="getEndBalance(customerDocuments)" :loading="tableLoading" />
+        @open-edition-modal="openEditionModal" :start-balance="getStartBalance()" :loading="tableLoading"
+        :end-balance="getEndBalance(customerDocuments)" :type="CUSTOMER" @remove-refund="validateRefundDeletion" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
           color="white" icon="add" />
@@ -459,6 +459,30 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'attestation fiscale.');
+      }
+    },
+    validateRefundDeletion (refund) {
+      const refundDate = (new Date(refund.date)).getFullYear().toString();
+      const message = this.taxCertificates.find(tax => tax.year === refundDate)
+        ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer'
+        : 'Etes-vous sûr de vouloir supprimer ce remboursement ?';
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message,
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteRefund(refund._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteRefund (refundId) {
+      try {
+        await Payments.remove(refundId);
+        this.refresh();
+        NotifyPositive('Remboursement supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du remboursement.');
       }
     },
   },
