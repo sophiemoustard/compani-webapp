@@ -59,9 +59,9 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :new-payment.sync="newPayment" v-model="paymentCreationModal"
-      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
-      @submit="createPayment" @hide="resetPaymentCreationModal" :validations="$v.newPayment" />
+    <ni-payment-creation-modal :new-payment.sync="newPayment" v-model="paymentCreationModal" :selected-tpp="selectedTpp"
+      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :validations="$v.newPayment"
+      @submit="validatePaymentCreation(taxCertificates)" @hide="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
@@ -369,7 +369,10 @@ export default {
     async validatePaymentUpdate () {
       this.paymentEditionLoading = true;
       this.$v.editedPayment.$touch();
-      if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
+      if (this.$v.editedPayment.$error) {
+        this.paymentEditionLoading = false;
+        return NotifyWarning('Champ(s) invalide(s)');
+      }
 
       const editedPaymentDate = (new Date(this.editedPayment.date)).getFullYear().toString();
       if (!this.taxCertificates.some(tax => tax.year === editedPaymentDate)) return this.updatePayment();
