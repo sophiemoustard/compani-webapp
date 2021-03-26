@@ -50,7 +50,7 @@
     <!-- Payment creation modal -->
     <ni-payment-creation-modal v-model="paymentCreationModal" :new-payment.sync="newPayment"
       :selected-tpp="selectedTpp" :loading="paymentCreationLoading" @hide="resetPaymentCreationModal"
-      @submit="createPayment" :selected-customer="selectedCustomer" :validations="$v.newPayment" />
+      @submit="submitPaymentCreation" :selected-customer="selectedCustomer" :validations="$v.newPayment" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
       :disable="selected.length === 0" @click="validatePaymentListCreation" />
@@ -63,6 +63,7 @@ import get from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
+import TaxCertificates from '@api/TaxCertificates';
 import SimpleTable from '@components/table/SimpleTable';
 import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
@@ -244,6 +245,10 @@ export default {
       }
 
       return downloadCsv(csvData, `clients_balances_${moment().format('DD_MM_YYYY')}.csv`);
+    },
+    async submitPaymentCreation () {
+      const taxCertificates = await TaxCertificates.list({ customer: this.newPayment.customer });
+      return this.validatePaymentCreation(taxCertificates);
     },
   },
 };
