@@ -197,7 +197,4 @@ export default {
   border-radius: 10px !important
   width: 100px
 
-.two-lines
-  height: 48px
-  overflow: hidden
 </style>
