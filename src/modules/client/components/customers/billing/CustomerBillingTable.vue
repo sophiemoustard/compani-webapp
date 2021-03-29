@@ -51,8 +51,8 @@
           <template v-else-if="col.name === 'actions' && displayActions">
             <q-btn v-if="paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
               @click="openEditionModal(props.row)" />
-            <q-btn v-if="REFUND === props.row.nature" flat dense color="grey" icon="close"
-              @click="removeRefund(props.row)" />
+            <q-btn v-if="REFUND === props.row.nature" flat dense color="grey" icon="delete"
+              @click="deleteRefund(props.row)" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -215,8 +215,8 @@ export default {
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');
       }
     },
-    removeRefund (refund) {
-      this.$emit('remove-refund', refund);
+    deleteRefund (refund) {
+      this.$emit('delete', refund);
     },
   },
 };

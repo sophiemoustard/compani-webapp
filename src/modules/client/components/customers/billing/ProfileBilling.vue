@@ -13,7 +13,7 @@
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :display-actions="isAdmin"
         @open-edition-modal="openEditionModal" :start-balance="getStartBalance()" :loading="tableLoading"
-        :end-balance="getEndBalance(customerDocuments)" :type="CUSTOMER" @remove-refund="validateRefundDeletion" />
+        :end-balance="getEndBalance(customerDocuments)" :type="CUSTOMER" @delete="validateRefundDeletion" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
           color="white" icon="add" />
@@ -23,7 +23,7 @@
       <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates" :display-actions="isAdmin"
         @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
-        :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
+        :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" @delete="validateRefundDeletion" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
