@@ -65,6 +65,7 @@ import SlotCreationModal from '@components/courses/SlotCreationModal';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { E_LEARNING } from '@data/constants';
 import { formatQuantity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { frAddress } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { courseMixin } from '@mixins/courseMixin';
@@ -97,7 +98,7 @@ export default {
           endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
-        step: null,
+        step: '',
       },
       editedCourseSlot: {},
       editionModal: false,
@@ -176,7 +177,7 @@ export default {
     stepOptions () {
       if (!this.stepsLength) return [{ label: 'Aucune étape disponible', value: '' }];
       return [
-        { label: 'Pas d\'étape spécifiée', value: null },
+        { label: 'Pas d\'étape spécifiée', value: '' },
         ...this.course.subProgram.steps.map((step, index) => ({
           label: `${index + 1} - ${step.name}${step.type === E_LEARNING ? ' (eLearning)' : ''}`,
           value: step._id,
@@ -196,10 +197,7 @@ export default {
   },
   methods: {
     groupByCourses () {
-      this.courseSlots = groupBy(
-        this.course.slots.filter(slot => !!slot.startDate),
-        s => moment(s.startDate).format('DD/MM/YYYY')
-      );
+      this.courseSlots = groupBy(this.course.slots.filter(slot => !!slot.startDate), s => formatDate(s.startDate));
       this.courseSlotsToPlan = this.course.slotsToPlan || [];
     },
     getSlotDuration (slot) {
@@ -222,7 +220,7 @@ export default {
           endDate: moment().startOf('d').hours(12).toISOString(),
         },
         address: {},
-        step: null,
+        step: '',
       };
       this.$v.newCourseSlot.$reset();
     },
@@ -243,7 +241,7 @@ export default {
         _id: slot._id,
         dates: has(slot, 'startDate') ? pick(slot, ['startDate', 'endDate']) : defaultDate,
         address: {},
-        step: get(slot, 'step._id') || null,
+        step: get(slot, 'step._id') || '',
       };
       if (slot.address) this.editedCourseSlot.address = { ...slot.address };
       this.editionModal = true;

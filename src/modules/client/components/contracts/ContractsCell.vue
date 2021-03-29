@@ -91,6 +91,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import { COACH, CUSTOMER, AUXILIARY, DOC_EXTENSIONS } from '@data/constants';
 import { downloadDriveDocx, downloadFile } from '@helpers/file';
 import { formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 import { generateContractFields } from 'src/modules/client/helpers/generateContractFields';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -119,27 +120,15 @@ export default {
       pagination: { rowsPerPage: 0 },
       contractsColumns: [
         { name: 'weeklyHours', label: 'Volume horaire hebdomadaire', align: 'center', field: 'weeklyHours' },
-        {
-          name: 'startDate',
-          label: 'Date d\'effet',
-          align: 'left',
-          field: 'startDate',
-          format: value => moment(value).format('DD/MM/YYYY'),
-        },
-        {
-          name: 'endDate',
-          label: 'Date de fin',
-          align: 'left',
-          field: 'endDate',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : '∞'),
-        },
+        { name: 'startDate', label: 'Date d\'effet', align: 'left', field: 'startDate', format: formatDate },
+        { name: 'endDate', label: 'Date de fin', align: 'left', field: 'endDate', format: d => formatDate(d) || '∞' },
         { name: 'grossHourlyRate', label: 'Taux horaire', align: 'center', field: 'grossHourlyRate' },
         { name: 'contractEmpty', label: 'Word', align: 'center', field: 'contractEmpty' },
         {
           name: 'contractSigned',
           label: 'Contrat / Avenant',
           align: 'center',
-          field: val => (val.signature ? val.signature.eversignId : ''),
+          field: val => get(val, 'signature.eversignId') || '',
         },
         { name: 'archives', label: 'Archives', align: 'center', field: 'auxiliaryArchives' },
         { name: 'actions', align: 'center', field: '_id' },

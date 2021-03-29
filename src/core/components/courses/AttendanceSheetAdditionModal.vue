@@ -24,6 +24,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import { INTRA } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 
 export default {
@@ -54,8 +55,8 @@ export default {
     },
     dateOptions () {
       const dateOptionsSet = new Set([...this.course.slots.map(date => moment(date.startDate).startOf('d').toDate())]);
-      const dateOptions = [...dateOptionsSet];
-      return dateOptions.map(date => ({ value: moment(date), label: moment(date).format('DD/MM/YYYY') }));
+
+      return [...dateOptionsSet].map(date => ({ value: new Date(date), label: formatDate(date) }));
     },
   },
   methods: {

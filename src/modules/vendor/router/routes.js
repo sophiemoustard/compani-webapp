@@ -1,4 +1,3 @@
-import { Cookies } from 'quasar';
 import get from 'lodash/get';
 import { TRAINER } from '@data/constants';
 import { canNavigate } from '@helpers/alenvi';
@@ -93,21 +92,21 @@ const routes = [
         },
       },
       {
-        path: 'ni/config/programs',
-        name: 'ni config programs',
-        component: () => import('src/modules/vendor/pages/ni/config/ProgramsDirectory'),
+        path: 'ni/pedagogy/programs',
+        name: 'ni pedagogy programs',
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/ProgramsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
       {
-        path: 'ni/config/programs/:programId',
-        name: 'ni config programs info',
-        component: () => import('src/modules/vendor/pages/ni/config/ProgramProfile'),
+        path: 'ni/pedagogy/programs/:programId',
+        name: 'ni pedagogy programs info',
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/ProgramProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni config activity info') to.params.defaultTab = 'content';
+            if (from.name === 'ni pedagogy activity info') to.params.defaultTab = 'content';
 
             return next();
           } catch (e) {
@@ -117,17 +116,17 @@ const routes = [
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
       {
-        path: 'ni/config/programs/:programId/subprogram/:subProgramId/step/:stepId/activity/:activityId',
-        name: 'ni config activity info',
-        component: () => import('src/modules/vendor/pages/ni/config/ActivityProfile'),
+        path: 'ni/pedagogy/programs/:programId/subprogram/:subProgramId/step/:stepId/activity/:activityId',
+        name: 'ni pedagogy activity info',
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/ActivityProfile'),
         props: true,
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
       {
@@ -142,10 +141,10 @@ const routes = [
       {
         path: 'ni/management/blended-courses/:courseId',
         name: 'ni management blended courses info',
-        component: () => import('src/core/pages/courses/BlendedCourseProfile'),
+        component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (['ni users learners info', 'ni management questionnaire answers'].includes(from.name)) {
+            if (from.name === 'ni users learners info') {
               to.params.defaultTab = 'traineeFollowUp';
             }
             return next();
@@ -200,12 +199,17 @@ const routes = [
       {
         path: 'trainers/management/courses/:courseId',
         name: 'trainers courses info',
-        component: () => import('src/core/pages/courses/BlendedCourseProfile'),
-        async beforeEnter (to, from, next) {
-          await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
-          const { course } = store.state.course;
+        component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
+        beforeEnter: async (to, from, next) => {
+          try {
+            await store.dispatch('course/fetchCourse', { courseId: to.params.courseId });
+            const { course } = store.state.course;
+            const { loggedUser } = store.state.main;
 
-          return Cookies.get('user_id') === get(course, 'trainer._id') ? next() : next('/404');
+            return loggedUser._id === get(course, 'trainer._id') ? next() : next('/404');
+          } catch (e) {
+            console.error(e);
+          }
         },
         props: true,
         meta: {
@@ -231,22 +235,12 @@ const routes = [
         },
       },
       {
-        path: 'ni/management/:courseId/questionnaire/:activityId',
-        name: 'ni management questionnaire answers',
-        component: () => import('src/modules/vendor/pages/trainers/management/QuestionnaireAnswers'),
-        props: true,
-        meta: {
-          parent: 'management',
-          cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
-      {
-        path: 'ni/config/categories',
-        name: 'ni config categories',
-        component: () => import('src/modules/vendor/pages/ni/config/CategoriesDirectory'),
+        path: 'ni/pedagogy/categories',
+        name: 'ni pedagogy categories',
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/CategoriesDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
-          parent: 'configuration',
+          parent: 'pedagogy',
         },
       },
     ],

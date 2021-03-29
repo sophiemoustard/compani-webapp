@@ -32,5 +32,5 @@ export const userModel = {
       rib: { iban: '', bic: '' },
     },
   },
-  establishment: null,
+  establishment: '',
 };

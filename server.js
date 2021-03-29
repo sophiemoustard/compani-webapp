@@ -1,7 +1,7 @@
 const path = require('path');
 const express = require('express');
 const history = require('connect-history-api-fallback');
-const sslRedirect = require('heroku-ssl-redirect');
+const sslRedirect = require('heroku-ssl-redirect').default;
 
 const app = express();
 

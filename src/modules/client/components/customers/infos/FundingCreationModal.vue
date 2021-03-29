@@ -13,7 +13,8 @@
         @blur="validations.startDate.$touch" :error="validations.startDate.$error" required-field
         @input="update($event, 'startDate')" />
       <ni-date-input :value="newFunding.endDate" in-modal caption="Date de fin de prise en charge"
-        :min="minStartDate" @input="update($event, 'endDate')" />
+        :min="minStartDate" @input="update($event, 'endDate')" @blur="validations.endDate.$touch"
+        :error="validations.endDate.$error" error-message="La date de fin doit etre postérieure à la date de début" />
       <ni-input in-modal :value="newFunding.folderNumber" caption="Numéro de dossier"
         @input="update($event, 'folderNumber')" />
       <ni-select in-modal caption="Fréquence" :options="fundingFreqOptions" :value="newFunding.frequency"
@@ -21,20 +22,20 @@
         @input="update($event, 'frequency')" />
       <ni-select in-modal caption="Nature" :options="fundingNatureOptions" :value="newFunding.nature"
         :error="validations.nature.$error" @blur="validations.nature.$touch" required-field
-        @input="updateNature($event)" />
+        @input="update($event, 'nature')" />
       <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.unitTTCRate" caption="Prix unitaire TTC"
         type="number" @blur="validations.unitTTCRate.$touch" :error="validations.unitTTCRate.$error"
-        required-field @input="update($event, 'unitTTCRate')" />
+        required-field @input="update($event, 'unitTTCRate')" :error-message="unitTtcRateErrorMessage" />
       <ni-input in-modal v-if="isFixedFunding" :value="newFunding.amountTTC" caption="Montant forfaitaire TTC"
         type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field
-        @input="update($event, 'amountTTC')" />
-      <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.careHours"
+        @input="update($event, 'amountTTC')" :error-message="amountTtcErrorMessage" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.careHours" :error-message="careHoursErrorMessage"
         caption="Nb. heures prises en charge" type="number" suffix="h" @blur="validations.careHours.$touch"
         :error="validations.careHours.$error" required-field @input="update($event, 'careHours')" />
       <ni-input in-modal v-if="!isFixedFunding" :value="newFunding.customerParticipationRate"
         caption="Taux de participation du bénéficiaire" type="number" suffix="%" required-field
         @blur="validations.customerParticipationRate.$touch" :error="validations.customerParticipationRate.$error"
-        @input="update($event, 'customerParticipationRate')" />
+        @input="update($event, 'customerParticipationRate')" :error-message="customerParticipationRateErrorMessage" />
       <ni-option-group :value="newFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
         required-field @input="update($event, 'careDays')" />
@@ -64,6 +65,10 @@ export default {
     fundingSubscriptionsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    careHoursErrorMessage: { type: String, default: '' },
+    amountTtcErrorMessage: { type: String, default: '' },
+    unitTtcRateErrorMessage: { type: String, default: '' },
+    customerParticipationRateErrorMessage: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
@@ -95,23 +100,7 @@ export default {
       return moment(this.newFunding.startDate).add(1, 'day').toISOString();
     },
   },
-  watch: {
-    'newFunding.thirdPartyPayer': function () {
-      this.setUnitUTTRate();
-    },
-    'newFunding.nature': function () {
-      this.setUnitUTTRate();
-    },
-  },
   methods: {
-    setUnitUTTRate () {
-      if (this.isFixedFunding) {
-        this.newFunding.unitTTCRate = 0;
-      } else {
-        const ttp = this.thirdPartyPayers.find(p => p._id === this.newFunding.thirdPartyPayer);
-        this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
-      }
-    },
     hide () {
       this.$emit('hide');
     },
@@ -123,12 +112,6 @@ export default {
     },
     update (event, prop) {
       this.$emit('update:newFunding', { ...this.newFunding, [prop]: event });
-    },
-    async updateNature (event) {
-      if (this.isFixedFunding && this.newFunding.frequency !== ONCE) {
-        await this.$emit('update:newFunding', { ...this.newFunding, frequency: '' });
-      }
-      await this.update(event, 'nature');
     },
   },
 };

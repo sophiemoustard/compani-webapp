@@ -5,22 +5,25 @@
       </template>
       <ni-input in-modal caption="Bénéficiaire" :value="formatIdentity(editedCreditNote.customer.identity, 'FL')"
         required-field disable />
-      <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur"
-        v-model="editedCreditNote.thirdPartyPayer.name" required-field disable />
-      <ni-date-input caption="Date de l'avoir" v-model="editedCreditNote.date" in-modal required-field
-        :error="validations.date.$error" @blur="validations.date.$touch" :disable="!editedCreditNote.isEditable" />
+      <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Tiers payeur" required-field disable
+        :value="editedCreditNote.thirdPartyPayer.name" />
+      <ni-date-input caption="Date de l'avoir" :value="editedCreditNote.date" in-modal required-field
+        :error="validations.date.$error" @blur="validations.date.$touch" :disable="!editedCreditNote.isEditable"
+        @input="update($event, 'date')" />
       <!-- Has linked events -->
       <template v-if="hasLinkedEvents">
-        <ni-date-input caption="Début période concernée" v-model="editedCreditNote.startDate" in-modal
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
-          :error="validations.startDate.$error" @blur="validations.startDate.$touch" />
-        <ni-date-input caption="Fin période concernée" v-model="editedCreditNote.endDate" in-modal
-          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents" required-field
-          :error="validations.endDate.$error" @blur="validations.endDate.$touch" />
+        <ni-date-input caption="Début période concernée" :value="editedCreditNote.startDate" in-modal required-field
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents($event, 'startDate')"
+          :error="validations.startDate.$error" @blur="validations.$touch" :max="minAndMaxDates.maxStartDate"
+          :error-message="startDateErrorMessage" />
+        <ni-date-input caption="Fin période concernée" :value="editedCreditNote.endDate" in-modal
+          :disable="!editedCreditNote.events || !editedCreditNote.isEditable" @input="getEvents($event, 'endDate')"
+          required-field :error="validations.endDate.$error" @blur="validations.$touch" :min="minAndMaxDates.minEndDate"
+          :error-message="endDateErrorMessage" />
         <template v-if="creditNoteEvents.length > 0">
-          <ni-option-group v-model="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
+          <ni-option-group :value="editedCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
             type="checkbox" required-field inline :disable="!editedCreditNote.isEditable"
-            :error="validations.events.$error" />
+            :error="validations.events.$error" @input="update($event, 'events')" />
         </template>
         <div v-if="editedCreditNoteHasNoEvents" class="light warning">
           <p>Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données</p>
@@ -46,15 +49,18 @@
       </template>
       <!-- Hasn't linked event -->
       <template v-else>
-        <ni-select in-modal caption="Souscription concernée" v-model="editedCreditNote.subscription"
+        <ni-select in-modal caption="Souscription concernée" :value="editedCreditNote.subscription"
           :options="subscriptionsOptions" :disable="!hasLinkedEvents && !editedCreditNote.customer" required-field
-          :error="validations.subscription.$error" @blur="validations.subscription.$touch" />
+          :error="validations.subscription.$error" @blur="validations.subscription.$touch"
+          @input="update($event, 'subscription')" />
         <ni-input in-modal v-if="!editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€" type="number"
-          v-model="editedCreditNote.inclTaxesCustomer" :error="validations.inclTaxesCustomer.$error"
-          @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError" required-field />
+          :value="editedCreditNote.inclTaxesCustomer" :error="validations.inclTaxesCustomer.$error"
+          @blur="validations.inclTaxesCustomer.$touch" :error-message="inclTaxesError" required-field
+          @input="update($event, 'inclTaxesCustomer')" />
         <ni-input in-modal v-if="editedCreditNote.thirdPartyPayer" caption="Montant TTC" suffix="€"
-          v-model="editedCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
-          @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" type="number" />
+          :value="editedCreditNote.inclTaxesTpp" required-field :error="validations.inclTaxesTpp.$error"
+          @blur="validations.inclTaxesTpp.$touch" :error-message="inclTaxesError" type="number"
+          @input="update($event, 'inclTaxesTpp')" />
       </template>
       <template v-if="editedCreditNote.isEditable" slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Editer l'avoir" icon-right="add" color="primary"
@@ -70,6 +76,7 @@ import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
 import Modal from '@components/modal/Modal';
 import { formatPrice, formatIdentity } from '@helpers/utils';
+import { REQUIRED_LABEL } from '@data/constants';
 
 export default {
   name: 'CreditNoteEditionModal',
@@ -82,6 +89,9 @@ export default {
     creditNoteEventsOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    startDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    endDateErrorMessage: { type: String, default: REQUIRED_LABEL },
+    minAndMaxDates: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-option-group': OptionGroup,
@@ -111,8 +121,12 @@ export default {
     submit () {
       this.$emit('submit');
     },
-    getEvents () {
-      this.$emit('get-events');
+    getEvents (event, value) {
+      this.update(event, value);
+      this.$emit('get-events', value);
+    },
+    update (event, prop) {
+      this.$emit('update:editedCreditNote', { ...this.editedCreditNote, [prop]: event });
     },
   },
 };

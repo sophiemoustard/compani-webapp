@@ -71,14 +71,6 @@ export default {
     courseName () {
       return this.composeCourseName(this.course, this.isVendorInterface);
     },
-    headerInfo () {
-      const infos = [
-        { icon: 'bookmark_border', label: this.courseType },
-        { icon: 'emoji_people', label: this.trainerName },
-      ];
-
-      return infos;
-    },
     traineesCount () {
       return get(this.course, 'trainees.length') || 0;
     },

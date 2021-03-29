@@ -25,7 +25,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <ni-button class="row no-wrap table-actions" icon="close" :disable="program.categories.length <= 1"
+                  <ni-button class="table-actions" icon="close" :disable="program.categories.length <= 1"
                     @click="validateCategoryRemoval(props.row)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -38,6 +38,7 @@
         </q-card-actions>
       </q-card>
     </div>
+    <tester-table :program-id="profileId" :testers="program.testers" @refresh="refreshProgram" />
 
     <category-addition-modal v-model="categoryAdditionModal" :new-category.sync="newCategory" :loading="loading"
       @hide="resetModal" @submit="addCategory" :category-options="categoryOptions" :validations="$v.newCategory" />
@@ -56,6 +57,7 @@ import FileUploader from '@components/form/FileUploader';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import CategoryAdditionModal from 'src/modules/vendor/components/programs/CategoryAdditionModal';
+import TesterTable from 'src/modules/vendor/components/programs/TesterTable';
 import Button from '@components/Button';
 import { IMAGE_EXTENSIONS } from '@data/constants';
 import { upperCaseFirstLetter, formatAndSortOptions } from '@helpers/utils';
@@ -71,6 +73,7 @@ export default {
     'ni-button': Button,
     'ni-responsive-table': ResponsiveTable,
     'category-addition-modal': CategoryAdditionModal,
+    'tester-table': TesterTable,
   },
   data () {
     return {
@@ -80,15 +83,8 @@ export default {
       newCategory: '',
       categories: [],
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          align: 'left',
-          field: 'name',
-          format: upperCaseFirstLetter,
-          style: 'width: 92%',
-        },
-        { name: 'actions', label: '', field: '_id' },
+        { name: 'name', label: 'Nom', align: 'left', field: 'name', format: upperCaseFirstLetter, style: 'width: 90%' },
+        { name: 'actions', label: '', field: '_id', align: 'right' },
       ],
       categoryAdditionModal: false,
       loading: false,

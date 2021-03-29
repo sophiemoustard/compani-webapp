@@ -22,10 +22,9 @@ export const chartMixin = {
       };
     },
     formatMonthAndYear (date) {
-      return `${new Date(date).getFullYear()}${new Date(date).getMonth() < 10
-        ? `0${new Date(date).getMonth()}`
-        : `${new Date(date).getMonth()}`
-      }`;
+      const month = new Date(date).getMonth() < 10 ? `0${new Date(date).getMonth()}` : new Date(date).getMonth();
+
+      return `${new Date(date).getFullYear()}${month}`;
     },
     getDataByMonth (activityHistories, groupByPath) {
       const historiesByMonth = groupBy(activityHistories, ah => this.formatMonthAndYear(ah.date));

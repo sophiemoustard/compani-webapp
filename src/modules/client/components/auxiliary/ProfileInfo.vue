@@ -519,7 +519,7 @@ export default {
     },
     establishmentsOptions () {
       return [
-        { label: 'Non affecté', value: null, inactive: true },
+        { label: 'Non affecté', value: '', inactive: true },
         ...this.establishments.map(est => ({ label: est.name, value: est._id, inactive: false })),
       ];
     },

@@ -74,9 +74,7 @@
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
                   <template v-if="col.name === 'sign'">
-                    <p class="no-margin" v-if="props.row.signedAt">
-                      Mandat signé le {{ getSignatureDate(props.row) }}
-                    </p>
+                    <p class="no-margin" v-if="props.row.signedAt">Mandat signé le {{ getSignatureDate(props.row) }}</p>
                     <q-btn color="primary" @click="preOpenESignModal(props.row)" data-cy="open-mandate"
                       v-else-if="displaySignButton(props.row)">
                       Signer
@@ -145,7 +143,7 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup
 import { REQUIRED_LABEL, DOC_EXTENSIONS } from '@data/constants';
 import { bic, iban } from '@helpers/vuelidateCustomVal';
 import { getLastVersion } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { formatDate } from '@helpers/date';
 import FundingGridTable from 'src/modules/client/components/table/FundingGridTable';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { subscriptionMixin } from 'src/modules/client/mixins/subscriptionMixin';
@@ -179,14 +177,6 @@ export default {
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
         { name: 'sign', label: 'Signature', align: 'left', field: 'signedAt' },
-        {
-          name: 'createdAt',
-          align: 'left',
-          field: 'createdAt',
-          sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
-        },
         { name: '_id', field: '_id' },
       ],
       mandatesVisibleColumns: ['rum', 'sign'],
@@ -227,11 +217,9 @@ export default {
       return '';
     },
     agreement () {
-      if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `(Accepté le ${moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
-          + `par ${this.acceptedBy})`;
-      }
-      return '';
+      return this.lastSubscriptionHistory && this.customer.subscriptionsAccepted
+        ? `(Accepté le ${formatDate(this.lastSubscriptionHistory.approvalDate)} par ${this.acceptedBy})`
+        : '';
     },
     esignRedirection () {
       if (this.$q.platform.is.desktop) {
@@ -266,7 +254,7 @@ export default {
   },
   methods: {
     getSignatureDate (mandate) {
-      return moment(mandate.signedAt).format('DD/MM/YYYY');
+      return formatDate(mandate.signedAt);
     },
     displaySignButton (mandate) {
       return this.getRowIndex(this.customer.payment.mandates, mandate) === this.customer.payment.mandates.length - 1;
@@ -377,7 +365,7 @@ export default {
               iban: this.customer.payment.iban || '',
               companyName: this.helper.company.name || '',
               companyAddress: this.helper.company.address.fullAddress || '',
-              downloadDate: moment().format('DD/MM/YYYY'),
+              downloadDate: formatDate(new Date()),
             },
             ...this.esignRedirection,
           }

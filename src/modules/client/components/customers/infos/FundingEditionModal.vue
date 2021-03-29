@@ -7,22 +7,23 @@
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="validations.startDate.$touch"
         :error="validations.startDate.$error" required-field @input="update($event, 'startDate')" />
       <ni-date-input :value="editedFunding.endDate" caption="Date de fin de prise en charge" in-modal
-        :min="minEndDate" @input="update($event, 'endDate')" />
+        :min="minEndDate" @input="update($event, 'endDate')" @blur="validations.endDate.$touch"
+        :error="validations.endDate.$error" error-message="La date de fin doit etre postérieure à la date de début" />
       <ni-input in-modal :value="editedFunding.folderNumber" caption="Numéro de dossier"
         @input="update($event, 'folderNumber')" />
-      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.unitTTCRate"
-        caption="Prix unitaire TTC" type="number" @blur="validations.unitTTCRate.$touch"
-        :error="validations.unitTTCRate.$error" required-field @input="update($event, 'unitTTCRate')" />
-      <ni-input in-modal v-if="isFixedFunding" :value="editedFunding.amountTTC"
-        caption="Montant forfaitaire TTC" type="number" @blur="validations.amountTTC.$touch"
-        :error="validations.amountTTC.$error" required-field @input="update($event, 'amountTTC')" />
-      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.careHours"
-        caption="Nb. heures prises en charge" type="number" @blur="validations.careHours.$touch"
+      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.unitTTCRate" caption="Prix unitaire TTC"
+        type="number" @blur="validations.unitTTCRate.$touch" :error="validations.unitTTCRate.$error" required-field
+        :error-message="unitTtcRateErrorMessage" @input="update($event, 'unitTTCRate')" />
+      <ni-input in-modal v-if="isFixedFunding" :value="editedFunding.amountTTC" caption="Montant forfaitaire TTC"
+        type="number" @blur="validations.amountTTC.$touch" :error="validations.amountTTC.$error" required-field
+        :error-message="amountTtcErrorMessage" @input="update($event, 'amountTTC')" />
+      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.careHours" caption="Nb. heures prises en charge"
+        :error-message="careHoursErrorMessage" type="number" @blur="validations.careHours.$touch"
         :error="validations.careHours.$error" required-field suffix="h" @input="update($event, 'careHours')" />
-      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.customerParticipationRate"
-        caption="Taux de participation du bénéficiaire" type="number" suffix="%"
+      <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.customerParticipationRate" type="number"
+        caption="Taux de participation du bénéficiaire" :error-message="customerParticipationRateErrorMessage"
         @blur="validations.customerParticipationRate.$touch" @input="update($event, 'customerParticipationRate')"
-        :error="validations.customerParticipationRate.$error" required-field />
+        :error="validations.customerParticipationRate.$error" required-field suffix="%" />
       <ni-option-group :value="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"
         type="checkbox" inline @blur="validations.careDays.$touch" :error="validations.careDays.$error"
         required-field @input="update($event, 'careDays')" />
@@ -49,6 +50,10 @@ export default {
     daysOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
+    careHoursErrorMessage: { type: String, default: '' },
+    amountTtcErrorMessage: { type: String, default: '' },
+    unitTtcRateErrorMessage: { type: String, default: '' },
+    customerParticipationRateErrorMessage: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,

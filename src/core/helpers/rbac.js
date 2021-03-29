@@ -84,16 +84,15 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni users trainers info' },
   { name: 'ni users learners' },
   { name: 'ni users learners info' },
-  { name: 'ni config programs' },
-  { name: 'ni config categories' },
-  { name: 'ni config programs info' },
-  { name: 'ni config activity info' },
+  { name: 'ni pedagogy programs' },
+  { name: 'ni pedagogy categories' },
+  { name: 'ni pedagogy programs info' },
+  { name: 'ni pedagogy activity info' },
   { name: 'ni management blended courses' },
   { name: 'ni management blended courses info' },
   { name: 'ni management elearning courses' },
   { name: 'ni management elearning courses info' },
   { name: 'account vendor' },
-  { name: 'ni management questionnaire answers' },
 ];
 const vendorAdminRoutes = [...trainingOrganisationManagerRoutes];
 const trainerRoutes = [

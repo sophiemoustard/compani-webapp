@@ -66,9 +66,7 @@
           <q-checkbox v-model="customer.subscriptionsAccepted" disable class="q-mr-sm" dense />
           <span style="vertical-align: middle">
             Validation en ligne des souscriptions
-            <span class="text-weight-thin text-italic">
-              {{ acceptedByHelper }}
-            </span>
+            <span class="text-weight-thin text-italic">{{ acceptedByHelper }}</span>
           </span>
         </div>
       </template>
@@ -119,7 +117,7 @@
       </div>
       <q-card>
         <ni-responsive-table :columns="mandatesColumns" :data="customer.payment.mandates" :pagination.sync="pagination"
-          :visible-columns="mandatesVisibleColumns" class="mandate-table" :loading="mandatesLoading">
+          class="mandate-table" :loading="mandatesLoading">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -202,7 +200,7 @@
       </div>
       <q-card>
         <ni-responsive-table :data="customer.quotes" :columns="quotesColumns" :pagination.sync="pagination"
-          :visible-columns="quotesVisibleColumns" :loading="quotesLoading">
+          :loading="quotesLoading">
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -266,20 +264,26 @@
       :selected="selectedFunding" @hide="resetFundingHistoryData" />
 
     <!-- Funding creation modal -->
-    <funding-creation-modal v-model="fundingCreationModal" :loading="loading" @hide="resetCreationFundingData"
-      :new-funding.sync="newFunding" :third-party-payers="ttpList" @submit="createFunding" :validations="$v.newFunding"
-      :funding-subscriptions-options="fundingSubscriptionsOptions" :days-options="daysOptions" />
+    <funding-creation-modal v-model="fundingCreationModal" :new-funding.sync="newFunding" :third-party-payers="ttpList"
+      :care-hours-error-message="careHoursErrorMessage($v.newFunding)" @submit="createFunding" :loading="loading"
+      :amount-ttc-error-message="amountTTCErrorMessage($v.newFunding)" :validations="$v.newFunding"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.newFunding)" :days-options="daysOptions"
+      :funding-subscriptions-options="fundingSubscriptionsOptions" @hide="resetCreationFundingData"
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.newFunding)" />
 
     <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
       :edited-funding.sync="editedFunding" @submit="editFunding" :days-options="daysOptions"
-      :validations="$v.editedFunding" />
+      :validations="$v.editedFunding" :care-hours-error-message="careHoursErrorMessage($v.editedFunding)"
+      :amount-ttc-error-message="amountTTCErrorMessage($v.editedFunding)"
+      :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.editedFunding)"
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)" />
 </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import { required, requiredIf } from 'vuelidate/lib/validators';
+import { required, requiredIf, minValue, maxValue } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -304,9 +308,11 @@ import {
   REQUIRED_LABEL,
   CIVILITY_OPTIONS,
   DOC_EXTENSIONS,
+  ONCE,
 } from '@data/constants';
 import { downloadDriveDocx } from '@helpers/file';
-import { frPhoneNumber, iban, bic, frAddress } from '@helpers/vuelidateCustomVal';
+import { formatDate } from '@helpers/date';
+import { frPhoneNumber, iban, bic, frAddress, minDate } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { userMixin } from '@mixins/userMixin';
 import { validationMixin } from '@mixins/validationMixin';
@@ -369,21 +375,11 @@ export default {
       tmpInput: '',
       subscriptions: [],
       services: [],
-      quotesVisibleColumns: ['quoteNumber', 'emptyQuote', 'signedQuote', 'signed'],
       quotesColumns: [
         { name: 'quoteNumber', label: 'Numéro du devis', align: 'left', field: 'quoteNumber' },
         { name: 'emptyQuote', label: 'Devis', align: 'center', field: 'emptyQuote' },
         { name: 'signedQuote', label: 'Devis signé', align: 'center', field: 'signedQuote' },
         { name: 'signed', label: 'Signé', align: 'center', field: row => row.drive && row.drive.driveId },
-        {
-          name: 'createdAt',
-          label: '',
-          field: 'createdAt',
-          align: 'left',
-          sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
-        },
       ],
       quotesLoading: false,
       newSubscription: {
@@ -392,22 +388,12 @@ export default {
         estimatedWeeklyVolume: '',
       },
       editedSubscription: {},
-      mandatesVisibleColumns: ['rum', 'emptyMandate', 'signedMandate', 'signed', 'signedAt'],
       mandatesColumns: [
         { name: 'rum', label: 'RUM', align: 'left', field: 'rum' },
         { name: 'emptyMandate', label: 'Mandat', align: 'center', field: 'emptyMandate' },
         { name: 'signedMandate', label: 'Mandat signé', align: 'center', field: 'signedMandate' },
         { name: 'signed', label: 'Signé', align: 'center', field: 'signedAt' },
         { name: 'signedAt', label: 'Date de signature', align: 'left', field: 'signedAt' },
-        {
-          name: 'createdAt',
-          label: '',
-          field: 'createdAt',
-          align: 'left',
-          sortable: true,
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
-        },
       ],
       mandatesLoading: false,
       fundingsVisibleColumns: ['thirdPartyPayer', 'folderNumber', 'nature', 'startDate', 'endDate', 'actions'],
@@ -488,11 +474,9 @@ export default {
       return '';
     },
     acceptedByHelper () {
-      if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        return `le ${moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY')} `
-          + `par ${this.acceptedBy}`;
-      }
-      return '';
+      return this.lastSubscriptionHistory && this.customer.subscriptionsAccepted
+        ? `le ${formatDate(this.lastSubscriptionHistory.approvalDate)} par ${this.acceptedBy}`
+        : '';
     },
     fundingSubscriptionsOptions () {
       return this.subscriptions
@@ -553,22 +537,19 @@ export default {
         subscription: { required },
         nature: { required },
         frequency: { required },
-        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
-        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
-        careHours: { required: requiredIf(item => item.nature === HOURLY) },
-        careDays: { required },
-        startDate: { required },
-        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
+        ...this.getFundingValidation(this.newFunding),
       },
-      editedFunding: {
-        amountTTC: { required: requiredIf(item => item.nature === FIXED) },
-        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY) },
-        careHours: { required: requiredIf(item => item.nature === HOURLY) },
-        careDays: { required },
-        startDate: { required },
-        customerParticipationRate: { required: requiredIf(item => item.nature === HOURLY) },
-      },
+      editedFunding: { ...this.getFundingValidation(this.editedFunding) },
     };
+  },
+  watch: {
+    'newFunding.thirdPartyPayer': function () {
+      this.setUnitUTTRate();
+    },
+    'newFunding.nature': function (newNature) {
+      if (newNature === FIXED) this.newFunding.frequency = ONCE;
+      this.setUnitUTTRate();
+    },
   },
   async mounted () {
     await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices()]);
@@ -576,6 +557,43 @@ export default {
   },
   methods: {
     get,
+    getFundingValidation (funding) {
+      return {
+        amountTTC: { required: requiredIf(item => item.nature === FIXED), minValue: minValue(0) },
+        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
+        careHours: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
+        careDays: { required },
+        startDate: { required },
+        endDate: { minDate: minDate(funding.startDate) },
+        customerParticipationRate: {
+          required: requiredIf(item => item.nature === HOURLY),
+          minValue: minValue(0),
+          maxValue: maxValue(100),
+        },
+      };
+    },
+    careHoursErrorMessage (validations) {
+      if (!validations.careHours.required) return REQUIRED_LABEL;
+      if (!validations.careHours.minValue) return 'Nombre d\'heures invalide';
+      return '';
+    },
+    amountTTCErrorMessage (validations) {
+      if (!validations.amountTTC.required) return REQUIRED_LABEL;
+      if (!validations.amountTTC.minValue) return 'Montant forfaitaire TTC invalide';
+      return '';
+    },
+    unitTTCRateErrorMessage (validations) {
+      if (!validations.unitTTCRate.required) return REQUIRED_LABEL;
+      if (!validations.unitTTCRate.minValue) return 'Prix unitaire TTC invalide';
+      return '';
+    },
+    customerParticipationRateErrorMessage (validations) {
+      if (!validations.customerParticipationRate.required) return REQUIRED_LABEL;
+      if (!validations.customerParticipationRate.minValue || !validations.customerParticipationRate.maxValue) {
+        return 'Taux de participation du bénéficiaire invalide';
+      }
+      return '';
+    },
     mandateFormFields (row) {
       return [
         { name: 'mandateId', value: row._id },
@@ -772,7 +790,7 @@ export default {
         const data = {
           bankAccountOwner: this.customer.payment.bankAccountOwner || '',
           customerAddress: this.customer.contact.primaryAddress.fullAddress,
-          downloadDate: moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: formatDate(Date.now()),
           ics: this.company.ics,
           rum: doc.rum,
           bic: this.customer.payment.bic || '',
@@ -827,7 +845,7 @@ export default {
           companyAddress: this.company.address.fullAddress,
           rcs: this.company.rcs,
           subscriptions,
-          downloadDate: moment(Date.now()).format('DD/MM/YYYY'),
+          downloadDate: formatDate(Date.now()),
         };
         const params = { driveId: quoteDriveId };
         await downloadDriveDocx(params, data, 'devis.docx');
@@ -862,6 +880,13 @@ export default {
       }
     },
     // Fundings
+    setUnitUTTRate () {
+      if (this.newFunding.nature === FIXED) this.newFunding.unitTTCRate = 0;
+      else {
+        const ttp = this.ttpList.find(p => p._id === this.newFunding.thirdPartyPayer);
+        this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
+      }
+    },
     async getThirdPartyPayers () {
       try {
         this.ttpList = await ThirdPartyPayers.list();

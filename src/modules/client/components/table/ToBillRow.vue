@@ -40,7 +40,8 @@
       <template v-else-if="index === 0">{{ col.value }}</template>
     </q-td>
     <q-td data-cy="col-selected-bill">
-      <q-checkbox v-if="index === 0 && displayCheckbox" v-model="props.selected" dense />
+      <q-checkbox v-if="index === 0 && displayCheckbox" :value="selected" @input="$emit('update:selected', $event)"
+        dense />
     </q-td>
   </q-tr>
 </template>
@@ -48,8 +49,8 @@
 <script>
 import EditableTd from '@components/table/EditableTd';
 import { formatPrice, getLastVersion, formatIdentity, truncate } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { FIXED } from '@data/constants';
-import moment from '@helpers/moment';
 
 export default {
   name: 'ToBillRow',
@@ -58,6 +59,7 @@ export default {
   },
   props: {
     props: { type: Object, default: () => ({}) },
+    selected: { type: Boolean, default: false },
     bill: { type: Object, default: () => ({}) },
     index: { type: Number, default: () => 0 },
     displayCheckbox: { type: Boolean, default: () => false },
@@ -70,13 +72,12 @@ export default {
       return getLastVersion(value, 'createdAt');
     },
     formatHours (bill) {
-      if (bill.subscription.service && bill.subscription.service.nature === FIXED) {
-        return bill.eventsList.length;
-      }
+      if (bill.subscription.service && bill.subscription.service.nature === FIXED) return bill.eventsList.length;
+
       return bill.hours ? `${parseFloat(bill.hours).toFixed(2)}h` : '';
     },
     formatDate (value) {
-      return value ? `${moment(value).format('DD/MM/YY')}` : '';
+      return formatDate(value);
     },
     getClientName (customer, bill) {
       if (!bill.thirdPartyPayer) return formatIdentity(customer.identity, 'Lf');

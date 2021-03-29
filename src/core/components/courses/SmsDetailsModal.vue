@@ -21,7 +21,7 @@ import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import Banner from '@components/Banner';
 import { formatQuantity } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { formatDate } from '@helpers/date';
 
 export default {
   name: 'SmsDetailsModal',
@@ -39,7 +39,7 @@ export default {
   },
   computed: {
     smsDate () {
-      return moment(this.smsHistory.date).format('DD/MM/YYYY');
+      return formatDate(this.smsHistory.date);
     },
   },
   methods: {

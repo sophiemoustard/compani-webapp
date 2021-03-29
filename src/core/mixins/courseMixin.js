@@ -33,6 +33,12 @@ export const courseMixin = {
 
       return missingInfo;
     },
+    headerInfo () {
+      return [
+        { icon: 'bookmark_border', label: this.courseType },
+        { icon: 'emoji_people', label: this.trainerName },
+      ];
+    },
   },
   methods: {
     happened (sameDaySlots) {

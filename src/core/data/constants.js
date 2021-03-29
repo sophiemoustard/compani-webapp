@@ -256,7 +256,7 @@ export const PAYMENT_OPTIONS = [
 export const REFUND = 'refund';
 export const PAYMENT = 'payment';
 export const PAYMENT_NATURE_OPTIONS = [
-  { label: 'Règlement', value: PAYMENT },
+  { label: 'Paiement', value: PAYMENT },
   { label: 'Remboursement', value: REFUND },
 ];
 
@@ -348,14 +348,15 @@ export const LESSON = 'lesson';
 export const QUIZ = 'quiz';
 export const SHARING_EXPERIENCE = 'sharing_experience';
 export const VIDEO = 'video';
-export const QUESTIONNAIRE = 'questionnaire';
 export const ACTIVITY_TYPES = [
   { label: 'Cours', value: LESSON },
   { label: 'Quiz', value: QUIZ },
   { label: 'Témoignage', value: SHARING_EXPERIENCE },
   { label: 'Vidéo', value: VIDEO },
-  { label: 'Questionnaire', value: QUESTIONNAIRE },
 ];
+
+// CARD CATEGORIES
+export const QUESTIONNAIRE = 'questionnaire';
 
 // E-LEARNING CARDS
 export const TRANSITION = 'transition';
@@ -384,6 +385,7 @@ export const CARD_TEMPLATES = [
   { label: 'Sondage', value: SURVEY, type: QUESTIONNAIRE },
   { label: 'Question\t&\tRéponse', value: QUESTION_ANSWER, type: QUESTIONNAIRE },
 ];
+
 export const TEMPLATE_TYPES = {
   [LESSON]: 'Cours',
   [QUIZ]: 'Quiz',

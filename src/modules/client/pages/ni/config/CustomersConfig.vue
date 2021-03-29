@@ -382,7 +382,7 @@ export default {
         nature: '',
         defaultUnitAmount: '',
         vat: '',
-        surcharge: null,
+        surcharge: '',
         exemptFromCharges: false,
       },
       editedService: {
@@ -391,7 +391,7 @@ export default {
         defaultUnitAmount: '',
         vat: '',
         nature: '',
-        surcharge: null,
+        surcharge: '',
         exemptFromCharges: false,
       },
       natureOptions: NATURE_OPTIONS,
