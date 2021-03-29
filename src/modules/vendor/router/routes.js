@@ -144,7 +144,7 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (['ni users learners info', 'ni management questionnaire answers'].includes(from.name)) {
+            if (from.name === 'ni users learners info') {
               to.params.defaultTab = 'traineeFollowUp';
             }
             return next();
@@ -231,16 +231,6 @@ const routes = [
         name: 'account vendor',
         component: () => import('src/core/pages/AccountInfo'),
         meta: {
-          cookies: ['alenvi_token', 'refresh_token'],
-        },
-      },
-      {
-        path: 'ni/management/:courseId/questionnaire/:activityId',
-        name: 'ni management questionnaire answers',
-        component: () => import('src/modules/vendor/pages/trainers/management/QuestionnaireAnswers'),
-        props: true,
-        meta: {
-          parent: 'management',
           cookies: ['alenvi_token', 'refresh_token'],
         },
       },
