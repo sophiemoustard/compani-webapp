@@ -13,7 +13,7 @@
                 <div class="row no-wrap table-actions justify-end">
                   <ni-button icon="file_download" color="primary" type="a" target="_blank"
                     :href="props.row.file.link" />
-                  <ni-button v-if="canUpdateAttendance" icon="delete" color="primary"
+                  <ni-button v-if="canUpdate" icon="delete" color="primary"
                     @click="validateAttendanceSheetDeletion(props.row)" />
                 </div>
               </template>
@@ -23,7 +23,7 @@
         </template>
       </ni-simple-table>
       <div class="flex justify-end">
-        <ni-button v-if="canUpdateAttendance" class="bg-primary" color="white" icon="add"
+        <ni-button v-if="canUpdate" class="bg-primary" color="white" icon="add"
           label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
@@ -38,6 +38,7 @@
 <script>
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
+import get from 'lodash/get';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -46,8 +47,8 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
-import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, INTER_B2B } from '@data/constants';
+import { upperCaseFirstLetter, formatQuantity, formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { defineAbilitiesFor } from '@helpers/ability';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
@@ -81,8 +82,8 @@ export default {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
           align: 'left',
-          field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee)),
-          format: value => (value ? `${value.identity.firstname} ${value.identity.lastname}` : ''),
+          field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee._id)),
+          format: value => formatIdentity(get(value, 'identity'), 'FL'),
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],
@@ -112,7 +113,7 @@ export default {
     visibleColumns () {
       return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
     },
-    canUpdateAttendance () {
+    canUpdate () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
       return ability.can('update', 'course_trainee_follow_up');
@@ -122,7 +123,12 @@ export default {
     async refreshAttendanceSheets () {
       try {
         this.tableLoading = true;
-        this.attendanceSheets = await AttendanceSheets.list({ course: this.profileId });
+        const attendanceSheets = await AttendanceSheets.list({ course: this.profileId });
+
+        if (this.course.type === INTER_B2B && this.isClientInterface) {
+          this.attendanceSheets = attendanceSheets
+            .filter(a => get(a, 'trainee.company') === this.loggedUser.company._id);
+        } else this.attendanceSheets = attendanceSheets;
       } catch (e) {
         console.error(e);
         this.attendanceSheets = [];
@@ -146,7 +152,7 @@ export default {
     },
     async addAttendanceSheet () {
       try {
-        if (!this.canUpdateAttendance) return NotifyNegative('Impossible d\'ajouter une feuille d\'emargement.');
+        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter une feuille d\'émargement.');
 
         this.$v.newAttendanceSheet.$touch();
         if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -165,7 +171,7 @@ export default {
       }
     },
     validateAttendanceSheetDeletion (attendanceSheet) {
-      if (!this.canUpdateAttendance) return NotifyNegative('Impossible de supprimer la feuille d\'emargement.');
+      if (!this.canUpdate) return NotifyNegative('Impossible de supprimer la feuille d\'émargement.');
 
       this.$q.dialog({
         title: 'Confirmation',
