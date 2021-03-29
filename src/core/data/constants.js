@@ -256,7 +256,7 @@ export const PAYMENT_OPTIONS = [
 export const REFUND = 'refund';
 export const PAYMENT = 'payment';
 export const PAYMENT_NATURE_OPTIONS = [
-  { label: 'Règlement', value: PAYMENT },
+  { label: 'Paiement', value: PAYMENT },
   { label: 'Remboursement', value: REFUND },
 ];
 

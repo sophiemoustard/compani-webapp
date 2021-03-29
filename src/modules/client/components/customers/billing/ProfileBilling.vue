@@ -12,8 +12,8 @@
         <a :href="'mailto:' + company.billingAssistance"> {{ company.billingAssistance }}</a>.
       </div>
       <ni-customer-billing-table :documents="customerDocuments" :billing-dates="billingDates" :display-actions="isAdmin"
-        @open-edition-modal="openEditionModal" :type="CUSTOMER" :start-balance="getStartBalance()"
-        :end-balance="getEndBalance(customerDocuments)" :loading="tableLoading" />
+        @open-edition-modal="openEditionModal" :start-balance="getStartBalance()" :loading="tableLoading"
+        :end-balance="getEndBalance(customerDocuments)" :type="CUSTOMER" @delete="validateRefundDeletion" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" @click="openPaymentCreationModal(customer)" no-caps flat
           color="white" icon="add" />
@@ -23,7 +23,7 @@
       <p data-cy="tpp-identity" class="text-weight-bold text-primary">{{ tpp.name }}</p>
       <ni-customer-billing-table :documents="tpp.documents" :billing-dates="billingDates" :display-actions="isAdmin"
         @open-edition-modal="openEditionModal" :type="THIRD_PARTY_PAYER" :start-balance="getStartBalance(tpp)"
-        :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" />
+        :end-balance="getEndBalance(tpp.documents, tpp)" :loading="tableLoading" @delete="validateRefundDeletion" />
       <div v-if="isAdmin" class="q-mt-md" align="right">
         <q-btn class="add-payment" label="Ajouter un réglement" no-caps flat color="white" icon="add"
           @click="openPaymentCreationModal(customer, tpp.documents[0].thirdPartyPayer)" />
@@ -59,14 +59,14 @@
     </div>
 
     <!-- Payment creation modal -->
-    <ni-payment-creation-modal :new-payment.sync="newPayment" v-model="paymentCreationModal"
-      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :selected-tpp="selectedTpp"
-      @submit="createPayment" @hide="resetPaymentCreationModal" :validations="$v.newPayment" />
+    <ni-payment-creation-modal :new-payment.sync="newPayment" v-model="paymentCreationModal" :selected-tpp="selectedTpp"
+      :selected-customer="selectedCustomer" :loading="paymentCreationLoading" :validations="$v.newPayment"
+      @submit="validatePaymentCreation(taxCertificates)" @hide="resetPaymentCreationModal" />
 
     <!-- Payment edition modal -->
     <ni-payment-edition-modal :validations="$v.editedPayment" :selected-tpp="selectedTpp" v-model="paymentEditionModal"
       :loading="paymentEditionLoading" :selected-customer="selectedCustomer" :edited-payment.sync="editedPayment"
-      @submit="updatePayment" @hide="resetPaymentEditionModal" />
+      @submit="validatePaymentUpdate" @hide="resetPaymentEditionModal" />
 
     <!-- Tax certificate upload modal -->
     <ni-modal v-model="taxCertificateModal" @hide="resetTaxCertificateModal">
@@ -366,12 +366,29 @@ export default {
       this.selectedTpp = {};
       this.editedPayment = {};
     },
+    async validatePaymentUpdate () {
+      this.paymentEditionLoading = true;
+      this.$v.editedPayment.$touch();
+      if (this.$v.editedPayment.$error) {
+        this.paymentEditionLoading = false;
+        return NotifyWarning('Champ(s) invalide(s)');
+      }
+
+      if (!this.hasTaxCertificateOnSameYear(this.editedPayment, this.taxCertificates)) return this.updatePayment();
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le modifier ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.updatePayment())
+        .onCancel(() => {
+          NotifyPositive('Modification annulée.');
+          this.paymentEditionLoading = false;
+        });
+    },
     async updatePayment () {
       try {
-        this.paymentEditionLoading = true;
-        this.$v.editedPayment.$touch();
-        if (this.$v.editedPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-
         const payload = omit(this.editedPayment, ['_id', 'thirdPartyPayer']);
         await Payments.update(this.editedPayment._id, payload);
         this.paymentEditionModal = false;
@@ -459,6 +476,29 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'attestation fiscale.');
+      }
+    },
+    validateRefundDeletion (refund) {
+      const message = this.hasTaxCertificateOnSameYear(refund, this.taxCertificates)
+        ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer ?'
+        : 'Etes-vous sûr de vouloir supprimer ce remboursement ?';
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message,
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteRefund(refund._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteRefund (refundId) {
+      try {
+        await Payments.remove(refundId);
+        this.refresh();
+        NotifyPositive('Remboursement supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du remboursement.');
       }
     },
   },
