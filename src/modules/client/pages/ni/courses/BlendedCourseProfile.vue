@@ -29,27 +29,35 @@ export default {
     'profile-tabs': ProfileTabs,
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
   },
+  data () {
+    const organizationTab = {
+      label: 'Organisation',
+      name: 'organization',
+      default: this.defaultTab === 'organization',
+      component: ProfileOrganization,
+    };
+    const adminTab = { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin };
+    const traineeFollowUpTab = {
+      label: 'Suivi des stagiaires',
+      name: 'traineeFollowUp',
+      default: this.defaultTab === 'traineeFollowUp',
+      component: ProfileTraineeFollowUp,
+    };
+
+    return {
+      organizationTab,
+      adminTab,
+      traineeFollowUpTab,
+    };
+  },
   computed: {
     ...mapState('course', ['course']),
     tabsContent () {
-      const tabs = [
-        {
-          label: 'Organisation',
-          name: 'organization',
-          default: this.defaultTab === 'organization',
-          component: ProfileOrganization,
-        },
-      ];
       if (this.isIntraCourse) {
-        tabs.push({ label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin });
+        return [this.organizationTab, this.adminTab, this.traineeFollowUpTab];
       }
-      tabs.push({
-        label: 'Suivi des stagiaires',
-        name: 'traineeFollowUp',
-        default: this.defaultTab === 'traineeFollowUp',
-        component: ProfileTraineeFollowUp,
-      });
-      return tabs;
+
+      return [this.organizationTab, this.traineeFollowUpTab];
     },
   },
   async created () {

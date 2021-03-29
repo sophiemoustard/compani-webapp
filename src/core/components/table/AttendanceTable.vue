@@ -247,7 +247,7 @@ export default {
 
         if (this.course.type === INTRA) query = { company: this.selectedCompany };
         if (this.course.type === INTER_B2B) {
-          query = !this.isClientInterface ? { hasCompany: true } : { company: get(this.loggedUser, 'company._id') };
+          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
         }
 
         this.potentialTrainees = await Users.learnerList(query);
