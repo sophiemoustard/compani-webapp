@@ -115,7 +115,7 @@ export const menuItemsMixin = {
           ],
         }, {
           ref: 'customers',
-          label: 'Beneficiaires',
+          label: 'Bénéficiaires',
           children: [
             { name: 'ni customers', icon: 'contacts', label: 'Répertoire bénéficiaires' },
             { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },
@@ -180,7 +180,7 @@ export const menuItemsMixin = {
           ],
         }, {
           ref: 'customers',
-          label: 'Beneficiaires',
+          label: 'Bénéficiaires',
           children: [
             { name: 'auxiliaries customers', icon: 'contacts', label: 'Fiches' },
             { name: 'ni customers fundings monitoring', icon: 'view_headline', label: 'Suivi des plans d\'aide' },

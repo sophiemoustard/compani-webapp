@@ -69,12 +69,33 @@ export const paymentMixin = {
       };
       this.$v.newPayment.$reset();
     },
+    hasTaxCertificateOnSameYear (payment, taxCertificates) {
+      const paymentDate = (new Date(payment.date)).getFullYear().toString();
+      return taxCertificates.some(tax => tax.year === paymentDate);
+    },
+    validatePaymentCreation (taxCertificates) {
+      this.paymentCreationLoading = true;
+      this.$v.newPayment.$touch();
+      if (this.$v.newPayment.$error) {
+        this.paymentCreationLoading = false;
+        return NotifyWarning('Champ(s) invalide(s)');
+      }
+
+      if (!this.hasTaxCertificateOnSameYear(this.newPayment, taxCertificates)) return this.createPayment();
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le créer ?',
+        ok: 'OK',
+        cancel: 'Annuler',
+      }).onOk(() => this.createPayment())
+        .onCancel(() => {
+          NotifyPositive('Création annulée.');
+          this.paymentCreationLoading = false;
+        });
+    },
     async createPayment () {
       try {
-        this.paymentCreationLoading = true;
-        this.$v.newPayment.$touch();
-        if (this.$v.newPayment.$error) return NotifyWarning('Champ(s) invalide(s)');
-
         await Payments.create(pickBy(this.newPayment));
         NotifyPositive('Règlement créé');
         await this.refresh();

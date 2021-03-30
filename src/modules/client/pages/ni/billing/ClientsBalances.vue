@@ -50,7 +50,7 @@
     <!-- Payment creation modal -->
     <ni-payment-creation-modal v-model="paymentCreationModal" :new-payment.sync="newPayment"
       :selected-tpp="selectedTpp" :loading="paymentCreationLoading" @hide="resetPaymentCreationModal"
-      @submit="createPayment" :selected-customer="selectedCustomer" :validations="$v.newPayment" />
+      @submit="submitPaymentCreation" :selected-customer="selectedCustomer" :validations="$v.newPayment" />
 
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer les prélèvements"
       :disable="selected.length === 0" @click="validatePaymentListCreation" />
@@ -63,6 +63,7 @@ import get from 'lodash/get';
 import uniqueId from 'lodash/uniqueId';
 import Payments from '@api/Payments';
 import Balances from '@api/Balances';
+import TaxCertificates from '@api/TaxCertificates';
 import SimpleTable from '@components/table/SimpleTable';
 import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
@@ -76,6 +77,7 @@ import {
   roundFrenchPercentage,
   formatNumberForCSV,
 } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
 import PaymentCreationModal from 'src/modules/client/components/customers/billing/PaymentCreationModal';
@@ -125,14 +127,8 @@ export default {
         { name: 'billed', label: 'Facturé TTC', align: 'center', field: 'billed', format: val => formatPrice(val) },
         { name: 'paid', label: 'Payé TTC', align: 'center', field: 'paid', format: val => formatPrice(val) },
         { name: 'balance', label: 'Solde', align: 'center', field: row => row.balance, sortable: true },
-        {
-          name: 'toPay',
-          label: 'A Prélever',
-          align: 'center',
-          field: 'toPay',
-          format: value => formatPrice(value),
-          sortable: true,
-        },
+        { name: 'lastCesuDate', label: 'Dernier CESU', field: 'lastCesuDate', align: 'center', format: formatDate },
+        { name: 'toPay', label: 'A Prélever', align: 'center', field: 'toPay', format: formatPrice, sortable: true },
         { name: 'actions', label: '', align: 'left', field: row => row.customer._id },
       ],
       pagination: { rowsPerPage: 0 },
@@ -249,6 +245,10 @@ export default {
       }
 
       return downloadCsv(csvData, `clients_balances_${moment().format('DD_MM_YYYY')}.csv`);
+    },
+    async submitPaymentCreation () {
+      const taxCertificates = await TaxCertificates.list({ customer: this.newPayment.customer });
+      return this.validatePaymentCreation(taxCertificates);
     },
   },
 };

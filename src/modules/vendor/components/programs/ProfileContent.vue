@@ -373,7 +373,7 @@ export default {
     // ACTIVITY
     goToActivityProfile (subProgram, step, activity) {
       this.$router.push({
-        name: 'ni config activity info',
+        name: 'ni pedagogy activity info',
         params: {
           programId: this.program._id,
           subProgramId: subProgram._id,

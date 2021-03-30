@@ -29,7 +29,7 @@ import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';
 import { NotifyNegative } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
-import moment from '@helpers/moment';
+import { formatDate } from '@helpers/date';
 
 export default {
   name: 'DebitArchive',
@@ -43,13 +43,7 @@ export default {
       loading: false,
       columns: [
         { name: 'name', label: 'Nom du fichier', align: 'left', field: 'name' },
-        {
-          name: 'createdTime',
-          label: 'Date de création',
-          align: 'left',
-          field: 'createdTime',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'createdTime', label: 'Date de création', align: 'left', field: 'createdTime', format: formatDate },
         { name: 'download', label: '', align: 'left', field: 'webViewLink' },
       ],
       pagination: {

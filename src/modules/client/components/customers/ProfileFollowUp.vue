@@ -123,7 +123,7 @@ import {
 } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatHours } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
@@ -150,12 +150,19 @@ export default {
       followUpLoading: false,
       followUpColumns: [
         { name: 'identity', align: 'left', field: row => row },
-        { name: 'hours', align: 'center', label: 'Heures réalisées', field: row => formatHours(row.totalHours, 1) },
+        {
+          name: 'hours',
+          align: 'center',
+          label: 'Heures réalisées',
+          field: 'totalHours',
+          format: value => formatHours(value, 1),
+        },
         {
           name: 'lastEvent',
           align: 'center',
           label: 'Dernière inter.',
-          field: row => moment(row.lastEvent.startDate).format('DD/MM/YYYY'),
+          field: row => get(row, 'lastEvent.startDate') || '',
+          format: formatDate,
         },
       ],
       fundingsMonitoring: [],
@@ -167,24 +174,28 @@ export default {
           name: 'prevMonthCareHours',
           align: 'center',
           label: 'Mois dernier',
-          field: row => (row.prevMonthCareHours === -1 ? 'N/A' : formatHours(row.prevMonthCareHours, 1)),
+          field: 'prevMonthCareHours',
+          format: value => (value === -1 ? 'N/A' : formatHours(value, 1)),
         },
         {
           name: 'currentMonthCareHours',
           align: 'center',
           label: 'Mois en cours',
-          field: row => formatHours(row.currentMonthCareHours, 1),
+          field: 'currentMonthCareHours',
+          format: value => formatHours(value, 1),
         },
       ],
       situationOptions: SITUATION_OPTIONS,
     };
   },
-  validations: {
-    customer: {
-      contact: {
-        phone: { frPhoneNumber },
+  validations () {
+    return {
+      customer: {
+        contact: {
+          phone: { frPhoneNumber },
+        },
       },
-    },
+    };
   },
   computed: {
     ...mapState('customer', ['customer']),

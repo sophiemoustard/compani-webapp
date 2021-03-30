@@ -27,4 +27,10 @@ export default {
   async removeCategory (programId, categoryId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/programs/${programId}/categories/${categoryId}`);
   },
+  async addTester (programId, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/programs/${programId}/testers`, payload);
+  },
+  async removeTester (programId, testerId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/programs/${programId}/testers/${testerId}`);
+  },
 };

@@ -71,10 +71,10 @@ export default {
         this.disableSubProgram = false;
         this.subProgramOptions = formatAndSortOptions(selectedProgram.subPrograms, 'name');
 
-        if (this.subProgramOptions.length === 1) this.newCourse.subProgram = this.subProgramOptions[0].value;
+        if (this.subProgramOptions.length === 1) this.update(this.subProgramOptions[0].value, 'subProgram');
       } else {
         this.subProgramOptions = [];
-        this.newCourse.subProgram = '';
+        this.update('', 'subProgram');
         this.disableSubProgram = true;
       }
     },

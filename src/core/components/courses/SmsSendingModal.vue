@@ -4,7 +4,7 @@
         Envoyer un <span class="text-weight-bold">message</span>
       </template>
       <ni-select in-modal caption="Modèle" :options="filteredMessageTypeOptions" :value="newSms.type"
-        required-field @input="updateType" />
+        required-field @input="updateType($event)" />
       <ni-input in-modal caption="Message" :value="newSms.content" @input="update($event, 'content')" type="textarea"
         :rows="7" required-field />
       <template slot="footer">
@@ -43,8 +43,9 @@ export default {
     input (event) {
       this.$emit('input', event);
     },
-    updateType () {
-      this.$emit('update-type', this.newSms.type);
+    updateType (event) {
+      this.$emit('update-type', event);
+      this.update(event, 'type');
     },
     send () {
       this.$emit('send', this.newSms);

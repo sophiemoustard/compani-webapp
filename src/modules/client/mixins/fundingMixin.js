@@ -1,8 +1,8 @@
 import capitalize from 'lodash/capitalize';
 import { days } from '@data/days';
 import { FUNDING_FREQ_OPTIONS, NATURE_OPTIONS } from '@data/constants';
-import { getLastVersion } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { getLastVersion, formatPrice, formatHours } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 
 export const fundingMixin = {
   data () {
@@ -15,7 +15,7 @@ export const fundingMixin = {
           name: 'startDate',
           label: 'Date de début de prise en charge',
           align: 'left',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
+          format: formatDate,
           field: 'startDate',
         },
         {
@@ -35,45 +35,22 @@ export const fundingMixin = {
           },
           field: 'nature',
         },
-        {
-          name: 'folderNumber',
-          label: 'Numéro de dossier',
-          align: 'left',
-          field: 'folderNumber',
-        },
+        { name: 'folderNumber', label: 'Numéro de dossier', align: 'left', field: 'folderNumber' },
         {
           name: 'endDate',
           label: 'Date de fin de prise en charge',
           align: 'left',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : '∞'),
+          format: value => formatDate(value) || '∞',
           field: 'endDate',
         },
-        {
-          name: 'frequency',
-          label: 'Fréquence',
-          align: 'left',
-          format: value => this.frequencyFormat(value),
-          field: 'frequency',
-        },
-        {
-          name: 'amountTTC',
-          label: 'Montant forfaitaire TTC',
-          align: 'left',
-          format: value => (value ? `${value}€` : ''),
-          field: 'amountTTC',
-        },
-        {
-          name: 'unitTTCRate',
-          label: 'Prix unitaire TTC',
-          align: 'left',
-          format: value => (value ? `${value}€` : ''),
-          field: 'unitTTCRate',
-        },
+        { name: 'frequency', label: 'Fréquence', align: 'left', format: this.frequencyFormat, field: 'frequency' },
+        { name: 'amountTTC', label: 'Montant forfaitaire TTC', align: 'left', format: formatPrice, field: 'amountTTC' },
+        { name: 'unitTTCRate', label: 'Prix unitaire TTC', align: 'left', format: formatPrice, field: 'unitTTCRate' },
         {
           name: 'careHours',
           label: 'Nb. heures de prise en charge',
           align: 'left',
-          format: value => (value ? `${value}h` : ''),
+          format: formatHours,
           field: 'careHours',
         },
         {
@@ -97,18 +74,8 @@ export const fundingMixin = {
           format: value => (value ? value.service.name : ''),
           field: 'subscription',
         },
-        {
-          name: 'createdAt',
-          label: '',
-          align: 'left',
-          field: 'createdAt',
-        },
-        {
-          name: 'actions',
-          label: '',
-          align: 'left',
-          field: '_id',
-        },
+        { name: 'createdAt', label: '', align: 'left', field: 'createdAt' },
+        { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
     };
   },

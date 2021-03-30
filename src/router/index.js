@@ -1,9 +1,8 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueMeta from 'vue-meta';
-import { Cookies } from 'quasar';
 import pick from 'lodash/pick';
-import { refreshAlenviCookies } from '@helpers/alenvi';
+import { refreshState } from '@helpers/alenvi';
 import { defineAbilitiesFor } from '@helpers/ability';
 import routes from 'src/router/routes';
 import { logOutAndRedirectToLogin } from 'src/router/redirect';
@@ -24,37 +23,18 @@ const Router = new VueRouter({
 
 Router.beforeEach(async (to, from, next) => {
   if (to.meta.cookies) {
-    if (!Cookies.get('user_id')) {
-      const refresh = await refreshAlenviCookies();
-      if (refresh) {
-        if (store.state.main.refreshState) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
+    let loggedUser = store.getters['main/getLoggedUser'];
+    if (!loggedUser) {
+      const refresh = await refreshState();
+      if (!refresh) return logOutAndRedirectToLogin({ to });
 
-        const loggedUser = store.getters['main/getLoggedUser'];
-        if (!loggedUser) return logOutAndRedirectToLogin({ to });
-
-        const ability = defineAbilitiesFor(pick(loggedUser, ['role', 'company']));
-        if (!ability.can('read', to.name)) next('/404');
-        else {
-          store.dispatch('main/setRefreshState', false);
-          next();
-        }
-      } else return logOutAndRedirectToLogin({ to });
-    } else {
-      if (store.state.main.refreshState) await store.dispatch('main/fetchLoggedUser', Cookies.get('user_id'));
-
-      const loggedUser = store.getters['main/getLoggedUser'];
-      if (!loggedUser) return logOutAndRedirectToLogin({ to });
-
-      const ability = defineAbilitiesFor(pick(loggedUser, ['role', 'company']));
-      if (!ability.can('read', to.name)) next('/404');
-      else {
-        store.dispatch('main/setRefreshState', false);
-        next();
-      }
+      loggedUser = store.getters['main/getLoggedUser'];
     }
-  } else {
-    next();
-  }
+
+    const ability = defineAbilitiesFor(pick(loggedUser, ['role', 'company']));
+    if (!ability.can('read', to.name)) next('/404');
+    else next();
+  } else next();
 });
 
 export default Router;

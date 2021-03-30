@@ -20,4 +20,7 @@ export default {
     const payment = await alenviAxios.put(`${process.env.API_HOSTNAME}/payments/${id}`, data);
     return payment.data.data.payment;
   },
+  async remove (id) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/payments/${id}`);
+  },
 };

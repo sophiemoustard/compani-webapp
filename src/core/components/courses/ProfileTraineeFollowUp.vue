@@ -13,7 +13,8 @@
                 <div class="row no-wrap table-actions justify-end">
                   <ni-button icon="file_download" color="primary" type="a" target="_blank"
                     :href="props.row.file.link" />
-                  <ni-button icon="delete" color="primary" @click="validateAttendanceSheetDeletion(props.row)" />
+                  <ni-button v-if="canUpdateAttendance" icon="delete" color="primary"
+                    @click="validateAttendanceSheetDeletion(props.row)" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -22,29 +23,11 @@
         </template>
       </ni-simple-table>
       <div class="flex justify-end">
-        <ni-button class="bg-primary" color="white" icon="add" label="Ajouter une feuille d'émargement"
-          @click="attendanceSheetAdditionModal = true" />
+        <ni-button v-if="canUpdateAttendance" class="bg-primary" color="white" icon="add"
+          label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
     <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" is-blended />
-    <div v-if="questionnaireActivities.length" class="q-my-xl">
-      <p class="text-weight-bold">Réponses aux questionnaires</p>
-      <div class="questionnaire-container">
-        <q-card v-for="activity in questionnaireActivities" @click="goToQuestionnaireAnswers(activity)"
-         :key="activity._id" flat class="cursor-pointer">
-          <div class="q-pa-sm questionnaire-activity q-mb-md">
-            <div class="q-mb-sm text-grey-800 ellipsis-2-lines two-lines">
-              Étape {{ activity.stepIndex + 1 }} - {{ upperCaseFirstLetter(activity.stepName) }}
-            </div>
-            <div class="ellipsis-2-lines two-lines">{{ upperCaseFirstLetter(activity.name) }}</div>
-          </div>
-          <q-separator />
-          <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-100 answers">
-            {{ formatQuantity('réponse', new Set(activity.activityHistories.map(aH => aH.user)).size) }}
-          </div>
-        </q-card>
-      </div>
-    </div>
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
       @submit="addAttendanceSheet" :new-attendance-sheet.sync="newAttendanceSheet" :validations="$v.newAttendanceSheet"
@@ -54,6 +37,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import pick from 'lodash/pick';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
@@ -62,9 +46,10 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, QUESTIONNAIRE } from '@data/constants';
-import moment from '@helpers/moment';
+import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
+import { defineAbilitiesFor } from '@helpers/ability';
 import { traineeFollowUpTableMixin } from '@mixins/traineeFollowUpTableMixin';
 
 export default {
@@ -91,13 +76,7 @@ export default {
       OPEN_QUESTION,
       QUESTION_ANSWER,
       columns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
@@ -129,15 +108,14 @@ export default {
     await this.refreshAttendanceSheets();
   },
   computed: {
-    ...mapState('course', ['course']),
+    ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),
     visibleColumns () {
       return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
     },
-    questionnaireActivities () {
-      return this.course.subProgram.steps.map((step, stepIndex) => step.activities
-        .filter(activity => activity.type === QUESTIONNAIRE)
-        .map(activity => ({ ...activity, stepIndex, stepName: step.name })))
-        .flat();
+    canUpdateAttendance () {
+      const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
+
+      return ability.can('update', 'course_trainee_follow_up');
     },
   },
   methods: {
@@ -168,6 +146,8 @@ export default {
     },
     async addAttendanceSheet () {
       try {
+        if (!this.canUpdateAttendance) return NotifyNegative('Impossible d\'ajouter une feuille d\'emargement.');
+
         this.$v.newAttendanceSheet.$touch();
         if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
         this.modalLoading = true;
@@ -185,6 +165,8 @@ export default {
       }
     },
     validateAttendanceSheetDeletion (attendanceSheet) {
+      if (!this.canUpdateAttendance) return NotifyNegative('Impossible de supprimer la feuille d\'emargement.');
+
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Êtes-vous sûr(e) de vouloir supprimer cette feuille d\'émargement ?',
@@ -207,14 +189,6 @@ export default {
         this.$q.loading.hide();
       }
     },
-    goToQuestionnaireAnswers (activity) {
-      return this.$router.push(
-        {
-          name: 'ni management questionnaire answers',
-          params: { courseId: this.profileId, activityId: activity._id },
-        }
-      );
-    },
   },
 };
 </script>
@@ -223,17 +197,4 @@ export default {
   border-radius: 10px !important
   width: 100px
 
-.questionnaire-container
-  display: grid
-  grid-auto-flow: row
-  grid-auto-rows: 1fr
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr))
-  grid-gap: 16px
-
-.questionnaire-activity
-  flex: 1
-
-.two-lines
-  height: 48px
-  overflow: hidden
 </style>

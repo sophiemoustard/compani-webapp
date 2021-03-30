@@ -98,6 +98,7 @@ import CourseInfoLink from '@components/courses/CourseInfoLink';
 import BiColorButton from '@components/BiColorButton';
 import { CONVOCATION, REMINDER, REQUIRED_LABEL } from '@data/constants';
 import { formatQuantity, formatIdentity } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { openPdf, downloadZip } from '@helpers/file';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
@@ -132,13 +133,7 @@ export default {
       smsSent: [],
       smsSentColumns: [
         { name: 'type', label: 'Type', align: 'left', field: 'type', format: this.getType },
-        {
-          name: 'date',
-          label: 'Date d\'envoi',
-          align: 'left',
-          field: 'date',
-          format: value => moment(value).format('DD/MM/YYYY'),
-        },
+        { name: 'date', label: 'Date d\'envoi', align: 'left', field: 'date', format: formatDate },
         {
           name: 'sender',
           label: 'Expéditeur',

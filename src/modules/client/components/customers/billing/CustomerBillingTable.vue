@@ -48,9 +48,11 @@
               </q-item-section>
             </q-item>
           </template>
-          <template v-else-if="col.name === 'actions'">
-            <q-btn v-if="displayActions && paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
+          <template v-else-if="col.name === 'actions' && displayActions">
+            <q-btn v-if="paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
               @click="openEditionModal(props.row)" />
+            <q-btn v-if="REFUND === props.row.nature" flat dense color="grey" icon="delete"
+              @click="deleteRefund(props.row)" />
           </template>
           <template v-else>{{ col.value }}</template>
         </q-td>
@@ -88,8 +90,8 @@ import {
   PAYMENT,
   COMPANI,
 } from '@data/constants';
-import moment from '@helpers/moment';
 import { formatPrice } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { openPdf } from '@helpers/file';
 
 export default {
@@ -111,21 +113,16 @@ export default {
       CREDIT_NOTE,
       BILL,
       COMPANI,
+      REFUND,
       columns: [
-        {
-          name: 'date',
-          label: 'Date',
-          align: 'left',
-          field: 'date',
-          format: value => (value ? moment(value).format('DD/MM/YYYY') : ''),
-        },
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         { name: 'document', label: '', align: 'left' },
         {
           name: 'inclTaxes',
           label: 'Montant TTC',
           align: 'center',
           field: row => this.getInclTaxes(row),
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
         {
           name: 'balance',
@@ -133,9 +130,9 @@ export default {
           align: 'center',
           field: 'balance',
           style: 'width: 100px',
-          format: value => formatPrice(value),
+          format: formatPrice,
         },
-        { name: 'actions', label: '', align: 'center' },
+        { name: 'actions', label: '', align: 'left', style: 'width: 100px' },
       ],
       pagination: { rowsPerPage: 0 },
       paymentTypes: PAYMENT_OPTIONS.map(op => op.value),
@@ -161,7 +158,7 @@ export default {
       return `${titlePrefix}${typeLabel}`;
     },
     formatDate (value) {
-      return value ? `${moment(value).format('DD/MM/YY')}` : '';
+      return formatDate(value);
     },
     formatPrice (value) {
       return formatPrice(value);
@@ -218,6 +215,9 @@ export default {
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');
       }
     },
+    deleteRefund (refund) {
+      this.$emit('delete', refund);
+    },
   },
 };
 </script>
@@ -228,9 +228,6 @@ export default {
 
   .q-table tbody tr:hover
     background: none;
-
-  .q-btn
-    height: 100%;
 
   .download
     cursor: pointer;

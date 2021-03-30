@@ -283,6 +283,11 @@ export default {
         NotifyPositive('Contrat créé');
       } catch (e) {
         console.error(e);
+        if (e.status === 422) {
+          this.$v.newContract.$reset();
+          return NotifyNegative(`Impossible de créer ce contrat : il est en conflit avec les évènements ou autres
+            contrats de l'auxiliaire.`);
+        }
         NotifyNegative('Erreur lors de la création du contrat.');
       } finally {
         this.loading = false;

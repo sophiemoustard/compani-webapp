@@ -10,7 +10,7 @@
         Tu pourras modifier et rajouter des règles d’accès par la suite.
       </span>
       <ni-select class="select" in-modal v-model="accessCompany" required-field caption="Structure"
-        :options="companyOptions" />
+        :options="companyOptions" :error="$v.accessCompany.$error" />
     </template>
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Publier avec cette règle d'accès" color="primary"
@@ -20,9 +20,11 @@
 </template>
 
 <script>
+import { requiredIf } from 'vuelidate/lib/validators';
 import Modal from '@components/modal/Modal';
 import OptionGroup from '@components/form/OptionGroup';
 import Select from '@components/form/Select';
+import { NotifyWarning } from '@components/popup/notify';
 import { FREE_ACCESS, RESTRICTED_ACCESS, ACCESS_OPTIONS } from '@data/constants';
 
 export default {
@@ -42,23 +44,29 @@ export default {
       access: FREE_ACCESS,
       RESTRICTED_ACCESS,
       ACCESS_OPTIONS,
-      accessCompany: null,
+      accessCompany: '',
     };
+  },
+  validations () {
+    return { accessCompany: { required: requiredIf(() => this.access === RESTRICTED_ACCESS) } };
   },
   methods: {
     hide () {
       this.access = FREE_ACCESS;
-      this.accessCompany = null;
+      this.accessCompany = '';
       this.$emit('hide');
     },
     input (event) {
       this.$emit('input', event);
     },
     submit () {
+      this.$v.accessCompany.$touch();
+      if (this.$v.accessCompany.$error) return NotifyWarning('Champ(s) invalide(s)');
+
       this.$emit('submit', this.accessCompany);
     },
     resetAccess () {
-      this.accessCompany = null;
+      this.accessCompany = '';
     },
   },
 };

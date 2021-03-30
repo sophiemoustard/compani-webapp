@@ -118,7 +118,7 @@ export default {
           align: 'left',
           sortable: true,
           format: value => ((value === BLENDED) ? 'Mixte' : 'ELearning'),
-          sort: (a, b) => sortStrings(a, b),
+          sort: sortStrings,
         },
         {
           name: 'progress',

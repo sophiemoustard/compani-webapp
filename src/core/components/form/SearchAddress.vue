@@ -4,15 +4,14 @@
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
-    <q-field dense :error="error" :error-message="errorMessage" borderless>
       <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
         input-debounce="500" :options="options" :class="{ 'borders': inModal }" :disable="disable" behavior="menu"
-        @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color">
+        @filter="searchAddress" @blur="blurEvent" @focus="focusEvent" :bg-color="color" :error="error"
+        :error-message="errorMessage">
         <template v-if="value.fullAddress && !disable" #append>
           <ni-button icon="close" @click.stop="resetValue" size="sm" />
         </template>
       </q-select>
-    </q-field>
   </div>
 </template>
 
@@ -82,8 +81,6 @@ export default {
 <style lang="stylus" scoped>
   /deep/ .q-select
     width: 100%
-
-  /deep/ .q-field__append
     .q-select__dropdown-icon
       display: none
     .q-spinner

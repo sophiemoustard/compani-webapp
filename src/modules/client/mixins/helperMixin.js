@@ -10,7 +10,7 @@ import Email from '@api/Email';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
-import moment from '@helpers/moment';
+import { formatDate, ascendingSort } from '@helpers/date';
 
 export const helperMixin = {
   data () {
@@ -37,15 +37,15 @@ export const helperMixin = {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: value => formatPhone(value),
+          format: formatPhone,
         },
         {
           name: 'startDate',
           label: 'Depuis le...',
           field: 'createdAt',
           align: 'left',
-          format: value => moment(value).format('DD/MM/YYYY'),
-          sort: (a, b) => (moment(a).toDate()) - (moment(b).toDate()),
+          format: formatDate,
+          sort: ascendingSort,
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
@@ -58,12 +58,6 @@ export const helperMixin = {
     sortedHelpers () {
       return [...this.helpers]
         .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
-    },
-    acceptedByHelper () {
-      if (this.lastSubscriptionHistory && this.customer.subscriptionsAccepted) {
-        const approvalDate = moment(this.lastSubscriptionHistory.approvalDate).format('DD/MM/YYYY');
-        return `le ${approvalDate} par ${this.acceptedBy}`;
-      }
     },
   },
   methods: {
