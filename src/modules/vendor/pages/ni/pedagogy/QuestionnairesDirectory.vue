@@ -8,7 +8,7 @@
 import TitleHeader from '@components/TitleHeader';
 
 export default {
-  metaInfo: { title: 'Catégories' },
+  metaInfo: { title: 'Questionnaires' },
   name: 'QuestionnairesDirectory',
   components: {
     'ni-title-header': TitleHeader,
