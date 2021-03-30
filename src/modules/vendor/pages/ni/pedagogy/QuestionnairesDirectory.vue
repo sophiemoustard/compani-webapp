@@ -1,6 +1,6 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Questionnaires" class="row q-mb-xl" />
+    <ni-title-header title="Questionnaires" class="q-mb-xl" />
   </q-page>
 </template>
 
