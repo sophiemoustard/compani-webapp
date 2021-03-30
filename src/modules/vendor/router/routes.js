@@ -243,6 +243,15 @@ const routes = [
           parent: 'pedagogy',
         },
       },
+      {
+        path: 'ni/pedagogy/questionnaires',
+        name: 'ni pedagogy questionnaires',
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/QuestionnairesDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'pedagogy',
+        },
+      },
     ],
   },
 ];
