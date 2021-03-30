@@ -34,7 +34,7 @@ export const menuItemsMixin = {
           children: [
             { name: 'ni pedagogy programs', icon: 'view_headline', label: 'Catalogue' },
             { name: 'ni pedagogy categories', icon: 'category', label: 'Catégories' },
-            { name: 'ni pedagogy questionnaires', icon: 'help', label: 'Questionnaires' },
+            { name: 'ni pedagogy questionnaires', icon: 'assessment', label: 'Questionnaires' },
           ],
         },
       ],
