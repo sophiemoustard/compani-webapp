@@ -13,7 +13,7 @@
         </div>
       </div>
       <div class="title">{{ questionnaire.title }}</div>
-      <div class="delimiter" />
+      <q-separator />
     </q-card-section>
   </q-card>
 </template>
@@ -47,6 +47,4 @@ export default {
     color: $green-800;
   .title
     margin 16px 0px;
-  .delimiter
-    border-bottom 1px solid $grey-100;
   </style>

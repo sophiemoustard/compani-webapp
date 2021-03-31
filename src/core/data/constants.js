@@ -444,5 +444,5 @@ export const WEBAPP = 'webapp';
 export const TRAINEE = 'trainee';
 
 // QUESTIONNAIRE TYPES
-export const EXPECTATIONS_COLLECTION = 'expectations_collection';
-export const QUESTIONNAIRE_TYPES = [{ label: 'Recueil des attentes', value: EXPECTATIONS_COLLECTION }];
+export const EXPECTATIONS = 'expectations';
+export const QUESTIONNAIRE_TYPES = [{ label: 'Recueil des attentes', value: EXPECTATIONS }];
