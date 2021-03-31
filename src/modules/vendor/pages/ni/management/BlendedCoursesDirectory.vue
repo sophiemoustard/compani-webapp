@@ -20,7 +20,7 @@
 
     <ni-trello :courses="coursesFiltered" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
-      @click="courseCreationModal = true" />
+      @click="openCourseCreationModal" />
 
     <!-- Course creation modal -->
     <course-creation-modal v-model="courseCreationModal" :new-course.sync="newCourse" :is-intra-course="isIntraCourse"
@@ -156,6 +156,10 @@ export default {
       } finally {
         this.modalLoading = false;
       }
+    },
+    openCourseCreationModal () {
+      this.newCourse = { ...this.newCourse, salesRepresentative: this.loggedUser._id };
+      this.courseCreationModal = true;
     },
   },
   beforeDestroy () {
