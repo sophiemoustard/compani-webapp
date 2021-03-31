@@ -49,7 +49,7 @@ import {
   TRAINING_ORGANISATION_MANAGER,
   TRAINER,
 } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
 import BiColorButton from '@components/BiColorButton';
@@ -164,7 +164,7 @@ export default {
     async refreshTrainers () {
       try {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }));
+        this.trainerOptions = formatAndSortIdentityOptions(trainers);
       } catch (e) {
         console.error(e);
       }

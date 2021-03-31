@@ -44,7 +44,7 @@ import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
-import { formatAndSortOptions, formatIdentity } from '@helpers/utils';
+import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -128,8 +128,7 @@ export default {
     async refreshSalesRepresentatives () {
       try {
         const salesRepresentative = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.salesRepresentativeOptions = salesRepresentative
-          .map(user => ({ label: formatIdentity(user.identity, 'FL'), value: user._id }));
+        this.salesRepresentativeOptions = formatAndSortIdentityOptions(salesRepresentative);
       } catch (e) {
         console.error(e);
         this.salesRepresentativeOptions = [];

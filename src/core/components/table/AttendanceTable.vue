@@ -70,7 +70,7 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { DEFAULT_AVATAR, INTRA, INTER_B2B } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
-import { upperCaseFirstLetter, formatIdentity } from '@helpers/utils';
+import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
 import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
@@ -164,12 +164,7 @@ export default {
       }, []);
     },
     traineeFilterOptions () {
-      const formattedTrainees = this.potentialTrainees
-        .map(trainee => ({
-          label: formatIdentity(trainee.identity, 'FL'),
-          value: trainee._id,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      const formattedTrainees = formatAndSortIdentityOptions(this.potentialTrainees);
 
       return formattedTrainees.filter(trainee => !this.trainees.map(t => t._id).includes(trainee.value));
     },
