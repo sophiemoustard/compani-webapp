@@ -5,7 +5,7 @@
       <div class="text-weight-bold q-mb-md">{{ type.label }}</div>
       <div class="row">
         <questionnaire-cell v-for="(questionnaire, index) in questionnaires[type.value]" :key="questionnaire.title"
-          :index="questionnaires[type.value].length - index" :questionnaire="questionnaire" class="q-mr-md" />
+          :index="questionnaires[type.value].length - index" :questionnaire="questionnaire" class="q-mr-md q-mb-md" />
       </div>
     </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un questionnaire"
