@@ -5,6 +5,9 @@
       </template>
       <ni-option-group :value="newCourse.type" @input="updateType($event)" type="radio" :options="courseTypes"
         caption="Type" required-field inline :error="validations.type.$error" />
+      <ni-select in-modal :value="newCourse.salesRepresentative" @input="update($event, 'salesRepresentative')"
+        @blur="validations.salesRepresentative.$touch" :error="validations.salesRepresentative.$error" required-field
+        caption="Référent Compani" :options="salesRepresentativeOptions" />
       <ni-select in-modal :value="newCourse.program" @input="update($event, 'program')" :options="programOptions"
         @blur="validations.program.$touch" required-field caption="Programme" :error="validations.program.$error" />
       <ni-select in-modal :value="newCourse.subProgram" @input="update($event, 'subProgram')"

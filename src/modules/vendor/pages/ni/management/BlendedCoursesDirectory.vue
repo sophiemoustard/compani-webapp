@@ -64,6 +64,7 @@ export default {
         company: '',
         misc: '',
         type: INTRA,
+        salesRepresentative: '',
       },
       programs: [],
       courseCreationModal: false,
@@ -78,6 +79,7 @@ export default {
         subProgram: { required },
         company: { required: requiredIf(item => item.type === INTRA) },
         type: { required },
+        salesRepresentative: { required },
       },
     };
   },
