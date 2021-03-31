@@ -43,6 +43,7 @@ export default {
     newCourse: { type: Object, default: () => ({}) },
     programs: { type: Array, default: () => [] },
     companyOptions: { type: Array, default: () => [] },
+    salesRepresentativeOptions: { type: Array, default: () => [] },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
