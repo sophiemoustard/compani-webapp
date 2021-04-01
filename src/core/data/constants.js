@@ -386,12 +386,6 @@ export const CARD_TEMPLATES = [
   { label: 'Question\t&\tRéponse', value: QUESTION_ANSWER, type: QUESTIONNAIRE },
 ];
 
-export const TEMPLATE_TYPES = {
-  [LESSON]: 'Cours',
-  [QUIZ]: 'Quiz',
-  [QUESTIONNAIRE]: 'Questionnaire',
-};
-
 export const SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT = 3;
 export const SINGLE_CHOICE_QUESTION_MIN_FALSY_ANSWERS_COUNT = 1;
 export const MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT = 4;
@@ -442,3 +436,8 @@ export const WEBAPP = 'webapp';
 
 // Email
 export const TRAINEE = 'trainee';
+
+// QUESTIONNAIRE TYPES
+export const EXPECTATIONS = 'expectations';
+export const DRAFT = 'draft';
+export const QUESTIONNAIRE_TYPES = { [EXPECTATIONS]: 'Recueil des attentes' };
