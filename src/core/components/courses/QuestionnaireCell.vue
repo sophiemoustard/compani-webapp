@@ -3,7 +3,7 @@
     <q-card-section>
       <div class="row justify-between">
         <div class="version">Version {{ index }}</div>
-        <div v-if="questionnaire.status === 'draft'" class="draft">
+        <div v-if="questionnaire.status === DRAFT" class="draft">
           <q-icon size="12px" name="edit" color="orange-500" />
           Brouillon
         </div>
@@ -19,12 +19,18 @@
 </template>
 
 <script>
+import { DRAFT } from '@data/constants';
 
 export default {
   name: 'QuestionnaireCell',
   props: {
     questionnaire: { type: Object, required: true },
     index: { type: Number, required: true },
+  },
+  data () {
+    return {
+      DRAFT,
+    };
   },
 };
 </script>

@@ -28,6 +28,7 @@ import QuestionnaireCell from '@components/courses/QuestionnaireCell';
 import QuestionnaireCreationModal from 'src/modules/vendor/components/programs/QuestionnaireCreationModal';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { QUESTIONNAIRE_TYPES } from '@data/constants';
+import { descendingSort } from '@helpers/date';
 
 export default {
   metaInfo: { title: 'Questionnaires' },
@@ -59,16 +60,19 @@ export default {
     async refreshQuestionnaires () {
       try {
         this.loading = true;
-        const questionnaires = (await Questionnaires.list())
-          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const questionnaires = await Questionnaires.list();
 
-        const questionnairesByType = groupBy(questionnaires, q => q.type);
+        const questionnairesByType = groupBy(
+          questionnaires.sort((a, b) => descendingSort(a.createdAt, b.createdAt)),
+          q => q.type
+        );
 
         this.questionnaires = QUESTIONNAIRE_TYPES
           .map(q => ({ type: q, questionnairesList: questionnairesByType[q.value] }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
+        this.questionnaires = [];
       } finally {
         this.loading = false;
       }
@@ -83,7 +87,7 @@ export default {
         if (this.$v.newQuestionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.modalLoading = true;
-        await Questionnaires.create({ title: this.newQuestionnaire.title, type: this.newQuestionnaire.type });
+        await Questionnaires.create(this.newQuestionnaire);
 
         this.questionnaireCreationModal = false;
         NotifyPositive('Questionnaire créé.');
