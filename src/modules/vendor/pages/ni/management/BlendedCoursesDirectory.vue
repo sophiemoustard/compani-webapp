@@ -71,6 +71,7 @@ export default {
       courseCreationModal: false,
       coursesWithGroupedSlot: [],
       courseTypes: COURSE_TYPES,
+      salesRepresentativeOptions: [],
     };
   },
   validations () {
