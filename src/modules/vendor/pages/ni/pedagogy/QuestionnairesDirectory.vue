@@ -4,9 +4,9 @@
     <div v-for="questionnairesByType in questionnaires" :key="questionnairesByType.type.value">
       <div class="text-weight-bold">{{ questionnairesByType.type.label }}</div>
       <div v-if="questionnairesByType.questionnairesList" class="row">
-        <questionnaire-cell v-for="(questionnaire, index) in questionnairesByType.questionnairesList" :key="index"
-          :index="questionnairesByType.questionnairesList.length - index" :questionnaire="questionnaire"
-          class="q-my-md q-mr-md" />
+        <questionnaire-cell v-for="(questionnaire, index) in questionnairesByType.questionnairesList"
+          :key="questionnaire._id" :index="questionnairesByType.questionnairesList.length - index"
+          :questionnaire="questionnaire" class="q-my-md q-mr-md" />
       </div>
       <div v-else class="text-italic">Aucun questionnaire "{{ questionnairesByType.type.label }}"</div>
     </div>
@@ -79,7 +79,7 @@ export default {
     },
     resetCreationModal () {
       this.$v.newQuestionnaire.$reset();
-      this.newQuestionnaire = { title: '' };
+      this.newQuestionnaire = { title: '', type: '' };
     },
     async createQuestionnaire () {
       try {
