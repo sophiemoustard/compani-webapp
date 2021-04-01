@@ -8,7 +8,7 @@
           :index="questionnairesByType.questionnairesList.length - index" :questionnaire="questionnaire"
           class="q-my-md q-mr-md" />
       </div>
-      <div v-else class="text-italic">Aucun questionnaire {{ questionnairesByType.type.label }}</div>
+      <div v-else class="text-italic">Aucun questionnaire "{{ questionnairesByType.type.label }}"</div>
     </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un questionnaire"
       @click="questionnaireCreationModal = true" :disable="loading" />
