@@ -84,7 +84,7 @@
           </div>
         </div>
       </q-card-section>
-      <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width">
+      <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width column items-end">
         <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
           @click="openAuxiliariesDetails(sector)" />
         <div v-show="displayStats[sector].loadingDetails" class="col-md-12 col-xs-12 spinner-container">
