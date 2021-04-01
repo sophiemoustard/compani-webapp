@@ -1,14 +1,13 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Questionnaires" class="q-mb-xl" />
-    <div v-for="questionnairesByType in questionnaires" :key="questionnairesByType.type.value">
-      <div class="text-weight-bold">{{ questionnairesByType.type.label }}</div>
-      <div v-if="questionnairesByType.questionnairesList" class="row">
-        <questionnaire-cell v-for="(questionnaire, index) in questionnairesByType.questionnairesList"
-          :key="questionnaire._id" :index="questionnairesByType.questionnairesList.length - index"
-          :questionnaire="questionnaire" class="q-my-md q-mr-md" />
+    <div v-for="group in questionnairesByType" :key="group.type">
+      <div class="text-weight-bold">{{ QUESTIONNAIRE_TYPES[group.type] }}</div>
+      <div v-if="group.list" class="row">
+        <questionnaire-cell v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
+          :index="group.list.length - index" :questionnaire="questionnaire" class="q-my-md q-mr-md" />
       </div>
-      <div v-else class="text-italic">Aucun questionnaire "{{ questionnairesByType.type.label }}"</div>
+      <div v-else class="text-italic q-mb-md">Aucun questionnaire "{{ QUESTIONNAIRE_TYPES[group.type] }}"</div>
     </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un questionnaire"
       @click="questionnaireCreationModal = true" :disable="loading" />
@@ -41,11 +40,12 @@ export default {
   data () {
     return {
       loading: false,
-      questionnaires: [],
+      questionnairesByType: [],
       modalLoading: false,
       questionnaireCreationModal: false,
       newQuestionnaire: { title: '', type: '' },
       questionnaireTypes: [],
+      QUESTIONNAIRE_TYPES,
     };
   },
   validations () {
@@ -62,17 +62,17 @@ export default {
         this.loading = true;
         const questionnaires = await Questionnaires.list();
 
-        const questionnairesByType = groupBy(
+        const questionnairesGroups = groupBy(
           questionnaires.sort((a, b) => descendingSort(a.createdAt, b.createdAt)),
           q => q.type
         );
 
-        this.questionnaires = QUESTIONNAIRE_TYPES
-          .map(q => ({ type: q, questionnairesList: questionnairesByType[q.value] }));
+        this.questionnairesByType = Object.keys(QUESTIONNAIRE_TYPES)
+          .map(type => ({ type, list: questionnairesGroups[type] }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
-        this.questionnaires = [];
+        this.questionnairesByType = [];
       } finally {
         this.loading = false;
       }

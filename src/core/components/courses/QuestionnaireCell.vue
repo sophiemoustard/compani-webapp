@@ -37,7 +37,6 @@ export default {
 
 <style lang="stylus" scoped>
   .q-card__section
-    height: fit-content
     width: 184px
     padding: 8px
     &:hover

@@ -446,4 +446,4 @@ export const TRAINEE = 'trainee';
 // QUESTIONNAIRE TYPES
 export const EXPECTATIONS = 'expectations';
 export const DRAFT = 'draft';
-export const QUESTIONNAIRE_TYPES = [{ label: 'Recueil des attentes', value: EXPECTATIONS }];
+export const QUESTIONNAIRE_TYPES = { [EXPECTATIONS]: 'Recueil des attentes' };

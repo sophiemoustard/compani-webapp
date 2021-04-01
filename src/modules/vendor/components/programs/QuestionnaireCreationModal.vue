@@ -30,7 +30,7 @@ export default {
   },
   data () {
     return {
-      typeOptions: QUESTIONNAIRE_TYPES,
+      typeOptions: Object.keys(QUESTIONNAIRE_TYPES).map(type => ({ label: QUESTIONNAIRE_TYPES[type], value: type })),
     };
   },
   components: {
