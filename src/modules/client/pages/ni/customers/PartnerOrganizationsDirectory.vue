@@ -4,7 +4,8 @@
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="partnerOrganizationCreationModal = true" />
 
-    <partner-organization-creation-modal :new-partner-organization="newPartnerOrganization" />
+    <partner-organization-creation-modal :value="partnerOrganizationCreationModal"
+      :new-partner-organization="newPartnerOrganization" />
   </q-page>
 </template>
 <script>
@@ -20,6 +21,7 @@ export default {
   },
   data () {
     return {
+      partnerOrganizationCreationModal: false,
       newPartnerOrganization: { name: '', phone: '', address: '', email: '' },
     };
   },

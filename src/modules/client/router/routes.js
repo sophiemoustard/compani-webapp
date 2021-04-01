@@ -257,8 +257,7 @@ const routes = [
       {
         path: 'ni/customers/partner-organizations',
         name: 'ni customers partner organizations',
-        props: true,
-        component: () => import('src/modules/client/pages/ni/customers/PartnerOrganizationDirectory.vue'),
+        component: () => import('src/modules/client/pages/ni/customers/PartnerOrganizationsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'customers',
