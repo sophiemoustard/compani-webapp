@@ -94,6 +94,7 @@ export default {
         await this.refreshQuestionnaires();
       } catch (e) {
         console.error(e);
+        if (e.status === 403) return NotifyWarning('Il existe déjà un questionnaire en brouillon.');
         NotifyNegative('Erreur lors de la création du questionnaire.');
       } finally {
         this.modalLoading = false;
