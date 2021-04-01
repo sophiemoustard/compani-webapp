@@ -84,7 +84,7 @@
           </div>
         </div>
       </q-card-section>
-      <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width">
+      <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width column items-end">
         <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
           @click="openAuxiliariesDetails(sector)" />
         <div v-show="displayStats[sector].loadingDetails" class="col-md-12 col-xs-12 spinner-container">
@@ -400,9 +400,10 @@ export default {
     &:not(:nth-last-child(-n+2))
       border-bottom: 1px solid $grey-300
     &-container
-      margin: 0 16px
+      padding: 0 16px
+      width: 100%
       @media screen and (max-width: 767px)
-        margin: 0 8px
+        padding: 0 8px
 
 .auxiliary-label
   border-right: 1px solid $grey-300
