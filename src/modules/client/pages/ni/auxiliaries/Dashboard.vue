@@ -84,15 +84,15 @@
           </div>
         </div>
       </q-card-section>
-      <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width column items-end">
+      <q-card-actions v-show="!displayStats[sector].loading" align="right" class="full-width column">
         <q-btn flat no-caps color="primary" :icon="getIcon(sector)" label="Voir le détail par auxiliaire"
-          @click="openAuxiliariesDetails(sector)" />
+          @click="openAuxiliariesDetails(sector)" class="self-end" />
         <div v-show="displayStats[sector].loadingDetails" class="col-md-12 col-xs-12 spinner-container">
           <q-spinner-facebook size="25px" color="primary" />
         </div>
         <q-slide-transition>
           <div v-show="displayStats[sector].openedDetails && !displayStats[sector].loadingDetails"
-            class="auxiliary-cell-container row">
+            class="auxiliary-cell-container row self-start">
             <div v-for="auxiliary in auxiliariesStats[sector]" :key="`${sector}-${auxiliary._id}`"
               class="col-md-6 col-xs-12 auxiliary-cell q-mb-lg">
               <div class="row person-name q-mb-md">
