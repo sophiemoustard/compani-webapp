@@ -209,7 +209,7 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newCustomer);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = pickBy(this.newCustomer);
+        const payload = pickBy(this.newCustomer); // à quoi ça sert ?
         await Customers.create(payload);
 
         await this.getCustomers();

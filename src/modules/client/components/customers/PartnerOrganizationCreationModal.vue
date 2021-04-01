@@ -7,8 +7,7 @@
       required-field />
     <ni-input in-modal caption="Téléphone" :value="newPartnerOrganization.phone"
       @input="update($event.trim(), 'phone')" />
-    <ni-search-address in-modal required-field :value="newPartnerOrganization.address"
-      @input="update($event, 'address')" />
+    <ni-search-address in-modal :value="newPartnerOrganization.address" @input="update($event, 'address')" />
     <div class="row margin-input last">
       <ni-input in-modal caption="Email" :value="newPartnerOrganization.email"
         @input="update($event.trim(), 'email')" />
@@ -31,6 +30,7 @@ export default {
   props: {
     value: { type: Boolean, default: false },
     newPartnerOrganization: { type: Object, default: () => ({}) },
+    loading: { type: Boolean, default: false },
   },
   components: {
     'ni-search-address': SearchAddress,
