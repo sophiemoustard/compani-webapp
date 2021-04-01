@@ -245,19 +245,19 @@ const routes = [
         },
       },
       {
-        path: 'ni/customers/:customerId',
-        name: 'ni customers info',
-        props: true,
-        component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),
+        path: 'ni/customers/partner-organizations',
+        name: 'ni customers partner organizations',
+        component: () => import('src/modules/client/pages/ni/customers/PartnerOrganizationsDirectory'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'customers',
         },
       },
-      {
-        path: 'ni/customers/partner-organizations',
-        name: 'ni customers partner organizations',
-        component: () => import('src/modules/client/pages/ni/customers/PartnerOrganizationsDirectory'),
+      { // must be last of ni/customers/... routes
+        path: 'ni/customers/:customerId',
+        name: 'ni customers info',
+        props: true,
+        component: () => import('src/modules/client/pages/ni/customers/CustomerProfile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'customers',
