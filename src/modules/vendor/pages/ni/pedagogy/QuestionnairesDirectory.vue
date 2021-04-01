@@ -2,11 +2,13 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Questionnaires" class="q-mb-xl" />
     <div v-for="questionnairesByType in questionnaires" :key="questionnairesByType.type.value">
-      <div class="text-weight-bold q-mb-md">{{ questionnairesByType.type.label }}</div>
-      <div class="row">
-        <questionnaire-cell v-for="(questionnaire, index) in questionnairesByType.list" :key="index"
-          :index="questionnairesByType.list.length - index" :questionnaire="questionnaire" class="q-mr-md q-mb-md" />
+      <div class="text-weight-bold">{{ questionnairesByType.type.label }}</div>
+      <div v-if="questionnairesByType.questionnairesList" class="row">
+        <questionnaire-cell v-for="(questionnaire, index) in questionnairesByType.questionnairesList" :key="index"
+          :index="questionnairesByType.questionnairesList.length - index" :questionnaire="questionnaire"
+          class="q-my-md q-mr-md" />
       </div>
+      <div v-else class="text-italic">Aucun questionnaire {{ questionnairesByType.type.label }}</div>
     </div>
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Créer un questionnaire"
       @click="questionnaireCreationModal = true" :disable="loading" />
@@ -57,16 +59,13 @@ export default {
     async refreshQuestionnaires () {
       try {
         this.loading = true;
-        const questionnairesByType = groupBy(
-          (await Questionnaires.list()).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)),
-          q => q.type
-        );
+        const questionnaires = (await Questionnaires.list())
+          .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-        const questionnaireTypes = QUESTIONNAIRE_TYPES
-          .filter(type => Object.keys(questionnairesByType).includes(type.value));
+        const questionnairesByType = groupBy(questionnaires, q => q.type);
 
-        this.questionnaires = questionnaireTypes
-          .map(q => ({ type: q, list: questionnairesByType[q.value] }));
+        this.questionnaires = QUESTIONNAIRE_TYPES
+          .map(q => ({ type: q, questionnairesList: questionnairesByType[q.value] }));
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la récupération des questionnaires.');

@@ -23,8 +23,8 @@
 export default {
   name: 'QuestionnaireCell',
   props: {
-    questionnaire: { type: Object, default: () => ({}) },
-    index: { type: Number, default: () => 1 },
+    questionnaire: { type: Object, required: true },
+    index: { type: Number, required: true },
   },
 };
 </script>
