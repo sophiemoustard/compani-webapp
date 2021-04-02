@@ -1,13 +1,14 @@
 <template>
   <q-page padding class="vendor-background">
     <template v-if="questionnaire">
-      <ni-profile-header :title="questionnaire.title" :header-info="headerInfo" />
+      <ni-profile-header :title="questionnaireTitle" :header-info="headerInfo" />
       <profile-tabs :profile-id="questionnaireId" :tabs-content="tabsContent" />
     </template>
   </q-page>
 </template>
 
 <script>
+import get from 'lodash/get';
 import { mapState } from 'vuex';
 import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
@@ -29,6 +30,7 @@ export default {
       tabsContent: [
         { label: 'Édition', name: 'edition', default: this.defaultTab === 'edition', component: ProfileEdition },
       ],
+      questionnaireTitle: '',
     };
   },
   computed: {
@@ -42,8 +44,14 @@ export default {
       return infos;
     },
   },
+  watch: {
+    questionnaire () {
+      this.questionnaireTitle = get(this.questionnaire, 'title') || '';
+    },
+  },
   async created () {
     await this.refreshQuestionnaire();
+    this.questionnaireTitle = get(this.questionnaire, 'title') || '';
   },
   methods: {
     async refreshQuestionnaire () {
