@@ -122,7 +122,7 @@ import {
   SITUATION_OPTIONS,
 } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { formatIdentity, formatHours } from '@helpers/utils';
+import { formatIdentity, formatHours, formatAndSortIdentityOptions } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
@@ -214,10 +214,7 @@ export default {
       const auxiliariesOptions = [{ label: 'Pas de référent', value: '' }];
       const referentId = get(this.customer, 'referent._id') || null;
       if (this.auxiliaries.length) {
-        auxiliariesOptions.push(...this.auxiliaries.map(aux => ({
-          label: formatIdentity(aux.identity, 'FL'),
-          value: aux._id,
-        })));
+        auxiliariesOptions.push(...formatAndSortIdentityOptions(this.auxiliaries));
       } else if (referentId) {
         const identity = get(this.customer, 'referent.identity') || {};
         auxiliariesOptions.push({ label: formatIdentity(identity, 'FL'), value: referentId });

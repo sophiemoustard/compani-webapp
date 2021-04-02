@@ -36,7 +36,7 @@ import {
   SECTOR,
   DOC_EXTENSIONS,
 } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
 import PlanningModalHeader from 'src/modules/client/components/planning/PlanningModalHeader';
 
@@ -94,7 +94,7 @@ export const planningModalMixin = {
     },
     auxiliariesOptions () {
       if (this.isCustomerPlanning && this.creationModal) {
-        return this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux));
+        return formatAndSortIdentityOptions(this.activeAuxiliaries);
       }
 
       const sectorId = this.newEvent ? this.newEvent.sector : this.editedEvent.sector;
@@ -102,18 +102,18 @@ export const planningModalMixin = {
 
       return [
         { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
-        ...this.activeAuxiliaries.map(aux => this.formatPersonOptions(aux)),
+        ...formatAndSortIdentityOptions(this.activeAuxiliaries),
       ];
     },
     customersOptions () {
       if (this.customers.length === 0) return [];
       if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
-        return this.customers.map(cus => this.formatPersonOptions(cus)); // Unassigned event
+        return formatAndSortIdentityOptions(this.customers); // Unassigned event
       }
 
       if (!this.selectedAuxiliary.contracts) return [];
 
-      return this.customers.map(cus => this.formatPersonOptions(cus));
+      return formatAndSortIdentityOptions(this.customers);
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
@@ -201,12 +201,6 @@ export const planningModalMixin = {
       if (!user || !user._id) return UNKNOWN_AVATAR;
 
       return get(user, 'picture.link') || DEFAULT_AVATAR;
-    },
-    formatPersonOptions (person) {
-      return {
-        label: formatIdentity(person.identity, 'FL'),
-        value: person._id,
-      };
     },
     formatAddressOptions (address) {
       return { label: address.fullAddress, value: address };
