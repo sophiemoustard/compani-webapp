@@ -13,8 +13,9 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
-          <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="salesRepresentative" caption="Référent Compani"
-            :options="salesRepresentativeOptions" />
+          <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="course.salesRepresentative._id"
+            @blur="updateCourse('salesRepresentative')" caption="Référent Compani"
+            :options="salesRepresentativeOptions" :error="$v.course.salesRepresentative.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
             :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
         </div>
@@ -91,6 +92,7 @@ export default {
     return {
       course: {
         trainer: { required },
+        salesRepresentative: { required },
       },
       newTrainee: this.traineeValidations,
       editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
@@ -111,9 +113,6 @@ export default {
       return `Le lien vers la page sera disponible dès que l'équipe aura rentré ${
         this.followUpMissingInfo.length > 1 ? 'les informations manquantes : ' : 'l\'information manquante : '
       }${this.followUpMissingInfo.join(', ')}`;
-    },
-    salesRepresentative () {
-      return this.course.salesRepresentative || '';
     },
   },
   async created () {
@@ -175,8 +174,12 @@ export default {
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = trainers.filter(t => t.role !== trainerRole._id);
 
-        this.trainerOptions = formatAndSortIdentityOptions(trainers);
-        this.salesRepresentativeOptions = formatAndSortIdentityOptions(salesRepresentatives);
+        console.log('ici', this.course);
+        console.log('trainers', this.course.trainer);
+        console.log('salesRepresentatives', this.course.salesRepresentative);
+
+        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(trainers));
+        this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
       } catch (e) {
         console.error(e);
       }
