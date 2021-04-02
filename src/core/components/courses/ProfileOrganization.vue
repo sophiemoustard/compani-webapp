@@ -35,6 +35,7 @@ import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
+import Roles from '@api/Roles';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SlotContainer from '@components/courses/SlotContainer';
@@ -75,6 +76,7 @@ export default {
 
     return {
       trainerOptions: [],
+      salesRepresentativeOptions: [],
       courseLoading: false,
       courseSlotsLoading: false,
       tmpInput: '',
@@ -111,7 +113,7 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    if (this.isAdmin) await this.refreshTrainers();
+    if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
   },
   methods: {
     get,
@@ -161,10 +163,15 @@ export default {
         this.courseLoading = false;
       }
     },
-    async refreshTrainers () {
+    async refreshTrainersAndSalesRepresentatives () {
       try {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+
+        const [trainerRole] = await Roles.list({ name: [TRAINER] });
+        const salesRepresentatives = trainers.filter(t => t.role !== trainerRole._id);
+
         this.trainerOptions = formatAndSortIdentityOptions(trainers);
+        this.salesRepresentativeOptions = formatAndSortIdentityOptions(salesRepresentatives);
       } catch (e) {
         console.error(e);
       }
