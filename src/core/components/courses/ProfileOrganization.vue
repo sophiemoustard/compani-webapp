@@ -13,6 +13,8 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
+          <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="salesRepresentative" caption="Référent Compani"
+            :options="salesRepresentativeOptions" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
             :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
         </div>
@@ -109,6 +111,9 @@ export default {
       return `Le lien vers la page sera disponible dès que l'équipe aura rentré ${
         this.followUpMissingInfo.length > 1 ? 'les informations manquantes : ' : 'l\'information manquante : '
       }${this.followUpMissingInfo.join(', ')}`;
+    },
+    salesRepresentative () {
+      return this.course.salesRepresentative || '';
     },
   },
   async created () {
