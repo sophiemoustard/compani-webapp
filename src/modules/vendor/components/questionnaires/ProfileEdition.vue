@@ -33,7 +33,6 @@ export default {
   },
   computed: {
     ...mapState('questionnaire', ['questionnaire']),
-
   },
   async created () {
     await this.refreshQuestionnaire();
@@ -47,13 +46,14 @@ export default {
       }
     },
     saveTmpTitle () {
-      this.tmpInput = get(this.questionnaire, 'title') || '';
+      this.tmpInput = get(this.questionnaire, 'title', '');
     },
     async updateQuestionnaireTitle () {
       try {
         const title = get(this.questionnaire, 'title');
         if (this.tmpInput === title) return;
         this.$v.questionnaire.$touch();
+
         if (this.$v.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         await Questionnaires.update(this.questionnaire._id, { title });
@@ -62,7 +62,6 @@ export default {
         await this.refreshQuestionnaire();
       } catch (e) {
         console.error(e);
-        if (e.message === 'Champ(s) invalide(s)') return NotifyWarning(e.message);
         NotifyNegative('Erreur lors de la modification du questionnaire.');
       } finally {
         this.tmpInput = null;
