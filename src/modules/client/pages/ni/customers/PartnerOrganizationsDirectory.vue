@@ -47,21 +47,21 @@ export default {
     },
   },
   methods: {
+    formatPayload (payload) {
+      return get(payload, 'address.fullAddress') ? payload : omit(payload, ['address']);
+    },
     async createPartnerOrganization () {
       try {
         this.loading = true;
 
         this.$v.newPartnerOrganization.$touch();
-        if (this.$v.newPartnerOrganization.$error) return NotifyWarning('Champ(s) invalide(s)');
+        if (this.$v.newPartnerOrganization.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        const payload = get(this.newPartnerOrganization, 'address.fullAddress')
-          ? this.newPartnerOrganization
-          : omit(this.newPartnerOrganization, ['address']);
-
+        const payload = this.formatPayload(this.newPartnerOrganization);
         await PartnerOrganization.create(payload);
 
         this.partnerOrganizationCreationModal = false;
-        NotifyPositive('Structure partenaire créée');
+        NotifyPositive('Structure partenaire créée.');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
