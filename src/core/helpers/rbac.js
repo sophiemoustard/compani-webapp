@@ -89,6 +89,7 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni pedagogy programs info' },
   { name: 'ni pedagogy activity info' },
   { name: 'ni pedagogy questionnaires' },
+  { name: 'ni pedagogy questionnaire profile' },
   { name: 'ni management blended courses' },
   { name: 'ni management blended courses info' },
   { name: 'ni management elearning courses' },

@@ -5,7 +5,8 @@
       <div class="text-weight-bold">{{ QUESTIONNAIRE_TYPES[group.type] }}</div>
       <div v-if="group.list" class="row">
         <questionnaire-cell v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
-          :index="group.list.length - index" :questionnaire="questionnaire" class="q-my-md q-mr-md" />
+          :index="group.list.length - index" :questionnaire="questionnaire" class="q-my-md q-mr-md"
+          @click="goToQuestionnaireProfile(questionnaire._id)" />
       </div>
       <div v-else class="text-italic q-mb-md">Aucun questionnaire "{{ QUESTIONNAIRE_TYPES[group.type] }}"</div>
     </div>
@@ -57,6 +58,9 @@ export default {
     await this.refreshQuestionnaires();
   },
   methods: {
+    goToQuestionnaireProfile (questionnaireId) {
+      this.$router.push({ name: 'ni pedagogy questionnaire profile', params: { questionnaireId } });
+    },
     async refreshQuestionnaires () {
       try {
         this.loading = true;

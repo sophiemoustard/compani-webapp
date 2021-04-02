@@ -144,9 +144,8 @@ const routes = [
         component: () => import('src/modules/vendor/pages/ni/management/BlendedCourseProfile'),
         beforeEnter: async (to, from, next) => {
           try {
-            if (from.name === 'ni users learners info') {
-              to.params.defaultTab = 'traineeFollowUp';
-            }
+            if (from.name === 'ni users learners info') to.params.defaultTab = 'traineeFollowUp';
+
             return next();
           } catch (e) {
             console.error(e);
@@ -247,6 +246,16 @@ const routes = [
         path: 'ni/pedagogy/questionnaires',
         name: 'ni pedagogy questionnaires',
         component: () => import('src/modules/vendor/pages/ni/pedagogy/QuestionnairesDirectory'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'pedagogy',
+        },
+      },
+      {
+        path: 'ni/pedagogy/questionnaires/:questionnaireId',
+        name: 'ni pedagogy questionnaire profile',
+        props: true,
+        component: () => import('src/modules/vendor/pages/ni/pedagogy/QuestionnaireProfile'),
         meta: {
           cookies: ['alenvi_token', 'refresh_token'],
           parent: 'pedagogy',
