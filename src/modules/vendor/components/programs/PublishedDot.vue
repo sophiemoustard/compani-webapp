@@ -1,7 +1,7 @@
 <template>
   <div class="dot-container">
     <q-icon v-if="status === PUBLISHED_DOT_WARNING"
-      size="12px" name="circle" color="warning" />
+      size="12px" name="circle" color="orange-500" />
     <q-icon v-if="isPublished && status === PUBLISHED_DOT_ACTIVE"
       size="12px" name="check_circle" color="green-800" />
     <span v-if="isPublished"
@@ -40,6 +40,6 @@ export default {
   margin-left: 8px
   &-error
     font-size: 12px
-    color: $warning
+    color: $orange-500
     margin-left: 8px
 </style>

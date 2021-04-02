@@ -1,18 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <template v-if="questionnaire">
-      <ni-profile-header :title="questionnaire.title">
-        <template #body>
-          <div class="row profile-info q-pl-lg">
-            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side>
-                <q-icon size="xs" :name="info.icon" :class="info.class" />
-              </q-item-section>
-              <q-item-section :class="info.class">{{ info.label }}</q-item-section>
-            </q-item>
-          </div>
-        </template>
-      </ni-profile-header>
+      <ni-profile-header :title="questionnaire.title" :header-info="headerInfo" />
     </template>
   </q-page>
 </template>
@@ -51,11 +40,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-.info
-  &-active
-    color: $green-800
-  &-warning
-    color: $orange-500
-</style>

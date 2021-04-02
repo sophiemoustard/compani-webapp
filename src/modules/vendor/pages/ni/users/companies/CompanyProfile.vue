@@ -1,15 +1,6 @@
 <template>
   <q-page padding class="vendor-background">
-    <ni-profile-header :title="companyName">
-      <template #body>
-        <div class="profile-info col-mb-6 col-xs-12 q-pl-lg">
-          <q-item>
-            <q-item-section side><q-icon size="xs" name="bookmark_border" /></q-item-section>
-            <q-item-section class="text-capitalize">{{ companyType }}</q-item-section>
-          </q-item>
-        </div>
-      </template>
-    </ni-profile-header>
+    <ni-profile-header :title="companyName" :header-info="headerInfo" />
     <profile-tabs :profile-id="companyId" :tabs-content="tabsContent" />
   </q-page>
 </template>
@@ -44,6 +35,9 @@ export default {
     companyType () {
       const companyType = COMPANY_TYPES.find(type => type.value === get(this.company, 'type'));
       return companyType ? companyType.label : '';
+    },
+    headerInfo () {
+      return [{ icon: 'bookmark_border', label: this.companyType }];
     },
   },
   watch: {
