@@ -172,7 +172,7 @@ export default {
         const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
 
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
-        const salesRepresentatives = trainers.filter(t => t.role !== trainerRole._id);
+        const salesRepresentatives = trainers.filter(t => t.role.vendor !== trainerRole._id);
 
         this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(trainers));
         this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
