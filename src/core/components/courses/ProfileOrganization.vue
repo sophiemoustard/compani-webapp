@@ -14,8 +14,8 @@
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
           <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="course.salesRepresentative._id"
-            @blur="updateCourse('salesRepresentative')" caption="Référent Compani"
-            :options="salesRepresentativeOptions" :error="$v.course.salesRepresentative.$error" />
+            @blur="updateCourse('salesRepresentative')" caption="Référent Compani" :options="salesRepresentativeOptions"
+            @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
             :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
         </div>
@@ -173,10 +173,6 @@ export default {
 
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = trainers.filter(t => t.role !== trainerRole._id);
-
-        console.log('ici', this.course);
-        console.log('trainers', this.course.trainer);
-        console.log('salesRepresentatives', this.course.salesRepresentative);
 
         this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(trainers));
         this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
