@@ -1,7 +1,8 @@
 <template>
-  <ni-input v-model.trim="questionnaire.title" required-field caption="Titre" @blur="updateQuestionnaireTitle"
-    class="col-md-6" @focus="saveTmpTitle" :error="$v.questionnaire.title.$error"
-    :disable="questionnaire.status === PUBLISHED" />
+  <div class="row col-md-6">
+    <ni-input v-model.trim="questionnaire.title" required-field caption="Titre" @blur="updateQuestionnaireTitle"
+      @focus="saveTmpTitle" :error="$v.questionnaire.title.$error" :disable="questionnaire.status === PUBLISHED" />
+  </div>
 </template>
 
 <script>
