@@ -11,7 +11,7 @@ export default {
     },
   },
   mutations: {
-    SET_CUSTOMER: (state, data) => { state.customer = !data ? data : ({ ...data }); },
+    SET_CUSTOMER: (state, data) => { state.customer = data ? ({ ...data }) : data; },
     SET_NOTIFICATION: (state, notification) => {
       if (!notification) {
         state.notifications = {};

@@ -6,7 +6,7 @@ export default {
     questionnaire: null,
   },
   mutations: {
-    SET_QUESTIONNAIRE: (state, data) => { state.questionnaire = !data ? data : ({ ...data }); },
+    SET_QUESTIONNAIRE: (state, data) => { state.questionnaire = data ? ({ ...data }) : data; },
   },
   actions: {
     fetchQuestionnaire: async ({ commit }, params) => {

@@ -12,7 +12,7 @@ export default {
     },
   },
   mutations: {
-    SET_USER_PROFILE: (state, data) => { state.userProfile = !data ? data : ({ ...data }); },
+    SET_USER_PROFILE: (state, data) => { state.userProfile = data ? ({ ...data }) : data; },
     SET_NOTIFICATION: (state, notification) => {
       if (!notification) {
         state.notifications = {};

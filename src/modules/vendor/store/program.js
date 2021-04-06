@@ -10,9 +10,9 @@ export default {
     openedStep: null,
   },
   mutations: {
-    SET_PROGRAM: (state, data) => { state.program = !data ? data : ({ ...data }); },
-    SET_ACTIVITY: (state, data) => { state.activity = !data ? data : ({ ...data }); },
-    SET_CARD: (state, data) => { state.card = !data ? data : ({ ...data }); },
+    SET_PROGRAM: (state, data) => { state.program = data ? ({ ...data }) : data; },
+    SET_ACTIVITY: (state, data) => { state.activity = data ? ({ ...data }) : data; },
+    SET_CARD: (state, data) => { state.card = data ? ({ ...data }) : data; },
     SET_OPENED_STEP: (state, data) => { state.openedStep = data; },
   },
   actions: {

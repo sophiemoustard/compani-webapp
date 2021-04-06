@@ -1,6 +1,7 @@
 <template>
   <ni-input v-model.trim="questionnaire.title" required-field caption="Titre" @blur="updateQuestionnaireTitle"
-    @focus="saveTmpTitle" :error="$v.questionnaire.title.$error" :disable="questionnaire.status === PUBLISHED" />
+    class="col-md-6" @focus="saveTmpTitle" :error="$v.questionnaire.title.$error"
+    :disable="questionnaire.status === PUBLISHED" />
 </template>
 
 <script>
@@ -64,7 +65,7 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la modification du questionnaire.');
       } finally {
-        this.tmpInput = null;
+        this.tmpInput = '';
       }
     },
   },
