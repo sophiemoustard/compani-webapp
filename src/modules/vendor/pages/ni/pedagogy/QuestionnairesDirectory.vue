@@ -94,6 +94,7 @@ export default {
         await this.refreshQuestionnaires();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la création du questionnaire.');
       } finally {
         this.modalLoading = false;
