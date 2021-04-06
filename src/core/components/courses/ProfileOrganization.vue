@@ -13,7 +13,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
-          <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="course.salesRepresentative._id"
+          <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="course.salesRepresentative"
             @blur="updateCourse('salesRepresentative')" caption="Référent Compani" :options="salesRepresentativeOptions"
             @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative.$error" :clearable="false" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
@@ -170,12 +170,12 @@ export default {
     },
     async refreshTrainersAndSalesRepresentatives () {
       try {
-        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
 
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
-        const salesRepresentatives = trainers.filter(t => t.role.vendor !== trainerRole._id);
+        const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
 
-        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(trainers));
+        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
         this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
       } catch (e) {
         console.error(e);
