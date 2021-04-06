@@ -12,6 +12,7 @@
 <script>
 import { required, email, requiredIf } from 'vuelidate/lib/validators';
 import omit from 'lodash/omit';
+import pickBy from 'lodash/pickBy';
 import get from 'lodash/get';
 import TitleHeader from '@components/TitleHeader';
 import PartnerOrganization from '@api/PartnerOrganizations';
@@ -48,7 +49,7 @@ export default {
   },
   methods: {
     formatPayload (payload) {
-      return get(payload, 'address.fullAddress') ? payload : omit(payload, ['address']);
+      return get(payload, 'address.fullAddress') ? pickBy(payload) : pickBy(omit(payload, ['address']));
     },
     async createPartnerOrganization () {
       try {
