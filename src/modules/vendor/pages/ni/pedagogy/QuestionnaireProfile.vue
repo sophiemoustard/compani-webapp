@@ -46,12 +46,12 @@ export default {
   },
   watch: {
     questionnaire () {
-      this.questionnaireTitle = get(this.questionnaire, 'title', '');
+      this.questionnaireTitle = get(this.questionnaire, 'title') || '';
     },
   },
   async created () {
     await this.refreshQuestionnaire();
-    this.questionnaireTitle = get(this.questionnaire, 'title', '');
+    this.questionnaireTitle = get(this.questionnaire, 'title') || '';
   },
   methods: {
     async refreshQuestionnaire () {

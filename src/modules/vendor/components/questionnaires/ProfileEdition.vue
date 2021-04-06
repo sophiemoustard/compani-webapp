@@ -47,7 +47,7 @@ export default {
       }
     },
     saveTmpTitle () {
-      this.tmpInput = get(this.questionnaire, 'title', '');
+      this.tmpInput = get(this.questionnaire, 'title') || '';
     },
     async updateQuestionnaireTitle () {
       try {
