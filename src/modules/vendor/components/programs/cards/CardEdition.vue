@@ -4,7 +4,8 @@
       :content-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
         <div v-if="card && Object.values(card).length">
-          <component :is="templateInstance" :key="card._id" class="q-mx-lg" :disable-edition="disableEdition" />
+          <component :is="templateInstance" :key="card._id" class="q-mx-lg" :disable-edition="disableEdition"
+            @refresh="refreshCard" :media-file-name="mediaFileName" />
         </div>
     </q-scroll-area>
   </div>
@@ -31,6 +32,7 @@ export default {
   name: 'CardEdition',
   props: {
     disableEdition: { type: Boolean, default: false },
+    mediaFileName: { type: String, default: '' },
   },
   data () {
     return {
@@ -50,7 +52,7 @@ export default {
     };
   },
   computed: {
-    ...mapState('program', ['card']),
+    ...mapState('card', ['card']),
     templateInstance () {
       switch (this.currentTemplate) {
         case TRANSITION:
@@ -85,6 +87,11 @@ export default {
   watch: {
     'card.template': function (value) {
       this.currentTemplate = value;
+    },
+  },
+  methods: {
+    refreshCard () {
+      this.$emit('refresh');
     },
   },
 };

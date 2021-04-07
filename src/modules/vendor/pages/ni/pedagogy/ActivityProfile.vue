@@ -4,9 +4,9 @@
       <ni-profile-header :title="activity.name" :header-info="headerInfo" />
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
-          @delete-card="validateCardDeletion" :disable-edition="isEditionLocked"
-          @unlock-edition="validateUnlockEdition" @refresh="refreshActivity" />
-        <card-edition :disable-edition="isEditionLocked" />
+          @delete-card="validateCardDeletion" :disable-edition="isEditionLocked" :card-parent="activity"
+          @unlock-edition="validateUnlockEdition" @update="updateAndRefreshActivity" />
+        <card-edition :disable-edition="isEditionLocked" @refresh="refreshCard" :media-file-name="mediaFileName" />
       </div>
     </template>
 
@@ -54,7 +54,11 @@ export default {
     };
   },
   computed: {
-    ...mapState('program', ['program', 'activity']),
+    ...mapState({
+      activity: state => state.program.activity,
+      program: state => state.program.program,
+      card: state => state.card.card,
+    }),
     activityType () {
       return ACTIVITY_TYPES.find(type => type.value === this.activity.type).label || '';
     },
@@ -79,6 +83,9 @@ export default {
 
       return infos;
     },
+    mediaFileName () {
+      return this.card && this.card.title ? this.card.title.replace(/ /g, '_') : this.activity.name.replace(/ /g, '_');
+    },
   },
   async created () {
     try {
@@ -102,6 +109,15 @@ export default {
     async refreshActivity () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activityId });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshCard () {
+      try {
+        await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
+        const card = this.activity.cards.find(c => c._id === this.card._id);
+        this.$store.dispatch('card/fetchCard', card);
       } catch (e) {
         console.error(e);
       }
@@ -149,7 +165,7 @@ export default {
 
         await this.refreshActivity();
         const cardCreated = this.activity.cards[this.activity.cards.length - 1];
-        await this.$store.dispatch('program/fetchCard', cardCreated);
+        await this.$store.dispatch('card/fetchCard', cardCreated);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la carte.');
@@ -170,17 +186,21 @@ export default {
       try {
         await Cards.deleteById(cardId);
         await this.refreshActivity();
-        this.$store.dispatch('program/resetCard');
+        this.$store.dispatch('card/resetCard');
         NotifyPositive('Carte supprimée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
+    async updateAndRefreshActivity (event) {
+      await Activities.updateById(this.activity._id, { cards: event });
+      this.refreshActivity();
+    },
   },
   async beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
-    this.$store.dispatch('program/resetCard');
+    this.$store.dispatch('card/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
       this.$store.dispatch('program/fetchProgram', { programId: this.programId });
       this.$store.dispatch('program/setOpenedStep', { stepId: this.stepId });

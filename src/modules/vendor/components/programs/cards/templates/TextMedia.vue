@@ -22,6 +22,7 @@ export default {
   name: 'TextMedia',
   props: {
     disableEdition: { type: Boolean, default: false },
+    mediaFileName: { type: String, default: '' },
   },
   components: {
     'ni-input': Input,
