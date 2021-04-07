@@ -1,18 +1,7 @@
 <template>
   <q-page padding class="vendor-background">
     <template v-if="activity">
-      <ni-profile-header :title="activity.name">
-        <template #body>
-          <div class="row profile-info q-pl-lg">
-            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side>
-                <q-icon size="xs" :name="info.icon" :class="info.class" />
-              </q-item-section>
-              <q-item-section :class="info.class">{{ info.label }}</q-item-section>
-            </q-item>
-          </div>
-        </template>
-      </ni-profile-header>
+      <ni-profile-header :title="activity.name" :header-info="headerInfo" />
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked"
@@ -213,10 +202,4 @@ export default {
 .q-item
   padding: 0
   min-height: 0
-
-.info
-  &-active
-    color: $green-800
-  &-warning
-    color: $warning
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <q-card>
+  <q-card @click="$emit('click')">
     <q-card-section>
       <div class="row justify-between">
         <div class="version">Version {{ index }}</div>

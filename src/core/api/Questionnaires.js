@@ -8,4 +8,11 @@ export default {
   async create (payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/questionnaires`, payload);
   },
+  async getById (id) {
+    const questionnaire = await alenviAxios.get(`${process.env.API_HOSTNAME}/questionnaires/${id}`);
+    return questionnaire.data.data.questionnaire;
+  },
+  async update (id, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/questionnaires/${id}`, payload);
+  },
 };

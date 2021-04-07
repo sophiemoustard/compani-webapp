@@ -1,16 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <div v-if="userProfile">
-      <ni-profile-header :title="userIdentity">
-        <template #body>
-          <div class="row profile-info q-pl-lg">
-            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
-              <q-item-section>{{ info.label }}</q-item-section>
-            </q-item>
-          </div>
-        </template>
-      </ni-profile-header>
+      <ni-profile-header :title="userIdentity" :header-info="headerInfo" />
       <profile-tabs :profile-id="learnerId" :tabs-content="tabsContent" />
     </div>
   </q-page>

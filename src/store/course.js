@@ -12,7 +12,7 @@ export default {
     selectedCompany: '',
   },
   mutations: {
-    SET_COURSE: (state, data) => { state.course = !data ? data : ({ ...data }); },
+    SET_COURSE: (state, data) => { state.course = data ? ({ ...data }) : data; },
     SET_SELECTED_TRAINER: (state, data) => { state.selectedTrainer = data; },
     SET_SELECTED_PROGRAM: (state, data) => { state.selectedProgram = data; },
     SET_SELECTED_COMPANY: (state, data) => { state.selectedCompany = data; },
