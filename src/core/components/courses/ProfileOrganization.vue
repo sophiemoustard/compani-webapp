@@ -13,6 +13,9 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
+          <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="course.salesRepresentative"
+            @blur="updateCourse('salesRepresentative')" caption="Référent Compani" :options="salesRepresentativeOptions"
+            @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
             :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
         </div>
@@ -35,6 +38,7 @@ import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
+import Roles from '@api/Roles';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SlotContainer from '@components/courses/SlotContainer';
@@ -75,6 +79,7 @@ export default {
 
     return {
       trainerOptions: [],
+      salesRepresentativeOptions: [],
       courseLoading: false,
       courseSlotsLoading: false,
       tmpInput: '',
@@ -86,7 +91,8 @@ export default {
   validations () {
     return {
       course: {
-        trainer: { required },
+        trainer: { _id: { required }, identity: { required } },
+        salesRepresentative: { required },
       },
       newTrainee: this.traineeValidations,
       editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
@@ -111,7 +117,7 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    if (this.isAdmin) await this.refreshTrainers();
+    if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
   },
   methods: {
     get,
@@ -161,10 +167,15 @@ export default {
         this.courseLoading = false;
       }
     },
-    async refreshTrainers () {
+    async refreshTrainersAndSalesRepresentatives () {
       try {
-        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = formatAndSortIdentityOptions(trainers);
+        const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+
+        const [trainerRole] = await Roles.list({ name: [TRAINER] });
+        const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
+
+        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
+        this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
       } catch (e) {
         console.error(e);
       }
