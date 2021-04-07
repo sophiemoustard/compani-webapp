@@ -5,8 +5,8 @@
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked" :card-parent="activity"
-          @unlock-edition="validateUnlockEdition" @update="updateAndRefreshActivity" />
-        <card-edition :disable-edition="isEditionLocked" @refresh="refreshCard" :media-file-name="mediaFileName" />
+          @unlock-edition="validateUnlockEdition" @update="updateActivity" />
+        <card-edition :disable-edition="isEditionLocked" @refresh="refreshCard" :card-parent="activity" />
       </div>
     </template>
 
@@ -82,9 +82,6 @@ export default {
       }
 
       return infos;
-    },
-    mediaFileName () {
-      return this.card && this.card.title ? this.card.title.replace(/ /g, '_') : this.activity.name.replace(/ /g, '_');
     },
   },
   async created () {
@@ -193,7 +190,7 @@ export default {
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
-    async updateAndRefreshActivity (event) {
+    async updateActivity (event) {
       await Activities.updateById(this.activity._id, { cards: event });
       this.refreshActivity();
     },

@@ -29,6 +29,11 @@ export const templateMixin = {
   },
   computed: {
     ...mapState('card', ['card']),
+    mediaFileName () {
+      return this.card && this.card.title
+        ? this.card.title.replace(/ /g, '_')
+        : this.cardParent.name.replace(/ /g, '_');
+    },
     mediaUploadUrl () {
       return `${process.env.API_HOSTNAME}/cards/${this.card._id}/upload`;
     },

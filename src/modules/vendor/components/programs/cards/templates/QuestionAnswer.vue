@@ -37,6 +37,7 @@ export default {
   name: 'QuestionAnswer',
   props: {
     disableEdition: { type: Boolean, default: false },
+    cardParent: { type: Object, default: () => {} },
   },
   components: {
     'ni-input': Input,
@@ -56,11 +57,11 @@ export default {
   computed: {
     disableAnswerCreation () {
       return this.card.qcAnswers.length >= QUESTION_ANSWER_MAX_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
     disableAnswerDeletion () {
       return this.card.qcAnswers.length <= QUESTION_ANSWER_MIN_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
   },
   methods: {

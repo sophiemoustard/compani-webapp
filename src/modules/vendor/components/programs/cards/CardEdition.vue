@@ -5,7 +5,7 @@
       :content-active-style="{ display:'flex', 'flex-direction': 'column', 'padding-top': '30px' }">
         <div v-if="card && Object.values(card).length">
           <component :is="templateInstance" :key="card._id" class="q-mx-lg" :disable-edition="disableEdition"
-            @refresh="refreshCard" :media-file-name="mediaFileName" />
+            @refresh="refreshCard" :card-parent="cardParent" />
         </div>
     </q-scroll-area>
   </div>
@@ -32,7 +32,7 @@ export default {
   name: 'CardEdition',
   props: {
     disableEdition: { type: Boolean, default: false },
-    mediaFileName: { type: String, default: '' },
+    cardParent: { type: Object, default: () => {} },
   },
   data () {
     return {

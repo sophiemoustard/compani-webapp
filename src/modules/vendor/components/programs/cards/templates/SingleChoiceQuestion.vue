@@ -39,6 +39,7 @@ export default {
   name: 'SingleChoiceQuestion',
   props: {
     disableEdition: { type: Boolean, default: false },
+    cardParent: { type: Object, default: () => {} },
   },
   components: {
     'ni-input': Input,
@@ -68,11 +69,11 @@ export default {
     },
     disableAnswerCreation () {
       return this.card.qcAnswers.length >= SINGLE_CHOICE_QUESTION_MAX_FALSY_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
     disableAnswerDeletion () {
       return this.card.qcAnswers.length <= SINGLE_CHOICE_QUESTION_MIN_FALSY_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
   },
   methods: {

@@ -46,6 +46,7 @@ export default {
   name: 'FillTheGaps',
   props: {
     disableEdition: { type: Boolean, default: false },
+    cardParent: { type: Object, default: () => {} },
   },
   components: {
     'ni-input': Input,
@@ -88,11 +89,11 @@ export default {
     },
     disableAnswerCreation () {
       return this.card.falsyGapAnswers.length >= FILL_THE_GAPS_MAX_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
     disableAnswerDeletion () {
       return this.card.falsyGapAnswers.length <= FILL_THE_GAPS_MIN_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
   },
   methods: {

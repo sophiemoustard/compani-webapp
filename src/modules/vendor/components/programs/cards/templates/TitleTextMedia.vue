@@ -24,7 +24,7 @@ export default {
   name: 'TitleTextMedia',
   props: {
     disableEdition: { type: Boolean, default: false },
-    mediaFileName: { type: String, default: '' },
+    cardParent: { type: Object, default: () => {} },
   },
   components: {
     'ni-input': Input,
