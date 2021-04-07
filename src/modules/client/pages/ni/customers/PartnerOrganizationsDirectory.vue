@@ -47,13 +47,28 @@ export default {
       email: { email },
     },
   },
+  async mounted () {
+    await this.refreshPartnerOrganizations();
+  },
   methods: {
+    async refreshPartnerOrganizations () {
+      try {
+        this.tableLoading = true;
+        const partnerOrganizations = await PartnerOrganization.list();
+        this.partnerOrganizations = Object.freeze(partnerOrganizations);
+      } catch (e) {
+        this.partnerOrganizations = [];
+        console.error(e);
+      } finally {
+        this.tableLoading = false;
+      }
+    },
     formatPayload (payload) {
       return get(payload, 'address.fullAddress') ? pickBy(payload) : pickBy(omit(payload, ['address']));
     },
     async createPartnerOrganization () {
       try {
-        this.loading = true;
+        this.modalLoading = true;
 
         this.$v.newPartnerOrganization.$touch();
         if (this.$v.newPartnerOrganization.$error) return NotifyWarning('Champ(s) invalide(s).');
@@ -63,12 +78,14 @@ export default {
 
         this.partnerOrganizationCreationModal = false;
         NotifyPositive('Structure partenaire créée.');
+
+        await this.refreshPartnerOrganizations();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la création de la structure partenaire.');
       } finally {
-        this.loading = false;
+        this.modalLoading = false;
       }
     },
     resetModal () {
