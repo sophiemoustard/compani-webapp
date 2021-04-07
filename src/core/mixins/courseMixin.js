@@ -66,10 +66,9 @@ export const courseMixin = {
     async updateCourse (path) {
       try {
         const value = this.getValue(path);
-
         if (this.tmpInput === value) return;
 
-        const vAttribute = get(this.$v.course, path);
+        const vAttribute = path === 'trainer' ? get(this.$v.course, 'trainer._id') : get(this.$v.course, path);
         if (vAttribute) {
           vAttribute.$touch();
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');
