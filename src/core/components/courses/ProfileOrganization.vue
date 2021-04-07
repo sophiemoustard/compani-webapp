@@ -118,6 +118,7 @@ export default {
   async created () {
     if (!this.course) await this.refreshCourse();
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
+    console.log('le pb vient d ici');
   },
   methods: {
     get,
@@ -170,14 +171,15 @@ export default {
     async refreshTrainersAndSalesRepresentatives () {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
 
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-
-        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
         this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
       } catch (e) {
         console.error(e);
+        this.trainerOptions = [];
+        this.salesRepresentativeOptions = [];
       }
     },
   },
