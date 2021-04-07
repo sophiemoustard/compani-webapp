@@ -13,7 +13,7 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
-          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative" :disable="!isAdmin"
+          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id" :disable="!isAdmin"
             @blur="updateCourse('salesRepresentative')" caption="Référent Compani" :options="salesRepresentativeOptions"
             @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
@@ -92,7 +92,7 @@ export default {
     return {
       course: {
         trainer: { _id: { required }, identity: { required } },
-        salesRepresentative: { required },
+        salesRepresentative: { _id: { required }, identity: { required } },
       },
       newTrainee: this.traineeValidations,
       editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
@@ -117,8 +117,9 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
+
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
-    console.log('le pb vient d ici');
+    else this.salesRepresentativeOptions = formatAndSortIdentityOptions([this.course.salesRepresentative]);
   },
   methods: {
     get,
