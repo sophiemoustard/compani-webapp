@@ -13,11 +13,11 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
-          <ni-select v-if="isAdmin && !isClientInterface" v-model.trim="course.salesRepresentative"
+          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id" :disable="!isAdmin"
             @blur="updateCourse('salesRepresentative')" caption="Référent Compani" :options="salesRepresentativeOptions"
-            @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative.$error" />
+            @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative._id.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
-            :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
+            :options="trainerOptions" :error="$v.course.trainer._id.$error" @blur="updateCourse('trainer')" />
         </div>
       </div>
     </div>
@@ -92,7 +92,7 @@ export default {
     return {
       course: {
         trainer: { _id: { required }, identity: { required } },
-        salesRepresentative: { required },
+        salesRepresentative: { _id: { required }, identity: { required } },
       },
       newTrainee: this.traineeValidations,
       editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
@@ -117,7 +117,9 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
+
     if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
+    else this.salesRepresentativeOptions = formatAndSortIdentityOptions([this.course.salesRepresentative]);
   },
   methods: {
     get,
@@ -170,14 +172,15 @@ export default {
     async refreshTrainersAndSalesRepresentatives () {
       try {
         const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
 
         const [trainerRole] = await Roles.list({ name: [TRAINER] });
         const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
-
-        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
         this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
       } catch (e) {
         console.error(e);
+        this.trainerOptions = [];
+        this.salesRepresentativeOptions = [];
       }
     },
   },
