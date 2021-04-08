@@ -1,8 +1,8 @@
 <template>
   <q-page class="client-background" padding>
     <ni-title-header title="Structures partenaires" class="q-mb-xl" />
-    <ni-table-list :data="partnerOrganizations" :columns="columns" :pagination.sync="pagination" :loading="tableLoading"
-      :rows-per-page="[15, 50, 100, 200]">
+    <ni-table-list :data="partnerOrganizations" :columns="columns" :visible-columns="visibleColumns"
+      :pagination.sync="pagination" :rows-per-page="[15, 50, 100, 200]" :loading="tableLoading">
       <template #body="{ col }">
         <template>{{ col.value }}</template>
       </template>
@@ -26,6 +26,7 @@ import PartnerOrganization from '@api/PartnerOrganizations';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { sortStrings } from '@helpers/utils';
+import { ascendingSort } from '@helpers/date';
 import PartnerOrganizationCreationModal from 'src/modules/client/components/customers/PartnerOrganizationCreationModal';
 
 export default {
@@ -44,15 +45,10 @@ export default {
       tableLoading: false,
       partnerOrganizations: [],
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'name',
-          align: 'left',
-          sortable: true,
-          sort: (a, b) => sortStrings(a, b),
-        },
+        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true, sort: (a, b) => sortStrings(a, b) },
+        { name: 'createdAt', field: 'createdAt', sort: ascendingSort },
       ],
+      visibleColumns: ['name'],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
     };
   },
