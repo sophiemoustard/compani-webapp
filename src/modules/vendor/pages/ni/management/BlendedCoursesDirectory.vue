@@ -2,18 +2,22 @@
   <q-page class="vendor-background" padding>
     <ni-title-header title="Formations mixtes" class="q-mb-xl" />
     <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-3">
+      <div class="col-xs-12 col-sm-6 col-md-4">
         <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-3">
+      <div class="col-xs-12 col-sm-6 col-md-4">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
           :value="selectedTrainer" @input="updateSelectedTrainer" />
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-3">
+      <div class="col-xs-12 col-sm-6 col-md-4">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
           :value="selectedProgram" @input="updateSelectedProgram" />
       </div>
-      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
+      <div class="col-xs-12 col-sm-6 col-md-4">
+        <ni-select :options="salesRepresentativesFilterOptions" :value="selectedCompany"
+          @input="updateSelectedCompany" />
+      </div>
+      <div class="col-xs-12 col-sm-6 col-md-4 reset-filters" @click="resetFilters">
         <span>Effacer les filtres</span>
       </div>
     </div>

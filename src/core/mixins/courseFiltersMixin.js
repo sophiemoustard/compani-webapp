@@ -62,6 +62,21 @@ export const courseFiltersMixin = {
 
       return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
     },
+    salesRepresentativesFilterOptions () {
+      const salesRepresentatives = this.coursesWithGroupedSlot
+        .filter(course => !!course.salesRepresentative)
+        .map(course => ({
+          label: formatIdentity(course.salesRepresentative.identity, 'FL'),
+          value: course.salesRepresentative._id,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label));
+
+      return [
+        { label: 'Tous les intervenants', value: '' },
+        { label: 'Sans intervenant', value: 'without_sales_representative' },
+        ...uniqBy(salesRepresentatives, 'value'),
+      ];
+    },
   },
   methods: {
     updateSelectedTrainer (trainerId) {
