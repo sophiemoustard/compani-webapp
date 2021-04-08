@@ -2,7 +2,7 @@
   <q-page class="client-background" padding>
     <ni-title-header title="Structures partenaires" class="q-mb-xl" />
     <ni-table-list :data="partnerOrganizations" :columns="columns" :visible-columns="visibleColumns"
-      :pagination.sync="pagination" :rows-per-page="[15, 50, 100, 200]" :loading="tableLoading">
+      :pagination.sync="pagination" :rows-per-page="[15, 50]" :loading="tableLoading">
       <template #body="{ col }">
         <template>{{ col.value }}</template>
       </template>
