@@ -3,7 +3,8 @@
     <ni-title-header title="Formations mixtes" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-4">
-        <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
+        <ni-select :options="companyFilterOptions"
+          :value="selectedCompany" @input="updateSelectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
@@ -14,7 +15,7 @@
           :value="selectedProgram" @input="updateSelectedProgram" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
-        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="salesRepresentativesFilterOptions"
+        <ni-select :options="salesRepresentativesFilterOptions"
           :value="selectedSalesRepresentative" @input="updateSelectedSalesRepresentative" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4 reset-filters" @click="resetFilters">
