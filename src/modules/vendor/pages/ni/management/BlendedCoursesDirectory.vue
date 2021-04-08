@@ -14,8 +14,8 @@
           :value="selectedProgram" @input="updateSelectedProgram" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
-        <ni-select :options="salesRepresentativesFilterOptions" :value="selectedCompany"
-          @input="updateSelectedCompany" />
+        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="salesRepresentativesFilterOptions"
+          :value="selectedSalesRepresentative" @input="updateSelectedSalesRepresentative" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4 reset-filters" @click="resetFilters">
         <span>Effacer les filtres</span>
