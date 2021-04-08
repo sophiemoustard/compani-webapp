@@ -15,9 +15,9 @@
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
           <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id" :disable="!isAdmin"
             @blur="updateCourse('salesRepresentative')" caption="Référent Compani" :options="salesRepresentativeOptions"
-            @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative.$error" />
+            @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative._id.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
-            :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
+            :options="trainerOptions" :error="$v.course.trainer._id.$error" @blur="updateCourse('trainer')" />
         </div>
       </div>
     </div>
