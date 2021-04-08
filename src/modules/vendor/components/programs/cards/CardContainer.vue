@@ -3,32 +3,33 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <draggable v-model="draggableCards" @change="dropCard()" ghost-class="ghost" :disabled="isDraggableDisabled">
-        <div v-for="(card, index) in draggableCards" :key="index" :class="getCardStyle(card)">
+      <draggable v-model="draggableCardsList" ghost-class="ghost" :disabled="isDraggableDisabled" @input="update">
+        <div v-for="(draggableCard, index) in draggableCardsList" :key="index" :class="getCardStyle(draggableCard)">
           <div class="card-actions">
-            <ni-button v-if="isSelected(card) && !isActivityPublished" icon="delete" @click="deleteCard(card)"
-              :disable="disableEdition" />
+            <ni-button v-if="isSelected(draggableCard) && !isParentPublished" icon="delete"
+              @click="deleteCard(draggableCard)" :disable="disableEdition" />
           </div>
-          <div class="card-cell cursor-pointer" @click="selectCard(card)">
+          <div class="card-cell cursor-pointer" @click="selectCard(draggableCard)">
             <div class="card-cell-title">
-              <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(card) }}</div>
-              <q-icon v-if="disableEdition" name="lock" size="xs" :class="{'locked-unselected': !isSelected(card)}" />
+              <div class="text-weight-bold">{{ index + 1 }}. {{ getHeading(draggableCard) }}</div>
+              <q-icon v-if="disableEdition" name="lock" :class="{'locked-unselected': !isSelected(draggableCard)}"
+                size="xs" />
             </div>
-            <div>{{ getTemplateName(card.template) }}</div>
+            <div>{{ getTemplateName(draggableCard.template) }}</div>
           </div>
-          <div v-if="!isSelected(card) && !card.isValid" :class="{ 'dot dot-error': true }" />
+          <div v-if="!isSelected(draggableCard) && !draggableCard.isValid" :class="{ 'dot dot-error': true }" />
         </div>
       </draggable>
     </q-scroll-area>
-    <ni-button v-if="disableEdition" label="Déverouiller l'activité" color="primary" icon="mdi-lock-outline"
+    <ni-button v-if="disableEdition" label="Déverouiller" color="primary" icon="mdi-lock-outline"
       @click="unlockEdition" />
-    <ni-button v-else-if="!isActivityPublished" label="Ajouter une carte" color="primary" icon="add"
+    <ni-button v-else-if="!isParentPublished" label="Ajouter une carte" color="primary" icon="add"
       @click="openCreationModal" />
   </div>
 </template>
 
 <script>
-import { mapState, mapGetters } from 'vuex';
+import { mapState } from 'vuex';
 import cloneDeep from 'lodash/cloneDeep';
 import draggable from 'vuedraggable';
 import {
@@ -48,13 +49,12 @@ import {
   PUBLISHED,
 } from '@data/constants';
 import Button from '@components/Button';
-import Activities from '@api/Activities';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
   name: 'CardContainer',
   props: {
     disableEdition: { type: Boolean, default: false },
+    cardParent: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-button': Button,
@@ -62,23 +62,25 @@ export default {
   },
   data () {
     return {
-      draggableCards: [],
+      draggableCardsList: [],
     };
   },
   computed: {
-    ...mapState('program', ['card', 'activity']),
-    ...mapGetters({ cards: 'program/getCards' }),
-    isActivityPublished () {
-      return this.activity.status === PUBLISHED;
+    ...mapState('card', ['card']),
+    cards () {
+      return this.cardParent.cards;
+    },
+    isParentPublished () {
+      return this.cardParent.status === PUBLISHED;
     },
     isDraggableDisabled () {
-      return this.$q.platform.is.mobile || this.disableEdition || this.isActivityPublished;
+      return this.$q.platform.is.mobile || this.disableEdition || this.isParentPublished;
     },
   },
   watch: {
     cards: {
       handler () {
-        this.draggableCards = cloneDeep(this.cards);
+        this.draggableCardsList = cloneDeep(this.cards);
       },
       immediate: true,
     },
@@ -126,7 +128,7 @@ export default {
       scrollArea.setScrollPosition(scrollTarget.scrollHeight, duration);
     },
     selectCard (card) {
-      this.$store.dispatch('program/fetchCard', card);
+      this.$store.dispatch('card/fetchCard', card);
     },
     deleteCard (card) {
       this.$emit('delete-card', card._id);
@@ -134,17 +136,9 @@ export default {
     unlockEdition () {
       this.$emit('unlock-edition');
     },
-    async dropCard () {
-      try {
-        const cards = this.draggableCards.map(c => c._id);
-        await Activities.updateById(this.activity._id, { cards });
-        NotifyPositive('Modification enregistrée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification des cartes.');
-      } finally {
-        await this.$emit('refresh');
-      }
+    update (event) {
+      const cards = event.map(c => c._id);
+      this.$emit('update', cards);
     },
   },
 };

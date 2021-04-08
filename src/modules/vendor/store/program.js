@@ -6,13 +6,11 @@ export default {
   state: {
     program: null,
     activity: null,
-    card: null,
     openedStep: null,
   },
   mutations: {
     SET_PROGRAM: (state, data) => { state.program = data ? ({ ...data }) : data; },
     SET_ACTIVITY: (state, data) => { state.activity = data ? ({ ...data }) : data; },
-    SET_CARD: (state, data) => { state.card = data ? ({ ...data }) : data; },
     SET_OPENED_STEP: (state, data) => { state.openedStep = data; },
   },
   actions: {
@@ -34,8 +32,6 @@ export default {
       }
     },
     resetActivity: ({ commit }) => { commit('SET_ACTIVITY', null); },
-    fetchCard: ({ commit }, card) => { commit('SET_CARD', card); },
-    resetCard: ({ commit }) => { commit('SET_CARD', null); },
     setOpenedStep: async ({ commit }, params) => {
       try {
         commit('SET_OPENED_STEP', params.stepId);
