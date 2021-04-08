@@ -1,12 +1,9 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-title-header title="Structures partenaires" class="q-mb-xl" />
-    <ni-table-list :data="partnerOrganizations" :columns="columns" :visible-columns="visibleColumns"
-      :pagination.sync="pagination" :rows-per-page="[15, 50]" :loading="tableLoading">
-      <template #body="{ col }">
-        <template>{{ col.value }}</template>
-      </template>
-    </ni-table-list>
+    <ni-directory-header title="Structures partenaires" search-placeholder="Rechercher une structure"
+      @update-search="updateSearch" :search="searchStr" />
+    <ni-table-list :data="filteredPartnerOrganizations" :columns="columns" :visible-columns="visibleColumns"
+      :pagination.sync="pagination" :rows-per-page="[15, 50]" :loading="tableLoading" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une structure"
       @click="partnerOrganizationCreationModal = true" />
 
@@ -20,12 +17,13 @@ import { required, email, requiredIf } from 'vuelidate/lib/validators';
 import omit from 'lodash/omit';
 import pickBy from 'lodash/pickBy';
 import get from 'lodash/get';
-import TitleHeader from '@components/TitleHeader';
+import escapeRegExp from 'lodash/escapeRegExp';
+import DirectoryHeader from '@components/DirectoryHeader.vue';
 import TableList from '@components/table/TableList';
 import PartnerOrganization from '@api/PartnerOrganizations';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
-import { sortStrings } from '@helpers/utils';
+import { sortStrings, removeDiacritics } from '@helpers/utils';
 import { ascendingSort } from '@helpers/date';
 import PartnerOrganizationCreationModal from 'src/modules/client/components/customers/PartnerOrganizationCreationModal';
 
@@ -33,19 +31,20 @@ export default {
   metaInfo: { title: 'Structures partenaires' },
   name: 'PartnerOrgarnizationsDirectory',
   components: {
-    'ni-title-header': TitleHeader,
+    'ni-directory-header': DirectoryHeader,
     'partner-organization-creation-modal': PartnerOrganizationCreationModal,
     'ni-table-list': TableList,
   },
   data () {
     return {
+      searchStr: '',
       partnerOrganizationCreationModal: false,
       newPartnerOrganization: { name: '', phone: '', address: {}, email: '' },
       modalLoading: false,
       tableLoading: false,
       partnerOrganizations: [],
       columns: [
-        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true, sort: (a, b) => sortStrings(a, b) },
+        { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true, sort: sortStrings },
         { name: 'createdAt', field: 'createdAt', sort: ascendingSort },
       ],
       visibleColumns: ['name'],
@@ -65,15 +64,26 @@ export default {
       email: { email },
     },
   },
+  computed: {
+    filteredPartnerOrganizations () {
+      const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
+      return this.partnerOrganizations.filter(po => po.noDiacriticsName.match(new RegExp(formattedString, 'i')));
+    },
+  },
   async mounted () {
     await this.refreshPartnerOrganizations();
   },
   methods: {
+    updateSearch (value) {
+      this.searchStr = value;
+    },
     async refreshPartnerOrganizations () {
       try {
         this.tableLoading = true;
         const partnerOrganizations = await PartnerOrganization.list();
-        this.partnerOrganizations = Object.freeze(partnerOrganizations);
+        this.partnerOrganizations = Object.freeze(
+          partnerOrganizations.map(po => ({ ...po, noDiacriticsName: removeDiacritics(po.name) }))
+        );
       } catch (e) {
         this.partnerOrganizations = [];
         console.error(e);
