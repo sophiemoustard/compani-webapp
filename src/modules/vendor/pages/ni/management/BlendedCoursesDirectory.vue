@@ -3,8 +3,7 @@
     <ni-title-header title="Formations mixtes" class="q-mb-xl" />
     <div class="row">
       <div class="col-xs-12 col-sm-6 col-md-4">
-        <ni-select :options="companyFilterOptions"
-          :value="selectedCompany" @input="updateSelectedCompany" />
+        <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
       </div>
       <div class="col-xs-12 col-sm-6 col-md-4">
         <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"

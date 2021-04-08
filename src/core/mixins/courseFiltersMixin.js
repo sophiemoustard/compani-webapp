@@ -106,7 +106,7 @@ export const courseFiltersMixin = {
     },
     filterCoursesByCompany (courses) {
       return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
-      (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
+        (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
     },
     filterCoursesBySalesRepresentative (courses) {
       return courses.filter(course => (course.salesRepresentative
