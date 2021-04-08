@@ -191,8 +191,15 @@ export default {
       }
     },
     async updateActivity (event) {
-      await Activities.updateById(this.activity._id, { cards: event });
-      this.refreshActivity();
+      try {
+        await Activities.updateById(this.activity._id, { cards: event });
+        NotifyPositive('Modification enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des cartes.');
+      } finally {
+        this.refreshActivity();
+      }
     },
   },
   async beforeDestroy () {

@@ -3,7 +3,7 @@
     <q-scroll-area ref="cardContainer" :thumb-style="{ width: '6px', 'border-radius': '10px' }"
       :content-style="{ display:'flex', 'flex-direction': 'column' }"
       :content-active-style="{ display:'flex', 'flex-direction': 'column' }">
-      <draggable v-model="draggableCardsList" @change="dropCard()" ghost-class="ghost" :disabled="isDraggableDisabled"
+      <draggable v-model="draggableCardsList" ghost-class="ghost" :disabled="isDraggableDisabled"
         @input="update($event)">
         <div v-for="(draggableCard, index) in draggableCardsList" :key="index" :class="getCardStyle(draggableCard)">
           <div class="card-actions">
@@ -50,13 +50,12 @@ import {
   PUBLISHED,
 } from '@data/constants';
 import Button from '@components/Button';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 
 export default {
   name: 'CardContainer',
   props: {
     disableEdition: { type: Boolean, default: false },
-    cardParent: { type: Object, default: () => {} },
+    cardParent: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-button': Button,
@@ -137,14 +136,6 @@ export default {
     },
     unlockEdition () {
       this.$emit('unlock-edition');
-    },
-    async dropCard () {
-      try {
-        NotifyPositive('Modification enregistrée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la modification des cartes.');
-      }
     },
     update (event) {
       const cards = event.map(c => c._id);

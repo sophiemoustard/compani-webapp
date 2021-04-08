@@ -32,7 +32,7 @@ export default {
   name: 'CardEdition',
   props: {
     disableEdition: { type: Boolean, default: false },
-    cardParent: { type: Object, default: () => {} },
+    cardParent: { type: Object, default: () => ({}) },
   },
   data () {
     return {
