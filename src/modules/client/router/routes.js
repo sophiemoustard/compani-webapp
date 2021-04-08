@@ -253,6 +253,16 @@ const routes = [
           parent: 'customers',
         },
       },
+      {
+        path: 'ni/customers/partner-organizations/:partnerOrganizationId',
+        name: 'ni customers partner organizations info',
+        props: true,
+        component: () => import('src/modules/client/pages/ni/customers/PartnerOrganizationProfile'),
+        meta: {
+          cookies: ['alenvi_token', 'refresh_token'],
+          parent: 'customers',
+        },
+      },
       { // must be last of ni/customers/... routes
         path: 'ni/customers/:customerId',
         name: 'ni customers info',
