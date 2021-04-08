@@ -21,8 +21,8 @@
         </div>
       </div>
     </div>
-    <ni-slot-container :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
-    <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
@@ -47,12 +47,7 @@ import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import Banner from '@components/Banner';
 import { NotifyNegative } from '@components/popup/notify';
-import {
-  INTER_B2B,
-  VENDOR_ADMIN,
-  TRAINING_ORGANISATION_MANAGER,
-  TRAINER,
-} from '@data/constants';
+import { INTER_B2B, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
@@ -100,14 +95,20 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    isTrainer () {
+      return this.vendorRole === TRAINER;
+    },
     isAdmin () {
       return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },
     isCourseInter () {
       return this.course.type === INTER_B2B;
     },
-    canEdit () {
+    canEditSlots () {
       return !(this.isClientInterface && this.isCourseInter);
+    },
+    canEditTrainees () {
+      return this.isIntraCourse || (!this.isClientInterface && !this.isTrainer);
     },
     missingInfoMsg () {
       return `Le lien vers la page sera disponible dès que l'équipe aura rentré ${
