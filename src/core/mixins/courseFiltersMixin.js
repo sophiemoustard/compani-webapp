@@ -2,7 +2,7 @@ import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 
 export const courseFiltersMixin = {
@@ -46,10 +46,8 @@ export const courseFiltersMixin = {
       ];
     },
     trainerFilterOptions () {
-      const trainers = this.coursesWithGroupedSlot
-        .filter(course => !!course.trainer)
-        .map(course => ({ label: formatIdentity(course.trainer.identity, 'FL'), value: course.trainer._id }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      const filteredCourses = this.coursesWithGroupedSlot.filter(course => !!course.salesRepresentative);
+      const trainers = formatAndSortIdentityOptions(filteredCourses, 'trainer');
 
       return [
         { label: 'Tous les intervenants', value: '' },
@@ -65,13 +63,8 @@ export const courseFiltersMixin = {
       return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
     },
     salesRepresentativesFilterOptions () {
-      const salesRepresentatives = this.coursesWithGroupedSlot
-        .filter(course => !!course.salesRepresentative)
-        .map(course => ({
-          label: formatIdentity(course.salesRepresentative.identity, 'FL'),
-          value: course.salesRepresentative._id,
-        }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      const filteredCourses = this.coursesWithGroupedSlot.filter(course => !!course.salesRepresentative);
+      const salesRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'salesRepresentative');
 
       return [
         { label: 'Tous les référents Compani', value: '' },
