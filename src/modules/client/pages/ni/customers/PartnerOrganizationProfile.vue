@@ -6,13 +6,16 @@
     </div>
     <div class="row gutter-profile">
       <ni-input caption="Nom" v-model="partnerOrganization.name" @focus="saveTmp('name')"
-          @blur="updatePartnerOrganization('name')" />
+        @blur="updatePartnerOrganization('name')" :error="$v.partnerOrganization.name.$error" />
       <ni-input caption="Téléphone" v-model="partnerOrganization.phone" @focus="saveTmp('phone')"
-          @blur="updatePartnerOrganization('phone')" />
+        @blur="updatePartnerOrganization('phone')" :error="$v.partnerOrganization.phone.$error"
+        :error-message="phoneNumberError($v.partnerOrganization)" />
       <ni-search-address v-model="partnerOrganization.address" @focus="saveTmp('address')"
-          @blur="updatePartnerOrganization('address')" />
+        @blur="updatePartnerOrganization('address')" :error="$v.partnerOrganization.address.$error"
+      :error-message="addressError($v.partnerOrganization)" />
       <ni-input caption="Email" v-model="partnerOrganization.email" @focus="saveTmp('email')"
-          @blur="updatePartnerOrganization('email')" />
+        @blur="updatePartnerOrganization('email')" :error="$v.partnerOrganization.email.$error"
+        :error-message="emailError($v.partnerOrganization)" />
     </div>
   </q-page>
 </template>
@@ -28,6 +31,7 @@ import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
+import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 
 export default {
   metaInfo: { title: 'Structure partenaire' },
@@ -39,7 +43,7 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-input': Input,
   },
-  mixins: [validationMixin],
+  mixins: [validationMixin, partnerOrganizationMixin],
   data () {
     return {
       partnerOrganization: { name: '', phone: '', address: {}, email: '' },
@@ -83,7 +87,8 @@ export default {
         this.$v.partnerOrganization.$touch();
         if (get(this.$v, `partnerOrganization.${path}.$error`)) return NotifyWarning('Champ(s) invalide(s).');
 
-        const payload = set({}, path, value);
+        let payload = set({}, path, value);
+        if (payload.address && !payload.address.fullAddress) payload = { address: {} };
         await PartnerOrganization.updateById(this.partnerOrganizationId, payload);
 
         NotifyPositive('Modification enregistrée');
@@ -91,6 +96,7 @@ export default {
         await this.refreshPartnerOrganization();
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
