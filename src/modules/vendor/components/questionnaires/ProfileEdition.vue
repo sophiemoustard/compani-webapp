@@ -7,8 +7,7 @@
     <div class="row body">
       <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
         @delete-card="validateCardDeletion" :card-parent="questionnaire" @update="updateQuestionnaire" />
-      <card-edition :card-parent="questionnaire"
-        @refresh="refreshCard('questionnaire/fetchQuestionnaire', { questionnaireId: questionnaire._id }) " />
+      <card-edition :card-parent="questionnaire" @refresh="refreshCard" />
     </div>
 
     <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
@@ -53,7 +52,10 @@ export default {
     };
   },
   computed: {
-    ...mapState('questionnaire', ['questionnaire']),
+    ...mapState({
+      questionnaire: state => state.questionnaire.questionnaire,
+      card: state => state.card.card,
+    }),
   },
   async created () {
     await this.refreshQuestionnaire();
@@ -62,6 +64,15 @@ export default {
     async refreshQuestionnaire () {
       try {
         await this.$store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: this.profileId });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshCard () {
+      try {
+        await this.$store.dispatch('questionnaire/fetchQuestionnaire', { questionnaireId: this.questionnaire._id });
+        const card = this.questionnaire.cards.find(c => c._id === this.card._id);
+        this.$store.dispatch('card/fetchCard', card);
       } catch (e) {
         console.error(e);
       }

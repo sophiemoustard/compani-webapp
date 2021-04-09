@@ -6,8 +6,7 @@
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked" :card-parent="activity"
           @unlock-edition="validateUnlockEdition" @update="updateActivity" />
-        <card-edition :disable-edition="isEditionLocked" :card-parent="activity"
-          @refresh="refreshCard('program/fetchActivity', { activityId })" />
+        <card-edition :disable-edition="isEditionLocked" :card-parent="activity" @refresh="refreshCard" />
       </div>
     </template>
 
@@ -55,7 +54,11 @@ export default {
     };
   },
   computed: {
-    ...mapState('program', ['program', 'activity']),
+    ...mapState({
+      activity: state => state.program.activity,
+      program: state => state.program.program,
+      card: state => state.card.card,
+    }),
     activityType () {
       return ACTIVITY_TYPES.find(type => type.value === this.activity.type).label || '';
     },
@@ -103,6 +106,15 @@ export default {
     async refreshActivity () {
       try {
         await this.$store.dispatch('program/fetchActivity', { activityId: this.activityId });
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    async refreshCard () {
+      try {
+        await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
+        const card = this.activity.cards.find(c => c._id === this.card._id);
+        this.$store.dispatch('card/fetchCard', card);
       } catch (e) {
         console.error(e);
       }

@@ -19,6 +19,6 @@ export default {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/questionnaires/${questionnaireId}/cards`, payload);
   },
   async deleteCard (cardId) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/questionnaires/card/${cardId}`);
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/questionnaires/cards/${cardId}`);
   },
 };
