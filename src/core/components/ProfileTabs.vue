@@ -49,12 +49,20 @@ export default {
     .q-tab-panels
       background-color: inherit
       flex: 1
+      display: flex
+      flex-direction: column
       .scroll
         overflow: initial
-      .q-panel
+      /deep/ .q-panel
+        flex: 1
+        display: flex
+        flex-direction: column
         .q-tab-panel
-          div
-            height: 100%
+          flex: 1
+          display: flex
+          flex-direction: column
+          > div
+            flex: 1
     & /deep/ .q-tabs
       & .q-tabs__content
         & .q-tab
