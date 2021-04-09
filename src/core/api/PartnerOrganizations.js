@@ -14,4 +14,7 @@ export default {
     );
     return partnerOrganization.data.data.partnerOrganization;
   },
+  async updateById (partnerOrganizationId, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/partnerorganizations/${partnerOrganizationId}`, payload);
+  },
 };

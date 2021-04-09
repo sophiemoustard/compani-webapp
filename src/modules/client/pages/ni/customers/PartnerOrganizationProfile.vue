@@ -20,6 +20,7 @@
 <script>
 import { required, email, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
+import set from 'lodash/set';
 import PartnerOrganization from '@api/PartnerOrganizations';
 import ProfileHeader from '@components/ProfileHeader';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
@@ -76,10 +77,14 @@ export default {
     },
     async updatePartnerOrganization (path) {
       try {
-        if (this.tmpInput === get(this.partnerOrganization, path)) return;
+        const value = get(this.partnerOrganization, path);
+        if (this.tmpInput === value) return;
 
         this.$v.partnerOrganization.$touch();
         if (get(this.$v, `partnerOrganization.${path}.$error`)) return NotifyWarning('Champ(s) invalide(s).');
+
+        const payload = set({}, path, value);
+        await PartnerOrganization.updateById(this.partnerOrganizationId, payload);
 
         NotifyPositive('Modification enregistrée');
 
