@@ -17,8 +17,8 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
 import get from 'lodash/get';
+import { mapState } from 'vuex';
 import { required } from 'vuelidate/lib/validators';
 import Questionnaires from '@api/Questionnaires';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
