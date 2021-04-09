@@ -11,7 +11,6 @@
       </div>
     </template>
 
-    <!-- Card creation modal -->
     <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
   </q-page>
 </template>
@@ -110,9 +109,7 @@ export default {
     },
     validateUnlockEdition () {
       const programsReusingActivity = [...new Set(
-        this.activity.steps
-          .filter(s => s._id !== this.stepId)
-          .map(s => get(s, 'subProgram.program.name'))
+        this.activity.steps.filter(s => s._id !== this.stepId).map(s => get(s, 'subProgram.program.name'))
       )];
 
       const usedInOtherStepMessage = this.isActivityUsedInOtherStep
@@ -156,6 +153,17 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async deleteCard (cardId) {
+      try {
+        await Activities.deleteCard(cardId);
+        await this.refreshActivity();
+        this.$store.dispatch('card/resetCard');
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la carte.');
+      }
+    },
     async updateActivity (event) {
       try {
         await Activities.updateById(this.activity._id, { cards: event });
@@ -166,9 +174,6 @@ export default {
       } finally {
         this.refreshActivity();
       }
-    },
-    async refreshParent () {
-      await this.refreshActivity();
     },
   },
   async beforeDestroy () {

@@ -1,6 +1,5 @@
 import { mapState } from 'vuex';
-import Cards from '@api/Cards';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyPositive } from '@components/popup/notify';
 
 export const cardMixin = {
   computed: {
@@ -29,17 +28,6 @@ export const cardMixin = {
         cancel: 'Annuler',
       }).onOk(() => this.deleteCard(cardId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
-    async deleteCard (cardId) {
-      try {
-        await Cards.deleteById(cardId);
-        await this.refreshParent();
-        this.$store.dispatch('card/resetCard');
-        NotifyPositive('Carte supprimée');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la suppression de la carte.');
-      }
     },
   },
 };

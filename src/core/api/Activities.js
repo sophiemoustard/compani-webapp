@@ -11,4 +11,7 @@ export default {
   async addCard (activityId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/activities/${activityId}/cards`, payload);
   },
+  async deleteCard (cardId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/activities/card/${cardId}`);
+  },
 };

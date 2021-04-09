@@ -7,11 +7,10 @@
     <div class="row body">
       <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
         @delete-card="validateCardDeletion" :card-parent="questionnaire" @update="updateQuestionnaire" />
-      <card-edition :card-parent="questionnaire" @refresh="refreshCard('questionnaire/fetchQuestionnaire',
-          { questionnaireId: questionnaire._id }) " />
+      <card-edition :card-parent="questionnaire"
+        @refresh="refreshCard('questionnaire/fetchQuestionnaire', { questionnaireId: questionnaire._id }) " />
     </div>
 
-      <!-- Card creation modal -->
     <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
   </q-page>
 </template>
@@ -90,6 +89,17 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async deleteCard (cardId) {
+      try {
+        await Questionnaires.deleteCard(cardId);
+        await this.refreshQuestionnaire();
+        this.$store.dispatch('card/resetCard');
+        NotifyPositive('Carte supprimée');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression de la carte.');
+      }
+    },
     async updateQuestionnaire (event) {
       try {
         if (event) await Questionnaires.update(this.questionnaire._id, { cards: event });
@@ -112,9 +122,10 @@ export default {
         this.refreshQuestionnaire();
       }
     },
-    async refreshParent () {
-      await this.refreshQuestionnaire();
-    },
+  },
+  async beforeDestroy () {
+    this.$store.dispatch('questionnaire/resetQuestionnaire');
+    this.$store.dispatch('card/resetCard');
   },
 };
 </script>

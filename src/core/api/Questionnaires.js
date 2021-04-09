@@ -18,4 +18,7 @@ export default {
   async addCard (questionnaireId, payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/questionnaires/${questionnaireId}/cards`, payload);
   },
+  async deleteCard (cardId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/questionnaires/card/${cardId}`);
+  },
 };
