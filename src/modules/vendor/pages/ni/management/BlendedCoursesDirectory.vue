@@ -1,23 +1,14 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Formations mixtes" class="q-mb-xl" />
-    <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
-          :value="selectedTrainer" @input="updateSelectedTrainer" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
-          :value="selectedProgram" @input="updateSelectedProgram" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
-        <span>Effacer les filtres</span>
-      </div>
+    <div class="filters-container">
+      <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
+      <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
+      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
+      <ni-select :options="salesRepresentativesFilterOptions" :value="selectedSalesRepresentative"
+        @input="updateSelectedSalesRepresentative" />
+      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
-
     <ni-trello :courses="coursesFiltered" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
       @click="openCourseCreationModal" />

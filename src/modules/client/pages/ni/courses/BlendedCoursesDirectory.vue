@@ -1,19 +1,11 @@
 <template>
   <q-page class="client-background" padding>
     <ni-title-header title="Formations" class="q-mb-xl" />
-    <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
-          :value="selectedProgram" @input="updateSelectedProgram" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
-        <span>Effacer les filtres</span>
-      </div>
+    <div class="filters-container">
+      <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
+      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
+      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
-
     <ni-trello :courses="coursesFiltered" />
   </q-page>
 </template>
