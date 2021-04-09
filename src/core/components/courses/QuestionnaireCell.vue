@@ -12,7 +12,7 @@
           Publiée
         </div>
       </div>
-      <div class="title">{{ questionnaire.title }}</div>
+      <div class="title ellipsis-2-lines">{{ questionnaire.title }}</div>
       <q-separator />
     </q-card-section>
   </q-card>
@@ -52,4 +52,5 @@ export default {
     color: $green-800;
   .title
     margin 16px 0px;
+    word-break: break-word;
   </style>
