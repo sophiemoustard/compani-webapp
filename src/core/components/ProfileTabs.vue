@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-tabs">
+  <div class="profile-tabs column">
     <q-tabs align="justify" color="transparent" v-model="selectedTab" no-caps>
       <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" :alert="alert(tab)" />
     </q-tabs>
@@ -48,8 +48,13 @@ export default {
       opacity: 1
     .q-tab-panels
       background-color: inherit
+      flex: 1
       .scroll
         overflow: initial
+      .q-panel
+        .q-tab-panel
+          div
+            height: 100%
     & /deep/ .q-tabs
       & .q-tabs__content
         & .q-tab

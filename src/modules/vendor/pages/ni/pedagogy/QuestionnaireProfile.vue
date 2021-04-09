@@ -1,8 +1,8 @@
 <template>
-  <q-page padding class="vendor-background">
+  <q-page padding class="vendor-background column no-wrap">
     <template v-if="questionnaire">
       <ni-profile-header :title="questionnaireTitle" :header-info="headerInfo" />
-      <profile-tabs :profile-id="questionnaireId" :tabs-content="tabsContent" />
+      <profile-tabs :profile-id="questionnaireId" :tabs-content="tabsContent" class="tabs" />
     </template>
   </q-page>
 </template>
@@ -63,3 +63,8 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.tabs
+  flex: 1
+</style>

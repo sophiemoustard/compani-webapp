@@ -1,6 +1,6 @@
 <template>
-  <q-page>
-    <div class="row col-md-6">
+  <div class="column">
+    <div class="row">
       <ni-input v-model.trim="questionnaire.title" required-field caption="Titre" @blur="updateQuestionnaire"
         @focus="saveTmpTitle" :error="$v.questionnaire.title.$error" :disable="questionnaire.status === PUBLISHED" />
     </div>
@@ -11,7 +11,7 @@
     </div>
 
     <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
-  </q-page>
+  </div>
 </template>
 
 <script>
@@ -142,10 +142,6 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-.q-page
-  display: flex
-  flex-direction: column
-
 .body
   flex: 1
 </style>
