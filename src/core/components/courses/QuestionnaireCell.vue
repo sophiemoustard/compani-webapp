@@ -53,4 +53,5 @@ export default {
   .title
     margin 16px 0px;
     word-break: break-word;
+    height: 48px;
   </style>

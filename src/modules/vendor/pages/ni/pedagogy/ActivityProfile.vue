@@ -6,11 +6,10 @@
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
           @delete-card="validateCardDeletion" :disable-edition="isEditionLocked" :card-parent="activity"
           @unlock-edition="validateUnlockEdition" @update="updateActivity" />
-        <card-edition :disable-edition="isEditionLocked" @refresh="refreshCard" :card-parent="activity" />
+        <card-edition :disable-edition="isEditionLocked" :card-parent="activity" @refresh="refreshCard" />
       </div>
     </template>
 
-    <!-- Card creation modal -->
     <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
   </q-page>
 </template>
@@ -18,7 +17,6 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
-import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
@@ -26,6 +24,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
+import { cardMixin } from '@mixins/cardMixin';
 
 export default {
   name: 'ActivityProfile',
@@ -42,6 +41,7 @@ export default {
     'card-edition': CardEdition,
     'card-creation-modal': CardCreationModal,
   },
+  mixins: [cardMixin],
   data () {
     return {
       programName: '',
@@ -121,9 +121,7 @@ export default {
     },
     validateUnlockEdition () {
       const programsReusingActivity = [...new Set(
-        this.activity.steps
-          .filter(s => s._id !== this.stepId)
-          .map(s => get(s, 'subProgram.program.name'))
+        this.activity.steps.filter(s => s._id !== this.stepId).map(s => get(s, 'subProgram.program.name'))
       )];
 
       const usedInOtherStepMessage = this.isActivityUsedInOtherStep
@@ -147,9 +145,6 @@ export default {
       }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
         .onCancel(() => NotifyPositive('Déverouillage annulée.'));
     },
-    openCardCreationModal (stepId) {
-      this.cardCreationModal = true;
-    },
     async createCard (template) {
       this.$q.loading.show();
       try {
@@ -170,18 +165,9 @@ export default {
         this.$q.loading.hide();
       }
     },
-    validateCardDeletion (cardId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer cette carte ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.deleteCard(cardId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
     async deleteCard (cardId) {
       try {
-        await Cards.deleteById(cardId);
+        await Activities.deleteCard(cardId);
         await this.refreshActivity();
         this.$store.dispatch('card/resetCard');
         NotifyPositive('Carte supprimée');
