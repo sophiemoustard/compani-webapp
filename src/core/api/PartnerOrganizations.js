@@ -8,4 +8,11 @@ export default {
     const partnerOrganizations = await alenviAxios.get(`${process.env.API_HOSTNAME}/partnerorganizations`);
     return partnerOrganizations.data.data.partnerOrganizations;
   },
+  async getById (id) {
+    const partnerOrganization = await alenviAxios.get(`${process.env.API_HOSTNAME}/partnerorganizations/${id}`);
+    return partnerOrganization.data.data.partnerOrganization;
+  },
+  async updateById (id, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/partnerorganizations/${id}`, payload);
+  },
 };
