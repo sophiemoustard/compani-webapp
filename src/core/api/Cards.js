@@ -13,9 +13,6 @@ export default {
   async deleteAnswer (params) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${params.cardId}/answers/${params.answerId}`);
   },
-  async deleteById (cardId) {
-    await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${cardId}`);
-  },
   async deleteMedia (cardId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/cards/${cardId}/upload`);
   },

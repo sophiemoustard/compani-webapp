@@ -2,7 +2,7 @@ import { mapState } from 'vuex';
 import uniqBy from 'lodash/uniqBy';
 import groupBy from 'lodash/groupBy';
 import { INTER_B2B, INTRA } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 
 export const courseFiltersMixin = {
@@ -13,7 +13,7 @@ export const courseFiltersMixin = {
     };
   },
   computed: {
-    ...mapState('course', ['selectedTrainer', 'selectedProgram', 'selectedCompany']),
+    ...mapState('course', ['selectedTrainer', 'selectedProgram', 'selectedCompany', 'selectedSalesRepresentative']),
     coursesFiltered () {
       let courses = this.coursesWithGroupedSlot;
       if (this.selectedProgram) courses = this.filterCoursesByProgram(courses);
@@ -21,6 +21,8 @@ export const courseFiltersMixin = {
       if (this.selectedTrainer) courses = this.filterCoursesByTrainer(courses);
 
       if (this.selectedCompany) courses = this.filterCoursesByCompany(courses);
+
+      if (this.selectedSalesRepresentative) courses = this.filterCoursesBySalesRepresentative(courses);
 
       return courses;
     },
@@ -44,10 +46,8 @@ export const courseFiltersMixin = {
       ];
     },
     trainerFilterOptions () {
-      const trainers = this.coursesWithGroupedSlot
-        .filter(course => !!course.trainer)
-        .map(course => ({ label: formatIdentity(course.trainer.identity, 'FL'), value: course.trainer._id }))
-        .sort((a, b) => a.label.localeCompare(b.label));
+      const filteredCourses = this.coursesWithGroupedSlot.filter(course => !!course.salesRepresentative);
+      const trainers = formatAndSortIdentityOptions(filteredCourses, 'trainer');
 
       return [
         { label: 'Tous les intervenants', value: '' },
@@ -62,6 +62,16 @@ export const courseFiltersMixin = {
 
       return [{ label: 'Tous les programmes', value: '' }, ...uniqBy(programs, 'value')];
     },
+    salesRepresentativesFilterOptions () {
+      const filteredCourses = this.coursesWithGroupedSlot.filter(course => !!course.salesRepresentative);
+      const salesRepresentatives = formatAndSortIdentityOptions(filteredCourses, 'salesRepresentative');
+
+      return [
+        { label: 'Tous les référents Compani', value: '' },
+        { label: 'Sans référent Compani', value: 'without_sales_representative' },
+        ...uniqBy(salesRepresentatives, 'value'),
+      ];
+    },
   },
   methods: {
     updateSelectedTrainer (trainerId) {
@@ -72,6 +82,9 @@ export const courseFiltersMixin = {
     },
     updateSelectedCompany (companyId) {
       this.$store.dispatch('course/setSelectedCompany', { companyId });
+    },
+    updateSelectedSalesRepresentative (salesRepresentativeId) {
+      this.$store.dispatch('course/setSelectedSalesRepresentative', { salesRepresentativeId });
     },
     resetFilters () {
       this.$store.dispatch('course/resetFilters');
@@ -87,6 +100,11 @@ export const courseFiltersMixin = {
     filterCoursesByCompany (courses) {
       return courses.filter(course => (course.type === INTRA && course.company._id === this.selectedCompany) ||
         (course.type === INTER_B2B && course.trainees.some(trainee => trainee.company._id === this.selectedCompany)));
+    },
+    filterCoursesBySalesRepresentative (courses) {
+      return courses.filter(course => (course.salesRepresentative
+        ? course.salesRepresentative._id === this.selectedSalesRepresentative
+        : this.selectedSalesRepresentative === 'without_sales_representative'));
     },
     groupByCourses (courses) {
       return courses.map(course => ({

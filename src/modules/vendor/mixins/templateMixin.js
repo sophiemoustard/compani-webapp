@@ -28,9 +28,13 @@ export const templateMixin = {
     };
   },
   computed: {
-    ...mapState('program', ['card', 'activity']),
+    ...mapState('card', ['card']),
     mediaFileName () {
-      return this.card.title ? this.card.title.replace(/ /g, '_') : this.activity.name.replace(/ /g, '_');
+      if (this.card && this.card.title) return this.card.title.replace(/ /g, '_');
+
+      return get(this.cardParent, 'name')
+        ? this.cardParent.name.replace(/ /g, '_')
+        : this.cardParent.title.replace(/ /g, '_');
     },
     mediaUploadUrl () {
       return `${process.env.API_HOSTNAME}/cards/${this.card._id}/upload`;
@@ -150,14 +154,8 @@ export const templateMixin = {
         NotifyNegative('Erreur lors de la suppression de la réponse.');
       }
     },
-    async refreshCard () {
-      try {
-        await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
-        const card = this.activity.cards.find(c => c._id === this.card._id);
-        this.$store.dispatch('program/fetchCard', card);
-      } catch (e) {
-        console.error(e);
-      }
+    refreshCard () {
+      this.$emit('refresh');
     },
     async mediaUploaded () {
       try {

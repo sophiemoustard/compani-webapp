@@ -21,9 +21,9 @@ export const learnerMixin = {
         case AUXILIARY_WITHOUT_COMPANY:
           return 'Auxiliaire';
         case CLIENT_ADMIN:
-          return 'Administateur';
+          return 'Administrateur';
         case VENDOR_ADMIN:
-          return 'Administateur Vendeur';
+          return 'Administrateur Vendeur';
         case COACH:
           return 'Coach';
         case TRAINING_ORGANISATION_MANAGER:

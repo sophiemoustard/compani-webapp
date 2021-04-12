@@ -13,13 +13,16 @@
         <div class="row gutter-profile">
           <ni-input caption="Informations complémentaires" v-model.trim="course.misc"
             @blur="updateCourse('misc')" @focus="saveTmp('misc')" />
+          <ni-select v-if="!isClientInterface" v-model.trim="course.salesRepresentative._id" :disable="!isAdmin"
+            @blur="updateCourse('salesRepresentative')" caption="Référent Compani" :options="salesRepresentativeOptions"
+            @focus="saveTmp('salesRepresentative')" :error="$v.course.salesRepresentative._id.$error" />
           <ni-select v-if="isAdmin" v-model.trim="course.trainer._id" @focus="saveTmp('trainer')" caption="Intervenant"
-            :options="trainerOptions" :error="$v.course.trainer.$error" @blur="updateCourse('trainer')" />
+            :options="trainerOptions" :error="$v.course.trainer._id.$error" @blur="updateCourse('trainer')" />
         </div>
       </div>
     </div>
-    <ni-slot-container :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
-    <ni-trainee-table :can-edit="canEdit" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-slot-container :can-edit="canEditSlots" :loading="courseLoading" @refresh="refreshCourse" />
+    <ni-trainee-table :can-edit="canEditTrainees" :loading="courseLoading" @refresh="refreshCourse" />
     <q-page-sticky expand position="right">
       <course-history-feed v-if="displayHistory" @toggle-history="toggleHistory" :course-histories="courseHistories"
         @load="updateCourseHistories" ref="courseHistoryFeed" />
@@ -35,6 +38,7 @@ import pick from 'lodash/pick';
 import cloneDeep from 'lodash/cloneDeep';
 import Users from '@api/Users';
 import CourseHistories from '@api/CourseHistories';
+import Roles from '@api/Roles';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import SlotContainer from '@components/courses/SlotContainer';
@@ -43,13 +47,8 @@ import CourseInfoLink from '@components/courses/CourseInfoLink';
 import CourseHistoryFeed from '@components/courses/CourseHistoryFeed';
 import Banner from '@components/Banner';
 import { NotifyNegative } from '@components/popup/notify';
-import {
-  INTER_B2B,
-  VENDOR_ADMIN,
-  TRAINING_ORGANISATION_MANAGER,
-  TRAINER,
-} from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { INTER_B2B, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER, TRAINER } from '@data/constants';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
 import BiColorButton from '@components/BiColorButton';
@@ -75,6 +74,7 @@ export default {
 
     return {
       trainerOptions: [],
+      salesRepresentativeOptions: [],
       courseLoading: false,
       courseSlotsLoading: false,
       tmpInput: '',
@@ -86,7 +86,8 @@ export default {
   validations () {
     return {
       course: {
-        trainer: { required },
+        trainer: { _id: { required }, identity: { required } },
+        salesRepresentative: { _id: { required }, identity: { required } },
       },
       newTrainee: this.traineeValidations,
       editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
@@ -94,14 +95,20 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    isTrainer () {
+      return this.vendorRole === TRAINER;
+    },
     isAdmin () {
       return [VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
     },
     isCourseInter () {
       return this.course.type === INTER_B2B;
     },
-    canEdit () {
+    canEditSlots () {
       return !(this.isClientInterface && this.isCourseInter);
+    },
+    canEditTrainees () {
+      return this.isIntraCourse || (!this.isClientInterface && !this.isTrainer);
     },
     missingInfoMsg () {
       return `Le lien vers la page sera disponible dès que l'équipe aura rentré ${
@@ -111,7 +118,9 @@ export default {
   },
   async created () {
     if (!this.course) await this.refreshCourse();
-    if (this.isAdmin) await this.refreshTrainers();
+
+    if (this.isAdmin) await this.refreshTrainersAndSalesRepresentatives();
+    else this.salesRepresentativeOptions = formatAndSortIdentityOptions([this.course.salesRepresentative]);
   },
   methods: {
     get,
@@ -161,12 +170,18 @@ export default {
         this.courseLoading = false;
       }
     },
-    async refreshTrainers () {
+    async refreshTrainersAndSalesRepresentatives () {
       try {
-        const trainers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
-        this.trainerOptions = trainers.map(t => ({ label: formatIdentity(t.identity, 'FL'), value: t._id }));
+        const vendorUsers = await Users.list({ role: [TRAINER, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        this.trainerOptions = Object.freeze(formatAndSortIdentityOptions(vendorUsers));
+
+        const [trainerRole] = await Roles.list({ name: [TRAINER] });
+        const salesRepresentatives = vendorUsers.filter(t => t.role.vendor !== trainerRole._id);
+        this.salesRepresentativeOptions = Object.freeze(formatAndSortIdentityOptions(salesRepresentatives));
       } catch (e) {
         console.error(e);
+        this.trainerOptions = [];
+        this.salesRepresentativeOptions = [];
       }
     },
   },
