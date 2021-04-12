@@ -5,7 +5,7 @@
         <ni-input v-model.trim="questionnaire.title" required-field caption="Titre" @blur="updateQuestionnaire"
           @focus="saveTmpTitle" :error="$v.questionnaire.title.$error" :disable="titleLock" />
         <ni-button v-if="isQuestionnairePublished" color="black" :icon="lockIcon"
-          @click.native="titleLock = !titleLock" />
+          @click="titleLock = !titleLock" />
       </div>
       <div class="publish-button">
         <ni-button v-if="!isQuestionnairePublished" color="primary" label="Publier" icon="vertical_align_top"
@@ -174,6 +174,9 @@ export default {
       }
     },
     async validateQuestionnairePublication () {
+      if (!this.questionnaire.cards.length) return NotifyWarning('Il n\'y a aucune carte dans ce questionnaire.');
+      if (!this.questionnaire.areCardsValid) return NotifyWarning('Carte(s) invalide(s).');
+
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir publier ce questionnaire ?',
@@ -192,6 +195,7 @@ export default {
         NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
+        if (e.status === 409) return NotifyWarning(e.data.message);
         NotifyNegative('Erreur lors de la publication du questionnaire.');
       } finally {
         this.refreshQuestionnaire();
