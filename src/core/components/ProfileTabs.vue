@@ -1,5 +1,5 @@
 <template>
-  <div class="profile-tabs column">
+  <div class="profile-tabs flex-column">
     <q-tabs align="justify" color="transparent" v-model="selectedTab" no-caps>
       <q-tab v-for="(tab, index) in tabsContent" :key="index" :label="tab.label" :name="tab.name" :alert="alert(tab)" />
     </q-tabs>
