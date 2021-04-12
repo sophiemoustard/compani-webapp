@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="client-background">
-    <ni-profile-header :title="partnerOrganization.name" />
+    <ni-profile-header :title="partnerOrganizationName" />
     <div class="row justify-between items-baseline">
       <p class="text-weight-bold">Informations</p>
     </div>
@@ -12,7 +12,7 @@
         :error-message="phoneNumberError($v.partnerOrganization)" />
       <ni-search-address v-model="partnerOrganization.address" @focus="saveTmp('address')"
         @blur="updatePartnerOrganization('address')" :error="$v.partnerOrganization.address.$error"
-      :error-message="addressError($v.partnerOrganization)" />
+        :error-message="addressError($v.partnerOrganization)" />
       <ni-input caption="Email" v-model="partnerOrganization.email" @focus="saveTmp('email')"
         @blur="updatePartnerOrganization('email')" :error="$v.partnerOrganization.email.$error"
         :error-message="emailError($v.partnerOrganization)" />
@@ -34,7 +34,7 @@ import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 
 export default {
-  metaInfo: { title: 'Structure partenaire' },
+  metaInfo: { title: 'Fiche structure partenaire' },
   props: {
     partnerOrganizationId: { type: String, required: true },
   },
@@ -48,6 +48,7 @@ export default {
     return {
       partnerOrganization: { name: '', phone: '', address: {}, email: '' },
       tmpInput: '',
+      partnerOrganizationName: '',
     };
   },
   validations: {
@@ -63,7 +64,7 @@ export default {
       email: { email },
     },
   },
-  async mounted () {
+  async created () {
     await this.refreshPartnerOrganization();
   },
   methods: {
@@ -73,6 +74,7 @@ export default {
     async refreshPartnerOrganization () {
       try {
         this.partnerOrganization = await PartnerOrganization.getById(this.partnerOrganizationId);
+        this.partnerOrganizationName = this.partnerOrganization.name;
       } catch (e) {
         this.partnerOrganization = { name: '', phone: '', address: {}, email: '' };
         console.error(e);
@@ -91,7 +93,7 @@ export default {
         if (payload.address && !payload.address.fullAddress) payload = { address: {} };
         await PartnerOrganization.updateById(this.partnerOrganizationId, payload);
 
-        NotifyPositive('Modification enregistrée');
+        NotifyPositive('Modification enregistrée.');
 
         await this.refreshPartnerOrganization();
       } catch (e) {
