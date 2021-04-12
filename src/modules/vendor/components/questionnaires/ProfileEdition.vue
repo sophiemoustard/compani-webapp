@@ -9,7 +9,7 @@
       </div>
       <div class="publish-button">
         <ni-button v-if="!isQuestionnairePublished" color="primary" label="Publier" icon="vertical_align_top"
-            @click="openCheckModal" :flat="false" />
+          @click="validateQuestionnairePublication" :flat="false" />
       </div>
     </div>
     <div class="row body">
@@ -173,7 +173,7 @@ export default {
         this.refreshQuestionnaire();
       }
     },
-    async openCheckModal () {
+    async validateQuestionnairePublication () {
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Es-tu sûr(e) de vouloir publier ce questionnaire ?',
