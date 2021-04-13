@@ -143,7 +143,7 @@ export default {
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
-        .onCancel(() => NotifyPositive('Déverouillage annulée.'));
+        .onCancel(() => NotifyPositive('Déverouillage annulé.'));
     },
     async createCard (template) {
       this.$q.loading.show();

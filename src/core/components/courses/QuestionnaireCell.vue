@@ -9,7 +9,7 @@
         </div>
         <div v-else class="published">
           <q-icon size="12px" name="check_circle" color="green-800" />
-          Publiée
+          Publié
         </div>
       </div>
       <div class="title ellipsis-2-lines">{{ questionnaire.title }}</div>
