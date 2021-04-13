@@ -1,6 +1,7 @@
 require('dotenv').config();
 const path = require('path');
 const webpack = require('webpack');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
 module.exports = function (ctx) {
   return {
@@ -109,14 +110,6 @@ module.exports = function (ctx) {
       preloadChunks: true,
       extendWebpack (cfg) {
         cfg.module.rules.push({
-          enforce: 'pre',
-          test: /\.(js|vue)$/,
-          loader: 'eslint-loader',
-          exclude: /(node_modules|quasar)/,
-          options: {
-            fix: true,
-          },
-        }, {
           test: /\.(html)$/,
           use: { loader: 'html-loader' },
         });
@@ -130,6 +123,7 @@ module.exports = function (ctx) {
           '@mixins': path.resolve(__dirname, './src/core/mixins'),
         };
         cfg.plugins.push(
+          new ESLintPlugin({ fix: true }),
           // Select moment locale files
           new webpack.ContextReplacementPlugin(/moment[/\\]locale$/, /fr/),
           // Ignore astronomia (date-holidays)
