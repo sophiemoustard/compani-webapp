@@ -41,6 +41,7 @@ export default {
   name: 'MultipleChoiceQuestion',
   props: {
     disableEdition: { type: Boolean, default: false },
+    cardParent: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-input': Input,
@@ -64,11 +65,11 @@ export default {
   computed: {
     disableAnswerCreation () {
       return this.card.qcAnswers.length >= MULTIPLE_CHOICE_QUESTION_MAX_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
     disableAnswerDeletion () {
       return this.card.qcAnswers.length <= MULTIPLE_CHOICE_QUESTION_MIN_ANSWERS_COUNT ||
-        this.disableEdition || this.activity.status === PUBLISHED;
+        this.disableEdition || this.cardParent.status === PUBLISHED;
     },
   },
   methods: {

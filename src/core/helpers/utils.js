@@ -134,4 +134,11 @@ export const formatAndSortOptions = (array, field) => array
   .map(element => ({ label: get(element, field), value: element._id }))
   .sort((a, b) => a.label.localeCompare(b.label));
 
+export const formatAndSortIdentityOptions = (array, field = null) => array
+  .map(element => ({
+    label: formatIdentity(get(element, field ? `${field}.identity` : 'identity'), 'FL'),
+    value: get(element, field ? `${field}._id` : '_id'),
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label));
+
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');

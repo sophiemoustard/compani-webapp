@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapState, mapGetters } from 'vuex';
 import { required, requiredIf, email } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
@@ -53,7 +53,7 @@ import omit from 'lodash/omit';
 import Users from '@api/Users';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
-import { INTER_B2B, TRAINEE } from '@data/constants';
+import { INTER_B2B, TRAINEE, TRAINER } from '@data/constants';
 import { formatPhone, clear, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
@@ -155,19 +155,23 @@ export default {
   },
   computed: {
     ...mapState('course', ['course']),
+    ...mapGetters({ vendorRole: 'main/getVendorRole' }),
+    isTrainer () {
+      return this.vendorRole === TRAINER;
+    },
     traineesNumber () {
       return this.course.trainees ? this.course.trainees.length : 0;
     },
     tableTitle () {
-      return this.canEdit
+      return this.canEdit || this.isTrainer
         ? `Participants (${this.traineesNumber})`
         : `Participants de votre structure (${this.traineesNumber})`;
     },
     traineesVisibleColumns () {
       const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
       if (this.canEdit) visibleColumns.push('actions');
-      if (this.isIntraCourse) return visibleColumns;
-      return ['company', ...visibleColumns];
+
+      return this.isIntraCourse ? visibleColumns : ['company', ...visibleColumns];
     },
     traineesEmails () {
       if (!this.course.trainees) return '';
@@ -176,7 +180,7 @@ export default {
     },
   },
   async created () {
-    if (!this.isIntraCourse && this.canEdit) await Promise.all([this.refreshCompanies()]);
+    if (!this.isIntraCourse && this.canEdit) await this.refreshCompanies();
   },
   methods: {
     async refreshCompanies () {
@@ -227,12 +231,15 @@ export default {
     },
     formatAddTraineePayload () {
       const payload = cloneDeep(this.newTrainee);
+
       if (get(payload, 'identity.firstname') === '') {
         if (get(payload, 'identity.lastname') === '') delete payload.identity;
         else delete payload.identity.firstname;
       }
+
       if (get(payload, 'contact.phone') === '') delete payload.contact;
       else payload.contact.phone = formatPhoneForPayload(payload.contact.phone);
+
       if (get(payload, 'company') === '') delete payload.company;
 
       return payload;

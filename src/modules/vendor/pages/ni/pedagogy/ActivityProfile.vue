@@ -1,27 +1,15 @@
 <template>
   <q-page padding class="vendor-background">
     <template v-if="activity">
-      <ni-profile-header :title="activity.name">
-        <template #body>
-          <div class="row profile-info q-pl-lg">
-            <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-              <q-item-section side>
-                <q-icon size="xs" :name="info.icon" :class="info.class" />
-              </q-item-section>
-              <q-item-section :class="info.class">{{ info.label }}</q-item-section>
-            </q-item>
-          </div>
-        </template>
-      </ni-profile-header>
+      <ni-profile-header :title="activity.name" :header-info="headerInfo" />
       <div class="row body">
         <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
-          @delete-card="validateCardDeletion" :disable-edition="isEditionLocked"
-          @unlock-edition="validateUnlockEdition" @refresh="refreshActivity" />
-        <card-edition :disable-edition="isEditionLocked" />
+          @delete-card="validateCardDeletion" :disable-edition="isEditionLocked" :card-parent="activity"
+          @unlock-edition="validateUnlockEdition" @update="updateActivity" />
+        <card-edition :disable-edition="isEditionLocked" :card-parent="activity" @refresh="refreshCard" />
       </div>
     </template>
 
-    <!-- Card creation modal -->
     <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
   </q-page>
 </template>
@@ -29,7 +17,6 @@
 <script>
 import { mapState } from 'vuex';
 import get from 'lodash/get';
-import Cards from '@api/Cards';
 import Activities from '@api/Activities';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import { ACTIVITY_TYPES, PUBLISHED, PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING } from '@data/constants';
@@ -37,6 +24,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
 import CardCreationModal from 'src/modules/vendor/components/programs/cards/CardCreationModal';
+import { cardMixin } from '@mixins/cardMixin';
 
 export default {
   name: 'ActivityProfile',
@@ -53,6 +41,7 @@ export default {
     'card-edition': CardEdition,
     'card-creation-modal': CardCreationModal,
   },
+  mixins: [cardMixin],
   data () {
     return {
       programName: '',
@@ -65,7 +54,11 @@ export default {
     };
   },
   computed: {
-    ...mapState('program', ['program', 'activity']),
+    ...mapState({
+      activity: state => state.program.activity,
+      program: state => state.program.program,
+      card: state => state.card.card,
+    }),
     activityType () {
       return ACTIVITY_TYPES.find(type => type.value === this.activity.type).label || '';
     },
@@ -117,11 +110,18 @@ export default {
         console.error(e);
       }
     },
+    async refreshCard () {
+      try {
+        await this.$store.dispatch('program/fetchActivity', { activityId: this.activity._id });
+        const card = this.activity.cards.find(c => c._id === this.card._id);
+        this.$store.dispatch('card/fetchCard', card);
+      } catch (e) {
+        console.error(e);
+      }
+    },
     validateUnlockEdition () {
       const programsReusingActivity = [...new Set(
-        this.activity.steps
-          .filter(s => s._id !== this.stepId)
-          .map(s => get(s, 'subProgram.program.name'))
+        this.activity.steps.filter(s => s._id !== this.stepId).map(s => get(s, 'subProgram.program.name'))
       )];
 
       const usedInOtherStepMessage = this.isActivityUsedInOtherStep
@@ -145,9 +145,6 @@ export default {
       }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Activité déverouillée.'); })
         .onCancel(() => NotifyPositive('Déverouillage annulée.'));
     },
-    openCardCreationModal (stepId) {
-      this.cardCreationModal = true;
-    },
     async createCard (template) {
       this.$q.loading.show();
       try {
@@ -160,7 +157,7 @@ export default {
 
         await this.refreshActivity();
         const cardCreated = this.activity.cards[this.activity.cards.length - 1];
-        await this.$store.dispatch('program/fetchCard', cardCreated);
+        await this.$store.dispatch('card/fetchCard', cardCreated);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la carte.');
@@ -168,30 +165,32 @@ export default {
         this.$q.loading.hide();
       }
     },
-    validateCardDeletion (cardId) {
-      this.$q.dialog({
-        title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer cette carte ?',
-        ok: true,
-        cancel: 'Annuler',
-      }).onOk(() => this.deleteCard(cardId))
-        .onCancel(() => NotifyPositive('Suppression annulée.'));
-    },
     async deleteCard (cardId) {
       try {
-        await Cards.deleteById(cardId);
+        await Activities.deleteCard(cardId);
         await this.refreshActivity();
-        this.$store.dispatch('program/resetCard');
+        this.$store.dispatch('card/resetCard');
         NotifyPositive('Carte supprimée');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de la carte.');
       }
     },
+    async updateActivity (event) {
+      try {
+        await Activities.updateById(this.activity._id, { cards: event });
+        NotifyPositive('Modification enregistrée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification des cartes.');
+      } finally {
+        this.refreshActivity();
+      }
+    },
   },
   async beforeDestroy () {
     this.$store.dispatch('program/resetActivity');
-    this.$store.dispatch('program/resetCard');
+    this.$store.dispatch('card/resetCard');
     if ((new RegExp(`programs/${this.program._id}`)).test(this.$router.currentRoute.path)) {
       this.$store.dispatch('program/fetchProgram', { programId: this.programId });
       this.$store.dispatch('program/setOpenedStep', { stepId: this.stepId });
@@ -213,10 +212,4 @@ export default {
 .q-item
   padding: 0
   min-height: 0
-
-.info
-  &-active
-    color: $green-800
-  &-warning
-    color: $warning
 </style>

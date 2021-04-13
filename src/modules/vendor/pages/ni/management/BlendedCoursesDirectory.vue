@@ -1,31 +1,22 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Formations mixtes" class="q-mb-xl" />
-    <div class="row">
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="trainerFilterOptions"
-          :value="selectedTrainer" @input="updateSelectedTrainer" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3">
-        <ni-select :class="{ 'q-pl-sm': $q.platform.is.desktop }" :options="programFilterOptions"
-          :value="selectedProgram" @input="updateSelectedProgram" />
-      </div>
-      <div class="col-xs-12 col-sm-6 col-md-3 reset-filters" @click="resetFilters">
-        <span>Effacer les filtres</span>
-      </div>
+    <div class="filters-container">
+      <ni-select :options="companyFilterOptions" :value="selectedCompany" @input="updateSelectedCompany" />
+      <ni-select :options="trainerFilterOptions" :value="selectedTrainer" @input="updateSelectedTrainer" />
+      <ni-select :options="programFilterOptions" :value="selectedProgram" @input="updateSelectedProgram" />
+      <ni-select :options="salesRepresentativesFilterOptions" :value="selectedSalesRepresentative"
+        @input="updateSelectedSalesRepresentative" />
+      <div class="reset-filters" @click="resetFilters">Effacer les filtres</div>
     </div>
-
     <ni-trello :courses="coursesFiltered" />
     <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une formation"
-      @click="courseCreationModal = true" />
+      @click="openCourseCreationModal" />
 
     <!-- Course creation modal -->
     <course-creation-modal v-model="courseCreationModal" :new-course.sync="newCourse" :is-intra-course="isIntraCourse"
       :programs="programs" :company-options="companyOptions" :validations="$v.newCourse" :loading="modalLoading"
-      @hide="resetCreationModal" @submit="createCourse" />
+      @hide="resetCreationModal" @submit="createCourse" :sales-representative-options="salesRepresentativeOptions" />
   </q-page>
 </template>
 
@@ -36,14 +27,15 @@ import omit from 'lodash/omit';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
 import Programs from '@api/Programs';
+import Users from '@api/Users';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import CourseCreationModal from 'src/modules/vendor/components/courses/CourseCreationModal';
 import Trello from '@components/courses/Trello';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
-import { INTRA, COURSE_TYPES, BLENDED } from '@data/constants';
+import { INTRA, COURSE_TYPES, BLENDED, TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN } from '@data/constants';
 import { courseFiltersMixin } from '@mixins/courseFiltersMixin';
-import { formatAndSortOptions } from '@helpers/utils';
+import { formatAndSortOptions, formatAndSortIdentityOptions } from '@helpers/utils';
 
 export default {
   metaInfo: { title: 'Catalogue' },
@@ -64,11 +56,13 @@ export default {
         company: '',
         misc: '',
         type: INTRA,
+        salesRepresentative: '',
       },
       programs: [],
       courseCreationModal: false,
       coursesWithGroupedSlot: [],
       courseTypes: COURSE_TYPES,
+      salesRepresentativeOptions: [],
     };
   },
   validations () {
@@ -78,6 +72,7 @@ export default {
         subProgram: { required },
         company: { required: requiredIf(item => item.type === INTRA) },
         type: { required },
+        salesRepresentative: { required },
       },
     };
   },
@@ -88,7 +83,12 @@ export default {
     },
   },
   async created () {
-    await Promise.all([this.refreshCourses(), this.refreshPrograms(), this.refreshCompanies()]);
+    await Promise.all([
+      this.refreshCourses(),
+      this.refreshPrograms(),
+      this.refreshCompanies(),
+      this.refreshSalesRepresentatives(),
+    ]);
   },
   methods: {
     async refreshCourses () {
@@ -117,9 +117,18 @@ export default {
         this.companyOptions = [];
       }
     },
+    async refreshSalesRepresentatives () {
+      try {
+        const salesRepresentative = await Users.list({ role: [TRAINING_ORGANISATION_MANAGER, VENDOR_ADMIN] });
+        this.salesRepresentativeOptions = formatAndSortIdentityOptions(salesRepresentative);
+      } catch (e) {
+        console.error(e);
+        this.salesRepresentativeOptions = [];
+      }
+    },
     resetCreationModal () {
       this.$v.newCourse.$reset();
-      this.newCourse = { program: '', company: '', misc: '', type: INTRA };
+      this.newCourse = { program: '', company: '', misc: '', type: INTRA, salesRepresentative: '' };
     },
     async createCourse () {
       try {
@@ -138,6 +147,10 @@ export default {
       } finally {
         this.modalLoading = false;
       }
+    },
+    openCourseCreationModal () {
+      this.newCourse = { ...this.newCourse, salesRepresentative: this.loggedUser._id };
+      this.courseCreationModal = true;
     },
   },
   beforeDestroy () {

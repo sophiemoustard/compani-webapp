@@ -26,8 +26,7 @@
 </template>
 
 <script>
-import { required, email } from 'vuelidate/lib/validators';
-import pickBy from 'lodash/pickBy';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import escapeRegExp from 'lodash/escapeRegExp';
 import Customers from '@api/Customers';
@@ -66,7 +65,6 @@ export default {
           lastname: '',
           firstname: '',
         },
-        email: '',
         contact: {
           primaryAddress: { fullAddress: '' },
         },
@@ -131,7 +129,6 @@ export default {
         title: { required },
         lastname: { required },
       },
-      email: { email },
       contact: {
         primaryAddress: {
           zipCode: { required },
@@ -196,7 +193,6 @@ export default {
       this.$v.newCustomer.$reset();
       this.newCustomer = {
         identity: { title: '', lastname: '', firstname: '' },
-        email: '',
         contact: {
           primaryAddress: { fullAddress: '' },
         },
@@ -209,7 +205,7 @@ export default {
         const isValid = await this.waitForFormValidation(this.$v.newCustomer);
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = pickBy(this.newCustomer);
+        const payload = this.newCustomer;
         await Customers.create(payload);
 
         await this.getCustomers();

@@ -1,6 +1,6 @@
 <template>
   <q-page class="vendor-background" padding>
-    <ni-title-header title="Catégories" class="row q-mb-xl" />
+    <ni-title-header title="Catégories" class="q-mb-xl" />
     <q-card>
       <ni-responsive-table :data="categories" :columns="columns" :pagination.sync="pagination" :loading="tableLoading">
         <template #body="{ props }">

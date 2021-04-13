@@ -2,8 +2,7 @@
   <q-page padding class="client-background">
     <template v-if="course">
       <ni-blended-course-profile-header :title="courseName" :header-info="headerInfo" />
-      <profile-tabs v-if="isIntraCourse" :profile-id="courseId" :tabs-content="tabsContent" />
-      <ni-profile-organization v-else :profile-id="courseId" />
+      <profile-tabs :profile-id="courseId" :tabs-content="tabsContent" />
     </template>
   </q-page>
 </template>
@@ -28,27 +27,37 @@ export default {
   },
   components: {
     'profile-tabs': ProfileTabs,
-    'ni-profile-organization': ProfileOrganization,
     'ni-blended-course-profile-header': BlendedCourseProfileHeader,
+  },
+  data () {
+    const organizationTab = {
+      label: 'Organisation',
+      name: 'organization',
+      default: this.defaultTab === 'organization',
+      component: ProfileOrganization,
+    };
+    const adminTab = { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin };
+    const traineeFollowUpTab = {
+      label: 'Suivi des stagiaires',
+      name: 'traineeFollowUp',
+      default: this.defaultTab === 'traineeFollowUp',
+      component: ProfileTraineeFollowUp,
+    };
+
+    return {
+      organizationTab,
+      adminTab,
+      traineeFollowUpTab,
+    };
   },
   computed: {
     ...mapState('course', ['course']),
     tabsContent () {
-      return [
-        {
-          label: 'Organisation',
-          name: 'organization',
-          default: this.defaultTab === 'organization',
-          component: ProfileOrganization,
-        },
-        { label: 'Admin', name: 'admin', default: this.defaultTab === 'admin', component: ProfileAdmin },
-        {
-          label: 'Suivi des stagiaires',
-          name: 'traineeFollowUp',
-          default: this.defaultTab === 'traineeFollowUp',
-          component: ProfileTraineeFollowUp,
-        },
-      ];
+      if (this.isIntraCourse) {
+        return [this.organizationTab, this.adminTab, this.traineeFollowUpTab];
+      }
+
+      return [this.organizationTab, this.traineeFollowUpTab];
     },
   },
   async created () {

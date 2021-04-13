@@ -23,7 +23,7 @@ import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import Input from '@components/form/Input';
 import { INTRA } from '@data/constants';
-import { formatIdentity } from '@helpers/utils';
+import { formatAndSortIdentityOptions } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import moment from '@helpers/moment';
 
@@ -48,10 +48,7 @@ export default {
   },
   computed: {
     traineeOptions () {
-      return this.course.trainees.map(trainee => ({
-        label: formatIdentity(trainee.identity, 'FL'),
-        value: trainee._id,
-      }));
+      return formatAndSortIdentityOptions(this.course.trainees);
     },
     dateOptions () {
       const dateOptionsSet = new Set([...this.course.slots.map(date => moment(date.startDate).startOf('d').toDate())]);

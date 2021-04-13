@@ -1,15 +1,7 @@
 <template>
-  <ni-profile-header :title="title" class="delete-container">
+  <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
     <template #title v-if="!isClientInterface">
       <ni-button class="delete" icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
-    </template>
-    <template #body>
-      <div class="row profile-info q-pl-lg">
-        <q-item v-for="info of headerInfo" class="col-md-6 col-xs-12" :key="info.icon">
-          <q-item-section side><q-icon size="xs" :name="info.icon" /></q-item-section>
-          <q-item-section>{{ info.label }}</q-item-section>
-        </q-item>
-      </div>
     </template>
   </ni-profile-header>
 </template>

@@ -48,7 +48,7 @@ export const courseMixin = {
       return minutes > 0 && minutes < 10 ? minutes.toString().padStart(2, 0) : minutes;
     },
     saveTmp (path) {
-      this.tmpInput = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
+      this.tmpInput = this.getValue(path);
     },
     formatUpdateCourseValue (path, value) {
       return path === 'contact.phone' ? formatPhoneForPayload(value) : value;
@@ -58,13 +58,24 @@ export const courseMixin = {
       const possiblyMisc = c.misc ? ` - ${c.misc}` : '';
       return possiblyCompanyName + c.subProgram.program.name + possiblyMisc;
     },
+    getValue (path) {
+      if (path === 'trainer') return get(this.course, 'trainer._id', '');
+      if (path === 'salesRepresentative') return get(this.course, 'salesRepresentative._id', '');
+
+      return get(this.course, path);
+    },
+    getVAttribute (path) {
+      if (path === 'trainer') return get(this.$v.course, 'trainer._id', '');
+      if (path === 'salesRepresentative') return get(this.$v.course, 'salesRepresentative._id', '');
+
+      return get(this.$v.course, path);
+    },
     async updateCourse (path) {
       try {
-        const value = path === 'trainer' ? get(this.course, 'trainer._id', '') : get(this.course, path);
-
+        const value = this.getValue(path);
         if (this.tmpInput === value) return;
 
-        const vAttribute = get(this.$v.course, path);
+        const vAttribute = this.getVAttribute(path);
         if (vAttribute) {
           vAttribute.$touch();
           if (vAttribute.$error) return NotifyWarning('Champ(s) invalide(s).');

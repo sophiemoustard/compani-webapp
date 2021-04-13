@@ -31,7 +31,7 @@
     <version-edition-modal v-model="versionEditionModal" :edited-version.sync="editedVersion" :loading="loading"
       :validations="$v.editedVersion" :min-start-date="editedVersionMinStartDate" @hide="resetVersionEditionModal"
       @submit="editVersion" :gross-hourly-rate-error="grossHourlyRateError($v.editedVersion)"
-      :start-date-error="startDateError" />
+      :start-date-error="startDateError($v.editedVersion)" />
   </q-page>
 </template>
 
