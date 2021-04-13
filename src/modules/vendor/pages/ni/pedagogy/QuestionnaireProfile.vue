@@ -39,7 +39,7 @@ export default {
       const infos = [{ icon: 'bookmark_border', label: QUESTIONNAIRE_TYPES[this.questionnaire.type] }];
 
       if (this.questionnaire.status === DRAFT) infos.push({ icon: 'edit', label: 'Brouillon', class: 'info-warning' });
-      else infos.push({ icon: 'check_circle', label: 'Publiée', class: 'info-active' });
+      else infos.push({ icon: 'check_circle', label: 'Publié', class: 'info-active' });
 
       return infos;
     },

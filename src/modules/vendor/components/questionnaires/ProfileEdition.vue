@@ -191,8 +191,8 @@ export default {
           await Questionnaires.update(this.questionnaire._id, { status: PUBLISHED });
           this.titleLock = true;
           this.isEditionLocked = true;
+          NotifyPositive('Questionnaire publié.');
         }
-        NotifyPositive('Modification enregistrée.');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
