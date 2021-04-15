@@ -154,11 +154,11 @@ export default {
         : 'formation eLearning terminée';
     },
     eLearningActivitiesCompleted () {
-      return uniqBy(this.eLearningCourses
-        .map(course => course.subProgram.steps
-          .map(step => step.activities.map(act => act.activityHistories).flat())
-          .flat())
-        .flat(), '_id');
+      const activityHistories = this.courses
+        .map(c => c.subProgram.steps.map(s => s.activities.map(a => a.activityHistories).flat()).flat())
+        .flat();
+
+      return uniqBy(activityHistories, '_id');
     },
     eLearningActivitesCompletedText () {
       return this.eLearningActivitiesCompleted.length > 1
