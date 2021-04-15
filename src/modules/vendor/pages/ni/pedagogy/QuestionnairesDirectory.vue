@@ -1,7 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Questionnaires" class="q-mb-xl" />
-    <div v-for="group in questionnairesByType" :key="group.type">
+    <div v-for="group in questionnairesByType" :key="group.type" class="q-mb-lg ">
       <div class="text-weight-bold">{{ QUESTIONNAIRE_TYPES[group.type] }}</div>
       <div v-if="group.list" class="row">
         <questionnaire-cell v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
