@@ -46,7 +46,7 @@ export const courseFiltersMixin = {
       ];
     },
     trainerFilterOptions () {
-      const filteredCourses = this.coursesWithGroupedSlot.filter(course => !!course.salesRepresentative);
+      const filteredCourses = this.coursesWithGroupedSlot.filter(course => !!course.trainer);
       const trainers = formatAndSortIdentityOptions(filteredCourses, 'trainer');
 
       return [
