@@ -1,9 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <ni-profile-header :title="partnerOrganizationName" />
-    <div class="row justify-between items-baseline">
-      <p class="text-weight-bold">Informations</p>
-    </div>
+    <p class="text-weight-bold">Informations</p>
     <div class="row gutter-profile">
       <ni-input caption="Nom" v-model="partnerOrganization.name" @focus="saveTmp('name')"
         @blur="updatePartnerOrganization('name')" :error="$v.partnerOrganization.name.$error" />
@@ -17,6 +15,7 @@
         @blur="updatePartnerOrganization('email')" :error="$v.partnerOrganization.email.$error"
         :error-message="emailError($v.partnerOrganization)" />
     </div>
+    <p class="text-weight-bold q-mt-lg">Partenaires</p>
   </q-page>
 </template>
 
