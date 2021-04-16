@@ -442,3 +442,14 @@ export const EXPECTATIONS = 'expectations';
 export const END_OF_COURSE = 'end_of_course';
 export const DRAFT = 'draft';
 export const QUESTIONNAIRE_TYPES = { [EXPECTATIONS]: 'Recueil des attentes', [END_OF_COURSE]: 'Fin de formation' };
+
+// PARTNER
+export const JOB_OPTIONS = [
+  { label: 'Assistante sociale', value: 'social_worker' },
+  { label: 'Évaluateur médico-sociau', value: 'medico-social_assessor' },
+  { label: 'Docteur', value: 'doctor' },
+  { label: 'Coordinateur', value: 'coordinator' },
+  { label: 'Gestionnaire de cas', value: 'case_manager' },
+  { label: 'Infirmier', value: 'nurse' },
+  { label: 'Psychologue', value: 'psychologist' },
+];
