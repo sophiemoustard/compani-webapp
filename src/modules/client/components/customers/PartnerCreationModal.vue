@@ -15,7 +15,7 @@
       :options="jobOptions" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Créer le partenaire" icon-right="add" color="primary"
-        @click="submit" />
+        @click="submit" :loading="loading" />
     </template>
   </ni-modal>
 </template>
@@ -35,6 +35,7 @@ export default {
     value: { type: Boolean, default: false },
     newPartner: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
+    loading: { type: Boolean, default: false },
   },
   components: {
     'ni-modal': Modal,

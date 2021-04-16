@@ -23,7 +23,7 @@
     </q-page>
 
     <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner"
-      :validations="$v.newPartner" />
+      :validations="$v.newPartner" :loading="modalLoading" @hide="resetModal" />
   </div>
 </template>
 
@@ -62,6 +62,7 @@ export default {
       partnerOrganizationName: '',
       partnerCreationModal: false,
       newPartner: { identity: { firstname: '', lastname: '' }, email: '', job: '' },
+      modalLoading: false,
     };
   },
   validations: {
@@ -124,17 +125,25 @@ export default {
     },
     async createPartner () {
       try {
+        this.modalLoading = true;
+
         this.$v.newPartner.$touch();
         if (this.$v.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         await PartnerOrganization.createPartner(this.partnerOrganizationId, this.newPartner);
 
-        this.partnerOrganizationCreationModal = false;
+        this.partnerCreationModal = false;
         NotifyPositive('Partenaire créé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du partenaire.');
+      } finally {
+        this.modalLoading = false;
       }
+    },
+    resetModal () {
+      this.$v.newPartner.$reset();
+      this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', job: '' };
     },
   },
 };
