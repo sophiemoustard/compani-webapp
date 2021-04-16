@@ -22,7 +22,8 @@
       </q-card-actions>
     </q-page>
 
-    <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner" />
+    <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner"
+      :validations="$v.newPartner" />
   </div>
 </template>
 
@@ -75,6 +76,11 @@ export default {
       },
       email: { email },
     },
+    newPartner: {
+      identity: { lastname: { required }, firstname: { required }, required },
+      phone: { frPhoneNumber },
+      email: { email },
+    },
   },
   async created () {
     await this.refreshPartnerOrganization();
@@ -118,6 +124,9 @@ export default {
     },
     async createPartner () {
       try {
+        this.$v.newPartner.$touch();
+        if (this.$v.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
         await PartnerOrganization.createPartner(this.partnerOrganizationId, this.newPartner);
 
         this.partnerOrganizationCreationModal = false;

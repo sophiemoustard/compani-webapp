@@ -4,10 +4,13 @@
       Créer un nouveau <span class="text-weight-bold">partenaire</span>
     </template>
     <ni-input in-modal :value="newPartner.identity.lastname" @input="update($event.trim(), 'identity.lastname')"
-      caption="Nom" required-field />
+      @blur="validations.identity.lastname.$touch" :error="validations.identity.lastname.$error" caption="Nom"
+      required-field />
     <ni-input in-modal :value="newPartner.identity.firstname" @input="update($event.trim(), 'identity.firstname')"
-      caption="Prénom" required-field />
-    <ni-input in-modal :value="newPartner.email" @input="update($event.trim(), 'email')" caption="Email" />
+      @blur="validations.identity.firstname.$touch" :error="validations.identity.firstname.$error" caption="Prénom"
+      required-field />
+    <ni-input in-modal :value="newPartner.email" @input="update($event.trim(), 'email')" caption="Email"
+      @blur="validations.email.$touch" :error="validations.email.$error" :error-message="emailError(validations)" />
     <ni-select in-modal :value="newPartner.job" @input="update($event, 'job')" caption="Fonction"
       :options="jobOptions" />
     <template slot="footer">
@@ -23,12 +26,15 @@ import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import { JOB_OPTIONS } from '@data/constants';
+import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 
 export default {
   name: 'PartnerCreationModal',
+  mixins: [partnerOrganizationMixin],
   props: {
     value: { type: Boolean, default: false },
     newPartner: { type: Object, default: () => ({}) },
+    validations: { type: Object, default: () => ({}) },
   },
   components: {
     'ni-modal': Modal,
