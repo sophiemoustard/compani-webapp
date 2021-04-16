@@ -15,4 +15,7 @@ export default {
   async updateById (id, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/partnerorganizations/${id}`, payload);
   },
+  async createPartner (id, payload) {
+    await alenviAxios.post(`${process.env.API_HOSTNAME}/partnerorganizations/${id}/partner`, payload);
+  },
 };
