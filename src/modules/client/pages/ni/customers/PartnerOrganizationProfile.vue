@@ -1,22 +1,29 @@
 <template>
-  <q-page padding class="client-background">
-    <ni-profile-header :title="partnerOrganizationName" />
-    <p class="text-weight-bold">Informations</p>
-    <div class="row gutter-profile">
-      <ni-input caption="Nom" v-model="partnerOrganization.name" @focus="saveTmp('name')"
-        @blur="updatePartnerOrganization('name')" :error="$v.partnerOrganization.name.$error" />
-      <ni-input caption="Téléphone" v-model="partnerOrganization.phone" @focus="saveTmp('phone')"
-        @blur="updatePartnerOrganization('phone')" :error="$v.partnerOrganization.phone.$error"
-        :error-message="phoneNumberError($v.partnerOrganization)" />
-      <ni-search-address v-model="partnerOrganization.address" @focus="saveTmp('address')"
-        @blur="updatePartnerOrganization('address')" :error="$v.partnerOrganization.address.$error"
-        :error-message="addressError($v.partnerOrganization)" />
-      <ni-input caption="Email" v-model="partnerOrganization.email" @focus="saveTmp('email')"
-        @blur="updatePartnerOrganization('email')" :error="$v.partnerOrganization.email.$error"
-        :error-message="emailError($v.partnerOrganization)" />
-    </div>
-    <p class="text-weight-bold q-mt-lg">Partenaires</p>
-  </q-page>
+  <div>
+    <q-page padding class="client-background">
+      <ni-profile-header :title="partnerOrganizationName" />
+      <p class="text-weight-bold">Informations</p>
+      <div class="row gutter-profile">
+        <ni-input caption="Nom" v-model="partnerOrganization.name" @focus="saveTmp('name')"
+          @blur="updatePartnerOrganization('name')" :error="$v.partnerOrganization.name.$error" />
+        <ni-input caption="Téléphone" v-model="partnerOrganization.phone" @focus="saveTmp('phone')"
+          @blur="updatePartnerOrganization('phone')" :error="$v.partnerOrganization.phone.$error"
+          :error-message="phoneNumberError($v.partnerOrganization)" />
+        <ni-search-address v-model="partnerOrganization.address" @focus="saveTmp('address')"
+          @blur="updatePartnerOrganization('address')" :error="$v.partnerOrganization.address.$error"
+          :error-message="addressError($v.partnerOrganization)" />
+        <ni-input caption="Email" v-model="partnerOrganization.email" @focus="saveTmp('email')"
+          @blur="updatePartnerOrganization('email')" :error="$v.partnerOrganization.email.$error"
+          :error-message="emailError($v.partnerOrganization)" />
+      </div>
+      <p class="text-weight-bold q-mt-lg">Partenaires</p>
+      <q-card-actions align="right">
+        <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
+      </q-card-actions>
+    </q-page>
+
+    <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner" />
+  </div>
 </template>
 
 <script>
@@ -28,9 +35,11 @@ import ProfileHeader from '@components/ProfileHeader';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
+import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
 
 export default {
   metaInfo: { title: 'Fiche structure partenaire' },
@@ -41,6 +50,8 @@ export default {
     'ni-profile-header': ProfileHeader,
     'ni-search-address': SearchAddress,
     'ni-input': Input,
+    'ni-button': Button,
+    'partner-creation-modal': PartnerCreationModal,
   },
   mixins: [validationMixin, partnerOrganizationMixin],
   data () {
@@ -48,6 +59,8 @@ export default {
       partnerOrganization: { name: '', phone: '', address: {}, email: '' },
       tmpInput: '',
       partnerOrganizationName: '',
+      partnerCreationModal: false,
+      newPartner: { identity: { firstname: '', lastname: '' }, email: '', job: '' },
     };
   },
   validations: {
@@ -101,6 +114,17 @@ export default {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = '';
+      }
+    },
+    async createPartner () {
+      try {
+        await PartnerOrganization.createPartner(this.partnerOrganizationId, this.newPartner);
+
+        this.partnerOrganizationCreationModal = false;
+        NotifyPositive('Partenaire créé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du partenaire.');
       }
     },
   },
