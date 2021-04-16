@@ -17,9 +17,12 @@
           :error-message="emailError($v.partnerOrganization)" />
       </div>
       <p class="text-weight-bold q-mt-lg">Partenaires</p>
-      <q-card-actions align="right">
-        <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
-      </q-card-actions>
+      <q-card>
+        <ni-responsive-table :data="partnerOrganization.partners" :columns="columns" />
+        <q-card-actions align="right">
+          <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
+        </q-card-actions>
+      </q-card>
     </q-page>
 
     <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner"
@@ -37,10 +40,13 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
+import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
+import { JOB_OPTIONS } from '@data/constants';
 
 export default {
   metaInfo: { title: 'Fiche structure partenaire' },
@@ -53,6 +59,7 @@ export default {
     'ni-input': Input,
     'ni-button': Button,
     'partner-creation-modal': PartnerCreationModal,
+    'ni-responsive-table': ResponsiveTable,
   },
   mixins: [validationMixin, partnerOrganizationMixin],
   data () {
@@ -63,6 +70,34 @@ export default {
       partnerCreationModal: false,
       newPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
       modalLoading: false,
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'identity',
+          format: value => formatIdentity(value, 'FL'),
+          sortable: true,
+          sort: (a, b) => sortStrings(a.lastname, b.lastname),
+        },
+        { name: 'email', label: 'Mail', align: 'left', field: 'email', sortable: true },
+        {
+          name: 'phone',
+          label: 'Téléphone',
+          align: 'left',
+          field: 'phone',
+          format: value => formatPhone(value),
+          sortable: true,
+        },
+        {
+          name: 'job',
+          label: 'Fonction',
+          align: 'left',
+          field: 'job',
+          format: value => (value ? JOB_OPTIONS.find(job => job.value === value).label : ''),
+          sortable: true,
+        },
+      ],
     };
   },
   validations: {
@@ -134,6 +169,8 @@ export default {
 
         this.partnerCreationModal = false;
         NotifyPositive('Partenaire créé.');
+
+        await this.refreshPartnerOrganization();
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la création du partenaire.');
