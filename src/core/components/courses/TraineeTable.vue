@@ -33,7 +33,7 @@
 
     <!-- Add trainee modal -->
     <learner-creation-modal v-model="traineeCreationModal" :new-user.sync="newTrainee" :company-options="companyOptions"
-      :first-step="firstStep" :identity-step="identityStep" :company-step="!isIntraCourse"
+      :first-step="firstStep" :identity-step="addNewTraineeIdentityStep" :company-step="!isIntraCourse"
       :validations="$v.newTrainee" :loading="traineeCreationModalLoading" @hide="resetAddTraineeForm"
       @submit="addTrainee" @next-step="nextStepTraineeCreationModal" />
 
@@ -122,7 +122,7 @@ export default {
       traineeCreationModal: false,
       traineeCreationModalLoading: false,
       firstStep: true,
-      identityStep: false,
+      addNewTraineeIdentityStep: false,
       newTrainee: {
         identity: {
           firstname: '',
@@ -131,12 +131,6 @@ export default {
         contact: { phone: '' },
         local: { email: '' },
         company: '',
-      },
-      traineeValidations: {
-        identity: { lastname: { required: requiredIf(() => this.identityStep) } },
-        local: { email: { required, email } },
-        contact: { phone: { required: requiredIf(() => this.identityStep), frPhoneNumber } },
-        company: { required: requiredIf(() => this.course.type === INTER_B2B) },
       },
       traineeEditionModal: false,
       traineeEditionModalLoading: false,
@@ -149,8 +143,16 @@ export default {
   },
   validations () {
     return {
-      newTrainee: this.traineeValidations,
-      editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
+      newTrainee: {
+        identity: { lastname: { required: requiredIf(() => this.addNewTraineeIdentityStep) } },
+        local: { email: { required, email } },
+        contact: { phone: { required: requiredIf(() => this.addNewTraineeIdentityStep), frPhoneNumber } },
+        company: { required: requiredIf(() => this.course.type === INTER_B2B) },
+      },
+      editedTrainee: {
+        identity: { lastname: { required } },
+        contact: { phone: { required, frPhoneNumber } },
+      },
     };
   },
   computed: {
@@ -194,7 +196,7 @@ export default {
     },
     resetAddTraineeForm () {
       this.firstStep = true;
-      this.identityStep = false;
+      this.addNewTraineeIdentityStep = false;
       this.newTrainee = { ...clear(this.newTrainee) };
       this.$v.newTrainee.$reset();
     },
@@ -220,7 +222,7 @@ export default {
         } else {
           if (this.isIntraCourse) this.newTrainee.company = this.course.company._id;
           this.firstStep = false;
-          this.identityStep = true;
+          this.addNewTraineeIdentityStep = true;
         }
         this.$v.newTrainee.$reset();
       } catch (e) {
@@ -274,11 +276,9 @@ export default {
         ...pick(trainee, ['_id', 'identity.firstname', 'identity.lastname', 'local.email', 'contact.phone']),
       };
       this.traineeEditionModal = true;
-      this.identityStep = true;
     },
     resetTraineeEditionForm () {
       this.$v.editedTrainee.$reset();
-      this.identityStep = false;
       this.editedTrainee = { identity: {}, local: {}, contact: {} };
     },
     async updateTrainee () {
