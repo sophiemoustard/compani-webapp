@@ -11,6 +11,9 @@
       required-field />
     <ni-input in-modal :value="newPartner.email" @input="update($event.trim(), 'email')" caption="Email"
       @blur="validations.email.$touch" :error="validations.email.$error" :error-message="emailError(validations)" />
+    <ni-input in-modal :value="newPartner.phone" @input="update($event.trim(), 'phone')" caption="Téléphone"
+      @blur="validations.phone.$touch" :error="validations.phone.$error"
+      :error-message="phoneNumberError(validations)" />
     <ni-select in-modal :value="newPartner.job" @input="update($event, 'job')" caption="Fonction"
       :options="jobOptions" />
     <template slot="footer">

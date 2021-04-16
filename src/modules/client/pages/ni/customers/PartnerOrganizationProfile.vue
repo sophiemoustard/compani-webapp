@@ -61,7 +61,7 @@ export default {
       tmpInput: '',
       partnerOrganizationName: '',
       partnerCreationModal: false,
-      newPartner: { identity: { firstname: '', lastname: '' }, email: '', job: '' },
+      newPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
       modalLoading: false,
     };
   },
@@ -143,7 +143,7 @@ export default {
     },
     resetModal () {
       this.$v.newPartner.$reset();
-      this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', job: '' };
+      this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
   },
 };
