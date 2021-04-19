@@ -86,7 +86,7 @@ export default {
           label: 'Téléphone',
           align: 'left',
           field: 'phone',
-          format: value => formatPhone(value),
+          format: formatPhone,
           sortable: true,
         },
         {

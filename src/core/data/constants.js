@@ -448,6 +448,7 @@ export const JOB_OPTIONS = [
   { label: 'Assistante sociale', value: 'social_worker' },
   { label: 'Évaluateur médico-social', value: 'medico-social_assessor' },
   { label: 'Docteur', value: 'doctor' },
+  { label: 'Gériatre', value: 'geriatrician' },
   { label: 'Coordinateur', value: 'coordinator' },
   { label: 'Gestionnaire de cas', value: 'case_manager' },
   { label: 'Infirmier', value: 'nurse' },

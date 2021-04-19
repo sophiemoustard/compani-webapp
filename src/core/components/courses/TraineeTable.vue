@@ -110,7 +110,7 @@ export default {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: value => formatPhone(value),
+          format: formatPhone,
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
