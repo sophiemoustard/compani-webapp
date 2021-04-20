@@ -91,7 +91,7 @@ export const helperMixin = {
 
       const payload = {
         local: { email: this.newHelper.local.email },
-        customers: [this.customer._id],
+        customer: this.customer._id,
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };
