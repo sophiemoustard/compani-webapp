@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="vendor-background column no-wrap">
     <template v-if="questionnaire">
-      <ni-profile-header :title="questionnaireTitle" :header-info="headerInfo" />
+      <ni-profile-header :title="questionnaireName" :header-info="headerInfo" />
       <profile-tabs :profile-id="questionnaireId" :tabs-content="tabsContent" class="tabs" />
     </template>
   </q-page>
@@ -30,7 +30,7 @@ export default {
       tabsContent: [
         { label: 'Édition', name: 'edition', default: this.defaultTab === 'edition', component: ProfileEdition },
       ],
-      questionnaireTitle: '',
+      questionnaireName: '',
     };
   },
   computed: {
@@ -46,12 +46,12 @@ export default {
   },
   watch: {
     questionnaire () {
-      this.questionnaireTitle = get(this.questionnaire, 'title') || '';
+      this.questionnaireName = get(this.questionnaire, 'name') || '';
     },
   },
   async created () {
     await this.refreshQuestionnaire();
-    this.questionnaireTitle = get(this.questionnaire, 'title') || '';
+    this.questionnaireName = get(this.questionnaire, 'name') || '';
   },
   methods: {
     async refreshQuestionnaire () {
