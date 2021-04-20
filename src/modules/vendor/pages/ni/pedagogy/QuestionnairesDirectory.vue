@@ -44,14 +44,14 @@ export default {
       questionnairesByType: [],
       modalLoading: false,
       questionnaireCreationModal: false,
-      newQuestionnaire: { title: '', type: '' },
+      newQuestionnaire: { name: '', type: '' },
       questionnaireTypes: [],
       QUESTIONNAIRE_TYPES,
     };
   },
   validations () {
     return {
-      newQuestionnaire: { title: { required }, type: { required } },
+      newQuestionnaire: { name: { required }, type: { required } },
     };
   },
   async created () {
@@ -83,7 +83,7 @@ export default {
     },
     resetCreationModal () {
       this.$v.newQuestionnaire.$reset();
-      this.newQuestionnaire = { title: '', type: '' };
+      this.newQuestionnaire = { name: '', type: '' };
     },
     async createQuestionnaire () {
       try {

@@ -2,10 +2,10 @@
   <div class="column">
     <div class="row justify-between">
       <div class="row body">
-        <ni-input v-model.trim="questionnaire.title" required-field caption="Titre" @blur="updateQuestionnaire"
-          @focus="saveTmpTitle" :error="$v.questionnaire.title.$error" :disable="titleLock" />
+        <ni-input v-model.trim="questionnaire.name" required-field caption="Nom" @blur="updateQuestionnaire"
+          @focus="saveTmpName" :error="$v.questionnaire.name.$error" :disable="nameLock" />
         <ni-button v-if="isQuestionnairePublished" color="black" :icon="lockIcon"
-          @click="titleLock = !titleLock" />
+          @click="nameLock = !nameLock" />
       </div>
       <div class="publish-button">
         <ni-button v-if="!isQuestionnairePublished" color="primary" label="Publier" icon="vertical_align_top"
@@ -52,7 +52,7 @@ export default {
   mixins: [cardMixin],
   validations () {
     return {
-      questionnaire: { title: { required } },
+      questionnaire: { name: { required } },
     };
   },
   data () {
@@ -60,7 +60,7 @@ export default {
       tmpInput: '',
       PUBLISHED,
       cardCreationModal: false,
-      titleLock: false,
+      nameLock: false,
       isEditionLocked: false,
     };
   },
@@ -76,12 +76,12 @@ export default {
       return this.questionnaire.areCardsValid && this.questionnaire.cards.length > 0;
     },
     lockIcon () {
-      return this.titleLock ? 'lock' : 'lock_open';
+      return this.nameLock ? 'lock' : 'lock_open';
     },
   },
   async created () {
     await this.refreshQuestionnaire();
-    this.titleLock = this.isQuestionnairePublished;
+    this.nameLock = this.isQuestionnairePublished;
     this.isEditionLocked = this.isQuestionnairePublished;
   },
   methods: {
@@ -117,8 +117,8 @@ export default {
       }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Questionnaire déverouillé.'); })
         .onCancel(() => NotifyPositive('Déverouillage annulé.'));
     },
-    saveTmpTitle () {
-      this.tmpInput = get(this.questionnaire, 'title') || '';
+    saveTmpName () {
+      this.tmpInput = get(this.questionnaire, 'name') || '';
     },
     async createCard (template) {
       this.$q.loading.show();
@@ -155,13 +155,13 @@ export default {
       try {
         if (event) await Questionnaires.update(this.questionnaire._id, { cards: event });
         else {
-          const title = get(this.questionnaire, 'title');
-          if (this.tmpInput === title) return;
+          const name = get(this.questionnaire, 'name');
+          if (this.tmpInput === name) return;
           this.$v.questionnaire.$touch();
 
           if (this.$v.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-          await Questionnaires.update(this.questionnaire._id, { title });
+          await Questionnaires.update(this.questionnaire._id, { name });
         }
 
         NotifyPositive('Modification enregistrée.');
@@ -189,7 +189,7 @@ export default {
       try {
         if (this.isQuestionnaireValid) {
           await Questionnaires.update(this.questionnaire._id, { status: PUBLISHED });
-          this.titleLock = true;
+          this.nameLock = true;
           this.isEditionLocked = true;
           NotifyPositive('Questionnaire publié.');
         }

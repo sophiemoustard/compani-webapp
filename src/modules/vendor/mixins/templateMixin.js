@@ -32,9 +32,7 @@ export const templateMixin = {
     mediaFileName () {
       if (this.card && this.card.title) return this.card.title.replace(/ /g, '_');
 
-      return get(this.cardParent, 'name')
-        ? this.cardParent.name.replace(/ /g, '_')
-        : this.cardParent.title.replace(/ /g, '_');
+      return this.cardParent.name.replace(/ /g, '_');
     },
     mediaUploadUrl () {
       return `${process.env.API_HOSTNAME}/cards/${this.card._id}/upload`;
