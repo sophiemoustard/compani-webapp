@@ -149,7 +149,8 @@ export const helperMixin = {
         } else if (userInfo.exists) {
           const roles = await Roles.list({ name: HELPER });
           if (roles.length === 0) throw new Error('Role not found');
-          const payload = { role: roles[0]._id, customers: [this.customer._id] };
+
+          const payload = { role: roles[0]._id, customer: this.customer._id };
           if (!user.company) payload.company = this.customer.company;
 
           await Users.updateById(user._id, payload);
