@@ -1,9 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <ni-profile-header :title="partnerOrganizationName" />
-    <div class="row justify-between items-baseline">
-      <p class="text-weight-bold">Informations</p>
-    </div>
+    <p class="text-weight-bold">Informations</p>
     <div class="row gutter-profile">
       <ni-input caption="Nom" v-model="partnerOrganization.name" @focus="saveTmp('name')"
         @blur="updatePartnerOrganization('name')" :error="$v.partnerOrganization.name.$error" />
@@ -17,6 +15,16 @@
         @blur="updatePartnerOrganization('email')" :error="$v.partnerOrganization.email.$error"
         :error-message="emailError($v.partnerOrganization)" />
     </div>
+    <p class="text-weight-bold q-mt-lg">Partenaires</p>
+    <q-card>
+      <ni-responsive-table :data="partnerOrganization.partners" :columns="columns" />
+      <q-card-actions align="right">
+        <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
+      </q-card-actions>
+    </q-card>
+
+    <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner"
+      :validations="$v.newPartner" :loading="modalLoading" @hide="resetModal" />
   </q-page>
 </template>
 
@@ -29,9 +37,14 @@ import ProfileHeader from '@components/ProfileHeader';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
+import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
+import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
+import { JOB_OPTIONS } from '@data/constants';
 
 export default {
   metaInfo: { title: 'Fiche structure partenaire' },
@@ -42,6 +55,9 @@ export default {
     'ni-profile-header': ProfileHeader,
     'ni-search-address': SearchAddress,
     'ni-input': Input,
+    'ni-button': Button,
+    'partner-creation-modal': PartnerCreationModal,
+    'ni-responsive-table': ResponsiveTable,
   },
   mixins: [validationMixin, partnerOrganizationMixin],
   data () {
@@ -49,6 +65,30 @@ export default {
       partnerOrganization: { name: '', phone: '', address: {}, email: '' },
       tmpInput: '',
       partnerOrganizationName: '',
+      partnerCreationModal: false,
+      newPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
+      modalLoading: false,
+      columns: [
+        {
+          name: 'name',
+          label: 'Nom',
+          align: 'left',
+          field: 'identity',
+          format: value => formatIdentity(value, 'FL'),
+          sortable: true,
+          sort: (a, b) => sortStrings(a.lastname, b.lastname),
+        },
+        { name: 'email', label: 'Mail', align: 'left', field: 'email', sortable: true },
+        { name: 'phone', label: 'Téléphone', align: 'left', field: 'phone', format: formatPhone, sortable: true },
+        {
+          name: 'job',
+          label: 'Fonction',
+          align: 'left',
+          field: 'job',
+          format: value => (value ? JOB_OPTIONS.find(job => job.value === value).label : ''),
+          sortable: true,
+        },
+      ],
     };
   },
   validations: {
@@ -61,6 +101,11 @@ export default {
         city: { required: requiredIf(item => item && !!item.fullAddress) },
         fullAddress: { frAddress },
       },
+      email: { email },
+    },
+    newPartner: {
+      identity: { lastname: { required }, firstname: { required }, required },
+      phone: { frPhoneNumber },
       email: { email },
     },
   },
@@ -103,6 +148,30 @@ export default {
       } finally {
         this.tmpInput = '';
       }
+    },
+    async createPartner () {
+      try {
+        this.modalLoading = true;
+
+        this.$v.newPartner.$touch();
+        if (this.$v.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await PartnerOrganization.createPartner(this.partnerOrganizationId, this.newPartner);
+
+        this.partnerCreationModal = false;
+        NotifyPositive('Partenaire créé.');
+
+        await this.refreshPartnerOrganization();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création du partenaire.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetModal () {
+      this.$v.newPartner.$reset();
+      this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
   },
 };
