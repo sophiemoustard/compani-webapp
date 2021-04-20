@@ -1,5 +1,4 @@
 import { mapGetters } from 'vuex';
-import has from 'lodash/has';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -7,6 +6,7 @@ import get from 'lodash/get';
 import Roles from '@api/Roles';
 import Users from '@api/Users';
 import Email from '@api/Email';
+import Helpers from '@api/Helpers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
@@ -65,9 +65,8 @@ export const helperMixin = {
     async getUserHelpers () {
       try {
         this.helpersLoading = true;
-        const params = { customers: this.customer._id };
-        if (has(this.company, '_id')) params.company = this.company._id;
-        this.helpers = await Users.list(params);
+        const params = { customer: this.customer._id };
+        this.helpers = await Helpers.list(params);
       } catch (e) {
         this.helpers = [];
         console.error(e);
