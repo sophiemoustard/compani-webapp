@@ -156,7 +156,7 @@ import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
-import CustomerPartnerCreationModalVue from './infos/CustomerPartnerCreationModal.vue';
+import CustomerPartnerCreationModal from './infos/CustomerPartnerCreationModal';
 
 export default {
   name: 'ProfileFollowUp',
@@ -166,7 +166,7 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-simple-table': SimpleTable,
     'ni-responsive-table': ResponsiveTable,
-    'customer-partner-creation-modal': CustomerPartnerCreationModalVue,
+    'customer-partner-creation-modal': CustomerPartnerCreationModal,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
@@ -227,12 +227,12 @@ export default {
       partnersColumns: [
         { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
         { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
-        { name: 'email', label: 'Email', align: 'left', field: row => row.email },
+        { name: 'email', label: 'Email', align: 'left', field: 'email' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => row.phone,
+          field: 'phone',
           format: formatPhone,
         },
         {
@@ -386,10 +386,10 @@ export default {
         if (this.$v.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
         await CustomerPartners.create({ partner: this.newPartner, customer: this.customer._id });
-        NotifyPositive('Partenaire créé.');
+        NotifyPositive('Partenaire ajouté.');
 
         this.openNewPartnerModal = false;
-        this.refreshCustomerPartners();
+        await this.refreshCustomerPartners();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
