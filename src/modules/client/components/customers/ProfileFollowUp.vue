@@ -65,33 +65,6 @@
         </template>
       </ni-simple-table>
     </div>
-    <div class="q-mb-xl">
-      <p class="text-weight-bold">Partenaires</p>
-      <q-card>
-        <ni-responsive-table :data="customerPartners" :columns="partnersColumns" :pagination.sync="pagination"
-          class="q-mb-md" :loading="partnersLoading">
-          <template #body="{ props }">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <template :class="col.name">{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </template>
-        </ni-responsive-table>
-        <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
-            @click="openNewPartnerModal = true" />
-        </q-card-actions>
-      </q-card>
-    </div>
-    <div v-if="fundingsMonitoring.length" class="q-mb-xl">
-      <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Financements</p>
-      </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
-        :rows-per-page="rowsPerPage" :pagination.sync="pagination" />
-    </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
@@ -119,6 +92,33 @@
           </q-tr>
         </template>
       </ni-simple-table>
+    </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Partenaires</p>
+      <q-card>
+        <ni-responsive-table :data="partners" :columns="partnersColumns" :pagination.sync="pagination"
+          class="q-mb-md" :loading="partnersLoading">
+          <template #body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template :class="col.name">{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
+        <q-card-actions align="right">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
+            @click="openNewPartnerModal = true" />
+        </q-card-actions>
+      </q-card>
+    </div>
+    <div v-if="fundingsMonitoring.length" class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Financements</p>
+      </div>
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
+        :rows-per-page="rowsPerPage" :pagination.sync="pagination" />
     </div>
 
     <customer-partner-creation-modal v-model="openNewPartnerModal" :loading="modalLoading"
@@ -223,7 +223,7 @@ export default {
       partnersLoading: false,
       newPartner: '',
       partnerOptions: [],
-      customerPartners: [],
+      partners: [],
       partnersColumns: [
         { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
         { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
@@ -373,11 +373,11 @@ export default {
     },
     async refreshCustomerPartners () {
       try {
-        const partners = await CustomerPartners.list({ customer: this.customer._id });
-        this.customerPartners = partners.map(partner => partner.partner);
+        const customerPartners = await CustomerPartners.list({ customer: this.customer._id });
+        this.partners = customerPartners.map(customerPartner => customerPartner.partner);
       } catch (e) {
         console.error(e);
-        this.customerPartners = [];
+        this.partners = [];
       }
     },
     async addPartner () {
@@ -388,12 +388,13 @@ export default {
 
         await CustomerPartners.create({ partner: this.newPartner, customer: this.customer._id });
         NotifyPositive('Partenaire créé.');
+
         this.openNewPartnerModal = false;
         this.refreshCustomerPartners();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
-        NotifyNegative('Erreur lors de la création du partenaire.');
+        NotifyNegative('Erreur lors de l\'ajout du partenaire.');
       } finally {
         this.modalLoading = false;
       }

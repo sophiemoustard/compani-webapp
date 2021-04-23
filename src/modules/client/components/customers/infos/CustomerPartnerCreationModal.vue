@@ -3,9 +3,8 @@
     <template slot="title">
       Ajouter un <span class="text-weight-bold">partenaire</span>
     </template>
-   <ni-select in-modal :value="newPartner" @input="update"
-        @blur="validations.$touch" :error="validations.$error" required-field
-        caption="Partenaire" :options="partnerOptions" />
+    <ni-select in-modal :value="newPartner" @input="update" @blur="validations.$touch" :error="validations.$error"
+      required-field caption="Partenaire" :options="partnerOptions" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Ajouter un partenaire" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
