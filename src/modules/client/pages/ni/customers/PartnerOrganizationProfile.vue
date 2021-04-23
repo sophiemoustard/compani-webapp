@@ -104,7 +104,7 @@ export default {
       email: { email },
     },
     newPartner: {
-      identity: { lastname: { required }, firstname: { required }, required },
+      identity: { lastname: { required } },
       phone: { frPhoneNumber },
       email: { email },
     },
