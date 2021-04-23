@@ -241,7 +241,7 @@ export default {
           align: 'left',
           field: row => get(JOB_OPTIONS.find(option => option.value === row.job), 'label') || '',
         },
-        { name: 'company', label: 'Structure', align: 'left', field: row => row.company.name },
+        { name: 'partnerOrganization', label: 'Structure', align: 'left', field: row => row.partnerOrganization.name },
       ],
     };
   },
