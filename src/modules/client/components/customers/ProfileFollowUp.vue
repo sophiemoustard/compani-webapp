@@ -65,6 +65,26 @@
         </template>
       </ni-simple-table>
     </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Partenaires</p>
+      <q-card>
+        <ni-responsive-table :data="customerPartners" :columns="partnersColumns" :pagination.sync="pagination"
+          class="q-mb-md" :loading="partnersLoading">
+          <template #body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template :class="col.name">{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
+        <q-card-actions align="right">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
+            @click="openNewPartnerModal = true" />
+        </q-card-actions>
+      </q-card>
+    </div>
     <div v-if="fundingsMonitoring.length" class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Financements</p>
@@ -100,18 +120,26 @@
         </template>
       </ni-simple-table>
     </div>
+
+    <customer-partner-creation-modal v-model="openNewPartnerModal" :loading="modalLoading"
+      :partner-options="partnerOptions" :new-partner.sync="newPartner" @submit="addPartner"
+      @hide="resetAddPartnerModal" :validations="$v.newPartner" />
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Stats from '@api/Stats';
 import Users from '@api/Users';
+import Partners from '@api/Partners';
+import CustomerPartners from '@api/CustomerPartners';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
+import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
 import {
   AUXILIARY,
@@ -120,13 +148,15 @@ import {
   DEFAULT_AVATAR,
   UNKNOWN_AVATAR,
   SITUATION_OPTIONS,
+  JOB_OPTIONS,
 } from '@data/constants';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
-import { formatIdentity, formatHours, formatAndSortIdentityOptions } from '@helpers/utils';
+import { formatIdentity, formatHours, formatAndSortIdentityOptions, formatPhone } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
+import CustomerPartnerCreationModalVue from './infos/CustomerPartnerCreationModal.vue';
 
 export default {
   name: 'ProfileFollowUp',
@@ -135,6 +165,8 @@ export default {
     'ni-select': Select,
     'ni-search-address': SearchAddress,
     'ni-simple-table': SimpleTable,
+    'ni-responsive-table': ResponsiveTable,
+    'customer-partner-creation-modal': CustomerPartnerCreationModalVue,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
@@ -186,6 +218,31 @@ export default {
         },
       ],
       situationOptions: SITUATION_OPTIONS,
+      modalLoading: false,
+      openNewPartnerModal: false,
+      partnersLoading: false,
+      newPartner: '',
+      partnerOptions: [],
+      customerPartners: [],
+      partnersColumns: [
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
+        { name: 'email', label: 'Email', align: 'left', field: row => row.email },
+        {
+          name: 'phone',
+          label: 'Téléphone',
+          align: 'left',
+          field: row => row.phone,
+          format: formatPhone,
+        },
+        {
+          name: 'job',
+          label: 'Profession',
+          align: 'left',
+          field: row => JOB_OPTIONS.find(option => option.value === row.job).label,
+        },
+        { name: 'company', label: 'Structure', align: 'left', field: row => row.company.name },
+      ],
     };
   },
   validations () {
@@ -195,6 +252,7 @@ export default {
           phone: { frPhoneNumber },
         },
       },
+      newPartner: { required },
     };
   },
   computed: {
@@ -229,7 +287,13 @@ export default {
     },
   },
   async mounted () {
-    const promises = [this.refreshCustomer(), this.getUserHelpers(), this.getAuxiliaries()];
+    const promises = [
+      this.refreshCustomer(),
+      this.getUserHelpers(),
+      this.getAuxiliaries(),
+      this.refreshPartnerOptions(),
+      this.refreshCustomerPartners(),
+    ];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
     if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
     await Promise.all(promises);
@@ -297,6 +361,46 @@ export default {
     getAvatar (value) {
       const link = get(value, 'picture.link', '');
       return link || DEFAULT_AVATAR;
+    },
+    async  refreshPartnerOptions () {
+      try {
+        const partners = await Partners.list();
+        this.partnerOptions = formatAndSortIdentityOptions(partners);
+      } catch (e) {
+        console.error(e);
+        this.partnerOptions = [];
+      }
+    },
+    async refreshCustomerPartners () {
+      try {
+        const partners = await CustomerPartners.list({ customer: this.customer._id });
+        this.customerPartners = partners.map(partner => partner.partner);
+      } catch (e) {
+        console.error(e);
+        this.customerPartners = [];
+      }
+    },
+    async addPartner () {
+      try {
+        this.modalLoading = true;
+        this.$v.newPartner.$touch();
+        if (this.$v.newPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await CustomerPartners.create({ partner: this.newPartner, customer: this.customer._id });
+        NotifyPositive('Partenaire créé.');
+        this.openNewPartnerModal = false;
+        this.refreshCustomerPartners();
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyWarning(e.data.message);
+        NotifyNegative('Erreur lors de la création du partenaire.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetAddPartnerModal () {
+      this.$v.newPartner.$reset();
+      this.newPartner = '';
     },
   },
   filters: {
