@@ -373,8 +373,7 @@ export default {
     },
     async refreshCustomerPartners () {
       try {
-        const customerPartners = await CustomerPartners.list({ customer: this.customer._id });
-        this.partners = customerPartners.map(customerPartner => customerPartner.partner);
+        this.partners = await CustomerPartners.list({ customer: this.customer._id });
       } catch (e) {
         console.error(e);
         this.partners = [];
