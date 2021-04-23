@@ -65,6 +65,33 @@
         </template>
       </ni-simple-table>
     </div>
+    <div class="q-mb-xl">
+      <p class="text-weight-bold">Partenaires</p>
+      <q-card>
+        <ni-responsive-table :data="partners" :columns="partnersColumns" :pagination.sync="pagination"
+          class="q-mb-md" :loading="partnersLoading">
+          <template #body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template :class="col.name">{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+        </ni-responsive-table>
+        <q-card-actions align="right">
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
+            @click="openNewPartnerModal = true" />
+        </q-card-actions>
+      </q-card>
+    </div>
+    <div v-if="fundingsMonitoring.length" class="q-mb-xl">
+      <div class="row justify-between items-baseline">
+        <p class="text-weight-bold">Financements</p>
+      </div>
+      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
+        :rows-per-page="rowsPerPage" :pagination.sync="pagination" />
+    </div>
     <div class="q-mb-xl" v-if="customer.firstIntervention">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Auxiliaires</p>
@@ -92,33 +119,6 @@
           </q-tr>
         </template>
       </ni-simple-table>
-    </div>
-    <div class="q-mb-xl">
-      <p class="text-weight-bold">Partenaires</p>
-      <q-card>
-        <ni-responsive-table :data="partners" :columns="partnersColumns" :pagination.sync="pagination"
-          class="q-mb-md" :loading="partnersLoading">
-          <template #body="{ props }">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <template :class="col.name">{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </template>
-        </ni-responsive-table>
-        <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
-            @click="openNewPartnerModal = true" />
-        </q-card-actions>
-      </q-card>
-    </div>
-    <div v-if="fundingsMonitoring.length" class="q-mb-xl">
-      <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Financements</p>
-      </div>
-      <ni-simple-table :data="fundingsMonitoring" :columns="fundingsMonitoringColumns" :loading="fundingsLoading"
-        :rows-per-page="rowsPerPage" :pagination.sync="pagination" />
     </div>
 
     <customer-partner-creation-modal v-model="openNewPartnerModal" :loading="modalLoading"
@@ -239,7 +239,7 @@ export default {
           name: 'job',
           label: 'Profession',
           align: 'left',
-          field: row => JOB_OPTIONS.find(option => option.value === row.job).label,
+          field: row => get(JOB_OPTIONS.find(option => option.value === row.job), 'label') || '',
         },
         { name: 'company', label: 'Structure', align: 'left', field: row => row.company.name },
       ],
