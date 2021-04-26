@@ -80,8 +80,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire"
-            :disable="partnersLoading || !partnersNotAdded.length" @click="openNewPartnerModal = true" />
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
+            @click="openNewPartnerModal" />
         </q-card-actions>
       </q-card>
     </div>
@@ -121,7 +121,7 @@
       </ni-simple-table>
     </div>
 
-    <customer-partner-creation-modal v-model="openNewPartnerModal" :loading="modalLoading"
+    <customer-partner-creation-modal v-model="newPartnerModal" :loading="modalLoading"
       :partner-options="partnerOptions" :new-partner.sync="newPartner" @submit="addPartner"
       @hide="resetAddPartnerModal" :validations="$v.newPartner" />
   </div>
@@ -219,7 +219,7 @@ export default {
       ],
       situationOptions: SITUATION_OPTIONS,
       modalLoading: false,
-      openNewPartnerModal: false,
+      newPartnerModal: false,
       partnersLoading: false,
       newPartner: '',
       partnerOptions: [],
@@ -291,7 +291,6 @@ export default {
       this.getAuxiliaries(),
       this.refreshPartnerOptions(),
     ];
-    this.partnersList = await Partners.list();
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
     if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
     await Promise.all(promises);
@@ -363,6 +362,7 @@ export default {
     async  refreshPartnerOptions () {
       try {
         await this.refreshCustomerPartners();
+        this.partnersList = await Partners.list();
         this.partnerOptions = formatAndSortIdentityOptions(this.partnersNotAdded);
       } catch (e) {
         console.error(e);
@@ -386,7 +386,7 @@ export default {
         await CustomerPartners.create({ partner: this.newPartner, customer: this.customer._id });
         NotifyPositive('Partenaire ajouté.');
 
-        this.openNewPartnerModal = false;
+        this.newPartnerModal = false;
         await this.refreshPartnerOptions();
       } catch (e) {
         console.error(e);
@@ -399,6 +399,10 @@ export default {
     resetAddPartnerModal () {
       this.$v.newPartner.$reset();
       this.newPartner = '';
+    },
+    openNewPartnerModal () {
+      if (!this.partnersNotAdded.length) return NotifyWarning('Tous les partenaires ont déjà été ajoutés.');
+      this.newPartnerModal = true;
     },
   },
   filters: {
