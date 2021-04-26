@@ -80,8 +80,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire" :disable="partnersLoading"
-            @click="openNewPartnerModal = true" />
+          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un partenaire"
+            :disable="partnersLoading || !partnersNotAdded.length" @click="openNewPartnerModal = true" />
         </q-card-actions>
       </q-card>
     </div>
@@ -224,17 +224,12 @@ export default {
       newPartner: '',
       partnerOptions: [],
       partners: [],
+      partnersList: [],
       partnersColumns: [
         { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
         { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
         { name: 'email', label: 'Email', align: 'left', field: 'email' },
-        {
-          name: 'phone',
-          label: 'Téléphone',
-          align: 'left',
-          field: 'phone',
-          format: formatPhone,
-        },
+        { name: 'phone', label: 'Téléphone', align: 'left', field: 'phone', format: formatPhone },
         {
           name: 'job',
           label: 'Profession',
@@ -285,6 +280,9 @@ export default {
         ? formatIdentity(this.customer.referent.identity, 'FL')
         : 'Pas de référent';
     },
+    partnersNotAdded () {
+      return this.partnersList.filter(partner => !this.partners.map(p => p._id).includes(partner._id));
+    },
   },
   async mounted () {
     const promises = [
@@ -292,8 +290,8 @@ export default {
       this.getUserHelpers(),
       this.getAuxiliaries(),
       this.refreshPartnerOptions(),
-      this.refreshCustomerPartners(),
     ];
+    this.partnersList = await Partners.list();
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
     if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
     await Promise.all(promises);
@@ -364,8 +362,8 @@ export default {
     },
     async  refreshPartnerOptions () {
       try {
-        const partners = await Partners.list();
-        this.partnerOptions = formatAndSortIdentityOptions(partners);
+        await this.refreshCustomerPartners();
+        this.partnerOptions = formatAndSortIdentityOptions(this.partnersNotAdded);
       } catch (e) {
         console.error(e);
         this.partnerOptions = [];
@@ -389,7 +387,7 @@ export default {
         NotifyPositive('Partenaire ajouté.');
 
         this.openNewPartnerModal = false;
-        await this.refreshCustomerPartners();
+        await this.refreshPartnerOptions();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyWarning(e.data.message);
