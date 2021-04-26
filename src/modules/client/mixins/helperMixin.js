@@ -65,8 +65,7 @@ export const helperMixin = {
     async getUserHelpers () {
       try {
         this.helpersLoading = true;
-        const params = { customer: this.customer._id };
-        this.helpers = await Helpers.list(params);
+        this.helpers = await Helpers.list({ customer: this.customer._id });
       } catch (e) {
         this.helpers = [];
         console.error(e);
