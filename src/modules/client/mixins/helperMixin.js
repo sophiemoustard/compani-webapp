@@ -1,5 +1,4 @@
 import { mapGetters } from 'vuex';
-import has from 'lodash/has';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -7,6 +6,7 @@ import get from 'lodash/get';
 import Roles from '@api/Roles';
 import Users from '@api/Users';
 import Email from '@api/Email';
+import Helpers from '@api/Helpers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
@@ -65,9 +65,7 @@ export const helperMixin = {
     async getUserHelpers () {
       try {
         this.helpersLoading = true;
-        const params = { customers: this.customer._id };
-        if (has(this.company, '_id')) params.company = this.company._id;
-        this.helpers = await Users.list(params);
+        this.helpers = await Helpers.list({ customer: this.customer._id });
       } catch (e) {
         this.helpers = [];
         console.error(e);
@@ -92,7 +90,7 @@ export const helperMixin = {
 
       const payload = {
         local: { email: this.newHelper.local.email },
-        customers: [this.customer._id],
+        customer: this.customer._id,
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };
@@ -150,7 +148,8 @@ export const helperMixin = {
         } else if (userInfo.exists) {
           const roles = await Roles.list({ name: HELPER });
           if (roles.length === 0) throw new Error('Role not found');
-          const payload = { role: roles[0]._id, customers: [this.customer._id] };
+
+          const payload = { role: roles[0]._id, customer: this.customer._id };
           if (!user.company) payload.company = this.customer.company;
 
           await Users.updateById(user._id, payload);
