@@ -1,7 +1,7 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-title-header title="Questionnaires" class="q-mb-xl" />
-    <div v-for="group in questionnairesByType" :key="group.type">
+    <div v-for="group in questionnairesByType" :key="group.type" class="q-mb-lg ">
       <div class="text-weight-bold">{{ QUESTIONNAIRE_TYPES[group.type] }}</div>
       <div v-if="group.list" class="row">
         <questionnaire-cell v-for="(questionnaire, index) in group.list" :key="questionnaire._id"
@@ -44,14 +44,14 @@ export default {
       questionnairesByType: [],
       modalLoading: false,
       questionnaireCreationModal: false,
-      newQuestionnaire: { title: '', type: '' },
+      newQuestionnaire: { name: '', type: '' },
       questionnaireTypes: [],
       QUESTIONNAIRE_TYPES,
     };
   },
   validations () {
     return {
-      newQuestionnaire: { title: { required }, type: { required } },
+      newQuestionnaire: { name: { required }, type: { required } },
     };
   },
   async created () {
@@ -83,7 +83,7 @@ export default {
     },
     resetCreationModal () {
       this.$v.newQuestionnaire.$reset();
-      this.newQuestionnaire = { title: '', type: '' };
+      this.newQuestionnaire = { name: '', type: '' };
     },
     async createQuestionnaire () {
       try {
