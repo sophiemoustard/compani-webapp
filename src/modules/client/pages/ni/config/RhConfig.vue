@@ -101,8 +101,8 @@
                     <div class="row no-wrap table-actions">
                       <q-btn flat round small color="primary" :href="getAdministrativeDocumentLink(props.row)" type="a"
                         target="_blank" :disable="!getAdministrativeDocumentLink(props.row)" icon="file_download" />
-                      <q-btn flat round small color="grey" icon="delete"
-                        @click="validateAdministrativeDocumentDeletion(props.row)" />
+                      <q-btn flat round small color="grey" :disable="!getAdministrativeDocumentLink(props.row)"
+                         icon="delete" @click="validateAdministrativeDocumentDeletion(props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
