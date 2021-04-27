@@ -9,10 +9,10 @@
         </div>
         <div v-else class="published">
           <q-icon size="12px" name="check_circle" color="green-800" />
-          Publiée
+          Publié
         </div>
       </div>
-      <div class="title ellipsis-2-lines">{{ questionnaire.title }}</div>
+      <div class="name ellipsis-2-lines">{{ questionnaire.name }}</div>
       <q-separator />
     </q-card-section>
   </q-card>
@@ -50,7 +50,7 @@ export default {
   .published
     font-size: 12px;
     color: $green-800;
-  .title
+  .name
     margin 16px 0px;
     word-break: break-word;
     height: 48px;

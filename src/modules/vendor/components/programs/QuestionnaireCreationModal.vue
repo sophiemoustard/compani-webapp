@@ -3,8 +3,8 @@
     <template slot="title">
       Créer un nouveau <span class="text-weight-bold">questionnaire</span>
     </template>
-    <ni-input in-modal :value="newQuestionnaire.title" @input="update($event.trim(), 'title')"
-      :error="validations.title.$error" @blur="validations.title.$touch" required-field caption="Titre" />
+    <ni-input in-modal :value="newQuestionnaire.name" @input="update($event.trim(), 'name')"
+      :error="validations.name.$error" @blur="validations.name.$touch" required-field caption="Nom" />
     <ni-select in-modal :value="newQuestionnaire.type" @input="update($event, 'type')" :options="typeOptions"
       :error="validations.type.$error" @blur="validations.type.$touch" required-field caption="Type" />
     <template slot="footer">

@@ -10,7 +10,7 @@
         :error="validations.identity.lastname.$error" caption="Nom" @blur="validations.identity.lastname.$touch"
         required-field />
       <ni-input in-modal :value="editedTrainee.contact.phone" @input="update($event.trim(), 'contact.phone')"
-        caption="Téléphone" @blur="validations.contact.phone.$touch"
+        caption="Téléphone" @blur="validations.contact.phone.$touch" required-field
         :error-message="phoneNbrError(validations)" :error="validations.contact.phone.$error" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"

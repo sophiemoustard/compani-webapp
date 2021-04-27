@@ -439,5 +439,18 @@ export const TRAINEE = 'trainee';
 
 // QUESTIONNAIRE TYPES
 export const EXPECTATIONS = 'expectations';
+export const END_OF_COURSE = 'end_of_course';
 export const DRAFT = 'draft';
-export const QUESTIONNAIRE_TYPES = { [EXPECTATIONS]: 'Recueil des attentes' };
+export const QUESTIONNAIRE_TYPES = { [EXPECTATIONS]: 'Recueil des attentes', [END_OF_COURSE]: 'Fin de formation' };
+
+// PARTNER
+export const JOB_OPTIONS = [
+  { label: 'Assistante sociale', value: 'social_worker' },
+  { label: 'Évaluateur médico-social', value: 'medico_social_assessor' },
+  { label: 'Docteur', value: 'doctor' },
+  { label: 'Gériatre', value: 'geriatrician' },
+  { label: 'Coordinateur', value: 'coordinator' },
+  { label: 'Gestionnaire de cas', value: 'case_manager' },
+  { label: 'Infirmier', value: 'nurse' },
+  { label: 'Psychologue', value: 'psychologist' },
+];

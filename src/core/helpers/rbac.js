@@ -23,6 +23,7 @@ const coachRoutes = [
   { name: 'ni customers fundings monitoring', subscription: ERP },
   { name: 'ni customers info', subscription: ERP },
   { name: 'ni customers partner organizations', subscription: ERP },
+  { name: 'ni customers partner organizations info', subscription: ERP },
   { name: 'ni planning auxiliaries', subscription: ERP },
   { name: 'ni planning customers', subscription: ERP },
   { name: 'account client' },

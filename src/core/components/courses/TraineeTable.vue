@@ -110,7 +110,7 @@ export default {
           label: 'Téléphone',
           align: 'left',
           field: row => get(row, 'contact.phone') || '',
-          format: value => formatPhone(value),
+          format: formatPhone,
         },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
@@ -132,12 +132,6 @@ export default {
         local: { email: '' },
         company: '',
       },
-      traineeValidations: {
-        identity: { lastname: { required: requiredIf(() => this.addNewTraineeIdentityStep) } },
-        local: { email: { required, email } },
-        contact: { phone: { required: requiredIf(() => this.addNewTraineeIdentityStep), frPhoneNumber } },
-        company: { required: requiredIf(() => this.course.type === INTER_B2B) },
-      },
       traineeEditionModal: false,
       traineeEditionModalLoading: false,
       editedTrainee: {
@@ -149,8 +143,16 @@ export default {
   },
   validations () {
     return {
-      newTrainee: this.traineeValidations,
-      editedTrainee: pick(this.traineeValidations, ['identity', 'contact']),
+      newTrainee: {
+        identity: { lastname: { required: requiredIf(() => this.addNewTraineeIdentityStep) } },
+        local: { email: { required, email } },
+        contact: { phone: { required: requiredIf(() => this.addNewTraineeIdentityStep), frPhoneNumber } },
+        company: { required: requiredIf(() => this.course.type === INTER_B2B) },
+      },
+      editedTrainee: {
+        identity: { lastname: { required } },
+        contact: { phone: { required, frPhoneNumber } },
+      },
     };
   },
   computed: {

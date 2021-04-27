@@ -1,13 +1,22 @@
 <template>
   <div class="column">
-    <div class="row">
-      <ni-input v-model.trim="questionnaire.title" required-field caption="Titre" @blur="updateQuestionnaire"
-        @focus="saveTmpTitle" :error="$v.questionnaire.title.$error" :disable="questionnaire.status === PUBLISHED" />
+    <div class="row justify-between">
+      <div class="row body">
+        <ni-input v-model.trim="questionnaire.name" required-field caption="Nom" @blur="updateQuestionnaire"
+          @focus="saveTmpName" :error="$v.questionnaire.name.$error" :disable="nameLock" />
+        <ni-button v-if="isQuestionnairePublished" color="black" :icon="lockIcon"
+          @click="nameLock = !nameLock" />
+      </div>
+      <div class="publish-button">
+        <ni-button v-if="!isQuestionnairePublished" color="primary" label="Publier" icon="vertical_align_top"
+          @click="validateQuestionnairePublication" :flat="false" />
+      </div>
     </div>
     <div class="row body">
       <card-container ref="cardContainer" class="col-md-3 col-sm-4 col-xs-6" @add="openCardCreationModal"
-        @delete-card="validateCardDeletion" :card-parent="questionnaire" @update="updateQuestionnaire" />
-      <card-edition :card-parent="questionnaire" @refresh="refreshCard" />
+        @delete-card="validateCardDeletion" :card-parent="questionnaire" @update="updateQuestionnaire"
+        :disable-edition="isEditionLocked" @unlock-edition="validateUnlockEdition" />
+      <card-edition :card-parent="questionnaire" @refresh="refreshCard" :disable-edition="isEditionLocked" />
     </div>
 
     <card-creation-modal v-model="cardCreationModal" @submit="createCard" />
@@ -21,6 +30,7 @@ import { required } from 'vuelidate/lib/validators';
 import Questionnaires from '@api/Questionnaires';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import Input from '@components/form/Input';
+import Button from '@components/Button';
 import { PUBLISHED } from '@data/constants';
 import CardContainer from 'src/modules/vendor/components/programs/cards/CardContainer';
 import CardEdition from 'src/modules/vendor/components/programs/cards/CardEdition';
@@ -37,11 +47,12 @@ export default {
     'card-container': CardContainer,
     'card-edition': CardEdition,
     'card-creation-modal': CardCreationModal,
+    'ni-button': Button,
   },
   mixins: [cardMixin],
   validations () {
     return {
-      questionnaire: { title: { required } },
+      questionnaire: { name: { required } },
     };
   },
   data () {
@@ -49,6 +60,8 @@ export default {
       tmpInput: '',
       PUBLISHED,
       cardCreationModal: false,
+      nameLock: false,
+      isEditionLocked: false,
     };
   },
   computed: {
@@ -56,9 +69,20 @@ export default {
       questionnaire: state => state.questionnaire.questionnaire,
       card: state => state.card.card,
     }),
+    isQuestionnairePublished () {
+      return this.questionnaire.status === PUBLISHED;
+    },
+    isQuestionnaireValid () {
+      return this.questionnaire.areCardsValid && this.questionnaire.cards.length > 0;
+    },
+    lockIcon () {
+      return this.nameLock ? 'lock' : 'lock_open';
+    },
   },
   async created () {
     await this.refreshQuestionnaire();
+    this.nameLock = this.isQuestionnairePublished;
+    this.isEditionLocked = this.isQuestionnairePublished;
   },
   methods: {
     async refreshQuestionnaire () {
@@ -77,8 +101,24 @@ export default {
         console.error(e);
       }
     },
-    saveTmpTitle () {
-      this.tmpInput = get(this.questionnaire, 'title') || '';
+    validateUnlockEdition () {
+      const isPublishedMessage = this.isQuestionnairePublished
+        ? 'Ce questionnaire est publié, tu ne pourras pas ajouter, supprimer ou changer l\'ordre des cartes'
+          + '<br /><br />'
+        : '';
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: `${isPublishedMessage}
+          Es-tu sûr(e) de vouloir déverrouiller ce questionnaire ?`,
+        html: true,
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => { this.isEditionLocked = false; NotifyPositive('Questionnaire déverouillé.'); })
+        .onCancel(() => NotifyPositive('Déverouillage annulé.'));
+    },
+    saveTmpName () {
+      this.tmpInput = get(this.questionnaire, 'name') || '';
     },
     async createCard (template) {
       this.$q.loading.show();
@@ -115,13 +155,13 @@ export default {
       try {
         if (event) await Questionnaires.update(this.questionnaire._id, { cards: event });
         else {
-          const title = get(this.questionnaire, 'title');
-          if (this.tmpInput === title) return;
+          const name = get(this.questionnaire, 'name');
+          if (this.tmpInput === name) return;
           this.$v.questionnaire.$touch();
 
           if (this.$v.questionnaire.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-          await Questionnaires.update(this.questionnaire._id, { title });
+          await Questionnaires.update(this.questionnaire._id, { name });
         }
 
         NotifyPositive('Modification enregistrée.');
@@ -129,6 +169,34 @@ export default {
         console.error(e);
         if (event) NotifyNegative('Erreur lors de la modification des cartes.');
         else NotifyNegative('Erreur lors de la modification du questionnaire.');
+      } finally {
+        this.refreshQuestionnaire();
+      }
+    },
+    async validateQuestionnairePublication () {
+      if (!this.questionnaire.cards.length) return NotifyWarning('Il n\'y a aucune carte dans ce questionnaire.');
+      if (!this.questionnaire.areCardsValid) return NotifyWarning('Carte(s) invalide(s).');
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir publier ce questionnaire ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.publishQuestionnaire())
+        .onCancel(() => NotifyPositive('Publication annulée.'));
+    },
+    async publishQuestionnaire () {
+      try {
+        if (this.isQuestionnaireValid) {
+          await Questionnaires.update(this.questionnaire._id, { status: PUBLISHED });
+          this.nameLock = true;
+          this.isEditionLocked = true;
+          NotifyPositive('Questionnaire publié.');
+        }
+      } catch (e) {
+        console.error(e);
+        if (e.status === 409) return NotifyWarning(e.data.message);
+        NotifyNegative('Erreur lors de la publication du questionnaire.');
       } finally {
         this.refreshQuestionnaire();
       }
@@ -144,4 +212,8 @@ export default {
 <style lang="stylus" scoped>
 .body
   flex: 1
+.publish-button
+  display: flex
+  height: 40px
+  align-self: center
 </style>

@@ -24,6 +24,7 @@
       <ni-button icon="save_alt" color="primary" @click="exportTxt(IDENTIFICATION)" label="Données d'identification" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(CONTRACT_VERSION)" label="Données avenants" />
       <ni-button icon="save_alt" color="primary" @click="exportTxt(ABSENCE)" label="Données absences" />
+      <ni-button icon="save_alt" color="primary" @click="exportTxt(PAY)" label="Données paie" />
     </div>
     <ni-simple-table :data="displayedDraftPay" :columns="columns" selection="multiple" row-key="auxiliaryId"
       :selected.sync="selected" :pagination.sync="pagination" :loading="tableLoading"
@@ -103,7 +104,7 @@ import SelectSector from '@components/form/SelectSector';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 import EditableTd from '@components/table/EditableTd';
-import { IDENTIFICATION, ABSENCE, CONTRACT_VERSION } from '@data/constants';
+import { IDENTIFICATION, ABSENCE, CONTRACT_VERSION, PAY } from '@data/constants';
 import PaySurchargeDetailsModal from 'src/modules/client/components/pay/PaySurchargeDetailsModal';
 import { payMixin } from 'src/modules/client/mixins/payMixin';
 import { editableTdMixin } from 'src/modules/client/mixins/editableTdMixin';
@@ -172,6 +173,7 @@ export default {
       IDENTIFICATION,
       CONTRACT_VERSION,
       ABSENCE,
+      PAY,
     };
   },
   computed: {
