@@ -21,7 +21,7 @@ export default {
     return course.data.data.followUp;
   },
   async getQuestionnaireAnswers (courseId) {
-    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}/questionnaires`);
+    const course = await alenviAxios.get(`${process.env.API_HOSTNAME}/courses/${courseId}/activities`);
     return course.data.data.questionnaireAnswers;
   },
   async update (courseId, payload) {
