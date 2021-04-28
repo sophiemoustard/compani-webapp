@@ -27,6 +27,13 @@
           label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
+    <div v-if="questionnaires.length" class="q-my-lg">
+      <p class="text-weight-bold">Réponses aux questionnaires</p>
+      <div class="questionnaires-container">
+        <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
+          :questionnaire="questionnaire" />
+      </div>
+    </div>
     <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" is-blended />
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
@@ -48,6 +55,7 @@ import SimpleTable from '@components/table/SimpleTable';
 import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
+import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, INTER_B2B } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity, formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
@@ -63,6 +71,7 @@ export default {
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
     'trainee-follow-up-table': TraineeFollowUpTable,
     'attendance-table': AttendanceTable,
+    'questionnaire-answers-cell': QuestionnaireAnswersCell,
   },
   props: {
     profileId: { type: String, required: true },
@@ -214,5 +223,10 @@ export default {
 .answers
   border-radius: 10px !important
   width: 100px
-
+.questionnaires-container
+  display: grid
+  grid-auto-flow: row
+  grid-auto-rows: 1fr
+  grid-template-columns: repeat(auto-fill, 184px)
+  grid-gap: 16px
 </style>
