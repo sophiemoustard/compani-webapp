@@ -41,6 +41,7 @@ import pick from 'lodash/pick';
 import get from 'lodash/get';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
+import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
@@ -93,6 +94,7 @@ export default {
       },
       upperCaseFirstLetter,
       formatQuantity,
+      questionnaires: [],
     };
   },
   validations () {
@@ -107,6 +109,7 @@ export default {
   async created () {
     await this.getLearnersList();
     await this.refreshAttendanceSheets();
+    await this.refreshQuestionnaires();
   },
   computed: {
     ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),
@@ -193,6 +196,15 @@ export default {
         NotifyNegative('Erreur lors de la suppresion de la feuille d\'émargement.');
       } finally {
         this.$q.loading.hide();
+      }
+    },
+    async refreshQuestionnaires () {
+      try {
+        this.questionnaires = await Courses.getCourseQuestionnaires(this.course._id);
+      } catch (e) {
+        console.error(e);
+        this.questionnaires = [];
+        NotifyNegative('Erreur lors de la récupération des questionnaires.');
       }
     },
   },
