@@ -4,7 +4,7 @@
       <div class="type">{{ QUESTIONNAIRE_TYPES[questionnaire.type] }}</div>
       <div class="name ellipsis-2-lines">{{ questionnaire.name }}</div>
       <q-separator />
-      <div class="q-ma-sm q-pa-xs text-center text-grey-800 bg-grey-300 answers">
+      <div class="q-my-sm q-pa-xs answers">
         {{ formatQuantity('réponse',questionnaire.historiesCount) }}
       </div>
     </q-card-section>
@@ -47,4 +47,7 @@ export default {
   .answers
     border-radius: 10px !important
     width: 100px
+    text-align: center
+    color: $grey-800
+    background-color: $grey-300
 </style>
