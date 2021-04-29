@@ -450,6 +450,7 @@ export const JOB_OPTIONS = [
   { label: 'Docteur', value: 'doctor' },
   { label: 'Gériatre', value: 'geriatrician' },
   { label: 'Coordinateur', value: 'coordinator' },
+  { label: 'Directeur', value: 'director' },
   { label: 'Gestionnaire de cas', value: 'case_manager' },
   { label: 'Infirmier', value: 'nurse' },
   { label: 'Psychologue', value: 'psychologist' },
