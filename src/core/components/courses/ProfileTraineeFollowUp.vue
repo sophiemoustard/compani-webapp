@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="q-my-md">
+    <div class="q-mt-lg q-mb-xl">
       <p class="text-weight-bold">Émargements</p>
       <attendance-table :course="course" />
       <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading"
@@ -27,14 +27,14 @@
           label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <div v-if="questionnaires.length" class="q-my-lg">
+    <div v-if="questionnaires.length" class="q-mb-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
           :questionnaire="questionnaire" />
       </div>
     </div>
-    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" is-blended />
+    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-mb-xl" is-blended />
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
       @submit="addAttendanceSheet" :new-attendance-sheet.sync="newAttendanceSheet" :validations="$v.newAttendanceSheet"
@@ -220,13 +220,10 @@ export default {
 };
 </script>
 <style lang="stylus" scoped>
-.answers
-  border-radius: 10px !important
-  width: 100px
-.questionnaires-container
-  display: grid
-  grid-auto-flow: row
-  grid-auto-rows: 1fr
-  grid-template-columns: repeat(auto-fill, 184px)
-  grid-gap: 16px
+  .questionnaires-container
+    display: grid
+    grid-auto-flow: row
+    grid-auto-rows: 1fr
+    grid-template-columns: repeat(auto-fill, 224px)
+    grid-gap: 16px
 </style>

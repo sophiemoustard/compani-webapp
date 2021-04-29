@@ -1,11 +1,11 @@
 <template>
   <q-card @click="$emit('click')">
-    <q-card-section>
+    <q-card-section class="q-pa-sm cursor-pointer">
       <div class="type">{{ QUESTIONNAIRE_TYPES[questionnaire.type] }}</div>
-      <div class="name ellipsis-2-lines">{{ questionnaire.name }}</div>
+      <div class="q-my-md name ellipsis-2-lines">{{ questionnaire.name }}</div>
       <q-separator />
       <div class="q-my-sm q-pa-xs answers">
-        {{ formatQuantity('réponse',questionnaire.historiesCount) }}
+        {{ formatQuantity('réponse', questionnaire.historiesCount) }}
       </div>
     </q-card-section>
   </q-card>
@@ -31,21 +31,15 @@ export default {
 
 <style lang="stylus" scoped>
   .q-card
-    border-radius: 10px !important
-  .q-card__section
-    width: 184px
-    padding: 8px
-    &:hover
-      cursor: pointer
+    border-radius: 8px
   .type
     font-size: 14px;
     color: $grey-800;
   .name
-    margin 16px 0px;
     word-break: break-word;
     height: 48px;
   .answers
-    border-radius: 10px !important
+    border-radius: 8px
     width: 100px
     text-align: center
     color: $grey-800
