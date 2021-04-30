@@ -20,7 +20,7 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Référent</p>
+        <p class="text-weight-bold">Auxiliaire Référent</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-md-6 col-xs-12 referent items-center">
@@ -264,7 +264,7 @@ export default {
       return !!get(this.customer, 'contact.secondaryAddress.fullAddress');
     },
     auxiliariesOptions () {
-      const auxiliariesOptions = [{ label: 'Pas de référent', value: '' }];
+      const auxiliariesOptions = [{ label: 'Pas d\'auxiliaire référent', value: '' }];
       const referentId = get(this.customer, 'referent._id') || null;
       if (this.auxiliaries.length) {
         auxiliariesOptions.push(...formatAndSortIdentityOptions(this.auxiliaries));
@@ -278,7 +278,7 @@ export default {
     auxiliaryPlaceholder () {
       return (this.customer.referent.identity)
         ? formatIdentity(this.customer.referent.identity, 'FL')
-        : 'Pas de référent';
+        : 'Pas d\'auxiliaire référent';
     },
     partnersNotAdded () {
       return this.partnersList.filter(partner => !this.partners.map(p => p._id).includes(partner._id));
