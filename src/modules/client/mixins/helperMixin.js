@@ -47,6 +47,7 @@ export const helperMixin = {
           format: formatDate,
           sort: ascendingSort,
         },
+        { name: 'referent', label: 'Référent', align: 'left', field: row => row.referent },
         { name: 'actions', label: '', align: 'left', field: '_id' },
       ],
       helpersPagination: { rowsPerPage: 0 },

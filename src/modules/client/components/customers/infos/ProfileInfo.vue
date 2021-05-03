@@ -80,6 +80,9 @@
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
+                <template v-if="col.name === 'referent'">
+                  <q-radio v-model="referentHelper" :val="props.row.helperId" @input="updateReferentHelper" />
+                </template>
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
                     <q-btn flat dense color="grey" icon="edit" @click="openEditionModalHelper(col.value)" />
@@ -291,6 +294,7 @@ import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
+import Helpers from '@api/Helpers';
 import SearchAddress from '@components/form/SearchAddress';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -430,6 +434,7 @@ export default {
       },
       extensions: DOC_EXTENSIONS,
       firstStep: true,
+      referentHelper: {},
     };
   },
   computed: {
@@ -762,6 +767,10 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deleteSubscriptions(subscriptionId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    // Helpers
+    updateReferentHelper (value) {
+      Helpers.update(value, { referent: true });
     },
     // Mandates
     getMandateLink (mandate) {
