@@ -113,6 +113,7 @@ import { mapState } from 'vuex';
 import draggable from 'vuedraggable';
 import { required } from 'vuelidate/lib/validators';
 import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import get from 'lodash/get';
 import Programs from '@api/Programs';
 import SubPrograms from '@api/SubPrograms';
@@ -175,7 +176,6 @@ export default {
       reusedActivity: '',
       programOptions: [],
       activityEditionModal: false,
-      activityToEdit: { name: '', type: '' },
       editedActivity: { name: '', type: '' },
       isActivitiesShown: {},
       currentSubProgramId: '',
@@ -466,7 +466,6 @@ export default {
     },
     // activity edition
     async openActivityEditionModal (activity) {
-      this.activityToEdit = pick(activity, ['name', 'type']);
       this.editedActivity = pick(activity, ['_id', 'name', 'type', 'status']);
       this.activityEditionModal = true;
     },
@@ -476,10 +475,9 @@ export default {
         this.$v.editedActivity.$touch();
         if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        const payload = {};
-        Object.keys(this.editedActivity)
-          .filter(key => this.activityToEdit[key] && this.editedActivity[key] !== this.activityToEdit[key])
-          .forEach(keyToEdit => (payload[keyToEdit] = this.editedActivity[keyToEdit]));
+        const payload = this.isPublished(this.editedActivity)
+          ? omit(this.editedActivity, ['_id', 'status', 'type'])
+          : omit(this.editedActivity, ['_id', 'status']);
 
         await Activities.updateById(this.editedActivity._id, payload);
         this.activityEditionModal = false;
@@ -494,7 +492,6 @@ export default {
     },
     resetActivityEditionModal () {
       this.editedActivity = { name: '', type: '' };
-      this.activityToEdit = { name: '', type: '' };
       this.$v.editedActivity.$reset();
     },
     validateStepDetachment (subProgramId, stepId) {
