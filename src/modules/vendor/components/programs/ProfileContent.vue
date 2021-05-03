@@ -30,7 +30,7 @@
               </q-item-section>
             </div>
             <div class="flex align-center">
-              <ni-button icon="edit" @click="openStepEditionModal(step)" :disable="isPublished(step)" />
+              <ni-button icon="edit" @click="openStepEditionModal(step)" />
               <ni-button icon="close" @click="validateStepDetachment(subProgram._id, step._id)"
                 :disable="isPublished(subProgram)" />
             </div>
@@ -51,8 +51,7 @@
                       :status="activity.areCardsValid ? PUBLISHED_DOT_ACTIVE : PUBLISHED_DOT_WARNING" />
                   </div>
                   <div class="row no-wrap">
-                    <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)"
-                     :disable="isPublished(activity)" />
+                    <ni-button class="q-px-sm" icon="edit" @click="openActivityEditionModal(activity)" />
                     <ni-button class="q-px-sm" icon="close" :disable="isPublished(step)"
                       @click="validateActivityDeletion(step._id, activity._id)" />
                   </div>
@@ -467,7 +466,7 @@ export default {
     },
     // activity edition
     async openActivityEditionModal (activity) {
-      this.editedActivity = pick(activity, ['_id', 'name', 'type']);
+      this.editedActivity = pick(activity, ['_id', 'name', 'type', 'status']);
       this.activityEditionModal = true;
     },
     async editActivity () {
@@ -476,7 +475,7 @@ export default {
         this.$v.editedActivity.$touch();
         if (this.$v.editedActivity.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        await Activities.updateById(this.editedActivity._id, omit(this.editedActivity, ['_id']));
+        await Activities.updateById(this.editedActivity._id, omit(this.editedActivity, ['_id', 'status']));
         this.activityEditionModal = false;
         await this.refreshProgram();
         NotifyPositive('Activité modifiée.');
