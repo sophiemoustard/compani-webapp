@@ -52,6 +52,7 @@ export const helperMixin = {
       ],
       helpersPagination: { rowsPerPage: 0 },
       helpersLoading: false,
+      referentHelper: {},
     };
   },
   computed: {
@@ -67,6 +68,8 @@ export const helperMixin = {
       try {
         this.helpersLoading = true;
         this.helpers = await Helpers.list({ customer: this.customer._id });
+        const referentHelper = this.helpers.find(h => h.isReferent);
+        if (referentHelper) this.referentHelper = referentHelper.helperId;
       } catch (e) {
         this.helpers = [];
         console.error(e);
@@ -79,11 +82,6 @@ export const helperMixin = {
       this.$v.newHelper.$reset();
       this.newHelper = { ...clear(this.newHelper) };
       this.firstStep = true;
-    },
-    resetEditedHelperForm () {
-      this.$v.editedHelper.$reset();
-      this.editedHelper = { ...clear(this.editedHelper) };
-      this.openEditedHelperModal = false;
     },
     async formatHelper () {
       const roles = await Roles.list({ name: HELPER });
@@ -168,6 +166,12 @@ export const helperMixin = {
         this.loading = false;
       }
     },
+    // Edition
+    resetEditedHelperForm () {
+      this.$v.editedHelper.$reset();
+      this.editedHelper = { ...clear(this.editedHelper) };
+      this.openEditedHelperModal = false;
+    },
     async editHelper () {
       try {
         this.loading = true;
@@ -198,6 +202,11 @@ export const helperMixin = {
       };
       this.openEditedHelperModal = true;
     },
+    async updateReferentHelper (value) {
+      await Helpers.update(value, { referent: true });
+      await this.getUserHelpers();
+    },
+    // Deletion
     async deleteHelper (helperId) {
       try {
         await Users.deleteById(helperId);
