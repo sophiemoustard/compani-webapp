@@ -1,11 +1,12 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-profile-header :title="questionnaireName" :header-info="headerInfo" />
-    <div class="q-my-xl">
+    <div v-if="questionnaireAnswers.followUp.length">
       <q-card v-for="(card, cardIndex) of questionnaireAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
          <component :is="getChartComponent(card.template)" :card="card" />
       </q-card>
     </div>
+    <div v-else class="text-italic q-mb-md">Aucune réponse au questionnaire</div>
   </q-page>
 </template>
 
@@ -31,7 +32,6 @@ export default {
   data () {
     return {
       questionnaireAnswers: [],
-      questionnaireName: '',
     };
   },
   computed: {
@@ -43,23 +43,12 @@ export default {
       ];
       return infos;
     },
-  },
-  watch: {
-    questionnaireAnswers () {
-      this.questionnaireName = get(this.questionnaireAnswers, 'questionnaire.name') || '';
+    questionnaireName () {
+      return get(this.questionnaireAnswers, 'questionnaire.name') || '';
     },
   },
   async created () {
-    try {
-      this.questionnaireAnswers = await Questionnaires.getQuestionnaireAnswers(
-        this.questionnaireId,
-        { course: this.courseId }
-      );
-    } catch (e) {
-      this.questionnaireAnswers = [];
-      console.error(e);
-      NotifyNegative('Erreur lors de la récupération des réponses au questionnaire.');
-    }
+    await this.getQuestionnaireAnswers();
   },
   methods: {
     getChartComponent (template) {
@@ -70,6 +59,18 @@ export default {
           return OpenQuestionChart;
         case QUESTION_ANSWER:
           return QuestionAnswerChart;
+      }
+    },
+    async getQuestionnaireAnswers () {
+      try {
+        this.questionnaireAnswers = await Questionnaires.getQuestionnaireAnswers(
+          this.questionnaireId,
+          { course: this.courseId }
+        );
+      } catch (e) {
+        this.questionnaireAnswers = [];
+        console.error(e);
+        NotifyNegative('Erreur lors de la récupération des réponses au questionnaire.');
       }
     },
   },

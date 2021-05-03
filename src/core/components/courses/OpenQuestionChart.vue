@@ -2,7 +2,7 @@
   <q-card class="card" flat>
     <div class="text-weight-bold">{{ card.question }}</div>
     <div class="q-mb-lg subtitle">{{ subtitle }}</div>
-    <div v-for="(answer, index) in card.answers" :key="index" class="q-mt-sm answer-container bg-peach-200">
+    <div v-for="(answer, index) in card.answers" :key="index" class="q-mt-sm answer-container bg-peach-100">
       <div class="q-ma-sm">{{ answer }}</div>
     </div>
   </q-card>
