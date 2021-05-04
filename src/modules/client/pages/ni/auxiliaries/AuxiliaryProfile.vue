@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <div v-if="userProfile">
-      <auxiliary-profile-header :profile-id="auxiliaryId" />
+      <auxiliary-profile-header :profile-id="auxiliaryId" :title="auxiliaryName" />
       <profile-tabs :profile-id="auxiliaryId" :tabs-content="tabsContent" :notifications="notifications" />
     </div>
   </q-page>
@@ -39,10 +39,14 @@ export default {
         { label: 'Contrats', name: 'contracts', default: this.defaultTab === 'contracts', component: ProfileContracts },
         { label: 'Paie', name: 'pays', default: this.defaultTab === 'pays', component: ProfilePay },
       ],
+      auxiliaryName: '',
     };
   },
   async created () {
     await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.auxiliaryId });
+    this.auxiliaryName = this.userProfile.identity
+      ? `${this.userProfile.identity.firstname} ${this.userProfile.identity.lastname}`
+      : '';
   },
   computed: {
     ...mapState('userProfile', ['userProfile', 'notifications']),
@@ -50,6 +54,9 @@ export default {
   watch: {
     async userProfile () {
       await this.$store.dispatch('userProfile/updateNotifications');
+      this.auxiliaryName = this.userProfile.identity
+        ? `${this.userProfile.identity.firstname} ${this.userProfile.identity.lastname}`
+        : '';
     },
   },
   beforeDestroy () {

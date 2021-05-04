@@ -5,7 +5,7 @@
         <div class="row items-center">
           <ni-button v-if="isExternalUser" class="q-mr-md" icon="arrow_back" color="primary"
             @click.native="$router.go(-1)" />
-          <h4>{{ userProfile.identity.firstname }} {{ userProfile.identity.lastname }}</h4>
+          <h4 class="ellipsis">{{ title }}</h4>
           <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
             @click="goToPlanning" />
         </div>
@@ -77,6 +77,8 @@ export default {
   },
   props: {
     profileId: { type: String, required: true },
+    title: { type: String, required: true },
+
   },
   data () {
     return {

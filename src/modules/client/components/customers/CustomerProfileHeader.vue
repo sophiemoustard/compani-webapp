@@ -2,7 +2,7 @@
   <div class="header">
     <div class="row col-xs-12 q-mb-md items-center">
       <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
-      <h4>{{ customer.identity.firstname }} {{ customer.identity.lastname }}</h4>
+      <h4 class="ellipsis">{{ title }}</h4>
       <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
         @click="goToPlanning" />
     </div>
@@ -29,6 +29,9 @@ import moment from '@helpers/moment';
 
 export default {
   name: 'ProfileHeader',
+  props: {
+    title: { type: String, required: true },
+  },
   components: {
     'ni-button': Button,
   },
