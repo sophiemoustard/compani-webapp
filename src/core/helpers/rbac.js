@@ -96,6 +96,7 @@ const trainingOrganisationManagerRoutes = [
   { name: 'ni management blended courses info' },
   { name: 'ni management elearning courses' },
   { name: 'ni management elearning courses info' },
+  { name: 'ni management questionnaire answers' },
   { name: 'account vendor' },
 ];
 const vendorAdminRoutes = [...trainingOrganisationManagerRoutes];
@@ -104,6 +105,7 @@ const trainerRoutes = [
   { name: 'trainers courses info' },
   { name: 'trainers info' },
   { name: 'account vendor' },
+  { name: 'ni management questionnaire answers' },
 ];
 
 export const roleBasedAccessControl = {

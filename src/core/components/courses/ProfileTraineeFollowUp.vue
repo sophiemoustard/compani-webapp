@@ -31,7 +31,7 @@
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
-          :questionnaire="questionnaire" />
+          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
       </div>
     </div>
     <trainee-follow-up-table :learners="learners" :loading="loading" class="q-mb-xl" is-blended />
@@ -215,6 +215,11 @@ export default {
         this.questionnaires = [];
         NotifyNegative('Erreur lors de la récupération des questionnaires.');
       }
+    },
+    goToQuestionnaireAnswers (questionnaireId) {
+      return this.$router.push(
+        { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
+      );
     },
   },
 };
