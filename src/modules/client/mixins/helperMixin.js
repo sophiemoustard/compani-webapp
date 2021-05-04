@@ -29,8 +29,8 @@ export const helperMixin = {
       },
       helpers: [],
       helpersColumns: [
-        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.user.identity.firstname },
-        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.user.identity.lastname },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => get(row, 'user.identity.firstname') || '' },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => get(row, 'user.identity.lastname') || '' },
         { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'user.local.email') || '' },
         {
           name: 'phone',
@@ -48,7 +48,7 @@ export const helperMixin = {
           sort: ascendingSort,
         },
         { name: 'referent', label: 'Référent', align: 'left' },
-        { name: 'actions', label: '', align: 'left', field: row => row.user._id },
+        { name: 'actions', label: '', align: 'left', field: row => get(row, 'user._id') || '' },
       ],
       helpersPagination: { rowsPerPage: 0 },
       helpersLoading: false,
@@ -58,8 +58,9 @@ export const helperMixin = {
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
     sortedHelpers () {
-      return this.helpers
-        .sort((h1, h2) => (h1.user.identity.lastname || '').localeCompare((h2.user.identity.lastname || '')));
+      return this.helpers.sort(
+        (h1, h2) => (get(h1, 'user.identity.lastname') || '').localeCompare(get(h2, 'user.identity.lastname') || '')
+      );
     },
   },
   methods: {
