@@ -1,12 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-profile-header :title="questionnaireName" :header-info="headerInfo" />
-    <div v-if="questionnaireAnswers.followUp.length">
       <q-card v-for="(card, cardIndex) of questionnaireAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
          <component :is="getChartComponent(card.template)" :card="card" />
       </q-card>
-    </div>
-    <div v-else class="text-italic q-mb-md">Aucune réponse au questionnaire</div>
   </q-page>
 </template>
 
@@ -14,14 +11,13 @@
 import get from 'lodash/get';
 import Questionnaires from '@api/Questionnaires';
 import ProfileHeader from '@components/ProfileHeader';
-import SurveyChart from '@components/courses/SurveyChart';
-import OpenQuestionChart from '@components/courses/OpenQuestionChart';
-import QuestionAnswerChart from '@components/courses/QuestionAnswerChart';
 import { NotifyNegative } from '@components/popup/notify';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, QUESTIONNAIRE_TYPES } from '@data/constants';
+import { QUESTIONNAIRE_TYPES } from '@data/constants';
+import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
 
 export default {
   name: 'QuestionnaireAnswersProfile',
+  mixins: [questionnaireAnswersMixin],
   components: {
     'ni-profile-header': ProfileHeader,
   },
@@ -32,16 +28,20 @@ export default {
   data () {
     return {
       questionnaireAnswers: [],
+      get,
     };
   },
   computed: {
     headerInfo () {
-      const { questionnaire, companyName, programName, misc } = this.questionnaireAnswers;
-      const infos = [
-        { icon: 'bookmark_border', label: QUESTIONNAIRE_TYPES[get(questionnaire, 'type', '')] },
+      const { questionnaire, course } = this.questionnaireAnswers;
+      const questionnaireType = get(questionnaire, 'type', '');
+      const companyName = get(course, 'companyName') || '';
+      const programName = get(course, 'programName') || '';
+      const misc = get(course, 'misc') || '';
+      return [
+        { icon: 'bookmark_border', label: QUESTIONNAIRE_TYPES[questionnaireType] },
         { icon: 'mdi-teach', label: `${companyName} - ${programName} ${misc ? `- ${misc}` : ''}` },
       ];
-      return infos;
     },
     questionnaireName () {
       return get(this.questionnaireAnswers, 'questionnaire.name') || '';
@@ -51,16 +51,6 @@ export default {
     await this.getQuestionnaireAnswers();
   },
   methods: {
-    getChartComponent (template) {
-      switch (template) {
-        case SURVEY:
-          return SurveyChart;
-        case OPEN_QUESTION:
-          return OpenQuestionChart;
-        case QUESTION_ANSWER:
-          return QuestionAnswerChart;
-      }
-    },
     async getQuestionnaireAnswers () {
       try {
         this.questionnaireAnswers = await Questionnaires.getQuestionnaireAnswers(
