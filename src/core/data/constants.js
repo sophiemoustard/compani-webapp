@@ -4,7 +4,7 @@ export const IDENTIFICATION = 'identification';
 export const CONTRACT_END = 'contract_end';
 
 // MEDIA
-export const PINK_LOGO = 'https://storage.googleapis.com/compani-main/compani_texte_rose_1000.png';
+export const BLUE_TEXT_LOGO = 'https://storage.googleapis.com/compani-main/icons/compani_texte_bleu.png';
 export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
 export const VIDEO_EXTENSIONS = 'video/*';
