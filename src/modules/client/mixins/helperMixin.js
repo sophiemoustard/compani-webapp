@@ -189,6 +189,7 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.openEditedHelperModal = false;
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'aidant.');
       } finally {
         this.loading = false;
@@ -203,13 +204,20 @@ export const helperMixin = {
       this.openEditedHelperModal = true;
     },
     async updateReferentHelper (value) {
-      await Helpers.update(value, { referent: true });
-      await this.getUserHelpers();
+      try {
+        await Helpers.update(value, { referent: true });
+
+        await this.getUserHelpers();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition de l\'aidant référent');
+      }
     },
     // Deletion
     async deleteHelper (helperId) {
       try {
         await Users.deleteById(helperId);
+
         await this.getUserHelpers();
         NotifyPositive('Aidant supprimé');
       } catch (e) {
