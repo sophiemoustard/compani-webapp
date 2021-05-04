@@ -15,7 +15,9 @@ export default {
     signed: { type: String, default: 'false' },
   },
   data () {
-    return { PINK_LOGO };
+    return {
+      PINK_LOGO,
+    };
   },
   computed: {
     acknowledgement () {

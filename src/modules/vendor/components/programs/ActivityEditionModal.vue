@@ -31,7 +31,9 @@ export default {
     typeOptions: { type: Array, default: () => [] },
   },
   data () {
-    return { PUBLISHED };
+    return {
+      PUBLISHED,
+    };
   },
   components: {
     'ni-input': Input,
