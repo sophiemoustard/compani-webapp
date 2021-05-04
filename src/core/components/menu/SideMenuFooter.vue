@@ -47,6 +47,11 @@ export default {
   components: {
     'ni-button': Button,
   },
+  data () {
+    return {
+      interfaceLogo: 'https://storage.googleapis.com/compani-main/icons/blue_icon_small.png',
+    };
+  },
   computed: {
     ...mapGetters({
       clientRole: 'main/getClientRole',
@@ -58,11 +63,6 @@ export default {
     userCanFeedback () {
       return [...COACH_ROLES, AUXILIARY, PLANNING_REFERENT].includes(this.clientRole) ||
         [TRAINER, VENDOR_ADMIN, TRAINING_ORGANISATION_MANAGER].includes(this.vendorRole);
-    },
-    interfaceLogo () {
-      return this.interfaceType === CLIENT
-        ? 'https://storage.googleapis.com/compani-main/favicon_bordeaux-32x32.png'
-        : 'https://storage.googleapis.com/compani-main/favicon-32x32.png';
     },
     accessBothInterface () {
       return this.clientRole && this.vendorRole;
