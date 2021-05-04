@@ -78,7 +78,6 @@ export default {
   props: {
     profileId: { type: String, required: true },
     title: { type: String, required: true },
-
   },
   data () {
     return {

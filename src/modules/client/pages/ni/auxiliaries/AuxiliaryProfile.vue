@@ -44,9 +44,7 @@ export default {
   },
   async created () {
     await this.$store.dispatch('userProfile/fetchUserProfile', { userId: this.auxiliaryId });
-    this.auxiliaryName = this.userProfile.identity
-      ? `${this.userProfile.identity.firstname} ${this.userProfile.identity.lastname}`
-      : '';
+    this.refreshAuxiliaryName();
   },
   computed: {
     ...mapState('userProfile', ['userProfile', 'notifications']),
@@ -54,6 +52,13 @@ export default {
   watch: {
     async userProfile () {
       await this.$store.dispatch('userProfile/updateNotifications');
+    },
+    'userProfile.identity': function () {
+      this.refreshAuxiliaryName();
+    },
+  },
+  methods: {
+    refreshAuxiliaryName () {
       this.auxiliaryName = this.userProfile.identity
         ? `${this.userProfile.identity.firstname} ${this.userProfile.identity.lastname}`
         : '';

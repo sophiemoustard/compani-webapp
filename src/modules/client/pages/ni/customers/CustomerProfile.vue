@@ -53,9 +53,7 @@ export default {
   },
   async mounted () {
     await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customerId });
-    this.customerName = this.customer.identity
-      ? `${this.customer.identity.firstname} ${this.customer.identity.lastname}`
-      : '';
+    this.refreshCustomerName();
   },
   computed: {
     ...mapState('customer', ['customer', 'notifications']),
@@ -63,6 +61,13 @@ export default {
   watch: {
     async customer () {
       await this.$store.dispatch('customer/updateNotifications');
+    },
+    'customer.identity': function () {
+      this.refreshCustomerName();
+    },
+  },
+  methods: {
+    refreshCustomerName () {
       this.customerName = this.customer.identity
         ? `${this.customer.identity.firstname} ${this.customer.identity.lastname}`
         : '';
