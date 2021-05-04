@@ -20,7 +20,7 @@
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
-        <p class="text-weight-bold">Auxiliaire Référent</p>
+        <p class="text-weight-bold">Auxiliaire référent</p>
       </div>
       <div class="row gutter-profile">
         <div class="col-md-6 col-xs-12 referent items-center">
