@@ -12,7 +12,7 @@
     <div class="row profile-info column">
       <div class="row items-center">
         <div :class="getDotClass(getStatus(this.customer))" />
-        <div>{{ STATUS_TYPES[getStatus(this.customer)] }}</div>
+        <div :class="getDotTextClass(getStatus(this.customer))">{{ STATUS_TYPES[getStatus(this.customer)] }}</div>
       </div>
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
@@ -125,8 +125,15 @@ export default {
     getDotClass (value) {
       return {
         'dot dot-active': value === ACTIVATED,
-        'dot dot-stopped': value === STOPPED,
+        'dot dot-error': value === STOPPED,
         'dot dot-archived': value === ARCHIVED,
+      };
+    },
+    getDotTextClass (value) {
+      return {
+        'text-green-800': value === ACTIVATED,
+        'text-orange-700': value === STOPPED,
+        'text-copper-grey-700': value === ARCHIVED,
       };
     },
     async refreshCustomer () {

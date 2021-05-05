@@ -186,6 +186,7 @@ export default {
         this.firstInterventions = Object.freeze(firstInterventions);
         this.customers = Object.freeze(customers.map(customer => this.formatCustomer(customer)));
       } catch (e) {
+        this.customers = [];
         this.firstInterventions = [];
         console.error(e);
       } finally {
@@ -228,7 +229,7 @@ export default {
     getDotClass (value) {
       return {
         'dot dot-active': value === ACTIVATED,
-        'dot dot-stopped': value === STOPPED,
+        'dot dot-error': value === STOPPED,
         'dot dot-archived': value === ARCHIVED,
       };
     },

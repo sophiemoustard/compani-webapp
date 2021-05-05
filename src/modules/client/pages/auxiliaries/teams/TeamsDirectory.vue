@@ -120,6 +120,6 @@ export default {
 
 <style lang="stylus" scoped>
 .sector-label
-  color: grey
+  color: $copper-grey-400
   font-size: 14px
 </style>

@@ -8,14 +8,14 @@
       <div class="sidemenu-footer-icons">
         <q-item-section v-if="userCanFeedback">
           <ni-button icon="mdi-lightbulb-on-outline" color="secondary" size="sm"
-            @click.native="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
+            @click="openExtenalUrl('https://compani.atlassian.net/servicedesk/customer/portal/2')" />
         </q-item-section>
         <q-item-section v-if="isAuxiliaryWithCompany">
           <ni-button class="messenger" icon="mdi-facebook-messenger" color="blue" size="sm"
             @click.native="clickHandler" />
         </q-item-section>
         <q-item-section>
-          <ni-button class="person" icon="person" @click.native="goToProfile" size="sm" />
+          <ni-button class="person" icon="person" @click="goToProfile" size="sm" />
         </q-item-section>
       </div>
     </q-item>

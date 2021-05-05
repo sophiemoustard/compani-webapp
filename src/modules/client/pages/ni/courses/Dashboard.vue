@@ -25,14 +25,14 @@
         <q-card flat class="fit q-pa-md">
           <div class="text-weight-bold q-mb-sm">Apprenants les plus assidus</div>
           <div class="row justify-end">
-            <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
+            <div class="col-4 text-copper-grey-800 text-center">Activités eLearning réalisées</div>
           </div>
           <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
             class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
-              <div class="text-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
+              <div class="text-copper-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
             </div>
             <div class="col-4 text-center">{{ learner.activityCount }}</div>
           </div>
@@ -42,13 +42,13 @@
         <q-card flat class="fit q-pa-md">
           <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
           <div class="row justify-end">
-            <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
+            <div class="col-4 text-copper-grey-800 text-center">Nombre d'apprenants actifs</div>
           </div>
           <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
             class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
-              <div class="q-mx-md text-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
+              <div class="q-mx-md text-copper-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
             </div>
             <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
           </div>

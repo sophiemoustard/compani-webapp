@@ -14,9 +14,9 @@
                   :style="col.style" :data-cy="`col-${col.name}`">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)"
+                      <q-btn flat round small color="primary" icon="history" @click="showHistory(col.value)"
                         data-cy="show-subscription-history" />
-                      <q-btn :disable="!getFunding(col.value).length" flat round small color="grey"
+                      <q-btn :disable="!getFunding(col.value).length" flat round small color="primary"
                         icon="mdi-calculator" @click="showFunding(col.value)" data-cy="show-fundings-history" />
                     </div>
                   </template>

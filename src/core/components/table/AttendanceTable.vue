@@ -10,11 +10,11 @@
               <div class="text-primary date">{{ col.month }}</div>
               <div class="number">{{ col.day }}</div>
               <div class="text-weight-bold date">{{ col.weekDay }}</div>
-              <div class="text-grey">
+              <div class="text-copper-grey-400">
                 <div>{{ col.startHour }}</div>
                 <div>{{ col.endHour }}</div>
               </div>
-              <div class="text-grey-800">
+              <div class="text-copper-grey-800">
                 <q-icon name="supervisor_account" />
                 {{ traineesCount(col.slot) }}
               </div>
@@ -297,17 +297,17 @@ export default {
   td:first-child
     background-color: white
   th
-    border-right: 1px solid $grey-200
+    border-right: 1px solid $copper-grey-200
   tr:first-child
     td:first-child
       .rows
-        border-top: 1px solid $grey-200
+        border-top: 1px solid $copper-grey-200
         padding-top: 8px
         margin-right: 16px
   tr:last-child
     td:first-child
       .rows
-        border-bottom: 1px solid $grey-200
+        border-bottom: 1px solid $copper-grey-200
         padding-bottom: 8px
         margin-right: 16px
 

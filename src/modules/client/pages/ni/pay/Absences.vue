@@ -14,13 +14,12 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions">
-                <q-btn flat round small color="grey" icon="edit" @click="openAbsenceEditionModal(props.row)" />
+                <ni-button icon="edit" @click="openAbsenceEditionModal(props.row)" />
               </div>
             </template>
             <template v-if="col.name === 'attachment'">
               <div v-if="getAbsenceLink(props.row)" class="row no-wrap table-actions">
-                <q-btn flat round small color="primary" type="a" :href="getAbsenceLink(props.row)" target="_blank"
-                  icon="file_download" />
+                <ni-button type="a" :href="getAbsenceLink(props.row)" icon="file_download" />
               </div>
             </template>
             <template v-else>{{ col.value }}</template>
@@ -41,6 +40,7 @@
 <script>
 import get from 'lodash/get';
 import Events from '@api/Events';
+import Button from '@components/Button';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
@@ -55,6 +55,7 @@ export default {
   name: 'Absences',
   metaInfo: { title: 'Absences' },
   components: {
+    'ni-button': Button,
     'ni-date-range': DateRange,
     'ni-simple-table': SimpleTable,
     'ni-event-edition-modal': EventEditionModal,

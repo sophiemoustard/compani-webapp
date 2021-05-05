@@ -161,14 +161,14 @@ export default {
   &-selected
     justify-content: flex-end
     .card-cell
-      background-color: $pink-400
+      background-color: $copper-400
   &-locked
     .card-cell
-      background-color: $grey-100
+      background-color: $copper-grey-100
   &-locked-selected
     justify-content: flex-end
     .card-cell
-      background-color: $grey-800
+      background-color: $copper-grey-800
       color: white
   .dot
     margin: 0 0 0 3px
@@ -177,10 +177,10 @@ export default {
   display: flex
   flex-direction: column
 .locked-unselected
-  color: $grey-400
+  color: $copper-grey-400
 
 .card-cell
-  background-color: $pink-100
+  background-color: $copper-100
   border-radius: 4px
   height: fit-content
   @media screen and (min-width: 768px)

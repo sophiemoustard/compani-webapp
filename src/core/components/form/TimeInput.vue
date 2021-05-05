@@ -9,7 +9,8 @@
       :error-message="errorMessage" :error="error" :disable="disable" @blur="onBlur" :rules="['time']" mask="time"
       data-cy="time-input">
       <template #append>
-        <q-icon name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime" color="grey-600">
+        <q-icon name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime"
+          color="copper-grey-600">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-list dense padding>
               <q-item v-for="(hour, index) in hoursOptions" :key="index" clickable @click="select(hour.value)"

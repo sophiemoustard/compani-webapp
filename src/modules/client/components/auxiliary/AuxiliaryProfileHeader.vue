@@ -15,8 +15,8 @@
     <div class="row profile-info">
       <div class="col-6 q-pl-lg">
         <div class="row items-center">
-          <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-inactive']" />
-          <div>{{ userActivity.status }}</div>
+          <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-error']" />
+          <div :class="[userActivity.active ? 'text-green-800' : 'text-orange-700']">{{ userActivity.status }}</div>
         </div>
         <div class="row items-center">
           <q-icon name="restore" class="q-mr-md" size="1rem" />
@@ -25,7 +25,7 @@
       </div>
       <div class="q-pl-lg col-6 row">
         <div class="relative-position">
-          <q-icon size="36px" name="phone_iphone" color="grey-2" />
+          <q-icon size="36px" name="phone_iphone" color="copper-grey-300" />
           <q-icon v-if="!userProfile.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
           <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="green-800" size="16px" />
         </div>
@@ -190,7 +190,7 @@ export default {
   .avatar
     width: 59px
     height: 59px
-    border: 1px solid $grey-400
+    border: 1px solid $copper-grey-400
 
   .send-message-link
     color: $primary

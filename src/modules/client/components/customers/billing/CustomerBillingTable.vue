@@ -49,9 +49,9 @@
             </q-item>
           </template>
           <template v-else-if="col.name === 'actions' && displayActions">
-            <q-btn v-if="paymentTypes.includes(props.row.type)" flat dense color="grey" icon="edit"
+            <q-btn v-if="paymentTypes.includes(props.row.type)" flat dense color="primary" icon="edit"
               @click="openEditionModal(props.row)" />
-            <q-btn v-if="REFUND === props.row.nature" flat dense color="grey" icon="delete"
+            <q-btn v-if="REFUND === props.row.nature" flat dense color="primary" icon="delete"
               @click="deleteRefund(props.row)" />
           </template>
           <template v-else>{{ col.value }}</template>
@@ -141,7 +141,7 @@ export default {
   },
   methods: {
     balanceIconColor (val) {
-      return this.isZero(val) || !this.isNegative(val) ? 'grey' : 'secondary';
+      return this.isZero(val) || !this.isNegative(val) ? 'copper-grey-400' : 'secondary';
     },
     balanceIcon (val) {
       return this.isZero(val) || !this.isNegative(val) ? 'mdi-plus-circle-outline' : 'mdi-minus-circle-outline';

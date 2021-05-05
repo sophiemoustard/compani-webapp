@@ -364,7 +364,7 @@ export default {
   &-content
     margin: 5px 10px
     display: flex
-    background-color: $pink-100
+    background-color: $copper-100
     flex-direction: column
     border-radius: 4px !important
   &-content > .q-item
