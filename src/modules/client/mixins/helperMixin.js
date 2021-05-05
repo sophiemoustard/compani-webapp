@@ -29,14 +29,14 @@ export const helperMixin = {
       },
       helpers: [],
       helpersColumns: [
-        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
-        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
-        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => get(row, 'user.identity.firstname') || '' },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => get(row, 'user.identity.lastname') || '' },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'user.local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => get(row, 'contact.phone') || '',
+          field: row => get(row, 'user.contact.phone') || '',
           format: formatPhone,
         },
         {
@@ -47,17 +47,20 @@ export const helperMixin = {
           format: formatDate,
           sort: ascendingSort,
         },
-        { name: 'actions', label: '', align: 'left', field: '_id' },
+        { name: 'referent', label: 'Référent', align: 'left' },
+        { name: 'actions', label: '', align: 'left', field: row => get(row, 'user._id') || '' },
       ],
       helpersPagination: { rowsPerPage: 0 },
       helpersLoading: false,
+      referentHelper: {},
     };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
     sortedHelpers () {
-      return [...this.helpers]
-        .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
+      return this.helpers.sort(
+        (h1, h2) => (get(h1, 'user.identity.lastname') || '').localeCompare(get(h2, 'user.identity.lastname') || '')
+      );
     },
   },
   methods: {
@@ -66,6 +69,9 @@ export const helperMixin = {
       try {
         this.helpersLoading = true;
         this.helpers = await Helpers.list({ customer: this.customer._id });
+
+        const referentHelper = this.helpers.find(h => h.referent);
+        if (referentHelper) this.referentHelper = referentHelper._id;
       } catch (e) {
         this.helpers = [];
         console.error(e);
@@ -78,11 +84,6 @@ export const helperMixin = {
       this.$v.newHelper.$reset();
       this.newHelper = { ...clear(this.newHelper) };
       this.firstStep = true;
-    },
-    resetEditedHelperForm () {
-      this.$v.editedHelper.$reset();
-      this.editedHelper = { ...clear(this.editedHelper) };
-      this.openEditedHelperModal = false;
     },
     async formatHelper () {
       const roles = await Roles.list({ name: HELPER });
@@ -167,6 +168,12 @@ export const helperMixin = {
         this.loading = false;
       }
     },
+    // Edition
+    resetEditedHelperForm () {
+      this.$v.editedHelper.$reset();
+      this.editedHelper = { ...clear(this.editedHelper) };
+      this.openEditedHelperModal = false;
+    },
     async editHelper () {
       try {
         this.loading = true;
@@ -184,22 +191,35 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.openEditedHelperModal = false;
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'aidant.');
       } finally {
         this.loading = false;
       }
     },
     openEditionModalHelper (helperId) {
-      const helper = this.helpers.find(h => h._id === helperId);
+      const helperUser = this.helpers.map(h => h.user).find(u => u._id === helperId);
       this.editedHelper = {
-        ...pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
-        contact: { phone: get(helper, 'contact.phone') || '' },
+        ...pick(helperUser, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
+        contact: { phone: get(helperUser, 'contact.phone') || '' },
       };
       this.openEditedHelperModal = true;
     },
+    async updateReferentHelper (value) {
+      try {
+        await Helpers.update(value, { referent: true });
+
+        await this.getUserHelpers();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition de l\'aidant référent');
+      }
+    },
+    // Deletion
     async deleteHelper (helperId) {
       try {
         await Users.deleteById(helperId);
+
         await this.getUserHelpers();
         NotifyPositive('Aidant supprimé');
       } catch (e) {
