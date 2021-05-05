@@ -22,7 +22,10 @@ export default {
     isPublished: { type: Boolean, required: true },
   },
   data () {
-    return { PUBLISHED_DOT_ACTIVE, PUBLISHED_DOT_WARNING };
+    return {
+      PUBLISHED_DOT_ACTIVE,
+      PUBLISHED_DOT_WARNING,
+    };
   },
 };
 </script>

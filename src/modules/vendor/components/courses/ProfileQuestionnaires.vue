@@ -19,7 +19,9 @@ export default {
     ...mapState('course', ['course']),
   },
   data () {
-    return { questionnaireAnswers: [] };
+    return {
+      questionnaireAnswers: [],
+    };
   },
   async created () {
     try {
