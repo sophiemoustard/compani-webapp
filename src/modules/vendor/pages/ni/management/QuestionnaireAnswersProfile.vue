@@ -40,7 +40,10 @@ export default {
       const misc = get(course, 'misc') || '';
       return [
         { icon: 'bookmark_border', label: QUESTIONNAIRE_TYPES[questionnaireType] },
-        { icon: 'mdi-teach', label: `${companyName} - ${programName} ${misc ? `- ${misc}` : ''}` },
+        {
+          icon: 'mdi-teach',
+          label: `${companyName ? `${companyName} - ` : ''}${programName}${misc ? ` - ${misc}` : ''}`,
+        },
       ];
     },
     questionnaireName () {
