@@ -115,7 +115,7 @@ export default {
   /deep/ .q-uploader
     width: 100%
     &--bordered
-      border: 1px solid $grey-300
+      border: 1px solid $copper-grey-300
     .q-uploader__list
       display: none
     .q-uploader__header-content
@@ -123,7 +123,7 @@ export default {
       height: 38px
       margin: 0
       .q-btn__content
-        color: $grey-400
+        color: $copper-grey-400
     .q-btn
       margin: 0
       padding: 0

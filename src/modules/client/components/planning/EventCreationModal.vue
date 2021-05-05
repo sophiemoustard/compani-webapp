@@ -292,7 +292,7 @@ export default {
       width: 24%
       border-radius: 20px
       margin: 5px
-      background-color: $grey-300
+      background-color: $copper-grey-300
       @media screen and (max-width: 767px)
         width: 45%
 

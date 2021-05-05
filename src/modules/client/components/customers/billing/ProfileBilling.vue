@@ -43,7 +43,7 @@
                     :href="getUrl(props.row)" icon="file_download" target="_blank" />
                   <q-btn v-else data-cy="link" flat round small color="primary" icon="file_download"
                     @click="downloadTaxCertificate(props.row)" :disable="pdfLoading" />
-                  <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
+                  <q-btn v-if="isCoach" flat round small dense color="copper-grey-400" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
               </template>

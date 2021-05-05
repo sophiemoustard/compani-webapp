@@ -28,9 +28,8 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions">
-                <q-btn flat round color="grey" icon="remove_red_eye" size="12px"
-                  @click="goToCustomerBillingPage(col.value)" />
-                <q-btn flat round color="grey" icon="add" size="12px"
+                <ni-button icon="remove_red_eye" @click="goToCustomerBillingPage(col.value)" />
+                <ni-button icon="add"
                   @click="openPaymentCreationModal(props.row.customer, props.row.thirdPartyPayer)" />
               </div>
             </template>
@@ -65,6 +64,7 @@ import Payments from '@api/Payments';
 import Balances from '@api/Balances';
 import TaxCertificates from '@api/TaxCertificates';
 import SimpleTable from '@components/table/SimpleTable';
+import Button from '@components/Button';
 import PrefixedCellContent from '@components/table/PrefixedCellContent';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
@@ -88,6 +88,7 @@ export default {
   metaInfo: { title: 'Balances clients' },
   components: {
     'ni-simple-table': SimpleTable,
+    'ni-button': Button,
     'ni-prefixed-cell-content': PrefixedCellContent,
     'ni-payment-creation-modal': PaymentCreationModal,
     'ni-title-header': TitleHeader,

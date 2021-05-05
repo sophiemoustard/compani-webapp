@@ -26,7 +26,7 @@
                 <div class="sector-name text-weight-bold">{{ sectorName(sector) }}</div>
                 <div class="month-label">{{ monthLabel }}</div>
               </div>
-              <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="grey-5"
+              <q-circular-progress :value="Math.min(hoursRatio(sector), 100)" size="60px" track-color="copper-grey-300"
                 color="primary" show-value :thickness="0.2" class="text-weight-bold">
                 {{ roundFrenchPercentage(hoursRatio(sector), 0).replace('&nbsp;', '') }}
               </q-circular-progress>
@@ -387,18 +387,18 @@ export default {
   font-style: italic
 
 .auxiliary
-  border-left: 1px solid $grey-300
-  border-right: 1px solid $grey-300
-  border-bottom: 1px solid $grey-300
+  border-left: 1px solid $copper-grey-300
+  border-right: 1px solid $copper-grey-300
+  border-bottom: 1px solid $copper-grey-300
   &:nth-child(1)
-    border-top: 1px solid $grey-300
+    border-top: 1px solid $copper-grey-300
   div
     padding: 5px
   &-cell
     display: flex
     flex-direction: column
     &:not(:nth-last-child(-n+2))
-      border-bottom: 1px solid $grey-300
+      border-bottom: 1px solid $copper-grey-300
     &-container
       padding: 0 16px
       width: 100%
@@ -406,7 +406,7 @@ export default {
         padding: 0 8px
 
 .auxiliary-label
-  border-right: 1px solid $grey-300
+  border-right: 1px solid $copper-grey-300
 
 .auxiliary-value
   justify-content: flex-end
@@ -439,7 +439,7 @@ export default {
     &:nth-child(2)
       color: $secondary
     &:nth-child(3)
-      color: $grey-400
+      color: $copper-grey-400
   &-value
     font-size: 48px
     @media screen and (max-width: 767px)

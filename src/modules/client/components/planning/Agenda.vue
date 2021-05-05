@@ -149,8 +149,8 @@ export default {
           180deg,
           white,
           white 13.1%,
-          $grey-100,
-          $grey-100 13.3%
+          $copper-grey-100,
+          $copper-grey-100 13.3%
         )
         height: 100%
         position: relative
@@ -172,7 +172,7 @@ export default {
 
       .planning-hour
         position: absolute
-        color: $grey-300
+        color: $copper-grey-300
         font-size: 12px
         padding: 0 5px
 

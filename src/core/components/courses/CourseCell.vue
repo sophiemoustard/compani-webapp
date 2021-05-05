@@ -153,7 +153,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     font-size: 12px;
-    color: $grey-400;
+    color: $copper-grey-600;
   .item-section-container
     display: flex;
   .q-item__section--side
@@ -181,14 +181,11 @@ export default {
   .slots
     height: 10px;
     flex: 1;
-    background-color: $pink-100;
-    border: solid 1px $pink-400;
+    background-color: $copper-300;
     &-happened
       background-color: $primary;
-      border: none;
     &-to-plan
       background-color: $secondary;
-      border: none;
 
   .additional-infos
     color: $primary;

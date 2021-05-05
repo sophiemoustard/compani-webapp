@@ -29,8 +29,7 @@
           <q-icon size="xs" :name="icon" />
         </template>
         <template v-if="isPassword" #append>
-          <ni-button :icon="isPassword && showPassword ? 'visibility' : 'visibility_off'" color="middle-grey"
-            @click.native="showPassword = !showPassword" size="sm" />
+          <ni-button :icon="passwordIcon" @click="toggleIcon" size="sm" />
         </template>
       </q-input>
     </template>
@@ -82,8 +81,14 @@ export default {
     inputType () {
       return this.isPassword && this.showPassword ? 'text' : this.type;
     },
+    passwordIcon () {
+      return this.isPassword && this.showPassword ? 'visibility' : 'visibility_off';
+    },
   },
   methods: {
+    toggleIcon () {
+      this.showPassword = !this.showPassword;
+    },
     updateInputFile () {
       this.$emit('input', this.$refs.inputFile.files[0]);
     },
@@ -123,8 +128,6 @@ export default {
       height: 100%
       width: 100%
       font-size: 0
-    &.borders
-      border: 1px solid $grey-300
   .file-error
     color: $secondary
     line-height: 1
