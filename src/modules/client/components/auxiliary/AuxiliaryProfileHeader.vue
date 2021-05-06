@@ -1,20 +1,18 @@
 <template>
   <div class="header">
-    <div class="row col-xs-12 q-mb-md">
-      <div class="col-xs-8 row items-baseline col-md-10">
-        <div class="row items-center">
-          <ni-button v-if="isExternalUser" class="q-mr-md" icon="arrow_back" color="primary"
-            @click.native="$router.go(-1)" />
-          <h4 class="ellipsis">{{ title }}</h4>
-          <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
-            @click="goToPlanning" />
-        </div>
+    <div class="row q-mb-md">
+      <div class="col-xs-8 flex-row items-baseline col-md-10">
+        <ni-button v-if="isExternalUser" class="q-mr-md" icon="arrow_back" color="primary"
+          @click.native="$router.go(-1)" />
+        <h4 class="ellipsis">{{ title }}</h4>
+        <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
+          @click="goToPlanning" />
       </div>
-      <div class="row custom-justify-end col-xs-4 col-md-2">
+      <div class="flex-row custom-justify-end col-xs-4 col-md-2">
         <img :src="hasPicture" alt="Img user" class="avatar">
       </div>
     </div>
-    <div class="row col-xs-12 profile-info">
+    <div class="row profile-info">
       <div class="col-6 q-pl-lg">
         <div class="row items-center">
           <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-inactive']" />
