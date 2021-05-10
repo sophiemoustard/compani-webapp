@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="q-my-md">
+    <div class="q-mt-lg q-mb-xl">
       <p class="text-weight-bold">Émargements</p>
       <attendance-table :course="course" />
       <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading"
@@ -12,9 +12,9 @@
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions justify-end">
                   <ni-button icon="file_download" color="primary" type="a" target="_blank"
-                    :href="props.row.file.link" />
+                    :href="props.row.file.link" :disable="!props.row.file.link" />
                   <ni-button v-if="canUpdate" icon="delete" color="primary"
-                    @click="validateAttendanceSheetDeletion(props.row)" />
+                    @click="validateAttendanceSheetDeletion(props.row)" :disable="!props.row.file.link" />
                 </div>
               </template>
               <template v-else>{{ col.value }}</template>
@@ -27,7 +27,14 @@
           label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-my-md" is-blended />
+    <div v-if="questionnaires.length" class="q-mb-xl">
+      <p class="text-weight-bold">Réponses aux questionnaires</p>
+      <div class="questionnaires-container">
+        <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
+          :questionnaire="questionnaire" @click="goToQuestionnaireAnswers(questionnaire._id)" />
+      </div>
+    </div>
+    <trainee-follow-up-table :learners="learners" :loading="loading" class="q-mb-xl" is-blended />
 
     <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
       @submit="addAttendanceSheet" :new-attendance-sheet.sync="newAttendanceSheet" :validations="$v.newAttendanceSheet"
@@ -41,12 +48,14 @@ import pick from 'lodash/pick';
 import get from 'lodash/get';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
+import Courses from '@api/Courses';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
 import AttendanceTable from '@components/table/AttendanceTable';
 import Button from '@components/Button';
 import TraineeFollowUpTable from '@components/courses/TraineeFollowUpTable';
+import QuestionnaireAnswersCell from '@components/courses/QuestionnaireAnswersCell';
 import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER, INTRA, INTER_B2B } from '@data/constants';
 import { upperCaseFirstLetter, formatQuantity, formatIdentity } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
@@ -62,6 +71,7 @@ export default {
     'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
     'trainee-follow-up-table': TraineeFollowUpTable,
     'attendance-table': AttendanceTable,
+    'questionnaire-answers-cell': QuestionnaireAnswersCell,
   },
   props: {
     profileId: { type: String, required: true },
@@ -93,6 +103,7 @@ export default {
       },
       upperCaseFirstLetter,
       formatQuantity,
+      questionnaires: [],
     };
   },
   validations () {
@@ -107,6 +118,7 @@ export default {
   async created () {
     await this.getLearnersList();
     await this.refreshAttendanceSheets();
+    await this.refreshQuestionnaires();
   },
   computed: {
     ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),
@@ -195,12 +207,28 @@ export default {
         this.$q.loading.hide();
       }
     },
+    async refreshQuestionnaires () {
+      try {
+        this.questionnaires = await Courses.getCourseQuestionnaires(this.course._id);
+      } catch (e) {
+        console.error(e);
+        this.questionnaires = [];
+        NotifyNegative('Erreur lors de la récupération des questionnaires.');
+      }
+    },
+    goToQuestionnaireAnswers (questionnaireId) {
+      return this.$router.push(
+        { name: 'ni management questionnaire answers', params: { courseId: this.course._id, questionnaireId } }
+      );
+    },
   },
 };
 </script>
 <style lang="stylus" scoped>
-.answers
-  border-radius: 10px !important
-  width: 100px
-
+  .questionnaires-container
+    display: grid
+    grid-auto-flow: row
+    grid-auto-rows: 1fr
+    grid-template-columns: repeat(auto-fill, 224px)
+    grid-gap: 16px
 </style>

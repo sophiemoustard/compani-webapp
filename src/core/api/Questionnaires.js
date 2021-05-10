@@ -21,4 +21,11 @@ export default {
   async deleteCard (cardId) {
     await alenviAxios.delete(`${process.env.API_HOSTNAME}/questionnaires/cards/${cardId}`);
   },
+  async getQuestionnaireAnswers (id, params = null) {
+    const questionnaire = await alenviAxios.get(
+      `${process.env.API_HOSTNAME}/questionnaires/${id}/follow-up`,
+      { params }
+    );
+    return questionnaire.data.data.followUp;
+  },
 };

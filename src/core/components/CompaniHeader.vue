@@ -11,7 +11,9 @@ import { PINK_LOGO } from '@data/constants';
 export default {
   name: 'CompaniHeader',
   data () {
-    return { PINK_LOGO };
+    return {
+      PINK_LOGO,
+    };
   },
 };
 </script>

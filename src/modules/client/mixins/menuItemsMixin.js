@@ -1,7 +1,6 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
-import Customers from '@api/Customers';
 import {
   CLIENT_ADMIN,
   AUXILIARY,
@@ -214,14 +213,6 @@ export const menuItemsMixin = {
           ],
         },
       ];
-    },
-  },
-  methods: {
-    async refreshCustomer () {
-      if (this.loggedUser && this.loggedUser.customers) {
-        const customer = await Customers.getById(this.loggedUser.customers[0]);
-        this.$store.dispatch('customer/setCustomer', customer);
-      }
     },
   },
 };

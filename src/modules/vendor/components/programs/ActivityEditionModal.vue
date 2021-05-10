@@ -6,7 +6,7 @@
       <ni-input in-modal :value="editedActivity.name" :error="validations.name.$error"
         @blur="validations.name.$touch" required-field caption="Nom" @input="update($event.trim(), 'name')" />
       <ni-select caption="Type" :options="typeOptions" :value="editedActivity.type" required-field in-modal last
-        :error="validations.type.$error" @input="update($event, 'type')" />
+        :error="validations.type.$error" @input="update($event, 'type')" :disable="isPublished" />
       <template slot="footer">
         <q-btn no-caps class="full-width modal-btn" label="Éditer l'activité" color="primary" :loading="loading"
           icon-right="add" @click="submit" />
@@ -18,6 +18,7 @@
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
+import { PUBLISHED } from '@data/constants';
 
 export default {
   name: 'ActivityEditionModal',
@@ -27,6 +28,11 @@ export default {
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
     typeOptions: { type: Array, default: () => [] },
+  },
+  computed: {
+    isPublished () {
+      return this.editedActivity.status === PUBLISHED;
+    },
   },
   components: {
     'ni-input': Input,

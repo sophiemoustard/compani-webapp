@@ -9,24 +9,19 @@
 <script>
 import { mapState } from 'vuex';
 import Courses from '@api/Courses';
-import SurveyChart from '@components/courses/SurveyChart';
-import OpenQuestionChart from '@components/courses/OpenQuestionChart';
-import QuestionAnswerChart from '@components/courses/QuestionAnswerChart';
 import { NotifyNegative } from '@components/popup/notify';
-import { SURVEY, OPEN_QUESTION, QUESTION_ANSWER } from '@data/constants';
+import { questionnaireAnswersMixin } from '@mixins/questionnaireAnswersMixin';
 
 export default {
   name: 'ProfileQuestionnaires',
-  components: {
-    'survey-chart': SurveyChart,
-    'open-question-chart': OpenQuestionChart,
-    'question-answer-chart': QuestionAnswerChart,
-  },
+  mixins: [questionnaireAnswersMixin],
   computed: {
     ...mapState('course', ['course']),
   },
   data () {
-    return { questionnaireAnswers: [] };
+    return {
+      questionnaireAnswers: [],
+    };
   },
   async created () {
     try {
@@ -36,18 +31,6 @@ export default {
       console.error(e);
       NotifyNegative('Erreur lors de la récupération des questionnaires.');
     }
-  },
-  methods: {
-    getChartComponent (template) {
-      switch (template) {
-        case SURVEY:
-          return SurveyChart;
-        case OPEN_QUESTION:
-          return OpenQuestionChart;
-        case QUESTION_ANSWER:
-          return QuestionAnswerChart;
-      }
-    },
   },
 };
 </script>
