@@ -74,7 +74,11 @@
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template :class="col.name">{{ col.value }}</template>
+                <template v-if="col.name === 'prescriber'">
+                  <q-checkbox :value="prescriberPartner === props.row._id"
+                    @input="updatePrescriberPartner(props.row._id)" />
+                </template>
+                <template v-else :class="col.name">{{ col.value }}</template>
               </q-td>
             </q-tr>
           </template>
@@ -226,18 +230,25 @@ export default {
       partners: [],
       partnersList: [],
       partnersColumns: [
-        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
-        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
-        { name: 'email', label: 'Email', align: 'left', field: 'email' },
-        { name: 'phone', label: 'Téléphone', align: 'left', field: 'phone', format: formatPhone },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.partner.identity.firstname },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.partner.identity.lastname },
+        { name: 'email', label: 'Email', align: 'left', field: 'partner.email' },
+        { name: 'phone', label: 'Téléphone', align: 'left', field: 'partner.phone', format: formatPhone },
         {
           name: 'job',
           label: 'Profession',
           align: 'left',
-          field: row => get(JOB_OPTIONS.find(option => option.value === row.job), 'label') || '',
+          field: row => get(JOB_OPTIONS.find(option => option.value === row.partner.job), 'label') || '',
         },
-        { name: 'partnerOrganization', label: 'Structure', align: 'left', field: row => row.partnerOrganization.name },
+        {
+          name: 'partnerOrganization',
+          label: 'Structure',
+          align: 'left',
+          field: row => row.partner.partnerOrganization.name,
+        },
+        { name: 'prescriber', label: 'Prescripteur', align: 'left' },
       ],
+      prescriberPartner: '',
     };
   },
   validations () {
@@ -372,6 +383,8 @@ export default {
     async refreshCustomerPartners () {
       try {
         this.partners = await CustomerPartners.list({ customer: this.customer._id });
+        const prescriberPartner = this.partners.find(p => p.prescriber);
+        this.prescriberPartner = get(prescriberPartner, '_id') || '';
       } catch (e) {
         console.error(e);
         this.partners = [];
@@ -403,6 +416,18 @@ export default {
     openNewPartnerModal () {
       if (!this.partnersNotAdded.length) return NotifyWarning('Tous les partenaires ont déjà été ajoutés.');
       this.newPartnerModal = true;
+    },
+    async updatePrescriberPartner (value) {
+      try {
+        const payload = { prescriber: !(this.prescriberPartner === value) };
+        await CustomerPartners.update(value, payload);
+        NotifyPositive('Prescripteur modifié.');
+
+        await this.refreshCustomerPartners();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition du partenaire.');
+      }
     },
   },
   filters: {
