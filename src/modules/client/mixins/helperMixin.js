@@ -1,5 +1,4 @@
 import { mapGetters } from 'vuex';
-import has from 'lodash/has';
 import pickBy from 'lodash/pickBy';
 import pick from 'lodash/pick';
 import omit from 'lodash/omit';
@@ -7,6 +6,7 @@ import get from 'lodash/get';
 import Roles from '@api/Roles';
 import Users from '@api/Users';
 import Email from '@api/Email';
+import Helpers from '@api/Helpers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { HELPER } from '@data/constants';
 import { clear, formatPhone, formatPhoneForPayload } from '@helpers/utils';
@@ -29,14 +29,14 @@ export const helperMixin = {
       },
       helpers: [],
       helpersColumns: [
-        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
-        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
-        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'local.email') || '' },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => get(row, 'user.identity.firstname') || '' },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => get(row, 'user.identity.lastname') || '' },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'user.local.email') || '' },
         {
           name: 'phone',
           label: 'Téléphone',
           align: 'left',
-          field: row => get(row, 'contact.phone') || '',
+          field: row => get(row, 'user.contact.phone') || '',
           format: formatPhone,
         },
         {
@@ -47,17 +47,20 @@ export const helperMixin = {
           format: formatDate,
           sort: ascendingSort,
         },
-        { name: 'actions', label: '', align: 'left', field: '_id' },
+        { name: 'referent', label: 'Référent', align: 'left' },
+        { name: 'actions', label: '', align: 'left', field: row => get(row, 'user._id') || '' },
       ],
       helpersPagination: { rowsPerPage: 0 },
       helpersLoading: false,
+      referentHelper: {},
     };
   },
   computed: {
     ...mapGetters({ company: 'main/getCompany' }),
     sortedHelpers () {
-      return [...this.helpers]
-        .sort((u1, u2) => (u1.identity.lastname || '').localeCompare((u2.identity.lastname || '')));
+      return this.helpers.sort(
+        (h1, h2) => (get(h1, 'user.identity.lastname') || '').localeCompare(get(h2, 'user.identity.lastname') || '')
+      );
     },
   },
   methods: {
@@ -65,9 +68,10 @@ export const helperMixin = {
     async getUserHelpers () {
       try {
         this.helpersLoading = true;
-        const params = { customers: this.customer._id };
-        if (has(this.company, '_id')) params.company = this.company._id;
-        this.helpers = await Users.list(params);
+        this.helpers = await Helpers.list({ customer: this.customer._id });
+
+        const referentHelper = this.helpers.find(h => h.referent);
+        if (referentHelper) this.referentHelper = referentHelper._id;
       } catch (e) {
         this.helpers = [];
         console.error(e);
@@ -81,18 +85,13 @@ export const helperMixin = {
       this.newHelper = { ...clear(this.newHelper) };
       this.firstStep = true;
     },
-    resetEditedHelperForm () {
-      this.$v.editedHelper.$reset();
-      this.editedHelper = { ...clear(this.editedHelper) };
-      this.openEditedHelperModal = false;
-    },
     async formatHelper () {
       const roles = await Roles.list({ name: HELPER });
       if (roles.length === 0) throw new Error('Role not found');
 
       const payload = {
         local: { email: this.newHelper.local.email },
-        customers: [this.customer._id],
+        customer: this.customer._id,
         role: roles[0]._id,
         identity: pickBy(this.newHelper.identity),
       };
@@ -150,7 +149,8 @@ export const helperMixin = {
         } else if (userInfo.exists) {
           const roles = await Roles.list({ name: HELPER });
           if (roles.length === 0) throw new Error('Role not found');
-          const payload = { role: roles[0]._id, customers: [this.customer._id] };
+
+          const payload = { role: roles[0]._id, customer: this.customer._id };
           if (!user.company) payload.company = this.customer.company;
 
           await Users.updateById(user._id, payload);
@@ -167,6 +167,12 @@ export const helperMixin = {
       } finally {
         this.loading = false;
       }
+    },
+    // Edition
+    resetEditedHelperForm () {
+      this.$v.editedHelper.$reset();
+      this.editedHelper = { ...clear(this.editedHelper) };
+      this.openEditedHelperModal = false;
     },
     async editHelper () {
       try {
@@ -185,22 +191,35 @@ export const helperMixin = {
         await this.getUserHelpers();
         this.openEditedHelperModal = false;
       } catch (e) {
+        console.error(e);
         NotifyNegative('Erreur lors de la modification de l\'aidant.');
       } finally {
         this.loading = false;
       }
     },
     openEditionModalHelper (helperId) {
-      const helper = this.helpers.find(h => h._id === helperId);
+      const helperUser = this.helpers.map(h => h.user).find(u => u._id === helperId);
       this.editedHelper = {
-        ...pick(helper, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
-        contact: { phone: get(helper, 'contact.phone') || '' },
+        ...pick(helperUser, ['_id', 'local.email', 'identity.firstname', 'identity.lastname']),
+        contact: { phone: get(helperUser, 'contact.phone') || '' },
       };
       this.openEditedHelperModal = true;
     },
+    async updateReferentHelper (value) {
+      try {
+        await Helpers.update(value, { referent: true });
+
+        await this.getUserHelpers();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition de l\'aidant référent');
+      }
+    },
+    // Deletion
     async deleteHelper (helperId) {
       try {
         await Users.deleteById(helperId);
+
         await this.getUserHelpers();
         NotifyPositive('Aidant supprimé');
       } catch (e) {
