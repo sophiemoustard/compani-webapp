@@ -948,7 +948,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de l\'ajout d\'un financement');
+        NotifyNegative('Erreur lors de l\'ajout d\'un financement.');
       } finally {
         this.loading = false;
       }
@@ -1016,7 +1016,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.data.statusCode === 409) return NotifyNegative(e.data.message);
-        NotifyNegative('Erreur lors de la modification d\'un financement');
+        NotifyNegative('Erreur lors de la modification d\'un financement.');
       } finally {
         this.loading = false;
       }
