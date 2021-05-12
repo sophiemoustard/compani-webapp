@@ -1,16 +1,12 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
-      display-toggle @update-search="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
+    <ni-directory-header title="Répertoire bénéficiaires" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
       @go-to="goToCustomerProfile" :loading="tableLoading" :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>
         </q-item>
-        <template v-else-if="col.name === 'client'">
-          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }" />
-        </template>
         <template v-else-if="col.name === 'info'">
           <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
         </template>
@@ -71,7 +67,6 @@ export default {
       },
       customers: [],
       searchStr: '',
-      onlyClients: false,
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
       columns: [
         {
@@ -112,14 +107,6 @@ export default {
           sort: (a, b) => a - b,
           style: 'width: 30px',
         },
-        {
-          name: 'client',
-          label: 'Client',
-          field: 'firstIntervention',
-          align: 'right',
-          sortable: false,
-          style: 'width: 30px',
-        },
       ],
     };
   },
@@ -144,11 +131,8 @@ export default {
   },
   computed: {
     filteredCustomers () {
-      const customers = this.onlyClients
-        ? this.customers.filter(customer => customer.firstIntervention)
-        : this.customers;
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return customers
+      return this.customers
         .filter(customer => customer.identity.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
