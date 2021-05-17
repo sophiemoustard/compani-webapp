@@ -78,6 +78,11 @@
                   <q-checkbox :value="prescriberPartner === props.row._id"
                     @input="updatePrescriberPartner(props.row._id)" />
                 </template>
+                <template v-if="col.name === 'actions'">
+                  <div class="row no-wrap table-actions">
+                    <q-btn flat dense color="grey" icon="delete" @click="validatePartnerDeletion(col.value)" />
+                  </div>
+                </template>
                 <template v-else :class="col.name">{{ col.value }}</template>
               </q-td>
             </q-tr>
@@ -253,6 +258,7 @@ export default {
           field: row => get(row, 'partner.partnerOrganization.name'),
         },
         { name: 'prescriber', label: 'Prescripteur', align: 'left' },
+        { name: 'actions', label: '', align: 'left', field: row => get(row, '_id') || '' },
       ],
       prescriberPartner: '',
     };
@@ -434,6 +440,26 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de l\'édition du partenaire.');
       }
+    },
+    async deletePartner (customerPartnerId) {
+      try {
+        await CustomerPartners.delete(customerPartnerId);
+
+        await this.refreshCustomerPartners();
+        NotifyPositive('Partenaire supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du partenaire.');
+      }
+    },
+    validatePartnerDeletion (customerPartnerId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce partenaire ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deletePartner(customerPartnerId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
   filters: {

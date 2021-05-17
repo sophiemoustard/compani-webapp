@@ -221,7 +221,7 @@ export const helperMixin = {
         await Users.deleteById(helperId);
 
         await this.getUserHelpers();
-        NotifyPositive('Aidant supprimé');
+        NotifyPositive('Aidant supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'aidant.');
