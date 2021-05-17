@@ -3,18 +3,13 @@
     <div class="flex-row q-mb-md items-center">
       <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
       <h4 class="ellipsis">{{ title }}</h4>
-      <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
-        @click="goToPlanning" />
+      <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
-        <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-inactive']" />
-        <div>{{ userActivity.status }}</div>
-      </div>
-      <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
         <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
-        <ni-button :disable="deletionDisabled" icon="delete" @click="validateCustomerDeletion" />
+        <ni-button icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
   </div>
@@ -24,7 +19,7 @@
 import { mapState } from 'vuex';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
-import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import moment from '@helpers/moment';
 
 export default {
@@ -37,18 +32,6 @@ export default {
   },
   computed: {
     ...mapState('customer', ['customer']),
-    deletionDisabled () {
-      return !!this.customer.firstIntervention;
-    },
-    isPlanningRouterDisable () {
-      return !this.customer.firstIntervention;
-    },
-    userActivity () {
-      return {
-        status: this.customer.firstIntervention ? 'Client' : 'Prospect',
-        active: !!this.customer.firstIntervention,
-      };
-    },
     userStartDate () {
       if (this.customer.createdAt) return moment(this.customer.createdAt).format('DD/MM/YY');
       return 'N/A';
@@ -60,7 +43,11 @@ export default {
   },
   methods: {
     goToPlanning () {
-      this.$router.push({ name: 'ni planning customers', params: { targetedCustomer: this.customer } });
+      if (this.customer.subscriptions.length) {
+        return this.$router.push({ name: 'ni planning customers', params: { targetedCustomer: this.customer } });
+      }
+
+      return NotifyWarning('Ce bénéficiaire n\'a pas de souscription.');
     },
     async deleteCustomer () {
       try {
@@ -74,14 +61,14 @@ export default {
       }
     },
     validateCustomerDeletion () {
-      if (this.deletionDisabled) return;
+      if (this.customer.firstIntervention) return NotifyWarning('Ce bénéficiaire est lié à des interventions.');
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteCustomer)
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 };
