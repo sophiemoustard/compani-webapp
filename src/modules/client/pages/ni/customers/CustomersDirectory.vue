@@ -10,6 +10,10 @@
         <template v-else-if="col.name === 'info'">
           <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
         </template>
+        <template v-else-if="col.name === 'status'">
+          <div :class="{'dot dot-active': col.value === ACTIVATED, 'dot dot-stopped': col.value === STOPPED,
+            'dot dot-archived': col.value === ARCHIVED}" />
+        </template>
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
@@ -30,7 +34,7 @@ import { frAddress } from '@helpers/vuelidateCustomVal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { CIVILITY_OPTIONS } from '@data/constants';
+import { CIVILITY_OPTIONS, ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
@@ -82,10 +86,20 @@ export default {
         {
           name: 'createdAt',
           label: 'Depuis le...',
-          field: 'createdAt',
+          field: row => get(row, 'status.activatedAt'),
           align: 'left',
           sortable: true,
           format: value => formatDate(value) || 'N/A',
+          sort: ascendingSort,
+          style: 'width: 85px',
+        },
+        {
+          name: 'stoppedAt',
+          label: 'Arrêté le...',
+          field: row => ([STOPPED, ARCHIVED].includes(get(row, 'status.value')) && get(row, 'status.stoppedAt')),
+          align: 'left',
+          sortable: true,
+          format: value => formatDate(value) || '',
           sort: ascendingSort,
           style: 'width: 85px',
         },
@@ -107,7 +121,18 @@ export default {
           sort: (a, b) => a - b,
           style: 'width: 30px',
         },
+        {
+          name: 'status',
+          label: 'Statut',
+          field: row => get(row, 'status.value'),
+          align: 'right',
+          sortable: false,
+          style: 'width: 30px',
+        },
       ],
+      ACTIVATED,
+      STOPPED,
+      ARCHIVED,
     };
   },
   validations: {

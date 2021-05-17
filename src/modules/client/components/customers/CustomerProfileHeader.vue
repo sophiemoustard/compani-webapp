@@ -7,8 +7,14 @@
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
+        <div :class="{'dot dot-active': get(customer, 'status.value') === ACTIVATED,
+          'dot dot-stopped': get(customer, 'status.value') === STOPPED,
+          'dot dot-archived': get(customer, 'status.value') === ARCHIVED }" />
+        <div>{{ STATUS_TYPES[get(customer, 'status.value')] }}</div>
+      </div>
+      <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
-        <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
+        <div class="q-mr-md">Depuis le {{ statusDate }} ({{ relativeStatusDate }})</div>
         <ni-button icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
@@ -17,10 +23,12 @@
 
 <script>
 import { mapState } from 'vuex';
+import get from 'lodash/get';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import moment from '@helpers/moment';
+import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES } from '@data/constants';
 
 export default {
   name: 'ProfileHeader',
@@ -30,14 +38,27 @@ export default {
   components: {
     'ni-button': Button,
   },
+  data () {
+    return {
+      ACTIVATED,
+      STOPPED,
+      ARCHIVED,
+      STATUS_TYPES,
+      get,
+    };
+  },
   computed: {
     ...mapState('customer', ['customer']),
-    userStartDate () {
-      if (this.customer.createdAt) return moment(this.customer.createdAt).format('DD/MM/YY');
-      return 'N/A';
+    statusDate () {
+      switch (get(this.customer, 'status.value')) {
+        case ACTIVATED: return moment(this.customer.status.activatedAt).format('DD/MM/YY');
+        case STOPPED: return moment(this.customer.status.stoppedAt).format('DD/MM/YY');
+        case ARCHIVED: return moment(this.customer.status.archivedAt).format('DD/MM/YY');
+        default: return 'N/A';
+      }
     },
-    userRelativeStartDate () {
-      if (this.userStartDate !== 'N/A') return moment(this.userStartDate, 'DD/MM/YY').toNow(true);
+    relativeStatusDate () {
+      if (this.statusDate !== 'N/A') return moment(this.statusDate, 'DD/MM/YY').toNow(true);
       return '';
     },
   },

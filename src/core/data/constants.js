@@ -455,3 +455,9 @@ export const JOB_OPTIONS = [
   { label: 'Infirmier', value: 'nurse' },
   { label: 'Psychologue', value: 'psychologist' },
 ];
+
+// CUSTOMER STATUS
+export const ACTIVATED = 'activated';
+export const STOPPED = 'stopped';
+export const ARCHIVED = 'archived';
+export const STATUS_TYPES = { [ACTIVATED]: 'Actif', [STOPPED]: 'Arrêté', [ARCHIVED]: 'Archivé' };
