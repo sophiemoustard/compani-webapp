@@ -84,7 +84,7 @@ export default {
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteCourse)
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 };

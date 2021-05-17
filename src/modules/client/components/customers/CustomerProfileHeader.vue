@@ -3,8 +3,7 @@
     <div class="flex-row q-mb-md items-center">
       <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
       <h4 class="ellipsis">{{ title }}</h4>
-      <ni-button class="q-ml-sm" color="primary" icon="date_range"
-        @click="goToPlanning" />
+      <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -48,7 +47,7 @@ export default {
         return this.$router.push({ name: 'ni planning customers', params: { targetedCustomer: this.customer } });
       }
 
-      return NotifyWarning('Ce bénéficiaire n\'a pas de souscriptions.');
+      return NotifyWarning('Ce bénéficiaire n\'a pas de souscription.');
     },
     async deleteCustomer () {
       try {
@@ -62,14 +61,14 @@ export default {
       }
     },
     validateCustomerDeletion () {
-      if (this.customer.firstIntervention) return NotifyWarning('Ce bénéficiaire a des interventions en cours.');
+      if (this.customer.firstIntervention) return NotifyWarning('Ce bénéficiaire est lié à des interventions.');
       this.$q.dialog({
         title: 'Confirmation',
         message: 'Confirmez-vous la suppression ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteCustomer)
-        .onCancel(() => NotifyPositive('Suppression annulée'));
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
 };
