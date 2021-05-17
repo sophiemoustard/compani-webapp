@@ -79,8 +79,8 @@
                     @input="updatePrescriberPartner(props.row._id)" />
                 </template>
                 <template v-if="col.name === 'actions'">
-                  <div class="row no-wrap table-actions">
-                    <q-btn flat dense color="grey" icon="delete" @click="validatePartnerDeletion(col.value)" />
+                  <div class="remove-icon">
+                    <q-btn flat dense color="grey" icon="clear" @click="validatePartnerDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else :class="col.name">{{ col.value }}</template>
@@ -258,7 +258,7 @@ export default {
           field: row => get(row, 'partner.partnerOrganization.name'),
         },
         { name: 'prescriber', label: 'Prescripteur', align: 'left' },
-        { name: 'actions', label: '', align: 'left', field: row => get(row, '_id') || '' },
+        { name: 'actions', label: '', field: '_id' },
       ],
       prescriberPartner: '',
     };
@@ -477,4 +477,8 @@ export default {
     /deep/ .q-field__append
       .q-select__dropdown-icon
         display: none
+  .remove-icon
+    @media screen and (min-width: 768px)
+      width: 85px;
+      align-items: right;
 </style>
