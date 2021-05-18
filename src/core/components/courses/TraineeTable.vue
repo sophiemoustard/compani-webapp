@@ -53,7 +53,7 @@ import omit from 'lodash/omit';
 import Users from '@api/Users';
 import Courses from '@api/Courses';
 import Companies from '@api/Companies';
-import { INTER_B2B, TRAINEE, TRAINER } from '@data/constants';
+import { INTER_B2B, TRAINER } from '@data/constants';
 import { formatPhone, clear, formatPhoneForPayload, formatAndSortOptions } from '@helpers/utils';
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import Button from '@components/Button';
@@ -64,7 +64,6 @@ import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup
 import { userMixin } from '@mixins/userMixin';
 import { courseMixin } from '@mixins/courseMixin';
 import CopyButton from '@components/CopyButton';
-import Email from '@api/Email';
 
 export default {
   name: 'TraineeTable',
@@ -257,14 +256,20 @@ export default {
         const payload = this.formatAddTraineePayload();
         await Courses.addTrainee(this.course._id, payload);
         NotifyPositive('Stagiaire ajouté.');
-
-        await this.sendWelcome();
-
+        if (!this.firstStep) NotifyPositive('Email envoyé.');
         this.traineeCreationModal = false;
         this.$emit('refresh');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);
+        if (e.status === 424) {
+          NotifyPositive('Stagiaire ajouté.');
+
+          this.traineeCreationModal = false;
+          this.$emit('refresh');
+
+          return NotifyNegative(e.data.message);
+        }
         NotifyNegative('Erreur lors de l\'ajout du stagiaire.');
       } finally {
         this.traineeCreationModalLoading = false;
@@ -322,15 +327,6 @@ export default {
     },
     handleCopySuccess () {
       NotifyPositive('Adresses mail copiées !');
-    },
-    async sendWelcome () {
-      try {
-        await Email.sendWelcome({ email: this.newTrainee.local.email, type: TRAINEE });
-        NotifyPositive('Email envoyé');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de l\'envoi de l\' email.');
-      }
     },
   },
 };
