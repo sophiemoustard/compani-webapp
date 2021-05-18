@@ -78,6 +78,11 @@
                   <q-checkbox :value="prescriberPartner === props.row._id"
                     @input="updatePrescriberPartner(props.row._id)" />
                 </template>
+                <template v-if="col.name === 'actions'">
+                  <div class="remove-icon">
+                    <ni-button icon="close" @click="validatePartnerDeletion(col.value)" />
+                  </div>
+                </template>
                 <template v-else :class="col.name">{{ col.value }}</template>
               </q-td>
             </q-tr>
@@ -139,6 +144,7 @@ import Stats from '@api/Stats';
 import Users from '@api/Users';
 import Partners from '@api/Partners';
 import CustomerPartners from '@api/CustomerPartners';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -167,6 +173,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-select': Select,
+    'ni-button': Button,
     'ni-search-address': SearchAddress,
     'ni-simple-table': SimpleTable,
     'ni-responsive-table': ResponsiveTable,
@@ -253,6 +260,7 @@ export default {
           field: row => get(row, 'partner.partnerOrganization.name'),
         },
         { name: 'prescriber', label: 'Prescripteur', align: 'left' },
+        { name: 'actions', label: '', field: '_id' },
       ],
       prescriberPartner: '',
     };
@@ -435,6 +443,26 @@ export default {
         NotifyNegative('Erreur lors de l\'édition du partenaire.');
       }
     },
+    async deletePartner (customerPartnerId) {
+      try {
+        await CustomerPartners.delete(customerPartnerId);
+
+        await this.refreshCustomerPartners();
+        NotifyPositive('Partenaire supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du partenaire.');
+      }
+    },
+    validatePartnerDeletion (customerPartnerId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Es-tu sûr(e) de vouloir supprimer ce partenaire ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deletePartner(customerPartnerId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
   },
   filters: {
     formatIdentity,
@@ -451,4 +479,8 @@ export default {
     /deep/ .q-field__append
       .q-select__dropdown-icon
         display: none
+  .remove-icon
+    @media screen and (min-width: 768px)
+      width: 85px;
+      align-items: right;
 </style>

@@ -11,4 +11,7 @@ export default {
   async update (customerPartnerId, payload) {
     await alenviAxios.put(`${process.env.API_HOSTNAME}/customerpartners/${customerPartnerId}`, payload);
   },
+  async delete (customerPartnerId) {
+    await alenviAxios.delete(`${process.env.API_HOSTNAME}/customerpartners/${customerPartnerId}`);
+  },
 };
