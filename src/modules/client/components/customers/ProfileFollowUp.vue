@@ -80,7 +80,7 @@
                 </template>
                 <template v-if="col.name === 'actions'">
                   <div class="remove-icon">
-                    <q-btn flat dense color="grey" icon="clear" @click="validatePartnerDeletion(col.value)" />
+                    <ni-button icon="close" @click="validatePartnerDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else :class="col.name">{{ col.value }}</template>
@@ -144,6 +144,7 @@ import Stats from '@api/Stats';
 import Users from '@api/Users';
 import Partners from '@api/Partners';
 import CustomerPartners from '@api/CustomerPartners';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -172,6 +173,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-select': Select,
+    'ni-button': Button,
     'ni-search-address': SearchAddress,
     'ni-simple-table': SimpleTable,
     'ni-responsive-table': ResponsiveTable,
