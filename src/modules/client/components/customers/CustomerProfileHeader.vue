@@ -7,9 +7,7 @@
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
-        <div :class="{'dot dot-active': get(customer, 'status.value') === ACTIVATED,
-          'dot dot-stopped': get(customer, 'status.value') === STOPPED,
-          'dot dot-archived': get(customer, 'status.value') === ARCHIVED }" />
+        <div :class="getDotClass(get(customer, 'status.value'))" />
         <div>{{ STATUS_TYPES[get(customer, 'status.value')] }}</div>
       </div>
       <div class="row items-center">
@@ -29,6 +27,7 @@ import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import moment from '@helpers/moment';
 import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES } from '@data/constants';
+import { getDotClass } from '@helpers/utils';
 
 export default {
   name: 'ProfileHeader',
@@ -40,11 +39,9 @@ export default {
   },
   data () {
     return {
-      ACTIVATED,
-      STOPPED,
-      ARCHIVED,
       STATUS_TYPES,
       get,
+      getDotClass,
     };
   },
   computed: {

@@ -3,6 +3,7 @@ import isObject from 'lodash/isObject';
 import get from 'lodash/get';
 import diacriticsMap from '@data/diacritics';
 import moment from '@helpers/moment';
+import { ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 
 export const extend = (...sources) => {
   const extended = {};
@@ -142,3 +143,9 @@ export const formatAndSortIdentityOptions = (array, field = null) => array
   .sort((a, b) => a.label.localeCompare(b.label));
 
 export const formatNumberForCSV = number => parseFloat(number).toFixed(2).replace('.', ',');
+
+export const getDotClass = value => ({
+  'dot dot-active': value === ACTIVATED,
+  'dot dot-stopped': value === STOPPED,
+  'dot dot-archived': value === ARCHIVED,
+});

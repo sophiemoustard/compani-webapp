@@ -11,8 +11,7 @@
           <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
         </template>
         <template v-else-if="col.name === 'status'">
-          <div :class="{'dot dot-active': col.value === ACTIVATED, 'dot dot-stopped': col.value === STOPPED,
-            'dot dot-archived': col.value === ARCHIVED}" />
+          <div :class="getDotClass(col.value)" />
         </template>
         <template v-else>{{ col.value }}</template>
       </template>
@@ -34,8 +33,8 @@ import { frAddress } from '@helpers/vuelidateCustomVal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { CIVILITY_OPTIONS, ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
-import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
+import { CIVILITY_OPTIONS, STOPPED, ARCHIVED } from '@data/constants';
+import { formatIdentity, removeDiacritics, sortStrings, getDotClass } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
@@ -130,9 +129,7 @@ export default {
           style: 'width: 30px',
         },
       ],
-      ACTIVATED,
-      STOPPED,
-      ARCHIVED,
+      getDotClass,
     };
   },
   validations: {
