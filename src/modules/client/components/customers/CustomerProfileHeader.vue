@@ -25,9 +25,8 @@ import get from 'lodash/get';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import moment from '@helpers/moment';
+import { formatDate, dateDiff } from '@helpers/date';
 import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES } from '@data/constants';
-import { getDotClass } from '@helpers/utils';
 
 export default {
   name: 'ProfileHeader',
@@ -41,22 +40,25 @@ export default {
     return {
       STATUS_TYPES,
       get,
-      getDotClass,
     };
   },
   computed: {
     ...mapState('customer', ['customer']),
     statusDate () {
       switch (get(this.customer, 'status.value')) {
-        case ACTIVATED: return moment(this.customer.status.activatedAt).format('DD/MM/YY');
-        case STOPPED: return moment(this.customer.status.stoppedAt).format('DD/MM/YY');
-        case ARCHIVED: return moment(this.customer.status.archivedAt).format('DD/MM/YY');
+        case ACTIVATED: return formatDate(this.customer.status.activatedAt);
+        case STOPPED: return formatDate(this.customer.status.stoppedAt);
+        case ARCHIVED: return formatDate(this.customer.status.archivedAt);
         default: return 'N/A';
       }
     },
     relativeStatusDate () {
-      if (this.statusDate !== 'N/A') return moment(this.statusDate, 'DD/MM/YY').toNow(true);
-      return '';
+      switch (get(this.customer, 'status.value')) {
+        case ACTIVATED: return dateDiff(this.customer.status.activatedAt, new Date());
+        case STOPPED: return dateDiff(this.customer.status.stoppedAt, new Date());
+        case ARCHIVED: return dateDiff(this.customer.status.archivedAt, new Date());
+        default: return '';
+      }
     },
   },
   methods: {
@@ -87,6 +89,13 @@ export default {
         cancel: 'Annuler',
       }).onOk(this.deleteCustomer)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    getDotClass (value) {
+      return {
+        'dot dot-active': value === ACTIVATED,
+        'dot dot-stopped': value === STOPPED,
+        'dot dot-archived': value === ARCHIVED,
+      };
     },
   },
 };

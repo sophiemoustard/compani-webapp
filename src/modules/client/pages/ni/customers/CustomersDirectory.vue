@@ -33,8 +33,8 @@ import { frAddress } from '@helpers/vuelidateCustomVal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { CIVILITY_OPTIONS, STOPPED, ARCHIVED } from '@data/constants';
-import { formatIdentity, removeDiacritics, sortStrings, getDotClass } from '@helpers/utils';
+import { CIVILITY_OPTIONS, ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
+import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
@@ -129,7 +129,6 @@ export default {
           style: 'width: 30px',
         },
       ],
-      getDotClass,
     };
   },
   validations: {
@@ -224,6 +223,13 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    getDotClass (value) {
+      return {
+        'dot dot-active': value === ACTIVATED,
+        'dot dot-stopped': value === STOPPED,
+        'dot dot-archived': value === ARCHIVED,
+      };
     },
   },
 };

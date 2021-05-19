@@ -1,7 +1,16 @@
+import { formatQuantity } from '@helpers/utils';
+
 export const dateDiff = (firstDate, secondDate) => {
   const durationInMilliseconds = new Date(firstDate) - new Date(secondDate);
 
-  return parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24), 10);
+  if (Math.abs(durationInMilliseconds) < 86400000) {
+    const hours = Math.abs(parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60), 10));
+    return formatQuantity('heure', hours);
+  }
+
+  const days = Math.abs(parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24), 10));
+
+  return formatQuantity('jour', days);
 };
 
 export const isBetween = (date, min, max) => new Date(date) < new Date(max) && new Date(date) > new Date(min);
