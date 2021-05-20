@@ -124,7 +124,7 @@ export default {
           name: 'status',
           label: 'Statut',
           field: row => get(row, 'status.value'),
-          align: 'right',
+          align: 'center',
           sortable: false,
           style: 'width: 30px',
         },
@@ -234,3 +234,7 @@ export default {
   },
 };
 </script>
+<style lang="stylus" scoped>
+  .dot
+    margin: 0px;
+</style>

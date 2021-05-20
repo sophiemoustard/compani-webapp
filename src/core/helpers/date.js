@@ -3,7 +3,7 @@ import { formatQuantity } from '@helpers/utils';
 export const dateDiff = (firstDate, secondDate) => {
   const durationInMilliseconds = new Date(firstDate) - new Date(secondDate);
 
-  if (Math.abs(durationInMilliseconds) < 86400000) {
+  if (Math.abs(durationInMilliseconds) < 1000 * 60 * 60 * 24) {
     const hours = Math.abs(parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60), 10));
     return formatQuantity('heure', hours);
   }
