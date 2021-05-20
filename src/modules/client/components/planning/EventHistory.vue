@@ -3,8 +3,10 @@
     <div class="history-cell">
       <div class="history-title">
         <div class="history-title-text">
-          {{ historyInfo.title.pre }}<span class="history-type">{{ eventType }}</span>
-          <template v-if="!isAuxiliaryUpdate"> de <span class="history-info">{{ auxiliaryName }}</span></template>
+          {{ historyInfo.title.pre }}<span class="history-type">{{ timeStampingType || eventType }}</span>
+          <template v-if="!isAuxiliaryUpdate && !isTimestamping">
+            de <span class="history-info">{{ auxiliaryName }}</span>
+          </template>
           {{ historyInfo.title.post }}
         </div>
         <q-btn v-if="historyInfo.details" color="primary" size="10px" flat round icon="remove_red_eye"
@@ -41,6 +43,9 @@ import {
   EVERY_TWO_WEEKS,
   EVENT_UPDATE,
   CANCELLATION_OPTIONS,
+  MANUAL_TIME_STAMPING,
+  MANUAL_TIME_STAMPING_REASONS,
+  TIME_STAMPING_ACTIONS,
 } from '@data/constants';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -116,6 +121,13 @@ export default {
       const eventType = EVENT_TYPES.find(t => t.value === type);
       return eventType ? eventType.label.toLowerCase() : '';
     },
+    timeStampingType () {
+      if (!this.isTimestamping) return '';
+      return this.history.action === MANUAL_TIME_STAMPING ? 'Manuel' : 'QR code';
+    },
+    isTimestamping () {
+      return TIME_STAMPING_ACTIONS.includes(this.history.action);
+    },
     eventName () {
       const { type, internalHour, absence } = this.history.event;
       switch (type) {
@@ -144,6 +156,11 @@ export default {
           return {
             title: this.getEventUpdateTitle(),
             details: this.getEventUpdateDetails(),
+          };
+        case MANUAL_TIME_STAMPING:
+          return {
+            title: this.getEventTimeStampingTitle(),
+            details: this.getEventTimeStampingDetails(),
           };
         case EVENT_CREATION:
         default:
@@ -216,6 +233,17 @@ export default {
       const { address } = this.history.event;
 
       return address && address.fullAddress ? `${details} ${address.fullAddress}.` : details;
+    },
+    // Time stamping
+    getEventTimeStampingTitle () {
+      return { pre: this.history.update.startHour ? 'Début horodaté - ' : 'Fin horodaté - ', post: '' };
+    },
+    getEventTimeStampingDetails () {
+      const { startHour } = this.history.update;
+      const startHourFrom = formatHoursWithMinutes(startHour.from);
+
+      return `Début initialement prévu à ${startHourFrom}. `
+        + `Motif d’horodatage manuel : “${MANUAL_TIME_STAMPING_REASONS[this.history.manualTimeStampingReason]}”.`;
     },
     // Update
     getEventUpdateTitle () {

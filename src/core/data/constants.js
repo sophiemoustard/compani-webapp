@@ -461,3 +461,15 @@ export const ACTIVATED = 'activated';
 export const STOPPED = 'stopped';
 export const ARCHIVED = 'archived';
 export const STATUS_TYPES = { [ACTIVATED]: 'Actif', [STOPPED]: 'Arrêté', [ARCHIVED]: 'Archivé' };
+
+// TIMESTAMPING
+export const MANUAL_TIME_STAMPING = 'manual_time_stamping';
+export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING];
+export const QRCODE_MISSING = 'qrcode_missing';
+export const QRCODE_ERROR = 'qrcode_error';
+export const CAMERA_ERROR = 'camera_error';
+export const MANUAL_TIME_STAMPING_REASONS = {
+  [QRCODE_MISSING]: 'Je n\'ai pas accès au code barre',
+  [QRCODE_ERROR]: 'Le code barre ne fonctionne pas',
+  [CAMERA_ERROR]: 'Mon appareil photo ne fonctionne pas',
+};
