@@ -10,6 +10,9 @@
         <template v-else-if="col.name === 'info'">
           <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
         </template>
+        <template v-else-if="col.name === 'status'">
+          <div :class="getDotClass(col.value)" />
+        </template>
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
@@ -30,7 +33,7 @@ import { frAddress } from '@helpers/vuelidateCustomVal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { CIVILITY_OPTIONS } from '@data/constants';
+import { CIVILITY_OPTIONS, ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
@@ -82,10 +85,20 @@ export default {
         {
           name: 'createdAt',
           label: 'Depuis le...',
-          field: 'createdAt',
+          field: row => get(row, 'status.activatedAt'),
           align: 'left',
           sortable: true,
           format: value => formatDate(value) || 'N/A',
+          sort: ascendingSort,
+          style: 'width: 85px',
+        },
+        {
+          name: 'stoppedAt',
+          label: 'Arrêté le...',
+          field: row => ([STOPPED, ARCHIVED].includes(get(row, 'status.value')) && get(row, 'status.stoppedAt')),
+          align: 'left',
+          sortable: true,
+          format: value => formatDate(value) || '',
           sort: ascendingSort,
           style: 'width: 85px',
         },
@@ -105,6 +118,14 @@ export default {
           align: 'left',
           sortable: true,
           sort: (a, b) => a - b,
+          style: 'width: 30px',
+        },
+        {
+          name: 'status',
+          label: 'Statut',
+          field: row => get(row, 'status.value'),
+          align: 'center',
+          sortable: false,
           style: 'width: 30px',
         },
       ],
@@ -203,6 +224,17 @@ export default {
         this.loading = false;
       }
     },
+    getDotClass (value) {
+      return {
+        'dot dot-active': value === ACTIVATED,
+        'dot dot-stopped': value === STOPPED,
+        'dot dot-archived': value === ARCHIVED,
+      };
+    },
   },
 };
 </script>
+<style lang="stylus" scoped>
+  .dot
+    margin: 0px;
+</style>

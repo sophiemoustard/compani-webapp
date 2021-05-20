@@ -7,8 +7,12 @@
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
+        <div :class="getDotClass(get(customer, 'status.value'))" />
+        <div>{{ STATUS_TYPES[get(customer, 'status.value')] }}</div>
+      </div>
+      <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
-        <div class="q-mr-md">Depuis le {{ userStartDate }} ({{ userRelativeStartDate }})</div>
+        <div class="q-mr-md">Depuis le {{ statusDate }} ({{ relativeStatusDate }})</div>
         <ni-button icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
@@ -17,10 +21,12 @@
 
 <script>
 import { mapState } from 'vuex';
+import get from 'lodash/get';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import moment from '@helpers/moment';
+import { formatDate, dateDiff, formatDateDiff } from '@helpers/date';
+import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES } from '@data/constants';
 
 export default {
   name: 'ProfileHeader',
@@ -30,15 +36,29 @@ export default {
   components: {
     'ni-button': Button,
   },
+  data () {
+    return {
+      STATUS_TYPES,
+      get,
+    };
+  },
   computed: {
     ...mapState('customer', ['customer']),
-    userStartDate () {
-      if (this.customer.createdAt) return moment(this.customer.createdAt).format('DD/MM/YY');
-      return 'N/A';
+    statusDate () {
+      switch (get(this.customer, 'status.value')) {
+        case ACTIVATED: return formatDate(this.customer.status.activatedAt);
+        case STOPPED: return formatDate(this.customer.status.stoppedAt);
+        case ARCHIVED: return formatDate(this.customer.status.archivedAt);
+        default: return 'N/A';
+      }
     },
-    userRelativeStartDate () {
-      if (this.userStartDate !== 'N/A') return moment(this.userStartDate, 'DD/MM/YY').toNow(true);
-      return '';
+    relativeStatusDate () {
+      switch (get(this.customer, 'status.value')) {
+        case ACTIVATED: return formatDateDiff(dateDiff(this.customer.status.activatedAt, new Date()));
+        case STOPPED: return formatDateDiff(dateDiff(this.customer.status.stoppedAt, new Date()));
+        case ARCHIVED: return formatDateDiff(dateDiff(this.customer.status.archivedAt, new Date()));
+        default: return '';
+      }
     },
   },
   methods: {
@@ -69,6 +89,13 @@ export default {
         cancel: 'Annuler',
       }).onOk(this.deleteCustomer)
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    getDotClass (value) {
+      return {
+        'dot dot-active': value === ACTIVATED,
+        'dot dot-stopped': value === STOPPED,
+        'dot dot-archived': value === ARCHIVED,
+      };
     },
   },
 };
