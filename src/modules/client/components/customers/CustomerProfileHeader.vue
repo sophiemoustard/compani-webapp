@@ -25,7 +25,7 @@ import get from 'lodash/get';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { formatDate, dateDiff } from '@helpers/date';
+import { formatDate, dateDiff, formatDateDiff } from '@helpers/date';
 import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES } from '@data/constants';
 
 export default {
@@ -54,9 +54,9 @@ export default {
     },
     relativeStatusDate () {
       switch (get(this.customer, 'status.value')) {
-        case ACTIVATED: return dateDiff(this.customer.status.activatedAt, new Date());
-        case STOPPED: return dateDiff(this.customer.status.stoppedAt, new Date());
-        case ARCHIVED: return dateDiff(this.customer.status.archivedAt, new Date());
+        case ACTIVATED: return formatDateDiff(dateDiff(this.customer.status.activatedAt, new Date()));
+        case STOPPED: return formatDateDiff(dateDiff(this.customer.status.stoppedAt, new Date()));
+        case ARCHIVED: return formatDateDiff(dateDiff(this.customer.status.archivedAt, new Date()));
         default: return '';
       }
     },

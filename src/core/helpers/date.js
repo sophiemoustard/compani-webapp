@@ -1,16 +1,27 @@
 import { formatQuantity } from '@helpers/utils';
 
-export const dateDiff = (firstDate, secondDate) => {
-  const durationInMilliseconds = new Date(firstDate) - new Date(secondDate);
+export const dateDiff = (firstDate, secondDate) => Math.abs(new Date(firstDate) - new Date(secondDate));
 
-  if (Math.abs(durationInMilliseconds) < 1000 * 60 * 60 * 24) {
-    const hours = Math.abs(parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60), 10));
+export const formatDateDiff = (durationInMilliseconds) => {
+  if (durationInMilliseconds < 1000 * 60 * 60 * 24) {
+    const hours = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60), 10);
+
     return formatQuantity('heure', hours);
   }
+  if (durationInMilliseconds < 1000 * 60 * 60 * 24 * 30) {
+    const days = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24), 10);
 
-  const days = Math.abs(parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24), 10));
+    return formatQuantity('jour', days);
+  }
+  if (durationInMilliseconds < 1000 * 60 * 60 * 24 * 365) {
+    const months = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24 / 30), 10);
 
-  return formatQuantity('jour', days);
+    return `${months} mois`;
+  }
+
+  const years = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24 / 365), 10);
+
+  return formatQuantity('an', years);
 };
 
 export const isBetween = (date, min, max) => new Date(date) < new Date(max) && new Date(date) > new Date(min);

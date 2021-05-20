@@ -1,6 +1,6 @@
 import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
 import Users from '@api/Users';
-import { dateDiff } from '../helpers/date';
+import { dateDiff, formatDateDiff } from '../helpers/date';
 
 export const learnerDirectoryMixin = {
   data () {
@@ -45,7 +45,7 @@ export const learnerDirectoryMixin = {
           field: 'daysSinceLastActivityHistory',
           align: 'center',
           sortable: true,
-          format: value => value || '-',
+          format: value => (value !== null ? formatDateDiff(value) : '-'),
           sort: (a, b) => b - a,
         },
       ],
