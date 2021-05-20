@@ -87,6 +87,8 @@
 
 <script>
 import get from 'lodash/get';
+import set from 'lodash/set';
+import Events from '@api/Events';
 import Button from '@components/Button';
 import {
   ABSENCE,
@@ -104,8 +106,6 @@ import {
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
-import set from 'lodash/set';
-import Events from '@api/Events';
 
 export default {
   name: 'EventCreationModal',

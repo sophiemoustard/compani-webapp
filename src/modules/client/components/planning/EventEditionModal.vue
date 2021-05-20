@@ -77,6 +77,18 @@
               :error="validations.cancel.reason.$error" @input="update($event, 'cancel.reason')" />
           </div>
         </template>
+        <div class="q-mb-lg">
+          <div class="flex-row items-center justify-between">
+            <div class="flex-row">
+              <q-icon size="sm" name="history" class="q-mr-sm" color="grey-400" />
+              <div>Activité</div>
+            </div>
+            <ni-button :label="historyButtonLabel" flat color="grey-800" class="bg-grey-100" @click="toggleHistory" />
+          </div>
+          <div v-if="displayHistory" class="q-mt-sm">
+            <ni-event-history v-for="history in editedEvent.histories" :key="history._id" :history="history" />
+          </div>
+        </div>
       </div>
       <div v-if="editedEvent.type === INTERVENTION && customerAddressList(editedEvent).length > 0"
         class="customer-info">
@@ -98,12 +110,13 @@
 </template>
 
 <script>
-import { formatIdentity } from '@helpers/utils';
-import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/constants';
-import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
-import Button from '@components/Button';
-import moment from '@helpers/moment';
 import set from 'lodash/set';
+import Button from '@components/Button';
+import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
+import moment from '@helpers/moment';
+import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
+import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
 
 export default {
   name: 'EventEditionModal',
@@ -120,8 +133,17 @@ export default {
   },
   components: {
     'ni-button': Button,
+    'ni-event-history': NiEventHistory,
+  },
+  data () {
+    return {
+      displayHistory: false,
+    };
   },
   computed: {
+    historyButtonLabel () {
+      return this.displayHistory ? 'Masquer les détails' : 'Afficher les détails';
+    },
     selectedCustomer () {
       if (!this.editedEvent.customer) return {};
       return this.customers.find(customer => customer._id === this.editedEvent.customer);
@@ -155,6 +177,9 @@ export default {
     },
   },
   methods: {
+    toggleHistory () {
+      this.displayHistory = !this.displayHistory;
+    },
     toggleCancellationForm (value) {
       if (!value) {
         this.$emit('update:edited-event', {
