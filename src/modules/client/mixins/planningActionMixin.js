@@ -144,9 +144,7 @@ export const planningActionMixin = {
           (!contract.endDate || moment(contract.endDate).isAfter(startDate)));
     },
     getRowEvents (rowId) {
-      const rowEvents = this.events.find(group => group._id === rowId);
-
-      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
+      return this.events[rowId] || [];
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
