@@ -31,7 +31,7 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
-                  <ni-button icon="edit" @click.native="() => {}" />
+                  <ni-button icon="edit" @click.native="openPartnerEditionModal(props.row)" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -55,7 +55,9 @@
 import { required, email, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import omit from 'lodash/omit';
 import PartnerOrganization from '@api/PartnerOrganizations';
+import Partner from '@api/Partners';
 import ProfileHeader from '@components/ProfileHeader';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import SearchAddress from '@components/form/SearchAddress';
@@ -115,7 +117,7 @@ export default {
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
-      partnerEditionModal: true,
+      partnerEditionModal: false,
       editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '' },
       editedPartnerId: '',
     };
@@ -207,6 +209,11 @@ export default {
       this.$v.newPartner.$reset();
       this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
+    openPartnerEditionModal (row) {
+      this.editedPartner = omit(row, ['_id', 'job', 'identity._id']);
+      this.editedPartnerId = row._id;
+      this.partnerEditionModal = true;
+    },
     async updatePartner () {
       try {
         this.modalLoading = true;
@@ -214,7 +221,7 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await PartnerOrganization.updateById(this.editedPartnerId, this.editedPartner);
+        await Partner.updateById(this.editedPartnerId, this.editedPartner);
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');
