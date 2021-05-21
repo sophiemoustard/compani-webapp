@@ -8,7 +8,7 @@
           <template #header="{ props }">
             <q-tr :props="props">
               <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-                :class="[{ 'table-actions-responsive':col.name === 'actions' }]">
+                :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
                 {{ col.label }}
               </q-th>
             </q-tr>
@@ -17,9 +17,7 @@
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template v-if="col.name === 'actions'">
-                  <ni-button icon="edit" @click="openCoachEditionModal(props.row)" />
-                </template>
+                <ni-button v-if="col.name === 'actions'" icon="edit" @click="openCoachEditionModal(props.row)" />
                 <template v-else>{{ col.value }}</template>
               </q-td>
             </q-tr>
