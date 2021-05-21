@@ -236,14 +236,24 @@ export default {
     },
     // Time stamping
     getEventTimeStampingTitle () {
-      return { pre: this.history.update.startHour ? 'Début horodaté - ' : 'Fin horodaté - ', post: '' };
+      if (this.history.update.startHour) {
+        const { to } = this.history.update.startHour;
+        return { pre: `Début de l'intervention horodaté à ${formatHoursWithMinutes(to)} - `, post: '' };
+      }
+
+      return { pre: 'Fin de l\'intervention horodaté - ', post: '' };
     },
     getEventTimeStampingDetails () {
       const { startHour } = this.history.update;
       const startHourFrom = formatHoursWithMinutes(startHour.from);
 
-      return `Début initialement prévu à ${startHourFrom}. `
-        + `Motif d’horodatage manuel : “${MANUAL_TIME_STAMPING_REASONS[this.history.manualTimeStampingReason]}”.`;
+      let details = `Début initialement prévu à ${startHourFrom}. `;
+      if (this.history.action === MANUAL_TIME_STAMPING) {
+        const reason = MANUAL_TIME_STAMPING_REASONS[this.history.manualTimeStampingReason];
+        details += `Motif d’horodatage manuel : “${reason}”.`;
+      }
+
+      return details;
     },
     // Update
     getEventUpdateTitle () {
@@ -288,7 +298,7 @@ export default {
       const pre = `Changement d'horaire pour ${pronom}`;
       let post = this.isRepetition ? ` ${this.repetitionFrequency}` : ` le ${this.startDate}`;
       if (this.customerName) post += ` chez ${this.customerName}`;
-      post += `\xa0:  ${moment(startHourTo).format('HH:mm')} - ${moment(endHourTo).format('HH:mm')}.`;
+      post += `\xa0:  ${formatHoursWithMinutes(startHourTo)} - ${formatHoursWithMinutes(endHourTo)}.`;
 
       return { pre, post };
     },

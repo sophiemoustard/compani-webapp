@@ -83,7 +83,7 @@
               <q-icon size="sm" name="history" class="q-mr-sm" color="grey-400" />
               <div class="history-list-title text-weight-bold">Activité</div>
             </div>
-            <ni-button :label="historyButtonLabel" flat color="grey-800" class="bg-grey-100" @click="toggleHistory" />
+            <ni-button :label="historyButtonLabel" color="grey-800" class="bg-grey-100" @click="toggleHistory" />
           </div>
           <div v-if="displayHistory" class="q-mt-sm">
             <ni-event-history v-for="history in editedEvent.histories" :key="history._id" :history="history" />
@@ -208,6 +208,7 @@ export default {
       this.$emit('close');
     },
     hide (partialReset, type) {
+      this.displayHistory = false;
       this.$emit('hide', { partialReset, type });
     },
     deleteDocument (value) {
