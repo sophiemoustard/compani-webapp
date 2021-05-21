@@ -24,7 +24,10 @@
     </q-card>
 
     <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner"
-      :validations="$v.newPartner" :loading="modalLoading" @hide="resetModal" />
+      :validations="$v.newPartner" :loading="modalLoading" @hide="resetCreationModal" />
+
+    <partner-edition-modal v-model="partnerEditionModal" :edited-partner.sync="editedPartner" @submit="updatePartner"
+      :validations="$v.editedPartner" :loading="modalLoading" @hide="resetEditionModal" />
   </q-page>
 </template>
 
@@ -44,6 +47,7 @@ import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
+import PartnerEditionModal from 'src/modules/client/components/customers/PartnerEditionModal';
 import { JOB_OPTIONS } from '@data/constants';
 
 export default {
@@ -56,8 +60,9 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-input': Input,
     'ni-button': Button,
-    'partner-creation-modal': PartnerCreationModal,
     'ni-responsive-table': ResponsiveTable,
+    'partner-creation-modal': PartnerCreationModal,
+    'partner-edition-modal': PartnerEditionModal,
   },
   mixins: [validationMixin, partnerOrganizationMixin],
   data () {
@@ -89,6 +94,9 @@ export default {
           sortable: true,
         },
       ],
+      partnerEditionModal: true,
+      editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '' },
+      editedPartnerId: '',
     };
   },
   validations: {
@@ -104,6 +112,11 @@ export default {
       email: { email },
     },
     newPartner: {
+      identity: { lastname: { required } },
+      phone: { frPhoneNumber },
+      email: { email },
+    },
+    editedPartner: {
       identity: { lastname: { required } },
       phone: { frPhoneNumber },
       email: { email },
@@ -169,9 +182,33 @@ export default {
         this.modalLoading = false;
       }
     },
-    resetModal () {
+    resetCreationModal () {
       this.$v.newPartner.$reset();
       this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
+    },
+    async updatePartner () {
+      try {
+        this.modalLoading = true;
+
+        this.$v.editedPartner.$touch();
+        if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await PartnerOrganization.updateById(this.editedPartnerId, this.editedPartner);
+
+        this.partnerEditionModal = false;
+        NotifyPositive('Partenaire modifié.');
+
+        await this.refreshPartnerOrganization();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification du partenaire.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetEditionModal () {
+      this.$v.editedPartner.$reset();
+      this.editedPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '' };
     },
   },
 };
