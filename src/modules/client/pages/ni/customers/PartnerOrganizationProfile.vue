@@ -17,7 +17,27 @@
     </div>
     <p class="text-weight-bold q-mt-lg">Partenaires</p>
     <q-card>
-      <ni-responsive-table :data="partnerOrganization.partners" :columns="columns" />
+      <ni-responsive-table :data="partnerOrganization.partners" :columns="columns">
+        <template #header="{ props }">
+          <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
+              :class="[{ 'modal-actions':col.name === 'actions' }]">
+              {{ col.label }}
+            </q-th>
+          </q-tr>
+        </template>
+        <template #body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <template v-if="col.name === 'actions'">
+                  <ni-button icon="edit" @click.native="() => {}" />
+                </template>
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+      </ni-responsive-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
       </q-card-actions>
@@ -93,6 +113,7 @@ export default {
           format: value => (value ? JOB_OPTIONS.find(job => job.value === value).label : ''),
           sortable: true,
         },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       partnerEditionModal: true,
       editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '' },
