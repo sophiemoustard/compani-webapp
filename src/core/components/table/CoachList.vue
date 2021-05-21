@@ -8,7 +8,7 @@
           <template #header="{ props }">
             <q-tr :props="props">
               <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-                :class="[{ 'actions':col.name === 'actions' }]">
+                :class="[{ 'modal-actions':col.name === 'actions' }]">
                 {{ col.label }}
               </q-th>
             </q-tr>
@@ -288,9 +288,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-@media screen and (min-width: 767px)
-  .actions
-    width: 75px
-</style>

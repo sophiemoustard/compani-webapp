@@ -70,6 +70,14 @@
       <q-card>
         <ni-responsive-table :data="partners" :columns="partnersColumns" :pagination.sync="pagination"
           class="q-mb-md" :loading="partnersLoading">
+          <template #header="{ props }">
+            <q-tr :props="props">
+              <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
+                :class="[{ 'modal-actions':col.name === 'actions' }]">
+                {{ col.label }}
+              </q-th>
+            </q-tr>
+          </template>
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -79,9 +87,7 @@
                     @input="updatePrescriberPartner(props.row._id)" />
                 </template>
                 <template v-if="col.name === 'actions'">
-                  <div class="remove-icon">
-                    <ni-button icon="close" @click="validatePartnerDeletion(col.value)" />
-                  </div>
+                  <ni-button icon="close" @click="validatePartnerDeletion(col.value)" />
                 </template>
                 <template v-else :class="col.name">{{ col.value }}</template>
               </q-td>
@@ -479,8 +485,4 @@ export default {
     /deep/ .q-field__append
       .q-select__dropdown-icon
         display: none
-  .remove-icon
-    @media screen and (min-width: 768px)
-      width: 85px;
-      align-items: right;
 </style>
