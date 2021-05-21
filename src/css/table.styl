@@ -33,6 +33,7 @@
     & .q-select
       & .q-field__control
         font-size: 12px
+
   .q-item__section--avatar
     .avatar
       width: 38px
@@ -113,6 +114,9 @@
 
 .table-actions
   min-width: 20px;
+  &-responsive
+    @media screen and (min-width: 767px)
+      width: 75px;
 
 .table-responsive
   table

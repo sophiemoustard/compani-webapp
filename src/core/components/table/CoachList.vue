@@ -8,7 +8,7 @@
           <template #header="{ props }">
             <q-tr :props="props">
               <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-                :class="[{ 'modal-actions':col.name === 'actions' }]">
+                :class="[{ 'table-actions-responsive':col.name === 'actions' }]">
                 {{ col.label }}
               </q-th>
             </q-tr>

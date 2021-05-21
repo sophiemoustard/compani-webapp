@@ -21,7 +21,7 @@
         <template #header="{ props }">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-              :class="[{ 'modal-actions':col.name === 'actions' }]">
+              :class="[{ 'table-actions-responsive':col.name === 'actions' }]">
               {{ col.label }}
             </q-th>
           </q-tr>
@@ -56,6 +56,7 @@ import { required, email, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
 import omit from 'lodash/omit';
+import cloneDeep from 'lodash/cloneDeep';
 import PartnerOrganization from '@api/PartnerOrganizations';
 import Partner from '@api/Partners';
 import ProfileHeader from '@components/ProfileHeader';
@@ -119,7 +120,6 @@ export default {
       ],
       partnerEditionModal: false,
       editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '' },
-      editedPartnerId: '',
     };
   },
   validations: {
@@ -210,8 +210,7 @@ export default {
       this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
     openPartnerEditionModal (row) {
-      this.editedPartner = omit(row, ['_id', 'job', 'identity._id']);
-      this.editedPartnerId = row._id;
+      this.editedPartner = cloneDeep(row);
       this.partnerEditionModal = true;
     },
     async updatePartner () {
@@ -221,7 +220,7 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Partner.updateById(this.editedPartnerId, this.editedPartner);
+        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id', 'job']));
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');
