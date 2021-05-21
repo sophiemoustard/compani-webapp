@@ -81,7 +81,7 @@
           <div class="flex-row items-center justify-between">
             <div class="flex-row">
               <q-icon size="sm" name="history" class="q-mr-sm" color="grey-400" />
-              <div>Activité</div>
+              <div class="history-list-title text-weight-bold">Activité</div>
             </div>
             <ni-button :label="historyButtonLabel" flat color="grey-800" class="bg-grey-100" @click="toggleHistory" />
           </div>
@@ -264,5 +264,8 @@ export default {
   .infos
     font-style: italic;
     color: $grey-400;
+
+  .history-list-title
+    font-size: 14px
 
 </style>
