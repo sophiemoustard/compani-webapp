@@ -70,11 +70,26 @@
       <q-card>
         <ni-responsive-table :data="partners" :columns="partnersColumns" :pagination.sync="pagination"
           class="q-mb-md" :loading="partnersLoading">
+          <template #header="{ props }">
+            <q-tr :props="props">
+              <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
+                :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
+                {{ col.label }}
+              </q-th>
+            </q-tr>
+          </template>
           <template #body="{ props }">
             <q-tr :props="props">
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
-                <template :class="col.name">{{ col.value }}</template>
+                <template v-if="col.name === 'prescriber'">
+                  <q-checkbox :value="prescriberPartner === props.row._id"
+                    @input="updatePrescriberPartner(props.row._id)" />
+                </template>
+                <template v-if="col.name === 'actions'">
+                  <ni-button icon="close" @click="validatePartnerDeletion(col.value)" />
+                </template>
+                <template v-else :class="col.name">{{ col.value }}</template>
               </q-td>
             </q-tr>
           </template>
@@ -135,6 +150,7 @@ import Stats from '@api/Stats';
 import Users from '@api/Users';
 import Partners from '@api/Partners';
 import CustomerPartners from '@api/CustomerPartners';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -163,6 +179,7 @@ export default {
   components: {
     'ni-input': Input,
     'ni-select': Select,
+    'ni-button': Button,
     'ni-search-address': SearchAddress,
     'ni-simple-table': SimpleTable,
     'ni-responsive-table': ResponsiveTable,
@@ -226,18 +243,32 @@ export default {
       partners: [],
       partnersList: [],
       partnersColumns: [
-        { name: 'firstname', label: 'Prénom', align: 'left', field: row => row.identity.firstname },
-        { name: 'lastname', label: 'Nom', align: 'left', field: row => row.identity.lastname },
-        { name: 'email', label: 'Email', align: 'left', field: 'email' },
-        { name: 'phone', label: 'Téléphone', align: 'left', field: 'phone', format: formatPhone },
+        { name: 'firstname', label: 'Prénom', align: 'left', field: row => get(row, 'partner.identity.firstname') },
+        { name: 'lastname', label: 'Nom', align: 'left', field: row => get(row, 'partner.identity.lastname') },
+        { name: 'email', label: 'Email', align: 'left', field: row => get(row, 'partner.email') },
+        {
+          name: 'phone',
+          label: 'Téléphone',
+          align: 'left',
+          field: row => get(row, 'partner.phone'),
+          format: formatPhone,
+        },
         {
           name: 'job',
           label: 'Profession',
           align: 'left',
-          field: row => get(JOB_OPTIONS.find(option => option.value === row.job), 'label') || '',
+          field: row => get(JOB_OPTIONS.find(option => option.value === get(row, 'partner.job')), 'label') || '',
         },
-        { name: 'partnerOrganization', label: 'Structure', align: 'left', field: row => row.partnerOrganization.name },
+        {
+          name: 'partnerOrganization',
+          label: 'Structure',
+          align: 'left',
+          field: row => get(row, 'partner.partnerOrganization.name'),
+        },
+        { name: 'prescriber', label: 'Prescripteur', align: 'left' },
+        { name: 'actions', label: '', field: '_id' },
       ],
+      prescriberPartner: '',
     };
   },
   validations () {
@@ -372,6 +403,8 @@ export default {
     async refreshCustomerPartners () {
       try {
         this.partners = await CustomerPartners.list({ customer: this.customer._id });
+        const prescriberPartner = this.partners.find(p => p.prescriber);
+        this.prescriberPartner = get(prescriberPartner, '_id') || '';
       } catch (e) {
         console.error(e);
         this.partners = [];
@@ -403,6 +436,38 @@ export default {
     openNewPartnerModal () {
       if (!this.partnersNotAdded.length) return NotifyWarning('Tous les partenaires ont déjà été ajoutés.');
       this.newPartnerModal = true;
+    },
+    async updatePrescriberPartner (value) {
+      try {
+        const payload = { prescriber: !(this.prescriberPartner === value) };
+        await CustomerPartners.update(value, payload);
+        NotifyPositive('Prescripteur modifié.');
+
+        await this.refreshCustomerPartners();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'édition du partenaire.');
+      }
+    },
+    async deletePartner (customerPartnerId) {
+      try {
+        await CustomerPartners.delete(customerPartnerId);
+
+        await this.refreshCustomerPartners();
+        NotifyPositive('Partenaire supprimé.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppression du partenaire.');
+      }
+    },
+    validatePartnerDeletion (customerPartnerId) {
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr de vouloir retirer ce partenaire ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deletePartner(customerPartnerId))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
     },
   },
   filters: {
