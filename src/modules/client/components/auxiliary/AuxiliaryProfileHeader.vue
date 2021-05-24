@@ -64,6 +64,7 @@ import Modal from '@components/modal/Modal';
 import { NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import { DEFAULT_AVATAR, HR_SMS } from '@data/constants';
 import moment from '@helpers/moment';
+import { formatDate, dateDiff, formatDateDiff } from '@helpers/date';
 
 export default {
   name: 'ProfileHeader',
@@ -109,10 +110,10 @@ export default {
       };
     },
     userStartDate () {
-      return this.userProfile.createdAt ? moment(this.userProfile.createdAt).format('DD/MM/YY') : 'N/A';
+      return this.userProfile.createdAt ? formatDate(this.userProfile.createdAt) : 'N/A';
     },
     userRelativeStartDate () {
-      return this.userStartDate !== 'N/A' ? moment(this.userStartDate, 'DD/MM/YY').toNow(true) : '';
+      return this.userStartDate !== 'N/A' ? formatDateDiff(dateDiff(this.userProfile.createdAt, new Date())) : '';
     },
     isExternalUser () {
       return this.userProfile._id !== this.loggedUser._id;
