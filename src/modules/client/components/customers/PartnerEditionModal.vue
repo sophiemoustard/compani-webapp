@@ -6,7 +6,8 @@
     <ni-input in-modal :value="editedPartner.identity.firstname" @input="update($event.trim(), 'identity.firstname')"
       caption="Prénom" />
     <ni-input in-modal :value="editedPartner.identity.lastname" @input="update($event.trim(), 'identity.lastname')"
-      @blur="validations.identity.lastname.$touch" :error="validations.identity.lastname.$error" caption="Nom" />
+      @blur="validations.identity.lastname.$touch" :error="validations.identity.lastname.$error" caption="Nom"
+      required-field />
     <ni-input in-modal :value="editedPartner.email" @input="update($event.trim(), 'email')" caption="Email"
       @blur="validations.email.$touch" :error="validations.email.$error" :error-message="emailError(validations)" />
     <ni-input in-modal :value="editedPartner.phone" @input="update($event.trim(), 'phone')" caption="Téléphone"
