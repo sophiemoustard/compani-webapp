@@ -8,7 +8,7 @@
     </div>
     <div class="scroll-container" ref="scrollTargetRef">
       <q-infinite-scroll @load="load" :offset="100" :scroll-target="$refs.scrollTargetRef">
-        <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
+        <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" class="q-ma-xs" />
         <div slot="loading" class="loading">
           <q-spinner />
         </div>
@@ -18,8 +18,8 @@
 </template>
 
 <script>
-import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
 import Button from '@components/Button';
+import NiEventHistory from 'src/modules/client/components/planning/EventHistory';
 
 export default {
   name: 'EventHistoryFeed',

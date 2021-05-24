@@ -58,7 +58,7 @@ export default {
     return {
       loading: false,
       days: [],
-      events: [],
+      events: {},
       customers: [],
       auxiliaries: [],
       startOfWeek: '',
@@ -163,7 +163,7 @@ export default {
           groupBy: CUSTOMER,
         });
       } catch (e) {
-        this.events = [];
+        this.events = {};
       }
     },
     async getAuxiliaries () {
