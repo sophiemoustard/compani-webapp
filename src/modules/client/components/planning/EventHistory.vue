@@ -241,13 +241,21 @@ export default {
         return { pre: `Début de l'intervention horodaté à ${formatHoursWithMinutes(to)} - `, post: '' };
       }
 
-      return { pre: 'Fin de l\'intervention horodaté - ', post: '' };
+      const { to } = this.history.update.endHour;
+      return { pre: `Fin de l'intervention horodaté -  à ${formatHoursWithMinutes(to)} - `, post: '' };
     },
     getEventTimeStampingDetails () {
-      const { startHour } = this.history.update;
-      const startHourFrom = formatHoursWithMinutes(startHour.from);
+      const { startHour, endHour } = this.history.update;
+      let details;
 
-      let details = `Début initialement prévu à ${startHourFrom}. `;
+      if (startHour) {
+        const startHourFrom = formatHoursWithMinutes(startHour.from);
+        details = `Début initialement prévu à ${startHourFrom}. `;
+      } else {
+        const endHourFrom = formatHoursWithMinutes(endHour.from);
+        details = `Fin initialement prévue à ${endHourFrom}. `;
+      }
+
       if (this.history.action === MANUAL_TIME_STAMPING) {
         const reason = MANUAL_TIME_STAMPING_REASONS[this.history.manualTimeStampingReason];
         details += `Motif d’horodatage manuel : “${reason}”.`;
