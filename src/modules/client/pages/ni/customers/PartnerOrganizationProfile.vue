@@ -17,14 +17,36 @@
     </div>
     <p class="text-weight-bold q-mt-lg">Partenaires</p>
     <q-card>
-      <ni-responsive-table :data="partnerOrganization.partners" :columns="columns" />
+      <ni-responsive-table :data="partnerOrganization.partners" :columns="columns">
+        <template #header="{ props }">
+          <q-tr :props="props">
+            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
+              :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
+              {{ col.label }}
+            </q-th>
+          </q-tr>
+        </template>
+        <template #body="{ props }">
+            <q-tr :props="props">
+              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
+                :style="col.style">
+                <ni-button v-if="col.name === 'actions'" @click.native="openPartnerEditionModal(props.row)"
+                  icon="edit" />
+                <template v-else>{{ col.value }}</template>
+              </q-td>
+            </q-tr>
+          </template>
+      </ni-responsive-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
       </q-card-actions>
     </q-card>
 
     <partner-creation-modal v-model="partnerCreationModal" :new-partner.sync="newPartner" @submit="createPartner"
-      :validations="$v.newPartner" :loading="modalLoading" @hide="resetModal" />
+      :validations="$v.newPartner" :loading="modalLoading" @hide="resetCreationModal" />
+
+    <partner-edition-modal v-model="partnerEditionModal" :edited-partner.sync="editedPartner" @submit="updatePartner"
+      :validations="$v.editedPartner" :loading="modalLoading" @hide="resetEditionModal" />
   </q-page>
 </template>
 
@@ -32,7 +54,10 @@
 import { required, email, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import set from 'lodash/set';
+import omit from 'lodash/omit';
+import cloneDeep from 'lodash/cloneDeep';
 import PartnerOrganization from '@api/PartnerOrganizations';
+import Partner from '@api/Partners';
 import ProfileHeader from '@components/ProfileHeader';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import SearchAddress from '@components/form/SearchAddress';
@@ -44,6 +69,7 @@ import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
+import PartnerEditionModal from 'src/modules/client/components/customers/PartnerEditionModal';
 import { JOB_OPTIONS } from '@data/constants';
 
 export default {
@@ -56,8 +82,9 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-input': Input,
     'ni-button': Button,
-    'partner-creation-modal': PartnerCreationModal,
     'ni-responsive-table': ResponsiveTable,
+    'partner-creation-modal': PartnerCreationModal,
+    'partner-edition-modal': PartnerEditionModal,
   },
   mixins: [validationMixin, partnerOrganizationMixin],
   data () {
@@ -88,7 +115,10 @@ export default {
           format: value => (value ? JOB_OPTIONS.find(job => job.value === value).label : ''),
           sortable: true,
         },
+        { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
+      partnerEditionModal: false,
+      editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
     };
   },
   validations: {
@@ -104,6 +134,11 @@ export default {
       email: { email },
     },
     newPartner: {
+      identity: { lastname: { required } },
+      phone: { frPhoneNumber },
+      email: { email },
+    },
+    editedPartner: {
       identity: { lastname: { required } },
       phone: { frPhoneNumber },
       email: { email },
@@ -169,9 +204,37 @@ export default {
         this.modalLoading = false;
       }
     },
-    resetModal () {
+    resetCreationModal () {
       this.$v.newPartner.$reset();
       this.newPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
+    },
+    openPartnerEditionModal (row) {
+      this.editedPartner = cloneDeep(row);
+      this.partnerEditionModal = true;
+    },
+    async updatePartner () {
+      try {
+        this.modalLoading = true;
+
+        this.$v.editedPartner.$touch();
+        if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
+
+        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id']));
+
+        this.partnerEditionModal = false;
+        NotifyPositive('Partenaire modifié.');
+
+        await this.refreshPartnerOrganization();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la modification du partenaire.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    resetEditionModal () {
+      this.$v.editedPartner.$reset();
+      this.editedPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
   },
 };
