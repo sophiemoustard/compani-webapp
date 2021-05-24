@@ -118,7 +118,7 @@ export default {
         { name: 'actions', label: '', align: 'center', field: '_id' },
       ],
       partnerEditionModal: false,
-      editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '' },
+      editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
     };
   },
   validations: {
@@ -219,7 +219,7 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id', 'job']));
+        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id']));
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');
@@ -234,7 +234,7 @@ export default {
     },
     resetEditionModal () {
       this.$v.editedPartner.$reset();
-      this.editedPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '' };
+      this.editedPartner = { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' };
     },
   },
 };

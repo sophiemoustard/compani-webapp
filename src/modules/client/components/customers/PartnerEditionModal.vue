@@ -12,6 +12,8 @@
     <ni-input in-modal :value="editedPartner.phone" @input="update($event.trim(), 'phone')" caption="Téléphone"
       @blur="validations.phone.$touch" :error="validations.phone.$error"
       :error-message="phoneNumberError(validations)" />
+    <ni-select in-modal :value="editedPartner.job" @input="update($event, 'job')" caption="Fonction"
+      :options="jobOptions" />
     <template slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Editer le partenaire" icon-right="add" color="primary"
         @click="submit" :loading="loading" />
@@ -23,6 +25,8 @@
 import set from 'lodash/set';
 import Modal from '@components/modal/Modal';
 import Input from '@components/form/Input';
+import Select from '@components/form/Select';
+import { JOB_OPTIONS } from '@data/constants';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 
 export default {
@@ -37,6 +41,12 @@ export default {
   components: {
     'ni-modal': Modal,
     'ni-input': Input,
+    'ni-select': Select,
+  },
+  data () {
+    return {
+      jobOptions: JOB_OPTIONS,
+    };
   },
   methods: {
     hide () {
