@@ -1,18 +1,17 @@
 <template>
   <q-page class="client-background" padding>
-    <ni-directory-header title="Répertoire bénéficiaires" toggle-label="Clients" :toggle-value="onlyClients"
-      display-toggle @update-search="updateSearch" @toggle="onlyClients = !onlyClients" :search="searchStr" />
+    <ni-directory-header title="Répertoire bénéficiaires" @update-search="updateSearch" :search="searchStr" />
     <ni-table-list :data="filteredCustomers" :columns="columns" :pagination.sync="pagination"
       @go-to="goToCustomerProfile" :loading="tableLoading" :rows-per-page="[15, 50, 100, 200]">
       <template #body="{ props, col }">
         <q-item v-if="col.name === 'fullName'">
           <q-item-section>{{ col.value }}</q-item-section>
         </q-item>
-        <template v-else-if="col.name === 'client'">
-          <div :class="{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }" />
-        </template>
         <template v-else-if="col.name === 'info'">
           <q-icon v-if="props.row.missingInfo" name="error" color="secondary" size="1rem" />
+        </template>
+        <template v-else-if="col.name === 'status'">
+          <div :class="getDotClass(col.value)" />
         </template>
         <template v-else>{{ col.value }}</template>
       </template>
@@ -34,7 +33,7 @@ import { frAddress } from '@helpers/vuelidateCustomVal';
 import DirectoryHeader from '@components/DirectoryHeader';
 import TableList from '@components/table/TableList';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
-import { CIVILITY_OPTIONS } from '@data/constants';
+import { CIVILITY_OPTIONS, ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
@@ -71,7 +70,6 @@ export default {
       },
       customers: [],
       searchStr: '',
-      onlyClients: false,
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
       columns: [
         {
@@ -87,10 +85,20 @@ export default {
         {
           name: 'createdAt',
           label: 'Depuis le...',
-          field: 'createdAt',
+          field: row => get(row, 'status.activatedAt'),
           align: 'left',
           sortable: true,
           format: value => formatDate(value) || 'N/A',
+          sort: ascendingSort,
+          style: 'width: 85px',
+        },
+        {
+          name: 'stoppedAt',
+          label: 'Arrêté le...',
+          field: row => ([STOPPED, ARCHIVED].includes(get(row, 'status.value')) && get(row, 'status.stoppedAt')),
+          align: 'left',
+          sortable: true,
+          format: value => formatDate(value) || '',
           sort: ascendingSort,
           style: 'width: 85px',
         },
@@ -113,10 +121,10 @@ export default {
           style: 'width: 30px',
         },
         {
-          name: 'client',
-          label: 'Client',
-          field: 'firstIntervention',
-          align: 'right',
+          name: 'status',
+          label: 'Statut',
+          field: row => get(row, 'status.value'),
+          align: 'center',
           sortable: false,
           style: 'width: 30px',
         },
@@ -144,11 +152,8 @@ export default {
   },
   computed: {
     filteredCustomers () {
-      const customers = this.onlyClients
-        ? this.customers.filter(customer => customer.firstIntervention)
-        : this.customers;
       const formattedString = escapeRegExp(removeDiacritics(this.searchStr));
-      return customers
+      return this.customers
         .filter(customer => customer.identity.noDiacriticsName.match(new RegExp(formattedString, 'i')));
     },
   },
@@ -219,6 +224,17 @@ export default {
         this.loading = false;
       }
     },
+    getDotClass (value) {
+      return {
+        'dot dot-active': value === ACTIVATED,
+        'dot dot-stopped': value === STOPPED,
+        'dot dot-archived': value === ARCHIVED,
+      };
+    },
   },
 };
 </script>
+<style lang="stylus" scoped>
+  .dot
+    margin: 0px;
+</style>

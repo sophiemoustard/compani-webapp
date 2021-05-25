@@ -141,7 +141,7 @@ export default {
           name: 'active',
           label: 'Actif',
           field: 'isActive',
-          align: 'right',
+          align: 'center',
           sortable: false,
           style: 'min-width: 30px; width: 4%',
         },
@@ -350,3 +350,7 @@ export default {
   },
 };
 </script>
+<style lang="stylus" scoped>
+  .dot
+    margin: 0px;
+</style>

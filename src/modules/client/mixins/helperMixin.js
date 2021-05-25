@@ -163,7 +163,7 @@ export const helperMixin = {
         }
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'aidant');
+        NotifyNegative('Erreur lors de la création de l\'aidant.');
       } finally {
         this.loading = false;
       }
@@ -212,7 +212,7 @@ export const helperMixin = {
         await this.getUserHelpers();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'édition de l\'aidant référent');
+        NotifyNegative('Erreur lors de l\'édition de l\'aidant référent.');
       }
     },
     // Deletion
@@ -221,7 +221,7 @@ export const helperMixin = {
         await Users.deleteById(helperId);
 
         await this.getUserHelpers();
-        NotifyPositive('Aidant supprimé');
+        NotifyPositive('Aidant supprimé.');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors de la suppression de l\'aidant.');
