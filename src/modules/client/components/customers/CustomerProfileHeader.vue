@@ -7,8 +7,8 @@
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
-        <div :class="getDotClass(get(customer, 'status.value'))" />
-        <div>{{ STATUS_TYPES[get(customer, 'status.value')] }}</div>
+        <div :class="getDotClass(status)" />
+        <div>{{ STATUS_TYPES[status] }}</div>
       </div>
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
@@ -44,19 +44,25 @@ export default {
   },
   computed: {
     ...mapState('customer', ['customer']),
+    status () {
+      if (this.customer.archivedAt) return ARCHIVED;
+      if (this.customer.stoppedAt) return STOPPED;
+
+      return ACTIVATED;
+    },
     statusDate () {
-      switch (get(this.customer, 'status.value')) {
-        case ACTIVATED: return formatDate(this.customer.status.activatedAt);
-        case STOPPED: return formatDate(this.customer.status.stoppedAt);
-        case ARCHIVED: return formatDate(this.customer.status.archivedAt);
+      switch (this.status) {
+        case ACTIVATED: return formatDate(this.customer.createdAt);
+        case STOPPED: return formatDate(this.customer.stoppedAt);
+        case ARCHIVED: return formatDate(this.customer.archivedAt);
         default: return 'N/A';
       }
     },
     relativeStatusDate () {
-      switch (get(this.customer, 'status.value')) {
-        case ACTIVATED: return formatDateDiff(dateDiff(this.customer.status.activatedAt, new Date()));
-        case STOPPED: return formatDateDiff(dateDiff(this.customer.status.stoppedAt, new Date()));
-        case ARCHIVED: return formatDateDiff(dateDiff(this.customer.status.archivedAt, new Date()));
+      switch (this.status) {
+        case ACTIVATED: return formatDateDiff(dateDiff(this.customer.createdAt, new Date()));
+        case STOPPED: return formatDateDiff(dateDiff(this.customer.stoppedAt, new Date()));
+        case ARCHIVED: return formatDateDiff(dateDiff(this.customer.archivedAt, new Date()));
         default: return '';
       }
     },

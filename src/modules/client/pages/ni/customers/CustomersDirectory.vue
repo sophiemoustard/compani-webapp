@@ -85,7 +85,7 @@ export default {
         {
           name: 'createdAt',
           label: 'Depuis le...',
-          field: row => get(row, 'status.activatedAt'),
+          field: 'createdAt',
           align: 'left',
           sortable: true,
           format: value => formatDate(value) || 'N/A',
@@ -95,7 +95,7 @@ export default {
         {
           name: 'stoppedAt',
           label: 'Arrêté le...',
-          field: row => ([STOPPED, ARCHIVED].includes(get(row, 'status.value')) && get(row, 'status.stoppedAt')),
+          field: 'stoppedAt',
           align: 'left',
           sortable: true,
           format: value => formatDate(value) || '',
@@ -123,7 +123,7 @@ export default {
         {
           name: 'status',
           label: 'Statut',
-          field: row => get(row, 'status.value'),
+          field: row => this.getStatus(row),
           align: 'center',
           sortable: false,
           style: 'width: 30px',
@@ -223,6 +223,12 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    getStatus (customer) {
+      if (customer.archivedAt) return ARCHIVED;
+      if (customer.stoppedAt) return STOPPED;
+
+      return ACTIVATED;
     },
     getDotClass (value) {
       return {
