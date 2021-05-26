@@ -242,7 +242,7 @@ export default {
       }
 
       const { to } = this.history.update.endHour;
-      return { pre: `Fin de l'intervention horodaté -  à ${formatHoursWithMinutes(to)} - `, post: '' };
+      return { pre: `Fin de l'intervention horodaté à ${formatHoursWithMinutes(to)} - `, post: '' };
     },
     getEventTimeStampingDetails () {
       const { startHour, endHour } = this.history.update;
