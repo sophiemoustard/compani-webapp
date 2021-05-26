@@ -1,9 +1,13 @@
 <template>
   <div class="header">
-    <div class="flex-row q-mb-md items-center">
-      <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
-      <h4 class="ellipsis">{{ title }}</h4>
-      <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
+    <div class="row q-mb-md items-center justify-between">
+      <div class="row ellipsis">
+        <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
+        <h4 class="ellipsis">{{ title }}</h4>
+        <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
+      </div>
+       <q-btn v-if="!customer.stoppedAt" class="support-stopping justify-end" label="Arrêter"
+       @click="stopSupportModal=true" no-caps flat color="white" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -16,17 +20,25 @@
         <ni-button icon="delete" @click="validateCustomerDeletion" />
       </div>
     </div>
+
+    <stop-support-modal v-model="stopSupportModal" @hide="resetStopSupportModal" @submit="stopSupport"
+      :new-status.sync="newStatus" :validations="$v.newStatus" :loading="modalLoading"
+      :min-date="getStartOfDay(new Date(customer.createdAt)).toISOString()" :customer-name="title"
+      :stopping-date-error-message="setStoppingDateErrorMessage($v.newStatus)" />
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { formatDate, dateDiff, formatDateDiff } from '@helpers/date';
-import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES } from '@data/constants';
+import { formatDate, dateDiff, formatDateDiff, getStartOfDay, getEndOfDay } from '@helpers/date';
+import { minDate } from '@helpers/vuelidateCustomVal';
+import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES, REQUIRED_LABEL } from '@data/constants';
+import StopSupportModal from './infos/StopSupportModal';
 
 export default {
   name: 'ProfileHeader',
@@ -35,11 +47,16 @@ export default {
   },
   components: {
     'ni-button': Button,
+    'stop-support-modal': StopSupportModal,
   },
   data () {
     return {
       STATUS_TYPES,
       get,
+      getStartOfDay,
+      modalLoading: false,
+      stopSupportModal: false,
+      newStatus: { stopReason: '', stoppedAt: '' },
     };
   },
   computed: {
@@ -66,6 +83,17 @@ export default {
         default: return '';
       }
     },
+  },
+  validations () {
+    return {
+      newStatus: {
+        stoppedAt: {
+          required,
+          minDate: minDate(getStartOfDay(new Date(this.customer.createdAt)).toISOString()),
+        },
+        stopReason: { required },
+      },
+    };
   },
   methods: {
     goToPlanning () {
@@ -103,6 +131,42 @@ export default {
         'dot dot-archived': value === ARCHIVED,
       };
     },
+    async refreshCustomer () {
+      try {
+        await this.$store.dispatch('customer/fetchCustomer', { customerId: this.customer._id });
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du chargement des données.');
+      }
+    },
+    setStoppingDateErrorMessage (validations) {
+      if (!validations.stoppedAt.minDate) return 'La date d\'arrêt ne peut être antérieure à la date de création.';
+
+      return REQUIRED_LABEL;
+    },
+    resetStopSupportModal () {
+      this.$v.newStatus.$reset();
+      this.newStatus = { stopReason: '', stoppedAt: '' };
+    },
+    async stopSupport () {
+      try {
+        this.modalLoading = true;
+        const payload = {
+          stoppedAt: getEndOfDay(new Date(this.newStatus.stoppedAt)),
+          stopReason: this.newStatus.stopReason,
+        };
+        await Customers.updateById(this.customer._id, payload);
+
+        this.stopSupportModal = false;
+        NotifyPositive('Bénéficiaire arrêté.');
+        await this.refreshCustomer();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'arrêt du bénéficiaire.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
   },
 };
 </script>
@@ -110,4 +174,6 @@ export default {
 <style lang="stylus" scoped>
   .column
     flex-direction: column
+  .support-stopping
+    background-color: $primary;
 </style>

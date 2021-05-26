@@ -462,6 +462,21 @@ export const STOPPED = 'stopped';
 export const ARCHIVED = 'archived';
 export const STATUS_TYPES = { [ACTIVATED]: 'Actif', [STOPPED]: 'Arrêté', [ARCHIVED]: 'Archivé' };
 
+// CUSTOMER STOP REASONS
+export const QUALITY = 'quality';
+export const HOSPITALIZATION = 'hospitalization';
+export const DEATH = 'death';
+export const EPHAD_DEPARTURE = 'ephad_departure';
+export const CONDITION_IMPROVEMENT = 'condition_improvement';
+export const SUPPORT_STOPPING_REASONS_OPTIONS = {
+  [QUALITY]: 'Qualité',
+  [HOSPITALIZATION]: 'Hospitalisation',
+  [DEATH]: 'Décès',
+  [EPHAD_DEPARTURE]: 'Départ en EPHAD',
+  [CONDITION_IMPROVEMENT]: 'Amélioration de l\'état',
+  [OTHER]: 'Autre',
+};
+
 // TIMESTAMPING
 export const MANUAL_TIME_STAMPING = 'manual_time_stamping';
 export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING];
