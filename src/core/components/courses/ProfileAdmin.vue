@@ -27,9 +27,9 @@
           les attestations de fin de formation.
         </template>
       </ni-banner>
-      <ni-course-info-link :disable-link="followUpDisabled" />
+      <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       <ni-bi-color-button icon="file_download" label="Feuilles d'émargement"
-        :disable="followUpDisabled" @click="downloadAttendanceSheet" size="16px" />
+        :disable="disableDocDownload" @click="downloadAttendanceSheet" size="16px" />
       <ni-bi-color-button icon="file_download" label="Attestations de fin de formation"
         :disable="disableDownloadCompletionCertificates" @click="downloadCompletionCertificates" size="16px" />
     </div>
@@ -168,7 +168,7 @@ export default {
   computed: {
     ...mapState('course', ['course']),
     disableDownloadCompletionCertificates () {
-      return this.followUpDisabled || !get(this.course, 'subProgram.program.learningGoals');
+      return this.disableDocDownload || !get(this.course, 'subProgram.program.learningGoals');
     },
     isFinished () {
       const slots = this.course.slots.filter(slot => moment().isBefore(slot.startDate));
@@ -309,25 +309,31 @@ export default {
       }
     },
     async downloadAttendanceSheet () {
-      if (this.followUpDisabled) return;
+      if (this.disableDocDownload) return;
 
       try {
+        this.pdfLoading = true;
         const pdf = await Courses.downloadAttendanceSheet(this.course._id);
         openPdf(pdf);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la feuille d\'émargement.');
+      } finally {
+        this.pdfLoading = false;
       }
     },
     async downloadCompletionCertificates () {
       if (this.disableDownloadCompletionCertificates) return;
 
       try {
+        this.pdfLoading = true;
         const pdf = await Courses.downloadCompletionCertificates(this.course._id);
         downloadZip(pdf, 'attestations.zip');
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement des attestations.');
+      } finally {
+        this.pdfLoading = false;
       }
     },
   },
