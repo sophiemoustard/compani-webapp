@@ -37,13 +37,14 @@ import { CIVILITY_OPTIONS, ACTIVATED, STOPPED, ARCHIVED } from '@data/constants'
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 
 export default {
   name: 'CustomersDirectory',
   metaInfo: { title: 'Répertoire bénéficiaires' },
-  mixins: [validationMixin],
+  mixins: [validationMixin, customerMixin],
   components: {
     'ni-directory-header': DirectoryHeader,
     'customer-creation-modal': CustomerCreationModal,
@@ -223,12 +224,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    getStatus (customer) {
-      if (customer.archivedAt) return ARCHIVED;
-      if (customer.stoppedAt) return STOPPED;
-
-      return ACTIVATED;
     },
     getDotClass (value) {
       return {

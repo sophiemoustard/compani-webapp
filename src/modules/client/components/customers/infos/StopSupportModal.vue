@@ -59,6 +59,11 @@ export default {
     update (event, prop) {
       this.$emit('update:newStatus', { ...this.newStatus, [prop]: event });
     },
+    getDayAfterStoppingDate (value) {
+      const date = new Date(value);
+
+      return date.setDate(date.getDate() + 1);
+    },
     validateSupportStopping () {
       this.validations.$touch();
       if (this.validations.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -66,8 +71,9 @@ export default {
       this.$q.dialog({
         title: 'Confirmation',
         message: `Êtes-vous sûr de vouloir arrêter l'accompagnement ?<br /><br />
-        Toutes les interventions chez ${this.customerName} à partir du ${formatDate(this.newStatus.stoppedAt)}
-        seront supprimées et vous ne pourrez plus créer de nouvelles interventions à partir de cette date.`,
+        Toutes les interventions chez ${this.customerName} à partir du
+        ${formatDate(this.getDayAfterStoppingDate(this.newStatus.stoppedAt))} seront supprimées et vous ne pourrez
+        plus créer de nouvelles interventions à partir de cette date.`,
         html: true,
         ok: 'oui, arrêter l\'accompagnement',
         cancel: 'Non',

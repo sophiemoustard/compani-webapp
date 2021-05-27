@@ -6,13 +6,13 @@
         <h4 class="ellipsis">{{ title }}</h4>
         <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
       </div>
-      <q-btn v-if="!customer.stoppedAt" class="support-stopping justify-end" label="Arrêter"
-        @click="stopSupportModal=true" no-caps flat color="white" />
+      <ni-button v-if="!customer.stoppedAt" class="bg-pink-500 justify-end" label="Arrêter"
+        @click="stopSupportModal=true" color="white" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
-        <div :class="getDotClass(status)" />
-        <div>{{ STATUS_TYPES[status] }}</div>
+        <div :class="getDotClass(getStatus(this.customer))" />
+        <div>{{ STATUS_TYPES[getStatus(this.customer)] }}</div>
       </div>
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
@@ -22,9 +22,8 @@
     </div>
 
     <stop-support-modal v-model="stopSupportModal" @hide="resetStopSupportModal" @submit="stopSupport"
-      :new-status.sync="newStatus" :validations="$v.newStatus" :loading="modalLoading"
-      :min-date="minStoppingDate" :customer-name="title"
-      :stopping-date-error-message="setStoppingDateErrorMessage($v.newStatus)" />
+      :new-status.sync="newStatus" :validations="$v.newStatus" :loading="modalLoading" :customer-name="title"
+      :min-date="minStoppingDate" :stopping-date-error-message="setStoppingDateErrorMessage($v.newStatus)" />
   </div>
 </template>
 
@@ -38,10 +37,12 @@ import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup
 import { formatDate, dateDiff, formatDateDiff, getStartOfDay, getEndOfDay } from '@helpers/date';
 import { minDate } from '@helpers/vuelidateCustomVal';
 import { ACTIVATED, STOPPED, ARCHIVED, STATUS_TYPES, REQUIRED_LABEL } from '@data/constants';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import StopSupportModal from './infos/StopSupportModal';
 
 export default {
   name: 'ProfileHeader',
+  mixins: [customerMixin],
   props: {
     title: { type: String, required: true },
   },
@@ -61,14 +62,8 @@ export default {
   },
   computed: {
     ...mapState('customer', ['customer']),
-    status () {
-      if (this.customer.archivedAt) return ARCHIVED;
-      if (this.customer.stoppedAt) return STOPPED;
-
-      return ACTIVATED;
-    },
     statusDate () {
-      switch (this.status) {
+      switch (this.getStatus(this.customer)) {
         case ACTIVATED: return formatDate(this.customer.createdAt);
         case STOPPED: return formatDate(this.customer.stoppedAt);
         case ARCHIVED: return formatDate(this.customer.archivedAt);
@@ -76,7 +71,7 @@ export default {
       }
     },
     relativeStatusDate () {
-      switch (this.status) {
+      switch (this.getStatus(this.customer)) {
         case ACTIVATED: return formatDateDiff(dateDiff(this.customer.createdAt, new Date()));
         case STOPPED: return formatDateDiff(dateDiff(this.customer.stoppedAt, new Date()));
         case ARCHIVED: return formatDateDiff(dateDiff(this.customer.archivedAt, new Date()));
@@ -177,6 +172,4 @@ export default {
 <style lang="stylus" scoped>
   .column
     flex-direction: column
-  .support-stopping
-    background-color: $primary;
 </style>
