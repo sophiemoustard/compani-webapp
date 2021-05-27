@@ -72,9 +72,9 @@ export default {
     },
     relativeStatusDate () {
       switch (this.getStatus(this.customer)) {
-        case ACTIVATED: return formatDateDiff(dateDiff(this.customer.createdAt, new Date()));
-        case STOPPED: return formatDateDiff(dateDiff(this.customer.stoppedAt, new Date()));
-        case ARCHIVED: return formatDateDiff(dateDiff(this.customer.archivedAt, new Date()));
+        case ACTIVATED: return formatDateDiff(dateDiff(new Date(), this.customer.createdAt));
+        case STOPPED: return formatDateDiff(dateDiff(new Date(), this.customer.stoppedAt));
+        case ARCHIVED: return formatDateDiff(dateDiff(new Date(), this.customer.archivedAt));
         default: return '';
       }
     },
