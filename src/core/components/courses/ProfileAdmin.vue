@@ -129,7 +129,6 @@ export default {
       ],
       newSms: { content: '', type: '' },
       loading: false,
-      pdfLoading: false,
       courseLoading: false,
       smsSent: [],
       smsSentColumns: [
@@ -214,9 +213,6 @@ export default {
     },
     disableSms () {
       return this.followUpDisabled || this.isFinished || this.allFuturSlotsAreNotPlanned;
-    },
-    disableDocDownload () {
-      return this.followUpDisabled || this.pdfLoading;
     },
   },
   methods: {
@@ -310,20 +306,6 @@ export default {
         this.loading = false;
         this.message = '';
         this.setDefaultMessageType();
-      }
-    },
-    async downloadConvocation () {
-      if (this.disableDocDownload) return;
-
-      try {
-        this.pdfLoading = true;
-        const pdf = await Courses.downloadConvocation(this.course._id);
-        openPdf(pdf);
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement de la convocation.');
-      } finally {
-        this.pdfLoading = false;
       }
     },
     async downloadAttendanceSheet () {

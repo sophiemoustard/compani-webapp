@@ -6,7 +6,7 @@
         <ni-banner v-if="followUpDisabled">
           <template #message>{{ missingInfoMsg }}</template>
         </ni-banner>
-        <ni-course-info-link :disable-link="followUpDisabled" />
+        <ni-course-info-link :disable-link="disableDocDownload" @download="downloadConvocation" />
       </div>
       <div v-else class="profile-container">
         <ni-bi-color-button class="button-history" icon="history" label="Historique" @click="toggleHistory" />

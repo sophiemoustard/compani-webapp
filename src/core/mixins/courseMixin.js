@@ -5,9 +5,13 @@ import Courses from '@api/Courses';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import { INTRA, COURSE_TYPES } from '@data/constants';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import { openPdf } from '@helpers/file';
 import moment from '@helpers/moment';
 
 export const courseMixin = {
+  data () {
+    return { pdfLoading: false };
+  },
   computed: {
     ...mapGetters({ vendorRole: 'main/getVendorRole' }),
     isIntraCourse () {
@@ -38,6 +42,9 @@ export const courseMixin = {
         { icon: 'bookmark_border', label: this.courseType },
         { icon: 'emoji_people', label: this.trainerName },
       ];
+    },
+    disableDocDownload () {
+      return this.followUpDisabled || this.pdfLoading;
     },
   },
   methods: {
@@ -92,6 +99,20 @@ export const courseMixin = {
         NotifyNegative('Erreur lors de la modification.');
       } finally {
         this.tmpInput = null;
+      }
+    },
+    async downloadConvocation () {
+      if (this.disableDocDownload) return;
+
+      try {
+        this.pdfLoading = true;
+        const pdf = await Courses.downloadConvocation(this.course._id);
+        openPdf(pdf);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement de la convocation.');
+      } finally {
+        this.pdfLoading = false;
       }
     },
   },
