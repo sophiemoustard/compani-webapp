@@ -1,7 +1,7 @@
 <template>
   <div class="course-link">
-    <ni-bi-color-button icon="file_download" label="Convocation papier" :disable="disableLink" :href="courseLink()"
-      size="16px" type="a" />
+    <ni-bi-color-button icon="file_download" label="Convocation papier" :disable="disableLink" size="16px"
+      @click="$emit('download')" />
     <ni-button color="primary" :disable="disableLink" icon="link" label="Obtenir un lien de partage"
       v-clipboard:copy="!disableLink && courseLink()" v-clipboard:success="handleCopySuccess" />
 </div>
@@ -31,6 +31,8 @@ export default {
       return NotifyPositive('Lien copié !');
     },
     courseLink () {
+      if (this.disableLink) return;
+
       return Courses.getConvocationUrl(this.course._id);
     },
   },
