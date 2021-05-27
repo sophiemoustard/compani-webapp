@@ -110,6 +110,7 @@ export default {
   },
   data () {
     return {
+      pdfLoading: false,
       CREDIT_NOTE,
       BILL,
       COMPANI,
@@ -194,25 +195,33 @@ export default {
       return doc.origin === COMPANI;
     },
     async downloadBillPdf (bill) {
+      if (this.pdfLoading) return;
       if (!this.canDownload(bill)) return;
 
       try {
+        this.pdfLoading = true;
         const pdf = await Bills.getPdf(bill._id);
         openPdf(pdf);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de la facture');
+      } finally {
+        this.pdfLoading = false;
       }
     },
     async downloadCreditNotePdf (cn) {
+      if (this.pdfLoading) return;
       if (!this.canDownload(cn)) return;
 
       try {
+        this.pdfLoading = true;
         const pdf = await CreditNotes.getPdf(cn._id);
         openPdf(pdf);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'avoir');
+      } finally {
+        this.pdfLoading = false;
       }
     },
     deleteRefund (refund) {

@@ -42,7 +42,7 @@
                   <q-btn v-if="!!getUrl(props.row)" data-cy="link" flat round small color="primary" type="a"
                     :href="getUrl(props.row)" icon="file_download" target="_blank" />
                   <q-btn v-else data-cy="link" flat round small color="primary" icon="file_download"
-                    @click="downloadTaxCertificate(props.row)" />
+                    @click="downloadTaxCertificate(props.row)" :disable="pdfLoading" />
                   <q-btn v-if="isCoach" flat round small dense color="grey" icon="delete"
                     @click="validateTaxCertificateDeletion(col.value, props.row)" />
                 </div>
@@ -144,6 +144,7 @@ export default {
   mixins: [paymentMixin, tableMixin],
   data () {
     return {
+      pdfLoading: false,
       modalLoading: false,
       tableLoading: false,
       paymentEditionLoading: false,
@@ -450,12 +451,17 @@ export default {
       return get(doc, 'driveFile.link');
     },
     async downloadTaxCertificate (tc) {
+      if (this.pdfLoading) return;
+
       try {
+        this.pdfLoading = true;
         const pdf = await TaxCertificates.getPdf(tc._id);
         openPdf(pdf);
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du téléchargement de l\'attestation fiscale');
+      } finally {
+        this.pdfLoading = false;
       }
     },
     validateTaxCertificateDeletion (taxCertificateId, row) {
