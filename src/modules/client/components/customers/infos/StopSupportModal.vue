@@ -23,7 +23,7 @@ import Select from '@components/form/Select';
 import DateInput from '@components/form/DateInput';
 import { NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { SUPPORT_STOPPING_REASONS_OPTIONS, REQUIRED_LABEL } from '@data/constants';
-import { formatDate } from '@helpers/date';
+import { formatDate, addDays } from '@helpers/date';
 
 export default {
   name: 'StopSupportnModal',
@@ -59,11 +59,6 @@ export default {
     update (event, prop) {
       this.$emit('update:newStatus', { ...this.newStatus, [prop]: event });
     },
-    getDayAfterStoppingDate (value) {
-      const date = new Date(value);
-
-      return date.setDate(date.getDate() + 1);
-    },
     validateSupportStopping () {
       this.validations.$touch();
       if (this.validations.$error) return NotifyWarning('Champ(s) invalide(s)');
@@ -72,7 +67,7 @@ export default {
         title: 'Confirmation',
         message: `Êtes-vous sûr de vouloir arrêter l'accompagnement ?<br /><br />
         Toutes les interventions chez ${this.customerName} à partir du
-        ${formatDate(this.getDayAfterStoppingDate(this.newStatus.stoppedAt))} seront supprimées et vous ne pourrez
+        ${formatDate(addDays(this.newStatus.stoppedAt, 1))} seront supprimées et vous ne pourrez
         plus créer de nouvelles interventions à partir de cette date.`,
         html: true,
         ok: 'oui, arrêter l\'accompagnement',

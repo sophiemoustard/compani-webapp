@@ -1,7 +1,7 @@
 <template>
   <div class="header">
-    <div class="row q-mb-md items-center justify-between">
-      <div class="row ellipsis">
+    <div class="flex-row q-mb-md items-center justify-between">
+      <div class="flex-row ellipsis">
         <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
         <h4 class="ellipsis">{{ title }}</h4>
         <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />

@@ -45,3 +45,9 @@ export const formatDate = (value) => {
 
   return `${date}/${formattedMonth}/${new Date(value).getFullYear()}`;
 };
+
+export const addDays = (value, days) => {
+  const date = new Date(value);
+
+  return date.setDate(date.getDate() + days);
+};
