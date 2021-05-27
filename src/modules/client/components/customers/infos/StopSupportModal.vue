@@ -43,8 +43,7 @@ export default {
   },
   data () {
     return {
-      stopReasonOptions: Object.keys(SUPPORT_STOPPING_REASONS_OPTIONS)
-        .map(reason => ({ label: SUPPORT_STOPPING_REASONS_OPTIONS[reason], value: reason })),
+      stopReasonOptions: SUPPORT_STOPPING_REASONS_OPTIONS,
     };
   },
   methods: {

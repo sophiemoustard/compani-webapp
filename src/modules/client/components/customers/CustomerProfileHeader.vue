@@ -6,8 +6,8 @@
         <h4 class="ellipsis">{{ title }}</h4>
         <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
       </div>
-       <q-btn v-if="!customer.stoppedAt" class="support-stopping justify-end" label="Arrêter"
-       @click="stopSupportModal=true" no-caps flat color="white" />
+      <q-btn v-if="!customer.stoppedAt" class="support-stopping justify-end" label="Arrêter"
+        @click="stopSupportModal=true" no-caps flat color="white" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -23,7 +23,7 @@
 
     <stop-support-modal v-model="stopSupportModal" @hide="resetStopSupportModal" @submit="stopSupport"
       :new-status.sync="newStatus" :validations="$v.newStatus" :loading="modalLoading"
-      :min-date="getStartOfDay(new Date(customer.createdAt)).toISOString()" :customer-name="title"
+      :min-date="minStoppingDate" :customer-name="title"
       :stopping-date-error-message="setStoppingDateErrorMessage($v.newStatus)" />
   </div>
 </template>
@@ -83,13 +83,16 @@ export default {
         default: return '';
       }
     },
+    minStoppingDate () {
+      return getStartOfDay(new Date(this.customer.createdAt)).toISOString();
+    },
   },
   validations () {
     return {
       newStatus: {
         stoppedAt: {
           required,
-          minDate: minDate(getStartOfDay(new Date(this.customer.createdAt)).toISOString()),
+          minDate: minDate(this.minStoppingDate),
         },
         stopReason: { required },
       },
