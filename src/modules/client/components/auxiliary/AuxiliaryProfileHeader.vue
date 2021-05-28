@@ -114,7 +114,7 @@ export default {
       return 'N/A';
     },
     userRelativeStartDate () {
-      if (this.userStartDate !== 'N/A') return formatDateDiff(dateDiff(this.userProfile.createdAt, new Date()));
+      if (this.userStartDate !== 'N/A') return formatDateDiff(dateDiff(new Date(), this.userProfile.createdAt));
       return '';
     },
     isExternalUser () {
