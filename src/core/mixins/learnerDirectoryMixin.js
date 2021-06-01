@@ -1,6 +1,6 @@
 import { formatIdentity, sortStrings, removeDiacritics } from '@helpers/utils';
 import Users from '@api/Users';
-import { dateDiff, formatDateDiff } from '../helpers/date';
+import { dateDiff, formatDateDiff } from '@helpers/date';
 
 export const learnerDirectoryMixin = {
   data () {

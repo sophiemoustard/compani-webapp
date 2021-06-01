@@ -2,7 +2,7 @@
   <ni-modal :value="value" @hide="hide" @input="input"
     title="Suppression d'interventions sur une période">
     <ni-select in-modal caption="Bénéficiaire" v-model="deletedEvents.customer"
-      :options="customersOptions(deletedEvents.startDate)" required-field @blur="$v.deletedEvents.customer.$touch"
+      :options="getCustomersOptions(deletedEvents.startDate)" required-field @blur="$v.deletedEvents.customer.$touch"
       :error="$v.deletedEvents.customer.$error" />
     <ni-option-group :display-caption="false" v-model="deletedEvents.inRange" type="radio"
       :options="deletetionOptions" inline />

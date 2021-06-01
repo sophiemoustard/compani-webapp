@@ -222,7 +222,7 @@ export const planningModalMixin = {
         }
       }
     },
-    customersOptions (startDate) {
+    getCustomersOptions (startDate) {
       if (this.customers.length === 0) return [];
 
       const activeCustomers = this.customers

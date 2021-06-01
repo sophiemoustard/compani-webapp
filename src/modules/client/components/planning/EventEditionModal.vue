@@ -26,7 +26,7 @@
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
             @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
           <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer"
-            :options="customersOptions(editedEvent.dates.startDate)" :error="validations.customer.$error"
+            :options="getCustomersOptions(editedEvent.dates.startDate)" :error="validations.customer.$error"
             required-field disable />
           <ni-select in-modal :options="customerSubscriptionsOptions" @input="update($event, 'subscription')"
             :value="editedEvent.subscription" :error="validations.subscription.$error" caption="Service"
@@ -185,8 +185,7 @@ export default {
       return `Cette absence est une prolongation de ${nature.label.toLowerCase()} commencant le ${startDate}`;
     },
     stoppingDate () {
-      const customer = this.customers.find(c => c._id === this.editedEvent.customer);
-      return get(customer, 'stoppedAt') || '';
+      return get(this.selectedCustomer, 'stoppedAt') || '';
     },
   },
   methods: {

@@ -21,7 +21,7 @@
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
             @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
           <ni-select v-else in-modal caption="Bénéficiaire" :value="newEvent.customer"
-            :options="customersOptions(newEvent.dates.startDate)" :error="validations.customer.$error" required-field
+            :options="getCustomersOptions(newEvent.dates.startDate)" :error="validations.customer.$error" required-field
             @blur="validations.customer.$touch" @input="updateCustomer($event)" data-cy="event-creation-customer" />
           <ni-select in-modal caption="Service" :value="newEvent.subscription" :error="validations.subscription.$error"
             :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch"
@@ -167,8 +167,7 @@ export default {
       ].includes(this.newEvent.absence);
     },
     stoppingDate () {
-      const customer = this.customers.find(c => c._id === this.newEvent.customer);
-      return get(customer, 'stoppedAt') || '';
+      return get(this.selectedCustomer, 'stoppedAt') || '';
     },
   },
   watch: {
