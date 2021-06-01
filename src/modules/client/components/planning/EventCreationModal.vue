@@ -14,15 +14,15 @@
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
             :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
-            @input="update($event, 'dates')" />
+            @input="update($event, 'dates')" :max="stoppingDate" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="newEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
             @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
-          <ni-select v-else in-modal caption="Bénéficiaire" :value="newEvent.customer" :options="customersOptions"
-            :error="validations.customer.$error" required-field @blur="validations.customer.$touch"
-            @input="updateCustomer($event)" data-cy="event-creation-customer" />
+          <ni-select v-else in-modal caption="Bénéficiaire" :value="newEvent.customer"
+            :options="customersOptions(newEvent.dates.startDate)" :error="validations.customer.$error" required-field
+            @blur="validations.customer.$touch" @input="updateCustomer($event)" data-cy="event-creation-customer" />
           <ni-select in-modal caption="Service" :value="newEvent.subscription" :error="validations.subscription.$error"
             :options="customerSubscriptionsOptions" required-field @blur="validations.subscription.$touch"
             data-cy="event-creation-service" @input="update($event, 'subscription')" />
@@ -165,6 +165,10 @@ export default {
         TRANSPORT_ACCIDENT,
         ILLNESS,
       ].includes(this.newEvent.absence);
+    },
+    stoppingDate () {
+      const customer = this.customers.find(c => c._id === this.newEvent.customer);
+      return get(customer, 'stoppedAt') || '';
     },
   },
   watch: {

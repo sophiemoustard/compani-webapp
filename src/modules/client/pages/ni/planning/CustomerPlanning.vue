@@ -24,7 +24,7 @@ import get from 'lodash/get';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
   INTERVENTION,
   DEFAULT_AVATAR,
@@ -176,6 +176,11 @@ export default {
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
+
+      if (moment(selectedDay).toDate().toISOString() > person.stoppedAt) {
+        return NotifyWarning('Le bénéficiare est arrêté à cette date.');
+      }
+
       this.newEvent = {
         type: INTERVENTION,
         repetition: { frequency: NEVER },

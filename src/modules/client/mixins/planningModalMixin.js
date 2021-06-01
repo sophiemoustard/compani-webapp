@@ -105,16 +105,6 @@ export const planningModalMixin = {
         ...formatAndSortIdentityOptions(this.activeAuxiliaries),
       ];
     },
-    customersOptions () {
-      if (this.customers.length === 0) return [];
-      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
-        return formatAndSortIdentityOptions(this.customers); // Unassigned event
-      }
-
-      if (!this.selectedAuxiliary.contracts) return [];
-
-      return formatAndSortIdentityOptions(this.customers);
-    },
     internalHourOptions () {
       return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
     },
@@ -231,6 +221,19 @@ export const planningModalMixin = {
           });
         }
       }
+    },
+    customersOptions (startDate) {
+      if (this.customers.length === 0) return [];
+
+      const activeCustomers = this.customers
+        .filter(customer => !customer.stoppedAt || startDate < customer.stoppedAt);
+      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
+        return formatAndSortIdentityOptions(activeCustomers); // Unassigned event
+      }
+
+      if (!this.selectedAuxiliary.contracts) return [];
+
+      return formatAndSortIdentityOptions(activeCustomers);
     },
   },
 };
