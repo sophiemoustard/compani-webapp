@@ -7,7 +7,8 @@
         <ni-planning-modal-header v-else-if="[UNAVAILABILITY, ABSENCE].includes(editedEvent.type)"
           :value="editedEvent.auxiliary" :selected-person="selectedAuxiliary" @close="close" />
         <ni-planning-modal-header v-else :value="editedEvent.auxiliary" @input="update($event, 'auxiliary')"
-          :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close" />
+          :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close"
+          :disable="!!editedEvent.startDateTimeStampedCount" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap :value="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
@@ -16,14 +17,14 @@
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
-            :disable="isBilledIntervention || !!editedEvent.startDateTimeStampedCount" :error="validations.dates.$error"
-            @blur="validations.dates.$touch" @input="update($event, 'dates')" disable-end-date />
+            :disable="isBilledIntervention" :error="validations.dates.$error" @input="update($event, 'dates')"
+            @blur="validations.dates.$touch" :disable-start-date="!!editedEvent.startDateTimeStampedCount"
+            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')"
-            :disable="!!editedEvent.startDateTimeStampedCount" />
+            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
           <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer" :options="customersOptions"
             :error="validations.customer.$error" required-field disable />
           <ni-select in-modal :options="customerSubscriptionsOptions" @input="update($event, 'subscription')"
