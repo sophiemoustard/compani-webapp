@@ -51,3 +51,11 @@ export const addDays = (value, days) => {
 
   return date.setDate(date.getDate() + days);
 };
+
+export const isBefore = (date1, date2) => new Date(date1) < new Date(date2);
+
+export const isSameOrBefore = (date1, date2) => new Date(date1) <= new Date(date2);
+
+export const isAfter = (date1, date2) => new Date(date1) > new Date(date2);
+
+export const isSameOrAfter = (date1, date2) => new Date(date1) >= new Date(date2);

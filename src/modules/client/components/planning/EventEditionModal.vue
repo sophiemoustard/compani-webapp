@@ -19,7 +19,7 @@
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable="isBilledIntervention" :error="validations.dates.$error" @input="update($event, 'dates')"
             @blur="validations.dates.$touch" :disable-start-date="!!editedEvent.startDateTimeStampedCount"
-            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount" :max="stoppingDate" />
+            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount" :max="customerStoppedDate" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
@@ -184,7 +184,7 @@ export default {
 
       return `Cette absence est une prolongation de ${nature.label.toLowerCase()} commencant le ${startDate}`;
     },
-    stoppingDate () {
+    customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
   },

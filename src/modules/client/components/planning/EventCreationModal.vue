@@ -14,7 +14,7 @@
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
             :error="validations.dates.$error" @blur="validations.dates.$touch" disable-end-date
-            @input="update($event, 'dates')" :max="stoppingDate" />
+            @input="update($event, 'dates')" :max="customerStoppedDate" />
         </template>
         <template v-if="newEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="newEvent.auxiliary"
@@ -166,7 +166,7 @@ export default {
         ILLNESS,
       ].includes(this.newEvent.absence);
     },
-    stoppingDate () {
+    customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
   },

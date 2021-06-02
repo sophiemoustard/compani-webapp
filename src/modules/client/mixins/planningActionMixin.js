@@ -39,7 +39,9 @@ export const planningActionMixin = {
         dates: {
           startDate: {
             required,
-            maxDate: this.getStoppingDate(this.newEvent) ? maxDate(this.getStoppingDate(this.newEvent)) : '',
+            maxDate: this.getCustomerStoppedDate(this.newEvent)
+              ? maxDate(this.getCustomerStoppedDate(this.newEvent))
+              : '',
           },
           endDate: {
             required: requiredIf(() => this.newEvent &&
@@ -83,7 +85,9 @@ export const planningActionMixin = {
         dates: {
           startDate: {
             required,
-            maxDate: this.getStoppingDate(this.editedEvent) ? maxDate(this.getStoppingDate(this.editedEvent)) : '',
+            maxDate: this.getCustomerStoppedDate(this.editedEvent)
+              ? maxDate(this.getCustomerStoppedDate(this.editedEvent))
+              : '',
           },
           endDate: { required },
         },
@@ -586,7 +590,7 @@ export const planningActionMixin = {
         this.loading = false;
       }
     },
-    getStoppingDate (event) {
+    getCustomerStoppedDate (event) {
       const customer = this.customers ? this.customers.find(c => c._id === event.customer) : null;
       return get(customer, 'stoppedAt') || '';
     },
