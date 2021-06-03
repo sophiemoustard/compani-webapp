@@ -8,7 +8,7 @@
           :value="editedEvent.auxiliary" :selected-person="selectedAuxiliary" @close="close" />
         <ni-planning-modal-header v-else :value="editedEvent.auxiliary" @input="update($event, 'auxiliary')"
           :options="auxiliariesOptions" :selected-person="selectedAuxiliary" @close="close"
-          :disable="!!editedEvent.startDateTimeStampedCount" />
+          :disable="isEventTimeStamped" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap :value="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
@@ -18,8 +18,8 @@
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable="isBilledIntervention" :error="validations.dates.$error" @input="update($event, 'dates')"
-            @blur="validations.dates.$touch" :disable-start-date="!!editedEvent.startDateTimeStampedCount"
-            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount" :max="customerStoppedDate" />
+            @blur="validations.dates.$touch" :disable-start-date="isEventTimeStamped" :max="customerStoppedDate"
+            disable-end-date :disable-start-hour="isEventTimeStamped" :disable-end-hour="isEventTimeStamped" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
@@ -168,7 +168,8 @@ export default {
       return this.editedEvent.type === INTERVENTION &&
       !this.editedEvent.shouldUpdateRepetition &&
       !this.isBilledIntervention &&
-      !this.editedEvent.startDateTimeStampedCount;
+      !this.editedEvent.startDateTimeStampedCount &&
+      !this.editedEvent.endDateTimeStampedCount;
     },
     auxiliaryFilterPlaceholder () {
       return this.selectedAuxiliary.identity
@@ -186,6 +187,9 @@ export default {
     },
     customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
+    },
+    isEventTimeStamped () {
+      return !!this.editedEvent.startDateTimeStampedCount || !!this.editedEvent.endDateTimeStampedCount;
     },
   },
   methods: {
