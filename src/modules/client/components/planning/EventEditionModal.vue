@@ -19,7 +19,8 @@
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable="isBilledIntervention" :error="validations.dates.$error" @input="update($event, 'dates')"
             @blur="validations.dates.$touch" :disable-start-date="isEventTimeStamped" :max="customerStoppedDate"
-            disable-end-date :disable-start-hour="isEventTimeStamped" :disable-end-hour="isEventTimeStamped" />
+            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount"
+            :disable-end-hour="!!editedEvent.endDateTimeStampedCount" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
