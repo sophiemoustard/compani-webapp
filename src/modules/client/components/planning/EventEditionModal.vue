@@ -19,14 +19,15 @@
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable="isBilledIntervention" :error="validations.dates.$error" @input="update($event, 'dates')"
             @blur="validations.dates.$touch" :disable-start-date="!!editedEvent.startDateTimeStampedCount"
-            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount" />
+            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount" :max="customerStoppedDate" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
             @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
-          <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer" :options="customersOptions"
-            :error="validations.customer.$error" required-field disable />
+          <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer"
+            :options="getCustomersOptions(editedEvent.dates.startDate)" :error="validations.customer.$error"
+            required-field disable />
           <ni-select in-modal :options="customerSubscriptionsOptions" @input="update($event, 'subscription')"
             :value="editedEvent.subscription" :error="validations.subscription.$error" caption="Service"
             @blur="validations.subscription.$touch" required-field :disable="isBilledIntervention" />
@@ -111,6 +112,7 @@
 </template>
 
 <script>
+import get from 'lodash/get';
 import set from 'lodash/set';
 import Button from '@components/Button';
 import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/constants';
@@ -181,6 +183,9 @@ export default {
       const startDate = moment(this.editedEvent.extension.startDate).format('DD/MM/YYYY');
 
       return `Cette absence est une prolongation de ${nature.label.toLowerCase()} commencant le ${startDate}`;
+    },
+    customerStoppedDate () {
+      return get(this.selectedCustomer, 'stoppedAt') || '';
     },
   },
   methods: {

@@ -22,7 +22,7 @@ import {
   OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
-import { frAddress } from '@helpers/vuelidateCustomVal';
+import { frAddress, maxDate } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
@@ -37,7 +37,12 @@ export const planningActionMixin = {
       newEvent: {
         type: { required },
         dates: {
-          startDate: { required },
+          startDate: {
+            required,
+            maxDate: this.getCustomerStoppedDate(this.newEvent)
+              ? maxDate(this.getCustomerStoppedDate(this.newEvent))
+              : '',
+          },
           endDate: {
             required: requiredIf(() => this.newEvent &&
               (this.newEvent.type !== ABSENCE || this.newEvent.absenceNature === DAILY)),
@@ -78,7 +83,12 @@ export const planningActionMixin = {
       },
       editedEvent: {
         dates: {
-          startDate: { required },
+          startDate: {
+            required,
+            maxDate: this.getCustomerStoppedDate(this.editedEvent)
+              ? maxDate(this.getCustomerStoppedDate(this.editedEvent))
+              : '',
+          },
           endDate: { required },
         },
         auxiliary: { required: requiredIf(item => item && item.type !== INTERVENTION) },
@@ -579,6 +589,10 @@ export const planningActionMixin = {
       } finally {
         this.loading = false;
       }
+    },
+    getCustomerStoppedDate (event) {
+      const customer = this.customers ? this.customers.find(c => c._id === event.customer) : null;
+      return get(customer, 'stoppedAt') || '';
     },
   },
 };
