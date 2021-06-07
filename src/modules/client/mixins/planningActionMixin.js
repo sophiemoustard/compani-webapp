@@ -404,6 +404,7 @@ export const planningActionMixin = {
           'extension',
           'histories',
           'startDateTimeStampedCount',
+          'endDateTimeStampedCount',
         ]
       );
     },
