@@ -3,7 +3,6 @@ import omit from 'lodash/omit';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
-import cloneDeep from 'lodash/cloneDeep';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import { subject } from '@casl/ability';
 import InternalHours from '@api/InternalHours';
@@ -23,7 +22,7 @@ import {
   OTHER,
   WORK_ACCIDENT,
 } from '@data/constants';
-import { frAddress } from '@helpers/vuelidateCustomVal';
+import { frAddress, maxDate } from '@helpers/vuelidateCustomVal';
 import { defineAbilitiesFor } from '@helpers/ability';
 import moment from '@helpers/moment';
 import { validationMixin } from '@mixins/validationMixin';
@@ -38,7 +37,12 @@ export const planningActionMixin = {
       newEvent: {
         type: { required },
         dates: {
-          startDate: { required },
+          startDate: {
+            required,
+            maxDate: this.getCustomerStoppedDate(this.newEvent)
+              ? maxDate(this.getCustomerStoppedDate(this.newEvent))
+              : '',
+          },
           endDate: {
             required: requiredIf(() => this.newEvent &&
               (this.newEvent.type !== ABSENCE || this.newEvent.absenceNature === DAILY)),
@@ -79,7 +83,12 @@ export const planningActionMixin = {
       },
       editedEvent: {
         dates: {
-          startDate: { required },
+          startDate: {
+            required,
+            maxDate: this.getCustomerStoppedDate(this.editedEvent)
+              ? maxDate(this.getCustomerStoppedDate(this.editedEvent))
+              : '',
+          },
           endDate: { required },
         },
         auxiliary: { required: requiredIf(item => item && item.type !== INTERVENTION) },
@@ -144,9 +153,7 @@ export const planningActionMixin = {
           (!contract.endDate || moment(contract.endDate).isAfter(startDate)));
     },
     getRowEvents (rowId) {
-      const rowEvents = this.events.find(group => group._id === rowId);
-
-      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
+      return this.events[rowId] || [];
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
@@ -324,20 +331,8 @@ export const planningActionMixin = {
       this.editionModal = true;
     },
     formatEditedEvent (event) {
-      const {
-        createdAt,
-        updatedAt,
-        startDate,
-        endDate,
-        isBilled,
-        auxiliary,
-        subscription,
-        address,
-        customer,
-        internalHour,
-        sector,
-        ...eventData
-      } = cloneDeep(event);
+      const { startDate, endDate, isBilled, auxiliary, subscription, address, customer, internalHour, sector } = event;
+      const eventData = omit(event, ['createdAt', 'updatedAt']);
       const dates = { startDate, endDate };
 
       switch (event.type) {
@@ -396,16 +391,22 @@ export const planningActionMixin = {
       if (event.auxiliary) delete payload.sector;
       if (event.address && !event.address.fullAddress) payload.address = {};
 
-      return omit(payload, [
-        'customer',
-        'repetition',
-        'staffingBeginning',
-        'staffingDuration',
-        'type',
-        'displayedStartDate',
-        'displayedEndDate',
-        'extension',
-      ]);
+      return omit(
+        payload,
+        [
+          'customer',
+          'repetition',
+          'staffingBeginning',
+          'staffingDuration',
+          'type',
+          'displayedStartDate',
+          'displayedEndDate',
+          'extension',
+          'histories',
+          'startDateTimeStampedCount',
+          'endDateTimeStampedCount',
+        ]
+      );
     },
     async updateEvent () {
       try {
@@ -589,6 +590,10 @@ export const planningActionMixin = {
       } finally {
         this.loading = false;
       }
+    },
+    getCustomerStoppedDate (event) {
+      const customer = this.customers ? this.customers.find(c => c._id === event.customer) : null;
+      return get(customer, 'stoppedAt') || '';
     },
   },
 };

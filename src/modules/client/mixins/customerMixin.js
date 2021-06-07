@@ -3,6 +3,7 @@ import set from 'lodash/set';
 import Customers from '@api/Customers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import { ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 
 export const customerMixin = {
   computed: {
@@ -46,6 +47,12 @@ export const customerMixin = {
       } finally {
         this.tmpInput = null;
       }
+    },
+    getStatus (customer) {
+      if (customer.archivedAt) return ARCHIVED;
+      if (customer.stoppedAt) return STOPPED;
+
+      return ACTIVATED;
     },
   },
 };

@@ -37,13 +37,14 @@ import { CIVILITY_OPTIONS, ACTIVATED, STOPPED, ARCHIVED } from '@data/constants'
 import { formatIdentity, removeDiacritics, sortStrings } from '@helpers/utils';
 import { formatDate, ascendingSort } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
+import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import CustomerCreationModal from 'src/modules/client/components/customers/CustomerCreationModal';
 import { customerProfileValidation } from 'src/modules/client/helpers/customerProfileValidation';
 
 export default {
   name: 'CustomersDirectory',
   metaInfo: { title: 'Répertoire bénéficiaires' },
-  mixins: [validationMixin],
+  mixins: [validationMixin, customerMixin],
   components: {
     'ni-directory-header': DirectoryHeader,
     'customer-creation-modal': CustomerCreationModal,
@@ -85,7 +86,7 @@ export default {
         {
           name: 'createdAt',
           label: 'Depuis le...',
-          field: row => get(row, 'status.activatedAt'),
+          field: 'createdAt',
           align: 'left',
           sortable: true,
           format: value => formatDate(value) || 'N/A',
@@ -95,7 +96,7 @@ export default {
         {
           name: 'stoppedAt',
           label: 'Arrêté le...',
-          field: row => ([STOPPED, ARCHIVED].includes(get(row, 'status.value')) && get(row, 'status.stoppedAt')),
+          field: 'stoppedAt',
           align: 'left',
           sortable: true,
           format: value => formatDate(value) || '',
@@ -123,7 +124,7 @@ export default {
         {
           name: 'status',
           label: 'Statut',
-          field: row => get(row, 'status.value'),
+          field: row => this.getStatus(row),
           align: 'center',
           sortable: false,
           style: 'width: 30px',
