@@ -24,7 +24,7 @@ import get from 'lodash/get';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import Users from '@api/Users';
-import { NotifyNegative } from '@components/popup/notify';
+import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
   INTERVENTION,
   DEFAULT_AVATAR,
@@ -37,6 +37,7 @@ import {
 } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
+import { isAfter } from '@helpers/date';
 import { planningActionMixin } from 'src/modules/client/mixins/planningActionMixin';
 import Planning from 'src/modules/client/components/planning/Planning';
 import EventCreationModal from 'src/modules/client/components/planning/EventCreationModal';
@@ -58,7 +59,7 @@ export default {
     return {
       loading: false,
       days: [],
-      events: [],
+      events: {},
       customers: [],
       auxiliaries: [],
       startOfWeek: '',
@@ -163,7 +164,7 @@ export default {
           groupBy: CUSTOMER,
         });
       } catch (e) {
-        this.events = [];
+        this.events = {};
       }
     },
     async getAuxiliaries () {
@@ -176,6 +177,11 @@ export default {
     openCreationModal (vEvent) {
       const { dayIndex, person } = vEvent;
       const selectedDay = this.days[dayIndex];
+
+      if (isAfter(selectedDay, person.stoppedAt)) {
+        return NotifyWarning('Le bénéficiare est arrêté à cette date.');
+      }
+
       this.newEvent = {
         type: INTERVENTION,
         repetition: { frequency: NEVER },

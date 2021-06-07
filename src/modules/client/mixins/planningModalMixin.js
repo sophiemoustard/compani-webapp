@@ -38,6 +38,7 @@ import {
 } from '@data/constants';
 import { formatAndSortIdentityOptions } from '@helpers/utils';
 import moment from '@helpers/moment';
+import { isBefore } from '@helpers/date';
 import PlanningModalHeader from 'src/modules/client/components/planning/PlanningModalHeader';
 
 export const planningModalMixin = {
@@ -104,16 +105,6 @@ export const planningModalMixin = {
         { label: `À affecter ${sector ? sector.label : ''}`, value: '' },
         ...formatAndSortIdentityOptions(this.activeAuxiliaries),
       ];
-    },
-    customersOptions () {
-      if (this.customers.length === 0) return [];
-      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
-        return formatAndSortIdentityOptions(this.customers); // Unassigned event
-      }
-
-      if (!this.selectedAuxiliary.contracts) return [];
-
-      return formatAndSortIdentityOptions(this.customers);
     },
     internalHourOptions () {
       return this.internalHours.map(hour => ({ label: hour.name, value: hour._id }));
@@ -231,6 +222,19 @@ export const planningModalMixin = {
           });
         }
       }
+    },
+    getCustomersOptions (startDate) {
+      if (this.customers.length === 0) return [];
+
+      const activeCustomers = this.customers
+        .filter(customer => !customer.stoppedAt || !startDate || isBefore(startDate, customer.stoppedAt));
+      if (!this.selectedAuxiliary || !this.selectedAuxiliary._id) {
+        return formatAndSortIdentityOptions(activeCustomers); // Unassigned event
+      }
+
+      if (!this.selectedAuxiliary.contracts) return [];
+
+      return formatAndSortIdentityOptions(activeCustomers);
     },
   },
 };
