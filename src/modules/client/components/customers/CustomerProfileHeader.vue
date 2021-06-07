@@ -6,8 +6,10 @@
         <h4 class="ellipsis">{{ title }}</h4>
         <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
       </div>
-      <ni-button v-if="!customer.stoppedAt" class="bg-pink-500 justify-end" label="Arrêter"
-        @click="stopSupportModal=true" color="white" />
+      <div class="hidden">
+        <ni-button v-if="!customer.stoppedAt" class="bg-pink-500 justify-end" label="Arrêter"
+          @click="stopSupportModal=true" color="white" />
+      </div>
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
