@@ -169,7 +169,11 @@ export default {
         }
         if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
         if (userInfo.exists) {
-          await Users.updateById(userInfo.user._id, { role: this.newCoach.role, company: this.company._id });
+          const payload = { role: this.newCoach.role };
+          if (!user.company) payload.company = this.company._id;
+
+          await Users.updateById(userInfo.user._id, payload);
+
           NotifyPositive('Coach créé');
           await this.getUsers();
           this.coachCreationModal = false;
