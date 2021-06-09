@@ -153,7 +153,9 @@ export const planningActionMixin = {
           (!contract.endDate || moment(contract.endDate).isAfter(startDate)));
     },
     getRowEvents (rowId) {
-      return this.events[rowId] || [];
+      const rowEvents = this.events.find(group => group._id === rowId);
+
+      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
