@@ -110,10 +110,12 @@ export default {
       };
     },
     userStartDate () {
-      return this.userProfile.createdAt ? formatDate(this.userProfile.createdAt) : 'N/A';
+      if (this.userProfile.createdAt) return formatDate(this.userProfile.createdAt);
+      return 'N/A';
     },
     userRelativeStartDate () {
-      return this.userStartDate !== 'N/A' ? formatDateDiff(dateDiff(this.userProfile.createdAt, new Date())) : '';
+      if (this.userStartDate !== 'N/A') return formatDateDiff(dateDiff(new Date(), this.userProfile.createdAt));
+      return '';
     },
     isExternalUser () {
       return this.userProfile._id !== this.loggedUser._id;

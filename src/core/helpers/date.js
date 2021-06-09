@@ -1,27 +1,29 @@
 import { formatQuantity } from '@helpers/utils';
 
-export const dateDiff = (firstDate, secondDate) => Math.abs(new Date(firstDate) - new Date(secondDate));
+export const dateDiff = (newerDate, olderDate) => new Date(newerDate) - new Date(olderDate);
 
 export const formatDateDiff = (durationInMilliseconds) => {
-  if (durationInMilliseconds < 1000 * 60 * 60 * 24) {
-    const hours = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60), 10);
+  const absoluteDuration = Math.abs(durationInMilliseconds);
 
-    return formatQuantity('heure', hours);
+  if (absoluteDuration < 1000 * 60 * 60 * 24) {
+    const hours = parseInt(Math.floor(absoluteDuration / 1000 / 60 / 60), 10);
+
+    return `${durationInMilliseconds < 0 ? 'dans ' : ''}${formatQuantity('heure', hours)}`;
   }
-  if (durationInMilliseconds < 1000 * 60 * 60 * 24 * 30) {
-    const days = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24), 10);
+  if (absoluteDuration < 1000 * 60 * 60 * 24 * 30) {
+    const days = parseInt(Math.floor(absoluteDuration / 1000 / 60 / 60 / 24), 10);
 
-    return formatQuantity('jour', days);
+    return `${durationInMilliseconds < 0 ? 'dans ' : ''}${formatQuantity('jour', days)}`;
   }
-  if (durationInMilliseconds < 1000 * 60 * 60 * 24 * 365) {
-    const months = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24 / 30), 10);
+  if (absoluteDuration < 1000 * 60 * 60 * 24 * 365) {
+    const months = parseInt(Math.floor(absoluteDuration / 1000 / 60 / 60 / 24 / 30), 10);
 
-    return `${months} mois`;
+    return `${durationInMilliseconds < 0 ? 'dans ' : ''}${months} mois`;
   }
 
-  const years = parseInt(Math.floor(durationInMilliseconds / 1000 / 60 / 60 / 24 / 365), 10);
+  const years = parseInt(Math.floor(absoluteDuration / 1000 / 60 / 60 / 24 / 365), 10);
 
-  return formatQuantity('an', years);
+  return `${durationInMilliseconds < 0 ? 'dans ' : ''}${formatQuantity('an', years)}`;
 };
 
 export const isBetween = (date, min, max) => new Date(date) < new Date(max) && new Date(date) > new Date(min);
@@ -43,3 +45,17 @@ export const formatDate = (value) => {
 
   return `${date}/${formattedMonth}/${new Date(value).getFullYear()}`;
 };
+
+export const addDays = (value, days) => {
+  const date = new Date(value);
+
+  return date.setDate(date.getDate() + days);
+};
+
+export const isBefore = (date1, date2) => new Date(date1) < new Date(date2);
+
+export const isSameOrBefore = (date1, date2) => new Date(date1) <= new Date(date2);
+
+export const isAfter = (date1, date2) => new Date(date1) > new Date(date2);
+
+export const isSameOrAfter = (date1, date2) => new Date(date1) >= new Date(date2);

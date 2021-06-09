@@ -7,14 +7,14 @@
     <q-field :error="hasError" error-message="Date(s) et heure(s) invalide(s)" borderless>
       <div class="datetime-container row justify-evenly items-center">
         <ni-date-input :value="value.startDate" @input="update($event, 'startDate')" class="date-item"
-          @blur="blurHandler" :disable="disable" />
+          @blur="blurHandler" :disable="disable || disableStartDate" :max="max" />
         <ni-time-input :value="startHour" @input="updateHours($event, 'startHour')" class="time-item"
           @blur="blurHandler" :disable="disable || disableStartHour" />
         <p class="delimiter">-</p>
         <ni-time-input :value="endHour" @input="updateHours($event, 'endHour')" class="time-item"
           @blur="blurHandler" :disable="disable || disableEndHour" :min="startHour" />
         <ni-date-input :value="value.endDate" @input="update($event, 'endDate')" class="date-item"
-          @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" />
+          @blur="blurHandler" :min="value.startDate" :disable="disable || disableEndDate" :max="max" />
       </div>
     </q-field>
   </div>
@@ -39,9 +39,11 @@ export default {
     value: { type: Object, default: () => ({}) },
     requiredField: { type: Boolean, default: false },
     disable: { type: Boolean, default: false },
+    disableStartDate: { type: Boolean, default: false },
     disableEndDate: { type: Boolean, default: false },
     disableEndHour: { type: Boolean, default: false },
     disableStartHour: { type: Boolean, default: false },
+    max: { type: String, default: '' },
   },
   validations () {
     return {

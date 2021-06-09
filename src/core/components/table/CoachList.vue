@@ -169,7 +169,11 @@ export default {
         }
         if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
         if (userInfo.exists) {
-          await Users.updateById(userInfo.user._id, { role: this.newCoach.role, company: this.company._id });
+          const payload = { role: this.newCoach.role };
+          if (!user.company) payload.company = this.company._id;
+
+          await Users.updateById(userInfo.user._id, payload);
+
           NotifyPositive('Coach créé');
           await this.getUsers();
           this.coachCreationModal = false;
@@ -182,13 +186,13 @@ export default {
       }
     },
     async createCoach () {
-      let newCoach;
       try {
         this.loading = true;
         this.$v.newCoach.$touch();
         if (this.$v.newCoach.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        newCoach = await Users.create(this.formatUserPayload(this.newCoach));
+        await Users.create(this.formatUserPayload(this.newCoach));
+
         NotifyPositive('Utilisateur enregistré.');
       } catch (e) {
         console.error(e);
@@ -197,10 +201,11 @@ export default {
         this.loading = false;
       }
 
-      if (!get(newCoach, 'company.subscriptions.erp')) {
+      if (!get(this.company, 'subscriptions.erp')) {
         try {
           const userRole = this.roles.find(role => role._id === this.newCoach.role);
           if (!get(userRole, 'name')) return NotifyNegative('Problème lors de l\'envoi du mail');
+
           await Email.sendWelcome({ email: this.newCoach.local.email, type: get(userRole, 'name') });
           NotifyPositive('Email envoyé.');
         } catch (e) {
