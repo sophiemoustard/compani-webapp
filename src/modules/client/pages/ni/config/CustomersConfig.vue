@@ -489,6 +489,13 @@ export default {
           style: !this.$q.platform.is.mobile && 'width: 100px',
         },
         {
+          name: 'teletransmissionId',
+          label: 'ID télétransmission',
+          field: 'teletransmissionId',
+          align: 'center',
+          style: !this.$q.platform.is.mobile && 'word-break: break-word;',
+        },
+        {
           name: 'actions',
           label: '',
           align: 'center',
