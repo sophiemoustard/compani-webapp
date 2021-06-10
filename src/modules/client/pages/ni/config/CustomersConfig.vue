@@ -505,6 +505,7 @@ export default {
         unitTTCRate: 0,
         billingMode: '',
         isApa: false,
+        teletransmissionId: '',
       },
       billingModeOptions: [
         { label: 'Indirecte', value: BILLING_INDIRECT },
@@ -983,6 +984,7 @@ export default {
         unitTTCRate: 0,
         billingMode: '',
         isApa: false,
+        teletransmissionId: '',
       };
     },
     formatThirdPartyPayerPayload (tpp) {
