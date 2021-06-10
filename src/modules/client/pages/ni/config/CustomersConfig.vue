@@ -972,7 +972,10 @@ export default {
       const currentThirdPartyPayer = this.thirdPartyPayers.find(tpp => tpp._id === tppId);
       this.editedThirdPartyPayer = {
         address: {},
-        ...pick(currentThirdPartyPayer, ['_id', 'name', 'address', 'email', 'unitTTCRate', 'billingMode', 'isApa']),
+        ...pick(
+          currentThirdPartyPayer,
+          ['_id', 'name', 'address', 'email', 'unitTTCRate', 'billingMode', 'isApa', 'teletransmissionId']
+        ),
       };
     },
     resetThirdPartyPayerCreation () {
