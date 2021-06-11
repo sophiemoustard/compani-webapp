@@ -420,8 +420,6 @@ export const planningActionMixin = {
           'displayedEndDate',
           'extension',
           'histories',
-          'startDateTimeStampedCount',
-          'endDateTimeStampedCount',
         ]
       );
     },
