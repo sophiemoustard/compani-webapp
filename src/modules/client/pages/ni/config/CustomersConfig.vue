@@ -481,19 +481,19 @@ export default {
           },
         },
         {
+          name: 'teletransmissionId',
+          label: 'ID de télétransmission',
+          field: 'teletransmissionId',
+          align: 'center',
+          style: !this.$q.platform.is.mobile && 'word-break: break-word;',
+        },
+        {
           name: 'isApa',
           label: 'APA',
           field: 'isApa',
           align: 'center',
           format: val => (val ? 'Oui' : 'Non'),
           style: !this.$q.platform.is.mobile && 'width: 100px',
-        },
-        {
-          name: 'teletransmissionId',
-          label: 'ID télétransmission',
-          field: 'teletransmissionId',
-          align: 'center',
-          style: !this.$q.platform.is.mobile && 'word-break: break-word;',
         },
         {
           name: 'actions',
