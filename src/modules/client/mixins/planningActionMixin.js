@@ -325,15 +325,15 @@ export const planningActionMixin = {
       }
     },
     // Event edition
-    openEditionModal (event) {
+    async openEditionModal (event) {
       const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
-      this.formatEditedEvent(event);
+      await this.formatEditedEvent(event);
 
       this.editionModal = true;
     },
-    formatEditedEvent (event) {
+    async formatEditedEvent (event) {
       const {
         createdAt,
         updatedAt,
@@ -349,6 +349,8 @@ export const planningActionMixin = {
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
+      const histories = await Events.getHistoriesOfEvent(event._id);
+      eventData.histories = histories;
 
       switch (event.type) {
         case INTERVENTION: {

@@ -185,12 +185,12 @@ export default {
       }
     },
     // Event edition
-    openEditionModal (event) {
+    async openEditionModal (event) {
       const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action');
 
       this.selectedAuxiliary = event.auxiliary ? event.auxiliary : { picture: {}, identity: { lastname: '' } };
-      this.formatEditedEvent(event);
+      await this.formatEditedEvent(event);
 
       this.editionModal = true;
     },
