@@ -24,7 +24,7 @@
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
+            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" :disable="isEventTimeStamped" />
           <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer"
             :options="getCustomersOptions(editedEvent.dates.startDate)" :error="validations.customer.$error"
             required-field disable />

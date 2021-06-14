@@ -349,7 +349,7 @@ export const planningActionMixin = {
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
-      const histories = await Events.getHistoriesOfEvent(event._id);
+      const histories = await Events.getEventHistories(event._id);
       eventData.histories = histories;
 
       switch (event.type) {
