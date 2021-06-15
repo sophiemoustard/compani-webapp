@@ -558,7 +558,8 @@ export const planningActionMixin = {
         NotifyPositive('Évènement supprimé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'événement.');
+        if (e.status === 409) NotifyNegative(e.data.message);
+        else NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
         this.loading = false;
       }
@@ -577,7 +578,8 @@ export const planningActionMixin = {
         NotifyPositive('Évènement supprimé.');
       } catch (e) {
         console.error(e);
-        if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements.');
+        if (e.status === 409) NotifyNegative(e.data.message);
+        else if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements.');
         else NotifyNegative('Erreur lors de la suppression de l\'évènement.');
       } finally {
         this.loading = false;
