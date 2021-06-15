@@ -44,8 +44,4 @@ export default {
     );
     return unassignedHoursBySector.data.data.unassignedHoursBySector;
   },
-  async getEventHistories (id) {
-    const histories = await alenviAxios.get(`${process.env.API_HOSTNAME}/events/${id}/eventhistories`);
-    return histories.data.data.histories;
-  },
 };

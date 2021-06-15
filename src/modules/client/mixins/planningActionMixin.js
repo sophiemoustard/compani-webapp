@@ -9,6 +9,7 @@ import { subject } from '@casl/ability';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
+import EventHistories from '@api/EventHistories';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -349,7 +350,7 @@ export const planningActionMixin = {
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
-      const histories = await Events.getEventHistories(event._id);
+      const histories = await EventHistories.list({ eventId: event._id });
       eventData.histories = histories;
 
       switch (event.type) {
