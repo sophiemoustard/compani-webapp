@@ -19,13 +19,12 @@
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
             :disable="isBilledIntervention" :error="validations.dates.$error" @input="update($event, 'dates')"
             @blur="validations.dates.$touch" :disable-start-date="isEventTimeStamped" :max="customerStoppedDate"
-            disable-end-date :disable-start-hour="!!editedEvent.startDateTimeStampedCount"
-            :disable-end-hour="!!editedEvent.endDateTimeStampedCount" />
+            disable-end-date :disable-start-hour="!!startDateTimeStamped" :disable-end-hour="!!endDateTimeStamped" />
         </template>
         <template v-if="editedEvent.type === INTERVENTION">
           <ni-select v-if="isCustomerPlanning" in-modal caption="Auxiliaire" :value="editedEvent.auxiliary"
             :options="auxiliariesOptions" :error="validations.auxiliary.$error" required-field
-            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" />
+            @blur="validations.auxiliary.$touch" @input="update($event, 'auxiliary')" :disable="isEventTimeStamped" />
           <ni-select v-else in-modal caption="Bénéficiaire" :value="editedEvent.customer"
             :options="getCustomersOptions(editedEvent.dates.startDate)" :error="validations.customer.$error"
             required-field disable />
@@ -80,7 +79,7 @@
               :error="validations.cancel.reason.$error" @input="update($event, 'cancel.reason')" />
           </div>
         </template>
-        <div class="q-mb-lg hidden">
+        <div class="q-mb-lg">
           <div class="flex-row items-center justify-between">
             <div class="flex-row">
               <q-icon size="sm" name="history" class="q-mr-sm" color="grey-400" />
@@ -116,7 +115,7 @@
 import get from 'lodash/get';
 import set from 'lodash/set';
 import Button from '@components/Button';
-import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES } from '@data/constants';
+import { INTERVENTION, ABSENCE, OTHER, NEVER, ABSENCE_TYPES, TIME_STAMPING_ACTIONS } from '@data/constants';
 import { formatIdentity } from '@helpers/utils';
 import moment from '@helpers/moment';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
@@ -169,8 +168,8 @@ export default {
       return this.editedEvent.type === INTERVENTION &&
       !this.editedEvent.shouldUpdateRepetition &&
       !this.isBilledIntervention &&
-      !this.editedEvent.startDateTimeStampedCount &&
-      !this.editedEvent.endDateTimeStampedCount;
+      !this.startDateTimeStamped &&
+      !this.endDateTimeStamped;
     },
     auxiliaryFilterPlaceholder () {
       return this.selectedAuxiliary.identity
@@ -189,8 +188,14 @@ export default {
     customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
     },
+    startDateTimeStamped () {
+      return this.editedEvent.histories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.startHour);
+    },
+    endDateTimeStamped () {
+      return this.editedEvent.histories.some(h => TIME_STAMPING_ACTIONS.includes(h.action) && h.update.endHour);
+    },
     isEventTimeStamped () {
-      return !!this.editedEvent.startDateTimeStampedCount || !!this.editedEvent.endDateTimeStampedCount;
+      return !!this.startDateTimeStamped || !!this.endDateTimeStamped;
     },
   },
   methods: {

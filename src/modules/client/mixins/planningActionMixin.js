@@ -9,6 +9,7 @@ import { subject } from '@casl/ability';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
+import EventHistories from '@api/EventHistories';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -325,15 +326,15 @@ export const planningActionMixin = {
       }
     },
     // Event edition
-    openEditionModal (event) {
+    async openEditionModal (event) {
       const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
       if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
-      this.formatEditedEvent(event);
+      await this.formatEditedEvent(event);
 
       this.editionModal = true;
     },
-    formatEditedEvent (event) {
+    async formatEditedEvent (event) {
       const {
         createdAt,
         updatedAt,
@@ -349,6 +350,8 @@ export const planningActionMixin = {
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
+      const histories = await EventHistories.list({ eventId: event._id });
+      eventData.histories = histories;
 
       switch (event.type) {
         case INTERVENTION: {
@@ -418,8 +421,6 @@ export const planningActionMixin = {
           'displayedEndDate',
           'extension',
           'histories',
-          'startDateTimeStampedCount',
-          'endDateTimeStampedCount',
         ]
       );
     },
