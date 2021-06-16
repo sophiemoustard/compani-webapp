@@ -6,6 +6,9 @@
       <ni-select in-modal caption="Tiers payeur" :options="fundingTppOptions" :value="newFunding.thirdPartyPayer"
         :error="validations.thirdPartyPayer.$error" @blur="validations.thirdPartyPayer.$touch" required-field
         @input="update($event, 'thirdPartyPayer')" />
+        <ni-input in-modal v-if="newFunding.needTeletransmissionId" :value="newFunding.teletransmissionId"
+        caption="ID du plan de financement" @input="update($event, 'teletransmissionId')" required-field
+        :error="validations.teletransmissionId.$error" @blur="validations.teletransmissionId.$touch" />
       <ni-select in-modal :value="newFunding.subscription" :options="fundingSubscriptionsOptions"
         caption="Souscription" @blur="validations.subscription.$touch" :error="validations.subscription.$error"
         required-field @input="update($event, 'subscription')" />

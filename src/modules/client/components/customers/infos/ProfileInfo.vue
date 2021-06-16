@@ -286,7 +286,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required, requiredIf, minValue, maxValue } from 'vuelidate/lib/validators';
+import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -420,6 +420,8 @@ export default {
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
+        teletransmissionId: '',
+        needTeletransmissionId: false,
       },
       fundingCreationModal: false,
       fundingEditionModal: false,
@@ -548,6 +550,7 @@ export default {
   watch: {
     'newFunding.thirdPartyPayer': function () {
       this.setUnitUTTRate();
+      this.setNeedTeletransmissionId();
     },
     'newFunding.nature': function (newNature) {
       if (newNature === FIXED) this.newFunding.frequency = ONCE;
@@ -571,8 +574,9 @@ export default {
         customerParticipationRate: {
           required: requiredIf(item => item.nature === HOURLY),
           minValue: minValue(0),
-          maxValue: maxValue(100),
+          maxValue: value => value < 100,
         },
+        teletransmissionId: { required: requiredIf(item => item && !!item.needTeletransmissionId) },
       };
     },
     careHoursErrorMessage (validations) {
@@ -890,6 +894,10 @@ export default {
         this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
       }
     },
+    setNeedTeletransmissionId () {
+      const thirdPartyPayer = this.ttpList.find(ttp => ttp._id === this.newFunding.thirdPartyPayer);
+      this.newFunding.needTeletransmissionId = !!get(thirdPartyPayer, 'teletransmissionId');
+    },
     async getThirdPartyPayers () {
       try {
         this.ttpList = await ThirdPartyPayers.list();
@@ -924,14 +932,16 @@ export default {
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
+        teletransmissionId: '',
+        needTeletransmissionId: false,
       };
     },
     formatCreatedFunding () {
-      const cleanPayload = pickBy(this.newFunding);
-      const { nature, thirdPartyPayer, subscription, frequency, ...version } = cleanPayload;
+      const cleanPayload = pickBy(omit(this.newFunding, 'needTeletransmissionId'));
+      const { nature, thirdPartyPayer, subscription, frequency, teletransmissionId, ...version } = cleanPayload;
       if (version.endDate) version.endDate = moment(version.endDate).endOf('d').toDate();
 
-      return { nature, thirdPartyPayer, subscription, frequency, versions: [{ ...version }] };
+      return { nature, thirdPartyPayer, subscription, frequency, teletransmissionId, versions: [{ ...version }] };
     },
     async createFunding () {
       try {
@@ -984,6 +994,7 @@ export default {
     openFundingEditionModal (id) {
       this.editedFunding = { ...this.fundings.find(fund => fund._id === id) };
       this.editedFunding.subscription = this.editedFunding.subscription._id;
+      this.editedFunding.needTeletransmissionId = !!this.editedFunding.thirdPartyPayer.teletransmissionId;
       this.fundingEditionModal = true;
     },
     resetEditionFundingData () {
@@ -991,7 +1002,14 @@ export default {
       this.$v.editedFunding.$reset();
     },
     formatFundingEditionPayload (funding) {
-      const pickedFields = ['folderNumber', 'careDays', 'customerParticipationRate', 'startDate', 'subscription'];
+      const pickedFields = [
+        'folderNumber',
+        'careDays',
+        'customerParticipationRate',
+        'startDate',
+        'subscription',
+        'teletransmissionId',
+      ];
       if (funding.nature === FIXED) pickedFields.push('amountTTC');
       else if (funding.nature === HOURLY) pickedFields.push('unitTTCRate', 'careHours');
       const payload = {

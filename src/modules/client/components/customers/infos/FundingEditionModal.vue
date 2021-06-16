@@ -3,6 +3,9 @@
       <template slot="title">
         Éditer le <span class="text-weight-bold">financement</span>
       </template>
+      <ni-input in-modal v-if="editedFunding.needTeletransmissionId" :value="editedFunding.teletransmissionId"
+        caption="ID du plan de financement" @input="update($event, 'teletransmissionId')" required-field
+        :error="validations.teletransmissionId.$error" @blur="validations.teletransmissionId.$touch" />
       <ni-date-input :value="editedFunding.startDate" caption="Date de début de prise en charge"
         :max="editedFundingMaxStartDate" class="last" in-modal @blur="validations.startDate.$touch"
         :error="validations.startDate.$error" required-field @input="update($event, 'startDate')" />
