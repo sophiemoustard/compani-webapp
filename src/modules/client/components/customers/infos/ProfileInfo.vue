@@ -272,7 +272,8 @@
       :amount-ttc-error-message="amountTTCErrorMessage($v.newFunding)" :validations="$v.newFunding"
       :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.newFunding)" :days-options="daysOptions"
       :funding-subscriptions-options="fundingSubscriptionsOptions" @hide="resetCreationFundingData"
-      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.newFunding)" />
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.newFunding)"
+      :need-teletransmission-id-for-new-funding="needTeletransmissionIdForNewFunding" />
 
     <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
@@ -280,7 +281,8 @@
       :validations="$v.editedFunding" :care-hours-error-message="careHoursErrorMessage($v.editedFunding)"
       :amount-ttc-error-message="amountTTCErrorMessage($v.editedFunding)"
       :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.editedFunding)"
-      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)" />
+      :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)"
+      :need-teletransmission-id-for-edited-funding="needTeletransmissionIdForEditedFunding" />
 </div>
 </template>
 
@@ -421,7 +423,6 @@ export default {
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
         teletransmissionId: '',
-        needTeletransmissionId: false,
       },
       fundingCreationModal: false,
       fundingEditionModal: false,
@@ -491,6 +492,14 @@ export default {
     daysOptions () {
       return days.map((day, i) => ({ label: day !== 'Jours fériés' ? day.slice(0, 2) : day, value: i }));
     },
+    needTeletransmissionIdForNewFunding () {
+      const thirdPartyPayer = this.ttpList.find(ttp => ttp._id === this.newFunding.thirdPartyPayer);
+
+      return !!get(thirdPartyPayer, 'teletransmissionId');
+    },
+    needTeletransmissionIdForEditedFunding () {
+      return !!get(this.editedFunding, 'thirdPartyPayer.teletransmissionId');
+    },
   },
   validations () {
     return {
@@ -543,14 +552,19 @@ export default {
         nature: { required },
         frequency: { required },
         ...this.getFundingValidation(this.newFunding),
+        teletransmissionId: { required: requiredIf(this.needTeletransmissionIdForNewFunding) },
+
       },
-      editedFunding: { ...this.getFundingValidation(this.editedFunding) },
+      editedFunding: {
+        ...this.getFundingValidation(this.editedFunding),
+        teletransmissionId: { required: requiredIf(this.needTeletransmissionIdForEditedFunding) },
+      },
     };
   },
   watch: {
     'newFunding.thirdPartyPayer': function () {
       this.setUnitUTTRate();
-      this.setNeedTeletransmissionId();
+      if (!this.needTeletransmissionIdForNewFunding) this.newFunding.teletransmissionId = '';
     },
     'newFunding.nature': function (newNature) {
       if (newNature === FIXED) this.newFunding.frequency = ONCE;
@@ -576,7 +590,6 @@ export default {
           minValue: minValue(0),
           maxValue: value => value < 100,
         },
-        teletransmissionId: { required: requiredIf(item => item && !!item.needTeletransmissionId) },
       };
     },
     careHoursErrorMessage (validations) {
@@ -894,10 +907,6 @@ export default {
         this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
       }
     },
-    setNeedTeletransmissionId () {
-      const thirdPartyPayer = this.ttpList.find(ttp => ttp._id === this.newFunding.thirdPartyPayer);
-      this.newFunding.needTeletransmissionId = !!get(thirdPartyPayer, 'teletransmissionId');
-    },
     async getThirdPartyPayers () {
       try {
         this.ttpList = await ThirdPartyPayers.list();
@@ -933,11 +942,10 @@ export default {
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
         teletransmissionId: '',
-        needTeletransmissionId: false,
       };
     },
     formatCreatedFunding () {
-      const cleanPayload = pickBy(omit(this.newFunding, 'needTeletransmissionId'));
+      const cleanPayload = pickBy(this.newFunding);
       const { nature, thirdPartyPayer, subscription, frequency, teletransmissionId, ...version } = cleanPayload;
       if (version.endDate) version.endDate = moment(version.endDate).endOf('d').toDate();
 
@@ -994,7 +1002,6 @@ export default {
     openFundingEditionModal (id) {
       this.editedFunding = { ...this.fundings.find(fund => fund._id === id) };
       this.editedFunding.subscription = this.editedFunding.subscription._id;
-      this.editedFunding.needTeletransmissionId = !!this.editedFunding.thirdPartyPayer.teletransmissionId;
       this.fundingEditionModal = true;
     },
     resetEditionFundingData () {

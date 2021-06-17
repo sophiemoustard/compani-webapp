@@ -3,7 +3,7 @@
       <template slot="title">
         Éditer le <span class="text-weight-bold">financement</span>
       </template>
-      <ni-input in-modal v-if="editedFunding.needTeletransmissionId" :value="editedFunding.teletransmissionId"
+      <ni-input in-modal v-if="needTeletransmissionIdForEditedFunding" :value="editedFunding.teletransmissionId"
         caption="ID du plan de financement" @input="update($event, 'teletransmissionId')" required-field
         :error="validations.teletransmissionId.$error" @blur="validations.teletransmissionId.$touch" />
       <ni-date-input :value="editedFunding.startDate" caption="Date de début de prise en charge"
@@ -57,6 +57,7 @@ export default {
     amountTtcErrorMessage: { type: String, default: '' },
     unitTtcRateErrorMessage: { type: String, default: '' },
     customerParticipationRateErrorMessage: { type: String, default: '' },
+    needTeletransmissionIdForEditedFunding: { type: Boolean, default: false },
   },
   components: {
     'ni-input': Input,
