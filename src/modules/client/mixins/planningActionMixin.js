@@ -31,6 +31,12 @@ import { validationMixin } from '@mixins/validationMixin';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
+  data () {
+    return {
+      editedEventHistories: [],
+      historiesLoading: false,
+    };
+  },
   computed: {
     ...mapState('main', ['loggedUser']),
   },
@@ -325,12 +331,20 @@ export const planningActionMixin = {
     },
     // Event edition
     async openEditionModal (event) {
-      const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
-      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
+      try {
+        this.historiesLoading = true;
+        const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
+        if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
-      await this.formatEditedEvent(event);
-
-      this.editionModal = true;
+        await this.formatEditedEvent(event);
+        this.editionModal = true;
+        this.editedEventHistories = await EventHistories.list({ eventId: event._id });
+      } catch (e) {
+        console.error(e);
+        this.editedEventHistories = [];
+      } finally {
+        this.historiesLoading = false;
+      }
     },
     async formatEditedEvent (event) {
       const {
@@ -348,8 +362,6 @@ export const planningActionMixin = {
         ...eventData
       } = cloneDeep(event);
       const dates = { startDate, endDate };
-      const histories = await EventHistories.list({ eventId: event._id });
-      eventData.histories = histories;
 
       switch (event.type) {
         case INTERVENTION: {
