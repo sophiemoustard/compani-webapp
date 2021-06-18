@@ -91,7 +91,8 @@
               <q-icon size="sm" name="history" class="q-mr-sm" color="grey-400" />
               <div class="history-list-title text-weight-bold">Activité</div>
             </div>
-            <ni-button :label="historyButtonLabel" color="grey-800" class="bg-grey-100" @click="toggleHistory" />
+            <ni-button :label="historyButtonLabel" color="grey-800" class="bg-grey-100" @click="toggleHistory"
+              :disable="historiesLoading" />
           </div>
           <div v-if="displayHistory" class="q-mt-sm">
             <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />

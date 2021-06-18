@@ -337,6 +337,7 @@ export const planningActionMixin = {
         if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
         await this.formatEditedEvent(event);
+
         this.editionModal = true;
         this.editedEventHistories = await EventHistories.list({ eventId: event._id });
       } catch (e) {
@@ -405,7 +406,7 @@ export const planningActionMixin = {
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
-      this.editedEvent = {};
+      this.editionModal = false;
     },
     closeEditionModal () {
       this.editionModal = false;
