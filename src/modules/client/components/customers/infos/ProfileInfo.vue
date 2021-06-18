@@ -273,7 +273,7 @@
       :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.newFunding)" :days-options="daysOptions"
       :funding-subscriptions-options="fundingSubscriptionsOptions" @hide="resetCreationFundingData"
       :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.newFunding)"
-      :need-teletransmission-id-for-new-funding="needTeletransmissionIdForNewFunding" />
+      :need-funding-plan-id-for-new-funding="needFundingPlanIdForNewFunding" />
 
     <!-- Funding edition modal -->
     <funding-edition-modal v-model="fundingEditionModal" :loading="loading" @hide="resetEditionFundingData"
@@ -282,7 +282,7 @@
       :amount-ttc-error-message="amountTTCErrorMessage($v.editedFunding)"
       :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.editedFunding)"
       :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)"
-      :need-teletransmission-id-for-edited-funding="needTeletransmissionIdForEditedFunding" />
+      :need-funding-plan-id-for-edited-funding="needFundingPlanIdForEditedFunding" />
 </div>
 </template>
 
@@ -422,7 +422,7 @@ export default {
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
-        teletransmissionId: '',
+        fundingPlanId: '',
       },
       fundingCreationModal: false,
       fundingEditionModal: false,
@@ -492,12 +492,12 @@ export default {
     daysOptions () {
       return days.map((day, i) => ({ label: day !== 'Jours fériés' ? day.slice(0, 2) : day, value: i }));
     },
-    needTeletransmissionIdForNewFunding () {
+    needFundingPlanIdForNewFunding () {
       const thirdPartyPayer = this.ttpList.find(ttp => ttp._id === this.newFunding.thirdPartyPayer);
 
       return !!get(thirdPartyPayer, 'teletransmissionId');
     },
-    needTeletransmissionIdForEditedFunding () {
+    needFundingPlanIdForEditedFunding () {
       return !!get(this.editedFunding, 'thirdPartyPayer.teletransmissionId');
     },
   },
@@ -552,19 +552,19 @@ export default {
         nature: { required },
         frequency: { required },
         ...this.getFundingValidation(this.newFunding),
-        teletransmissionId: { required: requiredIf(this.needTeletransmissionIdForNewFunding) },
+        fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForNewFunding) },
 
       },
       editedFunding: {
         ...this.getFundingValidation(this.editedFunding),
-        teletransmissionId: { required: requiredIf(this.needTeletransmissionIdForEditedFunding) },
+        fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForEditedFunding) },
       },
     };
   },
   watch: {
     'newFunding.thirdPartyPayer': function () {
       this.setUnitUTTRate();
-      if (!this.needTeletransmissionIdForNewFunding) this.newFunding.teletransmissionId = '';
+      if (!this.needFundingPlanIdForNewFunding) this.newFunding.fundingPlanId = '';
     },
     'newFunding.nature': function (newNature) {
       if (newNature === FIXED) this.newFunding.frequency = ONCE;
@@ -941,15 +941,15 @@ export default {
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
-        teletransmissionId: '',
+        fundingPlanId: '',
       };
     },
     formatCreatedFunding () {
       const cleanPayload = pickBy(this.newFunding);
-      const { nature, thirdPartyPayer, subscription, frequency, teletransmissionId, ...version } = cleanPayload;
+      const { nature, thirdPartyPayer, subscription, frequency, fundingPlanId, ...version } = cleanPayload;
       if (version.endDate) version.endDate = moment(version.endDate).endOf('d').toDate();
 
-      return { nature, thirdPartyPayer, subscription, frequency, teletransmissionId, versions: [{ ...version }] };
+      return { nature, thirdPartyPayer, subscription, frequency, fundingPlanId, versions: [{ ...version }] };
     },
     async createFunding () {
       try {
@@ -1015,7 +1015,7 @@ export default {
         'customerParticipationRate',
         'startDate',
         'subscription',
-        'teletransmissionId',
+        'fundingPlanId',
       ];
       if (funding.nature === FIXED) pickedFields.push('amountTTC');
       else if (funding.nature === HOURLY) pickedFields.push('unitTTCRate', 'careHours');
