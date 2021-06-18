@@ -402,9 +402,7 @@ export default {
         NotifyPositive('Contrat terminé');
       } catch (e) {
         console.error(e);
-        if (e.status === 403) {
-          return NotifyNegative('Impossible: il y a des interventions horodatées après la date de fin du contrat.');
-        }
+        if (e.status === 403 || e.status === 409) return NotifyNegative(e.data.message);
         NotifyNegative('Erreur lors de la mise à jour du contrat.');
       } finally {
         this.loading = false;
