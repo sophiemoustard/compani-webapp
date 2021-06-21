@@ -9,6 +9,7 @@ import { subject } from '@casl/ability';
 import InternalHours from '@api/InternalHours';
 import Gdrive from '@api/GoogleDrive';
 import Events from '@api/Events';
+import EventHistories from '@api/EventHistories';
 import { NotifyWarning, NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import {
   INTERNAL_HOUR,
@@ -30,6 +31,12 @@ import { validationMixin } from '@mixins/validationMixin';
 
 export const planningActionMixin = {
   mixins: [validationMixin],
+  data () {
+    return {
+      editedEventHistories: [],
+      historiesLoading: false,
+    };
+  },
   computed: {
     ...mapState('main', ['loggedUser']),
   },
@@ -154,9 +161,7 @@ export const planningActionMixin = {
           (!contract.endDate || moment(contract.endDate).isAfter(startDate)));
     },
     getRowEvents (rowId) {
-      const rowEvents = this.events.find(group => group._id === rowId);
-
-      return (!rowEvents || !rowEvents.events) ? [] : rowEvents.events;
+      return this.events[rowId] || [];
     },
     // Event creation
     canCreateEvent (person, selectedDay) {
@@ -325,15 +330,24 @@ export const planningActionMixin = {
       }
     },
     // Event edition
-    openEditionModal (event) {
-      const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
-      if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
+    async openEditionModal (event) {
+      try {
+        this.historiesLoading = true;
+        const isAllowed = this.canEditEvent({ auxiliaryId: get(event, 'auxiliary._id'), sectorId: event.sector });
+        if (!isAllowed) return NotifyWarning('Vous n\'avez pas les droits pour réaliser cette action.');
 
-      this.formatEditedEvent(event);
+        await this.formatEditedEvent(event);
 
-      this.editionModal = true;
+        this.editionModal = true;
+        this.editedEventHistories = await EventHistories.list({ eventId: event._id });
+      } catch (e) {
+        console.error(e);
+        this.editedEventHistories = [];
+      } finally {
+        this.historiesLoading = false;
+      }
     },
-    formatEditedEvent (event) {
+    async formatEditedEvent (event) {
       const {
         createdAt,
         updatedAt,
@@ -392,7 +406,7 @@ export const planningActionMixin = {
     },
     resetEditionForm () {
       this.$v.editedEvent.$reset();
-      this.editedEvent = {};
+      this.editionModal = false;
     },
     closeEditionModal () {
       this.editionModal = false;
@@ -418,8 +432,6 @@ export const planningActionMixin = {
           'displayedEndDate',
           'extension',
           'histories',
-          'startDateTimeStampedCount',
-          'endDateTimeStampedCount',
         ]
       );
     },
@@ -558,7 +570,8 @@ export const planningActionMixin = {
         NotifyPositive('Évènement supprimé.');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la suppression de l\'événement.');
+        if (e.status === 409) NotifyNegative(e.data.message);
+        else NotifyNegative('Erreur lors de la suppression de l\'événement.');
       } finally {
         this.loading = false;
       }
@@ -577,7 +590,8 @@ export const planningActionMixin = {
         NotifyPositive('Évènement supprimé.');
       } catch (e) {
         console.error(e);
-        if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements.');
+        if (e.status === 409) NotifyNegative(e.data.message);
+        else if (shouldDeleteRepetition) NotifyNegative('Erreur lors de la suppression des évènements.');
         else NotifyNegative('Erreur lors de la suppression de l\'évènement.');
       } finally {
         this.loading = false;

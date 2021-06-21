@@ -19,7 +19,8 @@
       :edition-modal="editionModal" :internal-hours="internalHours" :active-auxiliaries="activeAuxiliaries"
       :customers="customers" @hide="resetEditionForm" @delete-document="validateDocumentDeletion"
       @document-uploaded="documentUploaded" @close="closeEditionModal" @delete-event="validateEventDeletion"
-      @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @submit="updateEvent" />
+      @delete-event-repetition="validationDeletionEventRepetition" :person-key="personKey" @submit="updateEvent"
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
   </q-page>
 </template>
 
@@ -55,7 +56,7 @@ export default {
     return {
       loading: false,
       days: [],
-      events: [],
+      events: {},
       customers: [],
       auxiliaries: [],
       internalHours: [],
@@ -161,7 +162,7 @@ export default {
       if (!this.displayAllSectors) {
         this.auxiliaries = [];
         this.filteredSectors = [];
-        this.events = [];
+        this.events = {};
         this.$refs.planningManager.restoreFilter(this.savedSearch);
       } else {
         this.savedSearch = search;
@@ -208,7 +209,7 @@ export default {
         if (this.displayHistory) await this.getEventHistories();
       } catch (e) {
         console.error(e);
-        this.events = [];
+        this.events = {};
       }
     },
     async refreshWorkingStats (params) {
