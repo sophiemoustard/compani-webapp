@@ -288,7 +288,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { required, requiredIf, minValue } from 'vuelidate/lib/validators';
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import pick from 'lodash/pick';
 import pickBy from 'lodash/pickBy';
@@ -416,9 +416,9 @@ export default {
         frequency: MONTHLY,
         endDate: '',
         nature: HOURLY,
-        amountTTC: 0,
-        unitTTCRate: 0,
-        careHours: 0,
+        amountTTC: null,
+        unitTTCRate: null,
+        careHours: null,
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
@@ -563,12 +563,19 @@ export default {
   },
   watch: {
     'newFunding.thirdPartyPayer': function () {
-      this.setUnitUTTRate();
+      if (this.newFunding.nature === HOURLY) this.setHourlyUnitUTTRate();
       if (!this.needFundingPlanIdForNewFunding) this.newFunding.fundingPlanId = '';
     },
     'newFunding.nature': function (newNature) {
-      if (newNature === FIXED) this.newFunding.frequency = ONCE;
-      this.setUnitUTTRate();
+      if (newNature === FIXED) {
+        this.newFunding.frequency = ONCE;
+        this.newFunding.unitTTCRate = null;
+        this.newFunding.careHours = null;
+        this.newFunding.customerParticipationRate = null;
+      } else {
+        this.setHourlyUnitUTTRate();
+        this.newFunding.amountTTC = null;
+      }
     },
   },
   async mounted () {
@@ -579,16 +586,26 @@ export default {
     get,
     getFundingValidation (funding) {
       return {
-        amountTTC: { required: requiredIf(item => item.nature === FIXED), minValue: minValue(0) },
-        unitTTCRate: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
-        careHours: { required: requiredIf(item => item.nature === HOURLY), minValue: minValue(0) },
+        amountTTC: {
+          required: requiredIf(item => item.nature === FIXED),
+          minValue: value => (funding.nature === FIXED ? value > 0 : value == null),
+        },
+        unitTTCRate: {
+          required: requiredIf(item => item.nature === HOURLY),
+          minValue: value => (funding.nature === HOURLY ? value > 0 : value == null),
+        },
+        careHours: {
+          required: requiredIf(item => item.nature === HOURLY),
+          minValue: value => (funding.nature === HOURLY ? value > 0 : value == null),
+
+        },
         careDays: { required },
         startDate: { required },
         endDate: { minDate: minDate(funding.startDate) },
         customerParticipationRate: {
           required: requiredIf(item => item.nature === HOURLY),
-          minValue: minValue(0),
-          maxValue: value => value < 100,
+          minValue: value => (funding.nature === HOURLY ? value >= 0 : value == null),
+          maxValue: value => (funding.nature === HOURLY ? value < 100 : value == null),
         },
       };
     },
@@ -900,12 +917,9 @@ export default {
       }
     },
     // Fundings
-    setUnitUTTRate () {
-      if (this.newFunding.nature === FIXED) this.newFunding.unitTTCRate = 0;
-      else {
-        const ttp = this.ttpList.find(p => p._id === this.newFunding.thirdPartyPayer);
-        this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : 0;
-      }
+    setHourlyUnitUTTRate () {
+      const ttp = this.ttpList.find(p => p._id === this.newFunding.thirdPartyPayer);
+      this.newFunding.unitTTCRate = ttp ? ttp.unitTTCRate : null;
     },
     async getThirdPartyPayers () {
       try {
@@ -935,9 +949,9 @@ export default {
         frequency: MONTHLY,
         endDate: '',
         nature: HOURLY,
-        amountTTC: 0,
-        unitTTCRate: 0,
-        careHours: 0,
+        amountTTC: null,
+        unitTTCRate: null,
+        careHours: null,
         customerParticipationRate: 0,
         careDays: [0, 1, 2, 3, 4, 5, 6, 7],
         subscription: '',
@@ -946,6 +960,9 @@ export default {
     },
     formatCreatedFunding () {
       const cleanPayload = pickBy(this.newFunding);
+      if (this.newFunding.nature === HOURLY && !this.newFunding.customerParticipationRate) {
+        cleanPayload.customerParticipationRate = 0;
+      }
       const { nature, thirdPartyPayer, subscription, frequency, fundingPlanId, ...version } = cleanPayload;
       if (version.endDate) version.endDate = moment(version.endDate).endOf('d').toDate();
 
@@ -1009,16 +1026,11 @@ export default {
       this.$v.editedFunding.$reset();
     },
     formatFundingEditionPayload (funding) {
-      const pickedFields = [
-        'folderNumber',
-        'careDays',
-        'customerParticipationRate',
-        'startDate',
-        'subscription',
-        'fundingPlanId',
-      ];
+      const pickedFields = ['folderNumber', 'careDays', 'startDate', 'subscription', 'fundingPlanId'];
       if (funding.nature === FIXED) pickedFields.push('amountTTC');
-      else if (funding.nature === HOURLY) pickedFields.push('unitTTCRate', 'careHours');
+      else if (funding.nature === HOURLY) {
+        pickedFields.push('unitTTCRate', 'careHours', 'customerParticipationRate');
+      }
       const payload = {
         ...pick(funding, pickedFields),
         endDate: funding.endDate ? moment(funding.endDate).endOf('d') : '',
