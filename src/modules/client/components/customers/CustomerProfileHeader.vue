@@ -2,12 +2,12 @@
   <div class="header">
     <div class="flex-row q-mb-md items-center justify-between">
       <div class="flex-row ellipsis">
-        <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
-        <h4 class="ellipsis">{{ title }}</h4>
-        <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
+        <ni-button class="q-mr-md" icon="arrow_back" @click="$router.go(-1)" />
+        <span class="ellipsis page-title">{{ title }}</span>
+        <ni-button class="q-ml-sm" icon="date_range" @click="goToPlanning" />
       </div>
-      <ni-button v-if="!customer.stoppedAt" class="bg-pink-500 justify-end" label="Arrêter"
-        @click="stopSupportModal=true" color="white" />
+      <ni-button :flat="false" v-if="!customer.stoppedAt" class="justify-end" label="Arrêter"
+        @click="stopSupportModal=true" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
@@ -41,7 +41,7 @@ import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import StopSupportModal from './infos/StopSupportModal';
 
 export default {
-  name: 'ProfileHeader',
+  name: 'CustomerProfileHeader',
   mixins: [customerMixin],
   props: {
     title: { type: String, required: true },

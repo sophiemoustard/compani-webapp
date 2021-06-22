@@ -1,8 +1,6 @@
 <template>
   <q-page class="client-background" padding>
-    <div class="flex no-wrap justify-between">
-      <h4>La formation Compani dans ma structure</h4>
-    </div>
+    <ni-title-header title="La formation Compani dans ma structure" />
     <div class="flex justify-between q-mt-xl">
       <p class="text-weight-bold section-title">Chiffres généraux</p>
       <ni-date-range v-model="dates" class="dates" borders />
@@ -73,6 +71,7 @@ import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
+import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
@@ -87,6 +86,7 @@ export default {
   metaInfo: { title: 'Tableau de bord des formations' },
   mixins: [chartMixin],
   components: {
+    'ni-title-header': TitleHeader,
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
     'ni-line-chart': LineChart,

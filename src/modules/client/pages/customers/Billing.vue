@@ -1,19 +1,21 @@
 <template>
   <q-page padding class="client-background">
-    <h4>Facturation</h4>
+    <ni-title-header title="Facturation" class="q-mb-xl" />
     <ni-profile-billing v-if="customer" />
   </q-page>
 </template>
 
 <script>
 import { mapState } from 'vuex';
-import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling';
 import Customers from '@api/Customers';
+import TitleHeader from '@components/TitleHeader';
+import ProfileBilling from 'src/modules/client/components/customers/billing/ProfileBilling';
 
 export default {
   name: 'Billing',
   metaInfo: { title: 'Facturation' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-profile-billing': ProfileBilling,
   },
   computed: {
