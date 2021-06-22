@@ -13,8 +13,9 @@
     <!-- Event edition modal -->
     <ni-event-edition-modal :validations="$v.editedEvent" :loading="loading" :edited-event.sync="editedEvent"
       :edition-modal="editionModal" :active-auxiliaries="activeAuxiliaries" :customers="customers"
-      @reset="resetEditionForm" @submit="updateEvent" @close="closeEditionModal" :person-key="personKey"
-      @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion" />
+      @hide="resetEditionForm" @submit="updateEvent" @close="closeEditionModal" :person-key="personKey"
+      @delete-event-repetition="validationDeletionEventRepetition" @delete-event="validateEventDeletion"
+      :event-histories="editedEventHistories" :histories-loading="historiesLoading" />
   </q-page>
 </template>
 
@@ -59,7 +60,7 @@ export default {
     return {
       loading: false,
       days: [],
-      events: [],
+      events: {},
       customers: [],
       auxiliaries: [],
       startOfWeek: '',
@@ -164,7 +165,7 @@ export default {
           groupBy: CUSTOMER,
         });
       } catch (e) {
-        this.events = [];
+        this.events = {};
       }
     },
     async getAuxiliaries () {
