@@ -25,8 +25,8 @@
         <ni-option-group :value="newCreditNote.events" :options="creditNoteEventsOptions" caption="Évènements"
           type="checkbox" required-field inline :error="validations.events.$error" @input="update($event, 'events')" />
       </template>
-      <div v-if="newCreditNoteHasNoEvents" class="light warning">
-        <p>Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données</p>
+      <div v-if="newCreditNoteHasNoEvents" class="text-orange-700">
+        <p>Il n'y a aucune intervention facturée pour le bénéficiaire aux dates données.</p>
       </div>
       <div class="row justify-between items-baseline">
         <div class="col-6 light">
@@ -143,8 +143,5 @@ export default {
 
 <style lang="stylus" scoped>
   .light
-    font-size: 14px;
-
-  .warning
-    color: $red;
+    font-size: 14px
 </style>

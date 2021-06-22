@@ -15,8 +15,8 @@
             :style="col.style">
             <template v-if="col.name === 'actions'">
               <div class="row no-wrap table-actions contract-actions">
-                <q-btn flat round small color="grey" icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
-                <q-btn flat round small color="grey" icon="edit" @click="openVersionEditionModal(props.row)" />
+                <ni-button icon="remove_red_eye" @click="goToUserContractPage(col.value)" />
+                <ni-button icon="edit" @click="openVersionEditionModal(props.row)" />
               </div>
             </template>
             <template v-else>
@@ -39,6 +39,7 @@
 import get from 'lodash/get';
 import { required, minValue } from 'vuelidate/lib/validators';
 import Contracts from '@api/Contracts';
+import Button from '@components/Button';
 import DateRange from '@components/form/DateRange';
 import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
@@ -53,6 +54,7 @@ export default {
   metaInfo: { title: 'Suivi Contrats/Avenants' },
   mixins: [contractMixin],
   components: {
+    'ni-button': Button,
     'ni-date-range': DateRange,
     'ni-title-header': TitleHeader,
     'version-edition-modal': VersionEditionModal,

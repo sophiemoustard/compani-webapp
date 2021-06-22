@@ -11,8 +11,8 @@
               :style="col.style">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions justify-end">
-                  <ni-button icon="file_download" color="primary" type="a" target="_blank"
-                    :href="props.row.file.link" :disable="!props.row.file.link" />
+                  <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
+                    :disable="!props.row.file.link" />
                   <ni-button v-if="canUpdate" icon="delete" color="primary"
                     @click="validateAttendanceSheetDeletion(props.row)" :disable="!props.row.file.link" />
                 </div>

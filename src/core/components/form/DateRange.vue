@@ -76,7 +76,7 @@ export default {
 
 <style lang="stylus" scoped>
   .date-container-borders
-    border: solid 1px $grey-300
+    border: solid 1px $copper-grey-300
     border-radius: 3px
 
   /deep/ .q-field__append

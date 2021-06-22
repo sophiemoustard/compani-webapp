@@ -1,5 +1,5 @@
 <template>
-  <div class="row justify-between full-width text-grey-600">
+  <div class="row justify-between full-width text-copper-grey-600">
     <div class="row items-center">
       <q-btn-toggle class="on-left no-shadow" :value="rowsPerPage" :options="rowsPerPageOptions" size="12px"
         toggle-text-color="primary" toggle-color="white" no-caps dense @input="update($event, 'rowsPerPage')" />
@@ -83,9 +83,9 @@ export default {
 <style lang="stylus" scoped>
   /deep/ .q-btn-group
     & > .q-btn-item:first-child
-      border: 1px solid $grey-300
+      border: 1px solid $copper-grey-300
     & > .q-btn-item:not(:first-child)
-      border: 1px solid $grey-300
+      border: 1px solid $copper-grey-300
       border-left: none
     & > .q-btn-item:last-child
       font-weight: bold
