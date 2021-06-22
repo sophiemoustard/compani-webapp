@@ -72,6 +72,9 @@
       </template>
     </div>
     <div class="q-mb-xl">
+      <customer-notes-container :notes-list="visibleNotesList" :display-all-notes.sync="displayAllNotes" />
+    </div>
+    <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
         <ni-responsive-table :data="sortedHelpers" :columns="helpersColumns" :pagination="helpersPagination"
@@ -292,6 +295,7 @@ import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
+import CustomerNotes from '@api/CustomerNotes';
 import SearchAddress from '@components/form/SearchAddress';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -326,6 +330,7 @@ import FundingDetailsModal from 'src/modules/client/components/customers/infos/F
 import FundingHistoryModal from 'src/modules/client/components/customers/infos/FundingHistoryModal';
 import FundingEditionModal from 'src/modules/client/components/customers/infos/FundingEditionModal';
 import FundingCreationModal from 'src/modules/client/components/customers/infos/FundingCreationModal';
+import CustomerNotesContainer from 'src/modules/client/components/table/CustomerNotesContainer';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
@@ -352,6 +357,7 @@ export default {
     'funding-creation-modal': FundingCreationModal,
     'funding-edition-modal': FundingEditionModal,
     'ni-responsive-table': ResponsiveTable,
+    'customer-notes-container': CustomerNotesContainer,
   },
   mixins: [
     customerMixin,
@@ -432,6 +438,9 @@ export default {
       },
       extensions: DOC_EXTENSIONS,
       firstStep: true,
+      customerNotesList: [],
+      newCustomerNote: { title: '', description: '' },
+      displayAllNotes: false,
     };
   },
   computed: {
@@ -496,6 +505,13 @@ export default {
     needFundingPlanIdForEditedFunding () {
       return !!get(this.editedFunding, 'thirdPartyPayer.teletransmissionId');
     },
+    visibleNotesList () {
+      let visibleNotesList = this.customerNotesList;
+      if (this.customerNotesList.length > 3) {
+        visibleNotesList = [this.customerNotesList[0], this.customerNotesList[1], this.customerNotesList[2]];
+      }
+      return this.displayAllNotes ? this.customerNotesList : visibleNotesList;
+    },
   },
   validations () {
     return {
@@ -555,6 +571,7 @@ export default {
         ...this.getFundingValidation(this.editedFunding),
         fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForEditedFunding) },
       },
+      newCustomerNote: { title: { required }, description: { required } },
     };
   },
   watch: {
@@ -575,7 +592,7 @@ export default {
     },
   },
   async mounted () {
-    await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices()]);
+    await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices(), this.getCustomerNotes()]);
     this.isLoaded = true;
   },
   methods: {
@@ -700,6 +717,14 @@ export default {
         { ...customer, subscriptions: [...this.subscriptions], fundings: [...this.fundings] }
       );
       this.$v.customer.$touch();
+    },
+    async getCustomerNotes () {
+      try {
+        this.customerNotesList = await CustomerNotes.list({ customer: this.customer._id });
+      } catch (e) {
+        console.error(e);
+        this.customerNotesList = [];
+      }
     },
     // Subscriptions
     formatCreatedSubscription () {
