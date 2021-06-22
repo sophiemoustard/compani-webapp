@@ -29,6 +29,7 @@
     "moment": "^2.29.1",
     "moment-business-days": "^1.2.0",
     "moment-range": "^4.0.1",
+    "qrcode": "git+https://github.com/sophiemoustard/node-qrcode.git",
     "qs": "^6.10.1",
     "quasar": "^1.15.13",
     "vue-analytics": "^5.22.1",
