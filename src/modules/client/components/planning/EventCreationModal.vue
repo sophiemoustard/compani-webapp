@@ -74,7 +74,7 @@
             :options="customerAddressList(newEvent)" :readonly="customerAddressList(newEvent).length === 1"
             :display-value="newEvent.address.fullAddress" ref="addressSelect" behavior="menu">
             <template #append v-if="customerAddressList(newEvent).length > 1">
-              <ni-button icon="swap_vert" class="select-icon pink-icon" @click.stop="toggleAddressSelect" />
+              <ni-button icon="swap_vert" class="select-icon primary-icon" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>
         </div>

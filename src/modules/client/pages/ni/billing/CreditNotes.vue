@@ -1,8 +1,6 @@
 <template>
   <q-page class="client-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Avoirs</h4>
-    </div>
+    <ni-title-header title="Avoirs" padding />
     <ni-simple-table :data="creditNotes" :columns="creditNotesColumns" :pagination.sync="pagination"
       :loading="tableLoading">
       <template #body="{ props }">
@@ -56,6 +54,7 @@ import isEqual from 'lodash/isEqual';
 import Events from '@api/Events';
 import Customers from '@api/Customers';
 import CreditNotes from '@api/CreditNotes';
+import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
@@ -71,6 +70,7 @@ export default {
   name: 'CreditNotes',
   metaInfo: { title: 'Avoirs' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-button': Button,
     'ni-simple-table': SimpleTable,
     'credit-note-edition-modal': CreditNoteEditionModal,

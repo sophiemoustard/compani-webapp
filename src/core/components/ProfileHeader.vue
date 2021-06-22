@@ -1,8 +1,8 @@
 <template>
   <div class="header">
-    <div class="arrow-title q-mb-md items-center">
-      <ni-button class="on-left" icon="arrow_back" color="primary" @click.native="$router.go(-1)" />
-      <h4 class="ellipsis">{{ title }}</h4>
+    <div class="flex-row q-mb-md items-center">
+      <ni-button class="on-left" icon="arrow_back" color="primary" @click="$router.go(-1)" />
+      <span class="ellipsis page-title flex-1">{{ title }}</span>
       <slot name="title" />
     </div>
     <div v-if="headerInfo" class="row profile-info q-pl-lg">
@@ -30,10 +30,3 @@ export default {
   },
 };
 </script>
-
-<style lang="stylus" scoped>
-  .arrow-title
-    display: flex
-  h4
-    margin: 0 !important
-</style>

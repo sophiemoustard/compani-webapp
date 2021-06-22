@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="client-background">
-    <h4>Documents</h4>
+    <ni-title-header title="Documents" class="q-mb-xl" />
     <p v-if="documents.length == 0">Aucun document disponible</p>
     <ni-simple-table :data="documents" :columns="columns" :pagination.sync="pagination" row-key="name"
       :loading="loading">
@@ -27,11 +27,13 @@
 <script>
 import get from 'lodash/get';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
+import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 
 export default {
   metaInfo: { title: 'Documents' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
   },
   async mounted () {
@@ -55,16 +57,8 @@ export default {
       pagination: { sortBy: 'title', descending: false, rowsPerPage: 0 },
       loading: false,
       columns: [
-        {
-          name: 'name',
-          label: 'Nom',
-          field: 'name',
-          align: 'left',
-        },
-        {
-          name: 'actions',
-          align: 'center',
-        },
+        { name: 'name', label: 'Nom', field: 'name', align: 'left' },
+        { name: 'actions', align: 'center' },
       ],
       documents: [],
     };

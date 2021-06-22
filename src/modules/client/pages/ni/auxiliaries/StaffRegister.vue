@@ -1,8 +1,6 @@
 <template>
   <q-page class="client-background q-pb-xl">
-    <div class="title-padding">
-      <h4>Registre unique du personnel</h4>
-    </div>
+    <ni-title-header title="Registre unique du personnel" padding />
     <ni-simple-table :data="staffRegister" :columns="columns" :loading="tableLoading" :pagination.sync="pagination"
       row-key="_id">
       <template #body="{ props }">
@@ -26,6 +24,7 @@
 <script>
 import get from 'lodash/get';
 import Contracts from '@api/Contracts';
+import TitleHeader from '@components/TitleHeader';
 import SimpleTable from '@components/table/SimpleTable';
 import nationalities from '@data/nationalities';
 import { CIVILITY_OPTIONS } from '@data/constants';
@@ -35,6 +34,7 @@ export default {
   name: 'StaffRegister',
   metaInfo: { title: 'Registre unique du personnel' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
   },
   data () {

@@ -11,7 +11,8 @@
       :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
       <template #append>
         <ni-button v-if="value && !disable" icon="close" @click.stop="resetValue" size="sm" />
-        <ni-button v-if="icon" :icon="icon" class="select-icon pink-icon" @click="$refs['selectInput'].showPopup()" />
+        <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
+          @click="$refs['selectInput'].showPopup()" />
       </template>
     </q-select>
   </div>

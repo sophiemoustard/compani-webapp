@@ -1,7 +1,7 @@
 <template>
   <ni-profile-header :title="title" class="delete-container" :header-info="headerInfo">
     <template #title v-if="!isClientInterface">
-      <ni-button class="delete" icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
+      <ni-button icon="delete" @click="deleteCourse" :disabled="disableCourseDeletion" />
     </template>
   </ni-profile-header>
 </template>
@@ -41,14 +41,6 @@ export default {
   padding: 0
   min-height: 0
 
-/deep/ h4
-  margin-right: 32px !important
-
 .delete-container
   position: relative
-
-.delete
-  position: absolute
-  top: 0
-  right: 0
 </style>

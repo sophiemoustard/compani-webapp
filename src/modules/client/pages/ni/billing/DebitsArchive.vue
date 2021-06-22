@@ -1,8 +1,6 @@
 <template>
   <q-page class="client-background">
-    <div class="title-padding">
-      <h4>Archive Prélèvements</h4>
-    </div>
+    <ni-title-header title="Archive Prélèvements" padding />
     <div class="q-pa-sm">
       <ni-simple-table :data="directDebits" :columns="columns" :pagination.sync="pagination" :loading="loading">
         <template #body="{ props }">
@@ -27,6 +25,7 @@
 import { mapGetters } from 'vuex';
 import { openURL } from 'quasar';
 import GoogleDrive from '@api/GoogleDrive';
+import TitleHeader from '@components/TitleHeader';
 import { NotifyNegative } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
 import { formatDate } from '@helpers/date';
@@ -35,6 +34,7 @@ export default {
   name: 'DebitArchive',
   metaInfo: { title: 'Archive prélèvements' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-simple-table': SimpleTable,
   },
   data () {

@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <div v-if="company">
-      <h4>Configuration RH</h4>
+      <ni-title-header title="Configuration RH" class="q-mb-xl" />
       <div class="q-mb-xl">
         <p class="text-weight-bold">Heures internes</p>
         <q-card>
@@ -167,6 +167,7 @@ import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
 import InternalHours from '@api/InternalHours';
+import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
@@ -186,6 +187,7 @@ export default {
   name: 'RhConfig',
   metaInfo: { title: 'Configuration rh' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-button': Button,
     'ni-input': Input,
     'ni-file-uploader': FileUploader,
