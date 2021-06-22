@@ -21,8 +21,8 @@
         </q-tr>
       </template>
     </ni-simple-table>
-    <ni-button class="fixed fab-custom" icon="add" label="Créer un avoir" @click="creditNoteCreationModal = true"
-      :disable="tableLoading" />
+    <q-btn class="fixed fab-custom" no-caps rounded icon="add" label="Créer un avoir" :disable="tableLoading"
+      @click="creditNoteCreationModal = true" color="primary" />
 
     <!-- Credit note creation modal -->
     <credit-note-creation-modal v-model="creditNoteCreationModal" @submit="createNewCreditNote"
