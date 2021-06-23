@@ -1,8 +1,7 @@
 <template>
 <div class="q-pa-sm">
-  <div class="text-primary">{{ note.title }}</div>
-  <div>{{ description.title }}</div>
-  <q-separator class="q-mt-sm" />
+  <div class="text-primary ellipsis">{{ note.title }}</div>
+  <div class="ellipsis">{{ note.description }}</div>
 </div>
 </template>
 
