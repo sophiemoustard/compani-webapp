@@ -3,7 +3,7 @@
     <div :class="[!staffingView && 'q-mb-sm']">
       <div class="chip-container" @click="openIndicatorsModal">
         <img :src="getAvatar(person.picture)" class="avatar">
-        <q-chip v-if="hasContractOnEvent" :class="[`${occupationLevel}-occupation`]" small text-color="white">
+        <q-chip v-if="hasContractOnEvent" :class="[`${occupationLevel}-occupation`]" small>
           <q-spinner-dots v-if="loading" />
           <span v-else class="chip-indicator">
             {{ Math.round(workingStats.workedHours) }}h / {{ Math.round(workingStats.hoursToWork) }}
