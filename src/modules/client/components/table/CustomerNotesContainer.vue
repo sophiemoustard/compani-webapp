@@ -1,24 +1,24 @@
 <template>
-<q-card>
-  <div class="row justify-between q-py-md q-px-sm bg-copper-100">
-    <div class="row items-center">
-      <q-icon size="24px" name="mdi-library-books" class="q-ma-sm" color="copper-grey-800" />
-      <div class="text-copper-grey-800 text-weight-bold">Note de suivi ({{ notesList.length }})</div>
+  <q-card>
+    <div class="row justify-between q-py-md q-px-sm bg-copper-100">
+      <div class="row items-center">
+        <q-icon size="24px" name="mdi-library-books" class="q-ma-sm" color="copper-grey-800" />
+        <div class="text-copper-grey-800 text-weight-bold">Note de suivi ({{ notesList.length }})</div>
+      </div>
+      <ni-button class="bg-primary" color="white" icon="add" label="Nouvelle note" @click="openNewNoteModal" />
     </div>
-   <ni-button class="bg-primary" color="white" icon="add" label="Nouvelle note" @click="openNewNoteModal" />
-</div>
-<div v-if="visibleNotesList.length">
-  <div v-for="note of visibleNotesList" :key="note._id">
-    <customer-note-cell :note="note" />
-    <q-separator v-if="notesList.length > 1" class="q-mx-sm q-mb-sm" />
-</div>
-</div>
-<div v-else class="text-italic text-center q-my-md">Aucune note de suivi pour ce bénéficiaire.</div>
-<div v-if="notesList.length > 3" class=" row justify-center">
-  <ni-button no-caps rounded color="primary" :label="displayAllNotes ? 'Afficher moins' : 'Afficher tout'"
-    @click="update(!displayAllNotes)" />
-</div>
-</q-card>
+    <div v-if="visibleNotesList.length">
+      <div v-for="note of visibleNotesList" :key="note._id">
+        <customer-note-cell :note="note" />
+        <q-separator v-if="notesList.length > 1" class="q-mx-sm q-mb-sm" />
+      </div>
+    </div>
+    <div v-else class="text-italic text-center q-my-md">Aucune note de suivi pour ce bénéficiaire.</div>
+    <div v-if="notesList.length > 3" class=" row justify-center">
+      <ni-button no-caps rounded color="primary" :label="displayAllNotes ? 'Afficher moins' : 'Afficher tout'"
+        @click="update(!displayAllNotes)" />
+    </div>
+  </q-card>
 </template>
 
 <script>
@@ -37,11 +37,8 @@ export default {
   },
   computed: {
     visibleNotesList () {
-      let visibleNotesList = this.notesList;
-      if (this.notesList.length > 3) {
-        visibleNotesList = [this.notesList[0], this.notesList[1], this.notesList[2]];
-      }
-      return this.displayAllNotes ? this.notesList : visibleNotesList;
+      if (this.displayAllNotes || this.notesList.length < 3) return this.notesList;
+      return [this.notesList[0], this.notesList[1], this.notesList[2]];
     },
   },
   methods: {
