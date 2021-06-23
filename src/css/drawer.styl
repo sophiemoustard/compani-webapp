@@ -8,23 +8,20 @@
       flex-direction: column
       min-height: 100%
       & .sidemenu-header
-        padding: 15px 16px
+        padding: 16px
         & .q-item__label--header
-          padding: 12px 9px
+          padding: 12px 8px
           display: flex
           img
             width: 200px
-            height: 42px
+            height: 40px
       & .q-item__label
         font-size: 1.125rem
 
       & .q-expansion-item__content
         padding: 8px 0
         & .q-item
-          min-height: 20px
           padding: 8px 16px
-          & .q-item__section--main
-            line-height: 20px
           & .q-item__section--avatar
             min-width: 24px
           & .q-item__label
@@ -38,6 +35,7 @@
           color: $copper-grey-700
         & .q-item__section--avatar
           min-width: 38px
+          justify-content: flex-start;
 
         &.q-router-link--active
           background-color: $copper-100

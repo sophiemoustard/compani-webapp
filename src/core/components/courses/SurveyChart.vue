@@ -103,7 +103,6 @@ export default {
 .bar-label
   position: absolute
   font-size: 16px
-  color: black
   text-align: center
   width: 100%
 </style>

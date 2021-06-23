@@ -22,16 +22,9 @@
       <ni-search-address :value="newUser.contact.address" color="white" inverted-light
         @blur="validations.contact.address.$touch" error-message="Adresse non valide"
         :error="validations.contact.address.$error" in-modal @input="updateUser($event, 'contact.address')" />
-      <div class="row margin-input">
-        <div class="col-12">
-          <div class="row justify-between">
-            <p class="input-caption required">Équipe</p>
-            <q-icon v-if="validations.sector.$error" name="error_outline" color="secondary" />
-          </div>
-          <ni-select-sector :value="newUser.sector" @blur="validations.sector.$touch" :error-message="REQUIRED_LABEL"
-            :company-id="companyId" :error="validations.sector.$error" in-modal @input="updateUser($event, 'sector')" />
-        </div>
-      </div>
+      <ni-select-sector :value="newUser.sector" @blur="validations.sector.$touch" :error-message="REQUIRED_LABEL"
+        :company-id="companyId" :error="validations.sector.$error" in-modal @input="updateUser($event, 'sector')"
+        required-field />
       <div class="row margin-input last">
         <q-checkbox :value="sendWelcomeMsg" label="Envoyer SMS d'accueil" dense @input="updateSendWelcome" />
       </div>

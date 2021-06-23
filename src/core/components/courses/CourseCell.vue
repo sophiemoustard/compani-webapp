@@ -165,7 +165,7 @@ export default {
     margin-right: 10px;
   .infos-course
     &-nearest-date
-      color: $primary !important;
+      color: $copper-grey-900 !important;
       font-size: 14px;
     &-container
       align-items: center;

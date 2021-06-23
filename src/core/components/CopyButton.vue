@@ -2,7 +2,7 @@
   <div class="button-container">
     <ni-button class="button" flat :icon="icon" color="primary" :size="size"
       v-clipboard:copy="valueToCopy" v-clipboard:success="copySuccess" />
-    <ni-button class="button" flat :label="label" color="black" :size="size"
+    <ni-button class="button" flat :label="label" color="copper-grey-700" :size="size"
       v-clipboard:copy="valueToCopy" v-clipboard:success="copySuccess" />
   </div>
 </template>

@@ -4,7 +4,7 @@
       <div class="row body">
         <ni-input v-model.trim="questionnaire.name" required-field caption="Nom" @blur="updateQuestionnaire"
           @focus="saveTmpName" :error="$v.questionnaire.name.$error" :disable="nameLock" />
-        <ni-button v-if="isQuestionnairePublished" color="black" :icon="lockIcon"
+        <ni-button v-if="isQuestionnairePublished" color="copper-grey-500" :icon="lockIcon"
           @click="nameLock = !nameLock" />
       </div>
       <div class="publish-button">
