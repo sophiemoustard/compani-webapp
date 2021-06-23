@@ -284,7 +284,6 @@
       :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)"
       :need-funding-plan-id-for-edited-funding="needFundingPlanIdForEditedFunding" />
 
-      <!-- Customer note creation modal -->
       <customer-note-creation-modal v-model="openNewCustomerNoteModal" @hide="resetCreationCustomerNote"
         @submit="createCustomerNote" :new-customer-note.sync="newCustomerNote" :validations="$v.newCustomerNote"
         :loading="customerNoteLoading" />
