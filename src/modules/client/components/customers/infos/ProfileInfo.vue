@@ -72,7 +72,8 @@
       </template>
     </div>
     <div class="q-mb-xl">
-      <customer-notes-container :notes-list="visibleNotesList" :display-all-notes.sync="displayAllNotes" />
+      <customer-notes-container :notes-list="customerNotesList" :display-all-notes.sync="displayAllNotes"
+        @openNewNoteModal="openNewCustomerNoteModal = true" />
     </div>
     <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
@@ -282,6 +283,11 @@
       :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.editedFunding)"
       :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)"
       :need-funding-plan-id-for-edited-funding="needFundingPlanIdForEditedFunding" />
+
+      <!-- Customer note creation modal -->
+      <customer-note-creation-modal v-model="openNewCustomerNoteModal" @hide="resetCreationCustomerNote"
+        @submit="createCustomerNote" :new-customer-note.sync="newCustomerNote" :validations="$v.newCustomerNote"
+        :loading="customerNoteLoading" />
 </div>
 </template>
 
@@ -330,6 +336,7 @@ import FundingDetailsModal from 'src/modules/client/components/customers/infos/F
 import FundingHistoryModal from 'src/modules/client/components/customers/infos/FundingHistoryModal';
 import FundingEditionModal from 'src/modules/client/components/customers/infos/FundingEditionModal';
 import FundingCreationModal from 'src/modules/client/components/customers/infos/FundingCreationModal';
+import CustomerNoteCreationModal from 'src/modules/client/components/customers/infos/CustomerNoteCreationModal';
 import CustomerNotesContainer from 'src/modules/client/components/table/CustomerNotesContainer';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
@@ -358,6 +365,7 @@ export default {
     'funding-edition-modal': FundingEditionModal,
     'ni-responsive-table': ResponsiveTable,
     'customer-notes-container': CustomerNotesContainer,
+    'customer-note-creation-modal': CustomerNoteCreationModal,
   },
   mixins: [
     customerMixin,
@@ -441,6 +449,8 @@ export default {
       customerNotesList: [],
       newCustomerNote: { title: '', description: '' },
       displayAllNotes: false,
+      openNewCustomerNoteModal: false,
+      customerNoteLoading: false,
     };
   },
   computed: {
@@ -504,13 +514,6 @@ export default {
     },
     needFundingPlanIdForEditedFunding () {
       return !!get(this.editedFunding, 'thirdPartyPayer.teletransmissionId');
-    },
-    visibleNotesList () {
-      let visibleNotesList = this.customerNotesList;
-      if (this.customerNotesList.length > 3) {
-        visibleNotesList = [this.customerNotesList[0], this.customerNotesList[1], this.customerNotesList[2]];
-      }
-      return this.displayAllNotes ? this.customerNotesList : visibleNotesList;
     },
   },
   validations () {
@@ -1077,6 +1080,29 @@ export default {
         NotifyNegative('Erreur lors de la modification d\'un financement.');
       } finally {
         this.loading = false;
+      }
+    },
+    resetCreationCustomerNote () {
+      this.$v.newCustomerNote.$reset();
+      this.newCustomerNote = { title: '', description: '' };
+    },
+    async createCustomerNote () {
+      try {
+        this.$v.newCustomerNote.$touch();
+        if (this.$v.newCustomerNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.customerNoteloading = true;
+        const payload = { ...this.newCustomerNote, customer: this.customer._id };
+        await CustomerNotes.create(payload);
+
+        this.openNewCustomerNoteModal = false;
+        await this.getCustomerNotes();
+        NotifyPositive('Note de suivi ajoutée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la note de suivi.');
+      } finally {
+        this.customerNoteloading = false;
       }
     },
   },
