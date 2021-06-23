@@ -1,12 +1,10 @@
 <template>
   <div class="header">
     <div class="row q-mb-md">
-      <div class="col-xs-8 flex-row items-baseline col-md-10">
-        <ni-button v-if="isExternalUser" class="q-mr-md" icon="arrow_back" color="primary"
-          @click.native="$router.go(-1)" />
-        <h4 class="ellipsis">{{ title }}</h4>
-        <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
-          @click="goToPlanning" />
+      <div class="col-xs-8 flex-row items-center col-md-10">
+        <ni-button v-if="isExternalUser" class="on-left" icon="arrow_back" @click="$router.go(-1)" />
+        <span class="ellipsis page-title">{{ title }}</span>
+        <ni-button :disable="isPlanningRouterDisable" icon="date_range" @click="goToPlanning" class="q-ml-sm" />
       </div>
       <div class="flex-row custom-justify-end col-xs-4 col-md-2">
         <img :src="hasPicture" alt="Img user" class="avatar">
@@ -67,7 +65,7 @@ import moment from '@helpers/moment';
 import { formatDate, dateDiff, formatDateDiff } from '@helpers/date';
 
 export default {
-  name: 'ProfileHeader',
+  name: 'AuxiliaryProfileHeader',
   components: {
     'ni-input': Input,
     'ni-button': Button,

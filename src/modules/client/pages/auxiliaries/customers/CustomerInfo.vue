@@ -3,7 +3,7 @@
     <div v-if="customer">
       <div class="row items-center col-xs-12 header-margin q-mb-xl">
         <ni-button class="on-left self-center" icon="arrow_back" color="primary" @click.native="$router.go(-1)" />
-        <h4 class="no-margin">{{ customer.identity | formatIdentity('FL') }}</h4>
+        <ni-title-header :title="customer.identity | formatIdentity('FL')" />
       </div>
       <profile-follow-up />
     </div>
@@ -14,10 +14,12 @@
 import { mapState } from 'vuex';
 import { formatIdentity } from '@helpers/utils';
 import Button from '@components/Button';
+import TitleHeader from '@components/TitleHeader';
 import ProfileFollowUp from 'src/modules/client/components/customers/ProfileFollowUp';
 
 export default {
   components: {
+    'ni-title-header': TitleHeader,
     'ni-button': Button,
     'profile-follow-up': ProfileFollowUp,
   },

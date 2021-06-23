@@ -3,11 +3,9 @@
     <div :class="containerClass">
       <div class="modal-padding">
         <div class="row justify-between items-baseline">
-          <div class="col-11">
-            <h5 :class="{ 'text-weight-bold': !!title }">
-              {{ title }}
-              <slot name="title" />
-            </h5>
+          <div :class="['col-11', !!title && 'text-weight-bold', 'modal-title', 'q-mb-lg']">
+            {{ title }}
+            <slot name="title" />
           </div>
           <div class="col-1 cursor-pointer modal-btn-close">
             <span>

@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="client-background q-pb-xl">
-    <h4>Historique</h4>
+    <ni-title-header title="Historique" class="q-mb-xl" />
     <div class="row q-col-gutter-sm">
       <ni-select caption="Type d'export" :options="exportTypeOptions" v-model="type" in-form />
       <ni-date-range class="col-md-6 col-xs-12" caption="Période" v-model="dateRange" :error="$v.dateRange.$error"
@@ -14,6 +14,7 @@
 <script>
 import Exports from '@api/Exports';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
+import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
 import DateRange from '@components/form/DateRange';
 import { EXPORT_HISTORY_TYPES, WORKING_EVENT } from '@data/constants';
@@ -25,6 +26,7 @@ export default {
   name: 'History',
   metaInfo: { title: 'Historique' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-select': Select,
     'ni-date-range': DateRange,
   },

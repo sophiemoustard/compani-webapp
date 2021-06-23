@@ -107,7 +107,7 @@
             :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
             :display-value="editedEvent.address.fullAddress" ref="addressSelect" :disable="historiesLoading">
             <template #append v-if="customerAddressList(editedEvent).length > 1">
-              <ni-button icon="swap_vert" class="select-icon pink-icon" @click.stop="toggleAddressSelect" />
+              <ni-button icon="swap_vert" class="select-icon primary-icon" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />

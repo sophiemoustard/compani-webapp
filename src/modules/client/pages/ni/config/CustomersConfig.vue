@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <div v-if="company">
-      <h4>Configuration bénéficiaires</h4>
+      <ni-title-header title="Configuration bénéficiaires" class="q-mb-xl" />
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
@@ -175,6 +175,7 @@ import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import FileUploader from '@components/form/FileUploader';
+import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import ReponsiveTable from '@components/table/ResponsiveTable';
@@ -207,6 +208,7 @@ export default {
   metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
     'ni-file-uploader': FileUploader,
+    'ni-title-header': TitleHeader,
     'ni-select': Select,
     'ni-button': Button,
     'ni-responsive-table': ReponsiveTable,

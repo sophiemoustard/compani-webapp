@@ -2,11 +2,17 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="À facturer" padding>
       <template slot="content">
-        <div class="col-xs-12 col-sm-12 col-md-3 col-lg-5 on-left selects">
-          <ni-select :options="toBillOptions" v-model="toBillOption" separator data-cy="select-tpp" />
-        </div>
-        <div class="col-xs-12 col-sm-12 col-md-8 col-lg-6 selects">
-          <ni-date-range v-model="billingDates" @input="getDraftBills" borderless :error.sync="billingDatesHasError" />
+        <div class="flex-row header-selects">
+          <div class="row header-selects-container">
+            <div class="col-xs-12 col-sm-4">
+              <ni-select class="q-ma-sm" :options="toBillOptions" v-model="toBillOption" separator
+                data-cy="select-tpp" />
+            </div>
+            <div class="col-xs-12 col-sm-8">
+              <ni-date-range v-model="billingDates" @input="getDraftBills" :error.sync="billingDatesHasError"
+                borderless class="q-ma-sm" />
+            </div>
+          </div>
         </div>
       </template>
     </ni-title-header>

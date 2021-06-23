@@ -1,7 +1,7 @@
 <template>
   <q-page :class="backgroundClass" padding>
     <div v-if="userProfile && userProfile._id">
-      <h4>Mon compte</h4>
+      <ni-title-header title="Mon compte" class="q-mb-xl" />
       <div class="q-mb-xl">
         <div class="photo-caption">Photo</div>
         <div class="row gutter-profile">
@@ -67,6 +67,7 @@ import get from 'lodash/get';
 import set from 'lodash/set';
 import Users from '@api/Users';
 import Authentication from '@api/Authentication';
+import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import HtmlModal from '@components/modal/HtmlModal';
@@ -86,6 +87,7 @@ export default {
   metaInfo: { title: 'Mon compte' },
   mixins: [passwordMixin, validationMixin, userMixin],
   components: {
+    'ni-title-header': TitleHeader,
     'ni-button': Button,
     'ni-input': Input,
     'ni-html-modal': HtmlModal,

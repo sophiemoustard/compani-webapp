@@ -1,5 +1,5 @@
 <template>
-  <div class="elearning-indicator text-weight-bold text-pink-500">{{ indicator }}</div>
+  <div class="elearning-indicator text-weight-bold text-copper-500">{{ indicator }}</div>
 </template>
 
 <script>

@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <div v-if="company">
-      <h4>Configuration générale</h4>
+      <ni-title-header title="Configuration générale" class="q-mb-xl" />
       <div class="q-mb-xl">
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
@@ -101,6 +101,7 @@ import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Establishments from '@api/Establishments';
+import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
@@ -130,6 +131,7 @@ export default {
   metaInfo: { title: 'Configuration générale' },
   components: {
     'ni-input': Input,
+    'ni-title-header': TitleHeader,
     'ni-button': Button,
     'ni-search-address': SearchAddress,
     'ni-responsive-table': ResponsiveTable,
