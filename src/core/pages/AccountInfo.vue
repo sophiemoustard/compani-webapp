@@ -24,7 +24,7 @@
               :error-message="emailError($v.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="black" />
+            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="copper-grey-500" />
           </div>
         </div>
         <ni-input v-model.trim="userProfile.contact.phone" @focus="saveTmp('contact.phone')"

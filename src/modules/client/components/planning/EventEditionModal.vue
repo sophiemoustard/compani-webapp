@@ -89,7 +89,7 @@
         <div class="q-mb-lg">
           <div class="flex-row items-center justify-between">
             <div class="flex-row items-center">
-              <q-icon size="sm" name="history" class="q-mr-sm" color="copper-grey-400" />
+              <q-icon size="sm" name="history" class="q-mr-sm" color="copper-grey-500" />
               <div class="history-list-title text-weight-bold">Activité</div>
             </div>
             <ni-button :label="historyButtonLabel" color="copper-grey-800" class="bg-copper-grey-100"

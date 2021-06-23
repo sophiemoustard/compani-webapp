@@ -65,7 +65,7 @@ export default {
 .bar-label
   font-size: 14px
   position: absolute
-  color: black
+  color: $copper-grey-700
   display: flex
   justify-content: space-between
   width: 100%

@@ -14,7 +14,7 @@
           <q-card-section class="step-head cursor-pointer row" :id="step._id">
             <div class="step-info" @click="showActivities(step._id)">
               <q-item-section side>
-                <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="black" />
+                <q-icon :name="getStepTypeIcon(step.type)" size="sm" color="copper-grey-500" />
               </q-item-section>
               <q-item-section>
                 <div class="flex-direction row">
@@ -670,7 +670,7 @@ export default {
       padding-right: 10px
 
 .no-activity
-  color: black
+  color: $copper-grey-700
   font-size: 14px
   margin: 10px
 

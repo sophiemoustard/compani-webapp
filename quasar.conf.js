@@ -80,8 +80,6 @@ module.exports = function (ctx) {
         'QTime',
         'QTr',
         'QToggle',
-        'QToolbar',
-        'QToolbarTitle',
         'QUploader',
       ],
       directives: [
