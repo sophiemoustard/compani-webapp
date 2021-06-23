@@ -4,8 +4,8 @@
       <div class="col-xs-12 col-md-5 planning-search">
         <ni-chips-autocomplete ref="refFilter" v-model="terms" :disable="displayAllSectors" :filters="filters"
           data-cy="planning-search" />
-        <q-btn v-if="!isCustomerPlanning && isCoach" flat round :icon="displayAllSectors ? 'arrow_forward' : 'people'"
-          @click="toggleAllSectors" :color="displayAllSectors ? 'primary' : ''" />
+        <ni-button v-if="!isCustomerPlanning && isCoach" :icon="displayAllSectors ? 'arrow_forward' : 'people'"
+          @click="toggleAllSectors" color="copper-grey-500" />
       </div>
       <div class="col-xs-12 col-md-7">
         <planning-navigation :timeline-title="timelineTitle()" :target-date="targetDate" :type="PLANNING"
@@ -19,7 +19,7 @@
       <table :class="[staffingView ? 'staffing' : 'non-staffing', 'planning-table']">
         <thead>
           <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': uniqPersons.length > 0 }">
-            <q-btn v-if="!isCustomerPlanning" flat round icon="view_week" :color="staffingView ? 'primary' : ''"
+            <ni-button v-if="!isCustomerPlanning" icon="view_week" color="copper-grey-500"
               @click="staffingView = !staffingView" />
           </th>
           <th :style="{ top: `${planningHeaderHeight}px`}" :class="{ 'bottom-border': uniqPersons.length > 0 }"
@@ -46,7 +46,7 @@
                 <div class="person-inner-cell">
                   <div :class="[!staffingView && 'q-mb-md', 'chip-container']">
                     <img :src="UNKNOWN_AVATAR" class="avatar">
-                    <q-chip small text-color="white">
+                    <q-chip small>
                       <span class="chip-indicator">{{ Math.round(unassignedHourCount(sectorId)) }}h</span>
                     </q-chip>
                   </div>
@@ -101,6 +101,7 @@ import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import Customers from '@api/Customers';
+import Button from '@components/Button';
 import { NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import {
   PLANNING,
@@ -128,6 +129,7 @@ export default {
   name: 'PlanningManager',
   mixins: [planningTimelineMixin, planningEventMixin],
   components: {
+    'ni-button': Button,
     'ni-planning-event-cell': NiPlanningEvent,
     'ni-chips-autocomplete': ChipsAutocomplete,
     'planning-navigation': PlanningNavigation,

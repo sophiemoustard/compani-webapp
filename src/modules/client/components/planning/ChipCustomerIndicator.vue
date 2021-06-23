@@ -3,7 +3,7 @@
     <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('fL') }}</div>
     <div :class="[!staffingView && 'q-mb-sm']">
       <div class="chip-container">
-        <q-chip small text-color="white">
+        <q-chip small>
           <span class="chip-indicator">{{ indicators.weeklyHours }}h - {{ indicators.auxiliariesNumber }}</span>
           <q-icon size="14px" name="mdi-human-male" />
         </q-chip>
