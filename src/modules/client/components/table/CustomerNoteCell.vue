@@ -1,6 +1,6 @@
 <template>
   <div class="q-pa-sm">
-    <div class="text-primary ellipsis">{{ note.title }}</div>
+    <div class="text-primary ellipsis q-mb-sm">{{ note.title }}</div>
     <div class="ellipsis">{{ note.description }}</div>
   </div>
 </template>

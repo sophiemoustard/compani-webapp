@@ -72,10 +72,6 @@
       </template>
     </div>
     <div class="q-mb-xl">
-      <customer-notes-container :notes-list="customerNotesList" :display-all-notes.sync="displayAllNotes"
-        @openNewNoteModal="openNewCustomerNoteModal = true" />
-    </div>
-    <div class="q-mb-xl">
       <p class="text-weight-bold">Aidants</p>
       <q-card>
         <ni-responsive-table :data="sortedHelpers" :columns="helpersColumns" :pagination="helpersPagination"
@@ -283,10 +279,6 @@
       :unit-ttc-rate-error-message="unitTTCRateErrorMessage($v.editedFunding)"
       :customer-participation-rate-error-message="customerParticipationRateErrorMessage($v.editedFunding)"
       :need-funding-plan-id-for-edited-funding="needFundingPlanIdForEditedFunding" />
-
-      <customer-note-creation-modal v-model="openNewCustomerNoteModal" @hide="resetCreationCustomerNote"
-        @submit="createCustomerNote" :new-customer-note.sync="newCustomerNote" :validations="$v.newCustomerNote"
-        :loading="customerNoteLoading" />
 </div>
 </template>
 
@@ -300,7 +292,6 @@ import omit from 'lodash/omit';
 import Services from '@api/Services';
 import Customers from '@api/Customers';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
-import CustomerNotes from '@api/CustomerNotes';
 import SearchAddress from '@components/form/SearchAddress';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
@@ -335,8 +326,6 @@ import FundingDetailsModal from 'src/modules/client/components/customers/infos/F
 import FundingHistoryModal from 'src/modules/client/components/customers/infos/FundingHistoryModal';
 import FundingEditionModal from 'src/modules/client/components/customers/infos/FundingEditionModal';
 import FundingCreationModal from 'src/modules/client/components/customers/infos/FundingCreationModal';
-import CustomerNoteCreationModal from 'src/modules/client/components/customers/infos/CustomerNoteCreationModal';
-import CustomerNotesContainer from 'src/modules/client/components/table/CustomerNotesContainer';
 import { financialCertificatesMixin } from 'src/modules/client/mixins/financialCertificatesMixin';
 import { fundingMixin } from 'src/modules/client/mixins/fundingMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
@@ -363,8 +352,6 @@ export default {
     'funding-creation-modal': FundingCreationModal,
     'funding-edition-modal': FundingEditionModal,
     'ni-responsive-table': ResponsiveTable,
-    'customer-notes-container': CustomerNotesContainer,
-    'customer-note-creation-modal': CustomerNoteCreationModal,
   },
   mixins: [
     customerMixin,
@@ -445,11 +432,6 @@ export default {
       },
       extensions: DOC_EXTENSIONS,
       firstStep: true,
-      customerNotesList: [],
-      newCustomerNote: { title: '', description: '' },
-      displayAllNotes: false,
-      openNewCustomerNoteModal: false,
-      customerNoteLoading: false,
     };
   },
   computed: {
@@ -573,7 +555,6 @@ export default {
         ...this.getFundingValidation(this.editedFunding),
         fundingPlanId: { required: requiredIf(() => this.needFundingPlanIdForEditedFunding) },
       },
-      newCustomerNote: { title: { required }, description: { required } },
     };
   },
   watch: {
@@ -594,7 +575,7 @@ export default {
     },
   },
   async mounted () {
-    await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices(), this.getCustomerNotes()]);
+    await Promise.all([this.getUserHelpers(), this.refreshCustomer(), this.getServices()]);
     this.isLoaded = true;
   },
   methods: {
@@ -719,14 +700,6 @@ export default {
         { ...customer, subscriptions: [...this.subscriptions], fundings: [...this.fundings] }
       );
       this.$v.customer.$touch();
-    },
-    async getCustomerNotes () {
-      try {
-        this.customerNotesList = await CustomerNotes.list({ customer: this.customer._id });
-      } catch (e) {
-        console.error(e);
-        this.customerNotesList = [];
-      }
     },
     // Subscriptions
     formatCreatedSubscription () {
@@ -1079,29 +1052,6 @@ export default {
         NotifyNegative('Erreur lors de la modification d\'un financement.');
       } finally {
         this.loading = false;
-      }
-    },
-    resetCreationCustomerNote () {
-      this.$v.newCustomerNote.$reset();
-      this.newCustomerNote = { title: '', description: '' };
-    },
-    async createCustomerNote () {
-      try {
-        this.$v.newCustomerNote.$touch();
-        if (this.$v.newCustomerNote.$error) return NotifyWarning('Champ(s) invalide(s)');
-
-        this.customerNoteloading = true;
-        const payload = { ...this.newCustomerNote, customer: this.customer._id };
-        await CustomerNotes.create(payload);
-
-        this.openNewCustomerNoteModal = false;
-        await this.getCustomerNotes();
-        NotifyPositive('Note de suivi ajoutée.');
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors de la création de la note de suivi.');
-      } finally {
-        this.customerNoteloading = false;
       }
     },
   },
