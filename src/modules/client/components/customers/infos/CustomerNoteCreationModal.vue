@@ -3,13 +3,13 @@
     <template slot="title">
        Nouvelle <span class="text-weight-bold">note</span>
     </template>
-    <ni-input in-modal :value="newCustomerNote.title" @input="update($event, 'title')" caption="Titre" required-field
+    <ni-input in-modal :value="newNote.title" @input="update($event, 'title')" caption="Titre" required-field
       @blur="validations.title.$touch" :error="validations.title.$error" />
-    <ni-input in-modal :value="newCustomerNote.description" @input="update($event, 'description')" type="textarea"
+    <ni-input in-modal :value="newNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" caption="Description"
       required-field />
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Créer la note" icon-right="add" color="primary"
+     <q-btn no-caps class="full-width modal-btn" label="Créer la note" icon-right="add" color="primary"
         :loading="loading" @click="submit" />
     </template>
   </ni-modal>
@@ -24,7 +24,7 @@ export default {
   name: 'CustomerNoteCreationModal',
   props: {
     value: { type: Boolean, default: false },
-    newCustomerNote: { type: Object, default: () => ({}) },
+    newNote: { type: Object, default: () => ({}) },
     validations: { type: Object, default: () => ({}) },
     loading: { type: Boolean, default: false },
   },
@@ -43,7 +43,7 @@ export default {
       this.$emit('submit');
     },
     update (event, prop) {
-      this.$emit('update:newCustomerNote', { ...this.newCustomerNote, [prop]: event });
+      this.$emit('update:newNote', { ...this.newNote, [prop]: event });
     },
   },
 };
