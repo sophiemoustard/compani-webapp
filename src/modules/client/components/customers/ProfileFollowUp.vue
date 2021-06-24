@@ -46,6 +46,10 @@
       </div>
     </div>
     <div class="q-mb-xl">
+      <customer-notes-container :notes-list="notesList" :display-all-notes.sync="displayAllNotes"
+        @openNewNoteModal="openNewNoteModal = true" />
+    </div>
+    <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Aidants</p>
       </div>
@@ -139,6 +143,10 @@
     <customer-partner-creation-modal v-model="newPartnerModal" :loading="modalLoading"
       :partner-options="partnerOptions" :new-partner.sync="newPartner" @submit="addPartner"
       @hide="resetAddPartnerModal" :validations="$v.newPartner" />
+
+    <customer-note-creation-modal v-model="openNewNoteModal" @hide="resetCreationCustomerNote"
+      @submit="createCustomerNote" :new-note.sync="newNote" :validations="$v.newNote"
+      :loading="noteLoading" />
   </div>
 </template>
 
@@ -150,6 +158,7 @@ import Stats from '@api/Stats';
 import Users from '@api/Users';
 import Partners from '@api/Partners';
 import CustomerPartners from '@api/CustomerPartners';
+import CustomerNotes from '@api/CustomerNotes';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -172,6 +181,8 @@ import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
+import CustomerNoteCreationModal from 'src/modules/client/components/customers/infos/CustomerNoteCreationModal';
+import CustomerNotesContainer from 'src/modules/client/components/table/CustomerNotesContainer';
 import CustomerPartnerCreationModal from './infos/CustomerPartnerCreationModal';
 
 export default {
@@ -184,6 +195,8 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-responsive-table': ResponsiveTable,
     'customer-partner-creation-modal': CustomerPartnerCreationModal,
+    'customer-notes-container': CustomerNotesContainer,
+    'customer-note-creation-modal': CustomerNoteCreationModal,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
@@ -269,6 +282,11 @@ export default {
         { name: 'actions', label: '', field: '_id' },
       ],
       prescriberPartner: '',
+      notesList: [],
+      newNote: { title: '', description: '' },
+      displayAllNotes: false,
+      openNewNoteModal: false,
+      noteLoading: false,
     };
   },
   validations () {
@@ -279,6 +297,7 @@ export default {
         },
       },
       newPartner: { required },
+      newNote: { title: { required }, description: { required } },
     };
   },
   computed: {
@@ -321,6 +340,7 @@ export default {
       this.getUserHelpers(),
       this.getAuxiliaries(),
       this.refreshPartnerOptions(),
+      this.getCustomerNotes(),
     ];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
     if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
@@ -378,6 +398,14 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des données.');
+      }
+    },
+    async getCustomerNotes () {
+      try {
+        this.notesList = await CustomerNotes.list({ customer: this.customer._id });
+      } catch (e) {
+        console.error(e);
+        this.notesList = [];
       }
     },
     saveTmp (path) {
@@ -468,6 +496,29 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deletePartner(customerPartnerId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    resetCreationCustomerNote () {
+      this.$v.newNote.$reset();
+      this.newNote = { title: '', description: '' };
+    },
+    async createCustomerNote () {
+      try {
+        this.$v.newNote.$touch();
+        if (this.$v.newNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.noteloading = true;
+        const payload = { ...this.newNote, customer: this.customer._id };
+        await CustomerNotes.create(payload);
+
+        this.openNewNoteModal = false;
+        await this.getCustomerNotes();
+        NotifyPositive('Note de suivi ajoutée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la note de suivi.');
+      } finally {
+        this.noteloading = false;
+      }
     },
   },
   filters: {
