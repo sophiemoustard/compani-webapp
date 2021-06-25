@@ -1,5 +1,5 @@
 <template>
-  <div class="q-pa-sm">
+  <div class="q-py-sm q-px-md">
     <div class="text-primary ellipsis q-mb-sm">{{ note.title }}</div>
     <div class="ellipsis">{{ note.description }}</div>
   </div>
