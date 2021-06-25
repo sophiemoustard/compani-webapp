@@ -9,7 +9,7 @@
           @input="update($event, 'auxiliary')" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap :value="newEvent.type" unelevated toggle-color="primary" :options="eventTypeOptions"
-            @input="updateType($event)" text-color="black" />
+            @input="updateType($event)" text-color="copper-grey-700" />
         </div>
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field

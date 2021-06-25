@@ -2,7 +2,7 @@
   <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal }"
     class="input">
     <div class="row justify-between" v-if="caption">
-      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input dense bg-color="white" borderless :value="value" @input="update" :class="{ borders: inModal }"
@@ -10,7 +10,7 @@
       data-cy="time-input">
       <template #append>
         <q-icon name="far fa-clock" class="cursor-pointer" @click.native="selectTime = !selectTime"
-          color="copper-grey-600">
+          color="copper-grey-500">
           <q-menu ref="qTimeMenu" anchor="bottom right" self="top right">
             <q-list dense padding>
               <q-item v-for="(hour, index) in hoursOptions" :key="index" clickable @click="select(hour.value)"
@@ -91,4 +91,7 @@ export default {
 <style lang="stylus" scoped>
   .q-list
     width: 100px
+
+  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+    color: $copper-grey-900
 </style>

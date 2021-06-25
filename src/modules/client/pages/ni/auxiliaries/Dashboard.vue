@@ -421,10 +421,6 @@ export default {
   @media screen and (max-width: 767px)
     font-size: 12px
 
-/deep/ .q-circular-progress__text
-  font-size: 15px
-  color: black
-
 .customer
   display: flex
   flex-direction: column

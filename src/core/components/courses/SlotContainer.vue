@@ -3,7 +3,7 @@
     <div class="q-mb-xl">
       <q-item class="slot-section-title">
         <q-item-section side>
-          <q-icon color="black" size="xl" :name="formatSlotTitle.icon" flat dense />
+          <q-icon color="copper-grey-700" size="xl" :name="formatSlotTitle.icon" flat dense />
         </q-item-section>
         <q-item-section>
           <div class="text-weight-bold">{{ formatSlotTitle.title }}</div>

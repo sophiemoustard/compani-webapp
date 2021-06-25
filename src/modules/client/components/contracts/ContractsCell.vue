@@ -305,9 +305,6 @@ export default {
     margin:  0 10px 10px
     font-size: 14px
 
-  .toolbar-padding
-    padding: 20px 58px
-
   /deep/ .q-layout-header
     box-shadow: none
 
