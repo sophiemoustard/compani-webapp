@@ -1,12 +1,10 @@
 <template>
   <div class="header">
     <div class="row q-mb-md">
-      <div class="col-xs-8 flex-row items-baseline col-md-10">
-        <ni-button v-if="isExternalUser" class="q-mr-md" icon="arrow_back" color="primary"
-          @click.native="$router.go(-1)" />
-        <h4 class="ellipsis">{{ title }}</h4>
-        <ni-button class="q-ml-sm" :disable="isPlanningRouterDisable" color="primary" icon="date_range"
-          @click="goToPlanning" />
+      <div class="col-xs-8 flex-row items-center col-md-10">
+        <ni-button v-if="isExternalUser" class="on-left" icon="arrow_back" @click="$router.go(-1)" />
+        <span class="ellipsis page-title">{{ title }}</span>
+        <ni-button :disable="isPlanningRouterDisable" icon="date_range" @click="goToPlanning" class="q-ml-sm" />
       </div>
       <div class="flex-row custom-justify-end col-xs-4 col-md-2">
         <img :src="hasPicture" alt="Img user" class="avatar">
@@ -15,8 +13,8 @@
     <div class="row profile-info">
       <div class="col-6 q-pl-lg">
         <div class="row items-center">
-          <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-inactive']" />
-          <div>{{ userActivity.status }}</div>
+          <div :class="['dot', userActivity.active ? 'dot-active' : 'dot-error']" />
+          <div :class="[userActivity.active ? 'text-green-800' : 'text-orange-700']">{{ userActivity.status }}</div>
         </div>
         <div class="row items-center">
           <q-icon name="restore" class="q-mr-md" size="1rem" />
@@ -25,7 +23,7 @@
       </div>
       <div class="q-pl-lg col-6 row">
         <div class="relative-position">
-          <q-icon size="36px" name="phone_iphone" color="grey-2" />
+          <q-icon size="36px" name="phone_iphone" color="copper-grey-300" />
           <q-icon v-if="!userProfile.isConfirmed" class="chip-icon" name="cancel" color="secondary" size="16px" />
           <q-icon v-if="userProfile.isConfirmed" class="chip-icon" name="check_circle" color="green-800" size="16px" />
         </div>
@@ -67,7 +65,7 @@ import moment from '@helpers/moment';
 import { formatDate, dateDiff, formatDateDiff } from '@helpers/date';
 
 export default {
-  name: 'ProfileHeader',
+  name: 'AuxiliaryProfileHeader',
   components: {
     'ni-input': Input,
     'ni-button': Button,
@@ -190,7 +188,7 @@ export default {
   .avatar
     width: 59px
     height: 59px
-    border: 1px solid $grey-400
+    border: 1px solid $copper-grey-400
 
   .send-message-link
     color: $primary

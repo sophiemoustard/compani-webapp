@@ -1,10 +1,12 @@
 <template>
   <q-page class="client-background q-pb-xl">
-    <ni-title-header title="Fin de contrats" padding slots>
+    <ni-title-header title="Fin de contrats" padding>
       <template slot="content">
-        <div class=" col-xs-12 row items-baseline justify-end fill-width">
-          <div class="col-xs-12 col-sm-6 col-md-3">
-            <ni-select class="q-pl-sm" :options="periodOptions" v-model="period" separator in-form />
+        <div class="flex-row header-selects">
+          <div class="row header-selects-container">
+            <div class="col-xs-12">
+              <ni-select :options="periodOptions" v-model="period" separator in-form />
+            </div>
           </div>
         </div>
       </template>
@@ -182,3 +184,10 @@ export default {
   },
 };
 </script>
+
+<style lang="stylus" scoped>
+.selects
+  justify-content: end
+  &-container
+    align-items: end
+</style>

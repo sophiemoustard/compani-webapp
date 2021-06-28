@@ -11,7 +11,7 @@
     </template>
     <template v-if="documents && documents.length > 0">
       <div class="row" v-if="caption">
-        <p class="input-caption">{{ caption }}</p>
+        <p class="input-caption text-copper-grey-500">{{ caption }}</p>
       </div>
       <div class="row gutter-profile">
         <template v-for="(certificate, index) in documents">

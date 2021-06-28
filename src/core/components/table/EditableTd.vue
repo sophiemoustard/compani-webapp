@@ -45,5 +45,5 @@ export default {
         min-width: 60px
         padding: 0 4px
       &__suffix
-        line-height: 19px
+        line-height: 20px
 </style>

@@ -1,14 +1,12 @@
 <template>
   <q-page class="client-background" padding>
-    <div class="flex no-wrap justify-between">
-      <h4>La formation Compani dans ma structure</h4>
-    </div>
+    <ni-title-header title="La formation Compani dans ma structure" />
     <div class="flex justify-between q-mt-xl">
       <p class="text-weight-bold section-title">Chiffres généraux</p>
       <ni-date-range v-model="dates" class="dates" borders />
     </div>
     <q-card flat class="q-pa-md row">
-      <div class="text-weight-bold q-mb-sm col-md-4 col-xs-12">Le eLearning dans ma structure</div>
+      <div class="text-weight-bold q-mb-sm col-md-4 col-xs-12 text-copper-grey-700">Le eLearning dans ma structure</div>
       <div class="row justify-around col-md-8 col-xs-12">
         <div class="column items-center">
           <ni-e-learning-indicator :indicator="activeLearners" />
@@ -23,16 +21,16 @@
     <div class="row q-mt-md">
       <div class="col-xs-12 col-md-6 left-card">
         <q-card flat class="fit q-pa-md">
-          <div class="text-weight-bold q-mb-sm">Apprenants les plus assidus</div>
+          <div class="text-weight-bold q-mb-sm text-copper-grey-700">Apprenants les plus assidus</div>
           <div class="row justify-end">
-            <div class="col-4 text-grey-800 text-center">Activités eLearning réalisées</div>
+            <div class="col-4 text-copper-grey-500 text-center">Activités eLearning réalisées</div>
           </div>
           <div v-for="(learner, index) in learnerList.slice(0, 5)" :key="learner._id"
             class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
               <img class="q-mx-md avatar" :src="learner.picture ? learner.picture.link : DEFAULT_AVATAR">
-              <div class="text-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
+              <div class="text-copper-grey-800">{{ formatIdentity(learner.identity, 'FL') }}</div>
             </div>
             <div class="col-4 text-center">{{ learner.activityCount }}</div>
           </div>
@@ -40,15 +38,15 @@
       </div>
       <div class="col-xs-12 col-md-6 right-card">
         <q-card flat class="fit q-pa-md">
-          <div class="text-weight-bold q-mb-sm">Formations les plus suivies</div>
+          <div class="text-weight-bold q-mb-sm text-copper-grey-700">Formations les plus suivies</div>
           <div class="row justify-end">
-            <div class="col-4 text-grey-800 text-center">Nombre d'apprenants actifs</div>
+            <div class="col-4 text-copper-grey-500 text-center">Nombre d'apprenants actifs</div>
           </div>
           <div v-for="(course, index) in courseList.slice(0, 5)" :key="course.name"
             class="justify-between items-center row q-my-sm">
             <div class="flex no-wrap items-center col-8">
               <ni-e-learning-indicator :indicator="index + 1" />
-              <div class="q-mx-md text-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
+              <div class="q-mx-md text-copper-grey-800">{{ upperCaseFirstLetter(course.name) }}</div>
             </div>
             <div class="col-4 text-center">{{ course.activeTraineesCount }}</div>
           </div>
@@ -73,6 +71,7 @@ import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
 import uniqBy from 'lodash/uniqBy';
 import ActivityHistories from '@api/ActivityHistories';
+import TitleHeader from '@components/TitleHeader';
 import DateRange from '@components/form/DateRange';
 import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
 import ELearningIndicator from '@components/courses/ELearningIndicator';
@@ -87,6 +86,7 @@ export default {
   metaInfo: { title: 'Tableau de bord des formations' },
   mixins: [chartMixin],
   components: {
+    'ni-title-header': TitleHeader,
     'ni-date-range': DateRange,
     'ni-e-learning-indicator': ELearningIndicator,
     'ni-line-chart': LineChart,
@@ -188,4 +188,5 @@ export default {
 
 .section-title
   font-size: 24px;
+  color: $copper-grey-900
 </style>

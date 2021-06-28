@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <div v-if="loggedUser">
-      <h4>Informations personnelles</h4>
+      <ni-title-header title="Informations personnelles" class="q-mb-xl" />
       <profile-info />
     </div>
   </q-page>
@@ -9,11 +9,13 @@
 
 <script>
 import { mapState } from 'vuex';
+import TitleHeader from '@components/TitleHeader';
 import ProfileInfo from 'src/modules/client/components/auxiliary/ProfileInfo';
 
 export default {
   components: {
-    ProfileInfo,
+    'ni-title-header': TitleHeader,
+    'profile-info': ProfileInfo,
   },
   metaInfo: { title: 'Infos personnelles' },
   computed: {

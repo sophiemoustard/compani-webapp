@@ -3,7 +3,8 @@
     <q-td v-for="col in props.cols" :key="col.name" :props="props" :data-cy="`col-${col.name}`"
       :style="{width: col.name === 'externalBilling' ? '100px' : '200px'}">
       <template v-if="index === 0 && col.name === 'externalBilling' && bill.thirdPartyPayer">
-        <q-checkbox :value="bill.externalBilling" color="grey" dense @input="update($event, 'externalBilling')" />
+        <q-checkbox :value="bill.externalBilling" color="copper-grey-400" @input="update($event, 'externalBilling')"
+          dense />
       </template>
       <template v-if="index === 0 && col.name === 'customer'">
         <span class="uppercase text-weight-bold">

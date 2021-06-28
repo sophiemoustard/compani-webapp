@@ -77,11 +77,11 @@ export default {
     display: flex
     flex-direction: row
     width: 100%;
-    border: 1px solid $grey-300
+    border: 1px solid $copper-grey-300
     &:not(:nth-child(2)) // first-child is title
       border-top: none
 
   .surcharge-type
     width: 60%
-    border-right: 1px solid $grey-300
+    border-right: 1px solid $copper-grey-300
 </style>

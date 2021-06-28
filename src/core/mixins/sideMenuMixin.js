@@ -1,20 +1,16 @@
 import { mapState } from 'vuex';
 import get from 'lodash/get';
-import { CLIENT } from '@data/constants';
+import { BLUE_TEXT_LOGO } from '../data/constants';
 
 export const sideMenuMixin = {
   data () {
     return {
       userFirstname: '',
+      companiLogo: BLUE_TEXT_LOGO,
     };
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    companiLogo () {
-      return this.interfaceType === CLIENT
-        ? 'https://storage.googleapis.com/compani-main/compani_texte_rose.png'
-        : 'https://storage.googleapis.com/compani-main/compani_texte_bordeaux.png';
-    },
   },
   watch: {
     loggedUser () {

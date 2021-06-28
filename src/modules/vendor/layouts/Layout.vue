@@ -74,7 +74,7 @@ export default {
 
   .chevron
     background-color: white
-    border: 1px solid $grey-300
+    border: 1px solid $copper-grey-300
     top: 5px
     position: fixed
     z-index: 5000
@@ -85,11 +85,8 @@ export default {
     @media screen and (max-width: $breakpoint-sm-max)
       display: none
 
-  .q-toolbar
-    color: $primary
-
   .q-btn
-    color: $grey-800
+    color: $copper-grey-800
     &:hover
       color: $primary
 

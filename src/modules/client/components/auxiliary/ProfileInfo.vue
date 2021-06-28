@@ -1,11 +1,8 @@
 <template>
   <div v-if="isLoaded">
     <div v-if="isCoach" class="row gutter-profile q-mb-xl">
-      <div class="col-xs-12 col-md-6">
-        <p class="input-caption">Équipe</p>
-        <ni-select-sector v-model="userProfile.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
-          :company-id="loggedUser.company._id" />
-      </div>
+      <ni-select-sector v-model="userProfile.sector" @blur="updateUser('sector')" @focus="saveTmp('sector')"
+        :company-id="loggedUser.company._id" />
       <ni-input v-model="userProfile.mentor" caption="Marraine/parrain" @focus="saveTmp('mentor')"
         @blur="updateUser('mentor')" />
       <ni-select v-model="userProfile.role.client._id" caption="Rôle" :options="auxiliaryRolesOptions"
@@ -75,7 +72,7 @@
               :error-message="emailError($v.userProfile)" v-model.trim="userProfile.local.email" />
           </div>
           <div :class="['col-xs-1', 'row', 'justify-end', { 'cursor-pointer': emailLock }]">
-            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="black" />
+            <ni-button :icon="lockIcon" @click.native="toggleEmailLock(!emailLock)" color="copper-grey-500" />
           </div>
         </div>
         <ni-search-address v-model="userProfile.contact.address" color="white"
@@ -194,9 +191,9 @@
           </div>
           <q-field dense :error="$v.userProfile.administrative.mutualFund.has.$error"
             :error-message="requiredLabel">
-            <q-btn-toggle class="full-width" color="white" text-color="black" toggle-color="primary"
-              v-model="userProfile.administrative.mutualFund.has"
-              @input="updateUser('administrative.mutualFund.has')" :options="mutualOptions" />
+            <q-btn-toggle class="full-width" color="white" text-color="copper-grey-700" toggle-color="primary"
+              v-model="userProfile.administrative.mutualFund.has" :options="mutualOptions"
+              @input="updateUser('administrative.mutualFund.has')" />
           </q-field>
         </div>
         <div class="col-xs-12 col-md-6" v-if="hasMutual">

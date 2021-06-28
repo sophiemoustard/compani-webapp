@@ -14,13 +14,13 @@
               :style="col.style">
               <template v-if="col.name === 'contractEmpty'">
                 <div class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" @click="dlTemplate(props.row, contract, contractIndex)"
-                    icon="file_download" :disable="!canDownload(props.row, contractIndex)" />
+                  <ni-button @click="dlTemplate(props.row, contract, contractIndex)" icon="file_download"
+                    :disable="!canDownload(props.row, contractIndex)" />
                 </div>
               </template>
               <template v-if="col.name === 'contractSigned'">
                 <div v-if="hasToBeSignedOnline(props.row) && shouldSignContract(props.row.signature)">
-                  <q-btn v-if="!props.row.endDate" no-caps small color="primary" label="Signer"
+                  <ni-button :flat="false" v-if="!props.row.endDate" label="Signer"
                   @click="openSignatureModal(props.row.signature.eversignId)" />
                 </div>
                 <div v-else-if="!getContractLink(props.row) && displayUploader && !hasToBeSignedOnline(props.row)"
@@ -30,8 +30,7 @@
                     @fail="failMsg" />
                 </div>
                 <div v-else-if="getContractLink(props.row)" class="row justify-center table-actions">
-                  <q-btn flat round small color="primary" type="a" :href="getContractLink(props.row)" target="_blank"
-                    icon="file_download" />
+                  <ni-button type="a" :href="getContractLink(props.row)" target="_blank" icon="file_download" />
                 </div>
                 <div v-else-if="hasToBeSignedOnline(props.row)" class="row justify-center table-actions">
                   <p class="no-margin">En attente de signature</p>
@@ -40,15 +39,15 @@
               <template v-else-if="col.name === 'archives'">
                 <div class="row archives justify-center">
                   <div v-for="archive in col.value" :key="archive._id">
-                    <q-btn flat round small color="primary" type="a" :href="getArchiveLink(archive)" target="_blank"
-                      icon="file_download" :disable="!getArchiveLink(archive)" />
+                    <ni-button type="a" :href="getArchiveLink(archive)" target="_blank" icon="file_download"
+                      :disable="!getArchiveLink(archive)" />
                   </div>
                 </div>
               </template>
               <template v-else-if="col.name === 'actions'">
                 <div v-if="!contract.endDate && !props.row.endDate" class="row no-wrap table-actions contract-actions">
-                  <q-btn flat round small color="grey" icon="edit" @click="openVersionEdition(contract, props.row)" />
-                  <q-btn flat round small color="grey" icon="delete" :disable="!props.row.canBeDeleted"
+                  <ni-button icon="edit" @click="openVersionEdition(contract, props.row)" />
+                  <ni-button icon="delete" :disable="!props.row.canBeDeleted"
                     @click="deleteVersion(contract._id, props.row._id)" />
                 </div>
               </template>
@@ -59,9 +58,9 @@
       </ni-responsive-table>
       <q-card-actions align="right">
         <template v-if="displayActions && !contract.endDate">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un avenant"
+          <ni-button icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" :disable="contractsLoading" />
-          <q-btn flat no-caps color="grey-6" icon="clear" label="Mettre fin au contrat"
+          <ni-button icon="clear" label="Mettre fin au contrat"
             @click="openEndContract(contract)" :disable="contractsLoading" />
         </template>
       </q-card-actions>
@@ -305,9 +304,6 @@ export default {
   .cell-subtitle
     margin:  0 10px 10px
     font-size: 14px
-
-  .toolbar-padding
-    padding: 20px 58px
 
   /deep/ .q-layout-header
     box-shadow: none

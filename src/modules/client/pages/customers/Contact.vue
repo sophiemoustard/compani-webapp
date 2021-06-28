@@ -1,6 +1,6 @@
 <template>
   <q-page padding class="client-background">
-    <h4>Contact</h4>
+    <ni-title-header title="Contact" class="q-mb-xl" />
     <div class="referent-container" v-if="referent">
       Pour toutes les questions concernant l’organisation des interventions et le planning, nous vous invitons à
       contacter votre auxiliaire référent.
@@ -30,12 +30,16 @@
 import { mapState, mapGetters } from 'vuex';
 import get from 'lodash/get';
 import Customers from '@api/Customers';
-import { formatIdentity } from '@helpers/utils';
+import TitleHeader from '@components/TitleHeader';
 import { DEFAULT_AVATAR, UNKNOWN_AVATAR } from '@data/constants';
+import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'Contact',
   metaInfo: { title: 'Contact' },
+  components: {
+    'ni-title-header': TitleHeader,
+  },
   computed: {
     ...mapState({
       helper: state => state.main.loggedUser,

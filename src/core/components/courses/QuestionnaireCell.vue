@@ -3,12 +3,12 @@
     <q-card-section>
       <div class="row justify-between">
         <div class="version">Version {{ index }}</div>
-        <div v-if="questionnaire.status === DRAFT" class="draft">
-          <q-icon size="12px" name="edit" color="orange-500" />
+        <div v-if="questionnaire.status === DRAFT" class="info-warning draft">
+          <q-icon size="12px" name="edit" />
           Brouillon
         </div>
-        <div v-else class="published">
-          <q-icon size="12px" name="check_circle" color="green-800" />
+        <div v-else class="published info-active">
+          <q-icon size="12px" name="check_circle" />
           Publié
         </div>
       </div>
@@ -43,13 +43,11 @@ export default {
       cursor: pointer
   .version
     font-size: 14px;
-    color: $grey-800;
+    color: $copper-grey-800;
   .draft
     font-size: 12px;
-    color: $orange-500;
   .published
     font-size: 12px;
-    color: $green-800;
   .name
     margin 16px 0px;
     word-break: break-word;

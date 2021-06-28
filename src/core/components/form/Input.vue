@@ -2,7 +2,7 @@
   <div v-if="!hidden" :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }"
     class="input">
     <div class="row justify-between">
-      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <template v-if="type === 'file'">
@@ -29,8 +29,7 @@
           <q-icon size="xs" :name="icon" />
         </template>
         <template v-if="isPassword" #append>
-          <ni-button :icon="isPassword && showPassword ? 'visibility' : 'visibility_off'" color="middle-grey"
-            @click.native="showPassword = !showPassword" size="sm" />
+          <ni-button :icon="passwordIcon" @click="toggleIcon" size="sm" />
         </template>
       </q-input>
     </template>
@@ -82,8 +81,14 @@ export default {
     inputType () {
       return this.isPassword && this.showPassword ? 'text' : this.type;
     },
+    passwordIcon () {
+      return this.isPassword && this.showPassword ? 'visibility' : 'visibility_off';
+    },
   },
   methods: {
+    toggleIcon () {
+      this.showPassword = !this.showPassword;
+    },
     updateInputFile () {
       this.$emit('input', this.$refs.inputFile.files[0]);
     },
@@ -123,11 +128,12 @@ export default {
       height: 100%
       width: 100%
       font-size: 0
-    &.borders
-      border: 1px solid $grey-300
   .file-error
     color: $secondary
     line-height: 1
     font-size: 11px
     padding-top: 3px
+
+  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+    color: $copper-grey-900
 </style>

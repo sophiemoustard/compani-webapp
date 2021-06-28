@@ -1,13 +1,13 @@
 <template>
   <div class="signed">
-    <p><img :src="PINK_LOGO" alt="Logo Compani" style="max-width: 250px"></p>
+    <p><img :src="BLUE_TEXT_LOGO" alt="Logo Compani" style="max-width: 250px"></p>
     <p>{{ acknowledgement }}</p>
     <p><q-btn v-if="$q.platform.is.mobile" color="primary" label="Accueil" icon="home" @click="$router.push('/')" /></p>
   </div>
 </template>
 
 <script>
-import { PINK_LOGO } from '@data/constants';
+import { BLUE_TEXT_LOGO } from '@data/constants';
 
 export default {
   name: 'DocumentSigned',
@@ -16,7 +16,7 @@ export default {
   },
   data () {
     return {
-      PINK_LOGO,
+      BLUE_TEXT_LOGO,
     };
   },
   computed: {

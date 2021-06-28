@@ -44,7 +44,7 @@ export default {
       & > .q-tab__indicator
         color: $primary
     /deep/.q-tab__indicator
-      color: $grey-300
+      color: $copper-grey-300
       opacity: 1
     .q-tab-panels
       background-color: inherit
@@ -84,7 +84,7 @@ export default {
         & :not(.q-tab--active)
           & .q-tab__content
             & .q-tab__label
-              color: $grey-800
+              color: $copper-grey-800
         & .q-tab--active
           & .q-tab__content
             & .q-tab__label

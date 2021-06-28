@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <div v-if="company">
-      <h4>Configuration RH</h4>
+      <ni-title-header title="Configuration RH" class="q-mb-xl" />
       <div class="q-mb-xl">
         <p class="text-weight-bold">Heures internes</p>
         <q-card>
@@ -12,8 +12,7 @@
                 <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
-                    <q-btn flat round small color="grey" icon="delete"
-                      @click="validateInternalHourDeletion(props.row)" />
+                    <ni-button icon="delete" @click="validateInternalHourDeletion(props.row)" />
                   </template>
                   <template v-else>{{ col.value }}</template>
                 </q-td>
@@ -21,8 +20,7 @@
             </template>
           </ni-responsive-table>
           <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une heure interne"
-              @click="internalHourCreationModal = true"
+            <ni-button icon="add" label="Ajouter une heure interne" @click="internalHourCreationModal = true"
               :disable="internalHours.length >= MAX_INTERNAL_HOURS_NUMBER || internalHoursLoading" />
           </q-card-actions>
         </q-card>
@@ -99,9 +97,9 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="primary" :href="getAdministrativeDocumentLink(props.row)" type="a"
-                        target="_blank" :disable="!getAdministrativeDocumentLink(props.row)" icon="file_download" />
-                      <q-btn flat round small color="grey" :disable="!getAdministrativeDocumentLink(props.row)"
+                      <ni-button :href="getAdministrativeDocumentLink(props.row)" type="a"
+                        :disable="!getAdministrativeDocumentLink(props.row)" icon="file_download" />
+                      <ni-button :disable="!getAdministrativeDocumentLink(props.row)"
                          icon="delete" @click="validateAdministrativeDocumentDeletion(props.row)" />
                     </div>
                   </template>
@@ -111,8 +109,8 @@
             </template>
           </ni-responsive-table>
           <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un document"
-              @click="administrativeDocumentCreationModal = true" :disable="administrativeDocumentsLoading" />
+            <ni-button icon="add" label="Ajouter un document" :disable="administrativeDocumentsLoading"
+              @click="administrativeDocumentCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -127,9 +125,8 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="edit"
-                        @click.native="openEditionModal(props.row._id)" />
-                      <q-btn flat round small color="grey" icon="delete" :disable="props.row.hasAuxiliaries"
+                      <ni-button icon="edit" @click.native="openEditionModal(props.row._id)" />
+                      <ni-button icon="delete" :disable="props.row.hasAuxiliaries"
                         @click="validateSectorDeletion(props.row)" />
                     </div>
                   </template>
@@ -139,8 +136,8 @@
             </template>
           </ni-responsive-table>
           <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter une équipe"
-              @click="sectorCreationModal = true" :disable="sectorsLoading" />
+            <ni-button icon="add" label="Ajouter une équipe" @click="sectorCreationModal = true"
+              :disable="sectorsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -170,11 +167,13 @@ import Companies from '@api/Companies';
 import Sectors from '@api/Sectors';
 import AdministrativeDocument from '@api/AdministrativeDocuments';
 import InternalHours from '@api/InternalHours';
-import { positiveNumber } from '@helpers/vuelidateCustomVal';
-import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
+import TitleHeader from '@components/TitleHeader';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 import FileUploader from '@components/form/FileUploader';
+import { NotifyWarning, NotifyPositive, NotifyNegative } from '@components/popup/notify';
 import ResponsiveTable from '@components/table/ResponsiveTable';
+import { positiveNumber } from '@helpers/vuelidateCustomVal';
 import { configMixin } from 'src/modules/client/mixins/configMixin';
 import { validationMixin } from '@mixins/validationMixin';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
@@ -188,6 +187,8 @@ export default {
   name: 'RhConfig',
   metaInfo: { title: 'Configuration rh' },
   components: {
+    'ni-title-header': TitleHeader,
+    'ni-button': Button,
     'ni-input': Input,
     'ni-file-uploader': FileUploader,
     'ni-responsive-table': ResponsiveTable,

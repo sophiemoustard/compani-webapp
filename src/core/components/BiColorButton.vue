@@ -2,7 +2,7 @@
   <div>
     <ni-button class="button" flat :icon="icon" color="primary" @click="click" :size="size" :href="href"
       :disable="disable" :type="type" />
-    <ni-button class="button" flat :label="label" color="black" @click="click" :size="size" :href="href"
+    <ni-button class="button" flat :label="label" color="copper-grey-700" @click="click" :size="size" :href="href"
       :disable="disable" :type="type" />
   </div>
 </template>

@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <div v-if="company">
-      <h4>Configuration bénéficiaires</h4>
+      <ni-title-header title="Configuration bénéficiaires" class="q-mb-xl" />
       <div class="q-mb-xl">
         <p class="text-weight-bold">Plans de majoration</p>
         <q-card>
@@ -13,10 +13,8 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small dense color="grey" icon="edit"
-                        @click.native="openSurchargeEditionModal(col.value)" />
-                      <q-btn flat round small dense color="grey" icon="delete"
-                        @click="validateSurchargeDeletion(col.value, props.row)" />
+                      <ni-button icon="edit" @click.native="openSurchargeEditionModal(col.value)" />
+                      <ni-button icon="delete" @click="validateSurchargeDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -25,8 +23,8 @@
             </template>
           </ni-responsive-table>
           <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un plan de majoration"
-              @click="surchargeCreationModal = true" :disable="surchargesLoading" />
+            <ni-button icon="add" label="Ajouter un plan de majoration" @click="surchargeCreationModal = true"
+              :disable="surchargesLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -41,11 +39,11 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <ni-btn icon="history" @click="showHistory(col.value)" />
-                      <ni-btn v-if="!props.row.isArchived" icon="edit" @click="openServiceEditionModal(col.value)" />
-                      <ni-btn v-if="props.row.subscriptionCount === 0" icon="delete"
+                      <ni-button icon="history" @click="showHistory(col.value)" />
+                      <ni-button v-if="!props.row.isArchived" icon="edit" @click="openServiceEditionModal(col.value)" />
+                      <ni-button v-if="props.row.subscriptionCount === 0" icon="delete"
                         @click="validateServiceDeletion(col.value, props.row)" />
-                      <ni-btn v-else-if="!props.row.isArchived" icon="mdi-archive"
+                      <ni-button v-else-if="!props.row.isArchived" icon="mdi-archive"
                         @click="validateServiceArchiving(col.value)" />
                       <div class="archived" v-else>archivé</div>
                     </div>
@@ -56,8 +54,8 @@
             </template>
           </ni-responsive-table>
           <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un service"
-              @click="serviceCreationModal = true" :disable="servicesLoading" />
+            <ni-button icon="add" label="Ajouter un service" @click="serviceCreationModal = true"
+              :disable="servicesLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -99,10 +97,9 @@
                   </template>
                   <template v-else-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small dense color="grey" icon="edit"
-                        @click="openThirdPartyPayerEditionModal(col.value)" />
-                      <q-btn :disable="isTppUsedInFundings(props.row)" flat round small dense color="grey"
-                        icon="delete" @click="validateTppDeletion(col.value, props.row)" />
+                      <ni-button icon="edit" @click="openThirdPartyPayerEditionModal(col.value)" />
+                      <ni-button :disable="isTppUsedInFundings(props.row)" icon="delete"
+                        @click="validateTppDeletion(col.value, props.row)" />
                     </div>
                   </template>
                   <template v-else>{{ col.value }}</template>
@@ -111,8 +108,8 @@
             </template>
           </ni-responsive-table>
           <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un tiers payeur"
-              @click="thirdPartyPayerCreationModal = true" :disable="tppsLoading" />
+            <ni-button icon="add" label="Ajouter un tiers payeur" @click="thirdPartyPayerCreationModal = true"
+              :disable="tppsLoading" />
           </q-card-actions>
         </q-card>
       </div>
@@ -178,6 +175,7 @@ import Surcharges from '@api/Surcharges';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
 import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import FileUploader from '@components/form/FileUploader';
+import TitleHeader from '@components/TitleHeader';
 import Button from '@components/Button';
 import Select from '@components/form/Select';
 import ReponsiveTable from '@components/table/ResponsiveTable';
@@ -210,8 +208,9 @@ export default {
   metaInfo: { title: 'Configuration bénéficiaire' },
   components: {
     'ni-file-uploader': FileUploader,
+    'ni-title-header': TitleHeader,
     'ni-select': Select,
-    'ni-btn': Button,
+    'ni-button': Button,
     'ni-responsive-table': ReponsiveTable,
     'service-creation-modal': ServiceCreationModal,
     'service-edition-modal': ServiceEditionModal,
