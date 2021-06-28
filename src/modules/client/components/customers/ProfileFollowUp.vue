@@ -47,7 +47,7 @@
     </div>
     <div class="q-mb-xl">
       <customer-notes-container :notes-list="notesList" :display-all-notes.sync="displayAllNotes"
-        @openNewNoteModal="openNewNoteModal = true" />
+        @openNewNoteModal="openNewNoteModal = true" @openEditedNoteModal="openNoteEditionModal" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -147,6 +147,9 @@
     <customer-note-creation-modal v-model="openNewNoteModal" @hide="resetCreationCustomerNote"
       @submit="createCustomerNote" :new-note.sync="newNote" :validations="$v.newNote"
       :loading="noteLoading" />
+
+    <customer-note-edition-modal v-model="openEditedNoteModal" @hide="resetEditionCustomerNote"
+      @submit="editCustomerNote" :edited-note.sync="editedNote" :validations="$v.editedNote" :loading="noteLoading" />
   </div>
 </template>
 
@@ -182,6 +185,7 @@ import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
 import CustomerNoteCreationModal from 'src/modules/client/components/customers/infos/CustomerNoteCreationModal';
+import CustomerNoteEditionModal from 'src/modules/client/components/customers/infos/CustomerNoteEditionModal';
 import CustomerNotesContainer from 'src/modules/client/components/table/CustomerNotesContainer';
 import CustomerPartnerCreationModal from './infos/CustomerPartnerCreationModal';
 
@@ -197,6 +201,7 @@ export default {
     'customer-partner-creation-modal': CustomerPartnerCreationModal,
     'customer-notes-container': CustomerNotesContainer,
     'customer-note-creation-modal': CustomerNoteCreationModal,
+    'customer-note-edition-modal': CustomerNoteEditionModal,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
@@ -284,8 +289,10 @@ export default {
       prescriberPartner: '',
       notesList: [],
       newNote: { title: '', description: '' },
+      editedNote: { _id: '', title: '', description: '' },
       displayAllNotes: false,
       openNewNoteModal: false,
+      openEditedNoteModal: false,
       noteLoading: false,
     };
   },
@@ -298,6 +305,7 @@ export default {
       },
       newPartner: { required },
       newNote: { title: { required }, description: { required } },
+      editedNote: { title: { required }, description: { required } },
     };
   },
   computed: {
@@ -501,12 +509,16 @@ export default {
       this.$v.newNote.$reset();
       this.newNote = { title: '', description: '' };
     },
+    resetEditionCustomerNote () {
+      this.$v.editedNote.$reset();
+      this.editedNoted = { _id: '', title: '', description: '' };
+    },
     async createCustomerNote () {
       try {
         this.$v.newNote.$touch();
         if (this.$v.newNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
-        this.noteloading = true;
+        this.noteLoading = true;
         const payload = { ...this.newNote, customer: this.customer._id };
         await CustomerNotes.create(payload);
 
@@ -517,7 +529,30 @@ export default {
         console.error(e);
         NotifyNegative('Erreur lors de la création de la note de suivi.');
       } finally {
-        this.noteloading = false;
+        this.noteLoading = false;
+      }
+    },
+    openNoteEditionModal (editedNote) {
+      this.openEditedNoteModal = true;
+      this.editedNote = editedNote;
+    },
+    async editCustomerNote () {
+      try {
+        this.$v.editedNote.$touch();
+        if (this.$v.editedNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.noteLoading = true;
+        const payload = { title: this.editedNote.title, description: this.editedNote.description };
+        await CustomerNotes.update(this.editedNote._id, payload);
+
+        this.openEditedNoteModal = false;
+        await this.getCustomerNotes();
+        NotifyPositive('Note de suivi mise à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la note de suivi.');
+      } finally {
+        this.noteLoading = false;
       }
     },
   },
