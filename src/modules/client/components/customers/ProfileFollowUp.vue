@@ -4,22 +4,22 @@
       <div class="row justify-between items-baseline">
         <p class="text-weight-bold">Pratique</p>
       </div>
-        <div class="row gutter-profile">
-          <ni-search-address v-if="isAuxiliary" caption="Adresse principale" v-model="customer.contact.primaryAddress"
-            color="white" disable />
-          <ni-search-address v-if="isAuxiliary && hasSecondaryAddress" caption="Adresse secondaire"
-            v-model="customer.contact.secondaryAddress" color="white" disable />
-          <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes"
-            @focus="saveTmp('contact.accessCodes')" @blur="updateCustomer('contact.accessCodes')" />
-          <div class="column">
-            <p class="input-caption">Horodatage</p>
-            <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
-          </div>
-          <ni-input v-if="isAuxiliary" type="tel" :error="$v.customer.contact.phone.$error"
-            error-message="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
-            @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
-          <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
-            @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" />
+      <div class="row gutter-profile">
+        <ni-search-address v-if="isAuxiliary" caption="Adresse principale" v-model="customer.contact.primaryAddress"
+          color="white" disable />
+        <ni-search-address v-if="isAuxiliary && hasSecondaryAddress" caption="Adresse secondaire"
+          v-model="customer.contact.secondaryAddress" color="white" disable />
+        <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes"
+          @focus="saveTmp('contact.accessCodes')" @blur="updateCustomer('contact.accessCodes')" />
+        <div class="flex-column">
+          <p class="input-caption text-copper-grey-500">Horodatage</p>
+          <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
+        </div>
+        <ni-input v-if="isAuxiliary" type="tel" :error="$v.customer.contact.phone.$error"
+          error-message="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
+          @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
+        <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
+          @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" />
       </div>
     </div>
     <div class="q-mb-xl">
@@ -573,7 +573,7 @@ export default {
         openPdf(pdf);
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors du téléchargement du QR code');
+        NotifyNegative('Erreur lors du téléchargement du QR code.');
       } finally {
         this.pdfLoading = false;
       }
