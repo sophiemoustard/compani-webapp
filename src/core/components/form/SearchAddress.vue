@@ -1,7 +1,7 @@
 <template>
   <div :class="{ 'col-12 col-md-6': !inModal, 'col-12': inModal }">
     <div class="row justify-between">
-      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
       <q-select dense borderless :value="value.fullAddress" @input="update" use-input fill-input hide-selected
@@ -85,4 +85,7 @@ export default {
       display: none
     .q-spinner
       display: none
+
+  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+    color: $copper-grey-900
 </style>

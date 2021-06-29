@@ -1,7 +1,7 @@
 <template>
   <q-page padding class="client-background">
     <div v-if="loggedUser">
-      <h4>Documents de paie</h4>
+      <ni-title-header title="Documents de paie" class="q-mb-xl" />
       <profile-pay />
     </div>
   </q-page>
@@ -9,6 +9,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import TitleHeader from '@components/TitleHeader';
 import ProfilePay from 'src/modules/client/components/auxiliary/ProfilePay';
 
 export default {
@@ -16,6 +17,7 @@ export default {
     id: { type: String, required: true },
   },
   components: {
+    'ni-title-header': TitleHeader,
     'profile-pay': ProfilePay,
   },
   metaInfo: { title: 'Documents de paie' },

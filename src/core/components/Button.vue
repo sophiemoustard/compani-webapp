@@ -8,7 +8,7 @@
 export default {
   name: 'Button',
   props: {
-    color: { type: String, default: 'grey' },
+    color: { type: String, default: 'copper-500' },
     disable: { type: Boolean, default: false },
     flat: { type: Boolean, default: true },
     href: { type: String, default: '' },

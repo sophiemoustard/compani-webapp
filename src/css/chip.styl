@@ -8,9 +8,11 @@
       left: 50%
       transform: translate(-50%, -50%)
   .q-chip
-    background: $grey-800
+    background-color: $copper-grey-50
+    border: 1px solid $copper-grey-300
+    color: $copper-grey-700
     width: 100%
-    padding: 0 10px
+    padding: 0 8px
     justify-content: flex-end
     margin: 0
     @media screen and (max-width: 767px)
@@ -21,9 +23,13 @@
       padding: 0 2px
       min-width: fit-content
     &.high-occupation
-      background: $secondary !important
+      background-color: $orange-300
+      color: $orange-900
+      border: 1px solid $orange-300
     &.extreme-occupation
-      background: $red !important
+      border: 1px solid $red
+      background: $red
+      color: $copper-grey-50
     &__content
       display: flex
       justify-content: flex-end
@@ -31,7 +37,7 @@
   .avatar
     z-index: 2
     box-shadow: none
-    border: 1px solid $grey-600
+    border: 1px solid $copper-grey-300
     @media screen and (min-width: $breakpoint-md-min)
       width: 2.5rem
       height: 2.5rem

@@ -1,7 +1,7 @@
 <template>
   <q-page class="client-background" padding>
     <div v-if="company">
-      <h4>Configuration générale</h4>
+      <ni-title-header title="Configuration générale" class="q-mb-xl" />
       <div class="q-mb-xl">
         <p class="text-weight-bold">Informations de l'organisation</p>
         <div class="row gutter-profile">
@@ -64,9 +64,8 @@
                   :style="col.style">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="edit"
-                        @click="openEstablishmentEditionModal(col.value)" />
-                      <q-btn flat round small color="grey" icon="delete" :disable="props.row.usersCount > 0"
+                      <ni-button icon="edit" @click="openEstablishmentEditionModal(col.value)" />
+                      <ni-button icon="delete" :disable="props.row.usersCount > 0"
                         @click="validateEstablishmentDeletion(col.value)" />
                     </div>
                   </template>
@@ -76,8 +75,8 @@
             </template>
           </ni-responsive-table>
           <q-card-actions align="right">
-            <q-btn no-caps flat color="primary" icon="add" label="Ajouter un établissement"
-              @click="establishmentCreationModal = true" :disable="establishmentsLoading" />
+            <ni-button icon="add" label="Ajouter un établissement" :disable="establishmentsLoading"
+              @click="establishmentCreationModal = true" />
           </q-card-actions>
         </q-card>
       </div>
@@ -102,6 +101,8 @@ import cloneDeep from 'lodash/cloneDeep';
 import pick from 'lodash/pick';
 import { required, maxLength } from 'vuelidate/lib/validators';
 import Establishments from '@api/Establishments';
+import TitleHeader from '@components/TitleHeader';
+import Button from '@components/Button';
 import Input from '@components/form/Input';
 import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
@@ -130,6 +131,8 @@ export default {
   metaInfo: { title: 'Configuration générale' },
   components: {
     'ni-input': Input,
+    'ni-title-header': TitleHeader,
+    'ni-button': Button,
     'ni-search-address': SearchAddress,
     'ni-responsive-table': ResponsiveTable,
     'establishment-creation-modal': EstablishmentCreationModal,

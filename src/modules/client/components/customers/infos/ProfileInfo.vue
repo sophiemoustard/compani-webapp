@@ -44,10 +44,10 @@
                 :style="col.style">
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn flat dense color="grey" icon="history" @click="showHistory(col.value)" />
-                    <q-btn flat dense color="grey" icon="edit" @click="openSubscriptionEditionModal(col.value)"
+                    <ni-button icon="history" @click="showHistory(col.value)" />
+                    <ni-button @click="openSubscriptionEditionModal(col.value)" icon="edit"
                       :disable="get(props, 'row.service.isArchived') || false" />
-                    <q-btn flat dense color="grey" icon="delete" :disable="props.row.eventCount > 0"
+                    <ni-button icon="delete" :disable="props.row.eventCount > 0"
                       @click="validateSubscriptionsDeletion(col.value)" />
                   </div>
                 </template>
@@ -57,7 +57,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="serviceOptions.length === 0 || subscriptionsLoading" flat no-caps color="primary" icon="add"
+          <ni-button :disable="serviceOptions.length === 0 || subscriptionsLoading" icon="add"
             label="Ajouter une souscription" @click="openNewSubscriptionModal = true" />
         </q-card-actions>
       </q-card>
@@ -85,8 +85,8 @@
                 </template>
                 <template v-if="col.name === 'actions'">
                   <div class="row no-wrap table-actions">
-                    <q-btn flat dense color="grey" icon="edit" @click="openEditionModalHelper(col.value)" />
-                    <q-btn flat dense color="grey" icon="delete" @click="validateHelperDeletion(col.value)" />
+                    <ni-button icon="edit" @click="openEditionModalHelper(col.value)" />
+                    <ni-button icon="delete" @click="validateHelperDeletion(col.value)" />
                   </div>
                 </template>
                 <template v-else>{{ col.value }}</template>
@@ -95,7 +95,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn flat no-caps color="primary" icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true"
+          <ni-button icon="add" label="Ajouter un aidant" @click="openNewHelperModal = true"
             :disable="helpersLoading" />
         </q-card-actions>
       </q-card>
@@ -126,10 +126,8 @@
               <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
                 :style="col.style">
                 <template v-if="col.name === 'emptyMandate'">
-                  <q-btn v-if="customer.payment.mandates && getRowIndex(customer.payment.mandates, props.row) == 0" flat
-                    round small color="primary" @click="downloadMandate(props.row)">
-                    <q-icon name="file_download" />
-                  </q-btn>
+                  <ni-button v-if="customer.payment.mandates && getRowIndex(customer.payment.mandates, props.row) == 0"
+                    @click="downloadMandate(props.row)" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signedMandate'">
                   <div v-if="!props.row.drive || !getMandateLink(props.row)" class="row justify-center table-actions">
@@ -137,8 +135,7 @@
                       field-name="file" auto-upload :accept="extensions" @uploaded="refreshMandates"
                       @failed="failMsg" />
                   </div>
-                  <q-btn v-else flat round small color="primary" type="a" :href="getMandateLink(props.row)"
-                    target="_blank" icon="file_download" />
+                  <ni-button v-else type="a" :href="getMandateLink(props.row)" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signedAt'">
                   <ni-date-input
@@ -147,7 +144,7 @@
                     @focus="saveTmpSignedAt(getRowIndex(customer.payment.mandates, props.row))" in-modal />
                 </template>
                 <template v-else-if="col.name === 'signed'">
-                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }]" />
+                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-error': !col.value }]" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -181,7 +178,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="fundingSubscriptionsOptions.length === 0 || fundingsLoading" flat no-caps color="primary"
+          <ni-button :disable="fundingSubscriptionsOptions.length === 0 || fundingsLoading"
             icon="add" label="Ajouter un financement" @click="openFundingCreationModal" />
         </q-card-actions>
       </q-card>
@@ -217,11 +214,10 @@
                       field-name="file" :accept="extensions" auto-upload @uploaded="refreshQuotes"
                       @failed="failMsg" />
                   </div>
-                  <q-btn v-else flat round small color="primary" type="a" :href="getQuoteLink(props.row)"
-                    target="_blank" icon="file_download" />
+                  <ni-button v-else type="a" :href="getQuoteLink(props.row)" icon="file_download" />
                 </template>
                 <template v-else-if="col.name === 'signed'">
-                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-inactive': !col.value }]" />
+                  <div :class="[{ 'dot dot-active': col.value, 'dot dot-error': !col.value }]" />
                 </template>
                 <template v-else>{{ col.value }}</template>
               </q-td>
@@ -229,8 +225,8 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <q-btn :disable="this.subscriptions.length === 0 || quotesLoading" flat no-caps color="primary" icon="add"
-            label="Générer un devis" @click="generateQuote" />
+          <ni-button :disable="this.subscriptions.length === 0 || quotesLoading" icon="add" label="Générer un devis"
+            @click="generateQuote" />
         </q-card-actions>
       </q-card>
     </div>
@@ -1061,9 +1057,6 @@ export default {
   .mandate-table
     td
       word-break: break-all
-
-  .dot-inactive
-    background: $secondary
 
   @media screen and (min-width: 768px)
     .dot

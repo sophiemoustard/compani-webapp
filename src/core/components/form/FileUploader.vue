@@ -1,7 +1,7 @@
 <template>
   <div class="margin-input col-xs-12 col-md-6">
     <div v-if="displayCaption" class="row justify-between">
-      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <div v-if="document && imageSource" class="row justify-between" style="background: white">
@@ -15,7 +15,7 @@
     </div>
     <q-field borderless v-else :error="error" :error-message="errorMessage">
       <q-uploader ref="uploader" flat :bordered="inModal" color="white" :label="label" :url="url" with-credentials
-        text-color="black" @failed="failMsg" :form-fields="additionalFields" :max-file-size="maxFileSize"
+        text-color="copper-grey-700" @failed="failMsg" :form-fields="additionalFields" :max-file-size="maxFileSize"
         @uploaded="documentUploaded" auto-upload :accept="extensions" field-name="file" :multiple="multiple"
         @rejected="rejected" :disable="disable" @start="uploadStarted" @finish="uploadFinished" />
     </q-field>
@@ -115,7 +115,7 @@ export default {
   /deep/ .q-uploader
     width: 100%
     &--bordered
-      border: 1px solid $grey-300
+      border: 1px solid $copper-grey-300
     .q-uploader__list
       display: none
     .q-uploader__header-content
@@ -123,7 +123,7 @@ export default {
       height: 38px
       margin: 0
       .q-btn__content
-        color: $grey-400
+        color: $copper-grey-400
     .q-btn
       margin: 0
       padding: 0

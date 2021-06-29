@@ -1,7 +1,7 @@
 <template>
   <div class="col-12">
     <div v-if="caption" class="row justify-between">
-      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field dense borderless :error="hasError" :error-message="innerErrorMessage">
@@ -76,7 +76,7 @@ export default {
 
 <style lang="stylus" scoped>
   .date-container-borders
-    border: solid 1px $grey-300
+    border: solid 1px $copper-grey-300
     border-radius: 3px
 
   /deep/ .q-field__append
@@ -93,7 +93,7 @@ export default {
     background-color: white
     & .delimiter
       margin: 0
-      color: black
+      color: $copper-grey-700
 
   .date-item
     max-width: 150px

@@ -2,17 +2,17 @@
   <div class="header">
     <div class="flex-row q-mb-md items-center justify-between">
       <div class="flex-row ellipsis">
-        <ni-button class="q-mr-md" icon="arrow_back" color="primary" @click="$router.go(-1)" />
-        <h4 class="ellipsis">{{ title }}</h4>
-        <ni-button class="q-ml-sm" color="primary" icon="date_range" @click="goToPlanning" />
+        <ni-button class="q-mr-md" icon="arrow_back" @click="$router.go(-1)" />
+        <span class="ellipsis page-title">{{ title }}</span>
+        <ni-button class="q-ml-sm" icon="date_range" @click="goToPlanning" />
       </div>
-      <ni-button v-if="!customer.stoppedAt" class="bg-pink-500 justify-end" label="Arrêter"
-        @click="stopSupportModal=true" color="white" />
+      <ni-button :flat="false" v-if="!customer.stoppedAt" class="justify-end" label="Arrêter"
+        @click="stopSupportModal=true" />
     </div>
     <div class="row profile-info column">
       <div class="row items-center">
         <div :class="getDotClass(getStatus(this.customer))" />
-        <div>{{ STATUS_TYPES[getStatus(this.customer)] }}</div>
+        <div :class="getDotTextClass(getStatus(this.customer))">{{ STATUS_TYPES[getStatus(this.customer)] }}</div>
       </div>
       <div class="row items-center">
         <q-icon name="restore" class="q-mr-md" size="1rem" />
@@ -41,7 +41,7 @@ import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import StopSupportModal from './infos/StopSupportModal';
 
 export default {
-  name: 'ProfileHeader',
+  name: 'CustomerProfileHeader',
   mixins: [customerMixin],
   props: {
     title: { type: String, required: true },
@@ -125,8 +125,15 @@ export default {
     getDotClass (value) {
       return {
         'dot dot-active': value === ACTIVATED,
-        'dot dot-stopped': value === STOPPED,
+        'dot dot-error': value === STOPPED,
         'dot dot-archived': value === ARCHIVED,
+      };
+    },
+    getDotTextClass (value) {
+      return {
+        'text-green-800': value === ACTIVATED,
+        'text-orange-700': value === STOPPED,
+        'text-copper-grey-700': value === ARCHIVED,
       };
     },
     async refreshCustomer () {

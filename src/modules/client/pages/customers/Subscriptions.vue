@@ -2,7 +2,7 @@
   <q-page padding class="client-background">
     <template v-if="customer">
       <div class="q-mb-lg">
-        <h4>Abonnement</h4>
+        <ni-title-header title="Abonnement" class="q-mb-xl" />
         <p class="title">Souscriptions</p>
         <p v-if="subscriptions.length === 0">Aucun service souscrit.</p>
         <q-card v-if="subscriptions.length > 0" class="contract-cell">
@@ -14,9 +14,9 @@
                   :style="col.style" :data-cy="`col-${col.name}`">
                   <template v-if="col.name === 'actions'">
                     <div class="row no-wrap table-actions">
-                      <q-btn flat round small color="grey" icon="history" @click="showHistory(col.value)"
+                      <q-btn flat round small color="primary" icon="history" @click="showHistory(col.value)"
                         data-cy="show-subscription-history" />
-                      <q-btn :disable="!getFunding(col.value).length" flat round small color="grey"
+                      <q-btn :disable="!getFunding(col.value).length" flat round small color="primary"
                         icon="mdi-calculator" @click="showFunding(col.value)" data-cy="show-fundings-history" />
                     </div>
                   </template>
@@ -133,6 +133,7 @@ import set from 'lodash/set';
 import Esign from '@api/Esign';
 import Drive from '@api/GoogleDrive';
 import Customers from '@api/Customers';
+import TitleHeader from '@components/TitleHeader';
 import Input from '@components/form/Input';
 import MultipleFilesUploader from '@components/form/MultipleFilesUploader';
 import Button from '@components/Button';
@@ -155,6 +156,7 @@ export default {
   name: 'Subscriptions',
   metaInfo: { title: 'Souscriptions' },
   components: {
+    'ni-title-header': TitleHeader,
     'ni-input': Input,
     'ni-button': Button,
     'ni-multiple-files-uploader': MultipleFilesUploader,

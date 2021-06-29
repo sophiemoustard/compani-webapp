@@ -106,5 +106,5 @@ export default {
         width: 50%
         border-radius: 20px
         margin: 5px
-        background-color: $grey-300
+        background-color: $copper-grey-300
 </style>

@@ -48,7 +48,7 @@ export default {
   padding: 16px 32px
 
 .subtitle
-  color: $grey-800
+  color: $copper-grey-800
   font-size: 14px
 
 .percentage
@@ -65,7 +65,7 @@ export default {
 .bar-label
   font-size: 14px
   position: absolute
-  color: black
+  color: $copper-grey-700
   display: flex
   justify-content: space-between
   width: 100%

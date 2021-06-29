@@ -1,7 +1,7 @@
 <template>
   <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
     <div v-if="caption" class="row justify-between">
-      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"
@@ -11,7 +11,8 @@
       :option-disable="optionDisable" :data-cy="dataCy" :hide-dropdown-icon="!!icon">
       <template #append>
         <ni-button v-if="value && !disable" icon="close" @click.stop="resetValue" size="sm" />
-        <ni-button v-if="icon" :icon="icon" class="select-icon pink-icon" @click="$refs['selectInput'].showPopup()" />
+        <ni-button v-if="icon" :icon="icon" class="select-icon primary-icon"
+          @click="$refs['selectInput'].showPopup()" />
       </template>
     </q-select>
   </div>
@@ -93,4 +94,7 @@ export default {
       display: none
   .select-icon
     margin: 0
+
+  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+    color: $copper-grey-900
 </style>

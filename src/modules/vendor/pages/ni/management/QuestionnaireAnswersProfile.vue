@@ -1,9 +1,9 @@
 <template>
   <q-page class="vendor-background" padding>
     <ni-profile-header :title="questionnaireName" :header-info="headerInfo" />
-      <q-card v-for="(card, cardIndex) of questionnaireAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
-         <component :is="getChartComponent(card.template)" :card="card" />
-      </q-card>
+    <q-card v-for="(card, cardIndex) of questionnaireAnswers.followUp" :key="cardIndex" flat class="q-mb-sm">
+      <component :is="getChartComponent(card.template)" :card="card" />
+    </q-card>
   </q-page>
 </template>
 

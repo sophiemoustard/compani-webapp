@@ -2,14 +2,12 @@
   <q-page class="client-background q-pb-xl">
     <ni-title-header title="Suivi des plans d'aide" padding>
       <template slot="title">
-        <q-btn round flat icon="save_alt" @click="exportToCSV" color="primary" style="margin-left: 5px"
-          :disable="!allCustomersFundingsMonitoring.length" />
+        <ni-button icon="save_alt" @click="exportToCSV" class="q-ml-sm" :disable="!allCustomersFundings.length" />
       </template>
       <template slot="content">
         <div class=" col-xs-12 row items-baseline justify-end fill-width">
           <div class="col-xs-12 col-sm-6 col-md-4">
-            <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector"
-              allow-null-option />
+            <ni-select-sector class="q-pl-sm" v-model="selectedSector" @input="onInputSector" allow-null-option />
           </div>
           <div class="col-xs-12 col-sm-6 col-md-4">
             <ni-select class="q-pl-sm" :options="thirdPartyPayerOptions" v-model="selectedThirdPartyPayer"
@@ -38,6 +36,7 @@ import moment from '@helpers/moment';
 import { downloadCsv } from '@helpers/file';
 import Stats from '@api/Stats';
 import ThirdPartyPayers from '@api/ThirdPartyPayers';
+import Button from '@components/Button';
 import SimpleTable from '@components/table/SimpleTable';
 import TitleHeader from '@components/TitleHeader';
 import Select from '@components/form/Select';
@@ -56,6 +55,7 @@ export default {
   name: 'CustomersFundingsMonitoring',
   metaInfo: { title: 'Suivi des plans d\'aide' },
   components: {
+    'ni-button': Button,
     'ni-simple-table': SimpleTable,
     'ni-title-header': TitleHeader,
     'ni-select': Select,
@@ -73,7 +73,7 @@ export default {
       selectedSector: '',
       selectedThirdPartyPayer: '',
       thirdPartyPayerOptions: [{ value: '', label: 'Tous les financeurs' }],
-      allCustomersFundingsMonitoring: [],
+      allCustomersFundings: [],
       columns: [
         {
           name: 'tpp',
@@ -154,7 +154,7 @@ export default {
   },
   computed: {
     displayedCustomersFundingsMonitoring () {
-      let monitoring = this.allCustomersFundingsMonitoring;
+      let monitoring = this.allCustomersFundings;
       if (this.selectedSector !== '') {
         monitoring = monitoring.filter(elem => get(elem, 'sector._id', null) === this.selectedSector);
       }
@@ -206,7 +206,7 @@ export default {
         'Mois suivant',
       ]];
 
-      for (const cusData of this.allCustomersFundingsMonitoring) {
+      for (const cusData of this.allCustomersFundings) {
         csvData.push([
           this.getTppName(cusData),
           this.formatCustomerName(cusData.customer),
@@ -228,9 +228,9 @@ export default {
     try {
       this.tableLoading = true;
       await this.getThirdPartyPayerOptions();
-      this.allCustomersFundingsMonitoring = Object.freeze(await Stats.getAllCustomersFundingsMonitoring());
+      this.allCustomersFundings = Object.freeze(await Stats.getAllCustomersFundingsMonitoring());
     } catch (e) {
-      this.allCustomersFundingsMonitoring = [];
+      this.allCustomersFundings = [];
       this.tableLoading = true;
       NotifyNegative('Erreur lors de la récupération des plans d\'aide.');
     } finally {

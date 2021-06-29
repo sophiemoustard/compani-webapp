@@ -13,7 +13,8 @@
           <q-btn-toggle no-wrap :value="editedEvent.type" toggle-color="primary" rounded unelevated
             :options="eventType" />
           <q-btn icon="delete" @click="isRepetition(editedEvent) ? deleteEventRepetition() : deleteEvent()" no-caps flat
-            color="grey" v-if="!isBilledIntervention" data-cy="event-deletion-button" :disable="historiesLoading" />
+            color="copper-grey-400" v-if="!isBilledIntervention" data-cy="event-deletion-button"
+            :disable="historiesLoading" />
         </div>
         <template v-if="editedEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="editedEvent.dates" required-field
@@ -87,12 +88,12 @@
         </template>
         <div class="q-mb-lg">
           <div class="flex-row items-center justify-between">
-            <div class="flex-row">
-              <q-icon size="sm" name="history" class="q-mr-sm" color="grey-400" />
+            <div class="flex-row items-center">
+              <q-icon size="sm" name="history" class="q-mr-sm" color="copper-grey-500" />
               <div class="history-list-title text-weight-bold">Activité</div>
             </div>
-            <ni-button :label="historyButtonLabel" color="grey-800" class="bg-grey-100" @click="toggleHistory"
-              :disable="historiesLoading" />
+            <ni-button :label="historyButtonLabel" color="copper-grey-800" class="bg-copper-grey-100"
+              @click="toggleHistory" :disable="historiesLoading" />
           </div>
           <div v-if="displayHistory" class="q-mt-sm">
             <ni-event-history v-for="history in eventHistories" :key="history._id" :history="history" />
@@ -106,7 +107,7 @@
             :options="customerAddressList(editedEvent)" :readonly="customerAddressList(editedEvent).length === 1"
             :display-value="editedEvent.address.fullAddress" ref="addressSelect" :disable="historiesLoading">
             <template #append v-if="customerAddressList(editedEvent).length > 1">
-              <ni-button icon="swap_vert" class="select-icon pink-icon" @click.stop="toggleAddressSelect" />
+              <ni-button icon="swap_vert" class="select-icon primary-icon" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>
           <q-btn flat size="md" color="primary" icon="mdi-information-outline" :to="customerProfileRedirect" />
@@ -193,7 +194,7 @@ export default {
       const nature = ABSENCE_TYPES.find(abs => abs.value === this.editedEvent.absence);
       const startDate = moment(this.editedEvent.extension.startDate).format('DD/MM/YYYY');
 
-      return `Cette absence est une prolongation de ${nature.label.toLowerCase()} commencant le ${startDate}`;
+      return `Cette absence est une prolongation de ${nature.label.toLowerCase()} commencant le ${startDate}.`;
     },
     customerStoppedDate () {
       return get(this.selectedCustomer, 'stoppedAt') || '';
@@ -291,12 +292,12 @@ export default {
         width: 100%
 
   .light-checkbox
-    color: $grey-400
+    color: $copper-grey-400
     font-size: 14px
 
   .infos
     font-style: italic;
-    color: $grey-400;
+    color: $copper-grey-400;
 
   .history-list-title
     font-size: 14px

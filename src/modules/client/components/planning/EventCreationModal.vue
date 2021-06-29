@@ -9,7 +9,7 @@
           @input="update($event, 'auxiliary')" />
         <div class="modal-subtitle">
           <q-btn-toggle no-wrap :value="newEvent.type" unelevated toggle-color="primary" :options="eventTypeOptions"
-            @input="updateType($event)" text-color="black" />
+            @input="updateType($event)" text-color="copper-grey-700" />
         </div>
         <template v-if="newEvent.type !== ABSENCE">
           <ni-datetime-range caption="Dates et heures de l'évènement" :value="newEvent.dates" required-field
@@ -74,7 +74,7 @@
             :options="customerAddressList(newEvent)" :readonly="customerAddressList(newEvent).length === 1"
             :display-value="newEvent.address.fullAddress" ref="addressSelect" behavior="menu">
             <template #append v-if="customerAddressList(newEvent).length > 1">
-              <ni-button icon="swap_vert" class="select-icon pink-icon" @click.stop="toggleAddressSelect" />
+              <ni-button icon="swap_vert" class="select-icon primary-icon" @click.stop="toggleAddressSelect" />
             </template>
           </q-select>
         </div>
@@ -292,7 +292,7 @@ export default {
       width: 24%
       border-radius: 20px
       margin: 5px
-      background-color: $grey-300
+      background-color: $copper-grey-300
       @media screen and (max-width: 767px)
         width: 45%
 

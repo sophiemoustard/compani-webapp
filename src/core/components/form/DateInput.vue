@@ -1,14 +1,14 @@
 <template>
   <div :class="contentClass">
     <div v-if="caption" class="row justify-between">
-      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-input borderless dense :value="inputDate" bg-color="white" @input="input" placeholder="jj/mm/yyyy" :error="error"
       :disable="disable" :class="{ 'borders': inModal }" :error-message="errorMessage" @blur="blur" ref="dateInput"
       @focus="focus">
       <template #append>
-        <q-icon name="event" class="cursor-pointer" @click="focus" color="grey-600">
+        <q-icon name="event" class="cursor-pointer" @click="focus" color="copper-grey-500">
           <q-menu ref="qDateMenu" anchor="bottom right" self="top right">
             <q-date minimal :value="date" @input="select" :options="dateOptions" :disable="disable" />
           </q-menu>
@@ -81,14 +81,13 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  .borders
-    /deep/ .q-field__control
-      border: 1px solid $grey-300
-
   .q-input
     /deep/ .q-field__control
       font-size: 16px
       padding-left: 14px
       padding-right: 14px
       border-radius: 3px
+
+  /deep/ .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+    color: $copper-grey-900
 </style>
