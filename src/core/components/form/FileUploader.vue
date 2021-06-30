@@ -1,7 +1,7 @@
 <template>
   <div class="margin-input col-xs-12 col-md-6">
     <div v-if="displayCaption" class="row justify-between">
-      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <div v-if="document && imageSource" class="row justify-between" style="background: white">

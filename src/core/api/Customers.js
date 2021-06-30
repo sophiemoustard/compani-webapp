@@ -38,6 +38,12 @@ export default {
   async updateById (id, data) {
     return alenviAxios.put(`${process.env.API_HOSTNAME}/customers/${id}`, data);
   },
+  async getQRCode (id) {
+    return alenviAxios.get(
+      `${process.env.API_HOSTNAME}/customers/${id}/qrcode`,
+      { responseType: 'arraybuffer', headers: { Accept: 'application/pdf' } }
+    );
+  },
   async addSubscription (id, data) {
     return alenviAxios.post(`${process.env.API_HOSTNAME}/customers/${id}/subscriptions`, data);
   },

@@ -16,6 +16,10 @@
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
           @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" />
+        <div class="flex-column col-xs-12 col-md-6">
+          <p class="input-caption">Horodatage</p>
+          <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -162,6 +166,7 @@ import Users from '@api/Users';
 import Partners from '@api/Partners';
 import CustomerPartners from '@api/CustomerPartners';
 import CustomerNotes from '@api/CustomerNotes';
+import Customers from '@api/Customers';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -169,6 +174,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
+import BiColorButton from '@components/BiColorButton';
 import {
   AUXILIARY,
   PLANNING_REFERENT,
@@ -181,6 +187,7 @@ import {
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatHours, formatAndSortIdentityOptions, formatPhone } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
+import { openPdf } from '@helpers/file';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
@@ -202,6 +209,7 @@ export default {
     'customer-notes-container': CustomerNotesContainer,
     'customer-note-creation-modal': CustomerNoteCreationModal,
     'customer-note-edition-modal': CustomerNoteEditionModal,
+    'ni-bi-color-button': BiColorButton,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
@@ -294,6 +302,7 @@ export default {
       openNewNoteModal: false,
       openEditedNoteModal: false,
       noteLoading: false,
+      pdfLoading: false,
     };
   },
   validations () {
@@ -553,6 +562,20 @@ export default {
         NotifyNegative('Erreur lors de la mise à jour de la note de suivi.');
       } finally {
         this.noteLoading = false;
+      }
+    },
+    async downloadQRCode () {
+      if (this.pdfLoading) return;
+
+      try {
+        this.pdfLoading = true;
+        const pdf = await Customers.getQRCode(this.customer._id);
+        openPdf(pdf);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du QR code.');
+      } finally {
+        this.pdfLoading = false;
       }
     },
   },
