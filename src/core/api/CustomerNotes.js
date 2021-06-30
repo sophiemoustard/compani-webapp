@@ -8,4 +8,7 @@ export default {
   async create (payload) {
     await alenviAxios.post(`${process.env.API_HOSTNAME}/customernotes`, payload);
   },
+  async update (customerNoteId, payload) {
+    await alenviAxios.put(`${process.env.API_HOSTNAME}/customernotes/${customerNoteId}`, payload);
+  },
 };

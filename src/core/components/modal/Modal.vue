@@ -2,7 +2,7 @@
   <q-dialog :value="value" v-on="$listeners">
     <div :class="containerClass">
       <div class="modal-padding">
-        <div class="row justify-between items-baseline">
+        <div class="row justify-between items-start">
           <div :class="['col-11', !!title && 'text-weight-bold', 'modal-title', 'q-mb-lg']">
             {{ title }}
             <slot name="title" />
