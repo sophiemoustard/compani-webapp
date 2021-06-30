@@ -1,41 +1,34 @@
 <template>
-  <q-dialog :value="value" v-on="$listeners">
-      <div class="modal-container-sm">
-        <div class="modal-padding">
-          <div class="row items-start">
-            <div :class="['col-11', 'q-mb-lg']">
-              <ni-input in-modal :value="editedNote.title" @input="update($event, 'title')"
-                @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title" />
-            </div>
-            <div class="col-1 cursor-pointer modal-btn-close">
-              <span>
-                <q-icon name="clear" v-close-popup data-cy="close-modal" />
-              </span>
-            </div>
-          </div>
-          <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
-            @blur="validations.description.$touch" :error="validations.description.$error" />
-        </div>
-        <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
-          :loading="loading" @click="submit" />
-      </div>
-    </q-dialog>
+  <ni-modal :value="value" @input="input" @hide="hide">
+    <template slot="title">
+      <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')"
+        @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title" />
+    </template>
+    <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
+      @blur="validations.description.$touch" :error="validations.description.$error" />
+    <template slot="footer">
+      <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
+        :loading="loading" @click="submit" />
+    </template>
+  </ni-modal>
 </template>
 
 <script>
 
 import Input from '@components/form/Input';
+import Modal from '@components/modal/Modal';
 
 export default {
   name: 'CustomerNoteEditionModal',
   props: {
-    value: { type: Boolean, default: false },
-    editedNote: { type: Object, default: () => ({}) },
-    validations: { type: Object, default: () => ({}) },
-    loading: { type: Boolean, default: false },
+    value: { type: Boolean, required: true },
+    editedNote: { type: Object, required: true },
+    validations: { type: Object, required: true },
+    loading: { type: Boolean, required: true },
   },
   components: {
     'ni-input': Input,
+    'ni-modal': Modal,
   },
   methods: {
     hide () {
@@ -57,5 +50,6 @@ export default {
 <style lang="stylus" scoped>
   ::v-deep .bold-title>.q-field__inner>.q-field__control>.q-field__control-container>.q-field__native
     color: $copper-grey-900
-    font-weight bold
+    font-weight: bold
+    font-size: 24px
 </style>
