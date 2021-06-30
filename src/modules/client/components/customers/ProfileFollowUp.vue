@@ -11,15 +11,15 @@
           v-model="customer.contact.secondaryAddress" color="white" disable />
         <ni-input caption="Accès / Codes/ Étage" v-model="customer.contact.accessCodes"
           @focus="saveTmp('contact.accessCodes')" @blur="updateCustomer('contact.accessCodes')" />
-        <div class="flex-column">
-          <p class="input-caption text-copper-grey-500">Horodatage</p>
-          <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
-        </div>
         <ni-input v-if="isAuxiliary" type="tel" :error="$v.customer.contact.phone.$error"
           error-message="Numéro de téléphone non valide" caption="Téléphone" v-model.trim="customer.contact.phone"
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
           @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" />
+        <div class="flex-column col-xs-12 col-md-6">
+          <p class="input-caption">Horodatage</p>
+          <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">

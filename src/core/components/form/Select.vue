@@ -1,7 +1,7 @@
 <template>
   <div :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }">
     <div v-if="caption" class="row justify-between">
-      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-select dense borderless :value="model" :bg-color="bgColor" :options="innerOptions" :multiple="multiple"

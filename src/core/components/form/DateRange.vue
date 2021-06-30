@@ -1,7 +1,7 @@
 <template>
   <div class="col-12">
     <div v-if="caption" class="row justify-between">
-      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <q-field dense borderless :error="hasError" :error-message="innerErrorMessage">
