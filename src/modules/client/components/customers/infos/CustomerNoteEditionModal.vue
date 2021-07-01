@@ -1,22 +1,33 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
-    <template slot="title">
-      <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')"
-        @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title" />
-    </template>
-    <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
-      @blur="validations.description.$touch" :error="validations.description.$error" />
-    <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
-        :loading="loading" @click="submit" />
-    </template>
-  </ni-modal>
+  <q-dialog :value="value" @hide="hide" @input="input">
+    <div class="modal-container-md">
+      <div class="modal-padding">
+        <div class="row justify-between items-start">
+          <div class="col-10 text-weight-bold modal-title q-mb-lg">
+            <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')" :read-only="readOnly"
+              @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title"
+              @click="readOnly = false" />
+          </div>
+          <div :class="['col-2', 'cursor-pointer', readOnly && 'top-buttons', !readOnly && 'modal-btn-close']">
+            <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" />
+            <q-icon name="clear" v-close-popup data-cy="close-modal" />
+          </div>
+        </div>
+        <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
+          @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
+          @click="readOnly = false" />
+      </div>
+      <div v-if="!readOnly">
+        <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
+          :loading="loading" @click="submit" />
+      </div>
+    </div>
+  </q-dialog>
 </template>
 
 <script>
 
 import Input from '@components/form/Input';
-import Modal from '@components/modal/Modal';
 
 export default {
   name: 'CustomerNoteEditionModal',
@@ -28,10 +39,15 @@ export default {
   },
   components: {
     'ni-input': Input,
-    'ni-modal': Modal,
+  },
+  data () {
+    return {
+      readOnly: true,
+    };
   },
   methods: {
     hide () {
+      this.readOnly = true;
       this.$emit('hide');
     },
     input (event) {
@@ -52,4 +68,11 @@ export default {
     color: $copper-grey-900
     font-weight: bold
     font-size: 24px
+
+.top-buttons
+  display: flex
+  flex-direction: row
+  justify-content: space-around
+  font-size: 21px
+
 </style>

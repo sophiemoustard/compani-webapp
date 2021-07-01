@@ -24,7 +24,7 @@
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
-        :class="[contentClass, { 'borders': inModal }]" :data-cy="dataCy">
+        :class="[contentClass, { 'borders': inModal && !readOnly }]" :data-cy="dataCy" @click="onClick">
         <template v-if="icon" #prepend>
           <q-icon size="xs" :name="icon" />
         </template>
@@ -105,6 +105,9 @@ export default {
     },
     select () {
       this.$refs[this.name].select();
+    },
+    onClick () {
+      this.$emit('click');
     },
   },
   watch: {
