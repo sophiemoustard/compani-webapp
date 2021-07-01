@@ -1,5 +1,5 @@
 <template>
-  <div class="person-inner-cell">
+  <div class="person-inner-cell flex-column">
     <div class="person-name overflow-hidden-nowrap">{{ person.identity | formatIdentity('fL') }}</div>
     <div :class="[!staffingView && 'q-mb-sm']">
       <div class="chip-container">
