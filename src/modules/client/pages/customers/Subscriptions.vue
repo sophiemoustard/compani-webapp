@@ -41,14 +41,14 @@
       </div>
       <div class="q-mb-md">
         <p class="title">Justificatifs APA ou autres financements</p>
-        <div class="row items-center">
-          <div class="col-xs-12 col-md-6 q-mr-lg">
+        <div class="row gutter-profile items-center">
+          <div class="col-xs-12 col-md-6">
             <ni-multiple-files-uploader path="financialCertificates" alt="justificatif_financement" :url="docsUploadUrl"
               @uploaded="documentUploadedForFinancialCertificates" name="financialCertificates" drive-storage
               collapsible-label="Ajouter un justificatif" :user-profile="customer" :extensions="extensions" multiple
               @delete="validateFinancialCertifDeletion($event)" additional-fields-name="justificatif_financement" />
           </div>
-          <div class="q-mb-md">
+          <div class="col-md-6 col-xs-12 q-mb-md">
             <p class="input-caption">Horodatage</p>
             <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
           </div>

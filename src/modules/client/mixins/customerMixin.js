@@ -7,6 +7,11 @@ import { openPdf } from '@helpers/file';
 import { ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 
 export const customerMixin = {
+  data () {
+    return {
+      pdfLoading: false,
+    };
+  },
   computed: {
     lastSubscriptionHistory () {
       if (this.customer.subscriptionsHistory && this.customer.subscriptionsHistory.length > 1) {

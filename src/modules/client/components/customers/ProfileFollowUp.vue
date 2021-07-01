@@ -300,7 +300,6 @@ export default {
       openNewNoteModal: false,
       openEditedNoteModal: false,
       noteLoading: false,
-      pdfLoading: false,
     };
   },
   validations () {
