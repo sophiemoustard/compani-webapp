@@ -3,14 +3,14 @@
     <div class="modal-container-md">
       <div class="modal-padding">
         <div class="row justify-between items-start">
-          <div class="col-10 text-weight-bold modal-title q-mb-lg">
+          <div class="flex-1 text-weight-bold modal-title q-mb-lg">
             <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')" :read-only="readOnly"
               @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title"
               @click="readOnly = false" />
           </div>
-          <div :class="['col-2', 'cursor-pointer', readOnly && 'top-buttons', !readOnly && 'modal-btn-close']">
+          <div class="cursor-pointer modal-btn-close">
             <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" />
-            <q-icon name="clear" v-close-popup data-cy="close-modal" />
+            <q-icon name="clear" v-close-popup data-cy="close-modal" class="close-btn" />
           </div>
         </div>
         <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
@@ -69,10 +69,6 @@ export default {
     font-weight: bold
     font-size: 24px
 
-.top-buttons
-  display: flex
-  flex-direction: row
-  justify-content: space-around
-  font-size: 21px
-
+.close-btn
+  margin-left: 0.8rem
 </style>
