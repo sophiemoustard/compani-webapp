@@ -166,7 +166,6 @@ import Users from '@api/Users';
 import Partners from '@api/Partners';
 import CustomerPartners from '@api/CustomerPartners';
 import CustomerNotes from '@api/CustomerNotes';
-import Customers from '@api/Customers';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -187,7 +186,6 @@ import {
 import { frPhoneNumber } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatHours, formatAndSortIdentityOptions, formatPhone } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-import { openPdf } from '@helpers/file';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
@@ -562,20 +560,6 @@ export default {
         NotifyNegative('Erreur lors de la mise à jour de la note de suivi.');
       } finally {
         this.noteLoading = false;
-      }
-    },
-    async downloadQRCode () {
-      if (this.pdfLoading) return;
-
-      try {
-        this.pdfLoading = true;
-        const pdf = await Customers.getQRCode(this.customer._id);
-        openPdf(pdf);
-      } catch (e) {
-        console.error(e);
-        NotifyNegative('Erreur lors du téléchargement du QR code.');
-      } finally {
-        this.pdfLoading = false;
       }
     },
   },

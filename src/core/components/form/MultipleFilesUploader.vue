@@ -2,7 +2,7 @@
   <div>
     <template v-if="documents.length === 0">
       <div class="row gutter-profile">
-        <div class="col-xs-12 col-md-6">
+        <div class="flex-1">
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name" :extensions="extensions"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption" :multiple="true"
             :additional-value="additionalFieldsName" label="Choisir un document" :drive-storage="driveStorage" />
@@ -15,7 +15,7 @@
       </div>
       <div class="row gutter-profile">
         <template v-for="(certificate, index) in documents">
-          <div class="col-md-6 col-xs-12" :key="index">
+          <div class="flex-1" :key="index">
             <div v-if="certificate.driveId" class="justify-between row" style="background: white">
               <div class="doc-thumbnail">
                 <ni-custom-img :image-source="certificate.driveId" :key="certificate.driveId" :alt="alt"
@@ -35,7 +35,7 @@
     <template v-if="documents && documents.length > 0">
       <div class="row gutter-profile">
         <q-expansion-item v-model="collapsibleOpened" :label="collapsibleLabel" :expand-icon="collapsibleIcon"
-          class="col-md-6 col-xs-12">
+          class="flex-1">
           <ni-file-uploader :path="path" :alt="alt" @uploaded="documentUploaded" :name="name" :extensions="extensions"
             :user-profile="userProfile" :url="url" @delete="deleteDocument($event)" :caption="caption" :multiple="true"
             :additional-value="additionalFieldsName" label="Choisir un document" :drive-storage="driveStorage" />
