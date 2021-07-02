@@ -1,33 +1,29 @@
 <template>
-  <q-dialog :value="value" @hide="hide" @input="input">
-    <div class="modal-container-md">
-      <div class="modal-padding">
-        <div class="row justify-between items-start">
-          <div class="flex-1 text-weight-bold modal-title q-mb-lg">
-            <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')" :read-only="readOnly"
-              @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title"
-              @click="readOnly = false" />
-          </div>
-          <div class="cursor-pointer modal-btn-close">
-            <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" />
-            <q-icon name="clear" v-close-popup data-cy="close-modal" class="close-btn" />
-          </div>
-        </div>
-        <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
-          @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
+  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
+    <template slot="title">
+      <div class="flex-row">
+        <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')" :read-only="readOnly"
+          @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title"
           @click="readOnly = false" />
+        <div class="cursor-pointer edit-btn">
+          <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" />
+        </div>
       </div>
-      <div v-if="!readOnly">
-        <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
-          :loading="loading" @click="submit" />
-      </div>
-    </div>
-  </q-dialog>
+    </template>
+    <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
+      @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
+      @click="readOnly = false" />
+    <template v-if="!readOnly" slot="footer">
+      <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
+        :loading="loading" @click="submit" />
+    </template>
+  </ni-modal>
 </template>
 
 <script>
 
 import Input from '@components/form/Input';
+import Modal from '@components/modal/Modal';
 
 export default {
   name: 'CustomerNoteEditionModal',
@@ -39,6 +35,7 @@ export default {
   },
   components: {
     'ni-input': Input,
+    'ni-modal': Modal,
   },
   data () {
     return {
@@ -69,6 +66,11 @@ export default {
     font-weight: bold
     font-size: 24px
 
-.close-btn
-  margin-left: 0.8rem
+.edit-btn
+  display: flex
+  margin-top: 2px
+  @media screen and (max-width: 420px)
+    margin-right: 0.5rem
+  & .q-icon
+      font-size: 21px
 </style>
