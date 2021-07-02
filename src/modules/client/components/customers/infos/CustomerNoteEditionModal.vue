@@ -6,7 +6,7 @@
           @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title"
           @click="readOnly = false" />
         <div class="cursor-pointer edit-btn">
-          <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" />
+          <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" size="sm" />
         </div>
       </div>
     </template>
@@ -71,6 +71,4 @@ export default {
   margin-top: 2px
   @media screen and (max-width: 420px)
     margin-right: 0.5rem
-  & .q-icon
-      font-size: 21px
 </style>
