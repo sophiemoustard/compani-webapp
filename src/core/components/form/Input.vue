@@ -68,7 +68,7 @@ export default {
     icon: { type: String, default: '' },
     mask: { type: String, default: '' },
     dataCy: { type: String, default: '' },
-    contentClass: { type: String, default: '' },
+    contentClass: { type: [Boolean, Array, String, Object], default: '' },
   },
   data () {
     return {

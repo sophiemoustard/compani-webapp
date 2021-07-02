@@ -2,9 +2,9 @@
   <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
     <template slot="title">
       <div class="flex-row">
-        <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')" :read-only="readOnly"
-          @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title"
-          @click="readOnly = false" />
+          <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')" :read-only="readOnly"
+            @blur="validations.title.$touch" :error="validations.title.$error" @click="readOnly = false"
+            :content-class="['bold-title', { 'read-only-cursor-pointer': readOnly }]" />
         <div class="cursor-pointer edit-btn">
           <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" size="sm" />
         </div>
@@ -12,7 +12,7 @@
     </template>
     <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
-      @click="readOnly = false" />
+      @click="readOnly = false" :content-class="readOnly && 'read-only-cursor-pointer'" />
     <template v-if="!readOnly" slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
         :loading="loading" @click="submit" />
@@ -65,6 +65,9 @@ export default {
     color: $copper-grey-900
     font-weight: bold
     font-size: 24px
+
+  ::v-deep .read-only-cursor-pointer>.q-field__inner>.q-field__control>.q-field__control-container>.q-field__native
+    cursor: pointer
 
 .edit-btn
   display: flex
