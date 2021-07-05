@@ -76,6 +76,7 @@ export const fundingMixin = {
         },
         { name: 'createdAt', label: '', align: 'left', field: 'createdAt' },
         { name: 'actions', label: '', align: 'left', field: '_id' },
+        { name: 'fundingPlanId', label: 'ID du plan de financement', align: 'left', field: 'fundingPlanId' },
       ],
     };
   },

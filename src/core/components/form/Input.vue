@@ -2,7 +2,7 @@
   <div v-if="!hidden" :class="{ 'col-xs-12 col-md-6': !inModal, 'margin-input full-width': inModal, last: last }"
     class="input">
     <div class="row justify-between">
-      <p :class="['input-caption', 'text-copper-grey-500', { required: requiredField }]">{{ caption }}</p>
+      <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
       <q-icon v-if="error" name="error_outline" color="secondary" />
     </div>
     <template v-if="type === 'file'">
@@ -24,7 +24,8 @@
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
-        :class="{ 'borders': inModal }" :data-cy="dataCy">
+        :class="inModal && !readOnly && 'borders'" :data-cy="dataCy" @click="onClick"
+        :input-class="inputClass">
         <template v-if="icon" #prepend>
           <q-icon size="xs" :name="icon" />
         </template>
@@ -68,6 +69,7 @@ export default {
     icon: { type: String, default: '' },
     mask: { type: String, default: '' },
     dataCy: { type: String, default: '' },
+    inputClass: { type: [Array, String, Object], default: '' },
   },
   data () {
     return {
@@ -104,6 +106,9 @@ export default {
     },
     select () {
       this.$refs[this.name].select();
+    },
+    onClick () {
+      this.$emit('click');
     },
   },
   watch: {
