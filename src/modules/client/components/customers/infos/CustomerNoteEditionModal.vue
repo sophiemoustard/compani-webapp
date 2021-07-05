@@ -1,5 +1,5 @@
 <template>
-  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
+  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md overflow-hidden">
     <template slot="title">
       <div class="flex-row">
         <ni-input in-modal :value="editedNote.title" @input="update($event, 'title')" :read-only="readOnly"
