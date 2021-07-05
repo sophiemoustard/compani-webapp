@@ -548,7 +548,7 @@ export default {
         if (this.$v.editedNote.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.noteLoading = true;
-        const payload = { title: this.editedNote.title, description: this.editedNote.description };
+        const payload = { title: this.editedNote.title.trim(), description: this.editedNote.description.trim() };
         await CustomerNotes.update(this.editedNote._id, payload);
 
         this.openEditedNoteModal = false;

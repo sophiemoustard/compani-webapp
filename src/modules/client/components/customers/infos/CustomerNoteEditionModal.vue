@@ -1,12 +1,19 @@
 <template>
-  <ni-modal :value="value" @input="input" @hide="hide">
+  <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
     <template slot="title">
-      <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')"
-        @blur="validations.title.$touch" :error="validations.title.$error" content-class="bold-title" />
+      <div class="flex-row">
+        <ni-input in-modal :value="editedNote.title" @input="update($event, 'title')" :read-only="readOnly"
+          @blur="validations.title.$touch" :error="validations.title.$error" @click="removeReadOnly"
+          :input-class="['bold-title', { 'cursor-pointer': readOnly }]" />
+        <div class="cursor-pointer edit-btn">
+          <q-icon v-if="readOnly" @click="removeReadOnly" name="edit" data-cy="edit" size="sm" />
+        </div>
+      </div>
     </template>
-    <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
-      @blur="validations.description.$touch" :error="validations.description.$error" />
-    <template slot="footer">
+    <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
+      @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
+      @click="removeReadOnly" :input-class="{ 'cursor-pointer': readOnly }" />
+    <template v-if="!readOnly" slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
         :loading="loading" @click="submit" />
     </template>
@@ -30,8 +37,17 @@ export default {
     'ni-input': Input,
     'ni-modal': Modal,
   },
+  data () {
+    return {
+      readOnly: true,
+    };
+  },
   methods: {
+    removeReadOnly () {
+      this.readOnly = false;
+    },
     hide () {
+      this.readOnly = true;
       this.$emit('hide');
     },
     input (event) {
@@ -48,8 +64,14 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  ::v-deep .bold-title>.q-field__inner>.q-field__control>.q-field__control-container>.q-field__native
+  ::v-deep .bold-title
     color: $copper-grey-900
     font-weight: bold
     font-size: 24px
+
+.edit-btn
+  display: flex
+  margin-top: 2px
+  @media screen and (max-width: 420px)
+    margin-right: 0.5rem
 </style>
