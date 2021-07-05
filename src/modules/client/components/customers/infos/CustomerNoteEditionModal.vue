@@ -2,17 +2,17 @@
   <ni-modal :value="value" @hide="hide" @input="input" container-class="modal-container-md">
     <template slot="title">
       <div class="flex-row">
-          <ni-input in-modal :value="editedNote.title" @input="update($event.trim(), 'title')" :read-only="readOnly"
-            @blur="validations.title.$touch" :error="validations.title.$error" @click="readOnly = false"
-            :content-class="['bold-title', { 'read-only-cursor-pointer': readOnly }]" />
+        <ni-input in-modal :value="editedNote.title" @input="update($event, 'title')" :read-only="readOnly"
+          @blur="validations.title.$touch" :error="validations.title.$error" @click="removeReadOnly"
+          :input-class="['bold-title', { 'cursor-pointer': readOnly }]" />
         <div class="cursor-pointer edit-btn">
-          <q-icon v-if="readOnly" @click="readOnly = false" name="edit" data-cy="edit" size="sm" />
+          <q-icon v-if="readOnly" @click="removeReadOnly" name="edit" data-cy="edit" size="sm" />
         </div>
       </div>
     </template>
-    <ni-input in-modal :value="editedNote.description" @input="update($event.trim(), 'description')" type="textarea"
+    <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
-      @click="readOnly = false" :content-class="readOnly && 'read-only-cursor-pointer'" />
+      @click="removeReadOnly" :input-class="{ 'cursor-pointer': readOnly }" />
     <template v-if="!readOnly" slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
         :loading="loading" @click="submit" />
@@ -43,6 +43,9 @@ export default {
     };
   },
   methods: {
+    removeReadOnly () {
+      this.readOnly = false;
+    },
     hide () {
       this.readOnly = true;
       this.$emit('hide');
@@ -61,13 +64,10 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
-  ::v-deep .bold-title>.q-field__inner>.q-field__control>.q-field__control-container>.q-field__native
+  ::v-deep .bold-title
     color: $copper-grey-900
     font-weight: bold
     font-size: 24px
-
-  ::v-deep .read-only-cursor-pointer>.q-field__inner>.q-field__control>.q-field__control-container>.q-field__native
-    cursor: pointer
 
 .edit-btn
   display: flex

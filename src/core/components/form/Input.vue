@@ -24,7 +24,8 @@
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
-        :class="[contentClass, { 'borders': inModal && !readOnly }]" :data-cy="dataCy" @click="onClick">
+        :class="inModal && !readOnly && 'borders'" :data-cy="dataCy" @click="onClick"
+        :input-class="inputClass">
         <template v-if="icon" #prepend>
           <q-icon size="xs" :name="icon" />
         </template>
@@ -68,7 +69,7 @@ export default {
     icon: { type: String, default: '' },
     mask: { type: String, default: '' },
     dataCy: { type: String, default: '' },
-    contentClass: { type: [Boolean, Array, String, Object], default: '' },
+    inputClass: { type: [Array, String, Object], default: '' },
   },
   data () {
     return {
