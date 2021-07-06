@@ -483,3 +483,5 @@ export const MANUAL_TIME_STAMPING_REASONS = {
   [QRCODE_ERROR]: 'Le code barre ne fonctionne pas',
   [CAMERA_ERROR]: 'Mon appareil photo ne fonctionne pas',
 };
+// NOTE
+export const NOTE_CREATION = 'note_creation';

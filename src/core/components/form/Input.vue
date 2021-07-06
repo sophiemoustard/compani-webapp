@@ -3,7 +3,7 @@
     class="input">
     <div class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
-      <q-icon v-if="error" name="error_outline" color="secondary" />
+      <q-icon v-if="error" name="error_outline" color="secondary" size="1rem" class="q-mb-xs" />
     </div>
     <template v-if="type === 'file'">
       <div class="row input-file-container" :class="{'borders': inModal}">
