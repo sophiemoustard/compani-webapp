@@ -3,9 +3,15 @@ import set from 'lodash/set';
 import Customers from '@api/Customers';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { formatIdentity, formatPhoneForPayload } from '@helpers/utils';
+import { openPdf } from '@helpers/file';
 import { ACTIVATED, STOPPED, ARCHIVED } from '@data/constants';
 
 export const customerMixin = {
+  data () {
+    return {
+      pdfLoading: false,
+    };
+  },
   computed: {
     lastSubscriptionHistory () {
       if (this.customer.subscriptionsHistory && this.customer.subscriptionsHistory.length > 1) {
@@ -53,6 +59,20 @@ export const customerMixin = {
       if (customer.stoppedAt) return STOPPED;
 
       return ACTIVATED;
+    },
+    async downloadQRCode () {
+      if (this.pdfLoading) return;
+
+      try {
+        this.pdfLoading = true;
+        const pdf = await Customers.getQRCode(this.customer._id);
+        openPdf(pdf);
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors du téléchargement du QR code.');
+      } finally {
+        this.pdfLoading = false;
+      }
     },
   },
 };

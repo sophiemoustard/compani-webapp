@@ -169,7 +169,7 @@
             name="phoneInvoice" @uploaded="documentUploaded" :additional-value="documentTitle('facture_telephone')"
             :error="$v.userProfile.administrative.phoneInvoice.driveId.$error" drive-storage />
         </div>
-        <div class="col-xs-12">
+        <div class="col-xs-12 col-md-6">
           <ni-multiple-files-uploader caption="Diplome(s) ou certificat(s)" path="administrative.certificates"
             alt="diplome" @delete="validateCertificateDeletion" name="certificates" drive-storage
             collapsible-label="Ajouter un diplôme" :user-profile="userProfile" :url="docsUploadUrl"

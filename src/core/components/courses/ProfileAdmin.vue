@@ -147,6 +147,8 @@ export default {
       smsLoading: false,
       smsHistoriesModal: false,
       smsHistory: { missingPhones: [] },
+      urlAndroid: 'https://bit.ly/3en5OkF',
+      urlIos: 'https://apple.co/33kKzcU',
     };
   },
   async created () {
@@ -272,9 +274,10 @@ export default {
       const hour = moment(slots[0].startDate).format('HH:mm');
 
       this.newSms.content = `Bonjour,\nVous êtes inscrit(e) à la formation ${this.courseName}.\n`
-      + `La première session a lieu le ${date} à ${hour}.\nMerci de vous `
-      + 'présenter au moins 15 minutes avant le début.\nToutes les informations sur : '
-      + `${this.courseLink}\nBonne formation,\nCompani`;
+      + `La première session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
+      + 'de cette formation, veuillez télécharger notre application Compani :\n'
+      + `Pour android : ${this.urlAndroid} \nPour iPhone : ${this.urlIos}\n`
+      + 'Bonne formation,\nCompani';
     },
     setReminderMessage () {
       const slots = this.course.slots
@@ -285,9 +288,10 @@ export default {
       const hour = moment(slots[0].startDate).format('HH:mm');
 
       this.newSms.content = `Bonjour,\nRAPPEL : vous êtes inscrit(e) à la formation ${this.courseName}.\n`
-      + `Votre prochaine session a lieu le ${date} à ${hour}.\nMerci de vous `
-      + 'présenter au moins 15 minutes avant le début.\nToutes les informations sur : '
-      + `${this.courseLink}\nBonne formation,\nCompani`;
+      + `Votre prochaine session a lieu le ${date} à ${hour}.\nPour le bon déroulement et le suivi `
+      + 'de cette formation, veuillez télécharger notre application Compani :\n'
+      + `Pour android : ${this.urlAndroid} \nPour iPhone : ${this.urlIos} `
+      + '\nBonne formation,\nCompani';
     },
     async sendMessage () {
       try {

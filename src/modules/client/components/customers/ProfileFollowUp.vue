@@ -16,6 +16,10 @@
           @focus="saveTmp('contact.phone')" @blur="updateCustomer('contact.phone')" />
         <ni-input v-if="isAuxiliary" caption="Compléments" v-model="customer.contact.others"
           @blur="updateCustomer('contact.others')" @focus="saveTmp('contact.others')" />
+        <div class="flex-column col-xs-12 col-md-6">
+          <p class="input-caption">Horodatage</p>
+          <ni-bi-color-button icon="file_download" label="QR Code" size="16px" @click="downloadQRCode()" />
+        </div>
       </div>
     </div>
     <div class="q-mb-xl">
@@ -44,6 +48,10 @@
         <ni-input caption="Autres" v-model="customer.followUp.misc" type="textarea"
           @blur="updateCustomer('followUp.misc')" @focus="saveTmp('followUp.misc')" />
       </div>
+    </div>
+    <div class="q-mb-xl">
+      <customer-notes-container :notes-list="notesList" :display-all-notes.sync="displayAllNotes"
+        @openNewNoteModal="openNewNoteModal = true" @openEditedNoteModal="openNoteEditionModal" />
     </div>
     <div class="q-mb-xl">
       <div class="row justify-between items-baseline">
@@ -139,6 +147,13 @@
     <customer-partner-creation-modal v-model="newPartnerModal" :loading="modalLoading"
       :partner-options="partnerOptions" :new-partner.sync="newPartner" @submit="addPartner"
       @hide="resetAddPartnerModal" :validations="$v.newPartner" />
+
+    <customer-note-creation-modal v-model="openNewNoteModal" @hide="resetCreationCustomerNote"
+      @submit="createCustomerNote" :new-note.sync="newNote" :validations="$v.newNote"
+      :loading="noteLoading" />
+
+    <customer-note-edition-modal v-model="openEditedNoteModal" @hide="resetEditionCustomerNote"
+      @submit="editCustomerNote" :edited-note.sync="editedNote" :validations="$v.editedNote" :loading="noteLoading" />
   </div>
 </template>
 
@@ -150,6 +165,7 @@ import Stats from '@api/Stats';
 import Users from '@api/Users';
 import Partners from '@api/Partners';
 import CustomerPartners from '@api/CustomerPartners';
+import CustomerNotes from '@api/CustomerNotes';
 import Button from '@components/Button';
 import Input from '@components/form/Input';
 import Select from '@components/form/Select';
@@ -157,6 +173,7 @@ import ResponsiveTable from '@components/table/ResponsiveTable';
 import SearchAddress from '@components/form/SearchAddress';
 import { NotifyNegative, NotifyWarning, NotifyPositive } from '@components/popup/notify';
 import SimpleTable from '@components/table/SimpleTable';
+import BiColorButton from '@components/BiColorButton';
 import {
   AUXILIARY,
   PLANNING_REFERENT,
@@ -172,6 +189,9 @@ import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { customerMixin } from 'src/modules/client/mixins/customerMixin';
 import { helperMixin } from 'src/modules/client/mixins/helperMixin';
+import CustomerNoteCreationModal from 'src/modules/client/components/customers/infos/CustomerNoteCreationModal';
+import CustomerNoteEditionModal from 'src/modules/client/components/customers/infos/CustomerNoteEditionModal';
+import CustomerNotesContainer from 'src/modules/client/components/table/CustomerNotesContainer';
 import CustomerPartnerCreationModal from './infos/CustomerPartnerCreationModal';
 
 export default {
@@ -184,6 +204,10 @@ export default {
     'ni-simple-table': SimpleTable,
     'ni-responsive-table': ResponsiveTable,
     'customer-partner-creation-modal': CustomerPartnerCreationModal,
+    'customer-notes-container': CustomerNotesContainer,
+    'customer-note-creation-modal': CustomerNoteCreationModal,
+    'customer-note-edition-modal': CustomerNoteEditionModal,
+    'ni-bi-color-button': BiColorButton,
   },
   mixins: [customerMixin, validationMixin, helperMixin],
   data () {
@@ -269,6 +293,13 @@ export default {
         { name: 'actions', label: '', field: '_id' },
       ],
       prescriberPartner: '',
+      notesList: [],
+      newNote: { title: '', description: '' },
+      editedNote: { _id: '', title: '', description: '' },
+      displayAllNotes: false,
+      openNewNoteModal: false,
+      openEditedNoteModal: false,
+      noteLoading: false,
     };
   },
   validations () {
@@ -279,6 +310,8 @@ export default {
         },
       },
       newPartner: { required },
+      newNote: { title: { required }, description: { required } },
+      editedNote: { title: { required }, description: { required } },
     };
   },
   computed: {
@@ -321,6 +354,7 @@ export default {
       this.getUserHelpers(),
       this.getAuxiliaries(),
       this.refreshPartnerOptions(),
+      this.getCustomerNotes(),
     ];
     if (this.customer.firstIntervention) promises.push(this.getCustomerFollowUp());
     if (this.customer.fundings && this.customer.fundings.length) promises.push(this.getCustomerFundingsMonitoring());
@@ -378,6 +412,14 @@ export default {
       } catch (e) {
         console.error(e);
         NotifyNegative('Erreur lors du chargement des données.');
+      }
+    },
+    async getCustomerNotes () {
+      try {
+        this.notesList = await CustomerNotes.list({ customer: this.customer._id });
+      } catch (e) {
+        console.error(e);
+        this.notesList = [];
       }
     },
     saveTmp (path) {
@@ -468,6 +510,56 @@ export default {
         cancel: 'Annuler',
       }).onOk(() => this.deletePartner(customerPartnerId))
         .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    resetCreationCustomerNote () {
+      this.$v.newNote.$reset();
+      this.newNote = { title: '', description: '' };
+    },
+    resetEditionCustomerNote () {
+      this.$v.editedNote.$reset();
+      this.editedNoted = { _id: '', title: '', description: '' };
+    },
+    async createCustomerNote () {
+      try {
+        this.$v.newNote.$touch();
+        if (this.$v.newNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.noteLoading = true;
+        const payload = { ...this.newNote, customer: this.customer._id };
+        await CustomerNotes.create(payload);
+
+        this.openNewNoteModal = false;
+        await this.getCustomerNotes();
+        NotifyPositive('Note de suivi ajoutée.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la création de la note de suivi.');
+      } finally {
+        this.noteLoading = false;
+      }
+    },
+    openNoteEditionModal (editedNote) {
+      this.openEditedNoteModal = true;
+      this.editedNote = editedNote;
+    },
+    async editCustomerNote () {
+      try {
+        this.$v.editedNote.$touch();
+        if (this.$v.editedNote.$error) return NotifyWarning('Champ(s) invalide(s)');
+
+        this.noteLoading = true;
+        const payload = { title: this.editedNote.title.trim(), description: this.editedNote.description.trim() };
+        await CustomerNotes.update(this.editedNote._id, payload);
+
+        this.openEditedNoteModal = false;
+        await this.getCustomerNotes();
+        NotifyPositive('Note de suivi mise à jour.');
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la mise à jour de la note de suivi.');
+      } finally {
+        this.noteLoading = false;
+      }
     },
   },
   filters: {
