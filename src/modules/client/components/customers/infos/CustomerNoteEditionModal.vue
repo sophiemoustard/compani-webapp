@@ -9,14 +9,12 @@
           <q-icon v-if="readOnly" @click="removeReadOnly" name="edit" data-cy="edit" size="sm" />
         </div>
       </div>
-      <div v-if="lastHistory" class="lastHistory q-mb-sm">
-        dernière modification le {{ formatDate(get(lastHistory, 'createdAt')) }} par {{ author }}
-      </div>
+      <div v-if="lastHistory" class="lastHistory q-mb-sm">{{ lastHistory }}</div>
     </template>
     <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
       @click="removeReadOnly" :input-class="{ 'cursor-pointer': readOnly }" />
-    <customer-note-history-container v-if="readOnly && this.editedNote.histories.length"
+    <customer-note-history-container v-if="readOnly && get(this.editedNote, 'histories.length')"
       :histories="this.editedNote.histories" />
     <template v-if="!readOnly" slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
@@ -53,12 +51,14 @@ export default {
   },
   computed: {
     lastHistory () {
-      return get(this.editedNote, 'histories') ? this.editedNote.histories[this.editedNote.histories.length - 1] : null;
-    },
-    author () {
-      return get(this.lastHistory, 'createdBy')
-        ? `${this.lastHistory.createdBy.identity.firstname} ${this.lastHistory.createdBy.identity.lastname}`
-        : '';
+      if (get(this.editedNote, 'histories.length')) {
+        const lastHistory = this.editedNote.histories[this.editedNote.histories.length - 1];
+        const name = `${lastHistory.createdBy.identity.firstname} ${lastHistory.createdBy.identity.lastname}`;
+
+        return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
+      }
+
+      return '';
     },
   },
   methods: {

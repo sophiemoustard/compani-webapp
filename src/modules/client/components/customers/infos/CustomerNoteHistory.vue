@@ -31,14 +31,8 @@ export default {
         case NOTE_CREATION:
         default:
           return [
-            {
-              label: 'Titre : ',
-              details: this.history.title,
-            },
-            {
-              label: 'Description : ',
-              details: this.history.description,
-            },
+            { label: 'Titre : ', details: this.history.title },
+            { label: 'Description : ', details: this.history.description },
           ];
       }
     },
