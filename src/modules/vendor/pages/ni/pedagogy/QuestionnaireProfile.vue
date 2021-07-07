@@ -14,6 +14,7 @@ import ProfileHeader from '@components/ProfileHeader';
 import ProfileTabs from '@components/ProfileTabs';
 import { DRAFT, QUESTIONNAIRE_TYPES } from '@data/constants';
 import ProfileEdition from 'src/modules/vendor/components/questionnaires/ProfileEdition';
+import ProfileAnswers from 'src/modules/vendor/components/questionnaires/ProfileAnswers';
 
 export default {
   name: 'QuestionnaireProfile',
@@ -29,6 +30,7 @@ export default {
     return {
       tabsContent: [
         { label: 'Édition', name: 'edition', default: this.defaultTab === 'edition', component: ProfileEdition },
+        { label: 'Réponses', name: 'answers', default: this.defaultTab === 'answers', component: ProfileAnswers },
       ],
       questionnaireName: '',
     };
