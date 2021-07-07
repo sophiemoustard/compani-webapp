@@ -1,8 +1,8 @@
 <template>
   <div class="q-py-sm q-px-md cursor-pointer" @click="click">
     <div class="text-primary ellipsis">{{ note.title }}</div>
-    <div v-if="lastHistory" class="lastHistory q-mb-sm">{{ lastHistory }}</div>
-    <div class="ellipsis">{{ note.description }}</div>
+    <div v-if="lastHistoryMessage" class="lastHistory">{{ lastHistoryMessage }}</div>
+    <div class="ellipsis q-mt-sm">{{ note.description }}</div>
   </div>
 </template>
 
@@ -16,15 +16,12 @@ export default {
     note: { type: Object, required: true },
   },
   computed: {
-    lastHistory () {
-      if (get(this.note, 'histories.length')) {
-        const lastHistory = this.note.histories[this.note.histories.length - 1];
-        const name = `${lastHistory.createdBy.identity.firstname} ${lastHistory.createdBy.identity.lastname}`;
+    lastHistoryMessage () {
+      if (!get(this.note, 'histories.length')) return '';
+      const lastHistory = this.note.histories[this.note.histories.length - 1];
+      const name = `${lastHistory.createdBy.identity.firstname} ${lastHistory.createdBy.identity.lastname}`;
 
-        return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
-      }
-
-      return '';
+      return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
     },
   },
   methods: {

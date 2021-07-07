@@ -9,7 +9,7 @@
           <q-icon v-if="readOnly" @click="removeReadOnly" name="edit" data-cy="edit" size="sm" />
         </div>
       </div>
-      <div v-if="lastHistory" class="lastHistory q-mb-sm">{{ lastHistory }}</div>
+      <div class="lastHistory">{{ lastHistoryMessage }}</div>
     </template>
     <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
@@ -50,15 +50,12 @@ export default {
     };
   },
   computed: {
-    lastHistory () {
-      if (get(this.editedNote, 'histories.length')) {
-        const lastHistory = this.editedNote.histories[this.editedNote.histories.length - 1];
-        const name = `${lastHistory.createdBy.identity.firstname} ${lastHistory.createdBy.identity.lastname}`;
+    lastHistoryMessage () {
+      if (!get(this.editedNote, 'histories.length')) return '';
+      const lastHistory = this.editedNote.histories[this.editedNote.histories.length - 1];
+      const name = `${lastHistory.createdBy.identity.firstname} ${lastHistory.createdBy.identity.lastname}`;
 
-        return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
-      }
-
-      return '';
+      return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
     },
   },
   methods: {
