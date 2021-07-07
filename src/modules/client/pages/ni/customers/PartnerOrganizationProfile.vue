@@ -17,7 +17,7 @@
     </div>
     <p class="text-weight-bold q-mt-lg">Partenaires</p>
     <q-card>
-      <ni-responsive-table :data="partnerOrganization.partners" :columns="columns">
+      <!-- <ni-responsive-table :data="partnerOrganization.partners" :columns="columns">
         <template #header="{ props }">
           <q-tr :props="props">
             <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
@@ -36,7 +36,35 @@
               </q-td>
             </q-tr>
           </template>
-      </ni-responsive-table>
+      </ni-responsive-table> -->
+      <ni-expanding-table :data="partnerOrganization.partners" :columns="columns" :loading="partnersloading"
+        :visible-columns="columns.map(c => c.name)" :pagination.sync="pagination">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'prescriptions'">
+                <div>{{ col.format }}</div>
+              </template>
+              <template v-else-if="col.name === 'actions'">
+                <div class="row no-wrap table-actions">
+                  <ni-button icon="edit" @click="openPartnerEditionModal(props.row)" />
+                  <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+                </div>
+              </template>
+              <!-- <template v-else-if="col.name === 'expand'">
+                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+              </template> -->
+            </q-td>
+          </template>
+          <!-- <template #expanding-row="{ props }">
+            <q-td colspan="100%">
+              <div v-for="(customer) in props.row.customers" :key="customer._id" :props="props"
+                class="q-ma-sm expanding-table-expanded-row">
+                <div>{{ formatIdentity(customer.identity, 'FL') }}</div>
+                <div>créé le {{ customer.createdAt }}</div>
+              </div>
+            </q-td>
+          </template> -->
+      </ni-expanding-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
       </q-card-actions>
@@ -63,7 +91,7 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import ResponsiveTable from '@components/table/ResponsiveTable';
+import ExpandingTable from '@components/table/ResponsiveTable';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
 import { validationMixin } from '@mixins/validationMixin';
@@ -82,7 +110,7 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-input': Input,
     'ni-button': Button,
-    'ni-responsive-table': ResponsiveTable,
+    'ni-expanding-table': ExpandingTable,
     'partner-creation-modal': PartnerCreationModal,
     'partner-edition-modal': PartnerEditionModal,
   },
@@ -93,6 +121,7 @@ export default {
       tmpInput: '',
       partnerOrganizationName: '',
       partnerCreationModal: false,
+      partner: [],
       newPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
       modalLoading: false,
       columns: [
@@ -116,6 +145,14 @@ export default {
           sortable: true,
         },
         { name: 'actions', label: '', align: 'center', field: '_id' },
+        {
+          name: 'prescriptions',
+          label: 'Prescriptions',
+          field: 'customerPartner',
+          align: 'left',
+          sortable: true,
+          format: value => value.lenght,
+        },
       ],
       partnerEditionModal: false,
       editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
