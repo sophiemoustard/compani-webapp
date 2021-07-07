@@ -17,53 +17,30 @@
     </div>
     <p class="text-weight-bold q-mt-lg">Partenaires</p>
     <q-card>
-      <!-- <ni-responsive-table :data="partnerOrganization.partners" :columns="columns">
-        <template #header="{ props }">
-          <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-              :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
-              {{ col.label }}
-            </q-th>
-          </q-tr>
-        </template>
-        <template #body="{ props }">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <ni-button v-if="col.name === 'actions'" @click.native="openPartnerEditionModal(props.row)"
-                  icon="edit" />
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
-          </template>
-      </ni-responsive-table> -->
-      <ni-expanding-table :data="partnerOrganization.partners" :columns="columns" :loading="partnersloading"
-        :visible-columns="columns.map(c => c.name)" :pagination.sync="pagination">
+      <ni-expanding-table :data="partnerOrganization.partners" :columns="columns"
+        :visible-columns="columns.map(c => c.name)">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
-              <template v-if="col.name === 'prescriptions'">
-                <div>{{ col.format }}</div>
-              </template>
-              <template v-else-if="col.name === 'actions'">
+              <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
                   <ni-button icon="edit" @click="openPartnerEditionModal(props.row)" />
                   <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
                 </div>
               </template>
-              <!-- <template v-else-if="col.name === 'expand'">
-                <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
-              </template> -->
+              <template v-else>
+                <div>{{ col.value }}</div>
+              </template>
             </q-td>
           </template>
-          <!-- <template #expanding-row="{ props }">
+          <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-for="(customer) in props.row.customers" :key="customer._id" :props="props"
+              <div v-for="(customerPartner) in props.row.customerPartner" :key="customerPartner._id" :props="props"
                 class="q-ma-sm expanding-table-expanded-row">
-                <div>{{ formatIdentity(customer.identity, 'FL') }}</div>
-                <div>créé le {{ customer.createdAt }}</div>
+                <div>{{ formatIdentity(customerPartner.customer.identity, 'FL') }}</div>
+                <div>créé le {{ formatDate(customerPartner.customer.subscriptions[0].createdAt) }}</div>
               </div>
             </q-td>
-          </template> -->
+          </template>
       </ni-expanding-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
@@ -91,9 +68,11 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import ExpandingTable from '@components/table/ResponsiveTable';
+import ExpandingTable from '@components/table/ExpandingTable';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
+
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
@@ -144,18 +123,20 @@ export default {
           format: value => (value ? JOB_OPTIONS.find(job => job.value === value).label : ''),
           sortable: true,
         },
-        { name: 'actions', label: '', align: 'center', field: '_id' },
         {
           name: 'prescriptions',
           label: 'Prescriptions',
           field: 'customerPartner',
-          align: 'left',
+          align: 'center',
+          format: value => value.length,
           sortable: true,
-          format: value => value.lenght,
         },
+        { name: 'actions', label: '', align: 'center' },
       ],
       partnerEditionModal: false,
       editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
+      formatIdentity,
+      formatDate,
     };
   },
   validations: {
