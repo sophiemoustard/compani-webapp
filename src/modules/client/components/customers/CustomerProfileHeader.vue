@@ -95,7 +95,7 @@ export default {
   },
   methods: {
     goToPlanning () {
-      if (this.customer.subscriptions.length) {
+      if (get(this.customer, 'subscriptions.length')) {
         return this.$router.push({ name: 'ni planning customers', params: { targetedCustomer: this.customer } });
       }
 
