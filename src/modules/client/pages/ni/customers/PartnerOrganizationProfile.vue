@@ -23,21 +23,19 @@
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'actions'">
                 <div class="row no-wrap table-actions">
-                  <ni-button icon="edit" @click="openPartnerEditionModal(props.row)" />
                   <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+                  <ni-button icon="edit" @click="openPartnerEditionModal(props.row)" />
                 </div>
               </template>
-              <template v-else>
-                <div>{{ col.value }}</div>
-              </template>
+              <template v-else>{{ col.value }}</template>
             </q-td>
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
               <div v-for="(customerPartner) in props.row.customerPartner" :key="customerPartner._id" :props="props"
-                class="q-ma-sm expanding-table-expanded-row">
+                class="q-px-lg row justify-between">
                 <div>{{ formatIdentity(customerPartner.customer.identity, 'FL') }}</div>
-                <div>créé le {{ formatDate(customerPartner.customer.subscriptions[0].createdAt) }}</div>
+                <div class="q-mr-xl">créé le {{ formatDate(customerPartner.customer.subscriptions[0].createdAt) }}</div>
               </div>
             </q-td>
           </template>
@@ -100,7 +98,6 @@ export default {
       tmpInput: '',
       partnerOrganizationName: '',
       partnerCreationModal: false,
-      partner: [],
       newPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
       modalLoading: false,
       columns: [
