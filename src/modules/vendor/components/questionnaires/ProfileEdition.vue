@@ -203,7 +203,6 @@ export default {
     },
   },
   async beforeDestroy () {
-    this.$store.dispatch('questionnaire/resetQuestionnaire');
     this.$store.dispatch('card/resetCard');
   },
 };
