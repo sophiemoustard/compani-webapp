@@ -85,11 +85,8 @@
             <ni-file-uploader caption="Conditions générales de services" path="customersConfig.templates.gcs"
               alt="template conditions générales de services" name="gcs" @uploaded="documentUploaded"
               :additional-value="`modele_gcs_${company.name}`" :url="docsUploadUrl" drive-storage :entity="company"
-              @delete="validateDocumentDeletion(
-                company.customersConfig.templates.gcs.driveId,
-                'gcs',
-                'customersConfig'
-              )" />
+              @delete="validateDocumentDeletion(company.customersConfig.templates.gcs.driveId,'gcs','customersConfig')"
+              />
           </div>
         </div>
       </div>
