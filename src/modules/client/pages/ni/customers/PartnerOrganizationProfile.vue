@@ -17,12 +17,11 @@
     </div>
     <p class="text-weight-bold q-mt-lg">Partenaires</p>
     <q-card>
-      <ni-expanding-table :data="partnerOrganization.partners" :columns="columns"
-        :visible-columns="columns.map(c => c.name)">
+      <ni-expanding-table :data="partnerOrganization.partners" :columns="columns">
           <template #row="{ props }">
             <q-td v-for="col in props.cols" :key="col.name" :props="props">
               <template v-if="col.name === 'actions'">
-                <div class="row no-wrap table-actions">
+                <div class="row no-wrap table-actions items-center">
                   <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
                   <ni-button icon="edit" @click="openPartnerEditionModal(props.row)" />
                 </div>
@@ -32,8 +31,8 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-for="(customerPartner) in props.row.customerPartner" :key="customerPartner._id" :props="props"
-                class="q-px-lg row justify-between">
+              <div v-for="(customerPartner) in props.row.customerPartners" :key="customerPartner._id" :props="props"
+                class="q-px-lg q-my-sm row justify-between">
                 <div>{{ formatIdentity(customerPartner.customer.identity, 'FL') }}</div>
                 <div class="q-mr-xl">créé le {{ formatDate(customerPartner.customer.subscriptions[0].createdAt) }}</div>
               </div>
@@ -70,7 +69,6 @@ import ExpandingTable from '@components/table/ExpandingTable';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
-
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
@@ -123,8 +121,8 @@ export default {
         {
           name: 'prescriptions',
           label: 'Prescriptions',
-          field: 'customerPartner',
-          align: 'center',
+          field: 'customerPartners',
+          align: 'left',
           format: value => value.length,
           sortable: true,
         },
@@ -234,10 +232,7 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Partner.updateById(
-          this.editedPartner._id,
-          omit(this.editedPartner, ['_id', 'customerPartner', 'identity.id', 'id'])
-        );
+        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id', 'customerPartners']));
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');

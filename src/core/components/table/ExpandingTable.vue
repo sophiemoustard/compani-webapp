@@ -1,7 +1,7 @@
 <template>
   <q-card class="relative-position table-spinner-container" flat>
     <q-table v-if="!loading" :data="data" :columns="columns" class="q-pa-md" :pagination="pagination" :row-key="rowKey"
-      :hide-bottom="hideBottom" :visible-columns="visibleColumns">
+      :hide-bottom="hideBottom" :visible-columns="formattedVisibleColumns">
       <template #header="props">
         <q-tr :props="props">
           <q-th v-for="col in props.cols" :key="col.name" :props="props"> {{ col.label }} </q-th>
@@ -26,6 +26,11 @@
 <script>
 export default {
   name: 'ExpandingTable',
+  computed: {
+    formattedVisibleColumns () {
+      return this.visibleColumns.length ? this.visibleColumns : this.columns.map(c => c.name);
+    },
+  },
   props: {
     data: { type: Array, default: () => [] },
     columns: { type: Array, default: () => [] },
