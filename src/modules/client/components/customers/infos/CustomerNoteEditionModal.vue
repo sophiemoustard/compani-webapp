@@ -9,10 +9,13 @@
           <q-icon v-if="readOnly" @click="removeReadOnly" name="edit" data-cy="edit" size="sm" />
         </div>
       </div>
+      <div class="lastHistory q-ml-sm">{{ lastHistoryMessage }}</div>
     </template>
     <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
       @click="removeReadOnly" :input-class="{ 'cursor-pointer': readOnly }" />
+    <customer-note-history-container v-if="readOnly && get(this.editedNote, 'histories.length')"
+      :histories="this.editedNote.histories" />
     <template v-if="!readOnly" slot="footer">
       <q-btn no-caps class="full-width modal-btn" label="Enregistrer et fermer" icon-right="save" color="primary"
         :loading="loading" @click="submit" />
@@ -24,6 +27,10 @@
 
 import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
+import get from 'lodash/get';
+import { formatDate } from '@helpers/date';
+import { formatIdentity } from '@helpers/utils';
+import CustomerNoteHistoryContainer from 'src/modules/client/components/customers/infos/CustomerNoteHistoryContainer';
 
 export default {
   name: 'CustomerNoteEditionModal',
@@ -36,13 +43,26 @@ export default {
   components: {
     'ni-input': Input,
     'ni-modal': Modal,
+    'customer-note-history-container': CustomerNoteHistoryContainer,
   },
   data () {
     return {
       readOnly: true,
     };
   },
+  computed: {
+    lastHistoryMessage () {
+      if (!get(this.editedNote, 'histories.length')) return '';
+
+      const lastHistory = this.editedNote.histories[this.editedNote.histories.length - 1];
+      const name = `${formatIdentity(lastHistory.createdBy.identity, 'FL')}`;
+
+      return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
+    },
+  },
   methods: {
+    get,
+    formatDate,
     removeReadOnly () {
       this.readOnly = false;
     },
@@ -74,4 +94,8 @@ export default {
   margin-top: 2px
   @media screen and (max-width: 420px)
     margin-right: 0.5rem
+
+.lastHistory
+  color: $grey-800
+  font-size: 14px
 </style>
