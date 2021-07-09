@@ -9,6 +9,7 @@
 <script>
 import get from 'lodash/get';
 import { formatDate } from '@helpers/date';
+import { formatIdentity } from '@helpers/utils';
 
 export default {
   name: 'CustomerNoteCell',
@@ -18,8 +19,9 @@ export default {
   computed: {
     lastHistoryMessage () {
       if (!get(this.note, 'histories.length')) return '';
+
       const lastHistory = this.note.histories[this.note.histories.length - 1];
-      const name = `${lastHistory.createdBy.identity.firstname} ${lastHistory.createdBy.identity.lastname}`;
+      const name = `${formatIdentity(lastHistory.createdBy.identity, 'FL')}`;
 
       return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
     },

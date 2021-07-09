@@ -9,7 +9,7 @@
           <q-icon v-if="readOnly" @click="removeReadOnly" name="edit" data-cy="edit" size="sm" />
         </div>
       </div>
-      <div class="lastHistory">{{ lastHistoryMessage }}</div>
+      <div class="lastHistory q-ml-sm">{{ lastHistoryMessage }}</div>
     </template>
     <ni-input in-modal :value="editedNote.description" @input="update($event, 'description')" type="textarea"
       @blur="validations.description.$touch" :error="validations.description.$error" :read-only="readOnly"
@@ -29,6 +29,7 @@ import Input from '@components/form/Input';
 import Modal from '@components/modal/Modal';
 import get from 'lodash/get';
 import { formatDate } from '@helpers/date';
+import { formatIdentity } from '@helpers/utils';
 import CustomerNoteHistoryContainer from 'src/modules/client/components/customers/infos/CustomerNoteHistoryContainer';
 
 export default {
@@ -52,8 +53,9 @@ export default {
   computed: {
     lastHistoryMessage () {
       if (!get(this.editedNote, 'histories.length')) return '';
+
       const lastHistory = this.editedNote.histories[this.editedNote.histories.length - 1];
-      const name = `${lastHistory.createdBy.identity.firstname} ${lastHistory.createdBy.identity.lastname}`;
+      const name = `${formatIdentity(lastHistory.createdBy.identity, 'FL')}`;
 
       return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
     },
@@ -95,5 +97,5 @@ export default {
 
 .lastHistory
   color: $grey-800
-  font-size: 12px
+  font-size: 14px
 </style>

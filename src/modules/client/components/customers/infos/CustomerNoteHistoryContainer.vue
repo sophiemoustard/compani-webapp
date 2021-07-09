@@ -1,5 +1,6 @@
 <template>
   <div class="q-mb-lg">
+    <q-separator class="q-my-lg" />
     <div class="flex-row items-center justify-between">
       <div class="flex-row items-center">
         <q-icon size="sm" name="history" class="q-mr-sm" color="copper-grey-500" />
