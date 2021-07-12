@@ -96,6 +96,6 @@ export default {
     margin-right: 0.5rem
 
 .lastHistory
-  color: $grey-800
+  color: $copper-grey-500
   font-size: 14px
 </style>
