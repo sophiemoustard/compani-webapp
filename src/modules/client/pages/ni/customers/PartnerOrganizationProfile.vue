@@ -31,10 +31,10 @@
           </template>
           <template #expanding-row="{ props }">
             <q-td colspan="100%">
-              <div v-if="!props.row.customerPartners.length" class="q-px-lg text-italic">
+              <div v-if="!props.row.customerPartners.length" class="q-px-lg text-italic text-center">
                 Aucun bénéficiaire prescrit.
               </div>
-              <div v-else v-for="(customerPartner) in props.row.customerPartners" :key="customerPartner._id"
+              <div v-else v-for="customerPartner in props.row.customerPartners" :key="customerPartner._id"
                 :props="props" class="q-px-lg q-my-sm row justify-between">
                 <div>{{ formatIdentity(customerPartner.customer.identity, 'FL') }}</div>
                 <div class="q-mr-xl">créé le {{ formatDate(customerPartner.customer.subscriptions[0].createdAt) }}</div>
