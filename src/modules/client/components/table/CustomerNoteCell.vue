@@ -38,6 +38,6 @@ export default {
 
 <style lang="stylus" scoped>
   .lastHistory
-    color: $grey-800
+    color: $copper-grey-500
     font-size: 12px
 </style>
