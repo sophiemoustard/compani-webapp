@@ -29,12 +29,9 @@ export default {
     historyInfos () {
       switch (this.history.action) {
         case NOTE_UPDATE:
-          if (this.history.description) {
-            return [
-              { label: 'Nouvelle description: ', details: this.history.description },
-            ];
-          }
-          return;
+          return this.history.description
+            ? [{ label: 'Nouvelle description : ', details: this.history.description }]
+            : [];
         case NOTE_CREATION:
         default:
           return [
