@@ -485,3 +485,4 @@ export const MANUAL_TIME_STAMPING_REASONS = {
 };
 // NOTE
 export const NOTE_CREATION = 'note_creation';
+export const NOTE_UPDATE = 'note_update';

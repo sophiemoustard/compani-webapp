@@ -16,7 +16,7 @@
 
 <script>
 import get from 'lodash/get';
-import { NOTE_CREATION, DEFAULT_AVATAR } from '@data/constants';
+import { NOTE_CREATION, NOTE_UPDATE, DEFAULT_AVATAR } from '@data/constants';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import { formatDate } from '@helpers/date';
 
@@ -28,6 +28,13 @@ export default {
   computed: {
     historyInfos () {
       switch (this.history.action) {
+        case NOTE_UPDATE:
+          if (this.history.description) {
+            return [
+              { label: 'Nouvelle description: ', details: this.history.description },
+            ];
+          }
+          return;
         case NOTE_CREATION:
         default:
           return [
