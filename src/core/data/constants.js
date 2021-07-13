@@ -9,6 +9,7 @@ export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
 export const VIDEO_EXTENSIONS = 'video/*';
 export const AUDIO_EXTENSIONS = 'audio/*';
+export const HTML_EXTENSIONS = '.html';
 
 // CUSTOMER
 export const CIVILITY_OPTIONS = [
