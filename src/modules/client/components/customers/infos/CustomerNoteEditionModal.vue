@@ -54,7 +54,7 @@ export default {
     lastHistoryMessage () {
       if (!get(this.editedNote, 'histories.length')) return '';
 
-      const lastHistory = this.editedNote.histories[this.editedNote.histories.length - 1];
+      const lastHistory = this.editedNote.histories[0];
       const name = `${formatIdentity(lastHistory.createdBy.identity, 'FL')}`;
 
       return `dernière modification le ${formatDate(lastHistory.createdAt)} par ${name}`;
