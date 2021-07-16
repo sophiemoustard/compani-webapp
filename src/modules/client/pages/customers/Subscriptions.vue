@@ -114,7 +114,7 @@
 
     <!-- CSG modal -->
     <ni-html-modal :title="htmlModalTitle" v-model="gcsModal" :html="gcs" @show="openGcsModal" @hide="closeGcsModal"
-      :loading="!gcsLoading" />
+      :loading="gcsLoading" />
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
@@ -438,14 +438,13 @@ export default {
     },
     async openGcsModal () {
       try {
-        this.gcsLoading = false;
+        this.gcsLoading = true;
         const gcsDriveId = get(this.helper, 'company.customersConfig.templates.gcs.driveId');
         if (!gcsDriveId) return;
 
         const file = await Drive.downloadFileById(gcsDriveId);
 
         this.gcs = file.data;
-        this.gcsLoading = true;
       } catch (e) {
         console.error(e);
       } finally {
