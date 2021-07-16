@@ -37,7 +37,7 @@
               <div v-else v-for="customerPartner in props.row.customerPartners" :key="customerPartner._id"
                 :props="props" class="q-px-lg q-my-sm row justify-between">
                 <div>{{ formatIdentity(customerPartner.customer.identity, 'FL') }}</div>
-                <div class="q-mr-xl">créé le {{ formatDate(customerPartner.customer.subscriptions[0].createdAt) }}</div>
+                <div class="q-mr-xl">créé le {{ formatDate(customerPartner.customer.createdAt) }}</div>
               </div>
             </q-td>
           </template>
