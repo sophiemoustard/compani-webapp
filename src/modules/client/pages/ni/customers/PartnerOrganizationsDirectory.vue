@@ -47,8 +47,15 @@ export default {
       columns: [
         { name: 'name', label: 'Nom', field: 'name', align: 'left', sortable: true, sort: sortStrings },
         { name: 'createdAt', field: 'createdAt', sort: ascendingSort },
+        {
+          name: 'prescriptions',
+          label: 'Prescriptions',
+          field: 'customerPartnersCount',
+          align: 'center',
+          sortable: true,
+        },
       ],
-      visibleColumns: ['name'],
+      visibleColumns: ['name', 'prescriptions'],
       pagination: { sortBy: 'createdAt', descending: true, page: 1, rowsPerPage: 15 },
     };
   },
