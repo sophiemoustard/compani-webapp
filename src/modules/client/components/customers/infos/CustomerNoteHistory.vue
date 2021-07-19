@@ -28,10 +28,14 @@ export default {
   computed: {
     historyInfos () {
       switch (this.history.action) {
-        case NOTE_UPDATE:
-          return this.history.description
-            ? [{ label: 'Nouvelle description : ', details: this.history.description }]
-            : [];
+        case NOTE_UPDATE: {
+          const result = [];
+          if (this.history.description) {
+            result.push({ label: 'Nouvelle description : ', details: this.history.description });
+          }
+          if (this.history.title) result.push({ label: 'Nouveau titre : ', details: this.history.title });
+          return result;
+        }
         case NOTE_CREATION:
         default:
           return [
