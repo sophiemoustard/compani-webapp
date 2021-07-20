@@ -50,8 +50,8 @@ export default {
         {
           name: 'prescriptions',
           label: 'Prescriptions',
-          field: 'customerPartnersCount',
-          align: 'center',
+          field: row => row.prescribedCustomersCount || '0',
+          align: 'left',
           sortable: true,
         },
       ],
