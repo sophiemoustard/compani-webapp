@@ -46,6 +46,7 @@ import {
   MANUAL_TIME_STAMPING,
   MANUAL_TIME_STAMPING_REASONS,
   TIME_STAMPING_ACTIONS,
+  QR_CODE_TIME_STAMPING,
 } from '@data/constants';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -158,6 +159,11 @@ export default {
             details: this.getEventUpdateDetails(),
           };
         case MANUAL_TIME_STAMPING:
+          return {
+            title: this.getEventTimeStampingTitle(),
+            details: this.getEventTimeStampingDetails(),
+          };
+        case QR_CODE_TIME_STAMPING:
           return {
             title: this.getEventTimeStampingTitle(),
             details: this.getEventTimeStampingDetails(),
