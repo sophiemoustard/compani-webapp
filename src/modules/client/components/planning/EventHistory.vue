@@ -46,6 +46,7 @@ import {
   MANUAL_TIME_STAMPING,
   MANUAL_TIME_STAMPING_REASONS,
   TIME_STAMPING_ACTIONS,
+  QR_CODE_TIME_STAMPING,
 } from '@data/constants';
 import { formatIdentity, formatHoursWithMinutes } from '@helpers/utils';
 import moment from '@helpers/moment';
@@ -158,6 +159,7 @@ export default {
             details: this.getEventUpdateDetails(),
           };
         case MANUAL_TIME_STAMPING:
+        case QR_CODE_TIME_STAMPING:
           return {
             title: this.getEventTimeStampingTitle(),
             details: this.getEventTimeStampingDetails(),
@@ -238,11 +240,11 @@ export default {
     getEventTimeStampingTitle () {
       if (this.history.update.startHour) {
         const { to } = this.history.update.startHour;
-        return { pre: `Début de l'intervention horodaté à ${formatHoursWithMinutes(to)} - `, post: '' };
+        return { pre: `Début de l'intervention horodatée à ${formatHoursWithMinutes(to)} - `, post: '' };
       }
 
       const { to } = this.history.update.endHour;
-      return { pre: `Fin de l'intervention horodaté à ${formatHoursWithMinutes(to)} - `, post: '' };
+      return { pre: `Fin de l'intervention horodatée à ${formatHoursWithMinutes(to)} - `, post: '' };
     },
     getEventTimeStampingDetails () {
       const { startHour, endHour } = this.history.update;

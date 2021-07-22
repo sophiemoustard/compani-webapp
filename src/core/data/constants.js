@@ -475,7 +475,8 @@ export const SUPPORT_STOPPING_REASONS_OPTIONS = [
 
 // TIMESTAMPING
 export const MANUAL_TIME_STAMPING = 'manual_time_stamping';
-export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING];
+export const QR_CODE_TIME_STAMPING = 'qr_code_time_stamping';
+export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING, QR_CODE_TIME_STAMPING];
 export const QRCODE_MISSING = 'qrcode_missing';
 export const QRCODE_ERROR = 'qrcode_error';
 export const CAMERA_ERROR = 'camera_error';
