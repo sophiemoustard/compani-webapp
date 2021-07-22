@@ -3,7 +3,7 @@
     class="input">
     <div class="row justify-between">
       <p :class="['input-caption', { required: requiredField }]">{{ caption }}</p>
-      <q-icon v-if="error" name="error_outline" color="secondary" />
+      <q-icon v-if="error" name="error_outline" color="secondary" size="1rem" class="q-mb-xs" />
     </div>
     <template v-if="type === 'file'">
       <div class="row input-file-container" :class="{'borders': inModal}">
@@ -24,7 +24,7 @@
         :upper-case="upperCase" :lower-case="lowerCase" :type="inputType" :rows="rows" :suffix="suffix" :error="error"
         @blur="onBlur" @input="update" @keyup.enter="$emit('keyup-enter')" :error-message="errorMessage" :mask="mask"
         :autogrow="this.type === 'textarea'" :readonly="readOnly" :debounce="debounce" :placeholder="placeholder"
-        :class="inModal && !readOnly && 'borders'" :data-cy="dataCy" @click="onClick"
+        :class="inModal && !readOnly && 'borders'" :data-cy="dataCy" @click="onClick" :hide-bottom-space="readOnly"
         :input-class="inputClass">
         <template v-if="icon" #prepend>
           <q-icon size="xs" :name="icon" />
