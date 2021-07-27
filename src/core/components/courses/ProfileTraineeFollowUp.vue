@@ -17,7 +17,10 @@
                     @click="validateAttendanceSheetDeletion(props.row)" :disable="!props.row.file.link" />
                 </div>
               </template>
-              <template v-else>{{ col.value }}</template>
+              <template v-else>
+                {{ col.value.identity }}
+                <div v-if="col.value.external" class="unsubscribed">Pas inscrit</div>
+              </template>
             </q-td>
           </q-tr>
         </template>
@@ -49,6 +52,7 @@ import get from 'lodash/get';
 import { required, requiredIf } from 'vuelidate/lib/validators';
 import AttendanceSheets from '@api/AttendanceSheets';
 import Courses from '@api/Courses';
+import Users from '@api/Users';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import SimpleTable from '@components/table/SimpleTable';
@@ -92,8 +96,11 @@ export default {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
           align: 'left',
-          field: row => (this.course.trainees.find(trainee => trainee._id === row.trainee._id)),
-          format: value => formatIdentity(get(value, 'identity'), 'FL'),
+          field: row => (this.trainees.find(trainee => trainee._id === row.trainee._id)),
+          format: value => ({
+            identity: formatIdentity(get(value, 'identity'), 'FL'),
+            external: get(value, 'external'),
+          }),
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],
@@ -104,6 +111,7 @@ export default {
       upperCaseFirstLetter,
       formatQuantity,
       questionnaires: [],
+      potentialTrainees: [],
     };
   },
   validations () {
@@ -118,6 +126,7 @@ export default {
   async created () {
     const promises = [this.getLearnersList(), this.refreshAttendanceSheets()];
     if (!this.isClientInterface) promises.push(this.refreshQuestionnaires());
+    if (this.course.type === INTER_B2B) promises.push(this.getTrainees());
 
     await Promise.all(promises);
   },
@@ -134,8 +143,40 @@ export default {
     areQuestionnaireAnswersVisible () {
       return !this.isClientInterface && this.questionnaires.length;
     },
+    trainees () {
+      return [...this.course.trainees, ...this.unsubscribedTrainees];
+    },
+    unsubscribedTrainees () {
+      if (this.course.type !== INTER_B2B) return [];
+
+      const traineesId = this.course.trainees.map(trainee => trainee._id);
+      const unsubscribedTraineesId = [...new Set(this.attendanceSheets
+        .filter(a => (!traineesId.includes(get(a, 'trainee._id'))))
+        .map(a => get(a, 'trainee._id')))];
+
+      if (!unsubscribedTraineesId.length) return [];
+
+      return unsubscribedTraineesId.reduce((filtered, traineeId) => {
+        const trainee = this.potentialTrainees.find(t => (t._id === traineeId));
+        if (trainee) {
+          filtered.push({ ...trainee, external: true });
+        }
+
+        return filtered;
+      }, []);
+    },
   },
   methods: {
+    async getTrainees () {
+      try {
+        const query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
+
+        this.potentialTrainees = await Users.learnerList(query);
+      } catch (error) {
+        this.potentialTrainees = [];
+        console.error(error);
+      }
+    },
     async refreshAttendanceSheets () {
       try {
         this.tableLoading = true;
@@ -235,4 +276,11 @@ export default {
     grid-auto-rows: 1fr
     grid-template-columns: repeat(auto-fill, 224px)
     grid-gap: 16px
+
+.unsubscribed
+    color: $primary
+    line-height: 1
+    font-size: 11px
+    font-style: italic
+    padding-top: 3px
 </style>
