@@ -2,7 +2,7 @@
   <div>
     <div class="q-mt-lg q-mb-xl">
       <p class="text-weight-bold">Émargements</p>
-      <attendance-table :course="course" />
+      <attendance-table :course="course" :potential-trainees="potentialTrainees" />
       <ni-simple-table :data="attendanceSheets" :columns="columns" :loading="tableLoading"
         :visible-columns="visibleColumns" :pagination.sync="pagination">
         <template #body="{ props }">
@@ -147,8 +147,6 @@ export default {
       return [...this.course.trainees, ...this.unsubscribedTrainees];
     },
     unsubscribedTrainees () {
-      if (this.course.type !== INTER_B2B) return [];
-
       const traineesId = this.course.trainees.map(trainee => trainee._id);
       const unsubscribedTraineesId = [...new Set(this.attendanceSheets
         .filter(a => (!traineesId.includes(get(a, 'trainee._id'))))
@@ -169,7 +167,12 @@ export default {
   methods: {
     async getTrainees () {
       try {
-        const query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
+        let query;
+
+        if (this.course.type === INTRA) query = { company: this.selectedCompany };
+        if (this.course.type === INTER_B2B) {
+          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
+        }
 
         this.potentialTrainees = await Users.learnerList(query);
       } catch (error) {

@@ -64,10 +64,9 @@ import pick from 'lodash/pick';
 import get from 'lodash/get';
 import { required } from 'vuelidate/lib/validators';
 import Attendances from '@api/Attendances';
-import Users from '@api/Users';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
-import { DEFAULT_AVATAR, INTRA, INTER_B2B } from '@data/constants';
+import { DEFAULT_AVATAR } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
 import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions } from '@helpers/utils';
@@ -78,6 +77,7 @@ export default {
   name: 'AttendanceTable',
   props: {
     course: { type: Object, default: () => ({}) },
+    potentialTrainees: { type: Array, default: () => [] },
   },
   components: {
     'ni-button': Button,
@@ -94,7 +94,6 @@ export default {
       modalLoading: false,
       traineeAdditionModal: false,
       newTraineeAttendance: { trainee: '', attendances: [] },
-      potentialTrainees: [],
       isClientInterface,
     };
   },
@@ -108,7 +107,6 @@ export default {
   },
   async created () {
     await this.refreshAttendances({ course: this.course._id });
-    await this.getTrainees();
   },
   computed: {
     ...mapState('main', ['loggedUser']),
@@ -234,21 +232,6 @@ export default {
         } finally {
           this.loading = false;
         }
-      }
-    },
-    async getTrainees () {
-      try {
-        let query;
-
-        if (this.course.type === INTRA) query = { company: this.selectedCompany };
-        if (this.course.type === INTER_B2B) {
-          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
-        }
-
-        this.potentialTrainees = await Users.learnerList(query);
-      } catch (error) {
-        this.potentialTrainees = [];
-        console.error(error);
       }
     },
     async addTrainee () {
