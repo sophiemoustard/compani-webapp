@@ -431,7 +431,7 @@ export default {
     },
     // Administrative document
     getAdministrativeDocumentLink (doc) {
-      return get(doc, 'driveFile.link') || false;
+      return get(doc, 'driveFile.link') || '';
     },
     async getAdministrativeDocuments () {
       try {
