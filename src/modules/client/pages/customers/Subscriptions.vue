@@ -104,7 +104,7 @@
     <q-dialog v-model="newESignModal" @hide="checkMandates" full-height full-width data-cy="esign-modal">
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end no-wrap">
-          <ni-button icon="clear" @click.native="newESignModal = false" />
+          <ni-button icon="close" @click.native="newESignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
           <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />

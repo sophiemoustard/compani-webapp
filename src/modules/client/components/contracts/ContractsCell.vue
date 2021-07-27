@@ -60,7 +60,7 @@
         <template v-if="displayActions && !contract.endDate">
           <ni-button icon="add" label="Ajouter un avenant"
             @click="openVersionCreation(contract)" :disable="contractsLoading" />
-          <ni-button icon="clear" label="Mettre fin au contrat"
+          <ni-button icon="close" label="Mettre fin au contrat"
             @click="openEndContract(contract)" :disable="contractsLoading" />
         </template>
       </q-card-actions>
@@ -69,7 +69,7 @@
     <q-dialog v-model="esignModal" @hide="refreshWithTimeout" full-height full-width>
       <q-card class="full-height" style="width: 80vw">
         <q-card-section class="row justify-end">
-          <ni-button icon="clear" size="sm" @click.native="esignModal = false" />
+          <ni-button icon="close" size="sm" @click.native="esignModal = false" />
         </q-card-section>
         <q-card-section class="full-height">
           <iframe :src="embeddedUrl" frameborder="0" class="iframe-normal" />

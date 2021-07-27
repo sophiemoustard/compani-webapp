@@ -14,7 +14,7 @@
         @click="validateImageDeletion" />
       <q-btn v-if="disablePictureEdition && hasPicture" color="primary" round flat icon="save_alt" size="1rem"
         type="a" :href="pictureDlLink(pictureLink)" target="_blank" />
-      <q-btn v-if="!disablePictureEdition" color="primary" icon="clear" @click="closePictureEdition" round flat
+      <q-btn v-if="!disablePictureEdition" color="primary" icon="close" @click="closePictureEdition" round flat
         size="1rem" />
       <q-btn v-if="!disablePictureEdition" color="primary" icon="rotate_left" @click="croppa.rotate(-1)" round
         flat size="1rem" />

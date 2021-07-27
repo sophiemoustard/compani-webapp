@@ -8,7 +8,7 @@
       </div>
     </div>
     <div class="col-1 cursor-pointer modal-btn-close">
-      <ni-button icon="clear" @click.native="close" />
+      <ni-button icon="close" @click.native="close" />
     </div>
   </div>
 </template>
