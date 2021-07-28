@@ -19,7 +19,7 @@
     </template>
     <template slot="footer">
       <q-btn class="modal-btn full-width" color="primary" no-caps :loading="loading" label="Supprimer les interventions"
-        @click="validateEventsDeletion" icon-right="clear" />
+        @click="validateEventsDeletion" icon-right="close" />
     </template>
   </ni-modal>
 </template>
