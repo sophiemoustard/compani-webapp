@@ -9,6 +9,7 @@ export const DOC_EXTENSIONS = 'image/jpg, image/jpeg, application/pdf';
 export const IMAGE_EXTENSIONS = 'image/jpg, image/jpeg, image/png';
 export const VIDEO_EXTENSIONS = 'video/*';
 export const AUDIO_EXTENSIONS = 'audio/*';
+export const HTML_EXTENSIONS = '.html';
 
 // CUSTOMER
 export const CIVILITY_OPTIONS = [
@@ -474,7 +475,8 @@ export const SUPPORT_STOPPING_REASONS_OPTIONS = [
 
 // TIMESTAMPING
 export const MANUAL_TIME_STAMPING = 'manual_time_stamping';
-export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING];
+export const QR_CODE_TIME_STAMPING = 'qr_code_time_stamping';
+export const TIME_STAMPING_ACTIONS = [MANUAL_TIME_STAMPING, QR_CODE_TIME_STAMPING];
 export const QRCODE_MISSING = 'qrcode_missing';
 export const QRCODE_ERROR = 'qrcode_error';
 export const CAMERA_ERROR = 'camera_error';
@@ -483,3 +485,6 @@ export const MANUAL_TIME_STAMPING_REASONS = {
   [QRCODE_ERROR]: 'Le code barre ne fonctionne pas',
   [CAMERA_ERROR]: 'Mon appareil photo ne fonctionne pas',
 };
+// NOTE
+export const NOTE_CREATION = 'note_creation';
+export const NOTE_UPDATE = 'note_update';

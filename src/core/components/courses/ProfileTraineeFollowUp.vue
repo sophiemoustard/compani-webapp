@@ -27,7 +27,7 @@
           label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
       </div>
     </div>
-    <div v-if="questionnaires.length" class="q-mb-xl">
+    <div v-if="areQuestionnaireAnswersVisible" class="q-mb-xl">
       <p class="text-weight-bold">Réponses aux questionnaires</p>
       <div class="questionnaires-container">
         <questionnaire-answers-cell v-for="questionnaire in questionnaires" :key="questionnaire._id"
@@ -116,9 +116,10 @@ export default {
     };
   },
   async created () {
-    await this.getLearnersList();
-    await this.refreshAttendanceSheets();
-    await this.refreshQuestionnaires();
+    const promises = [this.getLearnersList(), this.refreshAttendanceSheets()];
+    if (!this.isClientInterface) promises.push(this.refreshQuestionnaires());
+
+    await Promise.all(promises);
   },
   computed: {
     ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),
@@ -129,6 +130,9 @@ export default {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
       return ability.can('update', 'course_trainee_follow_up');
+    },
+    areQuestionnaireAnswersVisible () {
+      return !this.isClientInterface && this.questionnaires.length;
     },
   },
   methods: {

@@ -81,6 +81,13 @@
                 'customersConfig'
               )" />
           </div>
+          <div class="col-xs-12 col-md-6">
+            <ni-file-uploader caption="Conditions générales de services" path="customersConfig.templates.gcs"
+              alt="document conditions générales de services" name="gcs" @uploaded="documentUploaded"
+              :additional-value="`gcs_${company.name}`" :url="docsUploadUrl" drive-storage :entity="company"
+              @delete="validateDocumentDeletion(company.customersConfig.templates.gcs.driveId,'gcs','customersConfig')"
+              :extensions="HTML_EXTENSIONS" />
+          </div>
         </div>
       </div>
       <div class="q-mb-xl">
@@ -188,6 +195,7 @@ import {
   FIXED,
   COMPANY,
   REQUIRED_LABEL,
+  HTML_EXTENSIONS,
 } from '@data/constants';
 import moment from '@helpers/moment';
 import { roundFrenchPercentage, formatHoursWithMinutes } from '@helpers/utils';
@@ -527,6 +535,7 @@ export default {
         sortBy: 'startDate',
         descending: true,
       },
+      HTML_EXTENSIONS,
     };
   },
   validations: {

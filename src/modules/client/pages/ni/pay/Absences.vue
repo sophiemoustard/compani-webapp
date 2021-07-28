@@ -7,7 +7,7 @@
         </div>
       </template>
     </ni-title-header>
-    <ni-simple-table :data="absences" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
+    <ni-simple-table :data="events" :columns="columns" :loading="tableLoading" :pagination.sync="pagination">
       <template #body="{ props }">
         <q-tr :props="props">
           <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
@@ -67,7 +67,7 @@ export default {
       personKey: AUXILIARY,
       loading: false,
       tableLoading: false,
-      absences: [],
+      events: [],
       editedEvent: {},
       editionModal: false,
       selectedAuxiliary: { picture: {}, identity: { lastname: '' } },
@@ -173,13 +173,13 @@ export default {
       try {
         this.tableLoading = true;
         if (this.datesHasError) return;
-        this.absences = await Events.list({
+        this.events = await Events.list({
           type: ABSENCE,
           startDate: this.dates.startDate,
           endDate: this.dates.endDate,
         });
       } catch (e) {
-        this.absences = [];
+        this.events = [];
         console.error(e);
       } finally {
         this.tableLoading = false;

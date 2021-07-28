@@ -154,7 +154,7 @@ export default {
         await this.refreshUser();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modifiation du profil');
+        throw e;
       }
     },
     async submitPasswordChange () {

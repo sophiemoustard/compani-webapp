@@ -268,8 +268,8 @@ export default {
     update (event, path) {
       this.$emit('update:editedEvent', set({ ...this.editedEvent }, path, event));
     },
-    updateAbsence (event) {
-      this.$emit('update:editedEvent', { ...this.editedEvent, absence: event });
+    async updateAbsence (event) {
+      await this.$emit('update:editedEvent', { ...this.editedEvent, absence: event });
       this.setDateHours(this.editedEvent, 'editedEvent');
     },
     updateAddress (event) {

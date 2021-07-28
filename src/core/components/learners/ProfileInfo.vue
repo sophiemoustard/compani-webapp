@@ -38,7 +38,6 @@ import Users from '@api/Users';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
 import PictureUploader from '@components/PictureUploader';
-import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
 import { AUXILIARY_ROLES } from '@data/constants';
@@ -91,7 +90,7 @@ export default {
         await this.refreshUser();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modifiation de l\'apprenant');
+        throw e;
       }
     },
     async refreshUser () {

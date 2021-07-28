@@ -33,9 +33,13 @@
           <div class="col-xs-12">
             <q-checkbox v-model="customer.subscriptionsAccepted" class="q-mr-sm" @input="confirmAgreement"
               :disable="customer.subscriptionsAccepted" dense />
-            <span style="vertical-align: middle">J'accepte les conditions d’abonnement présentées ci-dessus ainsi que
-              les <a href="#cgs" @click.prevent="cgsModal = true">conditions générales de services
-                Alenvi</a>.<span class="text-weight-thin text-italic" data-cy="agreement"> {{ agreement }}</span></span>
+            <span style="vertical-align: middle">
+              J'accepte les conditions d’abonnement présentées ci-dessus ainsi que les
+              <a href="#gcs" @click.prevent="gcsModal = true">
+                conditions générales de services {{ helper.company.name }}.
+              </a>
+              <span class="text-weight-thin text-italic" data-cy="agreement">{{ agreement }}</span>
+            </span>
           </div>
         </div>
       </div>
@@ -109,8 +113,8 @@
     </q-dialog>
 
     <!-- CSG modal -->
-    <ni-html-modal title="Conditions Générales de Service Alenvi" v-model="cgsModal" :html="cgs" @show="openCgsModal"
-      @hide="closeCgsModal" :loading="!showCgs" />
+    <ni-html-modal :title="htmlModalTitle" v-model="gcsModal" :html="gcs" @show="openGcsModal" @hide="closeGcsModal"
+      :loading="gcsLoading" />
 
     <!-- Subscription history modal -->
     <ni-modal v-model="subscriptionHistoryModal" @hide="resetSubscriptionHistoryData">
@@ -174,9 +178,9 @@ export default {
   mixins: [customerMixin, subscriptionMixin, financialCertificatesMixin, fundingMixin, tableMixin],
   data () {
     return {
-      cgs: null,
-      cgsModal: false,
-      showCgs: false,
+      gcs: null,
+      gcsModal: false,
+      gcsLoading: false,
       agreed: false,
       tmpInput: null,
       newESignModal: false,
@@ -249,6 +253,9 @@ export default {
         ? `${process.env.API_HOSTNAME}/customers/${this.customer._id}/gdrive/${this.customer.driveFolder.driveId}`
           + '/upload'
         : '';
+    },
+    htmlModalTitle () {
+      return `Conditions Générales de Services ${this.helper.company.name}`;
     },
   },
   async created () {
@@ -429,20 +436,23 @@ export default {
       this.fundingData = [];
       this.fundingModal = false;
     },
-    async openCgsModal () {
+    async openGcsModal () {
       try {
-        this.showCgs = false;
-        const cgsDriveId = get(this.helper, 'company.customersConfig.templates.cgs.driveId');
-        if (!cgsDriveId) return;
-        const file = await Drive.downloadFileById(cgsDriveId);
-        this.cgs = file.data;
-        this.showCgs = true;
+        this.gcsLoading = true;
+        const gcsDriveId = get(this.helper, 'company.customersConfig.templates.gcs.driveId');
+        if (!gcsDriveId) return;
+
+        const file = await Drive.downloadFileById(gcsDriveId);
+
+        this.gcs = file.data;
       } catch (e) {
         console.error(e);
+      } finally {
+        this.gcsLoading = false;
       }
     },
-    closeCgsModal () {
-      this.cgs = null;
+    closeGcsModal () {
+      this.gcs = null;
     },
   },
 };

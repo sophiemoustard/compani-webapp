@@ -17,26 +17,31 @@
     </div>
     <p class="text-weight-bold q-mt-lg">Partenaires</p>
     <q-card>
-      <ni-responsive-table :data="partnerOrganization.partners" :columns="columns">
-        <template #header="{ props }">
-          <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props" :style="col.style"
-              :class="[{ 'table-actions-responsive': col.name === 'actions' }]">
-              {{ col.label }}
-            </q-th>
-          </q-tr>
-        </template>
-        <template #body="{ props }">
-            <q-tr :props="props">
-              <q-td v-for="col in props.cols" :key="col.name" :data-label="col.label" :props="props" :class="col.name"
-                :style="col.style">
-                <ni-button v-if="col.name === 'actions'" @click.native="openPartnerEditionModal(props.row)"
-                  icon="edit" />
-                <template v-else>{{ col.value }}</template>
-              </q-td>
-            </q-tr>
+      <ni-expanding-table :data="partnerOrganization.partners" :columns="columns">
+          <template #row="{ props }">
+            <q-td v-for="col in props.cols" :key="col.name" :props="props">
+              <template v-if="col.name === 'actions'">
+                <div class="row no-wrap table-actions items-center">
+                  <q-icon :name="props.expand ? 'expand_less' : 'expand_more'" />
+                  <ni-button icon="edit" @click="openPartnerEditionModal(props.row)" />
+                </div>
+              </template>
+              <template v-else>{{ col.value }}</template>
+            </q-td>
           </template>
-      </ni-responsive-table>
+          <template #expanding-row="{ props }">
+            <q-td colspan="100%">
+              <div v-if="!props.row.customerPartners.length" class="q-px-lg text-italic text-center">
+                Aucun bénéficiaire prescrit.
+              </div>
+              <div v-else v-for="customerPartner in props.row.customerPartners" :key="customerPartner._id"
+                :props="props" class="q-px-lg q-my-sm row justify-between">
+                <div>{{ formatIdentity(customerPartner.customer.identity, 'FL') }}</div>
+                <div class="q-mr-xl">créé le {{ formatDate(customerPartner.customer.createdAt) }}</div>
+              </div>
+            </q-td>
+          </template>
+      </ni-expanding-table>
       <q-card-actions align="right">
         <ni-button color="primary" icon="add" label="Ajouter un partenaire" @click="partnerCreationModal = true" />
       </q-card-actions>
@@ -63,9 +68,10 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup
 import SearchAddress from '@components/form/SearchAddress';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import ResponsiveTable from '@components/table/ResponsiveTable';
+import ExpandingTable from '@components/table/ExpandingTable';
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { formatIdentity, formatPhone, sortStrings } from '@helpers/utils';
+import { formatDate } from '@helpers/date';
 import { validationMixin } from '@mixins/validationMixin';
 import { partnerOrganizationMixin } from '@mixins/partnerOrganizationMixin';
 import PartnerCreationModal from 'src/modules/client/components/customers/PartnerCreationModal';
@@ -82,7 +88,7 @@ export default {
     'ni-search-address': SearchAddress,
     'ni-input': Input,
     'ni-button': Button,
-    'ni-responsive-table': ResponsiveTable,
+    'ni-expanding-table': ExpandingTable,
     'partner-creation-modal': PartnerCreationModal,
     'partner-edition-modal': PartnerEditionModal,
   },
@@ -115,10 +121,20 @@ export default {
           format: value => (value ? JOB_OPTIONS.find(job => job.value === value).label : ''),
           sortable: true,
         },
-        { name: 'actions', label: '', align: 'center', field: '_id' },
+        {
+          name: 'prescriptions',
+          label: 'Prescriptions',
+          field: 'customerPartners',
+          align: 'left',
+          format: value => value.length,
+          sortable: true,
+        },
+        { name: 'actions', label: '', align: 'center' },
       ],
       partnerEditionModal: false,
       editedPartner: { identity: { firstname: '', lastname: '' }, email: '', phone: '', job: '' },
+      formatIdentity,
+      formatDate,
     };
   },
   validations: {
@@ -219,7 +235,7 @@ export default {
         this.$v.editedPartner.$touch();
         if (this.$v.editedPartner.$error) return NotifyWarning('Champ(s) invalide(s).');
 
-        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id']));
+        await Partner.updateById(this.editedPartner._id, omit(this.editedPartner, ['_id', 'customerPartners']));
 
         this.partnerEditionModal = false;
         NotifyPositive('Partenaire modifié.');

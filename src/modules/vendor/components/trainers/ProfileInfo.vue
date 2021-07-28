@@ -34,7 +34,6 @@ import set from 'lodash/set';
 import Users from '@api/Users';
 import Input from '@components/form/Input';
 import Button from '@components/Button';
-import { NotifyNegative } from '@components/popup/notify';
 import { userMixin } from '@mixins/userMixin';
 import { required, email } from 'vuelidate/lib/validators';
 import { validationMixin } from '@mixins/validationMixin';
@@ -88,7 +87,7 @@ export default {
         await this.refreshUser();
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modifiation du formateur');
+        throw e;
       }
     },
     async refreshUser () {
