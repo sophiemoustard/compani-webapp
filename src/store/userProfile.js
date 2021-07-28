@@ -1,7 +1,10 @@
+import get from 'lodash/get';
 import Users from '@api/Users';
 import { userModel } from '@data/user';
 import { extend } from '@helpers/utils';
 import { userProfileValidation } from 'src/modules/client/helpers/userProfileValidation';
+import store from 'src/store/index';
+import router from 'src/router/index';
 
 export default {
   namespaced: true,
@@ -28,6 +31,12 @@ export default {
     fetchUserProfile: async ({ commit }, params) => {
       try {
         const user = await Users.getById(params.userId);
+
+        const userClientRole = store.getters['main/getClientRole'];
+        if (userClientRole && !/\/ad\//.test(router.currentRoute.path)) {
+          const loggedUserCompany = store.getters['main/getCompany'];
+          if (get(user, 'company._id') !== loggedUserCompany._id) return router.replace({ path: '/404' });
+        }
 
         commit('SET_USER_PROFILE', { ...extend(userModel, user) });
       } catch (e) {
