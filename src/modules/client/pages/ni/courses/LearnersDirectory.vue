@@ -107,9 +107,9 @@ export default {
         const userInfo = await Users.exists({ email: this.newLearner.local.email });
 
         if (!userInfo.exists) return this.goToCreationStep();
-        if (!userInfo.user.company) return this.updateLearner(userInfo.user._id);
+        if (!userInfo.user.company && userInfo.user._id) return this.updateLearner(userInfo.user._id);
 
-        return userInfo.user.company === this.company._id
+        return get(userInfo, 'user.company') === this.company._id
           ? NotifyWarning('L\'apprenant est déjà ajouté.')
           : NotifyNegative('L\'apprenant n\'est pas relié à cette structure.');
       } catch (e) {

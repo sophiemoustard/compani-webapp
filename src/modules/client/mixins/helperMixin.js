@@ -143,7 +143,7 @@ export const helperMixin = {
         const userInfo = await Users.exists({ email: this.newHelper.local.email });
         const { user } = userInfo;
 
-        const sameOrNoCompany = !user.company || user.company === this.company._id;
+        const sameOrNoCompany = (!user.company && user._id) || user.company === this.company._id;
         if (userInfo.exists && (get(user, 'role.client') || !sameOrNoCompany)) {
           NotifyNegative('Utilisateur déjà existant');
         } else if (userInfo.exists) {

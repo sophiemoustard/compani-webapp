@@ -211,10 +211,10 @@ export default {
 
         if (userInfo.exists) {
           if (this.isIntraCourse) {
-            if (!userInfo.user.company) {
+            if (!userInfo.user.company && userInfo.user._id) {
               this.newTrainee.company = this.course.company._id;
               await this.addTrainee();
-            } else if (userInfo.user.company === this.course.company._id) await this.addTrainee();
+            } else if (get(userInfo, 'user.company') === this.course.company._id) await this.addTrainee();
             else return NotifyNegative('Ce stagiaire n\'est pas relié à la structure de la formation.');
           } else if (userInfo.user.company) await this.addTrainee();
           else this.firstStep = false;
