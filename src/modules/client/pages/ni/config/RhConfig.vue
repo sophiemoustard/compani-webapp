@@ -340,7 +340,7 @@ export default {
     validateInternalHourDeletion (internalHour) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cette heure interne ?',
+        message: 'Êtes-vous sûr de vouloir supprimer cette heure interne ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteInternalHour(internalHour))
@@ -423,7 +423,7 @@ export default {
     validateSectorDeletion (sector) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cette équipe ?',
+        message: 'Êtes-vous sûr de vouloir supprimer cette équipe ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteSector(sector))
@@ -489,7 +489,7 @@ export default {
     validateAdministrativeDocumentDeletion (doc) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr de vouloir supprimer ce document ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteAdministrativeDocument(doc))

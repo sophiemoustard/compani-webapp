@@ -467,7 +467,7 @@ export default {
     validateTaxCertificateDeletion (taxCertificateId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cette attestation ?',
+        message: 'Êtes-vous sûr de vouloir supprimer cette attestation ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteTaxCertificate(taxCertificateId, row))
@@ -487,7 +487,7 @@ export default {
     validateRefundDeletion (refund) {
       const message = this.hasTaxCertificateOnSameYear(refund, this.taxCertificates)
         ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer ?'
-        : 'Etes-vous sûr de vouloir supprimer ce remboursement ?';
+        : 'Êtes-vous sûr de vouloir supprimer ce remboursement ?';
 
       this.$q.dialog({
         title: 'Confirmation',
