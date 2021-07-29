@@ -1013,6 +1013,7 @@ export default {
     },
     async createNewThirdPartyPayer () {
       try {
+        this.$v.newThirdPartyPayer.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.newThirdPartyPayer);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 
@@ -1034,6 +1035,7 @@ export default {
     },
     async updateThirdPartyPayer () {
       try {
+        this.$v.editedThirdPartyPayer.$touch();
         const formIsValid = await this.waitForFormValidation(this.$v.editedThirdPartyPayer);
         if (!formIsValid) return NotifyWarning('Champ(s) invalide(s)');
 

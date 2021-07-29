@@ -87,9 +87,12 @@ export default {
     async deleteEvents () {
       try {
         this.loading = true;
+        this.$v.deletedEvents.$touch();
         const isValid = await this.waitForFormValidation(this.$v.deletedEvents);
         if (!isValid) return NotifyNegative('Champ(s) invalide(s)');
+
         await Events.deleteList(omit(this.deletedEvents, 'inRange'));
+
         this.hide();
         NotifyPositive('Les évènements ont bien étés supprimés');
       } catch (e) {

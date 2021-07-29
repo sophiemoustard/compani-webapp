@@ -80,15 +80,18 @@ export default {
     async update (field, value) {
       this.formValue[field] = value;
       this.$emit('input', this.formValue);
+
       if (this.$v.formValue[field]) {
+        this.$v.formValue[field].$touch();
         await this.waitForFormValidation(this.$v.formValue[field]);
         this.$emit('valid', !this.$v.formValue.$invalid);
       }
     },
     async validate () {
-      this.$v.$touch();
+      this.$v.formValue.$touch();
       const isValid = await this.waitForFormValidation(this.$v.formValue);
       this.$emit('valid', isValid);
+
       return isValid;
     },
   },
