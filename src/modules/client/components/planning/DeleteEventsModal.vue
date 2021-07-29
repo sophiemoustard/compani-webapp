@@ -78,7 +78,7 @@ export default {
     validateEventsDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr de vouloir supprimer ces évènements ?',
+        message: 'Êtes-vous sûr de vouloir supprimer ces évènements ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(this.deleteEvents)
@@ -91,7 +91,7 @@ export default {
         if (!isValid) return NotifyNegative('Champ(s) invalide(s)');
         await Events.deleteList(omit(this.deletedEvents, 'inRange'));
         this.hide();
-        NotifyPositive('Les évènements ont bien étés supprimés');
+        NotifyPositive('Les évènements ont bien étés supprimés.');
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative(e.data.message);

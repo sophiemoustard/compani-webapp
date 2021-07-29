@@ -18,7 +18,7 @@ export const financialCertificatesMixin = {
     validateFinancialCertifDeletion (driveId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce document ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce document ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteDocument(driveId))

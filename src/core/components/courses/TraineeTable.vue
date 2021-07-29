@@ -309,7 +309,7 @@ export default {
     validateTraineeDeletion (traineeId) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir retirer ce stagiaire de la formation ?',
+        message: 'Êtes-vous sûr(e) de vouloir retirer ce stagiaire de la formation ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteTrainee(traineeId))
