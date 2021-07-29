@@ -150,10 +150,7 @@ export default {
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],
-      pagination: {
-        page: 1,
-        rowsPerPage: 15,
-      },
+      pagination: { page: 1, rowsPerPage: 15 },
       potentialTrainees: [],
     };
   },
@@ -226,11 +223,11 @@ export default {
 
       if (!unsubscribedTraineesId.length) return [];
 
-      return unsubscribedTraineesId.reduce((filtered, traineeId) => {
+      return unsubscribedTraineesId.reduce((acc, traineeId) => {
         const trainee = this.potentialTrainees.find(t => (t._id === traineeId));
-        if (trainee) filtered.push({ ...trainee, external: true });
+        if (trainee) acc.push({ ...trainee, external: true });
 
-        return filtered;
+        return acc;
       }, []);
     },
     traineeFilterOptions () {
