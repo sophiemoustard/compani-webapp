@@ -1,7 +1,7 @@
 <template>
 <div>
   <q-card flat>
-    <q-table v-if="courseHasSlot" :data="trainees" :columns="columns" class="q-pa-md table"
+    <q-table v-if="courseHasSlot" :data="traineesWithAttendance" :columns="attendanceColumns" class="q-pa-md table"
       separator="none" :hide-bottom="!noTrainees" :loading="loading" :pagination="{ rowsPerPage: 0 }">
       <template #header="props">
         <q-tr :props="props">
@@ -37,7 +37,7 @@
               </q-item>
             </div>
             <q-checkbox v-else :value="checkboxValue(col.value, col.slot)" dense size="sm"
-              @input="updateCheckbox(col.value, col.slot)" :disable="loading || !canUpdateAttendance" />
+              @input="updateCheckbox(col.value, col.slot)" :disable="loading || !canUpdate" />
           </q-td>
         </q-tr>
       </template>
@@ -48,13 +48,44 @@
     <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
-    <ni-button v-if="courseHasSlot && canUpdateAttendance" color="primary" icon="add" class="q-mb-sm"
+    <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm"
       label="Ajouter un participant" :disable="loading" @click="traineeAdditionModal = true" />
   </q-card>
 
+  <ni-simple-table :data="attendanceSheets" :columns="attendanceSheetColumns" :loading="attendanceSheetTableLoading"
+    :visible-columns="attendanceSheetVisibleColumns" :pagination.sync="pagination">
+    <template #body="{ props }">
+      <q-tr :props="props">
+        <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
+          :style="col.style">
+          <template v-if="col.name === 'actions'">
+            <div class="row no-wrap table-actions justify-end">
+              <ni-button icon="file_download" color="primary" type="a" :href="props.row.file.link"
+                :disable="!props.row.file.link" />
+              <ni-button v-if="canUpdate" icon="delete" color="primary"
+                @click="validateAttendanceSheetDeletion(props.row)" :disable="!props.row.file.link" />
+            </div>
+          </template>
+          <template v-else>
+            {{ col.value.identity }}
+            <div v-if="col.value.external" class="unsubscribed text-primary">Pas inscrit</div>
+          </template>
+        </q-td>
+      </q-tr>
+    </template>
+  </ni-simple-table>
+  <div class="flex justify-end">
+    <ni-button v-if="canUpdate" class="bg-primary" color="white" icon="add"
+      label="Ajouter une feuille d'émargement" @click="attendanceSheetAdditionModal = true" />
+  </div>
+
   <trainee-attendance-creation-modal v-model="traineeAdditionModal" :course="course" @hide="resetNewTraineeAttendance"
-    @submit="addTrainee" :loading="modalLoading" :trainees="trainees" :validation="$v.newTraineeAttendance"
-    :new-trainee-attendance.sync="newTraineeAttendance" :trainee-filter-options="traineeFilterOptions" />
+     :loading="modalLoading" :validation="$v.newTraineeAttendance" :trainee-filter-options="traineeFilterOptions"
+    :new-trainee-attendance.sync="newTraineeAttendance" :trainees="traineesWithAttendance" @submit="addTrainee" />
+
+  <attendance-sheet-addition-modal v-model="attendanceSheetAdditionModal" @hide="resetAttendanceSheetAdditionModal"
+      @submit="addAttendanceSheet" :new-attendance-sheet.sync="newAttendanceSheet" :validations="$v.newAttendanceSheet"
+      :loading="modalLoading" :course="course" />
 </div>
 </template>
 
@@ -62,16 +93,20 @@
 import { mapState } from 'vuex';
 import pick from 'lodash/pick';
 import get from 'lodash/get';
-import { required } from 'vuelidate/lib/validators';
+import { required, requiredIf } from 'vuelidate/lib/validators';
 import Attendances from '@api/Attendances';
+import AttendanceSheets from '@api/AttendanceSheets';
 import Users from '@api/Users';
 import Button from '@components/Button';
 import { NotifyPositive, NotifyNegative, NotifyWarning } from '@components/popup/notify';
 import { DEFAULT_AVATAR, INTRA, INTER_B2B } from '@data/constants';
 import { minArrayLength } from '@helpers/vuelidateCustomVal';
 import moment from '@helpers/moment';
+import { formatDate } from '@helpers/date';
 import { upperCaseFirstLetter, formatIdentity, formatAndSortIdentityOptions } from '@helpers/utils';
 import { defineAbilitiesFor } from '@helpers/ability';
+import SimpleTable from '@components/table/SimpleTable';
+import AttendanceSheetAdditionModal from '@components/courses/AttendanceSheetAdditionModal';
 import TraineeAttendanceCreationModal from './TraineeAttendanceCreationModal';
 
 export default {
@@ -81,7 +116,9 @@ export default {
   },
   components: {
     'ni-button': Button,
+    'ni-simple-table': SimpleTable,
     'trainee-attendance-creation-modal': TraineeAttendanceCreationModal,
+    'attendance-sheet-addition-modal': AttendanceSheetAdditionModal,
   },
   data () {
     const isClientInterface = !/\/ad\//.test(this.$router.currentRoute.path);
@@ -92,10 +129,29 @@ export default {
       attendances: [],
       loading: false,
       modalLoading: false,
+      attendanceSheetTableLoading: false,
       traineeAdditionModal: false,
       newTraineeAttendance: { trainee: '', attendances: [] },
-      potentialTrainees: [],
       isClientInterface,
+      attendanceSheetAdditionModal: false,
+      attendanceSheets: [],
+      newAttendanceSheet: { course: this.course._id },
+      attendanceSheetColumns: [
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
+        {
+          name: 'trainee',
+          label: 'Nom de l\'apprenant',
+          align: 'left',
+          field: row => (this.traineesWithAttendance.find(trainee => trainee._id === row.trainee._id)),
+          format: value => ({
+            identity: formatIdentity(get(value, 'identity'), 'FL'),
+            external: get(value, 'external'),
+          }),
+        },
+        { name: 'actions', label: '', align: 'left', field: row => row },
+      ],
+      pagination: { page: 1, rowsPerPage: 15 },
+      potentialTrainees: [],
     };
   },
   validations () {
@@ -104,15 +160,23 @@ export default {
         trainee: { required },
         attendances: { minArrayLength: minArrayLength(1) },
       },
+      newAttendanceSheet: {
+        file: { required },
+        trainee: { required: requiredIf(() => this.course.type !== INTRA) },
+        date: { required: requiredIf(() => this.course.type === INTRA) },
+      },
     };
   },
   async created () {
-    await this.refreshAttendances({ course: this.course._id });
-    await this.getTrainees();
+    await Promise.all([
+      this.refreshAttendances({ course: this.course._id }),
+      this.refreshAttendanceSheets(),
+      this.getPotentialTrainees(),
+    ]);
   },
   computed: {
     ...mapState('main', ['loggedUser']),
-    columns () {
+    attendanceColumns () {
       const columns = [{
         name: 'trainee',
         align: 'left',
@@ -137,41 +201,44 @@ export default {
         })),
       ];
     },
+    attendanceSheetVisibleColumns () {
+      return this.course.type === INTRA ? ['date', 'actions'] : ['trainee', 'actions'];
+    },
     noTrainees () {
       return !this.course.trainees.length;
     },
     courseHasSlot () {
       return this.course.slots.length;
     },
-    trainees () {
+    traineesWithAttendance () {
       return [...this.course.trainees, ...this.unsubscribedTrainees];
     },
     unsubscribedTrainees () {
       const traineesId = this.course.trainees.map(trainee => trainee._id);
-      const unsubscribedTraineesId = [...new Set(this.attendances
+      const attendanceInfos = [...this.attendances, ...this.attendanceSheets];
+
+      const unsubscribedTraineesId = [...new Set(attendanceInfos
         .filter(a => (!traineesId.includes(get(a, 'trainee._id'))))
         .map(a => get(a, 'trainee._id')))];
 
       if (!unsubscribedTraineesId.length) return [];
 
-      return unsubscribedTraineesId.reduce((filtered, traineeId) => {
+      return unsubscribedTraineesId.reduce((acc, traineeId) => {
         const trainee = this.potentialTrainees.find(t => (t._id === traineeId));
-        if (trainee) {
-          filtered.push({ ...trainee, external: true });
-        }
+        if (trainee) acc.push({ ...trainee, external: true });
 
-        return filtered;
+        return acc;
       }, []);
     },
     traineeFilterOptions () {
       const formattedTrainees = formatAndSortIdentityOptions(this.potentialTrainees);
 
-      return formattedTrainees.filter(trainee => !this.trainees.map(t => t._id).includes(trainee.value));
+      return formattedTrainees.filter(trainee => !this.traineesWithAttendance.map(t => t._id).includes(trainee.value));
     },
     selectedCompany () {
       return this.course.company ? this.course.company._id : '';
     },
-    canUpdateAttendance () {
+    canUpdate () {
       const ability = defineAbilitiesFor(pick(this.loggedUser, ['role', 'company', '_id', 'sector']));
 
       return ability.can('update', 'course_trainee_follow_up');
@@ -186,6 +253,96 @@ export default {
     },
     traineesCount (slotId) {
       return this.attendances.filter(a => a.courseSlot === slotId).length;
+    },
+    async getPotentialTrainees () {
+      try {
+        let query;
+
+        if (this.course.type === INTRA) query = { company: this.selectedCompany };
+        if (this.course.type === INTER_B2B) {
+          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
+        }
+
+        this.potentialTrainees = Object.freeze(await Users.learnerList(query));
+      } catch (error) {
+        this.potentialTrainees = [];
+        console.error(error);
+      }
+    },
+    async refreshAttendanceSheets () {
+      try {
+        this.attendanceSheetTableLoading = true;
+        const attendanceSheets = await AttendanceSheets.list({ course: this.course._id });
+
+        if (this.course.type === INTER_B2B && this.isClientInterface) {
+          this.attendanceSheets = attendanceSheets
+            .filter(a => get(a, 'trainee.company') === this.loggedUser.company._id);
+        } else this.attendanceSheets = attendanceSheets;
+      } catch (e) {
+        console.error(e);
+        this.attendanceSheets = [];
+        NotifyNegative('Erreur lors de la récupération des feuilles d\'émargement.');
+      } finally {
+        this.attendanceSheetTableLoading = false;
+      }
+    },
+    resetAttendanceSheetAdditionModal () {
+      this.$v.newAttendanceSheet.$reset();
+      this.newAttendanceSheet = { course: this.course._id };
+    },
+    formatPayload () {
+      const { course, file, trainee, date } = this.newAttendanceSheet;
+      const form = new FormData();
+      this.course.type === INTRA ? form.append('date', date) : form.append('trainee', trainee);
+      form.append('course', course);
+      form.append('file', file);
+
+      return form;
+    },
+    async addAttendanceSheet () {
+      try {
+        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter une feuille d\'émargement.');
+
+        this.$v.newAttendanceSheet.$touch();
+        if (this.$v.newAttendanceSheet.$error) return NotifyWarning('Champ(s) invalide(s)');
+        this.modalLoading = true;
+
+        await AttendanceSheets.create(this.formatPayload());
+
+        this.attendanceSheetAdditionModal = false;
+        NotifyPositive('Feuille d\'émargement ajoutée.');
+        await this.refreshAttendanceSheets();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de l\'ajout de la feuille d\'émargement.');
+      } finally {
+        this.modalLoading = false;
+      }
+    },
+    validateAttendanceSheetDeletion (attendanceSheet) {
+      if (!this.canUpdate) return NotifyNegative('Impossible de supprimer la feuille d\'émargement.');
+
+      this.$q.dialog({
+        title: 'Confirmation',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette feuille d\'émargement ?',
+        ok: true,
+        cancel: 'Annuler',
+      }).onOk(() => this.deleteAttendanceSheet(attendanceSheet._id))
+        .onCancel(() => NotifyPositive('Suppression annulée.'));
+    },
+    async deleteAttendanceSheet (attendanceSheetId) {
+      try {
+        this.$q.loading.show();
+        await AttendanceSheets.delete(attendanceSheetId);
+
+        NotifyPositive('Feuille d\'émargement supprimée.');
+        await this.refreshAttendanceSheets();
+      } catch (e) {
+        console.error(e);
+        NotifyNegative('Erreur lors de la suppresion de la feuille d\'émargement.');
+      } finally {
+        this.$q.loading.hide();
+      }
     },
     async refreshAttendances (query) {
       try {
@@ -207,7 +364,7 @@ export default {
       }
     },
     async updateCheckbox (traineeId, slotId) {
-      if (!this.canUpdateAttendance) return NotifyNegative('Impossible de modifier l\'emargement.');
+      if (!this.canUpdate) return NotifyNegative('Impossible de modifier l\'émargement.');
 
       if (this.checkboxValue(traineeId, slotId)) {
         try {
@@ -236,24 +393,9 @@ export default {
         }
       }
     },
-    async getTrainees () {
-      try {
-        let query;
-
-        if (this.course.type === INTRA) query = { company: this.selectedCompany };
-        if (this.course.type === INTER_B2B) {
-          query = this.isClientInterface ? { company: get(this.loggedUser, 'company._id') } : { hasCompany: true };
-        }
-
-        this.potentialTrainees = await Users.learnerList(query);
-      } catch (error) {
-        this.potentialTrainees = [];
-        console.error(error);
-      }
-    },
     async addTrainee () {
       try {
-        if (!this.canUpdateAttendance) return NotifyNegative('Impossible d\'ajouter un participant');
+        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un participant.');
 
         this.$v.newTraineeAttendance.$touch();
         if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
@@ -316,10 +458,11 @@ export default {
     position: sticky
     left: 0
     z-index: 1
+
 .unsubscribed
-    color: $secondary
-    line-height: 1
-    font-size: 11px
-    font-style: italic
-    padding-top: 3px
+  color: $secondary
+  line-height: 1
+  font-size: 11px
+  font-style: italic
+  padding-top: 3px
 </style>
