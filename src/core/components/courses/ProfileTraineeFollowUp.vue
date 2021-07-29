@@ -48,10 +48,8 @@ export default {
     };
   },
   async created () {
-    const promises = [this.getLearnersList()];
-    if (!this.isClientInterface) promises.push(this.refreshQuestionnaires());
-
-    await Promise.all(promises);
+    this.getLearnersList();
+    if (!this.isClientInterface) this.refreshQuestionnaires();
   },
   computed: {
     ...mapState({ course: state => state.course.course, loggedUser: state => state.main.loggedUser }),

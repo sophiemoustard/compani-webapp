@@ -367,7 +367,7 @@ export default {
       }
     },
     async updateCheckbox (traineeId, slotId) {
-      if (!this.canUpdate) return NotifyNegative('Impossible de modifier l\'emargement.');
+      if (!this.canUpdate) return NotifyNegative('Impossible de modifier l\'émargement.');
 
       if (this.checkboxValue(traineeId, slotId)) {
         try {
@@ -398,7 +398,7 @@ export default {
     },
     async addTrainee () {
       try {
-        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un participant');
+        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un participant.');
 
         this.$v.newTraineeAttendance.$touch();
         if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
