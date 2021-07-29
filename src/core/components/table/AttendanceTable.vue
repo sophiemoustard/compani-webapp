@@ -67,7 +67,7 @@
             </div>
           </template>
           <template v-else>
-            {{ col.value.identity }}
+            {{ col.value.title }}
             <div v-if="col.value.external" class="unsubscribed text-primary">Pas inscrit</div>
           </template>
         </q-td>
@@ -137,14 +137,14 @@ export default {
       attendanceSheets: [],
       newAttendanceSheet: { course: this.course._id },
       attendanceSheetColumns: [
-        { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: value => ({ title: formatDate(value) }) },
         {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
           align: 'left',
           field: row => (this.traineesWithAttendance.find(trainee => trainee._id === row.trainee._id)),
           format: value => ({
-            identity: formatIdentity(get(value, 'identity'), 'FL'),
+            title: formatIdentity(get(value, 'identity'), 'FL'),
             external: get(value, 'external'),
           }),
         },
