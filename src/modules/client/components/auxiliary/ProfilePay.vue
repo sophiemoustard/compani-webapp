@@ -33,49 +33,43 @@
         label="Ajouter un document" @click="documentUpload = true" :disable="payDocumentsLoading" />
 
       <!-- Document upload modal -->
-      <ni-modal v-model="documentUpload">
-        <template slot="title">
-          Ajouter un <span class="text-weight-bold">document</span>
-        </template>
-        <ni-document-upload in-modal :nature-options="documentNatureOptions" v-model="newDocument"
-          ref="documentUploadForm" @valid="formValid = $event" />
-        <template slot="footer">
-          <q-btn no-caps class="full-width modal-btn" label="Ajouter le document" icon-right="add" color="primary"
-            :loading="loading" @click="createDocument" />
-        </template>
-      </ni-modal>
+      <pay-document-creation-modal v-model="documentUpload" :validations="$v.newPayDocument" @submit="createDocument"
+        :new-pay-document.sync="newPayDocument" :loading="loading" @hide="resetNewPayDocument" />
     </div>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapState } from 'vuex';
+import { required } from 'vuelidate/lib/validators';
 import get from 'lodash/get';
 import keyBy from 'lodash/keyBy';
 import mapValues from 'lodash/mapValues';
 import PayDocuments from '@api/PayDocuments';
-import Modal from '@components/modal/Modal';
 import SimpleTable from '@components/table/SimpleTable';
 import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup/notify';
 import { PAY_DOCUMENT_NATURES, COACH_ROLES } from '@data/constants';
 import { formatDate } from '@helpers/date';
-import DocumentUpload from 'src/modules/client/components/documents/DocumentUpload';
+import { validationMixin } from '@mixins/validationMixin';
+import PayDocumentCreationModal from 'src/modules/client/components/pay/PayDocumentCreationModal';
 import { tableMixin } from 'src/modules/client/mixins/tableMixin';
 
 export default {
   name: 'ProfilePay',
-  mixins: [tableMixin],
+  mixins: [tableMixin, validationMixin],
   components: {
-    'ni-document-upload': DocumentUpload,
-    'ni-modal': Modal,
+    'pay-document-creation-modal': PayDocumentCreationModal,
     'ni-simple-table': SimpleTable,
   },
   data () {
     return {
       documentUpload: false,
-      documentNatureOptions: PAY_DOCUMENT_NATURES,
       loading: false,
-      newDocument: null,
+      newPayDocument: {
+        nature: null,
+        date: new Date().toISOString(),
+        file: null,
+      },
       formValid: false,
       payDocuments: [],
       payDocumentsLoading: false,
@@ -94,6 +88,14 @@ export default {
         sortBy: 'date',
         descending: true,
         rowsPerPage: 0,
+      },
+    };
+  },
+  validations () {
+    return {
+      newPayDocument: {
+        nature: { required },
+        file: { required, maxSize: file => !file || file.size < 5000000 },
       },
     };
   },
@@ -123,7 +125,7 @@ export default {
       return get(doc, 'file.link') || false;
     },
     formatDocumentPayload () {
-      const { file, nature, date } = this.newDocument;
+      const { file, nature, date } = this.newPayDocument;
       const form = new FormData();
       form.append('nature', nature);
       form.append('date', date);
@@ -133,9 +135,19 @@ export default {
 
       return form;
     },
+    resetNewPayDocument () {
+      this.newPayDocument = {
+        nature: null,
+        date: new Date().toISOString(),
+        file: null,
+      };
+      this.$v.newPayDocument.$reset();
+    },
     async createDocument () {
       if (!this.driveFolder) NotifyNegative('Dossier Google Drive manquant.');
-      const isValid = await this.$refs.documentUploadForm.validate();
+
+      this.$v.newPayDocument.$touch();
+      const isValid = await this.waitForFormValidation(this.$v.newPayDocument);
       if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
       this.loading = true;
