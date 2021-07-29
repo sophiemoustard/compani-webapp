@@ -337,7 +337,6 @@ export default {
         this.auxiliaryCreationModal = false;
 
         if (this.sendWelcomeMsg) await this.sendSMS(editedUser);
-        this.resetForm();
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative('Email déjà existant.');
