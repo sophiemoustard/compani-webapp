@@ -210,10 +210,14 @@ export default {
       return [...this.course.trainees, ...this.unsubscribedTrainees];
     },
     formattedAttendanceSheets () {
-      return this.attendanceSheets.map(as => ({
-        ...this.traineesWithAttendance.find(trainee => trainee._id === as.trainee._id),
-        ...as,
-      }));
+      if (this.course.type === INTER_B2B) {
+        return this.attendanceSheets.map(as => ({
+          ...this.traineesWithAttendance.find(trainee => trainee._id === as.trainee._id),
+          ...as,
+        }));
+      }
+
+      return this.attendanceSheets;
     },
     unsubscribedTrainees () {
       const traineesId = this.course.trainees.map(trainee => trainee._id);
