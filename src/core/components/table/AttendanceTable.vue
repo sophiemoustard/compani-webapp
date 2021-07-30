@@ -32,7 +32,7 @@
                 </q-item-section>
                 <q-item-section class="ellipsis">
                   {{ formatIdentity(col.value.identity, 'FL') }}
-                  <q-item-section v-if="col.value.external" class="unsubscribed">Pas inscrit</q-item-section>
+                  <q-item-section v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-section>
                 </q-item-section>
               </q-item>
             </div>
@@ -52,8 +52,8 @@
       label="Ajouter un participant" :disable="loading" @click="traineeAdditionModal = true" />
   </q-card>
 
-  <ni-simple-table :data="attendanceSheets" :columns="attendanceSheetColumns" :loading="attendanceSheetTableLoading"
-    :visible-columns="attendanceSheetVisibleColumns" :pagination.sync="pagination">
+  <ni-simple-table :data="formattedAttendanceSheet" :columns="attendanceSheetColumns" :pagination.sync="pagination"
+    :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -67,8 +67,8 @@
             </div>
           </template>
           <template v-else>
-            {{ col.value.title }}
-            <div v-if="col.value.external" class="unsubscribed text-primary">Pas inscrit</div>
+            {{ col.value }}
+            <div v-if="props.row.external" class="unsubscribed text-primary">Pas inscrit</div>
           </template>
         </q-td>
       </q-tr>
@@ -137,16 +137,13 @@ export default {
       attendanceSheets: [],
       newAttendanceSheet: { course: this.course._id },
       attendanceSheetColumns: [
-        { name: 'date', label: 'Date', align: 'left', field: 'date', format: value => ({ title: formatDate(value) }) },
+        { name: 'date', label: 'Date', align: 'left', field: 'date', format: value => formatDate(value) },
         {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
           align: 'left',
-          field: row => (this.traineesWithAttendance.find(trainee => trainee._id === row.trainee._id)),
-          format: value => ({
-            title: formatIdentity(get(value, 'identity'), 'FL'),
-            external: get(value, 'external'),
-          }),
+          field: row => row,
+          format: value => formatIdentity(get(value, 'identity'), 'FL'),
         },
         { name: 'actions', label: '', align: 'left', field: row => row },
       ],
@@ -180,7 +177,7 @@ export default {
       const columns = [{
         name: 'trainee',
         align: 'left',
-        field: row => ({ identity: row.identity, external: !!row.external }),
+        field: row => ({ identity: row.identity }),
         style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
       }];
       if (!this.course.slots) return columns;
@@ -212,6 +209,12 @@ export default {
     },
     traineesWithAttendance () {
       return [...this.course.trainees, ...this.unsubscribedTrainees];
+    },
+    formattedAttendanceSheet () {
+      return this.attendanceSheets.map(as => ({
+        ...this.traineesWithAttendance.find(trainee => trainee._id === as.trainee._id),
+        ...as,
+      }));
     },
     unsubscribedTrainees () {
       const traineesId = this.course.trainees.map(trainee => trainee._id);
