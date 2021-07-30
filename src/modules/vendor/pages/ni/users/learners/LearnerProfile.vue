@@ -19,7 +19,7 @@ import { learnerMixin } from '@mixins/learnerMixin';
 
 export default {
   name: 'LearnerProfile',
-  metaInfo: { title: 'Fiche apprenant' },
+  metaInfo: { title: 'Fiche apprenant(e)' },
   props: {
     learnerId: { type: String, required: true },
     defaultTab: { type: String, default: 'info' },

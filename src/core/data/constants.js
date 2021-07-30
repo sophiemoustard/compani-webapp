@@ -63,8 +63,8 @@ export const CONTRACT = 'contract';
 export const CONTRACT_VERSION = 'contract_version';
 export const OTHER = 'other';
 export const END_CONTRACT_REASONS = [
-  { label: 'Rupture période d’essai employeur', value: 'employer_trial_period_termination' },
-  { label: 'Rupture période d’essai salarié', value: 'employee_trial_period_termination' },
+  { label: 'Rupture période d’essai employeur(euse)', value: 'employer_trial_period_termination' },
+  { label: 'Rupture période d’essai salarié(e)', value: 'employee_trial_period_termination' },
   { label: 'Démission', value: 'resignation' },
   { label: 'Licenciement faute grave', value: 'serious_misconduct_layoff' },
   { label: 'Licenciement faute lourde', value: 'gross_fault_layoff' },
@@ -114,7 +114,7 @@ export const ABSENCE_TYPES = [
   { label: 'Maladie', value: ILLNESS },
   { label: 'Absence injustifiée', value: UNJUSTIFIED },
   { label: 'Arrêt de travail - garde d’enfant', value: CESSATION_OF_WORK_CHILD },
-  { label: 'Arrêt de travail - salarié à risque', value: CESSATION_OF_WORK_RISK },
+  { label: 'Arrêt de travail - salarié(e) à risque', value: CESSATION_OF_WORK_RISK },
   { label: 'Autre', value: OTHER },
 ];
 export const EDITION = 'edition';
@@ -161,8 +161,8 @@ export const CANCELLATION_OPTIONS = [
 export const CUSTOMER_INITIATIVE = 'customer_initiative';
 export const AUXILIARY_INITIATIVE = 'auxiliary_initiative';
 export const CANCELLATION_REASONS = [
-  { label: 'Initiative du client', value: CUSTOMER_INITIATIVE },
-  { label: 'Initiative de l\'intervenant', value: AUXILIARY_INITIATIVE },
+  { label: 'Initiative du/de la client(e)', value: CUSTOMER_INITIATIVE },
+  { label: 'Initiative de l\'intervenant(e)', value: AUXILIARY_INITIATIVE },
 ];
 
 // INTERFACE

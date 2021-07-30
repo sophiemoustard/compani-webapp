@@ -24,7 +24,7 @@
         :error-message="careHoursErrorMessage" type="number" @blur="validations.careHours.$touch"
         :error="validations.careHours.$error" required-field suffix="h" @input="update($event, 'careHours')" />
       <ni-input in-modal v-if="!isFixedFunding" :value="editedFunding.customerParticipationRate" type="number"
-        caption="Taux de participation du bénéficiaire" :error-message="customerParticipationRateErrorMessage"
+        caption="Taux de participation du/de la bénéficiaire" :error-message="customerParticipationRateErrorMessage"
         @blur="validations.customerParticipationRate.$touch" @input="update($event, 'customerParticipationRate')"
         :error="validations.customerParticipationRate.$error" required-field suffix="%" />
       <ni-option-group :value="editedFunding.careDays" :options="daysOptions" caption="Jours pris en charge"

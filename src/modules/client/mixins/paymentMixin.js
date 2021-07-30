@@ -85,7 +85,7 @@ export const paymentMixin = {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le créer ?',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le créer ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.createPayment())

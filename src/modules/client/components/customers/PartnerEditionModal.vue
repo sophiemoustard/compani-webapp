@@ -16,7 +16,7 @@
     <ni-select in-modal :value="editedPartner.job" @input="update($event, 'job')" caption="Fonction"
       :options="jobOptions" />
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Editer le partenaire" icon-right="add" color="primary"
+      <q-btn no-caps class="full-width modal-btn" label="Editer le/la partenaire" icon-right="add" color="primary"
         @click="submit" :loading="loading" />
     </template>
   </ni-modal>

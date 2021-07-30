@@ -7,7 +7,7 @@
       :error="validations.date.$error" @input="update($event, 'date')" :options="dateOptions" caption="Date"
       required-field />
     <ni-select v-else :value="newAttendanceSheet.trainee" @blur="validations.trainee.$touch" :options="traineeOptions"
-      :error="validations.trainee.$error" @input="update($event, 'trainee')" in-modal caption="Apprenant"
+      :error="validations.trainee.$error" @input="update($event, 'trainee')" in-modal caption="Apprenant(e)"
       required-field />
     <ni-input in-modal caption="Feuille d'émargement" type="file" @blur="validations.file.$touch" last required-field
       :value="newAttendanceSheet.file" @input="update($event, 'file')" :error="validations.file.$error" />

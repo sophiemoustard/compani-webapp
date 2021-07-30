@@ -42,14 +42,14 @@
         </q-tr>
       </template>
       <template #no-data>
-        <div class="text-center text-italic">Aucun apprenant n'a été ajouté à cette formation</div>
+        <div class="text-center text-italic">Aucun(e) apprenant(e) n'a été ajouté(e) à cette formation</div>
       </template>
     </q-table>
     <div v-if="!courseHasSlot" class="text-center text-italic q-pa-lg no-data">
       Aucun créneau n'a été ajouté à cette formation
     </div>
     <ni-button v-if="courseHasSlot && canUpdate" color="primary" icon="add" class="q-mb-sm"
-      label="Ajouter un participant" :disable="loading" @click="traineeAdditionModal = true" />
+      label="Ajouter un(e) participant(e)" :disable="loading" @click="traineeAdditionModal = true" />
   </q-card>
 
   <ni-simple-table :data="attendanceSheets" :columns="attendanceSheetColumns" :loading="attendanceSheetTableLoading"
@@ -140,7 +140,7 @@ export default {
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         {
           name: 'trainee',
-          label: 'Nom de l\'apprenant',
+          label: 'Nom de l\'apprenant(e)',
           align: 'left',
           field: row => (this.traineesWithAttendance.find(trainee => trainee._id === row.trainee._id)),
           format: value => ({
@@ -395,17 +395,17 @@ export default {
     },
     async addTrainee () {
       try {
-        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un participant.');
+        if (!this.canUpdate) return NotifyNegative('Impossible d\'ajouter un(e) participant(e).');
 
         this.$v.newTraineeAttendance.$touch();
         if (this.$v.newTraineeAttendance.$error) return NotifyWarning('Champs invalides');
         this.modalLoading = true;
         this.newTraineeAttendance.attendances.map(s => this.updateCheckbox(this.newTraineeAttendance.trainee, s));
         this.traineeAdditionModal = false;
-        NotifyPositive('Participant ajouté.');
+        NotifyPositive('Participant(e) ajouté(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de l\'ajout du participant.');
+        NotifyNegative('Erreur lors de l\'ajout du/de la participant(e).');
       } finally {
         this.modalLoading = false;
       }

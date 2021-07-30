@@ -1,18 +1,19 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-      Ajouter un nouveau <span class="text-weight-bold">participant</span>
+      Ajouter une <span class="text-weight-bold">personne</span>
     </template>
     <ni-select :options="traineeFilterOptions" :value="newTraineeAttendance.trainee"
-      @input="update($event, 'trainee')" caption="Participant" in-modal
+      @input="update($event, 'trainee')" caption="Participant(e)" in-modal
       :error="validation.trainee.$error" :error-message="REQUIRED_LABEL" required-field />
     <div class="row q-pb-md">
       <ni-option-group :value="newTraineeAttendance.attendances" @input="update($event, 'attendances')"
       :options="slotsOptions" :error="validation.attendances.$error" :error-message="REQUIRED_LABEL" required-field
-        type="checkbox" :inline="true" caption="Selectionner les créneaux auxquelles a été présent ce participant" />
+        type="checkbox" caption="Selectionner les créneaux auxquelles a été présent(e) le/la participant(e)"
+         :inline="true" />
     </div>
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Ajouter le participant" color="primary"
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
     </template>
   </ni-modal>

@@ -16,7 +16,7 @@
         <template v-else>{{ col.value }}</template>
       </template>
     </ni-table-list>
-    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter un bénéficiaire"
+    <q-btn class="fixed fab-custom" no-caps rounded color="primary" icon="add" label="Ajouter une personne"
       @click="customerCreationModal = true" :disable="tableLoading" />
 
     <customer-creation-modal v-model="customerCreationModal" :new-customer.sync="newCustomer" :loading="loading"

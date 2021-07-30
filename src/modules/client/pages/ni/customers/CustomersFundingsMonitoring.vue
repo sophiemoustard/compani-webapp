@@ -198,7 +198,7 @@ export default {
         'Bénéficiaire',
         'Référent',
         'Equipe',
-        'Taux participation du bénéficiaire',
+        'Taux participation du/de la bénéficiaire',
         'Prix unitaire',
         'Nb d\'heures',
         'Mois précédent',

@@ -15,21 +15,21 @@ export const learnerMixin = {
     getRoleLabel (role) {
       switch (role) {
         case HELPER:
-          return 'Aidant';
+          return 'Aidant(e)';
         case AUXILIARY:
         case PLANNING_REFERENT:
         case AUXILIARY_WITHOUT_COMPANY:
           return 'Auxiliaire';
         case CLIENT_ADMIN:
-          return 'Administrateur';
+          return 'Administrateur/administratrice';
         case VENDOR_ADMIN:
-          return 'Administrateur Vendeur';
+          return 'Administrateur/administratrice Vendeur';
         case COACH:
           return 'Coach';
         case TRAINING_ORGANISATION_MANAGER:
           return 'Responsable Formation';
         case TRAINER:
-          return 'Formateur';
+          return 'Formateur/formatrice';
         default:
           return '';
       }

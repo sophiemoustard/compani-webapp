@@ -24,7 +24,7 @@
           </template>
         </ni-responsive-table>
         <q-card-actions align="right">
-          <ni-button color="primary" icon="add" label="Ajouter un utilisateur" @click="coachCreationModal = true"
+          <ni-button color="primary" icon="add" label="Ajouter une personne" @click="coachCreationModal = true"
             :disable="usersLoading" />
         </q-card-actions>
       </q-card>
@@ -165,9 +165,11 @@ export default {
         const sameOrNoCompany = !user.company || user.company === this.company._id;
         const noDataOnUser = !Object.keys(user).length;
         if (userInfo.exists && (!sameOrNoCompany || noDataOnUser)) {
-          return NotifyNegative('Cet utilisateur n\'est pas relié à cette structure');
+          return NotifyNegative('L\'utilisateur/utilisatrice n\'est pas relié(e) à cette structure.');
         }
-        if (userInfo.exists && get(userInfo, 'user.role.client')) return NotifyNegative('Utilisateur déjà existant');
+        if (userInfo.exists && get(userInfo, 'user.role.client')) {
+          return NotifyNegative('Utilisateur/utilisatrice déjà existant(e).');
+        }
         if (userInfo.exists) {
           const payload = { role: this.newCoach.role };
           if (!user.company) payload.company = this.company._id;
@@ -180,7 +182,7 @@ export default {
         } else this.firstStep = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création du coach');
+        NotifyNegative('Erreur lors de la création du/de la coach');
       } finally {
         this.loading = false;
       }
@@ -193,10 +195,10 @@ export default {
 
         await Users.create(this.formatUserPayload(this.newCoach));
 
-        NotifyPositive('Utilisateur enregistré.');
+        NotifyPositive('Utilisateur/utilisatrice enregistré(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de l\'utilisateur.');
+        NotifyNegative('Erreur lors de la création de l\'utilisateur/utilisatrice.');
       } finally {
         this.loading = false;
       }
@@ -268,10 +270,10 @@ export default {
         await Users.updateById(this.selectedCoach._id, this.formatUpdatedUserPayload(this.selectedCoach));
         this.coachEditionModal = false;
         this.getUsers();
-        NotifyPositive('Utilisateur modifié.');
+        NotifyPositive('Utilisateur/utilisatrice modifié(e).');
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la modification de l\'utilisateur.');
+        NotifyNegative('Erreur lors de la modification de l\'utilisateur/utilisatrice.');
       } finally {
         this.loading = false;
       }
@@ -282,7 +284,7 @@ export default {
         this.users = await Users.list({ role: [CLIENT_ADMIN, COACH], company: this.company._id });
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la récupération des utilisateurs');
+        NotifyNegative('Erreur lors de la récupération des utilisateurs.');
         this.users = [];
       } finally {
         this.usersLoading = false;

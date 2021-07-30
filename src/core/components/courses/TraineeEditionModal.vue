@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @input="input" @hide="hide">
     <template slot="title">
-        Éditer un <span class="text-weight-bold">stagiaire</span>
+        Éditer une <span class="text-weight-bold">fiche</span>
       </template>
       <ni-input in-modal :value="editedTrainee.local.email" caption="Email" disable />
       <ni-input in-modal :value="editedTrainee.identity.firstname" @input="update($event, 'identity.firstname')"
@@ -13,7 +13,7 @@
         caption="Téléphone" @blur="validations.contact.phone.$touch" required-field
         :error-message="phoneNbrError(validations)" :error="validations.contact.phone.$error" />
       <template slot="footer">
-        <q-btn no-caps class="full-width modal-btn" label="Éditer un stagiaire" icon-right="add" color="primary"
+        <q-btn no-caps class="full-width modal-btn" label="Éditer la fiche" icon-right="add" color="primary"
           :loading="loading" @click="submit" />
       </template>
     </ni-modal>

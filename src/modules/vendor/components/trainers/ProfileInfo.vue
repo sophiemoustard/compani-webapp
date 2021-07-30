@@ -21,7 +21,7 @@
         :error="$v.userProfile.contact.phone.$error" />
     </div>
     <div class="row gutter-profile q-mb-xl">
-      <ni-input caption="Biographie du formateur" v-model="userProfile.biography" type="textarea"
+      <ni-input caption="Biographie du formateur/de la formatrice" v-model="userProfile.biography" type="textarea"
         @blur="updateUser('biography')" @focus="saveTmp('biography')" />
     </div>
   </div>

@@ -132,7 +132,8 @@ export default {
         this.message = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et `
         + 'documents importants pour compléter votre dossier.\nCliquez ici pour compléter votre profil: '
         + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/auxiliaries/info`
-        + '\nSi vous rencontrez des difficultés, n’hésitez pas à vous adresser à votre coach ou votre marraine.';
+        + '\nSi vous rencontrez des difficultés, n’hésitez pas à vous adresser à votre coach ou votre '
+        + 'marraine/parrain.';
       } else if (this.messageType === 'LA') {
         if (!this.userProfile.passwordToken || moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
           this.userProfile.passwordToken = await Authentication.createPasswordToken(

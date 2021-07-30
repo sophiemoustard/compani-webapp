@@ -180,7 +180,7 @@ export default {
       const selectedDay = this.days[dayIndex];
 
       if (isAfter(selectedDay, person.stoppedAt)) {
-        return NotifyWarning('Le bénéficiare est arrêté à cette date.');
+        return NotifyWarning('Le/la bénéficiare est arrêté(e) à cette date.');
       }
 
       this.newEvent = {

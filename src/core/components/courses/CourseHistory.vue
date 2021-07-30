@@ -136,16 +136,16 @@ export default {
     },
     getTraineeAdditionTitle () {
       return {
-        pre: 'Nouveau',
-        type: 'participant',
+        pre: 'Ajout d\'un(e)',
+        type: 'participant(e)',
         post: 'à la formation :',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };
     },
     getTraineeDeletionTitle () {
       return {
-        pre: 'Retrait d\'un',
-        type: 'participant',
+        pre: 'Retrait d\'un(e)',
+        type: 'participant(e)',
         post: 'de la formation :',
         infos: `\r\n${formatIdentity(this.courseHistory.trainee.identity, 'FL')}`,
       };

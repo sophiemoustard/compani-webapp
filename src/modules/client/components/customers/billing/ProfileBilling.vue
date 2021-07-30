@@ -379,7 +379,7 @@ export default {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sur de vouloir le modifier ?',
+        message: 'Attention, ce règlement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le modifier ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.updatePayment())
@@ -429,7 +429,7 @@ export default {
       this.$v.taxCertificate.$reset();
     },
     async createTaxCertificate () {
-      if (!this.customerFolder) return NotifyNegative('Dossier du bénéficiaire manquant.');
+      if (!this.customerFolder) return NotifyNegative('Dossier du/de la bénéficiaire manquant.');
       this.$v.taxCertificate.$touch();
       if (this.$v.taxCertificate.$error) return NotifyWarning('Champ(s) invalide(s)');
       this.modalLoading = true;
@@ -467,7 +467,7 @@ export default {
     validateTaxCertificateDeletion (taxCertificateId, row) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Êtes-vous sûr de vouloir supprimer cette attestation ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette attestation ?',
         ok: 'OK',
         cancel: 'Annuler',
       }).onOk(() => this.deleteTaxCertificate(taxCertificateId, row))
@@ -486,8 +486,8 @@ export default {
     },
     validateRefundDeletion (refund) {
       const message = this.hasTaxCertificateOnSameYear(refund, this.taxCertificates)
-        ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sur de vouloir le supprimer ?'
-        : 'Êtes-vous sûr de vouloir supprimer ce remboursement ?';
+        ? 'Attention, ce remboursement est lié à une attestation fiscale, êtes-vous sûr(e) de vouloir le supprimer ?'
+        : 'Êtes-vous sûr(e) de vouloir supprimer ce remboursement ?';
 
       this.$q.dialog({
         title: 'Confirmation',

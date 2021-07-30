@@ -494,7 +494,7 @@ export const planningActionMixin = {
         const { toDay, target, draggedObject } = vEvent;
 
         if (this.personKey === CUSTOMER && target._id !== draggedObject.customer._id) {
-          return NotifyNegative('Impossible de modifier le bénéficiaire de l\'intervention.');
+          return NotifyNegative('Impossible de modifier le/la bénéficiaire de l\'intervention.');
         }
         if (target.type === SECTOR && draggedObject.type !== INTERVENTION) {
           return NotifyNegative('Cette modification n\'est pas autorisée.');
