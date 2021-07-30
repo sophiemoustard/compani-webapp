@@ -130,9 +130,9 @@ export default {
     async updateMessage () {
       if (this.messageType === 'PM') {
         this.message = `Bonjour ${this.userProfile.identity.firstname},\nIl manque encore des informations et `
-        + 'documents importants pour compléter ton dossier.\nClique ici pour compléter ton profil: '
+        + 'documents importants pour compléter votre dossier.\nCliquez ici pour compléter votre profil: '
         + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}/auxiliaries/info`
-        + '\nSi tu rencontres des difficultés, n’hésite pas à t’adresser à ton/ta coach ou ta marraine.';
+        + '\nSi vous rencontrez des difficultés, n’hésitez pas à vous adresser à votre coach ou votre marraine.';
       } else if (this.messageType === 'LA') {
         if (!this.userProfile.passwordToken || moment().isAfter(this.userProfile.passwordToken.expiresIn)) {
           this.userProfile.passwordToken = await Authentication.createPasswordToken(
@@ -141,10 +141,11 @@ export default {
           );
         }
         this.message = `${this.companyName}. Bienvenue ! :)\nPour pouvoir `
-          + 'commencer ton enregistrement sur Compani avant ton intégration, crée ton mot de passe en suivant ce lien: '
+          + 'commencer votre enregistrement sur Compani avant votre intégration, '
+          + 'créez votre mot de passe en suivant ce lien: '
           + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}`
           + `/reset-password/${this.userProfile.passwordToken.token} :-)\n`
-          + 'Par la suite pour te connecter suis ce lien: '
+          + 'Par la suite pour vous connecter suivez ce lien: '
           + `${location.protocol}//${location.hostname}${(location.port ? `:${location.port}` : '')}.`;
       } else this.message = '';
     },

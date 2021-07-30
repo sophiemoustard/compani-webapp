@@ -585,7 +585,7 @@ export default {
       const deletedCreditNote = this.creditNotes.find(cd => cd._id === id);
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Etes-vous sûr de vouloir supprimer cet avoir '
+        message: 'Êtes-vous sûr de vouloir supprimer cet avoir '
           + `${deletedCreditNote.linkedCreditNote ? 'et l\'avoir relié aux mêmes évènements' : ''} ?`,
         ok: 'OK',
         cancel: 'Annuler',

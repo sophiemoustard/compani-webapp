@@ -103,14 +103,13 @@ export default {
     },
     validateUnlockEdition () {
       const isPublishedMessage = this.isQuestionnairePublished
-        ? 'Ce questionnaire est publié, tu ne pourras pas ajouter, supprimer ou changer l\'ordre des cartes'
+        ? 'Ce questionnaire est publié, vous ne pourrez pas ajouter, supprimer ou changer l\'ordre des cartes.'
           + '<br /><br />'
         : '';
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: `${isPublishedMessage}
-          Es-tu sûr(e) de vouloir déverrouiller ce questionnaire ?`,
+        message: `${isPublishedMessage} Êtes-vous sûr(e) de vouloir déverrouiller ce questionnaire ?`,
         html: true,
         ok: true,
         cancel: 'Annuler',
@@ -179,7 +178,7 @@ export default {
 
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir publier ce questionnaire ?',
+        message: 'Êtes-vous sûr(e) de vouloir publier ce questionnaire ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.publishQuestionnaire())

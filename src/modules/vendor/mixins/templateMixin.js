@@ -131,7 +131,7 @@ export const templateMixin = {
     validateAnswerDeletion (index) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer cette réponse ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer cette réponse ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteAnswer(index))
@@ -179,7 +179,7 @@ export const templateMixin = {
     validateMediaDeletion (path) {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ce média ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer ce média ?',
         ok: true,
         cancel: 'Annuler',
       }).onOk(() => this.deleteMedia(path))

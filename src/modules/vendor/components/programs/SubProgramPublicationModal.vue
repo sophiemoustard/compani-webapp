@@ -7,7 +7,7 @@
     <template v-if="access === RESTRICTED_ACCESS">
       <span class="text-italic">
         Seuls les apprenants de la structure choisie auront accès à la formation.
-        Tu pourras modifier et rajouter des règles d’accès par la suite.
+        Vous pourrez modifier et rajouter des règles d’accès par la suite.
       </span>
       <ni-select class="select" in-modal v-model="accessCompany" required-field caption="Structure"
         :options="companyOptions" :error="$v.accessCompany.$error" />

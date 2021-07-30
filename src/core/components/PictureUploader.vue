@@ -2,7 +2,7 @@
   <div class="row" style="background: white">
     <div class="row justify-center col-xs-12" style="padding: 12px 0px;">
       <croppa v-model="croppa" :canvas-color="canvasColor" accept="image/*" :initial-image="pictureLink"
-        :prevent-white-space="true" placeholder="Clique ici pour choisir ta photo" placeholder-color="black"
+        :prevent-white-space="true" placeholder="Cliquez ici pour choisir votre photo" placeholder-color="black"
         :placeholder-font-size="10" :show-remove-button="false" :disable-drag-and-drop="disablePictureEdition"
         :disable-drag-to-move="disablePictureEdition" :disable-scroll-to-zoom="disablePictureEdition"
         :disable-pinch-to-zoom="disablePictureEdition" @file-choose="choosePicture" />
@@ -109,7 +109,7 @@ export default {
     validateImageDeletion () {
       this.$q.dialog({
         title: 'Confirmation',
-        message: 'Es-tu sûr(e) de vouloir supprimer ta photo ?',
+        message: 'Êtes-vous sûr(e) de vouloir supprimer votre photo ?',
         ok: true,
         cancel: 'Annuler',
       })
