@@ -68,7 +68,7 @@
           </template>
           <template v-else>
             {{ col.value }}
-            <div v-if="props.row.trainee.external" class="unsubscribed text-primary">Pas inscrit</div>
+            <div v-if="get(props.row, 'trainee.external')" class="unsubscribed text-primary">Pas inscrit</div>
           </template>
         </q-td>
       </q-tr>
@@ -252,6 +252,7 @@ export default {
     },
   },
   methods: {
+    get,
     checkboxValue (traineeId, slotId) {
       if (this.attendances.length) {
         return !!this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
