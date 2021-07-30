@@ -144,9 +144,9 @@ export const helperMixin = {
         const { user } = userInfo;
 
         const sameOrNoCompany = (!user.company && user._id) || user.company === this.company._id;
-        if (userInfo.exists && (get(user, 'role.client') || !sameOrNoCompany)) {
-          NotifyNegative('Utilisateur déjà existant');
-        } else if (userInfo.exists) {
+        if (!userInfo.exists) this.firstStep = false;
+        else if (get(user, 'role.client') || !sameOrNoCompany) NotifyNegative('Utilisateur déjà existant');
+        else {
           const roles = await Roles.list({ name: HELPER });
           if (roles.length === 0) throw new Error('Role not found');
 
@@ -158,8 +158,6 @@ export const helperMixin = {
 
           this.getUserHelpers();
           this.openNewHelperModal = false;
-        } else {
-          this.firstStep = false;
         }
       } catch (e) {
         console.error(e);
