@@ -68,7 +68,7 @@
           </template>
           <template v-else>
             {{ col.value }}
-            <div v-if="props.row.external" class="unsubscribed text-primary">Pas inscrit</div>
+            <div v-if="props.row.trainee.external" class="unsubscribed text-primary">Pas inscrit</div>
           </template>
         </q-td>
       </q-tr>
@@ -142,7 +142,8 @@ export default {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
           align: 'left',
-          format: value => formatIdentity(get(value, 'identity'), 'FL'),
+          field: row => row,
+          format: value => formatIdentity(get(value, 'trainee.identity'), 'FL'),
         },
         { name: 'actions', label: '', align: 'left' },
       ],
@@ -212,8 +213,8 @@ export default {
     formattedAttendanceSheets () {
       if (this.course.type === INTER_B2B) {
         return this.attendanceSheets.map(as => ({
-          ...this.traineesWithAttendance.find(trainee => trainee._id === as.trainee._id),
           ...as,
+          trainee: this.traineesWithAttendance.find(trainee => trainee._id === as.trainee._id),
         }));
       }
 
