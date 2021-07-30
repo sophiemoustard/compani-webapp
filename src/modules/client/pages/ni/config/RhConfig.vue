@@ -360,8 +360,8 @@ export default {
     },
     async createNewSector () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.newSector.name);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.newSector.$touch();
+        if (this.$v.newSector.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Sectors.create(this.newSector);
@@ -388,8 +388,8 @@ export default {
     },
     async updateSector () {
       try {
-        const isValid = await this.waitForFormValidation(this.$v.editedSector.name);
-        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+        this.$v.editedSector.$touch();
+        if (this.$v.editedSector.$error) return NotifyWarning('Champ(s) invalide(s)');
 
         this.loading = true;
         await Sectors.updateById(this.editedSector._id, { name: this.editedSector.name });

@@ -31,7 +31,7 @@ import Events from '@api/Events';
 import Modal from '@components/modal/Modal';
 import Select from '@components/form/Select';
 import OptionGroup from '@components/form/OptionGroup';
-import { NotifyNegative, NotifyPositive } from '@components/popup/notify';
+import { NotifyNegative, NotifyPositive, NotifyWarning } from '@components/popup/notify';
 import { planningModalMixin } from 'src/modules/client/mixins/planningModalMixin';
 import { validationMixin } from '@mixins/validationMixin';
 
@@ -87,9 +87,12 @@ export default {
     async deleteEvents () {
       try {
         this.loading = true;
+        this.$v.deletedEvents.$touch();
         const isValid = await this.waitForFormValidation(this.$v.deletedEvents);
-        if (!isValid) return NotifyNegative('Champ(s) invalide(s)');
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
+
         await Events.deleteList(omit(this.deletedEvents, 'inRange'));
+
         this.hide();
         NotifyPositive('Les évènements ont bien étés supprimés');
       } catch (e) {

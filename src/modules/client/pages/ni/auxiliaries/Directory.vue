@@ -223,6 +223,7 @@ export default {
       this.newUser = cloneDeep(this.defaultNewUser);
       this.firstStep = true;
       this.fetchedUser = {};
+      this.sendWelcomeMsg = true;
     },
     async formatUserPayload () {
       const roles = await Roles.list({ name: AUXILIARY });

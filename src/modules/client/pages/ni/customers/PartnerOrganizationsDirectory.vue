@@ -26,6 +26,7 @@ import { NotifyPositive, NotifyWarning, NotifyNegative } from '@components/popup
 import { frPhoneNumber, frAddress } from '@helpers/vuelidateCustomVal';
 import { sortStrings, removeDiacritics } from '@helpers/utils';
 import { ascendingSort } from '@helpers/date';
+import { validationMixin } from '@mixins/validationMixin';
 import PartnerOrganizationCreationModal from 'src/modules/client/components/customers/PartnerOrganizationCreationModal';
 
 export default {
@@ -36,6 +37,7 @@ export default {
     'partner-organization-creation-modal': PartnerOrganizationCreationModal,
     'ni-table-list': TableList,
   },
+  mixins: [validationMixin],
   data () {
     return {
       searchStr: '',
@@ -113,7 +115,8 @@ export default {
         this.modalLoading = true;
 
         this.$v.newPartnerOrganization.$touch();
-        if (this.$v.newPartnerOrganization.$error) return NotifyWarning('Champ(s) invalide(s).');
+        const isValid = await this.waitForFormValidation(this.$v.newPartnerOrganization);
+        if (!isValid) return NotifyWarning('Champ(s) invalide(s).');
 
         const payload = this.formatPayload(this.newPartnerOrganization);
         await PartnerOrganization.create(payload);
