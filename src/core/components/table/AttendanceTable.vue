@@ -31,8 +31,8 @@
                   <img class="avatar" :src="props.row.picture ? props.row.picture.link : DEFAULT_AVATAR">
                 </q-item-section>
                 <q-item-section class="ellipsis">
-                  {{ formatIdentity(col.value.identity, 'FL') }}
-                  <q-item-section v-if="col.value.external" class="unsubscribed">Pas inscrit</q-item-section>
+                  {{ col.value }}
+                  <q-item-section v-if="props.row.external" class="unsubscribed">Pas inscrit</q-item-section>
                 </q-item-section>
               </q-item>
             </div>
@@ -52,8 +52,8 @@
       label="Ajouter un participant" :disable="loading" @click="traineeAdditionModal = true" />
   </q-card>
 
-  <ni-simple-table :data="attendanceSheets" :columns="attendanceSheetColumns" :loading="attendanceSheetTableLoading"
-    :visible-columns="attendanceSheetVisibleColumns" :pagination.sync="pagination">
+  <ni-simple-table :data="formattedAttendanceSheets" :columns="attendanceSheetColumns" :pagination.sync="pagination"
+    :visible-columns="attendanceSheetVisibleColumns" :loading="attendanceSheetTableLoading">
     <template #body="{ props }">
       <q-tr :props="props">
         <q-td :props="props" v-for="col in props.cols" :key="col.name" :data-label="col.label" :class="col.name"
@@ -67,8 +67,8 @@
             </div>
           </template>
           <template v-else>
-            {{ col.value.identity }}
-            <div v-if="col.value.external" class="unsubscribed text-primary">Pas inscrit</div>
+            {{ col.value }}
+            <div v-if="get(props.row, 'trainee.external')" class="unsubscribed text-primary">Pas inscrit</div>
           </template>
         </q-td>
       </q-tr>
@@ -142,13 +142,9 @@ export default {
           name: 'trainee',
           label: 'Nom de l\'apprenant',
           align: 'left',
-          field: row => (this.traineesWithAttendance.find(trainee => trainee._id === row.trainee._id)),
-          format: value => ({
-            identity: formatIdentity(get(value, 'identity'), 'FL'),
-            external: get(value, 'external'),
-          }),
+          field: row => formatIdentity(get(row, 'trainee.identity'), 'FL'),
         },
-        { name: 'actions', label: '', align: 'left', field: row => row },
+        { name: 'actions', label: '', align: 'left' },
       ],
       pagination: { page: 1, rowsPerPage: 15 },
       potentialTrainees: [],
@@ -180,7 +176,7 @@ export default {
       const columns = [{
         name: 'trainee',
         align: 'left',
-        field: row => ({ identity: row.identity, external: !!row.external }),
+        field: row => formatIdentity(row.identity, 'FL'),
         style: !this.$q.platform.is.mobile ? 'max-width: 250px' : 'max-width: 150px',
       }];
       if (!this.course.slots) return columns;
@@ -212,6 +208,16 @@ export default {
     },
     traineesWithAttendance () {
       return [...this.course.trainees, ...this.unsubscribedTrainees];
+    },
+    formattedAttendanceSheets () {
+      if (this.course.type === INTER_B2B) {
+        return this.attendanceSheets.map(as => ({
+          ...as,
+          trainee: this.traineesWithAttendance.find(trainee => trainee._id === as.trainee._id),
+        }));
+      }
+
+      return this.attendanceSheets;
     },
     unsubscribedTrainees () {
       const traineesId = this.course.trainees.map(trainee => trainee._id);
@@ -245,6 +251,7 @@ export default {
     },
   },
   methods: {
+    get,
     checkboxValue (traineeId, slotId) {
       if (this.attendances.length) {
         return !!this.attendances.find(a => get(a, 'trainee._id') === traineeId && a.courseSlot === slotId);
