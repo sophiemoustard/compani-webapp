@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-      Créer une nouvelle <span class="text-weight-bold">fiche partenaire</span>
+      Ajouter une <span class="text-weight-bold">personne</span>
     </template>
     <ni-input in-modal :value="newPartner.identity.firstname" @input="update($event.trim(), 'identity.firstname')"
       caption="Prénom" />
@@ -16,7 +16,7 @@
     <ni-select in-modal :value="newPartner.job" @input="update($event, 'job')" caption="Fonction"
       :options="jobOptions" />
     <template slot="footer">
-      <q-btn no-caps class="full-width modal-btn" label="Créer la fiche" icon-right="add" color="primary"
+      <q-btn no-caps class="full-width modal-btn" label="Ajouter la personne" icon-right="add" color="primary"
         @click="submit" :loading="loading" />
     </template>
   </ni-modal>

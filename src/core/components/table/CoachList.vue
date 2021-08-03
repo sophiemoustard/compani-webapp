@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="q-mb-xl">
-      <p class="text-weight-bold">Comptes</p>
+      <p class="text-weight-bold">Coachs</p>
       <q-card>
         <ni-responsive-table :data="users" :columns="usersColumns" :pagination.sync="usersPagination"
           :loading="usersLoading">
@@ -176,13 +176,13 @@ export default {
 
           await Users.updateById(userInfo.user._id, payload);
 
-          NotifyPositive('Coach créé');
+          NotifyPositive('Compte créé.');
           await this.getUsers();
           this.coachCreationModal = false;
         } else this.firstStep = false;
       } catch (e) {
         console.error(e);
-        NotifyNegative('Erreur lors de la création de la fiche coach.');
+        NotifyNegative('Erreur lors de la création du compte.');
       } finally {
         this.loading = false;
       }

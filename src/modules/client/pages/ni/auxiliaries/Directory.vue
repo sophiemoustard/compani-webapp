@@ -306,7 +306,7 @@ export default {
         this.firstStep = false;
         this.$v.newUser.$reset();
       } catch (e) {
-        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+        NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;
       }
@@ -320,7 +320,7 @@ export default {
         if (!isValid) return NotifyWarning('Champ(s) invalide(s)');
 
         const folderId = get(this.company, 'auxiliariesFolderId');
-        if (!folderId) return NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+        if (!folderId) return NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
 
         const payload = await this.formatUserPayload();
 
@@ -332,7 +332,7 @@ export default {
         }
         await Users.createDriveFolder(editedUser._id);
         await this.getUserList();
-        NotifyPositive('Fiche auxiliaire créée');
+        NotifyPositive('Auxiliaire créé(e)');
 
         this.auxiliaryCreationModal = false;
 
@@ -340,7 +340,7 @@ export default {
       } catch (e) {
         console.error(e);
         if (e.status === 409) return NotifyNegative('Email déjà existant.');
-        NotifyNegative('Erreur lors de la création de la fiche auxiliaire.');
+        NotifyNegative('Erreur lors de la création de l\'auxiliaire.');
       } finally {
         this.loading = false;
       }

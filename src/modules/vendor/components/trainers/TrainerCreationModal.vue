@@ -1,7 +1,7 @@
 <template>
   <ni-modal :value="value" @hide="hide" @input="input">
     <template slot="title">
-      Créer une nouvelle <span class="text-weight-bold">fiche formateur</span>
+      Ajouter une <span class="text-weight-bold">personne</span>
     </template>
     <ni-input in-modal :value="newTrainer.local.email" @input="update($event.trim(), 'local.email')" required-field
       @blur="validations.local.email.$touch" caption="Email" :error="validations.local.email.$error"
@@ -16,7 +16,7 @@
     <template slot="footer">
       <q-btn v-if="firstStep" no-caps class="full-width modal-btn" label="Suivant" color="primary"
         :loading="loading" icon-right="add" @click="goToNextStep" />
-      <q-btn v-else no-caps class="full-width modal-btn" label="Créer la fiche" color="primary"
+      <q-btn v-else no-caps class="full-width modal-btn" label="Ajouter la personne" color="primary"
         :loading="loading" icon-right="add" @click="submit" />
     </template>
   </ni-modal>

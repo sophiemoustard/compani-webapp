@@ -140,7 +140,7 @@ export default {
         { name: 'date', label: 'Date', align: 'left', field: 'date', format: formatDate },
         {
           name: 'trainee',
-          label: 'Participants',
+          label: 'Participant(e)',
           align: 'left',
           field: row => (this.traineesWithAttendance.find(trainee => trainee._id === row.trainee._id)),
           format: value => ({

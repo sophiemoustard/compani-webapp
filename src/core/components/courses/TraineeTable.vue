@@ -165,8 +165,8 @@ export default {
     },
     tableTitle () {
       return this.canEdit || this.isTrainer
-        ? `Participants (${this.traineesNumber})`
-        : `Participants de votre structure (${this.traineesNumber})`;
+        ? `Stagiaires (${this.traineesNumber})`
+        : `Stagiaires de votre structure (${this.traineesNumber})`;
     },
     traineesVisibleColumns () {
       const visibleColumns = ['firstname', 'lastname', 'email', 'phone'];
